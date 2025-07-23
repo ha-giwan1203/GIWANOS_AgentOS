@@ -1,0 +1,13 @@
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:34:07.929195"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:35:25.702156"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:36:35.266105"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:41:38.375920"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:42:49.834699"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:45:31.488318"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:47:18.375501"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:52:50.390827"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T19:56:12.669226"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T20:00:39.398168"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T20:13:18.985118"}
+{"type": "RAG_FEEDBACK", "memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "score": 3, "reason": "설명 부족", "timestamp": "2025-07-23T20:31:43.019458"}
+{"type": "COT_PROMPT", "memory": "회의 때 팀원들이 내가 너무 일방적으로 주도했다는 피드백을 받았다.", "cot_prompt": "[생각 시작]\n1. 먼저, 기억을 검토한다: \"회의 때 팀원들이 내가 너무 일방적으로 주도했다는 피드백을 받았다.\"\n2. 왜 이런 일이 발생했는지 가정한다.\n3. 그로부터 배운 점을 정리한다.\n4. 향후 대응 방안을 작성한다.\n[생각 끝]", "timestamp": "2025-07-23T20:31:43.135148"}

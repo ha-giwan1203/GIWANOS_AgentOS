@@ -1,0 +1,21 @@
+{
+  "slack": {
+    "status": "✅ 성공",
+    "channel": "#giwanos-리포트",
+    "message": "회고 PDF가 전송되었습니다."
+  },
+  "notion": {
+    "status": "✅ 성공",
+    "database": "지완 회고 기록",
+    "title": "GIWANOS 루프 회고 - 2025-07-19",
+    "link": "https://www.notion.so/giwanos/fake-record-id"
+  },
+  "pdf": {
+    "generated": true,
+    "path": "reflections/loop_reflection_log.pdf"
+  },
+  "zip": {
+    "generated": true,
+    "path": "loop_backups/GIWANOS_LOOP_BACKUP_2025_07_19.zip"
+  }
+}

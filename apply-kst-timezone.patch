@@ -1,0 +1,24 @@
+diff --git a/.github/workflows/sync_notion.yml b/.github/workflows/sync_notion.yml
+index 01a4935..dba22df 100644
+--- a/.github/workflows/sync_notion.yml
++++ b/.github/workflows/sync_notion.yml
+@@ -1,6 +1,9 @@
+ name: Sync Notion → GitHub
+ 
++# 전체 워크플로우에 KST 적용
++env:
++  TZ: Asia/Seoul
+ on:
+   workflow_dispatch:
+
+@@ -10,6 +13,8 @@ jobs:
+   sync:
+     name: Sync Notion → GitHub
+     runs-on: ubuntu-latest
++    # job 단위로도 한번 더 설정
++    env:
++      TZ: Asia/Seoul
+
+     steps:
+       - name: 체크아웃
+         uses: actions/checkout@v3

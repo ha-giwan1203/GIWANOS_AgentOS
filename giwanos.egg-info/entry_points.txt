@@ -1,0 +1,2 @@
+[console_scripts]
+giwanos = giwanos.launcher:run

@@ -1,0 +1,30 @@
+[
+  {
+    "memory": "회의 때 팀원들이 내가 너무 일방적으로 주도했다는 피드백을 받았다.",
+    "evaluation": {
+      "score": 3,
+      "reason": "설명 부족"
+    },
+    "timestamp": "2025-07-23T15:27:01"
+  },
+  {
+    "memory": "프로젝트 진행 상황을 미리 공유하지 않아 혼란이 발생했다.",
+    "evaluation": {
+      "score": 2,
+      "reason": "소통 미흡"
+    },
+    "timestamp": "2025-07-23T15:28:22"
+  }
+]
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:34:07.929195"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:35:25.702156"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:36:35.266105"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:41:38.375920"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:42:49.834699"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:45:31.488318"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:47:18.375501"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:52:50.390827"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T19:56:12.669226"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T20:00:39.398168"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T20:13:18.985118"}
+{"memory": "오늘 회의에서 내가 말을 너무 많이 했던 것 같아.", "reflection": "Memory: 오늘 회의에서 내가 말을 너무 많이 했던 것 같아.\nReflect and provide a helpful suggestion.", "evaluation": {"score": 3, "reason": "설명 부족"}, "updated_template": "Memory: {memory}\nPlease provide a more detailed reasoning before concluding.", "timestamp": "2025-07-23T20:31:43.019458"}

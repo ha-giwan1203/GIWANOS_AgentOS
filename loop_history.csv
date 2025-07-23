@@ -1,0 +1,26 @@
+timestamp,loop,success,details
+2025-07-19 07:28:56,sort_done,success,
+2025-07-19 07:28:57,reflection_log_created,success,
+2025-07-19 07:28:58,slack_posted,success,
+2025-07-19 07:28:59,notion_uploaded,fail,"Command '['python', '/mnt/data/giwanos_final_os_extracted/upload_notion_safe.py']' returned non-zero exit status 1."
+2025-07-19 07:28:59,zip_backup_done,success,
+2025-07-19 07:31:13,sort_done,fail,"Command '['python', '/mnt/data/giwanos_final_os_extracted/file_sort_for_지완OS_v2.py']' returned non-zero exit status 1."
+2025-07-19 07:31:14,reflection_log_created,success,
+2025-07-19 07:31:15,slack_posted,success,
+2025-07-19 07:31:15,notion_uploaded,success,
+2025-07-19 07:31:16,zip_backup_done,success,
+2025-07-19 07:32:46,sort_done,success,
+2025-07-19 07:32:46,reflection_log_created,success,
+2025-07-19 07:32:47,slack_posted,success,
+2025-07-19 07:32:47,notion_uploaded,success,
+2025-07-19 07:32:48,zip_backup_done,success,
+2025-07-19 07:34:24,sort_done,fail,"Command '['python', '/mnt/data/giwanos_final_os_extracted/file_sort_for_지완OS_v2.py']' returned non-zero exit status 1."
+2025-07-19 07:34:25,reflection_log_created,success,
+2025-07-19 07:34:25,slack_posted,success,
+2025-07-19 07:34:25,notion_uploaded,success,
+2025-07-19 07:34:26,zip_backup_done,success,
+2025-07-19 07:35:39,sort_done,success,
+2025-07-19 07:35:39,reflection_log_created,success,
+2025-07-19 07:35:40,slack_posted,success,
+2025-07-19 07:35:40,notion_uploaded,success,
+2025-07-19 07:35:40,zip_backup_done,success,
