@@ -1,68 +1,73 @@
 
 import os
 import shutil
+import glob
 
 BASE_DIR = "C:/giwanos"
 
-TARGET_FOLDERS = {
-    '.py': 'system',
-    '.md': 'docs',
-    '.json': 'memory',
-    '.db': 'memory',
-    '.sqlite3': 'memory',
-    '.pdf': 'reports',
-    '.zip': 'loop_backups',
-    '.log': 'logs'
+FILE_LOCATIONS = {
+    'giwanos_agent': ['controller.py', 'judge_agent.py'],
+    'interface': ['status_dashboard.py'],
+    'system': ['auto_file_mover.py', 'duplicate_file_cleaner.py', 'auto_cleanup.py'],
+    'docs': ['*.md'],
+    'memory': ['*.json', '*.db', '*.sqlite3'],
+    'reports': ['*.pdf'],
+    'loop_backups': ['*.zip'],
+    'logs': ['*.log']
 }
 
-EXCLUDE_FOLDERS = set(os.path.abspath(os.path.join(BASE_DIR, folder)) for folder in TARGET_FOLDERS.values())
-
-def move_files(base_dir, targets):
+def move_files_safely(base_dir, file_map):
     moved_files = []
-    planned_moves = []
+    errors = []
 
-    for root, dirs, files in os.walk(base_dir, topdown=True):
-        dirs[:] = [d for d in dirs if os.path.abspath(os.path.join(root, d)) not in EXCLUDE_FOLDERS]
-
-        for file in files:
-            ext = os.path.splitext(file)[1].lower()
-            if ext in targets:
-                target_folder = os.path.abspath(os.path.join(base_dir, targets[ext]))
-                current_path = os.path.abspath(os.path.join(root, file))
-                new_path = os.path.join(target_folder, file)
-
-                if current_path != new_path:
-                    planned_moves.append((current_path, new_path))
-
-    for current_path, new_path in planned_moves:
-        if not os.path.exists(current_path):
-            print(f"⚠️ 이미 이동되었거나 존재하지 않습니다: {current_path}")
-            continue
-
-        target_folder = os.path.dirname(new_path)
+    for folder, patterns in file_map.items():
+        target_folder = os.path.join(base_dir, folder)
         if not os.path.exists(target_folder):
             os.makedirs(target_folder)
 
-        if os.path.exists(new_path):
-            print(f"⚠️ 중복된 파일이 존재하여 덮어쓰기: {new_path}")
-            os.remove(new_path)
+        for pattern in patterns:
+            full_pattern = os.path.join(base_dir, '**', pattern)
+            for file_path in glob.glob(full_pattern, recursive=True):
+                current_path = os.path.abspath(file_path)
 
-        shutil.move(current_path, new_path)
-        moved_files.append((current_path, new_path))
+                # Skip if current path is already in the target folder
+                if os.path.dirname(current_path) == os.path.abspath(target_folder):
+                    continue
 
-    return moved_files
+                new_path = os.path.join(target_folder, os.path.basename(file_path))
+
+                try:
+                    if os.path.exists(new_path) and os.path.samefile(current_path, new_path):
+                        print(f"[정보] 원본과 대상 경로가 동일 파일입니다. 이동 건너뜀: {current_path}")
+                        continue
+
+                    if os.path.exists(new_path):
+                        print(f"[경고] 중복 파일 발견: {new_path}, 기존 파일 삭제 후 덮어쓰기 진행")
+                        os.remove(new_path)
+
+                    shutil.move(current_path, new_path)
+                    moved_files.append((current_path, new_path))
+                    print(f"[성공] {current_path} → {new_path}")
+                except Exception as e:
+                    errors.append((current_path, str(e)))
+                    print(f"[실패] {current_path} 이동 실패: {e}")
+
+    return moved_files, errors
 
 def main():
-    print("📂 파일 자동 이동 시작...\n")
+    print("📂 명시적 파일 자동 정리 (안정성 강화) 시작...\n")
 
-    moved_files = move_files(BASE_DIR, TARGET_FOLDERS)
+    moved_files, errors = move_files_safely(BASE_DIR, FILE_LOCATIONS)
 
     if moved_files:
         print(f"\n✅ 총 이동된 파일 개수: {len(moved_files)}개\n")
-        for old, new in moved_files:
-            print(f"➡️ {old}\n  └ 이동 완료 → {new}\n")
     else:
         print("🎉 이동할 파일이 없습니다. 모든 파일이 이미 올바른 위치에 있습니다.")
+
+    if errors:
+        print(f"\n🚫 발생한 오류: {len(errors)}개\n")
+        for path, err in errors:
+            print(f"❌ {path}: {err}\n")
 
 if __name__ == "__main__":
     main()

@@ -1,35 +1,27 @@
+# C:\giwanos\memory_reasoner.py
+
+#!/usr/bin/env python
 import sys
-try:
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-except AttributeError:
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
-
 import json
-from difflib import SequenceMatcher
 
-def reason_relations(timeline):
-    reasons = []
-    for i in range(1, len(timeline)):
-        a = timeline[i-1]
-        b = timeline[i]
-        sim = SequenceMatcher(None, a["content"], b["content"]).ratio()
-        if sim < 0.5:
-            reasons.append({
-                "from": a["content"],
-                "to": b["content"],
-                "reason": "새로운 주제로 전환됨"
-            })
-        else:
-            reasons.append({
-                "from": a["content"],
-                "to": b["content"],
-                "reason": "내용이 연결됨 (유사)"
-            })
-    return reasons
+def main():
+    # 1) 사용자 요청 인자 처리
+    input_data = sys.argv[1] if len(sys.argv) > 1 else ""
+
+    # 2) (기존 로그가 필요하면 stderr로)
+    sys.stderr.write(f"🔄 요청 분석 시작: {input_data}\n")
+
+    # 3) 실제 reasoning 로직 → loop_name, parameters 결정
+    #    여기를 실무 로직으로 대체하세요.
+    loop_name = "default_loop"
+    parameters = {}
+
+    # 4) 최종 계획을 JSON으로 stdout에 출력
+    plan = {
+        "loop_name": loop_name,
+        "parameters": parameters
+    }
+    print(json.dumps(plan))
 
 if __name__ == "__main__":
-    with open("memory_timeline.json", "r", encoding="utf-8") as f:
-        timeline = json.load(f)
-    relations = reason_relations(timeline)
-    for r in relations:
-        print(f"🔄 {r['from']} → {r['to']}  ({r['reason']})")
+    main()

@@ -1,0 +1,6 @@
+{
+    "theme": "light",
+    "refresh_interval_seconds": 60,
+    "display_charts": true,
+    "display_logs": true
+}
