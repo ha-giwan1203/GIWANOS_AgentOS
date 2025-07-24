@@ -1,52 +1,33 @@
+
 import subprocess
 import os
+from datetime import datetime
 
-# index.lock 충돌 방지용 제거 루틴
-lock_path = os.path.join('.git', 'index.lock')
-if os.path.exists(lock_path):
-    try:
-        os.remove(lock_path)
-        print('[🧹] index.lock 제거 완료')
-    except Exception as e:
-        print(f'[⚠️] index.lock 제거 실패: {e}')
+def run_command(command, cwd=None):
+    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8')
+    print(result.stdout)
+    if result.stderr:
+        print(f"에러 발생: {result.stderr}")
 
-print("🧠 JudgeAgent 플랜 실행 (plan-only)")
-subprocess.run(["python", "giwanos_agent/judge_agent.py"], check=True)
+def main():
+    base_path = "C:/giwanos"
+    
+    # Step 1: 주간 요약 생성
+    print("🚀 주간 요약 생성 시작")
+    run_command("python giwanos_agent/controller.py weekly_summary", cwd=base_path)
+    
+    # Step 2: Notion 자동 업로드
+    print("📌 Notion 자동 업로드 시작")
+    notion_path = os.path.join(base_path, "notion_integration")
+    run_command("python upload_notion_result.py", cwd=notion_path)
+    
+    # Step 3: GitHub 최신 상태 자동 동기화
+    print("☁️ GitHub 자동 동기화 시작")
+    run_command("git add .", cwd=base_path)
+    run_command(f'git commit -m "최종 통합 루프 자동 업데이트 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}"', cwd=base_path)
+    run_command("git push origin main", cwd=base_path)
+    
+    print("✅ 최종 통합 루프 모든 작업 완료!")
 
-print("🔁 회고 평가 루프 실행")
-subprocess.run(["python", "advanced_modules/rag_feedback_loop.py"], check=True)
-
-print("🔁 CoT 생성기 실행")
-subprocess.run(["python", "advanced_modules/test_cot_prompt.py"], check=True)
-
-print("🔁 재랭킹 평가기 실행")
-subprocess.run(["python", "advanced_modules/test_re_ranker.py"], check=True)
-
-print("📊 평가 통합")
-subprocess.run(["python", "aggregate_evaluation_logs.py"], check=True)
-
-print("🖨️ 회고 PDF 생성")
-subprocess.run(["python", "generate_reflection_pdf.py"], check=True)
-
-print("📄 PDF + 이메일 전송")
-subprocess.run(["python", "send_evaluation_report.py"], check=True)
-
-print("📤 회고 마크다운 Notion 전송")
-notion_script = os.path.abspath(os.path.join("giwanos", "reporting", "upload_final_runner.py"))
-subprocess.run(["python", notion_script], check=True)
-
-print("☁️ GitHub 백업 동기화")
-try:
-    subprocess.run(["python", "git_sync_with_cleanup.py"], check=True)
-    print("[✅] GitHub 백업 성공")
-except Exception as e:
-    print(f"[❌] GitHub 백업 실패 → 루프는 계속됨\n이유: {e}")
-
-print("🗓️ 주간 요약 생성")
-subprocess.run(["python", "weekly_summary_generator.py"], check=True)
-
-print("📈 Streamlit 대시보드 갱신 (옵션)")
-try:
-    subprocess.run(["python", "status_dashboard.py"], check=True)
-except Exception as e:
-    print(f"[경고] 대시보드 실행 실패: {e}")
+if __name__ == "__main__":
+    main()
