@@ -18,7 +18,7 @@ def upload_to_notion(page_content, config):
     payload = {
         "parent": {"database_id": config['database_id']},
         "properties": {
-            "Title": {
+            config["title_property_name"]: {
                 "title": [{"text": {"content": "Weekly Summary"}}]
             }
         },
