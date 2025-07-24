@@ -1,16 +1,21 @@
 
 import subprocess
 import os
+import sys
 from datetime import datetime
 
 def run_command(command, cwd=None):
-    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, encoding='cp949')
+    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8', env=dict(os.environ, PYTHONIOENCODING='utf-8'))
     print(result.stdout)
     if result.stderr:
         print(f"에러 발생: {result.stderr}")
 
 def main():
     base_path = "C:/giwanos"
+    
+    # 시스템 전체 UTF-8로 강제 설정
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    sys.stdout.reconfigure(encoding='utf-8')
     
     # Step 1: 주간 요약 생성
     print("🚀 주간 요약 생성 시작")
