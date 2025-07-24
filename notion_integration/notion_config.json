@@ -1,0 +1,5 @@
+{
+    "NOTION_TOKEN": "your-notion-token",
+    "NOTION_DATABASE_ID": "your-database-id",
+    "NOTION_PAGE_ID": "your-page-id"
+}
