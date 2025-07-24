@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 def run_command(command, cwd=None):
-    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, encoding='utf-8')
+    result = subprocess.run(command, shell=True, cwd=cwd, capture_output=True, text=True, encoding='cp949')
     print(result.stdout)
     if result.stderr:
         print(f"에러 발생: {result.stderr}")
