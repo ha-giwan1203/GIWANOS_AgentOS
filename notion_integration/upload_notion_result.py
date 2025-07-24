@@ -2,72 +2,55 @@
 import os
 import json
 import requests
-from pathlib import Path
-from dotenv import load_dotenv
 
-load_dotenv()
+def load_config():
+    with open("notion_config.json", "r", encoding="utf-8") as file:
+        return json.load(file)
 
-NOTION_TOKEN = os.getenv("NOTION_TOKEN")
-NOTION_DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
-
-HEADERS = {
-    "Authorization": f"Bearer {NOTION_TOKEN}",
-    "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"
-}
-
-def find_latest_weekly_summary():
-    md_dir = Path("reflection_md")
-    files = sorted(md_dir.glob("weekly_summary_*.md"), key=os.path.getmtime, reverse=True)
-    return files[0] if files else None
-
-def upload_weekly_summary(md_path, title="GIWANOS 주간 요약"):
-    if not NOTION_TOKEN or not NOTION_DATABASE_ID:
-        print("❌ Notion 정보 누락")
-        return
-
-    if not md_path.exists():
-        print("❌ 요약 파일이 없습니다:", md_path)
-        return
-
-    with open(md_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    created_date = datetime.now().isoformat()
-    payload = {
-        "parent": { "database_id": NOTION_DATABASE_ID },
-        "properties": {
-            "제목": { "title": [{ "text": { "content": md_path.stem }}]},
-            "날짜": { "date": { "start": created_date }},
-            "설명": { "rich_text": [{ "text": { "content": title }}]},
-            "유형": { "select": { "name": "MD" }},
-            "상태": { "status": { "name": "업로드 완료" }}
-        },
-        "children": [{
-            "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [{
-                    "type": "text",
-                    "text": { "content": content[:1900] }
-                }]
-            }
-        }]
+def upload_to_notion(page_content, config):
+    url = "https://api.notion.com/v1/pages"
+    headers = {
+        "Authorization": f"Bearer {config['token']}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
     }
 
-    res = requests.post("https://api.notion.com/v1/pages", headers=HEADERS, json=payload)
-    print("📤 Notion 응답 코드:", res.status_code)
-    if res.status_code in [200, 201]:
-        print("✅ Notion DB 업로드 성공")
-    else:
-        print("❌ 실패:", res.status_code, res.text)
+    payload = {
+        "parent": {"database_id": config['database_id']},
+        "properties": {
+            "Title": {
+                "title": [{"text": {"content": "Weekly Summary"}}]
+            }
+        },
+        "children": [
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {"rich_text": [{"text": {"content": page_content}}]}
+            }
+        ]
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    return response
 
 def main():
-    file = find_latest_weekly_summary()
-    if not file:
+    summary_file_path = "C:/giwanos/summaries/weekly_summary_2025W30.md"
+    
+    if not os.path.exists(summary_file_path):
         print("❌ 최신 요약 파일이 없습니다.")
         return
-    upload_weekly_summary(file)
+
+    with open(summary_file_path, "r", encoding="utf-8") as file:
+        page_content = file.read()
+
+    config = load_config()
+    response = upload_to_notion(page_content, config)
+
+    if response.status_code == 200:
+        print("✅ Notion 업로드 성공!")
+    else:
+        print(f"❌ Notion 업로드 실패: {response.text}")
 
 if __name__ == "__main__":
     main()
