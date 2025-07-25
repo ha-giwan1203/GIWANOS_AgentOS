@@ -1,0 +1,1 @@
+# Weekly summary automation placeholder
