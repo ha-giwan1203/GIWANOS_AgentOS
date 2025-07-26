@@ -23,6 +23,15 @@ def main():
     logger.info("[시작] GIWANOS Master 루프 실행 시작")
     agent = JudgeAgent()
     agent.run_loop()
+    # 📊 시스템 상태 진단 루프 실행
+    try:
+        from evaluation.system_insight_agent import run_system_insight_loop
+        logger.info("[중간] 시스템 상태 진단 시작")
+        run_system_insight_loop()
+        logger.info("[중간] 시스템 상태 진단 완료")
+    except Exception as e:
+        logger.warning(f"[오류] 시스템 진단 실패: {e}")
+
     logger.info("[완료] GIWANOS Master 루프 실행 완료")
 
 if __name__ == "__main__":

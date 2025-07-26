@@ -30,4 +30,13 @@ class JudgeAgent:
     def run_loop(self):
         logger.info("Starting JudgeAgent run loop.")
         self.execute()
+
+        try:
+            from evaluation.system_insight_agent import run_system_insight_loop
+            logger.info("Running system insight evaluation...")
+            run_system_insight_loop()
+            logger.info("System insight evaluation completed.")
+        except Exception as e:
+            logger.warning(f"System insight evaluation failed: {e}")
+
         logger.info("Run loop completed.")
