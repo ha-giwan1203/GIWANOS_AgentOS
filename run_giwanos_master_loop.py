@@ -1,6 +1,6 @@
 import logging
 import os
-from giwanos_agent.controller import JudgeAgent
+from core.controller import Controller
 
 log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs'))
 os.makedirs(log_dir, exist_ok=True)
@@ -21,11 +21,12 @@ logger.addHandler(console_handler)
 
 def main():
     logger.info("[시작] GIWANOS Master 루프 실행 시작")
-    agent = JudgeAgent()
-    agent.run_loop()
+    controller = Controller()
+    controller.run()
+    controller.run()
     # 📊 시스템 상태 진단 루프 실행
     try:
-        from evaluation.system_insight_agent import run_system_insight_loop
+        from evaluation.insight.system_insight_agent import run_system_insight_loop
         logger.info("[중간] 시스템 상태 진단 시작")
         run_system_insight_loop()
         logger.info("[중간] 시스템 상태 진단 완료")

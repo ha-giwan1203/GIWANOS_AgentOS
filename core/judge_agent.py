@@ -1,6 +1,6 @@
 import logging
 import os
-from giwanos_agent.reflection_agent import ReflectionAgent
+from .reflection_agent import ReflectionAgent
 
 log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'agent_logs'))
 os.makedirs(log_dir, exist_ok=True)
