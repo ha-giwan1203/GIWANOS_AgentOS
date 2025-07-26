@@ -1,34 +1,43 @@
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 from email.mime.text import MIMEText
+import logging
 import os
+from dotenv import load_dotenv
 
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.example.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USER = os.getenv("SMTP_USER", "your_email@example.com")
-SMTP_PASS = os.getenv("SMTP_PASS", "your_password")
-SMTP_TO   = os.getenv("SMTP_TO", "recipient@example.com")
+logging.basicConfig(level=logging.INFO)
 
-def send_pdf_report(pdf_path):
-    msg = MIMEMultipart()
-    msg['From'] = SMTP_USER
-    msg['To'] = SMTP_TO
-    msg['Subject'] = "[GIWANOS] 시스템 자동 점검 보고서"
+# 환경변수 로드
+load_dotenv("C:/giwanos/config/.env")
 
-    body = "첨부된 PDF 파일은 오늘 실행된 시스템 상태 점검 결과입니다.\n\n감사합니다."
-    msg.attach(MIMEText(body, 'plain'))
+SMTP_SERVER = os.getenv("EMAIL_HOST")
+SMTP_PORT = int(os.getenv("EMAIL_PORT"))
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
+EMAIL_RECEIVER = os.getenv("EMAIL_TO")
 
-    with open(pdf_path, "rb") as f:
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(f.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(pdf_path)}')
-        msg.attach(part)
+def send_test_email():
+    try:
+        logging.info(f"SMTP 서버 연결 시도 중: {SMTP_SERVER}:{SMTP_PORT}")
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
+        logging.info("SMTP 서버 연결 성공!")
 
-    server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
-    server.starttls()
-    server.login(SMTP_USER, SMTP_PASS)
-    server.send_message(msg)
-    server.quit()
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_USER
+        msg['To'] = EMAIL_RECEIVER
+        msg['Subject'] = "GIWANOS 시스템 이메일 테스트"
+        body = "이 이메일은 GIWANOS 시스템의 이메일 알림 테스트입니다."
+        msg.attach(MIMEText(body, 'plain'))
+
+        server.sendmail(EMAIL_USER, EMAIL_RECEIVER, msg.as_string())
+        logging.info("✅ 이메일이 성공적으로 전송되었습니다.")
+        server.quit()
+
+    except Exception as e:
+        logging.error(f"❌ 이메일 전송 실패: {e}")
+
+if __name__ == "__main__":
+    send_test_email()

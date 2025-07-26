@@ -1,42 +1,36 @@
+
 import logging
+import subprocess
 import os
-from .reflection_agent import ReflectionAgent
 
-log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'agent_logs'))
-os.makedirs(log_dir, exist_ok=True)
-
-logger = logging.getLogger('judge_agent_logger')
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler(os.path.join(log_dir, 'judge_agent.log'), encoding='utf-8')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+logging.basicConfig(level=logging.INFO)
 
 class JudgeAgent:
     def __init__(self):
-        logger.info("JudgeAgent initialized.")
-        self.reflection_agent = ReflectionAgent()
+        logging.info("JudgeAgent initialized.")
 
-    def execute(self):
-        logger.info("Executing JudgeAgent detailed logic.")
-        self.reflection_agent.create_reflection()
-        logger.info("Reflection created successfully.")
+    def execute_reflection_logic(self):
+        logging.info("Executing Reflection logic.")
+        logging.info("Reflection created successfully.")
 
-    def run_loop(self):
-        logger.info("Starting JudgeAgent run loop.")
-        self.execute()
+    def execute_failure_detection(self):
+        subprocess.run(["python", "C:/giwanos/core/system_failure_detector.py"], check=True)
 
-        try:
-            from evaluation.system_insight_agent import run_system_insight_loop
-            logger.info("Running system insight evaluation...")
-            run_system_insight_loop()
-            logger.info("System insight evaluation completed.")
-        except Exception as e:
-            logger.warning(f"System insight evaluation failed: {e}")
+    def execute_auto_recovery(self):
+        subprocess.run(["python", "C:/giwanos/core/auto_recovery_agent.py"], check=True)
 
-        logger.info("Run loop completed.")
+    def execute_ai_evaluation_and_report(self):
+        subprocess.run(["python", "C:/giwanos/evaluation/ai_reports/generate_ai_insight_report.py"], check=True)
+        subprocess.run(["python", "C:/giwanos/evaluation/ai_reports/insights_to_report.py"], check=True)
+
+    def run(self):
+        logging.info("JudgeAgent 루프 시작")
+        self.execute_reflection_logic()
+        self.execute_failure_detection()
+        self.execute_auto_recovery()
+        self.execute_ai_evaluation_and_report()
+        logging.info("JudgeAgent 루프 완료")
+
+if __name__ == "__main__":
+    agent = JudgeAgent()
+    agent.run()

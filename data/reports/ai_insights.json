@@ -1,0 +1,10 @@
+{
+    "generated_at": "2025-07-26T20:31:18.683070",
+    "insights": [
+        {
+            "metric": "score",
+            "insight": "score 성능이 낮으며 즉각적인 개선이 필요합니다 (50점).",
+            "score": 50
+        }
+    ]
+}

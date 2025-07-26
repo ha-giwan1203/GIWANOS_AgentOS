@@ -1,39 +1,40 @@
+
 import logging
-import os
 from core.controller import Controller
+from evaluation.human_readable_reports.generate_pdf_report import generate_and_send_report
+import os
 
-log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'logs'))
-os.makedirs(log_dir, exist_ok=True)
+# 전체 로그 최소화 및 fontTools 로그 억제
+logging.basicConfig(level=logging.ERROR, filename="C:/giwanos/data/logs/master_loop_execution.log", format='%(asctime)s %(levelname)s %(message)s')
+logging.getLogger('fontTools.subset').setLevel(logging.ERROR)
 
-logger = logging.getLogger('master_loop_logger')
-logger.setLevel(logging.INFO)
-
-# 파일 로그 핸들러 설정
-file_handler = logging.FileHandler(os.path.join(log_dir, 'master_loop_execution.log'), encoding='utf-8')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-# 콘솔 로그 핸들러 추가 설정
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+PDF_REPORT_PATH = "C:/giwanos/data/reports/weekly_report_{}.pdf"
+INSIGHT_REPORT_JSON = "C:/giwanos/data/reports/ai_insights.json"
+INSIGHT_REPORT_PDF = "C:/giwanos/data/reports/ai_insights_report.pdf"
+INSIGHT_REPORT_MD = "C:/giwanos/data/reports/ai_insights_report.md"
+REFLECTION_MD_DIR = "C:/giwanos/data/reflection_md"
 
 def main():
-    logger.info("[시작] GIWANOS Master 루프 실행 시작")
-    controller = Controller()
-    controller.run()
-    controller.run()
-    # 📊 시스템 상태 진단 루프 실행
     try:
-        from evaluation.insight.system_insight_agent import run_system_insight_loop
-        logger.info("[중간] 시스템 상태 진단 시작")
-        run_system_insight_loop()
-        logger.info("[중간] 시스템 상태 진단 완료")
-    except Exception as e:
-        logger.warning(f"[오류] 시스템 진단 실패: {e}")
+        controller = Controller()
+        controller.run()
 
-    logger.info("[완료] GIWANOS Master 루프 실행 완료")
+        generate_and_send_report()
+        
+        latest_weekly_pdf = PDF_REPORT_PATH.format(__import__('datetime').datetime.now().strftime('%Y%m%d'))
+        
+        print("[GIWANOS 시스템 실행 완료] 모든 작업이 성공적으로 처리되었습니다.")
+        print("\n생성된 주요 보고서 및 문서 위치:")
+        print(f"- 주간 보고서 (PDF): {latest_weekly_pdf}")
+        print(f"- AI 인사이트 보고서 (JSON): {INSIGHT_REPORT_JSON}")
+        print(f"- AI 인사이트 보고서 (Markdown): {INSIGHT_REPORT_MD}")
+        print(f"- AI 인사이트 보고서 (PDF): {INSIGHT_REPORT_PDF}")
+        print(f"- 회고 파일 위치 (최신): {REFLECTION_MD_DIR}")
+
+    except Exception as e:
+        print("[GIWANOS 시스템 오류] 다음 작업에서 오류가 발생했습니다:")
+        print(f"- 오류 내용: {e}")
+        logging.error(f"실행 중 오류 발생: {e}")
 
 if __name__ == "__main__":
     main()

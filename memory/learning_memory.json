@@ -1,5 +1,22 @@
-
 {
-  "recent_events": [],
-  "insights": []
+    "recent_events": [
+        {
+            "timestamp": "2025-07-26T17:50:47.754643",
+            "event": "자동 학습 루틴 실행됨"
+        }
+    ],
+    "insights": [
+        {
+            "timestamp": "2025-07-26T17:50:47.754643",
+            "insight": "학습 루틴이 정상적으로 동작하여 메모리를 업데이트했습니다."
+        }
+    ],
+    "performance_metrics": [
+        {
+            "timestamp": "2025-07-26T18:00:08.477875",
+            "accuracy": 0.9036,
+            "response_time_sec": 0.3869,
+            "system_health": "Good"
+        }
+    ]
 }
