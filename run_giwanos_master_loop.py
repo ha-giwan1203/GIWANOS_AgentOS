@@ -1,102 +1,139 @@
-# C:/giwanos/run_giwanos_master_loop.py
-
 import os
+import sys
 import logging
-import shutil
 import warnings
-import psutil
+from datetime import datetime
+from pathlib import Path
 
-# Suppress Streamlit warnings
-warnings.filterwarnings('ignore', 'Thread.*missing ScriptRunContext.*',
-                        module='streamlit.runtime.scriptrunner_utils')
-
-# Ensure log directory exists
-LOG_DIR = os.path.join("C:", os.sep, "giwanos", "data", "logs")
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "master_loop_execution.log")
-
-# Configure logging for master loop
-logging.basicConfig(
-    filename=LOG_FILE,
-    filemode='a',
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    level=logging.INFO,
-    force=True
+# suppress unwanted streamlit warnings
+warnings.filterwarnings(
+    'ignore', 'Thread.*missing ScriptRunContext.*',
+    module='streamlit.runtime.scriptrunner_utils'
 )
-logger = logging.getLogger()
 
-# Core imports
-from core.auto_optimization_cleanup import main as cleanup_main
-from notion_integration.notion_sync import main as notion_sync
-from automation.git_management.git_sync import main as git_sync
-from evaluation.giwanos_agent.judge_agent import JudgeAgent
-from evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
-from notifications.send_email import send_test_email as send_report_email
+# -------------------------------------------------------------------
+# Constants & Paths
+# -------------------------------------------------------------------
+ROOT_DIR = Path(__file__).parent
+DATA_DIR = ROOT_DIR / 'data'
+SNAPSHOT_DIR = DATA_DIR / 'snapshots'
+REPORT_DIR = DATA_DIR / 'reports'
+LOG_DIR = DATA_DIR / 'logs'
+
+# -------------------------------------------------------------------
+# Directory Creation
+# -------------------------------------------------------------------
+for directory in (SNAPSHOT_DIR, REPORT_DIR, LOG_DIR):
+    directory.mkdir(parents=True, exist_ok=True)
+
+# -------------------------------------------------------------------
+# Logger Setup
+# -------------------------------------------------------------------
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler(LOG_DIR / 'master_loop_execution.log')
+handler.setFormatter(
+    logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+)
+logger.addHandler(handler)
+
+# -------------------------------------------------------------------
+# Imports of Project Modules
+# -------------------------------------------------------------------
+try:
+    from evaluation.giwanos_agent.judge_agent import JudgeAgent
+    from core.snapshot_manager import create_incremental_snapshot, create_full_snapshot
+    from evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
+    from notifications.send_email import send_report_email
+    from notion_integration.notion_sync import main as notion_sync
+    from automation.git_management.git_sync import main as git_sync
+except ImportError as err:
+    logger.exception('Module import failed: %s', err)
+    sys.exit(1)
+
+# -------------------------------------------------------------------
+# Step Functions
+# -------------------------------------------------------------------
+
+def snapshot_step():
+    today = datetime.now().strftime('%Y%m%d')
+    inc_dir = SNAPSHOT_DIR / f'incremental_snapshot_{today}'
+    try:
+        create_incremental_snapshot(inc_dir)
+        logger.info('Incremental snapshot created: %s', inc_dir)
+    except Exception as e:
+        logger.warning('Incremental snapshot skipped: %s', e)
+        full_dir = SNAPSHOT_DIR / f'full_snapshot_{today}'
+        try:
+            create_full_snapshot(full_dir)
+            logger.info('Full snapshot created: %s', full_dir)
+        except Exception as ex:
+            logger.warning('Full snapshot skipped: %s', ex)
+
+
+def run_judge_agent():
+    try:
+        agent = JudgeAgent()
+        agent.run()
+        logger.info('JudgeAgent completed')
+    except Exception as e:
+        logger.exception('JudgeAgent failed: %s', e)
+
+
+def sync_notion_step():
+    try:
+        notion_sync()
+        logger.info('Notion sync completed')
+    except Exception as e:
+        logger.exception('Notion sync failed: %s', e)
+
+
+def sync_git_step():
+    try:
+        git_sync()
+        logger.info('Git sync completed')
+    except Exception as e:
+        logger.exception('Git sync failed: %s', e)
+
+
+def report_and_email_step():
+    try:
+        pdf_path = generate_pdf_report()
+        logger.info('PDF report generated: %s', pdf_path)
+    except Exception as e:
+        logger.exception('Report generation failed: %s', e)
+        return
+    try:
+        send_report_email(pdf_path)
+        logger.info('Report email sent')
+    except Exception as e:
+        logger.exception('Email sending failed: %s', e)
+
+
+def weekly_summary_step():
+    try:
+        from evaluation.summary.weekly_summary import generate_weekly_summary
+        summary_path = generate_weekly_summary(REPORT_DIR)
+        logger.info('Weekly summary created: %s', summary_path)
+    except ImportError:
+        logger.warning('Weekly summary module missing')
+    except Exception as e:
+        logger.exception('Weekly summary failed: %s', e)
+
+# -------------------------------------------------------------------
+# Main Entry Point
+# -------------------------------------------------------------------
 
 def main():
-    logger.info("=== GIWANOS Master Loop Start ===")
+    logger.info('=== GIWANOS Master Loop Start ===')
+    snapshot_step()
+    run_judge_agent()
+    sync_notion_step()
+    sync_git_step()
+    report_and_email_step()
+    weekly_summary_step()
+    logger.info('=== GIWANOS Master Loop End ===')
 
-    # 1) 자동 최적화 및 클린업
-    cleanup_main()
 
-    # 2) Notion 동기화
-    notion_sync()
-
-    # 3) 임시 드라이브 업로드 폴더 정리
-    shutil.rmtree(os.path.join("C:", "giwanos", ".tmp.driveupload"), ignore_errors=True)
-
-    # 4) GitHub 동기화
-    git_sync()
-
-    # 5) JudgeAgent 실행 및 로그 핸들러 설정
-    agent_logger = logging.getLogger("judge_agent")
-    for h in list(agent_logger.handlers):
-        agent_logger.removeHandler(h)
-    agent_log_file = os.path.join(LOG_DIR, "judge_agent.log")
-    agent_file_handler = logging.FileHandler(agent_log_file, mode='a', encoding='utf-8')
-    agent_file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
-    agent_logger.addHandler(agent_file_handler)
-
-    agent = JudgeAgent()
-    agent.run()
-
-    for h in agent_logger.handlers:
-        h.flush()
-
-    # 6) 시스템 성능 로깅
-    cpu = psutil.cpu_percent(interval=0.1)
-    mem = psutil.virtual_memory().percent
-    disk = psutil.disk_usage("C:/giwanos").percent
-    logger.info(f"[perf] cpu={cpu:.1f}, mem={mem:.1f}, disk={disk:.1f}")
-
-    # 7) PDF 보고서 생성 및 이메일 전송
-    generate_pdf_report()
-    send_report_email()
-
-    # 8) 스냅샷 생성
-    try:
-        from core.hybrid_snapshot_manager import create_incremental_snapshot
-        create_incremental_snapshot()
-    except Exception as e:
-        logger.warning(f"Failed to create incremental snapshot: {e}")
-
-    try:
-        from core.snapshot_manager import create_full_snapshot
-        create_full_snapshot()
-    except Exception as e:
-        logger.warning(f"Failed to create full snapshot: {e}")
-
-    # 9) 주간 요약 리포트 생성 (Stub)
-    from datetime import date
-    today = date.today()
-    year, week, _ = today.isocalendar()
-    summary_path = f"C:/giwanos/data/reports/weekly_summary_{year}W{week}.md"
-    os.makedirs(os.path.dirname(summary_path), exist_ok=True)
-    with open(summary_path, "w", encoding="utf-8") as f:
-        f.write(f"# Weekly Summary {year}W{week}\nGenerated on {today.isoformat()}\n")
-    logger.info(f"Weekly summary created: {summary_path}")
-
-    logger.info("=== GIWANOS Master Loop End ===")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
