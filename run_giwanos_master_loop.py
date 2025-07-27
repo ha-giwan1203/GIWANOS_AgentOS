@@ -54,11 +54,18 @@ def main():
     agent = JudgeAgent()
     agent.run()
 
-    # 6) PDF 보고서 생성 및 이메일 전송
+    # 6) 시스템 성능 로그에 기록
+    perf = agent.tool_handlers["monitor_performance"]()
+    mem = agent.tool_handlers["check_memory_usage"]()
+    disk = agent.tool_handlers["disk_space_alert"]()
+    logger.info(f"[monitor_performance] {perf}")
+    logger.info(f"[check_memory_usage] {mem}")
+    logger.info(f"[disk_space_alert] {disk}")
+
+    # 7) PDF 보고서 생성 및 이메일 전송
     generate_pdf_report()
     send_report_email()
 
-    # Dashboard update has been disabled; run separately via Streamlit.
     logger.info("=== GIWANOS Master Loop End ===")
 
 if __name__ == "__main__":
