@@ -29,9 +29,17 @@ def git_sync():
     # 후크 무시하고 커밋
     repo.git.commit('--no-verify', '-m', commit_message)
     origin = repo.remote(name="origin")
-    origin.push()
+    branch = repo.active_branch.name
+    try:
+        origin.push()
+    except Exception:
+        origin.push(refspec=f"{branch}:{branch}")
 
     print("[✅ GitHub 동기화 성공 - 민감 정보 제외됨]")
 
 if __name__ == "__main__":
     git_sync()
+
+
+# Alias for master loop
+main = git_sync

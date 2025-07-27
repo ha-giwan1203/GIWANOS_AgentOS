@@ -7,7 +7,7 @@ from core.auto_optimization_cleanup import main as optimize_and_cleanup
 from core.system_integrity_check import main as system_check
 from evaluation.human_readable_reports.generate_pdf_report import generate_and_send_report
 from notion_integration.notion_sync import main as notion_sync
-from automation.git_management.git_sync import main as git_sync  # 정확히 수정된 경로
+from automation.git_management.git_sync import git_sync  # import the function directly
 
 os.environ["PYTHONUTF8"] = "1"
 os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -22,37 +22,29 @@ logging.basicConfig(
 
 def master_loop():
     try:
-        # 시스템 자기 진단 실행
         print("[1] 시스템 자기 진단 시작")
         system_check()
 
-        # Controller 생성 및 실행
         print("[2] Controller 생성 및 실행")
         controller = Controller()
         controller.run()
 
-        # ReflectionAgent를 통한 회고 파일 생성
         print("[3] Reflection 파일 생성")
         reflection_agent = ReflectionAgent()
         reflection_agent.create_reflection()
 
-        # 자동 최적화 및 정리 루프 실행
         print("[4] 자동 최적화 및 클린업 실행")
         optimize_and_cleanup()
 
-        # 하이브리드 스냅샷 생성
         print("[5] 하이브리드 스냅샷 생성")
         manage_snapshots()
 
-        # 보고서 생성 및 이메일 전송
         print("[6] 보고서 생성 및 이메일 전송")
         generate_and_send_report()
 
-        # Notion 연동 및 동기화
         print("[7] Notion 동기화 실행")
         notion_sync()
 
-        # GitHub 연동 및 파일 커밋
         print("[8] GitHub 동기화 실행")
         git_sync()
 
