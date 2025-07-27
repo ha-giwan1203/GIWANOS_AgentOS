@@ -1,36 +1,75 @@
+"""
+File: C:/giwanos/core/judge_agent.py
+
+설명:
+- Hybrid Decision Engine을 사용한 유연한 판단 로직 통합
+- evaluate_context(context) 호출 후 반환된 actions 및 tool 호출 실행
+- decision이 dict이 아닌 경우에도 안전하게 처리
+- 툴매니저 메서드를 통해 fallback 액션 처리 지원
+"""
 
 import logging
-import subprocess
-import os
+from core.hybrid_decision_engine import evaluate_context
+from core.tool_manager import ToolManager
+from core.notifications import send_welcome_email, mark_as_adult
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class JudgeAgent:
     def __init__(self):
-        logging.info("JudgeAgent initialized.")
+        logger.info("Initializing JudgeAgent with hybrid decision engine.")
 
-    def execute_reflection_logic(self):
-        logging.info("Executing Reflection logic.")
-        logging.info("Reflection created successfully.")
+    def _gather_context(self) -> dict:
+        from core.memory import get_latest_metrics
+        return get_latest_metrics()
 
-    def execute_failure_detection(self):
-        subprocess.run(["python", "C:/giwanos/core/system_failure_detector.py"], check=True)
-
-    def execute_auto_recovery(self):
-        subprocess.run(["python", "C:/giwanos/core/auto_recovery_agent.py"], check=True)
-
-    def execute_ai_evaluation_and_report(self):
-        subprocess.run(["python", "C:/giwanos/evaluation/ai_reports/generate_ai_insight_report.py"], check=True)
-        subprocess.run(["python", "C:/giwanos/evaluation/ai_reports/insights_to_report.py"], check=True)
+    def _execute_action(self, action: str):
+        logger.info(f"Executing action: {action}")
+        # 기본 액션
+        if action == "send_welcome_email":
+            send_welcome_email()
+        elif action == "mark_as_adult":
+            mark_as_adult()
+        # ToolManager 기반 액션
+        elif hasattr(ToolManager, action):
+            logger.info(f"Invoking ToolManager for action: {action}")
+            getattr(ToolManager, action)()
+        else:
+            logger.warning(f"No handler defined for action: {action}")
 
     def run(self):
-        logging.info("JudgeAgent 루프 시작")
-        self.execute_reflection_logic()
-        self.execute_failure_detection()
-        self.execute_auto_recovery()
-        self.execute_ai_evaluation_and_report()
-        logging.info("JudgeAgent 루프 완료")
+        try:
+            context = self._gather_context()
+            decision = evaluate_context(context)
 
-if __name__ == "__main__":
-    agent = JudgeAgent()
-    agent.run()
+            # decision 타입 확인
+            if not isinstance(decision, dict):
+                logger.warning(f"Invalid decision type: {type(decision)}. Aborting run.")
+                return
+
+            # fallback tool 호출
+            used = decision.get('used_fallback', False)
+            tool_call = decision.get('tool', None)
+            if used and isinstance(tool_call, dict):
+                tool_name = tool_call.get('name')
+                tool_args = tool_call.get('args', [])
+                if hasattr(ToolManager, tool_name):
+                    logger.info(f"Invoking tool: {tool_name} with args {tool_args}")
+                    getattr(ToolManager, tool_name)(*tool_args)
+                else:
+                    logger.warning(f"Unknown tool request: {tool_name}. Skipping.")
+            elif used and tool_call is not None:
+                logger.warning(f"Invalid tool request type: {type(tool_call)}. Skipping.")
+
+            # actions 실행
+            actions = decision.get('actions', [])
+            if not isinstance(actions, list):
+                logger.warning(f"Invalid actions type: {type(actions)}, expected list.")
+                return
+            for action in actions:
+                self._execute_action(action)
+
+            logger.info("JudgeAgent run completed.")
+        except Exception as e:
+            logger.error(f"JudgeAgent run error: {e}")
+            raise

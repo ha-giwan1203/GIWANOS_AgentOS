@@ -1,5 +1,0 @@
-{
-    "max_retries": 3,
-    "retry_delay_seconds": 2,
-    "log_level": "DEBUG"
-}

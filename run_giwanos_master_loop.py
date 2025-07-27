@@ -1,40 +1,67 @@
+import sys
+import os
+from core.controller import Controller
+from core.hybrid_snapshot_manager import manage_snapshots
+from core.reflection_agent import ReflectionAgent
+from core.auto_optimization_cleanup import main as optimize_and_cleanup
+from core.system_integrity_check import main as system_check
+from evaluation.human_readable_reports.generate_pdf_report import generate_and_send_report
+from notion_integration.notion_sync import main as notion_sync
+from automation.git_management.git_sync import main as git_sync  # 정확히 수정된 경로
+
+os.environ["PYTHONUTF8"] = "1"
+os.environ["PYTHONIOENCODING"] = "utf-8"
 
 import logging
-from core.controller import Controller
-from evaluation.human_readable_reports.generate_pdf_report import generate_and_send_report
-import os
+logging.basicConfig(
+    level=logging.ERROR,
+    filename="C:/giwanos/data/logs/master_loop_execution.log",
+    format='%(asctime)s %(levelname)s %(message)s',
+    encoding='utf-8'
+)
 
-# 전체 로그 최소화 및 fontTools 로그 억제
-logging.basicConfig(level=logging.ERROR, filename="C:/giwanos/data/logs/master_loop_execution.log", format='%(asctime)s %(levelname)s %(message)s')
-logging.getLogger('fontTools.subset').setLevel(logging.ERROR)
-
-PDF_REPORT_PATH = "C:/giwanos/data/reports/weekly_report_{}.pdf"
-INSIGHT_REPORT_JSON = "C:/giwanos/data/reports/ai_insights.json"
-INSIGHT_REPORT_PDF = "C:/giwanos/data/reports/ai_insights_report.pdf"
-INSIGHT_REPORT_MD = "C:/giwanos/data/reports/ai_insights_report.md"
-REFLECTION_MD_DIR = "C:/giwanos/data/reflection_md"
-
-def main():
+def master_loop():
     try:
+        # 시스템 자기 진단 실행
+        print("[1] 시스템 자기 진단 시작")
+        system_check()
+
+        # Controller 생성 및 실행
+        print("[2] Controller 생성 및 실행")
         controller = Controller()
         controller.run()
 
+        # ReflectionAgent를 통한 회고 파일 생성
+        print("[3] Reflection 파일 생성")
+        reflection_agent = ReflectionAgent()
+        reflection_agent.create_reflection()
+
+        # 자동 최적화 및 정리 루프 실행
+        print("[4] 자동 최적화 및 클린업 실행")
+        optimize_and_cleanup()
+
+        # 하이브리드 스냅샷 생성
+        print("[5] 하이브리드 스냅샷 생성")
+        manage_snapshots()
+
+        # 보고서 생성 및 이메일 전송
+        print("[6] 보고서 생성 및 이메일 전송")
         generate_and_send_report()
-        
-        latest_weekly_pdf = PDF_REPORT_PATH.format(__import__('datetime').datetime.now().strftime('%Y%m%d'))
-        
-        print("[GIWANOS 시스템 실행 완료] 모든 작업이 성공적으로 처리되었습니다.")
-        print("\n생성된 주요 보고서 및 문서 위치:")
-        print(f"- 주간 보고서 (PDF): {latest_weekly_pdf}")
-        print(f"- AI 인사이트 보고서 (JSON): {INSIGHT_REPORT_JSON}")
-        print(f"- AI 인사이트 보고서 (Markdown): {INSIGHT_REPORT_MD}")
-        print(f"- AI 인사이트 보고서 (PDF): {INSIGHT_REPORT_PDF}")
-        print(f"- 회고 파일 위치 (최신): {REFLECTION_MD_DIR}")
+
+        # Notion 연동 및 동기화
+        print("[7] Notion 동기화 실행")
+        notion_sync()
+
+        # GitHub 연동 및 파일 커밋
+        print("[8] GitHub 동기화 실행")
+        git_sync()
+
+        print("[✅ GIWANOS 시스템 전체 마스터 루프 성공]")
 
     except Exception as e:
-        print("[GIWANOS 시스템 오류] 다음 작업에서 오류가 발생했습니다:")
-        print(f"- 오류 내용: {e}")
-        logging.error(f"실행 중 오류 발생: {e}")
+        error_message = f"[❌ GIWANOS 시스템 전체 마스터 루프 오류]: {str(e)}"
+        print(error_message)
+        logging.error(error_message)
 
 if __name__ == "__main__":
-    main()
+    master_loop()

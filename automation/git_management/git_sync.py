@@ -1,10 +1,37 @@
-import subprocess
+import os
+from git import Repo
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv('C:/giwanos/config/.env')
+
+REPO_PATH = "C:/giwanos"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO_URL = f"https://{GITHUB_TOKEN}@github.com/ha-giwan1203/GIWANOS_AgentOS.git"
+
+# 민감 정보 제외 목록 (절대 업로드되지 않도록 설정)
+EXCLUDE_FILES = ['.env', '*.log', '*.json', '__pycache__/']
 
 def git_sync():
-    subprocess.run(['git', 'add', '.'], encoding='utf-8', capture_output=True, errors='ignore')
-    subprocess.run(['git', 'commit', '-m', '자동 동기화'], encoding='utf-8', capture_output=True, errors='ignore')
-    subprocess.run(['git', 'push', 'origin', 'HEAD:main'], encoding='utf-8', capture_output=True, errors='ignore')
-    print("[성공] GitHub 동기화 완료")
+    repo = Repo(REPO_PATH)
+
+    # `.gitignore`에 제외 파일 추가
+    gitignore_path = os.path.join(REPO_PATH, '.gitignore')
+    with open(gitignore_path, 'a+', encoding='utf-8') as gitignore:
+        gitignore.seek(0)
+        existing_entries = gitignore.read().splitlines()
+        for pattern in EXCLUDE_FILES:
+            if pattern not in existing_entries:
+                gitignore.write(f"{pattern}\n")
+
+    repo.git.add(all=True)
+    commit_message = f"Auto-sync on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    repo.index.commit(commit_message)
+    
+    origin = repo.remote(name="origin")
+    origin.push()
+
+    print("[✅ GitHub 동기화 성공 - 민감 정보 제외됨]")
 
 if __name__ == "__main__":
     git_sync()

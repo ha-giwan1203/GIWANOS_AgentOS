@@ -1,23 +1,34 @@
+
 import logging
 import os
 from datetime import datetime
 
+logging.basicConfig(level=logging.INFO)
+
 class ReflectionAgent:
     def __init__(self):
-        self.reflection_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reflections'))
-        self.md_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reflection_md'))
-        os.makedirs(self.reflection_dir, exist_ok=True)
-        os.makedirs(self.md_dir, exist_ok=True)
+        self.reflections_dir = "C:/giwanos/data/reflections"
+        os.makedirs(self.reflections_dir, exist_ok=True)
 
     def create_reflection(self):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         reflection_content = f"Reflection created at {datetime.now()}"
-        reflection_filename = datetime.now().strftime("reflection_%Y%m%d_%H%M%S.txt")
-        md_filename = datetime.now().strftime("reflection_%Y%m%d_%H%M%S.md")
+        
+        txt_filename = f"reflection_{timestamp}.txt"
+        md_filename = f"reflection_{timestamp}.md"
 
-        with open(os.path.join(self.reflection_dir, reflection_filename), 'w', encoding='utf-8') as f:
-            f.write(reflection_content)
+        # 텍스트(.txt) 파일 저장
+        with open(os.path.join(self.reflections_dir, txt_filename), 'w', encoding='utf-8') as txt_file:
+            txt_file.write(reflection_content)
 
-        with open(os.path.join(self.md_dir, md_filename), 'w', encoding='utf-8') as f:
-            f.write(f"# Reflection\n\n{reflection_content}")
+        # Markdown(.md) 파일 저장
+        with open(os.path.join(self.reflections_dir, md_filename), 'w', encoding='utf-8') as md_file:
+            md_file.write(f"# Reflection\n\n{reflection_content}")
 
-        logging.info(f"Reflection files '{reflection_filename}' and '{md_filename}' created.")
+        logging.info(f"[성공] Reflection files '{txt_filename}' and '{md_filename}' created.")
+        print(f"[✅ 성공] Reflection 저장 완료: {txt_filename}, {md_filename}")
+
+# 예제 실행 코드
+if __name__ == "__main__":
+    agent = ReflectionAgent()
+    agent.create_reflection()

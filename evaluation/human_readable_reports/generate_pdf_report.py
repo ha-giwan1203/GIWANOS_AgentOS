@@ -9,6 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger('fontTools.subset').setLevel(logging.ERROR)
 
 load_dotenv("C:/giwanos/config/.env")
 
@@ -23,7 +24,7 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT"))
 def create_pdf_report():
     pdf = FPDF()
     pdf.add_page()
-    pdf.add_font('NanumGothic', '', 'C:/giwanos/Nanum_Gothic/NanumGothic-Regular.ttf', uni=True)
+    pdf.add_font('NanumGothic', '', 'C:/giwanos/Nanum_Gothic/NanumGothic-Regular.ttf')
     pdf.set_font("NanumGothic", size=14)
     pdf.cell(200, 10, text="GIWANOS 주간 보고서", align='C')
     pdf.ln(10)
@@ -33,7 +34,7 @@ def create_pdf_report():
     with open(MEMORY_PATH, 'r', encoding='utf-8') as file:
         import json
         memory_data = json.load(file)
-        insights = memory_data.get("insights", [])[-5:]  # 최근 5개 인사이트만
+        insights = memory_data.get("insights", [])[-5:]
 
     pdf.cell(200, 10, text="최근 인사이트:")
     pdf.ln(10)
