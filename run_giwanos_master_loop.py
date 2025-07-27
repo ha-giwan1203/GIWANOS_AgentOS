@@ -3,6 +3,10 @@
 import os
 import logging
 import shutil
+import warnings
+
+# Suppress specific Streamlit warnings
+warnings.filterwarnings('ignore', 'Thread.*missing ScriptRunContext.*', module='streamlit.runtime.scriptrunner_utils')
 
 from core.auto_optimization_cleanup import main as cleanup_main
 from notion_integration.notion_sync import main as notion_sync
@@ -16,6 +20,10 @@ from interface.status_dashboard import main as update_dashboard
 log_dir = os.path.abspath(os.path.join("C:", os.sep, "giwanos", "data", "logs"))
 os.makedirs(log_dir, exist_ok=True)
 log_file = os.path.join(log_dir, "master_loop_execution.log")
+
+# Clear log file at start for a fresh output
+with open(log_file, 'w', encoding='utf-8'):
+    pass
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,11 +59,10 @@ def main():
     generate_pdf_report()
     send_report_email()
 
-    # 7) 대시보드 갱신
+    # 7) 대시보드 갱신 (no Streamlit warnings)
     update_dashboard()
 
     logger.info("=== GIWANOS Master Loop End ===")
-    logger.info("")  # blank line
 
 if __name__ == "__main__":
     main()
