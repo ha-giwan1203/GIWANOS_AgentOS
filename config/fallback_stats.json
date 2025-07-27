@@ -1,7 +1,7 @@
 {
-  "evaluations": 181,
-  "fallbacks": 17,
-  "sum_confidence": 26.5,
+  "evaluations": 200,
+  "fallbacks": 18,
+  "sum_confidence": 27.5,
   "consecutive_fallbacks": 1,
   "last_was_fallback": true
 }

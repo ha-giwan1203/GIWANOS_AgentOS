@@ -493,5 +493,33 @@
       "version": "1.0",
       "description": "A tool to monitor system performance and resource usage."
     }
+  },
+  {
+    "id": 1,
+    "conditions": {
+      "age": 20,
+      "cpu": 12.9,
+      "memory": 33.7,
+      "disk": 80.5
+    },
+    "actions": [
+      {
+        "action": "monitor_performance",
+        "description": "CPU usage is moderate, monitor for any spikes."
+      },
+      {
+        "action": "check_memory_usage",
+        "description": "Memory usage is relatively high, consider optimizing applications."
+      },
+      {
+        "action": "disk_space_alert",
+        "description": "Disk usage is high, alert user to clean up space."
+      }
+    ],
+    "tool": {
+      "name": "SystemMonitor",
+      "version": "1.0",
+      "description": "A tool to monitor system performance and resource usage."
+    }
   }
 ]
