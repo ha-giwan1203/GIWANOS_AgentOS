@@ -37,3 +37,4 @@ vector_index/
 # Snapshots and backups
 snapshots/
 loop_backups/*.json
+*.json
