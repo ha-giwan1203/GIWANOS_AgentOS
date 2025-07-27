@@ -1,45 +1,33 @@
+# C:/giwanos/automation/git_management/git_sync.py
+
 import os
-from git import Repo
-from dotenv import load_dotenv
 from datetime import datetime
+import git
 
-load_dotenv('C:/giwanos/config/.env')
-
-REPO_PATH = "C:/giwanos"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPO_URL = f"https://{GITHUB_TOKEN}@github.com/ha-giwan1203/GIWANOS_AgentOS.git"
-
-# 민감 정보 제외 목록
-EXCLUDE_FILES = ['.env', '*.log', '*.json', '__pycache__/']
-
-def git_sync():
-    repo = Repo(REPO_PATH)
-
-    # .gitignore에 제외 패턴 추가
-    gitignore_path = os.path.join(REPO_PATH, '.gitignore')
-    with open(gitignore_path, 'a+', encoding='utf-8') as gitignore:
-        gitignore.seek(0)
-        existing_entries = gitignore.read().splitlines()
-        for pattern in EXCLUDE_FILES:
-            if pattern not in existing_entries:
-                gitignore.write(f"{pattern}\n")
-
-    repo.git.add(all=True)
+def main():
+    """
+    GitHub 동기화를 수행합니다.
+    변경사항이 없을 경우 예외를 무시합니다.
+    """
+    repo_path = os.path.abspath("C:/giwanos")
+    repo = git.Repo(repo_path)
+    # 스테이징
+    repo.git.add("--all")
+    # 커밋 메시지
     commit_message = f"Auto-sync on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    # 후크 무시하고 커밋
-    repo.git.commit('--no-verify', '-m', commit_message)
-    origin = repo.remote(name="origin")
-    branch = repo.active_branch.name
     try:
+        repo.git.commit("--no-verify", "-m", commit_message)
+    except git.exc.GitCommandError as e:
+        msg = str(e)
+        if "nothing to commit" in msg.lower():
+            print("[git_sync] No changes to commit.")
+        else:
+            raise
+    # 푸시
+    try:
+        origin = repo.remote(name="origin")
         origin.push()
-    except Exception:
-        origin.push(refspec=f"{branch}:{branch}")
-
-    print("[✅ GitHub 동기화 성공 - 민감 정보 제외됨]")
-
-if __name__ == "__main__":
-    git_sync()
-
-
-# Alias for master loop
-main = git_sync
+        print("[git_sync] Pushed to origin.")
+    except Exception as e:
+        print(f"[git_sync] Push failed: {e}")
+        raise
