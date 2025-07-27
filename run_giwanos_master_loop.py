@@ -14,7 +14,6 @@ from automation.git_management.git_sync import main as git_sync
 from evaluation.giwanos_agent.judge_agent import JudgeAgent
 from evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
 from notifications.send_email import send_test_email as send_report_email
-from interface.status_dashboard import main as update_dashboard
 
 # --- Logging Configuration ---
 log_dir = os.path.abspath(os.path.join("C:", os.sep, "giwanos", "data", "logs"))
@@ -59,9 +58,7 @@ def main():
     generate_pdf_report()
     send_report_email()
 
-    # 7) 대시보드 갱신 (no Streamlit warnings)
-    update_dashboard()
-
+    # Dashboard update has been disabled; run separately via Streamlit.
     logger.info("=== GIWANOS Master Loop End ===")
 
 if __name__ == "__main__":
