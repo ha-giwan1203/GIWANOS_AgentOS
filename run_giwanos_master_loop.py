@@ -4,6 +4,7 @@ import os
 import logging
 import shutil
 import warnings
+import psutil
 
 # Suppress specific Streamlit warnings
 warnings.filterwarnings('ignore', 'Thread.*missing ScriptRunContext.*', module='streamlit.runtime.scriptrunner_utils')
@@ -54,13 +55,11 @@ def main():
     agent = JudgeAgent()
     agent.run()
 
-    # 6) 시스템 성능 로그에 기록
-    perf = agent.tool_handlers["monitor_performance"]()
-    mem = agent.tool_handlers["check_memory_usage"]()
-    disk = agent.tool_handlers["disk_space_alert"]()
-    logger.info(f"[monitor_performance] {perf}")
-    logger.info(f"[check_memory_usage] {mem}")
-    logger.info(f"[disk_space_alert] {disk}")
+    # 6) 시스템 성능 로깅
+    cpu = psutil.cpu_percent(interval=0.1)
+    mem = psutil.virtual_memory().percent
+    disk = psutil.disk_usage("C:/giwanos").percent
+    logger.info(f"[perf] cpu={cpu:.1f}, mem={mem:.1f}, disk={disk:.1f}")
 
     # 7) PDF 보고서 생성 및 이메일 전송
     generate_pdf_report()
