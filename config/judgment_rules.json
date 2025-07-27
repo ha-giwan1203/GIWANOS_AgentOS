@@ -465,5 +465,33 @@
         "Resource allocation recommendations"
       ]
     }
+  },
+  {
+    "id": 1,
+    "conditions": {
+      "age": 20,
+      "cpu": 12.8,
+      "memory": 36.3,
+      "disk": 80.5
+    },
+    "actions": [
+      {
+        "action": "monitor_performance",
+        "description": "CPU, memory, and disk usage are within acceptable limits, continue monitoring."
+      },
+      {
+        "action": "optimize_resources",
+        "description": "Consider optimizing memory usage as it is relatively high."
+      },
+      {
+        "action": "schedule_maintenance",
+        "description": "Schedule regular maintenance for disk as usage is above 80%."
+      }
+    ],
+    "tool": {
+      "name": "SystemMonitor",
+      "version": "1.0",
+      "description": "A tool to monitor system performance and resource usage."
+    }
   }
 ]
