@@ -1,5 +1,3 @@
-# C:/giwanos/interface/status_dashboard.py
-
 import os
 import psutil
 import streamlit as st
@@ -45,10 +43,12 @@ if os.path.exists(log_path):
         full_log = f.read()
 
     st.subheader("Master Loop Log (Raw)")
-    st.code(full_log, language="text")
+    num_lines = st.selectbox("표시할 로그 줄 수", [20, 50, 100, 200], index=2)
+    log_lines = full_log.splitlines()
+    short_log = "\n".join(log_lines[-num_lines:])
+    st.code(short_log, language="text")
 
     st.subheader("Master Loop Log (Segment)")
-    # extract between markers if present
     match = re.search(r"(?:=== GIWANOS Master Loop Start ===)(.*?)(?:=== GIWANOS Master Loop End ===)", full_log, re.DOTALL)
     if match:
         seg = "=== GIWANOS Master Loop Start ===" + match.group(1) + "=== GIWANOS Master Loop End ==="
@@ -83,8 +83,18 @@ for line in full_log.splitlines():
 st.subheader("Historical System Metrics")
 if entries:
     df = pd.DataFrame(entries).sort_values("time")
-    df_m = df.melt(id_vars="time", value_vars=["cpu","memory","disk"], var_name="Metric", value_name="Usage")
+    df_m = df.melt(id_vars="time", value_vars=["cpu", "memory", "disk"], var_name="Metric", value_name="Usage")
     fig = px.line(df_m, x="time", y="Usage", color="Metric", markers=True)
     st.plotly_chart(fig, use_container_width=True)
 else:
     st.info("No [perf] entries found in log.")
+
+st.markdown("---")
+st.subheader("🔁 반복 오류 기반 리팩터링 권장 사항")
+
+refactor_path = "C:/giwanos/data/logs/refactor_recommendations.md"
+if os.path.exists(refactor_path):
+    with open(refactor_path, "r", encoding="utf-8") as f:
+        st.markdown(f.read())
+else:
+    st.info("리팩터링 리포트가 아직 생성되지 않았습니다.")

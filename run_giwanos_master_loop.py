@@ -1,75 +1,47 @@
-import os
-import sys
 import logging
-import warnings
+import sys
 from datetime import datetime
 from pathlib import Path
 
-# suppress unwanted streamlit warnings
-warnings.filterwarnings(
-    'ignore', 'Thread.*missing ScriptRunContext.*',
-    module='streamlit.runtime.scriptrunner_utils'
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler('C:/giwanos/data/logs/master_loop_execution.log'),
+        logging.StreamHandler(sys.stdout)
+    ],
+    format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-# -------------------------------------------------------------------
-# Constants & Paths
-# -------------------------------------------------------------------
-ROOT_DIR = Path(__file__).parent
-DATA_DIR = ROOT_DIR / 'data'
-SNAPSHOT_DIR = DATA_DIR / 'snapshots'
-REPORT_DIR = DATA_DIR / 'reports'
-LOG_DIR = DATA_DIR / 'logs'
-
-# -------------------------------------------------------------------
-# Directory Creation
-# -------------------------------------------------------------------
-for directory in (SNAPSHOT_DIR, REPORT_DIR, LOG_DIR):
-    directory.mkdir(parents=True, exist_ok=True)
-
-# -------------------------------------------------------------------
-# Logger Setup
-# -------------------------------------------------------------------
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.FileHandler(LOG_DIR / 'master_loop_execution.log')
-handler.setFormatter(
-    logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
-)
-logger.addHandler(handler)
 
-# -------------------------------------------------------------------
-# Imports of Project Modules
-# -------------------------------------------------------------------
-try:
-    from evaluation.giwanos_agent.judge_agent import JudgeAgent
-    from core.snapshot_manager import create_incremental_snapshot, create_full_snapshot
-    from evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
-    from notifications.send_email import send_report_email
-    from notion_integration.notion_sync import main as notion_sync
-    from automation.git_management.git_sync import main as git_sync
-except ImportError as err:
-    logger.exception('Module import failed: %s', err)
-    sys.exit(1)
-
-# -------------------------------------------------------------------
-# Step Functions
-# -------------------------------------------------------------------
+# 실제 사용되는 모듈 import (최종적으로 명시)
+from core.snapshot_manager import create_incremental_snapshot, create_full_snapshot
+from evaluation.giwanos_agent.judge_agent import JudgeAgent
+from notion_integration.notion_sync import main as notion_sync
+from automation.git_management.git_sync import main as git_sync
+from evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
+from notifications.send_email import send_report_email
+from scheduling.weekly_summary import generate_weekly_summary
+from advanced_modules.cot_evaluator import evaluate_cot
+from advanced_modules.advanced_rag import test_advanced_rag
+from core.auto_recovery_agent import main as auto_recovery_main
+from core.reflection_agent import run_reflection
+from core.adaptive_reasoning_agent import adaptive_reasoning_main
+from core.threshold_optimizer import threshold_optimizer_main
+from core.rule_optimizer import rule_optimizer_main
+from core.system_health_logger import update_system_health
 
 def snapshot_step():
-    today = datetime.now().strftime('%Y%m%d')
-    inc_dir = SNAPSHOT_DIR / f'incremental_snapshot_{today}'
     try:
-        create_incremental_snapshot(inc_dir)
-        logger.info('Incremental snapshot created: %s', inc_dir)
+        create_incremental_snapshot()
+        logger.info('Incremental snapshot created')
     except Exception as e:
-        logger.warning('Incremental snapshot skipped: %s', e)
-        full_dir = SNAPSHOT_DIR / f'full_snapshot_{today}'
+        logger.warning(f'Incremental snapshot skipped: {e}')
         try:
-            create_full_snapshot(full_dir)
-            logger.info('Full snapshot created: %s', full_dir)
+            create_full_snapshot()
+            logger.info('Full snapshot created')
         except Exception as ex:
-            logger.warning('Full snapshot skipped: %s', ex)
-
+            logger.warning(f'Full snapshot skipped: {ex}')
 
 def run_judge_agent():
     try:
@@ -77,63 +49,50 @@ def run_judge_agent():
         agent.run()
         logger.info('JudgeAgent completed')
     except Exception as e:
-        logger.exception('JudgeAgent failed: %s', e)
-
-
-def sync_notion_step():
-    try:
-        notion_sync()
-        logger.info('Notion sync completed')
-    except Exception as e:
-        logger.exception('Notion sync failed: %s', e)
-
-
-def sync_git_step():
-    try:
-        git_sync()
-        logger.info('Git sync completed')
-    except Exception as e:
-        logger.exception('Git sync failed: %s', e)
-
+        logger.exception(f'JudgeAgent failed: {e}')
 
 def report_and_email_step():
     try:
         pdf_path = generate_pdf_report()
-        logger.info('PDF report generated: %s', pdf_path)
+        logger.info(f'PDF report generated: {pdf_path}')
     except Exception as e:
-        logger.exception('Report generation failed: %s', e)
+        logger.exception(f'Report generation failed: {e}')
         return
     try:
         send_report_email(pdf_path)
         logger.info('Report email sent')
     except Exception as e:
-        logger.exception('Email sending failed: %s', e)
-
+        logger.exception(f'Email sending failed: {e}')
 
 def weekly_summary_step():
     try:
-        from evaluation.summary.weekly_summary import generate_weekly_summary
-        summary_path = generate_weekly_summary(REPORT_DIR)
-        logger.info('Weekly summary created: %s', summary_path)
-    except ImportError:
-        logger.warning('Weekly summary module missing')
+        report_dir = "C:/giwanos/data/reports"
+        summary_path = generate_weekly_summary(report_dir)
+        logger.info(f'Weekly summary created: {summary_path}')
     except Exception as e:
-        logger.exception('Weekly summary failed: %s', e)
-
-# -------------------------------------------------------------------
-# Main Entry Point
-# -------------------------------------------------------------------
+        logger.exception(f'Weekly summary failed: {e}')
 
 def main():
     logger.info('=== GIWANOS Master Loop Start ===')
+    update_system_health()
+
     snapshot_step()
     run_judge_agent()
-    sync_notion_step()
-    sync_git_step()
+    notion_sync()
+    git_sync()
     report_and_email_step()
     weekly_summary_step()
-    logger.info('=== GIWANOS Master Loop End ===')
+    evaluate_cot()
+    test_advanced_rag()
+    auto_recovery_main()
+    run_reflection()
 
+    # Adaptive Reasoning 관련 새롭게 추가된 루틴 실행
+    adaptive_reasoning_main()
+    threshold_optimizer_main()
+    rule_optimizer_main()
+
+    logger.info('=== GIWANOS Master Loop End ===')
 
 if __name__ == '__main__':
     main()
