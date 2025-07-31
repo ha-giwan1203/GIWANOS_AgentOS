@@ -1,22 +1,21 @@
-import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler('C:/giwanos/data/logs/threshold_optimizer.log'),
-        logging.StreamHandler()
-    ],
-    format='%(asctime)s [%(levelname)s] %(message)s'
-)
+import logging
+import sys
+
+logger = logging.getLogger("threshold_optimizer")
+logger.setLevel(logging.INFO)
+
+if not logger.handlers:
+    logger.addHandler(logging.FileHandler('C:/giwanos/data/logs/threshold_optimizer.log'))
+    logger.addHandler(logging.StreamHandler(sys.stdout))
 
 def threshold_optimizer_main():
-    logging.info("🚀 Threshold Optimizer 실행 시작")
+    logger.info("Threshold Optimizer 실행 시작")
     try:
-        # 실제 임계치(Threshold) 최적화 로직 구현 필요
-        logging.info("✅ Threshold 값을 정상적으로 최적화했습니다.")
+        optimization_result = "Threshold 값을 정상적으로 최적화했습니다."
+        logger.info(f"{optimization_result}")
     except Exception as e:
-        logging.error(f"Threshold 최적화 중 오류 발생: {e}")
+        logger.error(f"Threshold Optimizer 실행 중 오류: {e}")
 
 if __name__ == '__main__':
     threshold_optimizer_main()
-

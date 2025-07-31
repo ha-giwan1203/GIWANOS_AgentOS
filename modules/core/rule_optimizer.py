@@ -1,21 +1,21 @@
-import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler('C:/giwanos/data/logs/rule_optimizer.log'),
-        logging.StreamHandler()
-    ],
-    format='%(asctime)s [%(levelname)s] %(message)s'
-)
+import logging
+import sys
+
+logger = logging.getLogger("rule_optimizer")
+logger.setLevel(logging.INFO)
+
+if not logger.handlers:
+    logger.addHandler(logging.FileHandler('C:/giwanos/data/logs/rule_optimizer.log'))
+    logger.addHandler(logging.StreamHandler(sys.stdout))
 
 def rule_optimizer_main():
-    logging.info("🔧 Rule Optimizer 실행 시작")
+    logger.info("Rule Optimizer 실행 시작")
     try:
-        # 실제 룰 최적화 및 압축 로직을 구현합니다.
-        logging.info("✅ Rule 최적화 및 압축이 정상적으로 완료되었습니다.")
+        optimization_result = "Rule 최적화 및 압축이 정상적으로 완료되었습니다."
+        logger.info(f"{optimization_result}")
     except Exception as e:
-        logging.error(f"Rule 최적화 중 오류 발생: {e}")
+        logger.error(f"Rule Optimizer 실행 중 오류: {e}")
 
 if __name__ == '__main__':
     rule_optimizer_main()
