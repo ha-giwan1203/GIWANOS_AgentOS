@@ -1,6 +1,7 @@
 
 import logging
 import sys
+import os
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,12 +14,16 @@ logging.basicConfig(
 
 def main():
     logging.info("자동 복구 루틴 실행")
+    flag_path = "C:/giwanos/data/logs/fault_flag.tmp"
+
     try:
-        # 실제 자동 복구 로직 구현 전 가상 로직 예시
-        recovery_needed = False  # 실제 복구 필요 여부 체크 로직
+        recovery_needed = os.path.exists(flag_path)
 
         if recovery_needed:
-            logging.info("✅ 복구 작업이 완료되었습니다.")
+            logging.info("⚠️ 장애 플래그 발견. 복구 작업 수행 중...")
+            # 복구 작업 로직 추가
+            os.remove(flag_path)
+            logging.info("✅ 장애 복구 작업 완료. 플래그 제거 완료.")
         else:
             logging.info("✅ 장애 플래그 미발견. 복구 작업이 필요 없습니다.")
 
