@@ -1,6 +1,5 @@
-
-import shutil
 import os
+import shutil
 
 class FileManager:
     def __init__(self, backup_folder):
@@ -8,16 +7,10 @@ class FileManager:
 
     def manage_files(self, actions):
         results = {"moved": [], "kept": []}
-
-        for action_item in actions:
-            file_path = action_item["file"]
-            action = action_item["action"]
-
-            if action == "backup":
-                dest_path = os.path.join(self.backup_folder, os.path.basename(file_path))
-                shutil.move(file_path, dest_path)
-                results["moved"].append(file_path)
-            else:
-                results["kept"].append(file_path)
-
+        for file_path in actions["move"]:
+            filename = os.path.basename(file_path)
+            backup_path = os.path.join(self.backup_folder, filename)
+            shutil.move(file_path, backup_path)
+            results["moved"].append(filename)
+        results["kept"] = [os.path.basename(f) for f in actions["keep"]]
         return results

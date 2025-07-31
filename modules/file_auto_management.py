@@ -1,4 +1,3 @@
-
 from file_scanner import FileScanner
 from judge_agent import JudgeAgent
 from file_manager import FileManager
@@ -19,6 +18,6 @@ def file_auto_management(target_folder, backup_folder, days_unused=90):
     return results
 
 if __name__ == "__main__":
-    target = "C:/giwanos/data/logs"  # 명확한 하위 폴더 지정
+    target = "C:/giwanos"
     backup = "C:/giwanos_backup"
     print(file_auto_management(target, backup))
