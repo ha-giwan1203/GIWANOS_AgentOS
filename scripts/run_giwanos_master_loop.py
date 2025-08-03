@@ -1,3 +1,4 @@
+
 import logging
 import sys
 import os
@@ -36,6 +37,13 @@ from modules.core.adaptive_reasoning_agent import adaptive_reasoning_main
 from modules.core.threshold_optimizer import threshold_optimizer_main
 from modules.core.rule_optimizer import rule_optimizer_main
 from modules.automation.scheduling.system_health_logger import update_system_health
+from modules.core.notion_integration import (
+    add_notion_database_entry,
+    upload_reflection_to_notion,
+    append_summary_block_to_page
+)
+from tools.notifications.slack_api import send as send_slack_message
+from tools.notifications.send_pushbullet_notification import send_pushbullet_alert
 
 def snapshot_step():
     try:
@@ -54,6 +62,9 @@ def run_judge_agent():
         agent = JudgeAgent()
         agent.run_loop()
         logger.info('JudgeAgent completed')
+        add_notion_database_entry("JudgeAgent 작업 완료", "완료", "JudgeAgent가 정상 완료되었습니다.")
+        send_slack_message("JudgeAgent 작업이 정상적으로 완료되었습니다.")
+        send_pushbullet_alert("JudgeAgent 작업 완료됨")
     except Exception as e:
         logger.exception(f'JudgeAgent failed: {e}')
 
@@ -61,22 +72,31 @@ def report_and_email_step():
     try:
         pdf_path = generate_pdf_report()
         logger.info(f'PDF report generated: {pdf_path}')
-    except Exception as e:
-        logger.exception(f'Report generation failed: {e}')
-        return
-    try:
         send_report_email(pdf_path)
         logger.info('Report email sent')
+        add_notion_database_entry("주간 보고서 생성 및 이메일 전송", "완료", "보고서 생성 및 이메일 전송 완료")
+        send_slack_message("주간 보고서가 생성되고 이메일로 발송되었습니다.")
     except Exception as e:
-        logger.exception(f'Email sending failed: {e}')
+        logger.exception(f'Report or Email sending failed: {e}')
 
 def weekly_summary_step():
     try:
         report_dir = f"{BASE_DIR}/data/reports"
         summary_path = generate_weekly_summary(report_dir)
         logger.info(f'Weekly summary created: {summary_path}')
+        append_summary_block_to_page(f"✅ 주간 요약 생성 완료: {summary_path}")
+        send_slack_message("주간 요약 보고서가 정상적으로 생성되었습니다.")
     except Exception as e:
         logger.exception(f'Weekly summary failed: {e}')
+
+def run_reflection_step():
+    try:
+        reflection_message = "시스템 회고: 모든 주요 작업이 정상 완료됨."
+        run_reflection()
+        upload_reflection_to_notion(reflection_message)
+        send_slack_message("시스템 회고 데이터가 Notion에 업로드되었습니다.")
+    except Exception as e:
+        logger.exception(f'Reflection step failed: {e}')
 
 def main():
     logger.info('=== VELOS Master Loop Start ===')
@@ -90,7 +110,7 @@ def main():
     evaluate_cot()
     test_advanced_rag()
     auto_recovery_main()
-    run_reflection()
+    run_reflection_step()
 
     adaptive_reasoning_main()
     threshold_optimizer_main()
