@@ -38,12 +38,10 @@ vector_index/
 snapshots/
 loop_backups/*.json
 *.json
-. e n v  
- .env
-vector_cache/
-v e n v /  
- #   t r i g g e r 
-# allow project‑level Pytest config
+
+# Virtual environment
+venv/
+
+# trigger
+# allow project-level Pytest config
 !pytest.ini
- 
- 
