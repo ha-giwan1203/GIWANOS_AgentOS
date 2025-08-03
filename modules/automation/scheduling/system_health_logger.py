@@ -1,20 +1,13 @@
-"""
-System Health Logger  –  VELOS
-로그 파일:  <repo>/data/logs/system_health.json
-"""
-
 from __future__ import annotations
 import json, pathlib, datetime, psutil
 
-# GPU 모듈은 선택 사항
 try:
     import GPUtil
 except ImportError:
     GPUtil = None
 
-# ── 기본 필드 템플릿 ─────────────────────────────────────────
 TEMPLATE: dict[str, float | str] = {
-    "timestamp": "",           # ISO‑8601 UTC
+    "timestamp": "",
     "cpu_percent": 0.0,
     "memory_percent": 0.0,
     "disk_percent": 0.0,
@@ -23,41 +16,29 @@ TEMPLATE: dict[str, float | str] = {
     "net_recv_mb": 0.0,
 }
 
-# ── 경로 설정 ───────────────────────────────────────────────
-ROOT = pathlib.Path(__file__).resolve().parents[3]      # giwanos/
+ROOT = pathlib.Path(__file__).resolve().parents[3]
 LOG_FILE = ROOT / "data" / "logs" / "system_health.json"
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-# ── 수집 함수 ───────────────────────────────────────────────
 def current_stats() -> dict:
-    """현재 시스템 자원 사용률을 TEMPLATE 형식으로 반환."""
     s = TEMPLATE.copy()
     s["timestamp"] = datetime.datetime.utcnow().isoformat(timespec="seconds") + "Z"
-
-    # CPU / MEM / DISK
     s["cpu_percent"] = psutil.cpu_percent(interval=0.2)
     s["memory_percent"] = psutil.virtual_memory().percent
     s["disk_percent"] = psutil.disk_usage(str(ROOT)).percent
-
-    # GPU (첫 번째 카드만)
     if GPUtil:
         try:
             gpu = GPUtil.getGPUs()[0]
             s["gpu_percent"] = round(gpu.load * 100, 2)
         except Exception:
             pass
-
-    # 네트워크 누적 전송량
     io = psutil.net_io_counters()
     s["net_sent_mb"] = round(io.bytes_sent / 1_048_576, 2)
     s["net_recv_mb"] = round(io.bytes_recv / 1_048_576, 2)
-
     return s
 
-# ── 로그 파일에 추가 기록 ───────────────────────────────────
 def append_log() -> dict:
     entry = current_stats()
-
     try:
         if LOG_FILE.exists():
             data = json.loads(LOG_FILE.read_text(encoding="utf-8"))
@@ -67,12 +48,14 @@ def append_log() -> dict:
             data = []
     except Exception:
         data = []
-
     data.append(entry)
     LOG_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     return entry
 
-# ── CLI 실행 시 샘플 기록 ───────────────────────────────────
 if __name__ == "__main__":
     rec = append_log()
     print("Logged one entry:", rec)
+
+def update_system_health():
+    # 상태 업데이트를 위한 래퍼 함수
+    return append_log()

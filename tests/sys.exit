@@ -1,0 +1,14 @@
+- name: Report success to Slack
+  if: success()
+  run: |
+    python - <<'PY'
+    from tools.notifications.slack_api import send
+    import os, sys
+    sha = os.environ["GITHUB_SHA"][:7]
+    ok = send(f"✅ VELOS CI passed for commit {sha}")
+    if not ok:
+        sys.exit("Slack send returned False")
+    PY
+  env:
+    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}

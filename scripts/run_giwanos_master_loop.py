@@ -35,7 +35,7 @@ from modules.advanced.advanced_modules.advanced_rag import test_advanced_rag
 from modules.core.adaptive_reasoning_agent import adaptive_reasoning_main
 from modules.core.threshold_optimizer import threshold_optimizer_main
 from modules.core.rule_optimizer import rule_optimizer_main
-from modules.core.system_health_logger import update_system_health
+from modules.automation.scheduling.system_health_logger import update_system_health
 
 def snapshot_step():
     try:
