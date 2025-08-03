@@ -1,36 +1,60 @@
+name: VELOS CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
 jobs:
-  test-build:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # ── 1) 소스 체크아웃 ────────────────────────────────
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ── 2) Python 세팅 ─────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install deps
+
+      # ── 3) 의존성 설치 ────────────────────────────────
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run tests
+
+      # ── 4) 테스트 실행 (pytest만) ─────────────────────
+      - name: Run Tests
         run: |
-          pytest -q
+          pytest -q                # ← 여기만 남기고 나머지 삭제
+
+      # ── 5) 성공 시 Slack 알림 ─────────────────────────
       - name: Report success to Slack
         if: success()
         run: |
           python - <<'PY'
           from tools.notifications.slack_api import send
           import os
-          send(f"✅ VELOS CI passed for commit {os.environ['GITHUB_SHA'][:7]}")
+          sha = os.environ['GITHUB_SHA'][:7]
+          send(f"✅ VELOS CI passed for commit {sha}")
           PY
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      # ── 6) 실패 시 Slack 알림 ─────────────────────────
       - name: Report failure to Slack
         if: failure()
         run: |
           python - <<'PY'
           from tools.notifications.slack_api import send
           import os
-          send(f"❌ VELOS CI failed for commit {os.environ['GITHUB_SHA'][:7]}")
+          sha = os.environ['GITHUB_SHA'][:7]
+          send(f"❌ VELOS CI failed for commit {sha}")
           PY
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
