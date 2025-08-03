@@ -1,7 +1,22 @@
+# ───── Core ─────
+python-dotenv>=1.0.0      # .env 자동 로드
+requests>=2.31.0          # Slack / HTTP 통신
+slack_sdk>=3.36.0         # Slack 알림
+GitPython>=3.1.18         # Git 연동 (이미 포함)
 
+# ───── Data / PDF / Charts ─────
+pandas>=2.2.2
+matplotlib>=3.9.0
+fpdf>=1.7.2               # PDF 보고서
+GPUtil>=1.4.0             # GPU 모니터링
+psutil>=5.9.8             # 시스템 자원
+tqdm>=4.66.4              # 진행바 (trufflehog 등에서 사용)
+
+# ───── Web / Streamlit 대시보드 ─────
+streamlit==1.47.1         # 고정 버전 유지
 altair==5.5.0
+
+# ───── Type / Watch / 기타 ─────
 annotated-types==0.7.0
-GitPython==3.1.18
-streamlit==1.47.1
-urllib3==2.5.0
 watchdog==6.0.0
+urllib3==2.5.0
