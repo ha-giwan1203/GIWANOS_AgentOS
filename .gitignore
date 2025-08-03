@@ -45,3 +45,7 @@ venv/
 # trigger
 # allow project-level Pytest config
 !pytest.ini
+
+# 추가할 내용
+data/reports/*.md
+giwanos/data/reports/*.pdf
