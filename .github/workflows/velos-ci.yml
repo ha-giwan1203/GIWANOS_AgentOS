@@ -11,49 +11,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ── 1) 소스 체크아웃 ────────────────────────────────
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      # ── 1) Checkout ─────────────────────────────────────────
+      - uses: actions/checkout@v4
 
-      # ── 2) Python 세팅 ─────────────────────────────────
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      # ── 2) Python 3.11 ─────────────────────────────────────
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # ── 3) 의존성 설치 ────────────────────────────────
+      # ── 3) Dependencies ───────────────────────────────────
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ── 4) 테스트 실행 (pytest만) ─────────────────────
+      # ── 4) Tests ───────────────────────────────────────────
       - name: Run Tests
         run: |
-          pytest -q                # ← 여기만 남기고 나머지 삭제
+          pytest -q
 
-      # ── 5) 성공 시 Slack 알림 ─────────────────────────
+      # ── 5) (선택) Slack ENV 디버그 ────────────────────────
+      - name: Debug Slack env vars
+        run: |
+          echo "BOT token length: ${#SLACK_BOT_TOKEN}"
+          echo "CHANNEL ID: $SLACK_CHANNEL_ID"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      # ── 6) Slack Success 알림 ─────────────────────────────
       - name: Report success to Slack
         if: success()
         run: |
           python - <<'PY'
+          import os, sys
           from tools.notifications.slack_api import send
-          import os
-          sha = os.environ['GITHUB_SHA'][:7]
-          send(f"✅ VELOS CI passed for commit {sha}")
+
+          sha = os.environ["GITHUB_SHA"][:7]
+          ok = send(f"✅ VELOS CI passed for commit {sha}")
+          if not ok:
+              sys.exit("Slack send returned False")
           PY
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
 
-      # ── 6) 실패 시 Slack 알림 ─────────────────────────
+      # ── 7) Slack Failure 알림 ─────────────────────────────
       - name: Report failure to Slack
         if: failure()
         run: |
           python - <<'PY'
-          from tools.notifications.slack_api import send
           import os
-          sha = os.environ['GITHUB_SHA'][:7]
+          from tools.notifications.slack_api import send
+          sha = os.environ["GITHUB_SHA"][:7]
           send(f"❌ VELOS CI failed for commit {sha}")
           PY
         env:
