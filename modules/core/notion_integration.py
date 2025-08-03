@@ -1,7 +1,7 @@
-# modules/core/notion_integration.py
+
 import os
-from dotenv import load_dotenv
 from notion_client import Client
+from dotenv import load_dotenv
 from datetime import datetime
 import requests
 
@@ -24,18 +24,16 @@ def add_notion_database_entry(title, status, description, entry_type="결과"):
 
     notion.pages.create(parent={"database_id": DATABASE_ID}, properties=properties)
 
-
 def upload_reflection_to_notion(reflection_text):
     properties = {
         "제목": {"title": [{"text": {"content": f"회고 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"}}]},
-        "상태": {"status": {"name": "회고"}},
+        "상태": {"status": {"name": "완료"}},  # 상태는 표준 옵션으로 변경
+        "유형": {"select": {"name": "회고"}},  # 회고 유형 유지
         "설명": {"rich_text": [{"text": {"content": reflection_text}}]},
-        "유형": {"select": {"name": "회고"}},
         "날짜": {"date": {"start": datetime.now().strftime("%Y-%m-%d")}}
     }
 
     notion.pages.create(parent={"database_id": DATABASE_ID}, properties=properties)
-
 
 def append_summary_block_to_page(summary_text):
     url = f"https://api.notion.com/v1/blocks/{PAGE_ID}/children"
