@@ -1,0 +1,13 @@
+{
+    "sidebar": {
+        "enabled": true,
+        "position": "left"
+    },
+    "header": {
+        "display_logo": true,
+        "title": "GIWANOS Dashboard"
+    },
+    "footer": {
+        "enabled": false
+    }
+}

@@ -1,0 +1,10 @@
+openai
+requests
+numpy
+pandas
+python-dotenv
+faiss-cpu
+PyYAML
+streamlit
+matplotlib
+notion-client

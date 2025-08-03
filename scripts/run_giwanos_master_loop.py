@@ -1,0 +1,102 @@
+import logging
+import sys
+import os
+from datetime import datetime
+
+# 경로 설정
+BASE_DIR = "C:/giwanos"
+
+# PYTHONPATH 설정 (VELOS 기준 명확히 설정)
+sys.path.append(BASE_DIR)
+
+# 로그 설정
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler(f'{BASE_DIR}/data/logs/master_loop_execution.log'),
+        logging.StreamHandler(sys.stdout)
+    ],
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+
+# VELOS 최신 모듈 경로 기준 import
+from modules.core.snapshot_manager import create_incremental_snapshot, create_full_snapshot
+from modules.core.auto_recovery_agent import main as auto_recovery_main
+from modules.core.reflection_agent import run_reflection
+from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
+from modules.automation.git_management.git_sync import main as git_sync
+from modules.evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
+from tools.notifications.send_email import send_report_email
+from modules.automation.scheduling.weekly_summary import generate_weekly_summary
+from modules.advanced.advanced_modules.cot_evaluator import evaluate_cot
+from modules.advanced.advanced_modules.advanced_rag import test_advanced_rag
+from modules.core.adaptive_reasoning_agent import adaptive_reasoning_main
+from modules.core.threshold_optimizer import threshold_optimizer_main
+from modules.core.rule_optimizer import rule_optimizer_main
+from modules.core.system_health_logger import update_system_health
+
+def snapshot_step():
+    try:
+        create_incremental_snapshot()
+        logger.info('Incremental snapshot created')
+    except Exception as e:
+        logger.warning(f'Incremental snapshot skipped: {e}')
+        try:
+            create_full_snapshot()
+            logger.info('Full snapshot created')
+        except Exception as ex:
+            logger.warning(f'Full snapshot skipped: {ex}')
+
+def run_judge_agent():
+    try:
+        agent = JudgeAgent()
+        agent.run_loop()
+        logger.info('JudgeAgent completed')
+    except Exception as e:
+        logger.exception(f'JudgeAgent failed: {e}')
+
+def report_and_email_step():
+    try:
+        pdf_path = generate_pdf_report()
+        logger.info(f'PDF report generated: {pdf_path}')
+    except Exception as e:
+        logger.exception(f'Report generation failed: {e}')
+        return
+    try:
+        send_report_email(pdf_path)
+        logger.info('Report email sent')
+    except Exception as e:
+        logger.exception(f'Email sending failed: {e}')
+
+def weekly_summary_step():
+    try:
+        report_dir = f"{BASE_DIR}/data/reports"
+        summary_path = generate_weekly_summary(report_dir)
+        logger.info(f'Weekly summary created: {summary_path}')
+    except Exception as e:
+        logger.exception(f'Weekly summary failed: {e}')
+
+def main():
+    logger.info('=== VELOS Master Loop Start ===')
+    update_system_health()
+
+    snapshot_step()
+    run_judge_agent()
+    git_sync()
+    report_and_email_step()
+    weekly_summary_step()
+    evaluate_cot()
+    test_advanced_rag()
+    auto_recovery_main()
+    run_reflection()
+
+    adaptive_reasoning_main()
+    threshold_optimizer_main()
+    rule_optimizer_main()
+
+    logger.info('=== VELOS Master Loop End ===')
+
+if __name__ == '__main__':
+    main()

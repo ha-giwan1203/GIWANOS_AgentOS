@@ -1,0 +1,28 @@
+{
+  "uptime": "99.98%",
+  "events": [
+    {
+      "time": "10:45",
+      "issue": "네트워크 지연",
+      "resolution": "2분 내 자동 복구 완료"
+    },
+    {
+      "time": "15:30",
+      "issue": "DB 백업 완료",
+      "details": "백업 속도 10% 향상"
+    }
+  ],
+  "performance": {
+    "cpu_usage": "65%",
+    "memory_usage": "70%",
+    "avg_response_time": "120ms"
+  },
+  "issues_reported": [
+    "특정 기능 응답 속도 지연 보고",
+    "비정상 로그인 시도 감지"
+  ],
+  "plans": [
+    "성능 튜닝 및 사용자 경험 개선",
+    "다중 인증 시스템 도입 검토"
+  ]
+}
