@@ -1,3 +1,4 @@
+
 import logging
 import sys
 import os
@@ -23,17 +24,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 환경변수 로드
-load_dotenv("C:/giwanos/configs/.env")
+load_dotenv(f"{BASE_DIR}/configs/.env")
 
 # OpenAI 클라이언트 초기화
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# 주요 경로 설정
-API_COST_LOG = "C:/giwanos/data/logs/api_cost_log.json"
-MEMORY_PATH = "C:/giwanos/data/memory/learning_memory.json"
+# 주요 경로
+API_COST_LOG = f"{BASE_DIR}/data/logs/api_cost_log.json"
+MEMORY_PATH = f"{BASE_DIR}/data/memory/learning_memory.json"
 
 # 모듈 import
-from modules.core.hybrid_snapshot_manager import create_incremental_snapshot, create_full_snapshot
+from modules.core.hybrid_snapshot_manager import create_incremental_snapshot
 from modules.core.auto_recovery_agent import main as auto_recovery_main
 from modules.core.reflection_agent import run_reflection
 from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
@@ -54,7 +55,7 @@ from modules.core.notion_integration import (
 )
 from modules.core.slack_client import SlackClient
 
-# GPT-4o Turbo API 호출 및 분석 결과 저장
+# GPT 분석 엔진
 class GPT4oTurboDecisionEngine:
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -100,34 +101,33 @@ class GPT4oTurboDecisionEngine:
         with open(API_COST_LOG, 'w', encoding='utf-8') as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
-# 분석 결과 메모리 저장
+# 메모리 저장기
 class LearningMemoryManager:
     @staticmethod
     def save_analysis(analysis_result):
-        memory_path = MEMORY_PATH
         try:
-            data = []
-            if os.path.exists(memory_path):
-                with open(memory_path, 'r', encoding='utf-8') as mem_file:
+            data = {}
+            if os.path.exists(MEMORY_PATH):
+                with open(MEMORY_PATH, 'r', encoding='utf-8') as mem_file:
                     try:
                         data = json.load(mem_file)
                         if not isinstance(data, dict):
-                            data = {"recent_events": [], "insights": [], "performance_metrics": [], "user_behavior": []}
+                            data = {"insights": []}
                     except json.JSONDecodeError:
-                        data = {"recent_events": [], "insights": [], "performance_metrics": [], "user_behavior": []}
+                        data = {"insights": []}
 
-            data["insights"].append({
+            data.setdefault("insights", []).append({
                 "timestamp": datetime.utcnow().isoformat(),
                 "insight": analysis_result
             })
 
-            with open(memory_path, 'w', encoding='utf-8') as mem_file:
+            with open(MEMORY_PATH, 'w', encoding='utf-8') as mem_file:
                 json.dump(data, mem_file, indent=4, ensure_ascii=False)
 
-            logging.info("✅ 학습 메모리에 GPT-4o Turbo 분석 결과 저장 완료")
+            logger.info("✅ 학습 메모리에 GPT-4o Turbo 분석 결과 저장 완료")
 
         except Exception as e:
-            logging.error(f"학습 메모리 업데이트 실패: {e}")
+            logger.error(f"학습 메모리 업데이트 실패: {e}")
 
 def main():
     logger.info('=== VELOS Master Loop Start ===')
@@ -140,11 +140,16 @@ def main():
     decision_engine = GPT4oTurboDecisionEngine()
     slack_client = SlackClient()
     analysis_result = decision_engine.analyze_request("Check system health")
-    slack_client.send_message("#general", analysis_result)
+
+    # 조건부 Slack 알림
+    if "장애" in analysis_result or "경고" in analysis_result:
+        slack_client.send_message("#alerts", f"🚨 시스템 경고 발생!\n{analysis_result}")
+    else:
+        slack_client.send_message("#summary", "✅ VELOS 루프 정상 작동 완료.")
 
     pdf_report_path = generate_pdf_report()
     send_report_email(pdf_report_path)
-    generate_weekly_summary("C:/giwanos/data/reports")
+    generate_weekly_summary(f"{BASE_DIR}/data/reports")
 
     if "장애" in analysis_result or "경고" in analysis_result:
         auto_recovery_main()
