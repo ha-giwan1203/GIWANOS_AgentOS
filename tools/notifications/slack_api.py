@@ -1,5 +1,9 @@
-"""Unified Slack API – VELOS (dup‑skip + 콘솔 즉시 출력)"""
-
+"""Unified Slack API – VELOS (v2).
+Improvements:
+- TTL_SEC configurable via SLACK_DUP_TTL environment variable
+- Logging unified (no print)
+- Fallback to DM (self) when channel omitted
+"""
 from __future__ import annotations
 import os, json, time, hashlib, logging, pathlib, requests
 from typing import Optional
@@ -7,77 +11,83 @@ from dotenv import load_dotenv
 
 # ── .env 로드 ────────────────────────────────────────────────
 ROOT = pathlib.Path(__file__).resolve().parents[2]       # giwanos
-load_dotenv(ROOT / ".env", override=False)
-load_dotenv(ROOT.parent / ".env", override=False)
+load_dotenv(ROOT / "configs" / ".env", override=False)
+load_dotenv(pathlib.Path.home() / ".velos.env", override=True)
 # ────────────────────────────────────────────────────────────
 
 TOKEN   = os.getenv("SLACK_BOT_TOKEN")
-CHANNEL = os.getenv("SLACK_CHANNEL_ID") or os.getenv("SLACK_DEFAULT_CH")
+CHANNEL_DEFAULT = os.getenv("SLACK_CHANNEL_ID") or os.getenv("SLACK_DEFAULT_CH")
 
-_log = logging.getLogger("slack_api")
+TTL_SEC = int(os.getenv("SLACK_DUP_TTL", "5"))      # duplicate‑skip window
+_log = logging.getLogger("velos.slack")
 
-# 중복 전송 캐시
+# Deduplicate cache
 _recent: dict[str, float] = {}
-TTL_SEC = 5          # 같은 메시지 5초 내 한 번
 
 def _is_dup(sig: str) -> bool:
     now = time.time()
-    _recent.update({k: v for k, v in _recent.items() if v >= now})
+    # purge old
+    for k in list(_recent.keys()):
+        if _recent[k] < now:
+            _recent.pop(k, None)
     if sig in _recent:
         return True
     _recent[sig] = now + TTL_SEC
     return False
 
-def _post(text: str,
-          channel: Optional[str] = None,
-          blocks: Optional[list] = None) -> bool:
-    ch = channel or CHANNEL
+def _call_slack_api(method: str, payload: dict) -> dict:
+    resp = requests.post(
+        f"https://slack.com/api/{method}",
+        headers={
+            "Authorization": f"Bearer {TOKEN}",
+            "Content-Type": "application/json"
+        },
+        data=json.dumps(payload),
+        timeout=5
+    )
+    try:
+        return resp.json()
+    except Exception:
+        return {"ok": False, "error": "json_parse_fail"}
+
+def _resolve_dm_channel() -> Optional[str]:
+    # Open IM channel with self if not cached
+    if not TOKEN:
+        return None
+    data = _call_slack_api("auth.test", {})
+    user_id = data.get("user_id")
+    if not user_id:
+        return None
+    im = _call_slack_api("conversations.open", {"users": user_id})
+    return im.get("channel", {}).get("id")
+
+def _post(text: str, channel: Optional[str] = None, blocks: Optional[list] = None) -> bool:
+    ch = channel or CHANNEL_DEFAULT or _resolve_dm_channel()
     if not TOKEN or not ch:
-        msg = f"[Slack 전송 실패 ❌] TOKEN/CHANNEL 미설정 → {text}"
-        print(msg); _log.warning(msg)
+        _log.warning("Slack TOKEN or channel not set → message dropped: %s", text)
         return False
 
     sig = hashlib.md5(f"{ch}:{text}".encode()).hexdigest()
     if _is_dup(sig):
-        msg = f"[Slack ⏩ Skip dup] {text}"
-        print(msg); _log.info(msg)
+        _log.info("Slack dup‑skip: %s", text)
         return True
 
     payload = {"channel": ch, "text": text}
-    if blocks: payload["blocks"] = blocks
+    if blocks:
+        payload["blocks"] = blocks
 
-    try:
-        res = requests.post(
-            "https://slack.com/api/chat.postMessage",
-            headers={
-                "Authorization": f"Bearer {TOKEN}",
-                "Content-Type": "application/json",
-            },
-            data=json.dumps(payload),
-            timeout=5,
-        )
-        data = res.json()
-        if data.get("ok"):
-            msg = f"[Slack ✅] {text}"
-            print(msg); _log.info(msg)
-            return True
-        msg = f"[Slack 전송 실패 ❌] {data.get('error')} → {text}"
-        print(msg); _log.error(msg)
-        return False
-    except Exception as e:
-        msg = f"[Slack 예외 ❌] {e} → {text}"
-        print(msg); _log.exception(msg)
-        return False
+    res = _call_slack_api("chat.postMessage", payload)
+    if res.get("ok") is True:
+        _log.info("Slack ✅ %s", text)
+        return True
+    _log.error("Slack ❌ %s -> %s", res.get("error"), text)
+    return False
 
-# 공용 API
+# public helpers
 def send(text: str, channel: str | None = None, blocks: list | None = None):
     return _post(text, channel, blocks)
 
-def notify(text: str, channel: str | None = None, blocks: list | None = None):
-    return _post(text, channel, blocks)
-
-def post_message(text: str, channel: str | None = None, blocks: list | None = None):
-    return _post(text, channel, blocks)
+notify = post_message = send
 
 class SlackNotifier:
     def push(self, text: str, channel: str | None = None, blocks: list | None = None):
