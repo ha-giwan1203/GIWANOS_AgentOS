@@ -1,30 +1,24 @@
-"""
-Unified Slack client (bot‑token).  
-env vars required:
-  SLACK_BOT_TOKEN   xoxb‑***
-  SLACK_DEFAULT_CH  #velos-notify  (channel name or ID)
-"""
-import os, logging
+import os
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from dotenv import load_dotenv
 
-_TOKEN   = os.getenv("SLACK_BOT_TOKEN")
-_CHANNEL = os.getenv("SLACK_DEFAULT_CH", "#general")
-_client  = WebClient(token=_TOKEN)
-_log     = logging.getLogger("slack_client")
+# 정확한 실제 .env 파일 위치
+env_path = "C:/giwanos/configs/.env"
+load_dotenv(env_path)
 
-def send(text: str,
-         channel: str | None = None,
-         blocks: list | None = None) -> None:
-    if not _TOKEN:
-        _log.warning("SLACK_BOT_TOKEN not set; skip Slack notify")
-        return
-    try:
-        _client.chat_postMessage(
-            channel=channel or _CHANNEL,
-            text=text,
-            blocks=blocks
-        )
-        _log.info("Slack notify OK → %s", channel or _CHANNEL)
-    except SlackApiError as e:
-        _log.error("Slack error: %s", e.response.get('error'))
+class SlackClient:
+    def __init__(self):
+        self.token = os.getenv("SLACK_BOT_TOKEN")
+        self.default_channel = os.getenv("SLACK_DEFAULT_CH", "#general")
+        self.client = WebClient(token=self.token)
+
+        if not self.token:
+            raise ValueError(f"환경변수 SLACK_BOT_TOKEN이 설정되지 않았습니다. 현재 .env 경로: {env_path}")
+
+    def send_message(self, channel, message):
+        try:
+            response = self.client.chat_postMessage(channel=channel, text=message)
+            return f"Slack 메시지 전송 성공: {response['ts']}"
+        except SlackApiError as e:
+            return f"Slack 메시지 전송 실패: {e.response['error']}"

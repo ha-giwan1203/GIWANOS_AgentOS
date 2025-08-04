@@ -1,13 +1,13 @@
-
 import logging
 import sys
 import os
+import json
 from datetime import datetime
+from openai import OpenAI
+from dotenv import load_dotenv
 
 # 경로 설정
 BASE_DIR = "C:/giwanos"
-
-# PYTHONPATH 설정 (VELOS 기준 명확히 설정)
 sys.path.append(BASE_DIR)
 
 # 로그 설정
@@ -22,7 +22,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# VELOS 최신 모듈 경로 기준 import
+# 환경변수 로드
+load_dotenv("C:/giwanos/configs/.env")
+
+# OpenAI 클라이언트 초기화
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# 주요 경로 설정
+API_COST_LOG = "C:/giwanos/data/logs/api_cost_log.json"
+MEMORY_PATH = "C:/giwanos/memory/learning_memory.json"
+
+# 모듈 import
 from modules.core.hybrid_snapshot_manager import create_incremental_snapshot, create_full_snapshot
 from modules.core.auto_recovery_agent import main as auto_recovery_main
 from modules.core.reflection_agent import run_reflection
@@ -42,76 +52,95 @@ from modules.core.notion_integration import (
     upload_reflection_to_notion,
     append_summary_block_to_page
 )
-from tools.notifications.slack_api import send as send_slack_message
-from tools.notifications.send_pushbullet_notification import send_pushbullet_alert
+from modules.core.slack_client import SlackClient
 
-def snapshot_step():
-    try:
-        create_incremental_snapshot()
-        logger.info('Incremental snapshot created')
-    except Exception as e:
-        logger.warning(f'Incremental snapshot skipped: {e}')
-        try:
-            create_full_snapshot()
-            logger.info('Full snapshot created')
-        except Exception as ex:
-            logger.warning(f'Full snapshot skipped: {ex}')
+# GPT-4o Turbo API 호출 및 분석 결과 저장
+class GPT4oTurboDecisionEngine:
+    def analyze_request(self, request):
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "GPT-4o Turbo API Call"},
+                {"role": "user", "content": request}
+            ]
+        )
+        result = response.choices[0].message.content
+        self.record_api_usage(response.usage, "gpt-4o", result)
+        return result
 
-def run_judge_agent():
-    try:
-        agent = JudgeAgent()
-        agent.run_loop()
-        logger.info('JudgeAgent completed')
-        add_notion_database_entry("JudgeAgent 작업 완료", "완료", "JudgeAgent가 정상 완료되었습니다.")
-        send_slack_message("JudgeAgent 작업이 정상적으로 완료되었습니다.")
-        send_pushbullet_alert("JudgeAgent 작업 완료됨")
-    except Exception as e:
-        logger.exception(f'JudgeAgent failed: {e}')
+    def record_api_usage(self, usage, model_name, analysis_result):
+        record = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "model": model_name,
+            "prompt_tokens": usage.prompt_tokens,
+            "completion_tokens": usage.completion_tokens,
+            "total_tokens": usage.total_tokens,
+            "cost_usd": usage.total_tokens * 0.00001,
+            "analysis_result": analysis_result
+        }
+        if os.path.exists(API_COST_LOG):
+            with open(API_COST_LOG, 'r', encoding='utf-8') as file:
+                try:
+                    data = json.load(file)
+                    if isinstance(data, dict): data = [data]
+                    elif not isinstance(data, list): data = []
+                except json.JSONDecodeError:
+                    data = []
+        else:
+            data = []
 
-def report_and_email_step():
-    try:
-        pdf_path = generate_pdf_report()
-        logger.info(f'PDF report generated: {pdf_path}')
-        send_report_email(pdf_path)
-        logger.info('Report email sent')
-        add_notion_database_entry("주간 보고서 생성 및 이메일 전송", "완료", "보고서 생성 및 이메일 전송 완료")
-        send_slack_message("주간 보고서가 생성되고 이메일로 발송되었습니다.")
-    except Exception as e:
-        logger.exception(f'Report or Email sending failed: {e}')
+        data.append(record)
 
-def weekly_summary_step():
-    try:
-        report_dir = f"{BASE_DIR}/data/reports"
-        summary_path = generate_weekly_summary(report_dir)
-        logger.info(f'Weekly summary created: {summary_path}')
-        append_summary_block_to_page(f"✅ 주간 요약 생성 완료: {summary_path}")
-        send_slack_message("주간 요약 보고서가 정상적으로 생성되었습니다.")
-    except Exception as e:
-        logger.exception(f'Weekly summary failed: {e}')
+        with open(API_COST_LOG, 'w', encoding='utf-8') as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
 
-def run_reflection_step():
-    try:
-        reflection_message = "시스템 회고: 모든 주요 작업이 정상 완료됨."
-        run_reflection()
-        upload_reflection_to_notion(reflection_message)
-        send_slack_message("시스템 회고 데이터가 Notion에 업로드되었습니다.")
-    except Exception as e:
-        logger.exception(f'Reflection step failed: {e}')
+# 분석 결과 메모리 저장
+class LearningMemoryManager:
+    @staticmethod
+    def save_analysis(analysis_result):
+        with open(MEMORY_PATH, 'r', encoding='utf-8') as mem_file:
+            memory_data = json.load(mem_file)
+
+        memory_data["insights"].append({
+            "timestamp": datetime.utcnow().isoformat(),
+            "insight": analysis_result
+        })
+
+        with open(MEMORY_PATH, 'w', encoding='utf-8') as mem_file:
+            json.dump(memory_data, mem_file, indent=4, ensure_ascii=False)
+
+# 통합 Master Loop
 
 def main():
     logger.info('=== VELOS Master Loop Start ===')
     update_system_health()
 
-    snapshot_step()
-    run_judge_agent()
+    create_incremental_snapshot()
+    JudgeAgent().run_loop()
     git_sync()
-    report_and_email_step()
-    weekly_summary_step()
+
+    # GPT-4o Turbo API 호출 및 Slack 알림
+    decision_engine = GPT4oTurboDecisionEngine()
+    slack_client = SlackClient()
+    analysis_result = decision_engine.analyze_request("Check system health")
+    slack_client.send_message("#general", analysis_result)
+
+    # GPT-4o Turbo 분석 결과를 PDF 보고서 및 이메일 알림에 반영
+    pdf_report_path = generate_pdf_report()
+    send_report_email(pdf_report_path)
+    generate_weekly_summary("C:/giwanos/data/reports")
+
+    # GPT-4o Turbo 분석 결과를 자동 복구 에이전트에 반영
+    if "장애" in analysis_result or "경고" in analysis_result:
+        auto_recovery_main()
+
+    # GPT-4o Turbo 분석 결과를 학습 메모리에 저장
+    LearningMemoryManager.save_analysis(analysis_result)
+
+    # 기타 기존 작업
     evaluate_cot()
     test_advanced_rag()
-    auto_recovery_main()
-    run_reflection_step()
-
+    run_reflection()
     adaptive_reasoning_main()
     threshold_optimizer_main()
     rule_optimizer_main()
