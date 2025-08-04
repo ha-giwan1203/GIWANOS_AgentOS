@@ -8,9 +8,15 @@ class JudgeAgent:
         self.analysis_path = "C:/giwanos/data/logs/api_cost_log.json"
 
     def load_latest_analysis(self):
-        with open(self.analysis_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return data[-1]["analysis_result"]
+        try:
+            with open(self.analysis_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if data and "analysis_result" in data[-1]:
+                    return data[-1]["analysis_result"]
+                return "No valid analysis result found"
+        except Exception as e:
+            logger.error(f"Error loading analysis result: {e}")
+            return "No analysis data available"
 
     def run_loop(self):
         logger.info("JudgeAgent 루프 실행 시작")
@@ -22,4 +28,4 @@ class JudgeAgent:
         logger.info("JudgeAgent 루프 정상 완료")
 
     def trigger_alert(self, analysis):
-        logger.warning(f"JudgeAgent: 즉각적인 주의 필요 → {analysis}")
+        logger.warning(f"JudgeAgent 경고 발생 → {analysis}")

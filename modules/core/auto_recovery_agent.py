@@ -5,9 +5,15 @@ logger = logging.getLogger("auto_recovery_agent")
 logger.setLevel(logging.INFO)
 
 def load_latest_analysis():
-    with open('C:/giwanos/data/logs/api_cost_log.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        return data[-1]["analysis_result"]
+    try:
+        with open('C:/giwanos/data/logs/api_cost_log.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if data and "analysis_result" in data[-1]:
+                return data[-1]["analysis_result"]
+            return "No valid analysis result found"
+    except Exception as e:
+        logger.error(f"Error loading analysis result: {e}")
+        return "No analysis data available"
 
 def main():
     latest_analysis = load_latest_analysis()
@@ -20,4 +26,4 @@ def main():
 
 def perform_auto_recovery(issue):
     logger.info(f"자동 복구 시작: {issue}")
-    # 실제 복구 로직 구현 (필요한 로직 추가)
+    # 추가적인 복구 로직 구현 필요
