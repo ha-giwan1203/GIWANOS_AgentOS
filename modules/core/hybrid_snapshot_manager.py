@@ -4,7 +4,7 @@ import os
 import filecmp
 
 SNAPSHOT_DIR = "C:/giwanos/data/snapshots"
-SOURCE_DIR = "C:/giwanos/core"
+SOURCE_DIR = "C:/giwanos/modules/core"
 
 
 def create_full_snapshot():
