@@ -5,10 +5,11 @@ from pathlib import Path
 GIWANOS_ROOT = Path("C:/giwanos")
 
 required_paths = {
-    "config_rules": GIWANOS_ROOT / "config/judgment_rules.json",
-    "core_rules": GIWANOS_ROOT / "core/judgment_rules.json",
-    "memory": GIWANOS_ROOT / "memory",
+    "config_rules": GIWANOS_ROOT / "configs/judgment_rules.json",
+    "learning_memory": GIWANOS_ROOT / "data/memory/learning_memory.json",
+    "api_cost_log": GIWANOS_ROOT / "data/logs/api_cost_log.json",
     "logs": GIWANOS_ROOT / "data/logs",
+    "memory": GIWANOS_ROOT / "data/memory",
     "reflections": GIWANOS_ROOT / "data/reflections",
     "reports": GIWANOS_ROOT / "data/reports",
     "snapshots": GIWANOS_ROOT / "data/snapshots"
@@ -24,10 +25,12 @@ def check_paths():
 
 def validate_json():
     json_files = [
-        "config/judgment_rules.json",
-        "core/judgment_rules.json",
-        "config/system_config.json",
-        "config/fallback_stats.json"
+        "configs/judgment_rules.json",
+        "configs/system_config.json",
+        "configs/fallback_stats.json",
+        "data/logs/api_cost_log.json",
+        "data/memory/learning_memory.json",
+        "data/memory/identity_memory.json"
     ]
 
     print("\n[JSON 파일 검사 결과]")
