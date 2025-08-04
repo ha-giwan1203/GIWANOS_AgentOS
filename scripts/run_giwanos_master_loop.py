@@ -23,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # VELOS 최신 모듈 경로 기준 import
-from modules.core.snapshot_manager import create_incremental_snapshot, create_full_snapshot
+from modules.core.hybrid_snapshot_manager import create_incremental_snapshot, create_full_snapshot
 from modules.core.auto_recovery_agent import main as auto_recovery_main
 from modules.core.reflection_agent import run_reflection
 from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
