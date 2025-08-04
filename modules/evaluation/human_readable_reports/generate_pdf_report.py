@@ -7,7 +7,25 @@ import warnings
 # ⚠️ 콘솔에 경고 출력되지 않도록 설정
 warnings.filterwarnings("ignore", category=UserWarning)
 
-report_content = {'system_summary': {'cpu_usage': '25%', 'memory_usage': '45%', 'disk_usage': '60%', 'recent_events': ['JudgeAgent 정상 실행', 'GitHub 자동 커밋 완료']}, 'analysis_details': {'advanced_rag_test': 'API 호출 효율성: 80% 감소 (총 호출 20회)', 'cot_evaluation': '점수: 95.2점, 순위: 1위', 'threshold_rule_optimization': 'Threshold 및 Rule 최적화 완료'}, 'recent_git_commits': ['자동 커밋: 최신 파일 자동 백업', 'data_load_test.py 추가', 'generate_pdf_report.py 제거'], 'issues_summary': '이번 주 특별한 장애나 예외 사항 없음.'}
+report_content = {
+    'system_summary': {
+        'cpu_usage': '25%',
+        'memory_usage': '45%',
+        'disk_usage': '60%',
+        'recent_events': ['JudgeAgent 정상 실행', 'GitHub 자동 커밋 완료']
+    },
+    'analysis_details': {
+        'advanced_rag_test': 'API 호출 효율성: 80% 감소 (총 호출 20회)',
+        'cot_evaluation': '점수: 95.2점, 순위: 1위',
+        'threshold_rule_optimization': 'Threshold 및 Rule 최적화 완료'
+    },
+    'recent_git_commits': [
+        '자동 커밋: 최신 파일 자동 백업',
+        'data_load_test.py 추가',
+        'generate_pdf_report.py 제거'
+    ],
+    'issues_summary': '이번 주 특별한 장애나 예외 사항 없음.'
+}
 
 font_path = r"C:\giwanos\fonts\NotoSansKR-Regular.ttf"
 
@@ -62,8 +80,9 @@ def create_weekly_report():
     pdf_path = os.path.join(output_dir, f'weekly_report_{now.strftime("%Y%m%d")}.pdf')
     pdf.output(pdf_path)
     print(f"✅ 보고서 생성 완료: {pdf_path}")
+    return pdf_path  # ✅ 핵심 수정 부분
 
-# ▶ alias 추가 – 마스터 루프에서 호출 가능하도록
+# 마스터 루프 호환
 generate_pdf_report = create_weekly_report
 
 if __name__ == "__main__":
