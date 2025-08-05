@@ -1,14 +1,5 @@
 1. 최근 시스템 상태 로그
-:42:11Z",
-    "cpu_percent": 0.0,
-    "memory_percent": 47.1,
-    "disk_percent": 82.6,
-    "gpu_percent": 0.0,
-    "net_sent_mb": 17303.48,
-    "net_recv_mb": 10710.12
-  },
-  {
-    "timestamp": "2025-08-05T04:49:42Z",
+49:42Z",
     "cpu_percent": 2.1,
     "memory_percent": 47.3,
     "disk_percent": 82.6,
@@ -33,6 +24,15 @@
     "gpu_percent": 0.0,
     "net_sent_mb": 17318.87,
     "net_recv_mb": 10825.5
+  },
+  {
+    "timestamp": "2025-08-05T05:51:53Z",
+    "cpu_percent": 19.6,
+    "memory_percent": 49.9,
+    "disk_percent": 82.6,
+    "gpu_percent": 0.0,
+    "net_sent_mb": 17335.25,
+    "net_recv_mb": 10900.04
   }
 ]
 
