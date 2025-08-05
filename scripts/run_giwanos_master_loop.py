@@ -9,11 +9,15 @@
 
 import sys
 import os
+import warnings  # 추가됨
 import logging
 import json
 from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
+
+# 경고 무시 설정 (fpdf.ttfonts cmap warning 제거)
+warnings.filterwarnings("ignore", category=UserWarning, module="fpdf.ttfonts")
 
 # 경로 보정
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
