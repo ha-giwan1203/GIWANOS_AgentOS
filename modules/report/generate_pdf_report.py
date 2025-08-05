@@ -1,10 +1,4 @@
 
-import logging
-
-# 외부 라이브러리 로그 억제
-for lib in ["fpdf", "fontTools", "fontTools.subset"]:
-    logging.getLogger(lib).setLevel(logging.WARNING)
-
 from fpdf import FPDF
 import datetime
 import os
@@ -74,17 +68,20 @@ class DynamicPDFReport(FPDF):
         self.ln(5)
 
 
-import glob
-
 def load_latest_reflection_summary():
     reflection_dir = "C:/giwanos/data/reflections"
-    md_files = glob.glob(os.path.join(reflection_dir, "reflection_*.md"))
-    md_files.sort(reverse=True)
-    if not md_files:
+    files = sorted(
+        [f for f in os.listdir(reflection_dir) if f.endswith(".json")],
+        key=lambda x: os.path.getmtime(os.path.join(reflection_dir, x)),
+        reverse=True
+    )
+    if not files:
         return "요약 없음"
     try:
-        with open(md_files[0], "r", encoding="utf-8") as f:
-            return f.read()
+        latest_path = os.path.join(reflection_dir, files[0])
+        with open(latest_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("summary", "요약 없음")
     except:
         return "요약 로딩 실패"
 
