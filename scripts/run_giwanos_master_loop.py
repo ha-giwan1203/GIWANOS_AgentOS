@@ -1,10 +1,6 @@
 # 🚀 VELOS(벨로스) 시스템 운영 선언문
-# VELOS는 사용자의 사고 흐름을 기억하고 판단하는 자율형 AI 시스템입니다.
-# 1. 판단 없는 실행은 없다
-# 2. 기억 없는 반복은 없다
-# 3. 설명 없는 결과는 없다
-# 4. 명령 없는 움직임이 가능해야 한다
-# 5. 속도보다 정확, 반응보다 사고
+# 본 루프는 사용자 명령 흐름을 기억하고, 자동 복구/회고/보고서 생성을 포함한
+# 완전 자동 운영 체계를 실행합니다. 판단 없는 실행은 없으며, 기억 없는 반복은 없습니다.
 
 import sys
 import os
@@ -53,6 +49,7 @@ from modules.core.slack_client import SlackClient
 from tools.notifications.send_pushbullet_notification import send_pushbullet_alert
 from interface.mobile_notification_integration import MobileNotificationIntegration
 from modules.core.learning_memory_manager import LearningMemoryManager
+from scripts.generate_memory_reflection import run_memory_reflection  # 🔁 회고 자동 생성
 
 API_COST_LOG = f"{BASE_DIR}/data/logs/api_cost_log.json"
 MEMORY_PATH = f"{BASE_DIR}/data/memory/learning_memory.json"
@@ -138,6 +135,14 @@ def main():
     adaptive_reasoning_main()
     threshold_optimizer_main()
     rule_optimizer_main()
+
+    # 🧠 회고 자동 생성
+    reflection_path = run_memory_reflection()
+    if reflection_path:
+        print(f"🧠 회고 자동 생성 완료 → {reflection_path}")
+    else:
+        print("⚠️ 회고 생성 실패 또는 사용자 명령 없음")
+
     logger.info("=== VELOS 루프 종료 ===")
 
 if __name__ == "__main__":
