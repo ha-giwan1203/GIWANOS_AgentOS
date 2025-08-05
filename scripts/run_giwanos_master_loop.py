@@ -4,6 +4,8 @@
 # 해당 파일은 VELOS 마스터 루프의 전체 실행기능을 포함한 최종 형태입니다.
 # 사용자 명령을 memory에 저장하고, GPT 결과를 반복하지 않게 확인하며,
 # 회고, 보고서, Slack 전송 까지 전체로 연동됩니다.
+# 중복 명령은 회고 summary에서 자동 제거됩니다.
+# 모든 주요 단계마다 print()로 명확한 콘솔 출력을 제공합니다.
 
 import sys
 import os
@@ -100,17 +102,26 @@ class GPT4oTurboDecisionEngine:
 
 def main():
     logger.info("=== VELOS 사고 기반 마스터 루프 실행 시작 ===")
+    print("🟢 루프 시작: 시스템 상태 점검 및 스냅샷 생성")
     update_system_health()
     create_incremental_snapshot()
+
+    print("🧠 JudgeAgent 실행")
     JudgeAgent().run_loop()
+
+    print("🔁 GitHub 커밋 & 푸시 시작")
     git_sync()
+    print("✅ GitHub 완료")
 
     decision_engine = GPT4oTurboDecisionEngine()
     slack_client = SlackClient()
 
     request_prompt = "Check system health"
     LearningMemoryManager.save_insight("user", request_prompt, ["명령", "상태_점검"])
+    print(f"📩 사용자 명령 저장: {request_prompt}")
+
     result = decision_engine.analyze_request(request_prompt)
+    print("🔍 GPT 판단 결과 수신 완료")
 
     if "장애" in result or "경고" in result:
         slack_client.send_message("#alerts", f"🚨 시스템 경고 발생!\n{result}")
@@ -119,31 +130,50 @@ def main():
         slack_client.send_message("#summary", "✅ VELOS 루프 정상 작동 완료.")
         send_pushbullet_alert("✅ VELOS 루프 완료 - 보고서 생성 및 전송 완료")
 
+    print("📝 보고서 생성 시작")
     pdf_path = generate_pdf_report()
+    print(f"✅ 보고서 생성 완료: {pdf_path}")
+
+    print("📧 이메일 전송 시작")
     send_report_email(pdf_path)
+    print("✅ 이메일 전송 완료")
+
+    print("🧾 Notion 요약 업로드")
     upload_summary_to_notion()
+
+    print("📲 모바일 알림 전송")
     print(MobileNotificationIntegration().send_mobile_notification())
+
+    print("📈 주간 요약 보고서 생성")
     generate_weekly_summary(f"{BASE_DIR}/data/reports")
 
     if "장애" in result or "경고" in result:
+        print("🔧 자동 복구 루틴 실행")
         auto_recovery_main()
 
+    print("💾 GPT 판단 결과 메모리 저장")
     LearningMemoryManager.save_analysis(result)
+
+    print("🧪 CoT 평가 실행")
     evaluate_cot()
+    print("🧠 Advanced RAG 테스트")
     test_advanced_rag()
+    print("🧠 Reflection Agent 실행")
     run_reflection()
+    print("🧠 적응형 추론 실행")
     adaptive_reasoning_main()
+    print("⚙ Threshold 최적화")
     threshold_optimizer_main()
+    print("⚙ Rule 최적화")
     rule_optimizer_main()
 
-    # 🧠 회고 자동 생성 + Slack 전송
+    print("🧠 회고 생성 및 Slack 전송")
     reflection_path = run_memory_reflection()
     if reflection_path:
-        print(f"🧠 회고 자동 생성 완료 → {reflection_path}")
+        print(f"✅ 회고 저장 완료: {reflection_path}")
         try:
             with open(reflection_path, "r", encoding="utf-8") as f:
                 reflection_data = json.load(f)
-
             reflection_msg = reflection_data.get("summary", "")
             reflection_level = reflection_data.get("level", "normal")
             reflection_ts = reflection_data.get("timestamp", "")
@@ -153,6 +183,7 @@ def main():
                 channel,
                 f"🧠 *VELOS 회고 요약* ({reflection_level.upper()})\n📅 {reflection_ts}\n\n{reflection_msg}"
             )
+            print(f"📤 Slack 회고 전송 완료 → {channel}")
 
         except Exception as e:
             print(f"⚠️ 회고 Slack 전송 실패: {e}")
@@ -160,7 +191,7 @@ def main():
         print("⚠️ 회고 생성 실패 또는 사용자 명령 없음")
 
     logger.info("=== VELOS 루프 종료 ===")
+    print("✅ 마스터 루프 정상 종료")
 
 if __name__ == "__main__":
     main()
-
