@@ -73,6 +73,21 @@ class DynamicPDFReport(FPDF):
         self.multi_cell(0, 8, content)
         self.ln(5)
 
+
+import glob
+
+def load_latest_reflection_summary():
+    reflection_dir = "C:/giwanos/data/reflections"
+    md_files = glob.glob(os.path.join(reflection_dir, "reflection_*.md"))
+    md_files.sort(reverse=True)
+    if not md_files:
+        return "요약 없음"
+    try:
+        with open(md_files[0], "r", encoding="utf-8") as f:
+            return f.read()
+    except:
+        return "요약 로딩 실패"
+
 def generate_pdf_report():
     now = datetime.datetime.now()
     date_str = now.strftime("%Y%m%d")
