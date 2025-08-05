@@ -49,7 +49,7 @@ from modules.core.auto_recovery_agent import main as auto_recovery_main
 from modules.core.reflection_agent import run_reflection
 from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
 from modules.automation.git_management.git_sync import main as git_sync
-from modules.evaluation.human_readable_reports.generate_pdf_report import generate_pdf_report
+from modules.report.generate_pdf_report import generate_pdf_report
 from tools.notifications.send_email import send_report_email
 from modules.automation.scheduling.weekly_summary import generate_weekly_summary
 from modules.advanced.advanced_modules.cot_evaluator import evaluate_cot
