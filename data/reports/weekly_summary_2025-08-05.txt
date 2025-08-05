@@ -210,6 +210,15 @@
     "gpu_percent": 0.0,
     "net_sent_mb": 15337.9,
     "net_recv_mb": 9599.89
+  },
+  {
+    "timestamp": "2025-08-05T04:19:42Z",
+    "cpu_percent": 0.0,
+    "memory_percent": 48.3,
+    "disk_percent": 82.6,
+    "gpu_percent": 0.0,
+    "net_sent_mb": 17295.11,
+    "net_recv_mb": 10675.88
   }
 ]
 
