@@ -1,10 +1,6 @@
-"""
-🚀 VELOS(벨로스) 시스템 운영 선언문
-
-이 시스템은 GPT-4o Turbo 기반의 고도 사고형 운영 시스템 VELOS이다.
-모든 회고는 실제 판단 흐름을 기억하고, 반복을 방지하며, 설명 가능한 시스템 행동을 위해 기록된다.
-이 스크립트는 최근 메모리 기반 대화 흐름을 자동으로 요약하여 회고 파일로 저장한다.
-"""
+# 🚀 VELOS(벨로스) 시스템 운영 선언문
+# 이 스크립트는 사용자 명령과 판단 흐름을 반영하여 회고를 생성합니다.
+# 단순 키워드가 아닌 태그 기반 분류를 통해 명확한 개선 방향을 도출합니다.
 
 import os
 import json
@@ -13,33 +9,47 @@ from datetime import datetime
 MEMORY_PATH = "C:/giwanos/data/memory/learning_memory.json"
 REFLECTION_DIR = "C:/giwanos/data/reflections"
 
-def load_learning_memory(limit=10):
+def load_learning_memory(limit=20):
     try:
         with open(MEMORY_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return data[-limit:] if isinstance(data, list) else []
-    except:
+        insights = data.get("insights", [])
+        return insights[-limit:]
+    except Exception as e:
+        print(f"❌ 메모리 로딩 실패: {e}")
         return []
 
 def generate_summary(memory):
     if not memory:
         return "최근 대화 기록이 없어 회고를 생성할 수 없습니다.", "unknown"
 
-    highlights = []
+    issues = []
     level = "normal"
 
     for entry in memory:
-        if "파일명 변경" in str(entry) or "기억 단절" in str(entry):
-            highlights.append("🚨 동일 실수 반복 지적됨: " + entry.get("summary", ""))
+        source = entry.get("from", "")
+        insight = entry.get("insight", "")
+        tags = entry.get("tags", [])
+
+        if source != "user":
+            continue  # 사용자 명령만 분석
+
+        if "파일명_금지" in tags:
+            issues.append(f"🚨 파일명 변경 금지 명령 감지됨 → '{insight}'")
             level = "critical"
-        elif "검증 없이 파일 제공" in str(entry):
-            highlights.append("⚠️ 검증 생략 문제: " + entry.get("summary", ""))
+        elif "검증_생략" in tags:
+            issues.append(f"⚠️ 검증 없는 파일 제공 지시 감지됨 → '{insight}'")
             if level != "critical":
                 level = "warning"
+        elif "기억_유지" in tags:
+            issues.append(f"📌 기억 유지 요구 → '{insight}'")
         else:
-            highlights.append("✅ " + entry.get("summary", ""))
+            issues.append(f"✅ 명령 인식됨 → '{insight}'")
 
-    summary = "\n".join(highlights)
+    if not issues:
+        return "최근 사용자 명령이 없거나 회고 기준에 해당하지 않습니다.", "normal"
+
+    summary = "\n".join(issues)
     return summary, level
 
 def save_reflection(summary, level):
@@ -55,15 +65,23 @@ def save_reflection(summary, level):
         "level": level
     }
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-    return path
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return path
+    except Exception as e:
+        print(f"❌ 회고 저장 실패: {e}")
+        return None
 
 def run_memory_reflection():
     memory = load_learning_memory()
     summary, level = generate_summary(memory)
     return save_reflection(summary, level)
 
-# 마스터 루프 호환성
-generate_memory_reflection = run_memory_reflection
+# 실행용 진입점
+if __name__ == "__main__":
+    path = run_memory_reflection()
+    if path:
+        print(f"✅ 회고 저장 완료: {path}")
+    else:
+        print("❌ 회고 저장 실패")

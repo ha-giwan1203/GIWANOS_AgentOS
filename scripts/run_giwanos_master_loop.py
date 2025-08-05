@@ -14,10 +14,10 @@ from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# sys.path 경로 보정
+# 경로 보정
 sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
 
-# 환경 로딩
+# 환경 변수 로드
 BASE_DIR = "C:/giwanos"
 load_dotenv(f"{BASE_DIR}/configs/.env")
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -33,7 +33,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 기능 import
+# 모듈 import
 from modules.core.hybrid_snapshot_manager import create_incremental_snapshot
 from modules.core.auto_recovery_agent import main as auto_recovery_main
 from modules.core.reflection_agent import run_reflection
@@ -52,6 +52,7 @@ from modules.core.notion_integration.upload_summary_to_notion import upload_summ
 from modules.core.slack_client import SlackClient
 from tools.notifications.send_pushbullet_notification import send_pushbullet_alert
 from interface.mobile_notification_integration import MobileNotificationIntegration
+from modules.core.learning_memory_manager import LearningMemoryManager
 
 API_COST_LOG = f"{BASE_DIR}/data/logs/api_cost_log.json"
 MEMORY_PATH = f"{BASE_DIR}/data/memory/learning_memory.json"
@@ -97,29 +98,6 @@ class GPT4oTurboDecisionEngine:
         with open(API_COST_LOG, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
-class LearningMemoryManager:
-    @staticmethod
-    def save_analysis(result):
-        try:
-            data = {}
-            if os.path.exists(MEMORY_PATH):
-                with open(MEMORY_PATH, "r", encoding="utf-8") as mem_file:
-                    try:
-                        data = json.load(mem_file)
-                        if not isinstance(data, dict):
-                            data = {"insights": []}
-                    except json.JSONDecodeError:
-                        data = {"insights": []}
-            data.setdefault("insights", []).append({
-                "timestamp": datetime.utcnow().isoformat(),
-                "insight": result
-            })
-            with open(MEMORY_PATH, "w", encoding="utf-8") as mem_file:
-                json.dump(data, mem_file, indent=4, ensure_ascii=False)
-            logger.info("✅ GPT 분석 결과 → 학습 메모리 저장 완료")
-        except Exception as e:
-            logger.error(f"학습 메모리 저장 실패: {e}")
-
 def main():
     logger.info("=== VELOS 사고 기반 마스터 루프 실행 시작 ===")
     update_system_health()
@@ -129,7 +107,13 @@ def main():
 
     decision_engine = GPT4oTurboDecisionEngine()
     slack_client = SlackClient()
-    result = decision_engine.analyze_request("Check system health")
+
+    # ✅ 사용자 명령 저장
+    request_prompt = "Check system health"
+    LearningMemoryManager.save_insight("user", request_prompt, ["명령", "상태_점검"])
+
+    # 🔍 판단 실행
+    result = decision_engine.analyze_request(request_prompt)
 
     if "장애" in result or "경고" in result:
         slack_client.send_message("#alerts", f"🚨 시스템 경고 발생!\n{result}")
