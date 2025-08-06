@@ -110,13 +110,14 @@ def main():
     except Exception as e:
         logging.error(f"메모리 저장 실패: {e}")
 
-    email_receiver = os.getenv("EMAIL_RECEIVER")
+    to_email = os.getenv("EMAIL_TO")
+    print("[이메일 전송 테스트] 받는 사람:", to_email)
 
     for label, func in [
         ("update_system_health", update_system_health),
         ("generate_summary_dashboard", generate_summary_dashboard),
         ("log_gpt_cost", lambda: log_gpt_cost(gpt_response)),
-        ("send_email_report", lambda: send_email_report("VELOS 시스템 리포트", "보고서 자동 전송입니다.", email_receiver)),
+        ("send_email_report", lambda: send_email_report("VELOS 시스템 리포트", "보고서 자동 전송입니다.", to_email)),
         ("send_pushbullet_notification", lambda: send_pushbullet_notification("VELOS", "보고서 전송 완료됨.")),
         ("upload_summary_to_notion", lambda: upload_summary_to_notion(summary_path="C:/giwanos/data/reports/summary_dashboard.json")),
         ("generate_reflection", generate_reflection),
