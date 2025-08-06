@@ -7,7 +7,7 @@
 # =============================================================================
 
 import sys
-sys.path.append("C:/giwanos")  # 바로 경로 설정
+sys.path.append("C:/giwanos")
 
 import os
 import logging
@@ -110,13 +110,15 @@ def main():
     except Exception as e:
         logging.error(f"메모리 저장 실패: {e}")
 
+    email_receiver = os.getenv("EMAIL_RECEIVER")
+
     for label, func in [
         ("update_system_health", update_system_health),
         ("generate_summary_dashboard", generate_summary_dashboard),
         ("log_gpt_cost", lambda: log_gpt_cost(gpt_response)),
-        ("send_email_report", lambda: send_email_report("VELOS 리포트", "보고서 전송", "you@example.com")),
+        ("send_email_report", lambda: send_email_report("VELOS 시스템 리포트", "보고서 자동 전송입니다.", email_receiver)),
         ("send_pushbullet_notification", lambda: send_pushbullet_notification("VELOS", "보고서 전송 완료됨.")),
-        ("upload_summary_to_notion", upload_summary_to_notion),
+        ("upload_summary_to_notion", lambda: upload_summary_to_notion(summary_path="C:/giwanos/data/reports/summary_dashboard.json")),
         ("generate_reflection", generate_reflection),
         ("run_insight_evaluation", run_insight_evaluation),
         ("optimize_threshold", optimize_threshold),
