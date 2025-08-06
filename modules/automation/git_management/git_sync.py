@@ -52,5 +52,9 @@ def main():
     except subprocess.CalledProcessError as e:
         logging.error(f"[❌ GitHub 푸시 실패] {e}")
 
+# ✅ 마스터 루프에서 호출 가능한 함수 이름
+def sync_with_github():
+    main()
+
 if __name__ == "__main__":
     main()

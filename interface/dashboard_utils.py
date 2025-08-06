@@ -1,23 +1,41 @@
-import streamlit as st
+# VELOS 대시보드 유틸리티
+
 import os
-import pandas as pd
+import json
+from datetime import datetime
 
-# 자동 경로 지정: 프로젝트 루트 기준
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
-LOG_PATH = os.path.join(ROOT_DIR, "logs", "loop_history.csv")
+def load_dashboard_data(summary_file_path, tab_key):
+    try:
+        with open(summary_file_path, "r", encoding="utf-8") as f:
+            summary = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        summary = {}
 
-def render_loop_history():
-    if not os.path.exists(LOG_PATH):
-        st.warning(f"❌ 로그 파일이 존재하지 않습니다: {LOG_PATH}")
-        return
-    df = pd.read_csv(LOG_PATH)
-    st.dataframe(df)
+    if tab_key == "status":
+        return {
+            "cpu_usage": summary.get("cpu_usage", "N/A"),
+            "memory_usage": summary.get("memory_usage", "N/A"),
+            "disk_usage": summary.get("disk_usage", "N/A"),
+        }
+    elif tab_key == "evaluation":
+        return summary.get("evaluation_scores", [])
+    elif tab_key == "reports":
+        return summary.get("reports", [])
+    else:
+        return {}
 
-def main():
-    st.set_page_config(layout="wide", page_title="GIWANOS 루프 대시보드")
-    st.title("🌀 루프 로그 히스토리")
-    render_loop_history()
+def load_memory_summary(summary_file):
+    try:
+        with open(summary_file, "r", encoding="utf-8") as f:
+            summary = json.load(f)
+        return summary.get("memory", [])
+    except Exception as e:
+        print(f"[Error] memory 요약 파일 로드 실패: {e}")
+        return []
 
-if __name__ == "__main__":
-    main()
+def get_mock_dashboard_status():
+    return {
+        "cpu_usage": "10.5%",
+        "memory_usage": "50.5%",
+        "disk_usage": "82.9%"
+    }

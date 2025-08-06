@@ -1,27 +1,41 @@
+# =============================================================================
+# 🧠 VELOS 시스템 철학 선언문
+#
+# 기억을 기반으로 구조적 사고를 수행하며,
+# 판단 → 실행 → 회고 → 전송의 루프를 반복함으로써,
+# 스스로 개선되는 자율 운영 AI 시스템을 지향한다.
+# =============================================================================
 
-class ContextAwareDecisionEngine:
-    def __init__(self, memory_db):
-        self.memory_db = memory_db
+import os
+import openai
+from dotenv import load_dotenv
 
-    def check_memory_availability(self, query):
-        return self.memory_db.get(query, None)
+load_dotenv()
 
-    def need_external_search(self, query):
-        result = self.check_memory_availability(query)
-        return result is None
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def generate_gpt_response(prompt: str) -> str:
+    try:
+        print("🧠 GPT API 호출 중...")
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "당신은 VELOS 시스템의 판단 에이전트입니다."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4,
+            max_tokens=800
+        )
+
+        output = response.choices[0].message.content
+        print("✅ GPT 응답 완료")
+        return output.strip()
+
+    except Exception as e:
+        print(f"❌ GPT 호출 실패: {e}")
+        return "[GPT 판단 실패 – 예외 발생]"
 
 if __name__ == "__main__":
-    # 간단한 메모리 데이터베이스 테스트용 딕셔너리 생성
-    test_memory_db = {"날씨": "오늘 날씨는 맑습니다."}
-
-    # 엔진 초기화
-    decision_engine = ContextAwareDecisionEngine(test_memory_db)
-
-    # 테스트 쿼리
-    test_queries = ["날씨", "뉴스"]
-
-    for query in test_queries:
-        if decision_engine.need_external_search(query):
-            print(f"[{query}] 외부 검색 필요: 메모리에 데이터 없음")
-        else:
-            print(f"[{query}] 메모리에서 데이터 발견: {decision_engine.check_memory_availability(query)}")
+    result = generate_gpt_response("시스템 상태를 요약해줘")
+    print("▶️ GPT 응답:", result)

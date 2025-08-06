@@ -1,76 +1,72 @@
-# 🚀 VELOS(벨로스) 시스템 운영 선언문
-# 이 모듈은 VELOS 시스템의 기억 저장을 담당합니다.
-# GPT 응답뿐 아니라 사용자 명령도 명확히 분리 저장하며,
-# 모든 판단 근거는 메모리에 구조화된 형태로 기록됩니다.
+# VELOS 학습 메모리 관리자 - 리팩터링 완료
+# 사용자/시스템 인사이트를 memory에 명확히 구분 저장하고,
+# 중복 저장 방지 및 구조 일관성을 유지하며 판단 시 재활용을 가능케 함.
 
 import json
 from datetime import datetime
-import logging
-import os
+from pathlib import Path
 
-MEMORY_PATH = "C:/giwanos/data/memory/learning_memory.json"
+MEMORY_PATH = Path("C:/giwanos/data/memory/learning_memory.json")
 
 class LearningMemoryManager:
-    @staticmethod
-    def save_analysis(analysis_result):
-        """
-        기존 방식 - GPT 응답만 저장
-        """
-        try:
-            if os.path.exists(MEMORY_PATH):
-                with open(MEMORY_PATH, 'r', encoding='utf-8') as mem_file:
-                    memory_data = json.load(mem_file)
-                    if "insights" not in memory_data:
-                        memory_data["insights"] = []
-            else:
-                memory_data = {"recent_events": [], "insights": [], "performance_metrics": [], "user_behavior": []}
+    def __init__(self, path=MEMORY_PATH):
+        self.path = path
+        self.memory = self._load_memory()
 
-            memory_data["insights"].append({
-                "timestamp": datetime.utcnow().isoformat(),
-                "from": "system",
-                "insight": analysis_result,
-                "tags": ["system_response"]
-            })
+    def _load_memory(self):
+        if self.path.exists():
+            try:
+                with open(self.path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict) and "insights" in data:
+                        return data
+            except Exception:
+                pass
+        return {"insights": []}
 
-            with open(MEMORY_PATH, 'w', encoding='utf-8') as mem_file:
-                json.dump(memory_data, mem_file, indent=4, ensure_ascii=False)
+    def _is_duplicate(self, new_entry):
+        return any(
+            insight.get("insight") == new_entry.get("insight") and
+            insight.get("from") == new_entry.get("from")
+            for insight in self.memory["insights"][-30:]  # 최근 30개 기준 중복 방지
+        )
 
-            logging.info("✅ 학습 메모리에 GPT-4o Turbo 분석 결과 저장 완료")
-
-        except Exception as e:
-            logging.error(f"❌ 메모리 저장 실패: {e}")
-
-    @staticmethod
-    def save_insight(source: str, insight: str, tags: list = None):
-        """
-        확장 버전 - 사용자 명령 포함, 출처 및 태그 저장
-        source: "user" 또는 "system"
-        insight: 저장할 내용
-        tags: ["명령", "파일명_금지"] 등
-        """
-        tags = tags or []
-        new_entry = {
+    def save_insight(self, insight_text, source="system", tags=None):
+        entry = {
             "timestamp": datetime.utcnow().isoformat(),
             "from": source,
-            "insight": insight,
-            "tags": tags
+            "insight": insight_text.strip(),
+            "tags": tags or []
         }
 
-        try:
-            if os.path.exists(MEMORY_PATH):
-                with open(MEMORY_PATH, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    if not isinstance(data, dict):
-                        data = {"insights": []}
-            else:
-                data = {"recent_events": [], "insights": [], "performance_metrics": [], "user_behavior": []}
+        if not self._is_duplicate(entry):
+            self.memory["insights"].append(entry)
+            try:
+                with open(self.path, "w", encoding="utf-8") as f:
+                    json.dump(self.memory, f, indent=2, ensure_ascii=False)
+                print(f"🧠 메모리에 저장됨 → from: {source}, 내용: {insight_text[:40]}...")
+            except Exception as e:
+                print(f"❌ 메모리 저장 실패: {e}")
+        else:
+            print(f"⚠️ 중복 인사이트로 저장 생략됨 → '{insight_text[:40]}...'")
 
-            data.setdefault("insights", []).append(new_entry)
+    def get_latest(self, count=10, source_filter=None):
+        insights = self.memory.get("insights", [])
+        if source_filter:
+            insights = [i for i in insights if i.get("from") == source_filter]
+        return insights[-count:]
 
-            with open(MEMORY_PATH, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
+    def get_summary(self):
+        user_cmds = [i["insight"] for i in self.memory["insights"] if i.get("from") == "user"]
+        system_replies = [i["insight"] for i in self.memory["insights"] if i.get("from") == "system"]
+        return {
+            "total": len(self.memory["insights"]),
+            "user_commands": user_cmds[-5:],
+            "system_responses": system_replies[-3:]
+        }
 
-            print(f"✅ 메모리 저장 완료: {source} → {insight[:40]}...")
-
-        except Exception as e:
-            print(f"❌ 메모리 저장 실패: {e}")
+# ✅ 사용 예시:
+# manager = LearningMemoryManager()
+# manager.save_insight("Check system health", source="user", tags=["명령", "점검"])
+# manager.save_insight("System OK", source="system", tags=["결과"])
+# print(manager.get_summary())

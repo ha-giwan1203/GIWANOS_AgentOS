@@ -1,6 +1,14 @@
 {
-    "theme": "light",
-    "refresh_interval_seconds": 60,
-    "display_charts": true,
-    "display_logs": true
+  "tabs": [
+    "시스템 상태",
+    "보고서 요약",
+    "Memory Insight Viewer",
+    "마스터 루프 실행",
+    "판단 흐름 분석"
+  ],
+  "default_tab": "시스템 상태",
+  "refresh_interval_sec": 5,
+  "memory_display_limit": 10,
+  "report_folder": "C:/giwanos/data/reports",
+  "memory_file": "C:/giwanos/data/memory/learning_summary.json"
 }

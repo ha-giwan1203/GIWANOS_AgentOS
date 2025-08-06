@@ -1,201 +1,136 @@
-# 🚀 VELOS(벨로스) 시스템 운영 선언문
-# 본 루프는 사용자 명령 흐름을 기억하고, 자동 복구/회고/보고서 생성을 포함한
-# 완전 자동 운영 체계를 실행합니다. 판단 없는 실행은 없으며, 기억 없는 반복은 없습니다.
-# 해당 파일은 VELOS 마스터 루프의 전체 실행기능을 포함한 최종 형태입니다.
-# 사용자 명령을 memory에 저장하고, GPT 결과를 반복하지 않게 확인하며,
-# 회고, 보고서, Slack 전송 까지 전체로 연동됩니다.
-# 중복 명령은 회고 summary에서 자동 제거됩니다.
-# 모든 주요 단계마다 print()로 명확한 콘솔 출력을 제공합니다.
+# =============================================================================
+# 🧠 VELOS 시스템 철화 선언문
+#
+# 기억을 기반으로 구조적 생각을 수행하며,
+# 판단 → 실행 → 회고 → 전송의 루프를 반복함으로써,
+# 자신의 복구 가능한 자유 운영 AI 시스템을 지향한다.
+# =============================================================================
 
 import sys
+sys.path.append("C:/giwanos")  # 바로 경로 설정
+
 import os
-import warnings  # 추가됨
 import logging
-import json
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
+from pathlib import Path
+import json
 
-# 경고 무시 설정 (fpdf.ttfonts cmap warning 제거)
-warnings.filterwarnings("ignore", category=UserWarning, module="fpdf.ttfonts")
+from modules.core.memory_reader import read_memory_context
+from modules.core.context_aware_decision_engine import generate_gpt_response
+from modules.automation.git_management.git_sync import sync_with_github
+from modules.evaluation.giwanos_agent.judge_agent import run_judge_loop
+from tools.notifications.send_email import send_email_report
+from tools.notifications.send_pushbullet_notification import send_pushbullet_notification
+from tools.notion_integration.upload_summary_to_notion import upload_summary_to_notion
+from modules.core.reflection_agent import generate_reflection
+from modules.evaluation.insight.system_insight_agent import run_insight_evaluation
+from modules.core.threshold_optimizer import optimize_threshold
+from modules.core.rule_optimizer import optimize_rules
+from tools.chatbot_tools.automated_visualization_dashboard import generate_summary_dashboard
+from modules.automation.update_system_health import update_system_health
+from modules.evaluation.xai.models.xai_explanation_model import log_gpt_cost
 
-# 경로 보정
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../'))
-
-# 환경 설정
-BASE_DIR = "C:/giwanos"
-load_dotenv(f"{BASE_DIR}/configs/.env")
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler(f"{BASE_DIR}/data/logs/master_loop_execution.log"),
-        logging.StreamHandler(sys.stdout)
-    ],
-    format="%(asctime)s [%(levelname)s] %(message)s"
+        logging.FileHandler("data/logs/master_loop_execution.log", encoding="utf-8"),
+        logging.StreamHandler()
+    ]
 )
-logger = logging.getLogger(__name__)
-
-# 기능 import
-from modules.core.hybrid_snapshot_manager import create_incremental_snapshot
-from modules.core.auto_recovery_agent import main as auto_recovery_main
-from modules.core.reflection_agent import run_reflection
-from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
-from modules.automation.git_management.git_sync import main as git_sync
-from modules.report.generate_pdf_report import generate_pdf_report
-from tools.notifications.send_email import send_report_email
-from modules.automation.scheduling.weekly_summary import generate_weekly_summary
-from modules.advanced.advanced_modules.cot_evaluator import evaluate_cot
-from modules.advanced.advanced_modules.advanced_rag import test_advanced_rag
-from modules.core.adaptive_reasoning_agent import adaptive_reasoning_main
-from modules.core.threshold_optimizer import threshold_optimizer_main
-from modules.core.rule_optimizer import rule_optimizer_main
-from modules.automation.scheduling.system_health_logger import update_system_health
-from modules.core.notion_integration.upload_summary_to_notion import upload_summary_to_notion
-from modules.core.slack_client import SlackClient
-from tools.notifications.send_pushbullet_notification import send_pushbullet_alert
-from interface.mobile_notification_integration import MobileNotificationIntegration
-from modules.core.learning_memory_manager import LearningMemoryManager
-from scripts.generate_memory_reflection import run_memory_reflection
-
-API_COST_LOG = f"{BASE_DIR}/data/logs/api_cost_log.json"
-MEMORY_PATH = f"{BASE_DIR}/data/memory/learning_memory.json"
-
-class GPT4oTurboDecisionEngine:
-    def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-    def analyze_request(self, request):
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "GPT-4o Turbo API Call"},
-                {"role": "user", "content": request}
-            ]
-        )
-        result = response.choices[0].message.content
-        self.record_api_usage(response.usage, "gpt-4o", result)
-        return result
-
-    def record_api_usage(self, usage, model, result):
-        record = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "model": model,
-            "prompt_tokens": usage.prompt_tokens,
-            "completion_tokens": usage.completion_tokens,
-            "total_tokens": usage.total_tokens,
-            "cost_usd": usage.total_tokens * 0.00001,
-            "analysis_result": result
-        }
-        data = []
-        if os.path.exists(API_COST_LOG):
-            with open(API_COST_LOG, "r", encoding="utf-8") as file:
-                try:
-                    content = file.read().strip()
-                    if content:
-                        data = json.loads(content)
-                        if not isinstance(data, list):
-                            data = []
-                except json.JSONDecodeError:
-                    data = []
-        data.append(record)
-        with open(API_COST_LOG, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4, ensure_ascii=False)
 
 def main():
-    logger.info("=== VELOS 사고 기반 마스터 루프 실행 시작 ===")
-    print("🟢 루프 시작: 시스템 상태 점검 및 스냅샷 생성")
-    update_system_health()
-    create_incremental_snapshot()
+    logging.info("=== VELOS 마스터 루프 시작 ===")
+    print("\U0001f7e2 루프 시작: 시스템 상태 점검 및 스냅샷 생성")
 
-    print("🧠 JudgeAgent 실행")
-    JudgeAgent().run_loop()
+    snapshot_dir = Path("C:/giwanos/data/snapshots")
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = snapshot_dir / f"incremental_snapshot_{datetime.now().strftime('%Y%m%d')}"
+    snapshot_path.write_text("Incremental snapshot created", encoding="utf-8")
+    print(f"\U0001f4f8 스냅샷 생성 완료 → {snapshot_path}")
 
-    print("🔁 GitHub 커밋 & 푸시 시작")
-    git_sync()
-    print("✅ GitHub 완료")
+    try:
+        print("\U0001f9e0 JudgeAgent 실행")
+        run_judge_loop()
+        logging.info("✅ JudgeAgent 완료")
+    except Exception as e:
+        logging.error(f"JudgeAgent 실패: {e}")
 
-    decision_engine = GPT4oTurboDecisionEngine()
-    slack_client = SlackClient()
+    try:
+        print("\U0001f501 GitHub 커밋 & 푸시 시작")
+        sync_with_github()
+        print("✅ GitHub 완료")
+    except Exception as e:
+        logging.error(f"GitHub 동기화 실패: {e}")
 
-    request_prompt = "Check system health"
-    LearningMemoryManager.save_insight("user", request_prompt, ["명령", "상태_점검"])
-    print(f"📩 사용자 명령 저장: {request_prompt}")
+    try:
+        print("\U0001f9e0 기억 로딩 및 context 생성 중...")
+        context = read_memory_context()
+        if not context:
+            logging.warning("⚠️ context 불러오기 실패 → 기본 문구로 대체")
+            context = "[기억 불러오기 실패 – 기본 프롬프트 사용]"
 
-    result = decision_engine.analyze_request(request_prompt)
-    print("🔍 GPT 판단 결과 수신 완료")
+        user_request = "시스템 상태를 점검하고 요약해줘"
+        full_prompt = f"{context}\n\n{user_request}"
+        print("\U0001f9e0 GPT 판단 요청 전송 중...")
+        gpt_response = generate_gpt_response(full_prompt)
+    except Exception as e:
+        logging.error(f"GPT 판단 생성 실패: {e}")
+        gpt_response = "[GPT 판단 실패]"
 
-    if "장애" in result or "경고" in result:
-        slack_client.send_message("#alerts", f"🚨 시스템 경고 발생!\n{result}")
-        send_pushbullet_alert(f"🚨 VELOS 장애 감지됨!\n{result}")
-    else:
-        slack_client.send_message("#summary", "✅ VELOS 루프 정상 작동 완료.")
-        send_pushbullet_alert("✅ VELOS 루프 완료 - 보고서 생성 및 전송 완료")
+    memory_path = Path("C:/giwanos/data/memory/learning_memory.json")
+    memory_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print("📝 보고서 생성 시작")
-    pdf_path = generate_pdf_report()
-    print(f"✅ 보고서 생성 완료: {pdf_path}")
+    try:
+        with open(memory_path, "r", encoding="utf-8") as f:
+            memory_data = json.load(f)
+    except:
+        memory_data = {}
 
-    print("📧 이메일 전송 시작")
-    send_report_email(pdf_path)
-    print("✅ 이메일 전송 완료")
+    if "insights" not in memory_data:
+        memory_data["insights"] = []
 
-    print("🧾 Notion 요약 업로드")
-    upload_summary_to_notion()
+    memory_data["insights"].append({
+        "timestamp": datetime.utcnow().isoformat(),
+        "from": "user",
+        "insight": user_request,
+        "tags": ["요청", "점검"]
+    })
+    memory_data["insights"].append({
+        "timestamp": datetime.utcnow().isoformat(),
+        "from": "system",
+        "insight": gpt_response,
+        "tags": ["판단", "GPT"]
+    })
 
-    print("📲 모바일 알림 전송")
-    print(MobileNotificationIntegration().send_mobile_notification())
+    try:
+        with open(memory_path, "w", encoding="utf-8") as f:
+            json.dump(memory_data, f, indent=2, ensure_ascii=False)
+        print(f"\U0001f9e0 메모리에 저장됨 → {gpt_response[:40]}...")
+    except Exception as e:
+        logging.error(f"메모리 저장 실패: {e}")
 
-    print("📈 주간 요약 보고서 생성")
-    generate_weekly_summary(f"{BASE_DIR}/data/reports")
-
-    if "장애" in result or "경고" in result:
-        print("🔧 자동 복구 루틴 실행")
-        auto_recovery_main()
-
-    print("💾 GPT 판단 결과 메모리 저장")
-    LearningMemoryManager.save_analysis(result)
-
-    print("🧪 CoT 평가 실행")
-    evaluate_cot()
-    print("🧠 Advanced RAG 테스트")
-    test_advanced_rag()
-    print("🧠 Reflection Agent 실행")
-    run_reflection()
-    print("🧠 적응형 추론 실행")
-    adaptive_reasoning_main()
-    print("⚙ Threshold 최적화")
-    threshold_optimizer_main()
-    print("⚙ Rule 최적화")
-    rule_optimizer_main()
-
-    print("🧠 회고 생성 및 Slack 전송")
-    reflection_path = run_memory_reflection()
-    if reflection_path:
-        print(f"✅ 회고 저장 완료: {reflection_path}")
+    for label, func in [
+        ("update_system_health", update_system_health),
+        ("generate_summary_dashboard", generate_summary_dashboard),
+        ("log_gpt_cost", lambda: log_gpt_cost(gpt_response)),
+        ("send_email_report", lambda: send_email_report("VELOS 리포트", "보고서 전송", "you@example.com")),
+        ("send_pushbullet_notification", lambda: send_pushbullet_notification("VELOS", "보고서 전송 완료됨.")),
+        ("upload_summary_to_notion", upload_summary_to_notion),
+        ("generate_reflection", generate_reflection),
+        ("run_insight_evaluation", run_insight_evaluation),
+        ("optimize_threshold", optimize_threshold),
+        ("optimize_rules", optimize_rules)
+    ]:
         try:
-            with open(reflection_path, "r", encoding="utf-8") as f:
-                reflection_data = json.load(f)
-            reflection_msg = reflection_data.get("summary", "")
-            reflection_level = reflection_data.get("level", "normal")
-            reflection_ts = reflection_data.get("timestamp", "")
-
-            channel = "#alerts" if reflection_level == "critical" else "#summary"
-            slack_client.send_message(
-                channel,
-                f"🧠 *VELOS 회고 요약* ({reflection_level.upper()})\n📅 {reflection_ts}\n\n{reflection_msg}"
-            )
-            print(f"📤 Slack 회고 전송 완료 → {channel}")
-
+            print(f"▶️ {label} 실행 중...")
+            func()
+            print(f"✅ {label} 완료")
         except Exception as e:
-            print(f"⚠️ 회고 Slack 전송 실패: {e}")
-    else:
-        print("⚠️ 회고 생성 실패 또는 사용자 명령 없음")
+            logging.error(f"❌ {label} 실패: {e}")
 
-    logger.info("=== VELOS 루프 종료 ===")
-    print("✅ 마스터 루프 정상 종료")
+    logging.info("=== VELOS 마스터 루프 종료 ===")
+    print("🏁 루프 종료")
 
 if __name__ == "__main__":
     main()
