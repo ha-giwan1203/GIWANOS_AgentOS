@@ -18,10 +18,10 @@ def send_email_report(subject, body, to_email):
         print("❌ 이메일 전송 실패: subject, body, to_email 중 누락 있음")
         return False
 
-    from_email = os.getenv("SMTP_EMAIL")
-    password = os.getenv("SMTP_PASSWORD")
-    smtp_server = os.getenv("SMTP_SERVER", "smtp.naver.com")
-    smtp_port = int(os.getenv("SMTP_PORT", 587))
+    from_email = os.getenv("EMAIL_USER")
+    password = os.getenv("EMAIL_PASS")
+    smtp_server = os.getenv("EMAIL_HOST", "smtp.naver.com")
+    smtp_port = int(os.getenv("EMAIL_PORT", 587))
 
     try:
         msg = MIMEText(body, "plain", "utf-8")
