@@ -21,6 +21,7 @@ from modules.automation.git_management.git_sync import sync_with_github
 from modules.evaluation.giwanos_agent.judge_agent import run_judge_loop
 from tools.notifications.send_email import send_email_report
 from tools.notifications.send_pushbullet_notification import send_pushbullet_notification
+from tools.notifications.slack_api import send_slack_message
 from tools.notion_integration.upload_summary_to_notion import upload_summary_to_notion
 from modules.core.reflection_agent import generate_reflection
 from modules.evaluation.insight.system_insight_agent import run_insight_evaluation
@@ -119,6 +120,7 @@ def main():
         ("log_gpt_cost", lambda: log_gpt_cost(gpt_response)),
         ("send_email_report", lambda: send_email_report("VELOS 시스템 리포트", "보고서 자동 전송입니다.", to_email)),
         ("send_pushbullet_notification", lambda: send_pushbullet_notification("VELOS", "보고서 전송 완료됨.")),
+        ("send_slack_message", lambda: send_slack_message("📡 VELOS 보고서가 자동 생성되었습니다.")),
         ("upload_summary_to_notion", lambda: upload_summary_to_notion(summary_path="C:/giwanos/data/reports/summary_dashboard.json")),
         ("generate_reflection", generate_reflection),
         ("run_insight_evaluation", run_insight_evaluation),
