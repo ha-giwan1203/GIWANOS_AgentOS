@@ -16,6 +16,9 @@ def send_slack_message(message):
     token = os.getenv("SLACK_BOT_TOKEN")
     channel = os.getenv("SLACK_CHANNEL_ID")
 
+    print("[DEBUG] Loaded Slack Token:", token)
+    print("[DEBUG] Loaded Slack Channel:", channel)
+
     if not token or not channel:
         print("❌ SLACK_BOT_TOKEN 또는 SLACK_CHANNEL_ID 누락")
         return False
