@@ -2,22 +2,28 @@
 python-dotenv>=1.0.0      # .env 자동 로드
 requests>=2.31.0          # Slack / HTTP 통신
 slack_sdk>=3.36.0         # Slack 알림
-GitPython>=3.1.18         # Git 연동 (이미 포함)
+GitPython>=3.1.18         # Git 연동
+openai>=1.0.0             # GPT-4 Turbo 판단 엔진
+notion-client>=2.4.0      # Notion 연동 API 클라이언트
 
 # ───── Data / PDF / Charts ─────
-pandas>=2.2.2
-matplotlib>=3.9.0
-fpdf>=1.7.2               # PDF 보고서
+pandas>=2.2.2             # 데이터 분석 및 보고서
+matplotlib>=3.9.0         # 시각화
+fpdf>=1.7.2               # PDF 보고서 (기존 방식)
+reportlab>=4.0.0          # PDF 그래픽 생성용 (최종 출력)
 GPUtil>=1.4.0             # GPU 모니터링
-psutil>=5.9.8             # 시스템 자원
-tqdm>=4.66.4              # 진행바 (trufflehog 등에서 사용)
+psutil>=5.9.8             # 시스템 자원 상태
+tqdm>=4.66.4              # 진행바
 
 # ───── Web / Streamlit 대시보드 ─────
-streamlit==1.47.1         # 고정 버전 유지
-altair==5.5.0
+streamlit==1.47.1         # 대시보드 구성
+altair==5.5.0             # 시각화 그래프
+
+# ───── Memory / RAG / Search ─────
+faiss-cpu>=1.7.4          # 벡터 기반 검색 (Memory, RAG 등)
 
 # ───── Type / Watch / 기타 ─────
-annotated-types==0.7.0
-watchdog==6.0.0
-urllib3==2.5.0
-pytest>=8.4.1
+annotated-types==0.7.0    # 타입 기반 처리
+watchdog==6.0.0           # 디렉토리 감시
+urllib3==2.5.0            # HTTP 클라이언트
+pytest>=8.4.1             # 테스트 프레임워크
