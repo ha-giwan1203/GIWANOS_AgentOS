@@ -1,68 +1,128 @@
 """
-File: C:/giwanos/core/embedding_manager.py
+File: core/embedding_manager.py
 
-설명:
-- OpenAI Embeddings 및 FAISS를 이용한 규칙과 컨텍스트 텍스트 임베딩 생성/검색 모듈
-- judgment_rules.json에서 규칙을 로드하여 벡터 인덱스 생성
-- 컨텍스트 임베딩을 통해 유사한 규칙을 검색하여 추천
-- Updated for openai>=1.0.0 API: use openai.embeddings.create
+Description
+-----------
+- OpenAI 임베딩(text‑embedding‑ada‑002) + FAISS 벡터 검색
+- **규칙(rule)** 인덱스 + **문서/메모리** 인덱스를 한 클래스에 통합
+- 추가 메서드
+    * build_index_from_ndjson()  # 정규화 ND‑JSON → 벡터 인덱스
+    * query_similar_docs()       # 자유 텍스트 질의로 메모리 검색
 """
 
-import os
 import json
 from pathlib import Path
+from typing import List, Dict, Any, Optional
 
 import openai
 import faiss
 import numpy as np
 
-class EmbeddingManager:
-    def __init__(self, rules_path: Path):
-        self.rules_path = Path(rules_path)
-        self._load_rules()
-        self._build_index()
 
+class EmbeddingManager:
+    """Embeds & searches rules **and** arbitrary memory documents."""
+
+    def __init__(self,
+                 rules_path: Optional[Path] = None,
+                 model_name: str = "text-embedding-ada-002"):
+        self.model_name = model_name
+
+        # ---------- RULE INDEX ----------
+        if rules_path:
+            self.rules_path = Path(rules_path)
+            self._load_rules()
+            self.rule_vectors: np.ndarray = self._embed_batch(self.rules)
+            self.rule_index = self._build_faiss(self.rule_vectors)
+        else:
+            self.rules, self.rule_vectors, self.rule_index = [], None, None
+
+        # ---------- DOCUMENT (MEMORY) INDEX ----------
+        self.doc_vectors: Optional[np.ndarray] = None
+        self.doc_texts: List[str] = []
+        self.doc_meta: List[Dict[str, Any]] = []
+        self.doc_index: Optional[faiss.Index] = None
+
+    # ------------------------------------------------------------------ #
+    #                            Low‑level utils                         #
+    # ------------------------------------------------------------------ #
+    def _embed(self, text: str) -> np.ndarray:
+        resp = openai.embeddings.create(input=text,
+                                        model=self.model_name)
+        return np.asarray(resp.data[0].embedding, dtype="float32")
+
+    def _embed_batch(self, items: List[dict]) -> np.ndarray:
+        texts = [
+            itm.get("description") or itm.get("text") or json.dumps(itm, ensure_ascii=False)
+            for itm in items
+        ]
+        return np.stack([self._embed(t) for t in texts])
+
+    @staticmethod
+    def _build_faiss(vectors: np.ndarray) -> faiss.Index:
+        dim = vectors.shape[1]
+        index = faiss.IndexFlatL2(dim)
+        index.add(vectors)
+        return index
+
+    # ------------------------------------------------------------------ #
+    #                                RULES                               #
+    # ------------------------------------------------------------------ #
     def _load_rules(self):
         with open(self.rules_path, encoding='utf-8') as f:
             data = json.load(f)
-        # Ensure list of rules
         self.rules = data if isinstance(data, list) else [data]
 
-    def embed_text(self, text: str) -> np.ndarray:
-        # OpenAI Embedding API 호출 (v1+)
-        resp = openai.embeddings.create(
-            input=text,
-            model="text-embedding-ada-002"
-        )
-        embedding = resp.data[0].embedding
-        return np.array(embedding, dtype="float32")
+    def query_similar_rules(self, context: Dict[str, Any],
+                            top_k: int = 5) -> List[Dict[str, Any]]:
+        if self.rule_index is None:
+            raise RuntimeError("Rule index not initialised")
+        ctx_vec = self._embed(json.dumps(context, ensure_ascii=False))
+        distances, indices = self.rule_index.search(ctx_vec[np.newaxis, :], top_k)
+        return [
+            {
+                "rule": self.rules[idx],
+                "similarity": 1.0 / (1.0 + dist)
+            }
+            for dist, idx in zip(distances[0], indices[0])
+        ]
 
-    def _build_index(self):
-        # Generate embeddings for each rule
-        self.vectors = []
-        for rule in self.rules:
-            text = rule.get("description", "") + " " + json.dumps(rule.get("conditions", {}), ensure_ascii=False)
-            vec = self.embed_text(text)
-            self.vectors.append(vec)
-        if not self.vectors:
-            raise ValueError("No rules to index.")
-        self.vectors = np.stack(self.vectors)
+    # ------------------------------------------------------------------ #
+    #                      MEMORY / DOCUMENT  INDEX                      #
+    # ------------------------------------------------------------------ #
+    def build_index_from_ndjson(self,
+                                ndjson_path: str,
+                                content_field: str = "text"):
+        """Normalised ND‑JSON → 벡터 인덱스 (doc_index)."""
+        self.doc_texts.clear()
+        self.doc_meta.clear()
 
-        # Build FAISS index
-        dim = self.vectors.shape[1]
-        self.index = faiss.IndexFlatL2(dim)
-        self.index.add(self.vectors)
+        vectors = []
+        with open(ndjson_path, encoding="utf-8") as fp:
+            for line in fp:
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                txt = rec.get(content_field, "")
+                vectors.append(self._embed(txt))
+                self.doc_texts.append(txt)
+                self.doc_meta.append(rec)
 
-    def query_similar_rules(self, context: dict, top_k: int = 5) -> list:
-        # Embed context dict as text
-        ctx_text = json.dumps(context, ensure_ascii=False)
-        ctx_vec = self.embed_text(ctx_text)
-        # Search index
-        distances, indices = self.index.search(np.expand_dims(ctx_vec, 0), top_k)
-        results = []
-        for dist, idx in zip(distances[0], indices[0]):
-            rule = self.rules[idx]
-            # Convert L2 distance to similarity score
-            similarity = 1.0 / (1.0 + dist)
-            results.append({"rule": rule, "similarity": similarity})
-        return results
+        if not vectors:
+            raise ValueError("No valid records found in ND‑JSON")
+
+        self.doc_vectors = np.stack(vectors)
+        self.doc_index = self._build_faiss(self.doc_vectors)
+
+    def query_similar_docs(self, query: str,
+                           top_k: int = 5) -> List[Dict[str, Any]]:
+        if self.doc_index is None:
+            raise RuntimeError("Document index not built yet")
+        q_vec = self._embed(query)
+        distances, indices = self.doc_index.search(q_vec[np.newaxis, :], top_k)
+        return [
+            {
+                "record": self.doc_meta[idx],
+                "similarity": 1.0 / (1.0 + dist)
+            }
+            for dist, idx in zip(distances[0], indices[0])
+        ]

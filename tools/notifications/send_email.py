@@ -6,9 +6,12 @@
 # 스스로 개선되는 자율 운영 AI 시스템을 지향한다.
 # =============================================================================
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from email.mime.text import MIMEText
 import os
 import smtplib
-from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,4 +41,42 @@ def send_email_report(subject, body, to_email):
         return True
     except Exception as e:
         print("❌ 이메일 전송 실패:", e)
+        return False
+
+def send_report_email(pdf_path):
+    from_email = os.getenv("EMAIL_USER")
+    to_email = os.getenv("EMAIL_RECEIVER")
+    password = os.getenv("EMAIL_PASS")
+    smtp_server = os.getenv("EMAIL_HOST", "smtp.naver.com")
+    smtp_port = int(os.getenv("EMAIL_PORT", 587))
+
+    if not os.path.exists(pdf_path):
+        print(f"❌ 첨부파일 없음: {pdf_path}")
+        return False
+
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = from_email
+        msg["To"] = to_email
+        msg["Subject"] = "📄 VELOS 주간 보고서 첨부"
+
+        body = "VELOS 시스템에서 생성된 주간 보고서를 첨부드립니다."
+        msg.attach(MIMEText(body, "plain", "utf-8"))
+
+        with open(pdf_path, "rb") as file:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(file.read())
+            encoders.encode_base64(part)
+            part.add_header("Content-Disposition", f"attachment; filename={os.path.basename(pdf_path)}")
+            msg.attach(part)
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(from_email, password)
+            server.send_message(msg)
+
+        print("✅ 보고서 이메일 전송 완료")
+        return True
+    except Exception as e:
+        print("❌ 보고서 이메일 전송 실패:", e)
         return False

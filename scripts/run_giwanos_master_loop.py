@@ -1,212 +1,174 @@
-# =============================================================================
-# 🧠 VELOS 시스템 철학 선언문
-#
-# 기억을 기반으로 구조적 사고를 수행하며,
-# 판단 → 실행 → 회고 → 전송의 루프를 반복함으로써,
-# 스스로 개선되는 자율 운영 AI 시스템을 지향한다.
-# =============================================================================
+# =============================================
+# VELOS 운영 철학 선언문
+# 본 스크립트는 VELOS 시스템의 마스터 루프를 실행하며,
+# 자가 진단, 자동 보고서 생성, 연동 시스템 알림을 통합 수행합니다.
+# 파일명은 절대 변경하지 않으며, 모든 흐름은 기억과 판단에 기반합니다.
+# =============================================
 
-import sys
+import sys, os, logging, json
+from datetime import datetime
+import openai
+from dotenv import load_dotenv
+
 sys.path.append("C:/giwanos")
 
-import os
-import logging
-from datetime import datetime
-from pathlib import Path
-import json
-import zipfile
+BASE_DIR = "C:/giwanos"
+load_dotenv(f"{BASE_DIR}/configs/.env")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-from modules.core.memory_reader import read_memory_context
-from modules.core.context_aware_decision_engine import generate_gpt_response
-from modules.automation.git_management.git_sync import sync_with_github
-from modules.evaluation.giwanos_agent.judge_agent import run_judge_loop
-from tools.notifications.send_email import send_email_report
-from tools.notifications.send_pushbullet_notification import send_pushbullet_notification
-from tools.notifications.slack_api import send_slack_message
-from tools.notion_integration.upload_summary_to_notion import upload_summary_to_notion
-from modules.core.reflection_agent import generate_reflection
-from modules.evaluation.insight.system_insight_agent import run_insight_evaluation
-from modules.core.threshold_optimizer import optimize_threshold
-from modules.core.rule_optimizer import optimize_rules
-from tools.chatbot_tools.automated_visualization_dashboard import generate_summary_dashboard
-from modules.automation.update_system_health import update_system_health
-from modules.evaluation.xai.models.xai_explanation_model import log_gpt_cost
+# 경로 설정
+JUDGMENT_INDEX_PATH = f"{BASE_DIR}/data/judgments/judgment_history_index.json"
+DIALOG_MEMORY_PATH = f"{BASE_DIR}/data/memory/dialog_memory.json"
+API_COST_LOG = f"{BASE_DIR}/data/logs/api_cost_log.json"
+LOG_PATH = f"{BASE_DIR}/data/logs/master_loop_execution.log"
 
+# 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("data/logs/master_loop_execution.log", encoding="utf-8"),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.FileHandler(LOG_PATH), logging.StreamHandler(sys.stdout)],
+    format="%(asctime)s [%(levelname)s] %(message)s"
 )
+logger = logging.getLogger(__name__)
 
-def save_insight_report(text):
-    report_dir = Path("C:/giwanos/data/reports")
-    report_dir.mkdir(parents=True, exist_ok=True)
-    file_path = report_dir / f"ai_insight_{datetime.now().strftime('%Y%m%d')}.md"
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(text)
-    print(f"✅ GPT 판단 보고서 저장 완료 → {file_path}")
+# 🔧 올바른 import 구문 (기준 구조 기준)
+from modules.core.slack_client import SlackClient
+from tools.notifications.send_pushbullet_notification import send_pushbullet_notification
+from tools.notifications.send_email import send_report_email
+from modules.report.generate_pdf_report import generate_pdf_report
+from tools.notion_integration.upload_summary_to_notion import upload_summary_to_notion
+from modules.automation.scheduling.weekly_summary import generate_weekly_summary
+from modules.automation.scheduling.system_health_logger import update_system_health
+from modules.core.auto_recovery_agent import main as auto_recovery_main
+from modules.core.reflection_agent import run_reflection
+from modules.evaluation.giwanos_agent.judge_agent import JudgeAgent
+from modules.automation.git_management.git_sync import main as git_sync
+from modules.advanced.advanced_modules.cot_evaluator import evaluate_cot
+from modules.advanced.advanced_modules.advanced_rag import test_advanced_rag
+from modules.core.adaptive_reasoning_agent import adaptive_reasoning_main
+from modules.core.threshold_optimizer import threshold_optimizer_main
+from modules.core.rule_optimizer import rule_optimizer_main
 
-def save_reflection_log():
-    reflection_path = Path("C:/giwanos/data/reports/reflection_log")
-    reflection_path.mkdir(parents=True, exist_ok=True)
-    file_path = reflection_path / f"reflection_{datetime.now().strftime('%Y%m%d_%H%M')}.md"
-    result = generate_reflection()
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(result)
-    print(f"✅ 회고 저장 완료 → {file_path}")
+class GPT4oTurboDecisionEngine:
+    def __init__(self):
+        pass
 
-def zip_all_reports():
-    export_dir = Path("C:/giwanos/data/exports")
-    export_dir.mkdir(parents=True, exist_ok=True)
-    zip_path = export_dir / f"VELOS_report_{datetime.now().strftime('%Y%m%d')}.zip"
+    def analyze_request(self, request):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "GPT-4 Turbo AI Judge"},
+                    {"role": "user", "content": request}
+                ]
+            )
+            result = response['choices'][0]['message']['content']
+            self.record_api_usage(response['usage'], "gpt-4", result)
+            return result
+        except Exception as e:
+            logger.error(f"OpenAI API 호출 실패: {e}")
+            return "Error occurred during request analysis."
 
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-        report_root = Path("C:/giwanos/data/reports")
-        for path in report_root.rglob("*.*"):
-            zipf.write(path, arcname=path.relative_to(report_root.parent))
+    def record_api_usage(self, usage, model, result):
+        record = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "model": model,
+            "prompt_tokens": usage['prompt_tokens'],
+            "completion_tokens": usage['completion_tokens'],
+            "total_tokens": usage['total_tokens'],
+            "cost_usd": usage['total_tokens'] * 0.00001,
+            "analysis_result": result
+        }
+        data = []
+        if os.path.exists(API_COST_LOG):
+            with open(API_COST_LOG, "r", encoding="utf-8") as file:
+                try:
+                    data = json.load(file)
+                except json.JSONDecodeError:
+                    data = []
+        data.append(record)
+        with open(API_COST_LOG, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
 
-    print(f"📦 보고서 ZIP 압축 완료 → {zip_path}")
-
-def track_loop_status(start_time, success, failed_steps, summary):
-    log_path = Path("C:/giwanos/data/logs/loop_state_tracker.json")
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    record = {
-        "started_at": start_time.isoformat(),
-        "ended_at": datetime.utcnow().isoformat(),
-        "status": "success" if success else "failure",
-        "failed_steps": failed_steps,
-        "summary": summary[:200]  # 일부만 저장
+def save_dialog_memory(message):
+    entry = {
+        "session_id": datetime.utcnow().strftime("%Y%m%d_%H%M%S"),
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        "conversations": [{
+            "role": "system",
+            "message": message,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }]
     }
+    if os.path.exists(DIALOG_MEMORY_PATH):
+        with open(DIALOG_MEMORY_PATH, "r", encoding="utf-8") as f:
+            try:
+                dialog_memory = json.load(f)
+            except json.JSONDecodeError:
+                dialog_memory = {"sessions": []}
+    else:
+        dialog_memory = {"sessions": []}
+    dialog_memory["sessions"].append(entry)
+    with open(DIALOG_MEMORY_PATH, "w", encoding="utf-8") as f:
+        json.dump(dialog_memory, f, ensure_ascii=False, indent=2)
+    logger.info("✅ 메모리 누적 저장 완료")
 
-    try:
-        if log_path.exists():
-            with open(log_path, "r", encoding="utf-8") as f:
-                history = json.load(f)
-        else:
-            history = []
-        history.append(record)
-        with open(log_path, "w", encoding="utf-8") as f:
-            json.dump(history, f, indent=2, ensure_ascii=False)
-        print(f"🗂 루프 실행 상태 저장 완료 → {log_path}")
-    except Exception as e:
-        print(f"❌ 루프 상태 저장 실패: {e}")
+def save_judgment(result):
+    judgment = {
+        "id": datetime.utcnow().strftime("%Y%m%d_%H%M%S"),
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "user_request": "Check system health",
+        "explanation": result,
+        "tags": ["운영"]
+    }
+    judgments = []
+    if os.path.exists(JUDGMENT_INDEX_PATH):
+        with open(JUDGMENT_INDEX_PATH, "r", encoding="utf-8") as f:
+            try:
+                judgments = json.load(f)
+            except json.JSONDecodeError:
+                judgments = []
+    judgments.append(judgment)
+    with open(JUDGMENT_INDEX_PATH, "w", encoding="utf-8") as f:
+        json.dump(judgments, f, ensure_ascii=False, indent=2)
+    logger.info("✅ 판단 데이터 누적 저장 완료")
 
 def main():
-    start_time = datetime.utcnow()
-    failed_steps = []
-    summary_text = ""
+    logger.info("=== VELOS 통합 마스터 루프 시작 ===")
 
-    logging.info("=== VELOS 마스터 루프 시작 ===")
-    print("🟢 루프 시작: 시스템 상태 점검 및 스냅샷 생성")
+    update_system_health()
+    git_sync()
+    JudgeAgent().run_loop()
 
-    snapshot_dir = Path("C:/giwanos/data/snapshots")
-    snapshot_dir.mkdir(parents=True, exist_ok=True)
-    snapshot_path = snapshot_dir / f"incremental_snapshot_{datetime.now().strftime('%Y%m%d')}"
-    snapshot_path.write_text("Incremental snapshot created", encoding="utf-8")
-    print(f"📸 스냅샷 생성 완료 → {snapshot_path}")
+    decision_engine = GPT4oTurboDecisionEngine()
+    slack_client = SlackClient()
+    request = "Check system health"
+    result = decision_engine.analyze_request(request)
 
-    try:
-        print("🧠 JudgeAgent 실행")
-        run_judge_loop()
-        logging.info("✅ JudgeAgent 완료")
-    except Exception as e:
-        logging.error(f"JudgeAgent 실패: {e}")
-        failed_steps.append("judge_agent")
+    save_dialog_memory(result)
+    save_judgment(result)
 
-    try:
-        print("🔁 GitHub 커밋 & 푸시 시작")
-        sync_with_github()
-        print("✅ GitHub 완료")
-    except Exception as e:
-        logging.error(f"GitHub 동기화 실패: {e}")
-        failed_steps.append("git_sync")
+    pdf_report_path = generate_pdf_report()
+    send_report_email(pdf_report_path)
+    upload_summary_to_notion()
 
-    try:
-        print("🧠 기억 로딩 및 context 생성 중...")
-        context = read_memory_context()
-        if not context:
-            logging.warning("⚠️ context 불러오기 실패 → 기본 문구로 대체")
-            context = "[기억 불러오기 실패 – 기본 프롬프트 사용]"
+    if "장애" in result or "경고" in result:
+        slack_client.send_message("#alerts", f"🚨 시스템 경고 발생!\n{result}")
+        send_pushbullet_notification("🚨 VELOS 장애 감지됨!", result)
+        auto_recovery_main()
+    else:
+        slack_client.send_message("#summary", "✅ VELOS 루프 정상 작동 완료.")
+        send_pushbullet_notification("✅ VELOS 루프 완료", "보고서 생성 및 전송 완료")
 
-        user_request = "시스템 상태를 점검하고 요약해줘"
-        full_prompt = f"{context}\n\n{user_request}"
-        print("🧠 GPT 판단 요청 전송 중...")
-        gpt_response = generate_gpt_response(full_prompt)
-        summary_text = gpt_response
-        save_insight_report(gpt_response)
-    except Exception as e:
-        logging.error(f"GPT 판단 생성 실패: {e}")
-        gpt_response = "[GPT 판단 실패]"
-        failed_steps.append("gpt_decision")
+    evaluate_cot()
+    test_advanced_rag()
+    adaptive_reasoning_main()
+    threshold_optimizer_main()
+    rule_optimizer_main()
+    run_reflection()
 
-    memory_path = Path("C:/giwanos/data/memory/learning_memory.json")
-    memory_path.parent.mkdir(parents=True, exist_ok=True)
+    generate_weekly_summary(f"{BASE_DIR}/data/reports")
 
-    try:
-        with open(memory_path, "r", encoding="utf-8") as f:
-            memory_data = json.load(f)
-    except:
-        memory_data = {}
-
-    if "insights" not in memory_data:
-        memory_data["insights"] = []
-
-    memory_data["insights"].append({
-        "timestamp": datetime.utcnow().isoformat(),
-        "from": "user",
-        "insight": user_request,
-        "tags": ["요청", "점검"]
-    })
-    memory_data["insights"].append({
-        "timestamp": datetime.utcnow().isoformat(),
-        "from": "system",
-        "insight": gpt_response,
-        "tags": ["판단", "GPT"]
-    })
-
-    try:
-        with open(memory_path, "w", encoding="utf-8") as f:
-            json.dump(memory_data, f, indent=2, ensure_ascii=False)
-        print(f"🧠 메모리에 저장됨 → {gpt_response[:40]}...")
-    except Exception as e:
-        logging.error(f"메모리 저장 실패: {e}")
-        failed_steps.append("memory_save")
-
-    to_email = os.getenv("EMAIL_TO")
-    print("[이메일 전송 테스트] 받는 사람:", to_email)
-
-    steps = [
-        ("update_system_health", update_system_health),
-        ("generate_summary_dashboard", generate_summary_dashboard),
-        ("log_gpt_cost", lambda: log_gpt_cost(gpt_response)),
-        ("send_email_report", lambda: send_email_report("VELOS 시스템 리포트", "보고서 자동 전송입니다.", to_email)),
-        ("send_pushbullet_notification", lambda: send_pushbullet_notification("VELOS", "보고서 전송 완료됨.")),
-        ("send_slack_message", lambda: send_slack_message("📡 VELOS 보고서가 자동 생성되었습니다.")),
-        ("upload_summary_to_notion", lambda: upload_summary_to_notion(summary_path="C:/giwanos/data/reports/summary_dashboard.json")),
-        ("generate_reflection", save_reflection_log),
-        ("run_insight_evaluation", run_insight_evaluation),
-        ("optimize_threshold", optimize_threshold),
-        ("optimize_rules", optimize_rules),
-        ("zip_all_reports", zip_all_reports)
-    ]
-
-    for label, func in steps:
-        try:
-            print(f"▶️ {label} 실행 중...")
-            func()
-            print(f"✅ {label} 완료")
-        except Exception as e:
-            logging.error(f"❌ {label} 실패: {e}")
-            failed_steps.append(label)
-
-    track_loop_status(start_time, len(failed_steps) == 0, failed_steps, summary_text)
-
-    logging.info("=== VELOS 마스터 루프 종료 ===")
-    print("🏁 루프 종료")
+    logger.info("=== VELOS 통합 마스터 루프 종료 ===")
 
 if __name__ == "__main__":
     main()

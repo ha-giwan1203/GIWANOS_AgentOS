@@ -1,0 +1,9 @@
+# VELOS 통합 메모리 스키마
+id_field: id
+content_field: text
+timestamp_field: ts
+meta:
+  source: string
+  tags: list[string]
+  role: optional[string]
+  importance: optional[string]
