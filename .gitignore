@@ -1,51 +1,7 @@
-# Environment and configuration
+﻿# secrets
 .env
-*.env
-*.ini
-*.jsonl
-*.pickle
-*.pkl
-__pycache__/
-*.pyc
-*.log
-*.tmp
-*.cache
-
-# Temporary files and directories
-.tmp.driveupload/
-tmp/
-temp/
-*.tmp
-*.bak
-
-# Jupyter notebooks and checkpoints
-.ipynb_checkpoints
-
-# Build and packaging
-dist/
-build/
-*.egg-info/
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Vector Database files
-vector_cache/
-vector_index/
-
-# Snapshots and backups
-snapshots/
-loop_backups/*.json
-*.json
-
-# Virtual environment
-venv/
-
-# trigger
-# allow project-level Pytest config
-!pytest.ini
-
-# 추가할 내용
-data/reports/*.md
-giwanos/data/reports/*.pdf
+configs/.env
+data/backups/
+data/**/*.env*
+**/.env*
+*.key
