@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core import config
 """
 fix_missing.py  (ASCII‑safe)
 
@@ -101,3 +102,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

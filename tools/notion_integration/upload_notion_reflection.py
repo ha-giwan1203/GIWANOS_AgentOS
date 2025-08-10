@@ -1,3 +1,6 @@
+﻿
+
+from modules.core import config
 
 import sys
 try:
@@ -41,3 +44,6 @@ payload = {
 response = requests.patch(url, headers=headers, json=payload)
 print("🔗 Notion 응답 코드:", response.status_code)
 print("📨 응답 내용:", response.text)
+
+
+

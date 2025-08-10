@@ -1,4 +1,4 @@
-"""
+﻿"""
 VELOS 기억을 벡터화하여 FAISS 인덱스와 메타데이터(JSON)를 생성합니다.
 """
 
@@ -101,3 +101,5 @@ if __name__ == "__main__":
         _self_test()
     except Exception as e:
         print(f"[오류] {e}")
+
+

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from fpdf import FPDF
 import logging
 from datetime import datetime
@@ -42,3 +42,5 @@ def test_pdf_generation():
 
 if __name__ == '__main__':
     test_pdf_generation()
+
+

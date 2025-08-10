@@ -1,0 +1,353 @@
+[
+    {
+        "id": "rule_001",
+        "description": "사용자가 18세 이상일 때 성인으로 간주",
+        "conditions": {
+            "age": {
+                "type": "integer",
+                "value": 18,
+                "operator": ">="
+            }
+        },
+        "actions": [
+            "mark_as_adult",
+            "send_welcome_email"
+        ]
+    },
+    {
+        "id": "rule_002",
+        "conditions": {
+            "age": 20,
+            "cpu": 12.9,
+            "memory": 33.4,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor",
+                "description": "CPU usage is within acceptable limits, continue monitoring."
+            },
+            {
+                "action": "optimize",
+                "description": "Memory usage is moderate, consider optimizing applications to reduce usage."
+            },
+            {
+                "action": "alert",
+                "description": "Disk usage is high (80.3%), alert user to clean up space."
+            }
+        ],
+        "tool": {
+            "name": "System Monitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_003",
+        "conditions": {
+            "age": 20,
+            "cpu": 13.2,
+            "memory": 34.0,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_resources",
+                "description": "CPU, memory, and disk usage are within acceptable limits."
+            },
+            {
+                "action": "recommend_upgrade",
+                "description": "Consider upgrading CPU or memory if performance issues arise."
+            },
+            {
+                "action": "schedule_maintenance",
+                "description": "Schedule regular maintenance checks for disk health."
+            }
+        ],
+        "tool": {
+            "name": "Resource Monitoring Tool",
+            "version": "1.0",
+            "description": "A tool to monitor and analyze system resource usage."
+        }
+    },
+    {
+        "id": "rule_004",
+        "conditions": {
+            "age": 20,
+            "cpu": 9.3,
+            "memory": 34.0,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor",
+                "description": "CPU usage is low, continue monitoring for any spikes."
+            },
+            {
+                "action": "optimize_memory",
+                "description": "Memory usage is moderate, consider optimizing applications to free up resources."
+            },
+            {
+                "action": "check_disk_space",
+                "description": "Disk usage is high, check for unnecessary files and consider cleaning up."
+            }
+        ],
+        "tool": {
+            "name": "System Monitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_005",
+        "conditions": {
+            "age": 20,
+            "cpu": 12.5,
+            "memory": 33.6,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_resources",
+                "description": "CPU, memory, and disk usage are within acceptable limits."
+            },
+            {
+                "action": "recommend_upgrade",
+                "description": "Consider upgrading memory or disk if performance issues arise."
+            },
+            {
+                "action": "schedule_maintenance",
+                "description": "Schedule regular maintenance checks for system health."
+            }
+        ],
+        "tool": {
+            "name": "SystemMonitor",
+            "version": "1.0",
+            "description": "A tool to monitor system resources and performance."
+        }
+    },
+    {
+        "id": "rule_006",
+        "conditions": {
+            "age": 20,
+            "cpu": 10.5,
+            "memory": 34.0,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_resources",
+                "description": "CPU, memory, and disk usage are within acceptable limits."
+            },
+            {
+                "action": "recommend_upgrade",
+                "description": "Consider upgrading CPU or disk if performance issues arise."
+            },
+            {
+                "action": "schedule_maintenance",
+                "description": "Schedule regular maintenance checks for system health."
+            }
+        ],
+        "tool": {
+            "name": "SystemMonitor",
+            "version": "1.0",
+            "description": "A tool to monitor system resources and performance."
+        }
+    },
+    {
+        "id": "rule_007",
+        "conditions": {
+            "age": 20,
+            "cpu": 11.4,
+            "memory": 33.3,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor",
+                "description": "CPU usage is low, continue monitoring."
+            },
+            {
+                "action": "optimize_memory",
+                "description": "Memory usage is moderate, consider optimizing if it exceeds 50%."
+            },
+            {
+                "action": "check_disk_space",
+                "description": "Disk usage is high, check for unnecessary files to delete."
+            }
+        ],
+        "tool": {
+            "name": "System Monitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_008",
+        "conditions": {
+            "age": 20,
+            "cpu": 12.6,
+            "memory": 33.3,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor",
+                "description": "CPU usage is low, continue monitoring."
+            },
+            {
+                "action": "optimize_memory",
+                "description": "Memory usage is moderate, consider optimizing if it exceeds 50%."
+            },
+            {
+                "action": "check_disk_space",
+                "description": "Disk usage is high, check for unnecessary files to delete."
+            }
+        ],
+        "tool": {
+            "name": "System Monitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_009",
+        "conditions": {
+            "age": 20,
+            "cpu": 23.0,
+            "memory": 33.9,
+            "disk": 80.2
+        },
+        "actions": [
+            {
+                "action": "monitor_resources",
+                "description": "CPU, memory, and disk usage are within acceptable limits."
+            },
+            {
+                "action": "recommend_upgrade",
+                "description": "Consider upgrading disk space as it is above 80% usage."
+            },
+            {
+                "action": "schedule_maintenance",
+                "description": "Schedule regular maintenance checks for system performance."
+            }
+        ],
+        "tool": {
+            "name": "ResourceMonitor",
+            "version": "1.0",
+            "description": "A tool to monitor system resources and provide recommendations."
+        }
+    },
+    {
+        "id": "rule_010",
+        "conditions": {
+            "age": 20,
+            "cpu": 14.1,
+            "memory": 32.6,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_performance",
+                "description": "CPU usage is moderate, continue monitoring."
+            },
+            {
+                "action": "check_memory_usage",
+                "description": "Memory usage is high, consider optimizing applications."
+            },
+            {
+                "action": "evaluate_disk_space",
+                "description": "Disk usage is high, recommend cleaning up unnecessary files."
+            }
+        ],
+        "tool": {
+            "name": "SystemMonitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_011",
+        "conditions": {
+            "age": 20,
+            "cpu": 11.7,
+            "memory": 32.6,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_performance",
+                "description": "CPU usage is moderate, monitor for any spikes."
+            },
+            {
+                "action": "check_memory_usage",
+                "description": "Memory usage is high, consider optimizing applications."
+            },
+            {
+                "action": "disk_cleanup",
+                "description": "Disk usage is high, perform a cleanup to free up space."
+            }
+        ],
+        "tool": {
+            "name": "SystemMonitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_012",
+        "conditions": {
+            "age": 20,
+            "cpu": 9.4,
+            "memory": 32.9,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor",
+                "description": "CPU usage is low, continue monitoring for any spikes."
+            },
+            {
+                "action": "optimize",
+                "description": "Memory usage is moderate, consider optimizing applications to reduce usage."
+            },
+            {
+                "action": "check_disk_space",
+                "description": "Disk usage is high, check for unnecessary files and consider cleaning up."
+            }
+        ],
+        "tool": {
+            "name": "System Monitor",
+            "version": "1.0",
+            "description": "A tool to monitor system performance and resource usage."
+        }
+    },
+    {
+        "id": "rule_013",
+        "conditions": {
+            "age": 20,
+            "cpu": 10.5,
+            "memory": 32.9,
+            "disk": 80.3
+        },
+        "actions": [
+            {
+                "action": "monitor_resources",
+                "description": "CPU, memory, and disk usage are within acceptable limits."
+            },
+            {
+                "action": "recommend_upgrade",
+                "description": "Consider upgrading CPU if performance issues arise."
+            },
+            {
+                "action": "schedule_maintenance",
+                "description": "Schedule regular maintenance checks for disk health."
+            }
+        ],
+        "tool": {
+            "name": "Resource Monitoring Tool",
+            "version": "1.0",
+            "description": "A tool to monitor and analyze system resource usage."
+        }
+    }
+]

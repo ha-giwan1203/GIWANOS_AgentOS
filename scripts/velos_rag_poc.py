@@ -1,3 +1,6 @@
+﻿"""
+
+from modules.core import config
 """
 ##############################################################
 # VELOS OPERATION DECLARATION
@@ -48,7 +51,7 @@ except ImportError as e:
 # ──────────────────────────────
 # ④ 설정
 # ──────────────────────────────
-QDRANT_URL = os.getenv("VEL_QDRANT_URL", "http://127.0.0.1:6333")
+QDRANT_URL = os.getenv("VEL_QDRANT_URL", "config.nan127.0.0.1:6333")
 COLLECTION = "velos-memory"
 EMBED_MODEL = "jhgan/ko-sbert-sts"
 
@@ -129,3 +132,6 @@ if __name__ == "__main__":
     except Exception:
         logging.exception("PoC 전체 실패 – 세부 로그 참조")
         sys.exit(1)
+
+
+

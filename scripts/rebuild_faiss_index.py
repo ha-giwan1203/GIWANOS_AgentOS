@@ -1,4 +1,4 @@
-import faiss
+﻿import faiss
 import numpy as np
 import os
 
@@ -16,3 +16,5 @@ index.add(dummy_vector)
 faiss.write_index(index, INDEX_PATH)
 
 print("✅ FAISS 인덱스가 새로 생성되었습니다:", INDEX_PATH)
+
+

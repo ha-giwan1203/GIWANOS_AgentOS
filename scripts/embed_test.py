@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core import config
 """📄 scripts/embed_test.py
 
 정규화된 ND‑JSON 샘플을 읽어 임베딩 → 검색까지 ‘스모크 테스트’.
@@ -96,3 +97,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

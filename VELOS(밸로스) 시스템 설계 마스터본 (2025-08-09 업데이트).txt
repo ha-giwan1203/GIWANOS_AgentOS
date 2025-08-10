@@ -1,0 +1,271 @@
+## VELOS(밸로스) 시스템 설계 통합완성본 (2025-08-09 기준)
+
+---
+
+### 1. 시스템 정의
+
+VELOS(밸로스)는 **GPT-5 기반 AI 모델**과 **고급 에이전트 아키텍처**를 결합한 **자율 운영형 AI 오케스트레이션 플랫폼**이다. 목표는 다음과 같다.
+
+* 사용자 개입 최소화
+* 코드 자동화 및 환경 최적화
+* 지능형 통합 관리·보고·제어
+
+특징적으로 **XAI(설명 가능한 AI)** 기반으로 모든 의사결정과 작업 과정을 완전 추적·설명 가능하며, 로컬·서버·클라우드 환경 어디서든 동일한 안정성과 성능을 보장한다.
+
+---
+
+### 2. 9대 핵심 기능
+
+1. **맥락 인식 의사결정 엔진** – 자연어 쿼리 분석, 맥락·우선순위 판단, 중복 탐색 방지
+2. **고급 자가학습·자동 최적화** – 작업 결과 저장·주기적 학습, 환경 적응
+3. **병렬 실행·충돌 방지** – Async, ThreadPool, Lock 기반 자원 관리
+4. **설명 가능한 AI(XAI) 및 로깅** – 결정 근거·추론 과정 기록, 보고서 md/json/pdf 생성
+5. **자동 장애 진단·복구** – 자체 진단·복구, 실패 시 관리자 알림
+6. **스마트 백업·데이터 보호** – 주기적 백업, 오래된 데이터 자동 정리
+7. **보고서 자동 생성·연동** – 주간/일간 보고서·요약, Slack/Notion/클라우드 전송
+8. **유연한 확장성** – 모듈화 구조, 신규 기능 즉시 통합 가능
+9. **UI/UX** – Streamlit 대시보드, 실시간 시각화
+
+---
+
+### 3. 폴더·파일 구조 (2025-08-09 최신)
+
+**규칙:** 신규 발견 시 즉시 반영 + 역할 설명 필수
+
+```
+C:\giwanos
+│  README.md                 # 시스템 개요 및 설치 가이드
+│  setup_env.ps1              # 환경 설정 스크립트
+│  requirements.core.txt      # 핵심 패키지 목록
+│  requirements.rest.txt      # 부가 패키지 목록
+│  requirements.pinned.txt    # 버전 고정 패키지
+│  VELOS_SYSTEM_DECLARATION.py# 시스템 선언부
+│  .env                       # 환경변수 파일
+│
+├─.venv / venvs
+│   └─ velos
+│       ├─ Scripts
+│       ├─ Lib
+│       └─ pyvenv.cfg
+│
+├─configs
+│  └─ .env                    # 개별 설정 파일
+│
+├─data
+│  ├─ logs                    # 로그 저장소
+│  │   ├─ install.log
+│  │   └─ error.log
+│  ├─ reports                 # 보고서 저장
+│  │   ├─ daily_report.pdf
+│  │   ├─ weekly_report_YYYYMMDD.pdf
+│  │   ├─ weekly_summary_YYYYMMDD.md
+│  │   └─ 기타 보고서 zip
+│  ├─ temp                    # 임시 캐시
+│  │   └─ cache.tmp
+│  ├─ backups                 # 백업 파일
+│  │   └─ {날짜}_backup.zip
+│  └─ memory                  # 메모리 DB
+│      ├─ notion_cache.sqlite
+│      └─ 외부기억 동기화 데이터
+│
+├─modules
+│  ├─ core                    # 핵심 모듈
+│  │   ├─ slack_client.py
+│  │   ├─ slack_api.py
+│  │   └─ 기타 핵심 모듈
+│  ├─ memory
+│  │   └─ notion_memory_sync.py
+│  ├─ advanced
+│  │   └─ rag
+│  │       ├─ advanced_rag.py
+│  │       └─ cot_evaluator.py
+│  └─ automation
+│      ├─ git
+│      │   └─ git_sync.py
+│      └─ scheduling
+│          └─ report_and_disk_cleanup.py
+│
+├─scripts
+│  ├─ run_giwanos_master_loop.py
+│  ├─ run_masterloop.cmd
+│  └─ 기타 테스트 스크립트
+│
+└─tools
+   └─ notion_integration
+       ├─ upload_summary_to_notion.py
+       ├─ upload_notion_result.py
+       ├─ upload_notion_reflection.py
+       ├─ detect_notion_properties.py
+       ├─ notion_bridge.py
+       └─ upload_cleanup_log_to_notion.py
+```
+
+---
+
+### 4. 통합 기능 현황
+
+* Slack 연동: API 방식, 메시지·파일 업로드 성공 (`files.uploadV2` 호환)
+* Notion 연동: DB+페이지 동시 업로드, 속성 자동 매핑
+* Git 연동: 마스터 루프 내 자동 커밋·푸시 (환경변수 제어)
+* 외부기억: Notion DB → SQLite 동기화 완전 동작
+* 보고서: 주간·요약 보고서 자동 생성 및 Slack·Notion 전송
+* GPT-5: 의사결정 및 보고서 생성에 활용
+
+---
+
+### 5. 버그 해결 내역
+
+* 환경변수 인식 실패 → `.env` 다중 로드로 수정
+* Slack 채널 권한 부족 → 권한 부여 + 채널 ID 교정
+* 파일 업로드 실패 → External Flow 적용
+* Notion 속성 불일치 → 자동 매핑 로직 추가
+
+---
+
+### 6. 회고(Reflection)
+
+* 권한 문제 해결 후 안정성 크게 향상
+* Notion 업로드 성공률 100% 달성
+* 모듈 경로 통합으로 import 안정성 확보
+* 보고서 다양성 부족 → RAG + 판단 데이터 기반 요약 강화 필요
+
+---
+
+### 7. 향후 계획
+
+1. 보고서 품질 향상 (중복 제거, 채널 맞춤 포맷)
+2. 외부기억 확장 (다른 지식 저장소 연동)
+3. 자동화 심화 (Slack/Notion 동시 전송 강화)
+4. 모니터링 고도화 (실시간 대시보드 반영)
+5. API 토큰 관리 자동화
+
+---
+
+### 8. 작업 계획 (Work Plan – 상세)
+
+**단기 (1주 이내)**
+
+* 보고서 생성 로직 세분화:
+
+  * 일간 보고서: 주요 이슈, 오류 로그, 작업 현황 포함
+  * 주간 보고서: KPI, 모듈별 성능, 개선 포인트 포함
+  * 채널별 맞춤 포맷: Slack(요약 중심), Notion(상세 중심)
+* Slack/Notion 전송 플로우 통합 테스트:
+
+  * 파일 업로드, 메시지 포맷, 속성 매핑 동시 검증
+* 환경변수 자동 로드 모듈화:
+
+  * `.env` 다중 경로 스캔
+  * 로드 실패 시 경고 및 기본값 설정
+
+**중기 (1\~3개월)**
+
+* 외부기억 확장:
+
+  * Notion 외 Confluence, Google Drive API 연동
+  * 데이터 동기화 주기 설정 및 충돌 해결 로직 추가
+* RAG 검색 로직 최적화:
+
+  * 시맨틱 검색에 필터 조건(날짜, 상태, 카테고리) 강화
+  * 상위 결과 자동 요약 모듈 개발
+* 대시보드 모니터링 고도화:
+
+  * 실시간 에러 알림
+  * 성능 지표 그래프화
+* 보고서 템플릿 커스터마이징:
+
+  * 사용자 지정 항목 추가 기능
+  * 포맷 변경 자동 반영
+
+**장기 (6개월 이상)**
+
+* 전체 아키텍처 컨테이너화(Docker/Kubernetes):
+
+  * 개발/운영 환경 동일화
+  * 무중단 배포
+* 고급 멀티 에이전트 협업 로직:
+
+  * 에이전트 간 작업 분담 및 결과 통합
+* 보안 자동화:
+
+  * API 토큰 자동 회전
+  * 권한 레벨별 접근 제어
+* 다국어 보고서 생성:
+
+  * 한국어·영어·일본어 지원
+  * 언어별 포맷 및 용어 표준화
+
+**산출물:**
+
+* 단기: 테스트 통과 보고서, 통합 전송 로그, 환경변수 로드 모듈 코드
+* 중기: 확장 외부기억 모듈, 최적화된 RAG, 개선된 대시보드
+* 장기: 컨테이너 배포 스크립트, 멀티에이전트 협업 모듈, 보안 자동화 스크립트, 다국어 보고서 템플릿
+
+---
+
+### 9. RAG(Retrieval-Augmented Generation) 연동 로직
+
+목적:
+
+* 보고서 생성 및 의사결정 시, 단순 모델 추론이 아니라 외부 데이터베이스·문서·기록을 검색·활용해 정확성과 최신성 강화.
+
+구성 흐름:
+
+1. 쿼리 분석 → 사용자가 요청한 내용에서 핵심 질의어 추출
+2. 검색 스텝 →
+
+   * 로컬 메모리 DB (SQLite, notion\_cache.sqlite)
+   * Notion DB 및 외부 문서 저장소
+   * Git 저장소 내부 문서
+3. 결과 필터링 →
+
+   * 시맨틱 유사도 기반 상위 N개 문서 선택
+   * 날짜·상태값 조건 필터
+4. 컨텍스트 병합 → 검색 결과를 하나의 통합 컨텍스트로 구성
+5. 모델 호출(GPT-5) → 컨텍스트를 주입한 프롬프트로 최종 응답/보고서 생성
+6. XAI 로깅 → 검색·필터링·모델 응답 전 과정을 로그에 기록
+
+---
+
+### 10. 외부기억 활용 시퀀스 다이어그램
+
+```mermaid
+sequenceDiagram
+    participant User as 사용자
+    participant MasterLoop as VELOS Master Loop
+    participant MemorySync as Notion Memory Sync
+    participant LocalDB as SQLite 메모리
+    participant GPT5 as GPT-5 모델
+
+    User->>MasterLoop: 요청(보고서 생성 / 분석)
+    MasterLoop->>MemorySync: 최신 Notion DB 동기화 요청
+    MemorySync->>Notion: API 호출 → 데이터 가져오기
+    Notion-->>MemorySync: 데이터 반환(JSON)
+    MemorySync->>LocalDB: 데이터 저장/갱신
+    MasterLoop->>LocalDB: 관련 데이터 질의
+    LocalDB-->>MasterLoop: 검색 결과 반환
+    MasterLoop->>GPT5: 컨텍스트+질문 전달
+    GPT5-->>MasterLoop: 최종 응답/보고서
+    MasterLoop->>User: 결과 전달
+```
+
+---
+
+### 11. 통합 운영 흐름
+
+1. Master Loop 기동 → Slack·Notion·Git 연결 초기화
+2. 주기적 작업 스케줄링 (`report_and_disk_cleanup.py`) → 보고서·백업 처리
+3. 외부기억 동기화 (`notion_memory_sync.py`) → 최신 데이터 확보
+4. RAG 검색·응답 → 최신 정보 기반 의사결정
+5. 결과 전송 → Slack, Notion, 이메일 등 멀티 채널
+6. 장애 감지·복구 → 실패 시 알림 및 로그 기록
+
+---
+
+### 12. 작업 이력 (Changelog)
+
+* **2025-08-09**: 최신 폴더 구조 반영, GPT-5 기반 명시, 통합 기능 현황·회고·향후 계획 추가
+* **2025-08-08**: Notion 속성 자동 매핑 로직 구현, Slack 파일 업로드 문제 해결, Git 자동 커밋·푸시 환경변수 제어 기능 추가
+* **2025-08-07**: 외부기억 동기화 모듈(`notion_memory_sync.py`) 안정화, 보고서 자동 생성 기능 기본 동작 검증
+* **2025-08-05**: Slack 채널 권한 문제 해결, `.env` 다중 로드 구조 도입
+* **2025-08-03**: 초기 폴더 구조 설계, 핵심 모듈 배치 및 기본 연동 구성

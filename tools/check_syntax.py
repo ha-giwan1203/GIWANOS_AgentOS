@@ -1,4 +1,4 @@
-
+﻿
 import sys
 import py_compile
 import os
@@ -21,3 +21,5 @@ if __name__ == "__main__":
         print("사용법: python check_syntax.py [파일 경로]")
     else:
         check_syntax(sys.argv[1])
+
+

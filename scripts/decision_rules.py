@@ -1,4 +1,4 @@
-import os
+﻿import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -29,3 +29,5 @@ def generate_rules():
 
 if __name__ == "__main__":
     generate_rules()
+
+

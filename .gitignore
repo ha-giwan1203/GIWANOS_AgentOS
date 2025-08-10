@@ -5,3 +5,13 @@ data/backups/
 data/**/*.env*
 **/.env*
 *.key
+.patch_backups/
+node_modules/
+data/logs/
+data/reports/*.pdf
+interface/judgment_dashboard/node_modules/
+.patch_backups/
+node_modules/
+data/logs/
+data/reports/*.pdf
+interface/judgment_dashboard/node_modules/

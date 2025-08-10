@@ -1,0 +1,164 @@
+{
+  "summary": "BCT-9 설계 적합성: FAIL=0 / 9 핵심 항목",
+  "level": "low",
+  "checks": {
+    "paths": {
+      "status": "PASS",
+      "detail": {
+        "master_loop": "C:\\giwanos\\scripts\\run_giwanos_master_loop.py",
+        "dashboard": "C:\\giwanos\\interface\\velos_dashboard.py",
+        "health_json": "C:\\giwanos\\data\\logs\\system_health.json",
+        "memory_json": "C:\\giwanos\\data\\memory\\learning_memory.json",
+        "reports_dir": "C:\\giwanos\\data\\reports",
+        "backups_dir": "C:\\giwanos\\data\\backups",
+        "configs_settings": "C:\\giwanos\\configs\\settings.yaml",
+        "configs_sys": "C:\\giwanos\\configs\\system_config.json"
+      },
+      "exists": {
+        "master_loop": true,
+        "dashboard": true,
+        "health_json": true,
+        "memory_json": true,
+        "reports_dir": true,
+        "backups_dir": true,
+        "configs_settings": true,
+        "configs_sys": true
+      }
+    },
+    "context_engine": {
+      "status": "PASS",
+      "evidence_files": [
+        ".venv\\Lib\\site-packages\\GPUtil\\GPUtil.py",
+        ".venv\\Lib\\site-packages\\GPUtil\\demo_GPUtil.py",
+        ".venv\\Lib\\site-packages\\adodbapi\\apibase.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\_websocket\\reader_c.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\_websocket\\reader_py.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\abc.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client_ws.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\compression_utils.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\connector.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\cookiejar.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\formdata.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\helpers.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\http_writer.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\multipart.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\payload.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\streams.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\typedefs.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\web_fileresponse.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\web_protocol.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\web_response.py"
+      ]
+    },
+    "self_learning": {
+      "status": "PASS",
+      "detail": {
+        "learning_memory_exists": true,
+        "learning_memory_recent_14d": true
+      }
+    },
+    "parallel_lock": {
+      "status": "PASS",
+      "evidence_files": [
+        ".venv\\Lib\\site-packages\\aiohappyeyeballs\\_staggered.py",
+        ".venv\\Lib\\site-packages\\aiohappyeyeballs\\impl.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\_websocket\\reader_c.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\_websocket\\reader_py.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\_websocket\\writer.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\abc.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\base_protocol.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client_middleware_digest_auth.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client_middlewares.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client_reqrep.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\client_ws.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\compression_utils.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\connector.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\http_writer.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\multipart.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\payload.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\payload_streamer.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\pytest_plugin.py",
+        ".venv\\Lib\\site-packages\\aiohttp\\resolver.py"
+      ]
+    },
+    "xai_logging": {
+      "status": "PASS",
+      "recent_reports": [
+        "adaptive_reflection_20250801.md",
+        "ai_insight_20250806.md",
+        "ai_insights.json",
+        "ai_insights_report.md",
+        "ai_insights_report.pdf",
+        "cost_summary_20250805.json",
+        "design_conformance_20250808_1553.md",
+        "design_conformance_20250808_1645.md",
+        "design_conformance_20250808_1646.md",
+        "design_conformance_20250808_1649.md",
+        "design_conformance_20250808_1650.md",
+        "evaluation_report.pdf",
+        "font_sanity.pdf",
+        "recovery_log_20250801.md",
+        "summary_dashboard.json"
+      ]
+    },
+    "auto_recovery": {
+      "status": "PASS",
+      "evidence_files": [
+        "data\\snapshots\\full_snapshot_20250804\\auto_recovery_agent.py",
+        "data\\snapshots\\incremental_snapshot_20250804\\auto_recovery_agent.py",
+        "data\\snapshots\\incremental_snapshot_20250805\\auto_recovery_agent.py",
+        "modules\\core\\auto_recovery_agent.py"
+      ]
+    },
+    "smart_backup": {
+      "status": "PASS",
+      "recent_archives": [
+        "weekly_report_20250805.zip"
+      ]
+    },
+    "reporting": {
+      "status": "PASS",
+      "formats": {
+        "pdf": true,
+        "md": true,
+        "html": true
+      }
+    },
+    "extensibility": {
+      "status": "PASS",
+      "detail": {
+        "settings_yaml": true,
+        "system_config_json": true,
+        "tools_dir_exists": true
+      }
+    },
+    "dashboard": {
+      "status": "PASS",
+      "detail": {
+        "dashboard_path": "C:\\giwanos\\interface\\velos_dashboard.py"
+      }
+    },
+    "scheduler": {
+      "available": true,
+      "found": {
+        "VELOS_DailyCleanup": false,
+        "VELOS_MasterLoop": false
+      },
+      "raw_len": 379958
+    },
+    "master_loop_smoke": {
+      "python": "C:\\giwanos\\venv\\Scripts\\python.exe",
+      "returncode": 0,
+      "stdout_sample": "2025-08-08 16:52:43,608 [INFO] === VELOS 통합 마스터 루프 시작 ===\r\n2025-08-08 16:52:43,855 [INFO] [stub] git_sync called (dry-run: no-op)\r\n2025-08-08 16:52:43,855 [INFO] [stub] JudgeAgent.run_loop called\r\n2025-08-08 16:52:43,855 [INFO] [stub] SlackClient initialized\r\n2025-08-08 16:52:51,679 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions \"HTTP/1.1 200 OK\"\r\n2025-08-08 16:52:51,715 [INF",
+      "stderr_sample": "",
+      "executed": true,
+      "health_touched": true,
+      "health_before": 1754639519.0504203,
+      "health_after": 1754639563.85539
+    }
+  },
+  "timestamps": {
+    "now": "2025-08-08T16:52:36.908619"
+  }
+}

@@ -1,4 +1,4 @@
-import threading, time, shutil, pathlib, logging
+﻿import threading, time, shutil, pathlib, logging
 def start_backup():
     def loop():
         while True:
@@ -7,3 +7,5 @@ def start_backup():
             logging.getLogger("backup").info("백업완료 "+dst)
             time.sleep(3600)
     threading.Thread(target=loop,daemon=True).start()
+
+

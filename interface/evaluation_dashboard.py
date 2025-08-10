@@ -1,4 +1,4 @@
-
+﻿
 import streamlit as st
 import json
 from pathlib import Path
@@ -38,3 +38,5 @@ if "score" in df.columns:
 # 표 출력
 st.subheader("📋 필터링된 평가 결과")
 st.dataframe(df.sort_values("timestamp", ascending=False), use_container_width=True)
+
+

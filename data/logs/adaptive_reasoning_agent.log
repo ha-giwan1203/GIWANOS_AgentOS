@@ -1,0 +1,233 @@
+2025-07-30 18:36:58,861 [INFO] 🧠 Adaptive Reasoning Agent 실행 시작
+2025-07-30 18:36:58,862 [ERROR] Adaptive Reasoning Agent 실행 중 오류 발생: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+2025-07-31 10:26:40,415 [INFO] 🧠 Adaptive Reasoning Agent 실행 시작
+2025-07-31 10:26:50,061 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-31 10:26:50,085 [INFO] ✅ Adaptive Reasoning 결과 파일 생성 완료: C:\giwanos\data\reflections\adaptive_reasoning_20250731_102650.md, C:\giwanos\data\reflections\adaptive_reasoning_20250731_102650.txt
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 결과: '이번 주 시스템 상태 보고서를 생성해줘' 처리 완료
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 중 오류: 'dict' object has no attribute 'get_related_results'
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: 'None' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: '{'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: '{'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+추론 완료: 적응형 추론 결과: '{'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}' 처리 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료
+Adaptive Reasoning Agent 실행 시작
+적응형 추론 작업 정상 완료

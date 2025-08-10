@@ -1,4 +1,4 @@
-# slack_api_post_message.py - 슬랙 메시지를 전송하는 단독 실행 스크립트
+﻿# slack_api_post_message.py - 슬랙 메시지를 전송하는 단독 실행 스크립트
 
 import sys
 from slack_api import send_slack_message
@@ -16,3 +16,5 @@ if __name__ == "__main__":
         print("✅ Slack 메시지 전송 성공")
     else:
         print("❌ 전송 실패:", result)
+
+

@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+﻿#!config.PROJECT_HOMEbin/env python
 # scripts/verify_structure.py
+from modules.core import config
 """
 프로젝트 루트 이하의 디렉터리/파일 구조를 사양(spec)과 비교해
  ▫︎ 누락(Missing)
@@ -195,3 +196,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+

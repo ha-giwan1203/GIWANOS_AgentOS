@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core import config
 """
 init_vector_cache.py   (scripts/init_vector_cache.py)
 
@@ -47,3 +48,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+

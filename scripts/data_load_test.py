@@ -1,4 +1,4 @@
-import json
+﻿import json
 
 def test_load(path):
     try:
@@ -11,3 +11,5 @@ def test_load(path):
 
 test_load("C:/giwanos/data/logs/api_cost_log.json")
 test_load("C:/giwanos/data/memory/learning_memory.json")
+
+

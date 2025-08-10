@@ -1,3 +1,6 @@
+﻿
+
+from modules.core import config
 
 import os
 from notion_client import Client
@@ -53,3 +56,6 @@ def append_summary_block_to_page(summary_text):
     }
 
     requests.patch(url, headers=headers, json=payload)
+
+
+

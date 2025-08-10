@@ -1,4 +1,4 @@
-"""VELOS system_health.json 마이그레이션 스크립트
+﻿"""VELOS system_health.json 마이그레이션 스크립트
    - *_usage_percent → *_percent 로 키명 통일
    - 실행 전: data/logs/system_health.json 백업 권장
 """
@@ -40,3 +40,5 @@ def migrate():
 
 if __name__ == "__main__":
     migrate()
+
+

@@ -1,4 +1,4 @@
-# 🚀 VELOS 전체 파일 경로 추출기 (가상환경 제외 버전)
+﻿# 🚀 VELOS 전체 파일 경로 추출기 (가상환경 제외 버전)
 # 🔒 파일명 고정: export_giwanos_structure.py
 # 📂 저장 위치: C:/giwanos/scripts/
 
@@ -17,3 +17,5 @@ with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(full_path + "\n")
 
 print(f"✅ 전체 파일 경로를 '{OUTPUT_FILE}'에 저장했습니다. (가상환경 제외)")
+
+

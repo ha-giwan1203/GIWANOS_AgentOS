@@ -1,4 +1,5 @@
-# VELOS 시스템 - Notion 연동 모듈
+﻿# VELOS 시스템 - Notion 연동 모듈
+from modules.core import config
 import os
 import json
 import requests
@@ -65,3 +66,27 @@ def upload_summary_to_notion(summary_path):
     except Exception as e:
         print("❌ 예외 발생 (Notion 업로드):", e)
         return False
+
+# === VELOS shim: make summary_path optional ===
+try:
+    _velos_orig_upload = upload_summary_to_notion
+    def upload_summary_to_notion(summary_path=None, *args, **kwargs):
+        from pathlib import Path
+        root = Path(__file__).resolve().parents[2]
+        if summary_path is None:
+            reports = root / "data" / "reports"
+            candidates = []
+            if reports.exists():
+                candidates += list(reports.glob("weekly_summary_*.md"))
+                candidates += list(reports.glob("weekly_report_*.md"))
+                candidates += list(reports.glob("summary_dashboard.json"))
+            if not candidates:
+                raise FileNotFoundError("요약 파일을 찾을 수 없습니다. summary_path를 명시적으로 넘겨주세요.")
+            latest = max(candidates, key=lambda p: p.stat().st_mtime)
+            summary_path = str(latest)
+        return _velos_orig_upload(summary_path, *args, **kwargs)
+except Exception:
+    pass
+# === END shim ===
+
+

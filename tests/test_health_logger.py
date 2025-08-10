@@ -1,4 +1,4 @@
-from modules.automation.scheduling.system_health_logger import current_stats
+﻿from modules.automation.scheduling.system_health_logger import current_stats
 
 def test_current_stats_keys():
     stats = current_stats()
@@ -9,3 +9,5 @@ def test_current_stats_range():
     assert 0 <= stats["cpu_percent"] <= 100
     assert 0 <= stats["memory_percent"] <= 100
     assert 0 <= stats["disk_percent"] <= 100
+
+

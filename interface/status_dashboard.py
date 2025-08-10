@@ -1,4 +1,4 @@
-# status_dashboard.py - 시스템 상태만 단독 표시하는 버전
+﻿# status_dashboard.py - 시스템 상태만 단독 표시하는 버전
 
 import streamlit as st
 import json
@@ -18,3 +18,5 @@ if status_path.exists():
         st.json(status)
 else:
     st.warning("시스템 상태 요약 파일이 없습니다.")
+
+

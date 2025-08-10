@@ -1,4 +1,4 @@
-# system_alert_notifier.py - 시스템 경고 알림을 Slack으로 전송
+﻿# system_alert_notifier.py - 시스템 경고 알림을 Slack으로 전송
 
 import os
 from slack_api import send_slack_message
@@ -16,3 +16,5 @@ def notify_critical_alert(message):
             print("❌ Slack 전송 실패:", result)
     except Exception as e:
         print("❌ 알림 전송 중 오류 발생:", str(e))
+
+

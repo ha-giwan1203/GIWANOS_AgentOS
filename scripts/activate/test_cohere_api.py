@@ -1,3 +1,6 @@
+﻿echo @"
+
+from modules.core import config
 echo @"
 import requests, os
 from dotenv import load_dotenv
@@ -13,6 +16,9 @@ data = {
     'model': 'summarize-medium'
 }
 
-response = requests.post('https://api.cohere.ai/summarize', json=data, headers=headers)
+response = requests.post('config.nanapi.cohere.ai/summarize', json=data, headers=headers)
 print(response.json())
 "@ > C:\giwanos\test_cohere_api.py
+
+
+

@@ -1,0 +1,15 @@
+{
+  "id": "20250807_0410",
+  "timestamp": "2025-08-07T04:10:45.916063Z",
+  "user_request": "시스템 점검 요청",
+  "explanation": "디스크 사용량 과다",
+  "risk_level": "high",
+  "tags": [
+    "시스템",
+    "점검"
+  ],
+  "related_memory_keys": [
+    "syslog_0806"
+  ],
+  "file": "judgment_20250807_0410.json"
+}

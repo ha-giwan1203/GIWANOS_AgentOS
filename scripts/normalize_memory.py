@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core import config
 """📄  scripts/normalize_memory.py
 
 다양한 형식의 메모리 파일을 **통일된 ND‑JSON** 레코드로 변환.
@@ -85,3 +86,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

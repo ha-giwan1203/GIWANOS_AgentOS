@@ -1,4 +1,4 @@
-import pathlib, shutil
+﻿import pathlib, shutil
 from scripts.generate_pdf_report import generate
 
 def test_pdf_generate(tmp_path: pathlib.Path):
@@ -13,3 +13,5 @@ def test_pdf_generate(tmp_path: pathlib.Path):
     assert pdf_path.exists()
     assert pdf_path.suffix == ".pdf"
     assert pdf_path.stat().st_size > 0
+
+

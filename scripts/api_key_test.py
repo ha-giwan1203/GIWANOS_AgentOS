@@ -1,4 +1,4 @@
-import os
+﻿import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -12,3 +12,5 @@ try:
     print("✅ API 키 정상 작동, 임베딩 길이:", len(res.data[0].embedding))
 except Exception as e:
     print("❌ API 키 오류 발생:", e)
+
+

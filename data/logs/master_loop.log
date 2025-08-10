@@ -1,0 +1,442 @@
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│master_loop│답변: {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+ERROR│context_aware_decision_engine│외부 검색 실패: HTTPSConnectionPool(host='api.example.com', port=443): Max retries exceeded with url: /search?q=%EC%9D%B4%EB%B2%88+%EC%A3%BC+%EC%8B%9C%EC%8A%A4%ED%85%9C+%EC%83%81%ED%83%9C+%EB%B3%B4%EA%B3%A0%EC%84%9C%EB%A5%BC+%EC%83%9D%EC%84%B1%ED%95%B4%EC%A4%98 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001A96F2788D0>: Failed to resolve 'api.example.com' ([Errno 11001] getaddrinfo failed)"))
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+ERROR│context_aware_decision_engine│GOOGLE_API_KEY / GOOGLE_CSE_ID 환경변수가 없습니다.
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 30 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'one', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 30 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'one', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Retaining 30 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│generate_pdf_report│✅ PDF 생성 완료 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+ERROR│context_aware_decision_engine│GOOGLE_API_KEY / GOOGLE_CSE_ID 환경변수가 없습니다.
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 29 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'quotedbl', 'six', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 18, 19, 21, 22, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 29 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'quotedbl', 'six', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 18, 19, 21, 22, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Retaining 29 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│generate_pdf_report│✅ PDF 생성 완료 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+ERROR│context_aware_decision_engine│GOOGLE_API_KEY / GOOGLE_CSE_ID 환경변수가 없습니다.
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 30 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'one', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 30 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'one', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Retaining 30 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│generate_pdf_report│✅ PDF 생성 완료 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+ERROR│context_aware_decision_engine│GOOGLE_API_KEY / GOOGLE_CSE_ID 환경변수가 없습니다.
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 30 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'four', 'hyphen', 'numbersign', 'one', 'quotedbl', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 20, 21, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 30 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'four', 'hyphen', 'numbersign', 'one', 'quotedbl', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 17, 18, 19, 20, 21, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Retaining 30 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│generate_pdf_report│✅ PDF 생성 완료 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '2022. 9. 13. ... 우리 영업 시스템에 안 좋은 데이터가 많았어. 기한이 지난 것도 있고, 데이터 품질 규칙에 안 맞는 것들도 있었지. 매주 영업 회의는 똑같았어… 매니저가\xa0...', 'source': 'https://www.reddit.com/r/MicrosoftFlow/comments/xd38f0/what_are_some_great_examples_of_power_automate/?tl=ko'}
+INFO│master_loop│📝 2022. 9. 13. ... 우리 영업 시스템에 안 좋은 데이터가 많았어. 기한이 지난 것도 있고, 데이터 품질 규칙에 안 맞는 것들도 있었지. 매주 영업 회의는 똑같았어… 매니저가 ...
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 29 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 29 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'colon', 'eight', 'exclam', 'five', 'hyphen', 'numbersign', 'quotedbl', 'seven', 'space', 'three', 'two', 'uniAC01', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC131', 'uniC2DC', 'uniC791', 'uniC885', 'uniC8FC', 'uniD569', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 13, 16, 18, 19, 21, 23, 24, 26, 37, 44, 47, 51, 54, 496, 497, 571, 1458, 1635, 1648, 1751, 2057, 2122, 2146, 2709, 13295]
+INFO│fontTools.subset│Retaining 29 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│generate_pdf_report│✅ PDF 생성 완료 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+WARNING│fpdf.output│Font MPDFAA+NanumGothic is missing the following glyphs: '📊' (\U0001f4ca), '📌' (\U0001f4cc), '⚠' (\u26a0), '️' (\ufe0f), '📝' (\U0001f4dd)
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 97 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 97 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Retaining 97 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 1, 31, 45, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 99 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 99 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Retaining 99 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 1, 31, 45, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+WARNING│fpdf.output│Font MPDFAA+NotoEmoji is missing the following glyphs: '️' (\ufe0f)
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 8 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'NULL', 'nonmarkingreturn', 'space', 'u1F4CA', 'u1F4CC', 'u1F4DD', 'uni26A0']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 72, 538, 540, 557]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 8 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'NULL', 'nonmarkingreturn', 'space', 'u1F4CA', 'u1F4CC', 'u1F4DD', 'uni26A0']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 72, 538, 540, 557]
+INFO│fontTools.subset│Retaining 8 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 99 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 99 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Retaining 99 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 1, 31, 45, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│fontTools.subset│maxp pruned
+INFO│fontTools.subset│cmap pruned
+INFO│fontTools.subset│post pruned
+INFO│fontTools.subset│GPOS dropped
+INFO│fontTools.subset│GSUB dropped
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│Added gid0 to subset
+INFO│fontTools.subset│Added first four glyphs to subset
+INFO│fontTools.subset│Closing glyph list over 'glyf': 99 glyphs before
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Closed glyph list over 'glyf': 99 glyphs after
+INFO│fontTools.subset│Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'T', 'V', 'a', 'bracketleft', 'bracketright', 'bullet', 'c', 'colon', 'd', 'e', 'eight', 'endash', 'exclam', 'f', 'filledbox', 'five', 'four', 'g', 'hyphen', 'i', 'k', 'l', 'm', 'n', 'nine', 'numbersign', 'o', 'one', 'p', 'parenleft', 'parenright', 'period', 'periodcentered', 'quotedbl', 'r', 's', 'seven', 'six', 'space', 't', 'three', 'two', 'u', 'underscore', 'uniAC01', 'uniAC04', 'uniAC74', 'uniACE0', 'uniAD6C', 'uniADF8', 'uniADFC', 'uniB0C5', 'uniB298', 'uniB2C8', 'uniB2E4', 'uniB3D9', 'uniB798', 'uniBCF4', 'uniBCF5', 'uniBD88', 'uniC0C1', 'uniC0DD', 'uniC0F7', 'uniC11C', 'uniC131', 'uniC218', 'uniC2A4', 'uniC2DC', 'uniC548', 'uniC560', 'uniC5C5', 'uniC5C6', 'uniC624', 'uniC694', 'uniC74C', 'uniC758', 'uniC785', 'uniC790', 'uniC791', 'uniC7A5', 'uniC8FC', 'uniCD5C', 'uniD0DC', 'uniD15C', 'uniD1B5', 'uniD50C', 'uniD544', 'uniD568', 'uniD569', 'uniD589', 'uniD68C', 'v', 'y', 'zero']
+INFO│fontTools.subset│Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 37, 44, 47, 51, 52, 54, 59, 61, 63, 64, 66, 67, 68, 69, 70, 72, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 88, 99, 103, 157, 496, 497, 533, 571, 612, 643, 645, 808, 905, 917, 927, 995, 1153, 1458, 1459, 1484, 1611, 1621, 1628, 1635, 1648, 1708, 1742, 1751, 1850, 1864, 1897, 1898, 1936, 1972, 2027, 2037, 2050, 2056, 2057, 2067, 2146, 2334, 2502, 2527, 2543, 2691, 2698, 2708, 2709, 2720, 2774, 2883, 13295]
+INFO│fontTools.subset│Retaining 99 glyphs
+INFO│fontTools.subset│head subsetting not needed
+INFO│fontTools.subset│hhea subsetting not needed
+INFO│fontTools.subset│maxp subsetting not needed
+INFO│fontTools.subset│OS/2 subsetting not needed
+INFO│fontTools.subset│hmtx subsetted
+INFO│fontTools.subset│cmap subsetted
+INFO│fontTools.subset│fpgm subsetting not needed
+INFO│fontTools.subset│prep subsetting not needed
+INFO│fontTools.subset│cvt  subsetting not needed
+INFO│fontTools.subset│loca subsetting not needed
+INFO│fontTools.subset│post subsetted
+INFO│fontTools.subset│gasp subsetting not needed
+INFO│fontTools.subset│name subsetting not needed
+INFO│fontTools.subset│glyf subsetted
+INFO│fontTools.subset│head pruned
+INFO│fontTools.subset│OS/2 Unicode ranges pruned: [0, 1, 31, 45, 56]
+INFO│fontTools.subset│OS/2 CodePage ranges pruned: [0]
+INFO│fontTools.subset│glyf pruned
+INFO│fontTools.subset│name pruned
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│httpx│HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO│master_loop│📝 Summary generated → data\reports\weekly_report_2025-08-03.summary.md
+INFO│master_loop│=== VELOS Master Loop Start ===
+INFO│context_aware_decision_engine│메모리 미스: 이번 주 시스템 상태 보고서를 생성해줘
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '죄송해요, 아직 학습되지 않은 질문입니다.'}
+INFO│context_aware_decision_engine│메모리 DB 업데이트 완료: 이번 주 시스템 상태 보고서를 생성해줘 → {'answer': '보고서가 생성되었습니다 → C:\\giwanos\\data\\reports\\weekly_report_2025-08-03.pdf'}
+INFO│master_loop│📝 보고서가 생성되었습니다 → C:\giwanos\data\reports\weekly_report_2025-08-03.pdf
+INFO│master_loop│=== VELOS Master Loop End ===
+INFO│httpx│HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO│master_loop│📝 Summary generated → data\reports\weekly_report_2025-08-03.summary.md

@@ -1,1 +1,2 @@
-# This file indicates that the 'notifications' folder is a Python package.
+﻿# This file indicates that the 'notifications' folder is a Python package.
+

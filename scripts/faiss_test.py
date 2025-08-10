@@ -1,4 +1,4 @@
-import faiss
+﻿import faiss
 import numpy as np
 from dotenv import load_dotenv
 import os
@@ -41,3 +41,5 @@ print("상위 2개 검색 결과:\n")
 for idx, dist in zip(indices[0], distances[0]):
     similarity = 1 / (1 + dist)
     print(f"유사도: {similarity:.3f} | 문장: {texts[idx]}")
+
+

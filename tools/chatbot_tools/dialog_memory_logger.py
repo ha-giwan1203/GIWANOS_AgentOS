@@ -1,4 +1,4 @@
-"""
+﻿"""
 🚀 VELOS 대화 기억 저장 유틸리티
 
 이 모듈은 실시간 사용자 대화 및 AI 요약을 구조화된 JSON으로 저장한다.
@@ -37,3 +37,5 @@ def save_dialog_memory(user_input, ai_summary, tags=None):
     except Exception as e:
         print(f"[❌ 대화 기억 저장 실패]: {e}")
         return None
+
+

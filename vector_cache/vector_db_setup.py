@@ -1,0 +1,2 @@
+﻿# FAISS DB setup placeholder
+

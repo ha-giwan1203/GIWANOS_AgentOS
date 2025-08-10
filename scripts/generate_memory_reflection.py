@@ -1,4 +1,4 @@
-# 🚀 VELOS 회고 생성기 - generate_memory_reflection.py
+﻿# 🚀 VELOS 회고 생성기 - generate_memory_reflection.py
 # 최근 memory 내용을 기반으로 요약 + 인사이트 추출 + 위험/중요도 태그 자동 분류
 
 import json
@@ -45,3 +45,5 @@ def generate_reflection():
 
 if __name__ == "__main__":
     generate_reflection()
+
+

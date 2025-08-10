@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!config.PROJECT_HOMEbin/env bash
 # zipclean.sh  --  Remove unnecessary files (venv, __pycache__, .pyd, .so, .whl) from an existing ZIP
 #
 # Usage:
@@ -32,3 +32,4 @@ cd "$TMP_DIR"
 zip -rq "$OUT_ZIP" .
 
 echo "[+] Clean archive created: $OUT_ZIP"
+

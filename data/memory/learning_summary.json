@@ -1,0 +1,19 @@
+{
+  "cpu_usage": "12.1%",
+  "memory_usage": "61.5%",
+  "disk_usage": "73.8%",
+  "memory": [
+    {
+      "timestamp": "2025-08-06 09:25:10",
+      "from": "user",
+      "insight": "시스템 상태 확인 요청",
+      "tags": ["요청", "상태확인"]
+    },
+    {
+      "timestamp": "2025-08-06 09:25:22",
+      "from": "system",
+      "insight": "CPU 12.1%, 메모리 61.5%, 디스크 73.8%로 판단됨",
+      "tags": ["응답", "상태"]
+    }
+  ]
+}

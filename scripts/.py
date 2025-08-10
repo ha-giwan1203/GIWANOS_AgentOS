@@ -1,4 +1,4 @@
-from slack_notifier import SlackNotifier
+﻿from slack_notifier import SlackNotifier
 from google_sheets_manager import GoogleSheetsManager
 
 def slack_google_integration_test():
@@ -13,3 +13,4 @@ def slack_google_integration_test():
 
 if __name__ == "__main__":
     slack_google_integration_test()
+

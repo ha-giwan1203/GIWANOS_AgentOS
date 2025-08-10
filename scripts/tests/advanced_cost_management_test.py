@@ -1,4 +1,4 @@
-from advanced_cost_manager import AdvancedCostManager
+﻿from advanced_cost_manager import AdvancedCostManager
 from query_cache import QueryCache
 
 def advanced_cost_management_test():
@@ -31,3 +31,4 @@ def advanced_cost_management_test():
 
 if __name__ == "__main__":
     advanced_cost_management_test()
+

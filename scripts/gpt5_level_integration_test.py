@@ -1,4 +1,4 @@
-from voice_processor import VoiceProcessor
+﻿from voice_processor import VoiceProcessor
 from video_analyzer import VideoAnalyzer
 from long_term_memory import LongTermMemory
 from autonomous_planner import AutonomousPlanner
@@ -25,3 +25,4 @@ def gpt5_level_integration_test():
 
 if __name__ == "__main__":
     gpt5_level_integration_test()
+

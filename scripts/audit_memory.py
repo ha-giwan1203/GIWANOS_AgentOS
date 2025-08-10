@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core import config
 """📄  scripts/audit_memory.py
 
 모든 JSON 메모리 파일을 스캔하여
@@ -55,3 +56,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

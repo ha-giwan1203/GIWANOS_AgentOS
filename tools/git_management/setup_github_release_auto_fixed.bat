@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 chcp 65001 >nul
 
 SET TARGET_DIR=C:\giwanos\github_release_bundle
@@ -21,9 +21,10 @@ IF NOT EXIST ".git" (
 )
 
 git remote remove origin 2>nul
-git remote add origin https://github.com/YOUR_ID/YOUR_REPO.git
+git remote add origin %nan%github.com/YOUR_ID/YOUR_REPO.git
 
 REM 릴리즈 실행
 python push_github_release.py
 
 pause
+

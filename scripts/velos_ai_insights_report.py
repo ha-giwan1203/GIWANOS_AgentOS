@@ -1,4 +1,4 @@
-
+﻿
 from fpdf import FPDF
 import os
 
@@ -40,3 +40,5 @@ for file, summary in report_data["details"].items():
 
 pdf.output(report_path)
 print("✅ PDF 리포트 생성 완료")
+
+

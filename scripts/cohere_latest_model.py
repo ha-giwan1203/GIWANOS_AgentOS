@@ -1,4 +1,7 @@
 ﻿import requests, os
+
+from modules.core import config
+import requests, os
 from dotenv import load_dotenv
 load_dotenv('C:/giwanos/.env')
 
@@ -19,5 +22,8 @@ data = {
     'model': 'command-r-plus'  # 최신 모델로 업그레이드 적용
 }
 
-response = requests.post('https://api.cohere.ai/v1/chat', json=data, headers=headers)
+response = requests.post('config.nanapi.cohere.ai/v1/chat', json=data, headers=headers)
 print(response.json())
+
+
+

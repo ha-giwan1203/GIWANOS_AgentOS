@@ -1,0 +1,28 @@
+[
+    {
+        "id": "velos_adaptive_resource_management",
+        "conditions": {
+            "cpu": 75,
+            "memory": 70,
+            "disk": 85
+        },
+        "actions": [
+            {
+                "action": "adaptive_cpu_optimization",
+                "description": "CPU usage above 75%, automatically adapt and optimize process priority."
+            },
+            {
+                "action": "adaptive_memory_management",
+                "description": "Memory usage above 70%, automatically free up unused memory resources."
+            },
+            {
+                "action": "smart_disk_cleanup",
+                "description": "Disk usage exceeds 85%, initiate intelligent disk space cleanup."
+            }
+        ],
+        "tool": {
+            "name": "VELOS Advanced Resource Optimizer",
+            "version": "2.0"
+        }
+    }
+]

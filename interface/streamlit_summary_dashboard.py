@@ -1,4 +1,4 @@
-# streamlit_summary_dashboard.py - 보고서 요약만 단독 표시하는 버전
+﻿# streamlit_summary_dashboard.py - 보고서 요약만 단독 표시하는 버전
 
 import streamlit as st
 import json
@@ -17,3 +17,5 @@ if summary_path.exists():
         st.markdown(summary)
 else:
     st.warning("요약 파일이 존재하지 않습니다.")
+
+

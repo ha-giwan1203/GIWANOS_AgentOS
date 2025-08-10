@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 from typing import Any, Dict
 
 class ReflectionAgent:
@@ -17,3 +17,5 @@ class ReflectionAgent:
     # Wrapper expected by master‑loop
     def perform_reflection(self, answer: str, context: Dict[str, Any] | None = None):
         return self.evaluate(answer, context)
+
+

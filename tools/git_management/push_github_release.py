@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 try:
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 except AttributeError:
@@ -45,3 +45,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

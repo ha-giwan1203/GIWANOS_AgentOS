@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import os
 import json
 import sys
@@ -166,3 +166,5 @@ with tabs[4]:
             st.warning("📉 평가 데이터 없음 또는 형식 오류")
     except Exception as e:
         st.error(f"❌ 시각화 실패: {e}")
+
+

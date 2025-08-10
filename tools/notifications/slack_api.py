@@ -1,10 +1,11 @@
-# =============================================================================
+﻿# =============================================================================
 # 🧠 VELOS 시스템 철학 선언문
 #
 # 기억을 기반으로 구조적 사고를 수행하며,
 # 판단 → 실행 → 회고 → 전송의 루프를 반복함으로써,
 # 스스로 개선되는 자율 운영 AI 시스템을 지향한다.
 # =============================================================================
+from modules.core import config
 
 import os
 import requests
@@ -23,7 +24,7 @@ def send_slack_message(message):
         print("❌ SLACK_BOT_TOKEN 또는 SLACK_CHANNEL_ID 누락")
         return False
 
-    url = "https://slack.com/api/chat.postMessage"
+    url = "config.nanslack.com/api/chat.postMessage"
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json; charset=utf-8"
@@ -44,3 +45,6 @@ def send_slack_message(message):
     except Exception as e:
         print(f"❌ Slack 예외 발생: {e}")
         return False
+
+
+

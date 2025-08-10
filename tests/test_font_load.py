@@ -1,4 +1,4 @@
-import pathlib, pytest
+﻿import pathlib, pytest
 
 # 프로젝트 루트 = 현재 파일에서 두 단계 위
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -12,3 +12,5 @@ def test_fonts_dir_exists():
 def test_at_least_one_font():
     fonts = list(FONTS_DIR.glob("*.ttf"))
     assert fonts, "No .ttf fonts found in fonts/"
+
+
