@@ -1,80 +1,69 @@
-"""
-VELOS 운영 철학 선언문
-- 파일명 절대 변경 금지 · 모든 수정 후 자가 검증 필수 · 실행 결과 직접 테스트
-"""
+# -*- coding: utf-8 -*-
 from __future__ import annotations
+import os, json, time, threading
+from pathlib import Path
+from typing import Callable, Tuple
 
-import time
-import json
-import uuid
-from typing import Any, Callable, Optional
+AUDIT_LOG = Path("C:/giwanos/data/logs/chat_sync_audit.jsonl")
+CHAT_DIR  = Path("C:/giwanos/data/chat"); CHAT_DIR.mkdir(parents=True, exist_ok=True)
+_lock = threading.Lock()
 
-from modules.core.config import LOG_DIR
-from .sync_backends import SlackMirror, NotionMirror
+def _writeln(p: Path, rec: dict):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with p.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-AUDIT_LOG = (LOG_DIR / "chat_sync_audit.jsonl")
-AUDIT_LOG.parent.mkdir(parents=True, exist_ok=True)
+def _room_file(room_id: str) -> Path:
+    return CHAT_DIR / f"chat_{room_id}.jsonl"
 
+def _append_with_lock(p: Path, rec: dict, retries: int = 3, backoff: float = 0.2) -> bool:
+    for i in range(retries):
+        try:
+            with _lock:
+                with p.open("a", encoding="utf-8") as f:
+                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            return True
+        except Exception as e:
+            time.sleep(backoff * (2**i))
+    return False
 
 class ChatSyncGuard:
-    """
-    GPT 호출을 트랜잭션으로 감싸서
-    1) GPT 응답 수신
-    2) 로컬 저장 확인(콜백)
-    3) 외부 미러(슬랙/노션) 반영
-    4) 실패 시 지수 백오프로 재시도
-    를 보장한다.
-    """
+    def __init__(self, mirror_slack: bool = True, mirror_notion: bool = False, conversation_id: str | None = None):
+        self.mirror_slack = mirror_slack
+        self.mirror_notion = mirror_notion
+        self.conversation_id = conversation_id
 
-    def __init__(self, mirror_slack: bool = True, mirror_notion: bool = True, max_retries: int = 3):
-        self.slack = SlackMirror() if mirror_slack else None
-        self.notion = NotionMirror() if mirror_notion else None
-        self.max_retries = max_retries
+    def call(self, prompt: str,
+             gpt_call: Callable[[str], str],
+             local_save: Callable[[str], bool],
+             conversation_id: str | None = None) -> Tuple[bool, str]:
+        room_id = conversation_id or self.conversation_id
+        if not room_id:
+            raise ValueError("conversation_id is required to avoid session drift")
 
-    def _audit(self, record: dict[str, Any]) -> None:
-        record["ts"] = time.strftime("%Y-%m-%d %H:%M:%S")
-        with AUDIT_LOG.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        chat_file = _room_file(room_id)
 
-    def call(
-        self,
-        prompt: str,
-        gpt_call: Callable[[str], str],
-        local_save: Callable[[str], bool],
-        conversation_id: Optional[str] = None,
-    ) -> tuple[bool, Any]:
-        txid = str(uuid.uuid4())
-        cid = conversation_id or f"conv-{time.strftime('%Y%m%d')}"
-        backoff = 1.0
+        # 1) 입력 저장
+        ok1 = _append_with_lock(chat_file, {"ts": ts, "room_id": room_id, "role": "user", "text": prompt, "meta": {"source": "local"} })
+        # 2) GPT 호출
+        try:
+            rsp = gpt_call(prompt)
+            ok2 = True
+        except Exception as e:
+            rsp = f"[gpt_error] {e}"
+            ok2 = False
+        # 3) 출력 저장
+        ok3 = _append_with_lock(chat_file, {"ts": ts, "room_id": room_id, "role": "assistant", "text": rsp, "meta": {"source": "local"} })
 
-        for attempt in range(1, self.max_retries + 1):
-            try:
-                # 1) GPT
-                rsp = gpt_call(prompt)
-                self._audit({"txid": txid, "step": "gpt_response", "ok": True, "attempt": attempt})
+        # 4) 로컬 세이브 훅
+        ok4 = False
+        try:
+            ok4 = local_save(rsp)
+        except Exception:
+            ok4 = False
 
-                # 2) 로컬 저장 확인
-                if not local_save(rsp):
-                    raise RuntimeError("Local save verification failed")
-                self._audit({"txid": txid, "step": "local_save", "ok": True})
+        # 감사 로그
+        _writeln(AUDIT_LOG, {"ts": ts, "room_id": room_id, "step":"done", "save_in": ok1, "gpt": ok2, "save_out": ok3, "local_save": ok4})
+        return (ok2 and ok1 and ok3), rsp
 
-                # 3) 외부 미러
-                mirror_ok = True
-                if self.slack:
-                    mirror_ok &= self.slack.mirror(cid, prompt, rsp)
-                if self.notion:
-                    mirror_ok &= self.notion.mirror(cid, prompt, rsp)
-                if not mirror_ok:
-                    raise RuntimeError("Mirror verification failed")
-                self._audit({"txid": txid, "step": "mirror", "ok": True})
-
-                # 4) 성공
-                self._audit({"txid": txid, "step": "done", "ok": True})
-                return True, rsp
-
-            except Exception as e:
-                self._audit({"txid": txid, "step": "error", "ok": False, "attempt": attempt, "err": str(e)})
-                if attempt >= self.max_retries:
-                    return False, {"error": str(e)}
-                time.sleep(backoff)
-                backoff *= 2.0

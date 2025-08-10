@@ -1,60 +1,73 @@
-﻿"""
-VELOS 메모리 검색 모듈
+﻿# -*- coding: utf-8 -*-
+"""
+VELOS 의미검색 모듈 (경량 안정판)
+- ENV만으로 제어
+- 인덱스 없이 on-the-fly 검색(소규모 전제)
 """
 
-import os, threading, json, sys
-import faiss, numpy as np
+from __future__ import annotations
+import os, json
 from pathlib import Path
-from sentence_transformers import SentenceTransformer
+from typing import List, Dict, Tuple
 
-GIWANOS_ROOT = str(Path(__file__).resolve().parents[2])
-if GIWANOS_ROOT not in sys.path:
-    sys.path.append(GIWANOS_ROOT)
+# 캐시 폴더: 프로젝트 안으로 통일(ENV 우선)
+os.environ.setdefault("HF_HOME", r"C:\giwanos\.hf")
+os.environ.setdefault("TRANSFORMERS_CACHE", r"C:\giwanos\.hf\transformers")
+os.environ.setdefault("HUGGINGFACE_HUB_CACHE", r"C:\giwanos\.hf\hub")
 
-INDEX_PATH = r"C:\giwanos\vector_cache\local_index.faiss"
-EMB_PATH = r"C:\giwanos\vector_cache\embeddings.json"
-MODEL_NAME = "all-MiniLM-L6-v2"
-TOP_K = 5
+EMBEDDING_MODEL  = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+EMBEDDING_DEVICE = os.getenv("EMBEDDING_DEVICE", "cpu")
+LEARNING_MEMORY = Path(os.getenv("LEARNING_MEMORY", r"C:\giwanos\data\memory\learning_memory.json"))
 
-_model = SentenceTransformer(MODEL_NAME)
-_index_lock = threading.Lock()
+_model = None
 
-def _load_index():
-    if not (os.path.exists(INDEX_PATH) and os.path.exists(EMB_PATH)):
-        raise FileNotFoundError("인덱스 또는 메타 데이터가 없습니다.")
-    return faiss.read_index(INDEX_PATH), json.load(open(EMB_PATH, encoding="utf8"))
+def _get_model():
+    """SentenceTransformer 지연 로딩"""
+    global _model
+    if _model is None:
+        from sentence_transformers import SentenceTransformer
+        _model = SentenceTransformer(EMBEDDING_MODEL, device=EMBEDDING_DEVICE)
+    return _model
 
-_index, _meta = _load_index()
-
-def _to_dict(obj: dict):
-    return {
-        "from": obj.get("source", "unknown"),
-        "insight": obj.get("text", "데이터 없음"),
-        "tags": obj.get("tags", [])
-    }
-
-def search(query: str, k: int = TOP_K):
-    query = query.strip()
-    if not query:
+def _load_insights(max_items: int = 5000) -> List[Dict]:
+    if not LEARNING_MEMORY.exists():
+        return []
+    try:
+        data = json.loads(LEARNING_MEMORY.read_text(encoding="utf-8"))
+        items = data.get("insights", [])
+        return items[-max_items:]
+    except Exception:
         return []
 
-    vec = _model.encode([query]).astype("float32")
-    faiss.normalize_L2(vec)
+def _to_corpus(items: List[Dict]) -> Tuple[List[str], List[Dict]]:
+    texts, rows = [], []
+    for it in items:
+        t = it.get("insight") or it.get("text")
+        if not t:
+            continue
+        texts.append(t)
+        rows.append(it)
+    return texts, rows
 
-    with _index_lock:
-        _, idx = _index.search(vec, k)
+def search(query: str, k: int = 5) -> List[Dict]:
+    """메모리에서 의미 유사 top‑k 반환."""
+    items = _load_insights()
+    if not items:
+        return []
 
-    results = [_to_dict(_meta[i]) for i in idx[0] if i != -1]
-    return results
+    texts, rows = _to_corpus(items)
 
-def _self_test():
-    res = search("파일명 바꾸지 마", 3)
-    assert res, "검색 결과 없음"
-    for r in res:
-        assert {"from", "insight", "tags"}.issubset(r), "필드 누락"
-    print("[memory_retriever] self-test passed:", len(res), "results")
+    model = _get_model()
+    q_vec = model.encode([query], normalize_embeddings=True)
+    c_vec = model.encode(texts, normalize_embeddings=True)
 
-if __name__ == "__main__":
-    _self_test()
+    import numpy as np
+    sims = (c_vec @ q_vec.T).squeeze()  # (N,)
+    idx = np.argsort(-sims)[:max(1, k)]
 
-
+    out: List[Dict] = []
+    for i in idx:
+        r = dict(rows[int(i)])
+        r["score"] = float(sims[int(i)])
+        out.append(r)
+    return out

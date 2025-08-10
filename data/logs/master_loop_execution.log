@@ -3174,3 +3174,600 @@ A detailed migration guide is available here: https://github.com/openai/openai-p
 2025-08-10 10:27:31,503 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
 2025-08-10 10:27:31,503 [INFO] === VELOS 통합 마스터 루프 종료 ===
 2025-08-10 10:28:16,568 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 12:22:58,068 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 12:24:17,019 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 12:24:17,021 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 12:24:17,021 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 12:24:20,182 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 12:24:20,189 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 12:24:22,280 [INFO] CoT 평가 실행 시작
+2025-08-10 12:24:22,293 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 12:24:22,295 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 12:24:22,304 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 12:24:22,308 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 12:24:22,334 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 12:24:22,335 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 12:24:22,337 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 12:24:22,338 [INFO] Rule Optimizer 실행 시작
+2025-08-10 12:24:22,339 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 12:24:22,341 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 12:24:22,342 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 12:33:03,001 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 12:33:03,239 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 12:33:03,241 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 12:33:03,241 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 12:33:03,241 [ERROR] OpenAI API 호출 실패: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+
+2025-08-10 12:33:03,245 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 12:33:03,249 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 12:38:04,344 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 12:38:04,601 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 12:38:04,602 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 12:38:04,602 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 12:38:04,603 [ERROR] OpenAI API 호출 실패: 
+
+You tried to access openai.ChatCompletion, but this is no longer supported in openai>=1.0.0 - see the README at https://github.com/openai/openai-python for the API.
+
+You can run `openai migrate` to automatically upgrade your codebase to use the 1.0.0 interface. 
+
+Alternatively, you can pin your installation to the old version, e.g. `pip install openai==0.28`
+
+A detailed migration guide is available here: https://github.com/openai/openai-python/discussions/742
+
+2025-08-10 12:38:04,607 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 12:38:04,611 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 13:02:59,062 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 13:02:59,306 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 13:02:59,307 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 13:02:59,307 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 13:03:01,936 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 13:03:01,942 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 13:07:40,725 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 13:07:41,016 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 13:07:41,017 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 13:07:41,017 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 13:07:43,248 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 13:07:43,255 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 13:07:43,426 [INFO] maxp pruned
+2025-08-10 13:07:43,427 [INFO] cmap pruned
+2025-08-10 13:07:43,430 [INFO] post pruned
+2025-08-10 13:07:43,431 [INFO] GPOS dropped
+2025-08-10 13:07:43,432 [INFO] GSUB dropped
+2025-08-10 13:07:43,432 [INFO] glyf pruned
+2025-08-10 13:07:43,433 [INFO] Added gid0 to subset
+2025-08-10 13:07:43,433 [INFO] Added first four glyphs to subset
+2025-08-10 13:07:43,434 [INFO] Closing glyph list over 'glyf': 44 glyphs before
+2025-08-10 13:07:43,434 [INFO] Glyph names: ['.notdef', 'colon', 'exclam', 'five', 'hyphen', 'nine', 'numbersign', 'one', 'parenleft', 'parenright', 'period', 'quotedbl', 'space', 'two', 'uniAC00', 'uniACB0', 'uniACE0', 'uniACF5', 'uniACFC', 'uniB3D9', 'uniB8CC', 'uniB9AC', 'uniBA54', 'uniBAA8', 'uniBC0F', 'uniBC18', 'uniC0C1', 'uniC131', 'uniC2A4', 'uniC2DC', 'uniC601', 'uniC644', 'uniC704', 'uniC778', 'uniC790', 'uniC791', 'uniC7A5', 'uniC800', 'uniC810', 'uniC815', 'uniD15C', 'uniD3C9', 'uniD655', 'uniD68C']
+2025-08-10 13:07:43,434 [INFO] Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 17, 18, 21, 25, 26, 495, 559, 571, 582, 584, 995, 1217, 1260, 1308, 1326, 1395, 1401, 1611, 1648, 1742, 1751, 1925, 1951, 2005, 2044, 2056, 2057, 2067, 2088, 2093, 2096, 2527, 2644, 2764, 2774, 13295]
+2025-08-10 13:07:43,434 [INFO] Closed glyph list over 'glyf': 44 glyphs after
+2025-08-10 13:07:43,435 [INFO] Glyph names: ['.notdef', 'colon', 'exclam', 'five', 'hyphen', 'nine', 'numbersign', 'one', 'parenleft', 'parenright', 'period', 'quotedbl', 'space', 'two', 'uniAC00', 'uniACB0', 'uniACE0', 'uniACF5', 'uniACFC', 'uniB3D9', 'uniB8CC', 'uniB9AC', 'uniBA54', 'uniBAA8', 'uniBC0F', 'uniBC18', 'uniC0C1', 'uniC131', 'uniC2A4', 'uniC2DC', 'uniC601', 'uniC644', 'uniC704', 'uniC778', 'uniC790', 'uniC791', 'uniC7A5', 'uniC800', 'uniC810', 'uniC815', 'uniD15C', 'uniD3C9', 'uniD655', 'uniD68C']
+2025-08-10 13:07:43,435 [INFO] Glyph IDs:   [0, 1, 2, 3, 8, 9, 13, 14, 17, 18, 21, 25, 26, 495, 559, 571, 582, 584, 995, 1217, 1260, 1308, 1326, 1395, 1401, 1611, 1648, 1742, 1751, 1925, 1951, 2005, 2044, 2056, 2057, 2067, 2088, 2093, 2096, 2527, 2644, 2764, 2774, 13295]
+2025-08-10 13:07:43,436 [INFO] Retaining 44 glyphs
+2025-08-10 13:07:43,436 [INFO] head subsetting not needed
+2025-08-10 13:07:43,436 [INFO] hhea subsetting not needed
+2025-08-10 13:07:43,436 [INFO] maxp subsetting not needed
+2025-08-10 13:07:43,437 [INFO] OS/2 subsetting not needed
+2025-08-10 13:07:43,438 [INFO] hmtx subsetted
+2025-08-10 13:07:43,440 [INFO] cmap subsetted
+2025-08-10 13:07:43,441 [INFO] fpgm subsetting not needed
+2025-08-10 13:07:43,441 [INFO] prep subsetting not needed
+2025-08-10 13:07:43,445 [INFO] cvt  subsetting not needed
+2025-08-10 13:07:43,452 [INFO] loca subsetting not needed
+2025-08-10 13:07:43,453 [INFO] post subsetted
+2025-08-10 13:07:43,453 [INFO] gasp subsetting not needed
+2025-08-10 13:07:43,454 [INFO] name subsetting not needed
+2025-08-10 13:07:43,457 [INFO] glyf subsetted
+2025-08-10 13:07:43,460 [INFO] head pruned
+2025-08-10 13:07:43,461 [INFO] OS/2 Unicode ranges pruned: [0, 56]
+2025-08-10 13:07:43,470 [INFO] OS/2 CodePage ranges pruned: [0]
+2025-08-10 13:07:43,471 [INFO] glyf pruned
+2025-08-10 13:07:43,472 [INFO] name pruned
+2025-08-10 13:07:43,492 [INFO] maxp pruned
+2025-08-10 13:07:43,493 [INFO] cmap pruned
+2025-08-10 13:07:43,499 [INFO] post pruned
+2025-08-10 13:07:43,500 [INFO] GPOS dropped
+2025-08-10 13:07:43,504 [INFO] GSUB dropped
+2025-08-10 13:07:43,506 [INFO] glyf pruned
+2025-08-10 13:07:43,511 [INFO] Added gid0 to subset
+2025-08-10 13:07:43,512 [INFO] Added first four glyphs to subset
+2025-08-10 13:07:43,513 [INFO] Closing glyph list over 'glyf': 15 glyphs before
+2025-08-10 13:07:43,514 [INFO] Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'exclam', 'numbersign', 'quotedbl', 'space', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC8FC']
+2025-08-10 13:07:43,518 [INFO] Glyph IDs:   [0, 1, 2, 3, 37, 44, 47, 51, 54, 495, 569, 1456, 1633, 2144, 13532]
+2025-08-10 13:07:43,519 [INFO] Closed glyph list over 'glyf': 15 glyphs after
+2025-08-10 13:07:43,522 [INFO] Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'exclam', 'numbersign', 'quotedbl', 'space', 'uniAC04', 'uniACE0', 'uniBCF4', 'uniC11C', 'uniC8FC']
+2025-08-10 13:07:43,523 [INFO] Glyph IDs:   [0, 1, 2, 3, 37, 44, 47, 51, 54, 495, 569, 1456, 1633, 2144, 13532]
+2025-08-10 13:07:43,527 [INFO] Retaining 15 glyphs
+2025-08-10 13:07:43,529 [INFO] head subsetting not needed
+2025-08-10 13:07:43,530 [INFO] hhea subsetting not needed
+2025-08-10 13:07:43,531 [INFO] maxp subsetting not needed
+2025-08-10 13:07:43,537 [INFO] OS/2 subsetting not needed
+2025-08-10 13:07:43,540 [INFO] hmtx subsetted
+2025-08-10 13:07:43,546 [INFO] cmap subsetted
+2025-08-10 13:07:43,546 [INFO] fpgm subsetting not needed
+2025-08-10 13:07:43,547 [INFO] prep subsetting not needed
+2025-08-10 13:07:43,548 [INFO] cvt  subsetting not needed
+2025-08-10 13:07:43,551 [INFO] loca subsetting not needed
+2025-08-10 13:07:43,553 [INFO] post subsetted
+2025-08-10 13:07:43,556 [INFO] gasp subsetting not needed
+2025-08-10 13:07:43,557 [INFO] name subsetting not needed
+2025-08-10 13:07:43,561 [INFO] glyf subsetted
+2025-08-10 13:07:43,562 [INFO] head pruned
+2025-08-10 13:07:43,563 [INFO] OS/2 Unicode ranges pruned: [0, 56]
+2025-08-10 13:07:43,564 [INFO] OS/2 CodePage ranges pruned: [0]
+2025-08-10 13:07:43,568 [INFO] glyf pruned
+2025-08-10 13:07:43,571 [INFO] name pruned
+2025-08-10 13:07:45,511 [INFO] CoT 평가 실행 시작
+2025-08-10 13:07:45,517 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 13:07:45,518 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 13:07:45,519 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 13:07:45,520 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 13:07:45,526 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 13:07:45,529 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 13:07:45,531 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 13:07:45,540 [INFO] Rule Optimizer 실행 시작
+2025-08-10 13:07:45,545 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 13:07:45,547 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 13:07:45,548 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 13:55:03,069 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 13:55:03,311 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 13:55:03,312 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 13:55:03,313 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 13:55:05,614 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 13:55:05,620 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 13:56:26,773 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 13:56:27,011 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 13:56:27,012 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 13:56:27,012 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 13:56:28,879 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 13:56:28,883 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:04:13,264 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:04:13,519 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:04:13,520 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:04:13,521 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:04:16,482 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:04:16,488 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:04:18,836 [INFO] CoT 평가 실행 시작
+2025-08-10 14:04:18,837 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:04:18,837 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:04:18,837 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:04:18,837 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:04:18,838 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:04:18,838 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:04:18,838 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:04:18,839 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:04:18,839 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:04:18,842 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:04:18,842 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 14:12:49,854 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:12:50,094 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:12:50,096 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:12:50,097 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:12:52,787 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:12:52,793 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:12:54,572 [INFO] CoT 평가 실행 시작
+2025-08-10 14:12:54,573 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:12:54,574 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:12:54,575 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:12:54,575 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:12:54,576 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:12:54,576 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:12:54,576 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:12:54,577 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:12:54,577 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:12:54,578 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:12:54,579 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 14:17:39,779 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:17:40,007 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:17:40,008 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:17:40,008 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:17:42,859 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:17:42,865 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:17:45,008 [INFO] CoT 평가 실행 시작
+2025-08-10 14:17:45,010 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:17:45,011 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:17:45,013 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:17:45,018 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:17:45,024 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:17:45,029 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:17:45,055 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:17:45,059 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:17:45,070 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:17:45,082 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:17:45,090 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 14:34:50,899 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:34:51,147 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:34:51,148 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:34:51,148 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:34:53,268 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:34:53,275 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:34:55,014 [INFO] CoT 평가 실행 시작
+2025-08-10 14:34:55,016 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:34:55,017 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:34:55,020 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:34:55,021 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:34:55,023 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:34:55,023 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:34:55,025 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:34:55,026 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:34:55,030 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:34:55,036 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:34:55,047 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 14:35:18,443 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:35:18,700 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:35:18,701 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:35:18,702 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:35:20,896 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:35:20,904 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:35:22,695 [INFO] CoT 평가 실행 시작
+2025-08-10 14:35:22,701 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:35:22,702 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:35:22,703 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:35:22,704 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:35:22,705 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:35:22,707 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:35:22,708 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:35:22,709 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:35:22,710 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:35:22,713 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:35:22,713 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 14:36:07,849 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 14:36:08,078 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 14:36:08,079 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 14:36:08,079 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 14:36:09,994 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 14:36:09,998 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 14:36:11,888 [INFO] CoT 평가 실행 시작
+2025-08-10 14:36:11,888 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 14:36:11,889 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 14:36:11,891 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 14:36:11,891 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 14:36:11,892 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 14:36:11,893 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 14:36:11,894 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 14:36:11,895 [INFO] Rule Optimizer 실행 시작
+2025-08-10 14:36:11,896 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 14:36:11,900 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 14:36:11,908 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 15:12:30,669 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:12:31,930 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:23:11,154 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:23:11,154 [WARNING] [health] 읽기 실패, 리셋: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)
+2025-08-10 15:23:11,414 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 15:23:11,416 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 15:23:11,417 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 15:23:11,420 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 15:23:11,423 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 15:23:11,512 [ERROR] [report] PDF 생성 실패: Not enough horizontal space to render a single character
+2025-08-10 15:23:11,512 [INFO] CoT 평가 실행 시작
+2025-08-10 15:23:11,514 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 15:23:11,514 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 15:23:11,515 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 15:23:11,515 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 15:23:11,515 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 15:23:11,516 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 15:23:11,516 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 15:23:11,516 [INFO] Rule Optimizer 실행 시작
+2025-08-10 15:23:11,516 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 15:23:11,518 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 15:23:11,518 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_YYYYMMDD.md
+2025-08-10 15:23:11,530 [WARNING] [health] 기존 system_health.json 형식이 dict가 아님. 리셋합니다.
+2025-08-10 15:23:11,531 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 15:23:12,810 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:23:13,067 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 15:23:13,068 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 15:23:13,069 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 15:23:13,074 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 15:23:13,077 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 15:23:13,159 [ERROR] [report] PDF 생성 실패: Not enough horizontal space to render a single character
+2025-08-10 15:23:13,160 [WARNING] [safe] upload_summary_to_notion 실패: upload_summary_to_notion() missing 1 required positional argument: 'summary_path'
+2025-08-10 15:23:14,129 [INFO] CoT 평가 실행 시작
+2025-08-10 15:23:14,142 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 15:23:14,144 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 15:23:14,145 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 15:23:14,147 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 15:23:14,158 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 15:23:14,163 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 15:23:14,165 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 15:23:14,166 [INFO] Rule Optimizer 실행 시작
+2025-08-10 15:23:14,167 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 15:23:14,170 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_20250810.md
+2025-08-10 15:23:14,170 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_YYYYMMDD.md
+2025-08-10 15:23:14,188 [WARNING] [health] 기존 system_health.json 형식이 dict가 아님. 리셋합니다.
+2025-08-10 15:23:14,189 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 15:37:37,744 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:37:37,748 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 15:37:37,748 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 15:37:37,749 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 15:37:37,752 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 15:37:37,756 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 15:37:37,756 [ERROR] [report] PDF 생성 실패: TTF Font file not found: C:\giwanos\fonts\Nanum_Gothic\NanumGothic.ttf
+2025-08-10 15:37:37,756 [INFO] CoT 평가 실행 시작
+2025-08-10 15:37:37,757 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 15:37:37,758 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 15:37:37,758 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 15:37:37,758 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 15:37:37,759 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 15:37:37,759 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 15:37:37,759 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 15:37:37,759 [INFO] Rule Optimizer 실행 시작
+2025-08-10 15:37:37,759 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 15:37:37,762 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_YYYYMMDD.md
+2025-08-10 15:37:37,785 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 15:37:38,584 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 15:37:38,587 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 15:37:38,591 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 15:37:38,591 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 15:37:38,596 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 15:37:38,600 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 15:37:38,601 [ERROR] [report] PDF 생성 실패: TTF Font file not found: C:\giwanos\fonts\Nanum_Gothic\NanumGothic.ttf
+2025-08-10 15:37:38,602 [WARNING] [safe] upload_summary_to_notion 실패: upload_summary_to_notion() missing 1 required positional argument: 'summary_path'
+2025-08-10 15:37:39,793 [INFO] CoT 평가 실행 시작
+2025-08-10 15:37:39,802 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 15:37:39,819 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 15:37:39,829 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 15:37:39,831 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 15:37:39,833 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 15:37:39,835 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 15:37:39,846 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 15:37:39,850 [INFO] Rule Optimizer 실행 시작
+2025-08-10 15:37:39,854 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 15:37:39,864 [INFO] Weekly summary created: C:\giwanos\data\reports\weekly_summary_YYYYMMDD.md
+2025-08-10 15:37:39,881 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 07:15:01,630 [WARNING] [import-skip] modules.report.generate_pdf_report.generate_pdf_report 임포트 실패
+2025-08-10 07:15:01,649 [WARNING] [import-skip] modules.automation.scheduling.weekly_summary.generate_weekly_summary 임포트 실패
+2025-08-10 07:15:01,664 [WARNING] [import-skip] modules.automation.scheduling.system_health_logger.update_system_health 임포트 실패
+2025-08-10 07:15:01,729 [WARNING] [import-skip] modules.core.chat_session_backup.create_snapshot 임포트 실패
+2025-08-10 07:15:01,819 [INFO] [ntp] {}
+2025-08-10 07:15:01,819 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 07:15:01,821 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 07:15:01,822 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 07:15:01,822 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 07:15:01,826 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 07:15:01,830 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 07:15:01,830 [INFO] CoT 평가 실행 시작
+2025-08-10 07:15:01,830 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 07:15:01,830 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 07:15:01,831 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 07:15:01,831 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 07:15:01,831 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 07:15:01,831 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 07:15:01,831 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 07:15:01,832 [INFO] Rule Optimizer 실행 시작
+2025-08-10 07:15:01,832 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 07:15:01,833 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 07:59:16,733 [WARNING] [import-skip] modules.report.generate_pdf_report.generate_pdf_report 임포트 실패
+2025-08-10 07:59:16,738 [WARNING] [import-skip] modules.automation.scheduling.weekly_summary.generate_weekly_summary 임포트 실패
+2025-08-10 07:59:16,740 [WARNING] [import-skip] modules.automation.scheduling.system_health_logger.update_system_health 임포트 실패
+2025-08-10 07:59:16,752 [WARNING] [import-skip] modules.core.chat_session_backup.create_snapshot 임포트 실패
+2025-08-10 07:59:16,905 [INFO] [ntp] {"w32time_query_rc": 0, "w32time_running": true, "resync_rc": 2147942405, "resync_error": "", "status_rc": 0, "peers_rc": 0, "config_rc": 2147942405, "stratum": null, "precision": null, "last_sync": null, "offset": null, "poll_interval": null, "peer_list": [], "type": null, "hint": "resync_failed_or_not_admin"}
+2025-08-10 07:59:16,906 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 07:59:16,908 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 07:59:16,909 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 07:59:16,910 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 07:59:16,913 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 07:59:16,917 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 07:59:16,917 [INFO] CoT 평가 실행 시작
+2025-08-10 07:59:16,918 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 07:59:16,918 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 07:59:16,918 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 07:59:16,919 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 07:59:16,919 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 07:59:16,919 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 07:59:16,920 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 07:59:16,920 [INFO] Rule Optimizer 실행 시작
+2025-08-10 07:59:16,920 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 07:59:16,922 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 08:08:28,206 [WARNING] [import-skip] modules.report.generate_pdf_report.generate_pdf_report 임포트 실패
+2025-08-10 08:08:28,210 [WARNING] [import-skip] modules.automation.scheduling.weekly_summary.generate_weekly_summary 임포트 실패
+2025-08-10 08:08:28,211 [WARNING] [import-skip] modules.automation.scheduling.system_health_logger.update_system_health 임포트 실패
+2025-08-10 08:08:28,223 [WARNING] [import-skip] modules.core.chat_session_backup.create_snapshot 임포트 실패
+2025-08-10 08:08:29,933 [INFO] [ntp] {"locale": "ko_KR", "w32time_query_rc": 0, "w32time_running": true, "resync_rc": 0, "status_rc": 0, "peers_rc": 0, "config_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 5:08:29", "poll_interval": "10(1024s)", "peer_list": ["1", "time.windows.com"], "type": null}
+2025-08-10 08:08:29,934 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 08:08:29,938 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 08:08:29,938 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 08:08:29,939 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 08:08:29,942 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 08:08:29,946 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 08:08:29,946 [INFO] CoT 평가 실행 시작
+2025-08-10 08:08:29,947 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 08:08:29,947 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 08:08:29,948 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 08:08:29,948 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 08:08:29,948 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 08:08:29,949 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 08:08:29,949 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 08:08:29,949 [INFO] Rule Optimizer 실행 시작
+2025-08-10 08:08:29,949 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 08:08:29,951 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 08:18:42,922 [WARNING] [import-skip] modules.report.generate_pdf_report.generate_pdf_report 임포트 실패
+2025-08-10 08:18:42,927 [WARNING] [import-skip] modules.automation.scheduling.weekly_summary.generate_weekly_summary 임포트 실패
+2025-08-10 08:18:42,929 [WARNING] [import-skip] modules.automation.scheduling.system_health_logger.update_system_health 임포트 실패
+2025-08-10 08:18:42,942 [WARNING] [import-skip] modules.core.chat_session_backup.create_snapshot 임포트 실패
+2025-08-10 08:18:43,071 [INFO] [ntp] {"locale": "ko_KR", "w32time_query_rc": 0, "w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "peers_rc": 0, "config_rc": 2147942405, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 5:08:29", "poll_interval": "10(1024s)", "peer_list": ["1", "time.windows.com"], "type": null}
+2025-08-10 08:18:43,073 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 08:18:43,078 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 08:18:43,079 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 08:18:43,080 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 08:18:43,084 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 08:18:43,088 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 08:18:43,088 [INFO] CoT 평가 실행 시작
+2025-08-10 08:18:43,089 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 08:18:43,093 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 08:18:43,094 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 08:18:43,099 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 08:18:43,102 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 08:18:43,103 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 08:18:43,104 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 08:18:43,105 [INFO] Rule Optimizer 실행 시작
+2025-08-10 08:18:43,106 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 08:18:43,113 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 08:25:53,220 [INFO] [ntp] {"locale": "ko_KR", "w32time_query_rc": 0, "w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "peers_rc": 0, "config_rc": 2147942405, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 5:25:33", "poll_interval": "10(1024s)", "peer_list": ["1", "time.windows.com"], "type": null}
+2025-08-10 08:25:53,221 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 08:25:53,224 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 08:25:53,224 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 08:25:53,225 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 08:25:53,229 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 08:25:53,233 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 08:25:53,368 [INFO] CoT 평가 실행 시작
+2025-08-10 08:25:53,369 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 08:25:53,370 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 08:25:53,370 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 08:25:53,370 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 08:25:53,371 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 08:25:53,371 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 08:25:53,371 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 08:25:53,372 [INFO] Rule Optimizer 실행 시작
+2025-08-10 08:25:53,372 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 08:25:53,373 [INFO] Weekly summary created in: C:\giwanos\data\reports
+2025-08-10 08:25:53,382 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 09:29:49,225 [INFO] [ChatSyncGuard] audit log: C:\giwanos\data\logs\chat_sync_audit.jsonl
+2025-08-10 09:29:49,356 [INFO] [ntp] {"locale": "Korean_Korea", "w32time_query_rc": 0, "w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "peers_rc": 0, "config_rc": 2147942405, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 5:42:52", "poll_interval": "10(1024s)", "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "type": null}
+2025-08-10 09:29:49,357 [INFO] === VELOS 통합 마스터 루프 시작 ===
+2025-08-10 09:30:11,017 [INFO] JudgeAgent 루프 실행 시작
+2025-08-10 09:30:11,019 [INFO] JudgeAgent: 시스템 정상 상태 유지 중.
+2025-08-10 09:30:11,019 [INFO] JudgeAgent 루프 정상 완료
+2025-08-10 09:30:11,025 [INFO] ✅ 메모리 누적 저장 완료
+2025-08-10 09:30:11,039 [INFO] ✅ 판단 데이터 누적 저장 완료
+2025-08-10 09:30:11,196 [INFO] maxp pruned
+2025-08-10 09:30:11,196 [INFO] cmap pruned
+2025-08-10 09:30:11,204 [INFO] post pruned
+2025-08-10 09:30:11,206 [INFO] GPOS dropped
+2025-08-10 09:30:11,207 [INFO] GSUB dropped
+2025-08-10 09:30:11,207 [INFO] glyf pruned
+2025-08-10 09:30:11,209 [INFO] Added gid0 to subset
+2025-08-10 09:30:11,209 [INFO] Added first four glyphs to subset
+2025-08-10 09:30:11,210 [INFO] Closing glyph list over 'glyf': 66 glyphs before
+2025-08-10 09:30:11,210 [INFO] Glyph names: ['.notdef', 'A', 'C', 'G', 'J', 'O', 'R', 'T', 'a', 'bullet', 'c', 'colon', 'comma', 'd', 'e', 'eight', 'exclam', 'five', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'numbersign', 'o', 'one', 'p', 'period', 'quotedbl', 'r', 's', 'slash', 'space', 't', 'three', 'two', 'u', 'uniAC00', 'uniAC01', 'uniACFC', 'uniB204', 'uniB2E8', 'uniB3D9', 'uniB8CC', 'uniB9AC', 'uniBA54', 'uniBAA8', 'uniC0C1', 'uniC0DD', 'uniC131', 'uniC2DC', 'uniC644', 'uniC791', 'uniC7A5', 'uniC800', 'uniC801', 'uniC815', 'uniD0DC', 'uniD1B5', 'uniD310', 'uniD3C9', 'v', 'z', 'zero']
+2025-08-10 09:30:11,211 [INFO] Glyph IDs:   [0, 1, 2, 3, 12, 13, 14, 15, 16, 17, 18, 19, 21, 24, 26, 33, 35, 39, 42, 47, 50, 52, 64, 66, 67, 68, 70, 71, 72, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 89, 495, 496, 584, 879, 930, 995, 1217, 1260, 1308, 1326, 1611, 1621, 1648, 1751, 1951, 2057, 2067, 2088, 2089, 2096, 2502, 2543, 2601, 2644, 2883, 13295]
+2025-08-10 09:30:11,215 [INFO] Closed glyph list over 'glyf': 66 glyphs after
+2025-08-10 09:30:11,216 [INFO] Glyph names: ['.notdef', 'A', 'C', 'G', 'J', 'O', 'R', 'T', 'a', 'bullet', 'c', 'colon', 'comma', 'd', 'e', 'eight', 'exclam', 'five', 'g', 'h', 'hyphen', 'i', 'l', 'm', 'n', 'numbersign', 'o', 'one', 'p', 'period', 'quotedbl', 'r', 's', 'slash', 'space', 't', 'three', 'two', 'u', 'uniAC00', 'uniAC01', 'uniACFC', 'uniB204', 'uniB2E8', 'uniB3D9', 'uniB8CC', 'uniB9AC', 'uniBA54', 'uniBAA8', 'uniC0C1', 'uniC0DD', 'uniC131', 'uniC2DC', 'uniC644', 'uniC791', 'uniC7A5', 'uniC800', 'uniC801', 'uniC815', 'uniD0DC', 'uniD1B5', 'uniD310', 'uniD3C9', 'v', 'z', 'zero']
+2025-08-10 09:30:11,217 [INFO] Glyph IDs:   [0, 1, 2, 3, 12, 13, 14, 15, 16, 17, 18, 19, 21, 24, 26, 33, 35, 39, 42, 47, 50, 52, 64, 66, 67, 68, 70, 71, 72, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 89, 495, 496, 584, 879, 930, 995, 1217, 1260, 1308, 1326, 1611, 1621, 1648, 1751, 1951, 2057, 2067, 2088, 2089, 2096, 2502, 2543, 2601, 2644, 2883, 13295]
+2025-08-10 09:30:11,218 [INFO] Retaining 66 glyphs
+2025-08-10 09:30:11,221 [INFO] head subsetting not needed
+2025-08-10 09:30:11,222 [INFO] hhea subsetting not needed
+2025-08-10 09:30:11,223 [INFO] maxp subsetting not needed
+2025-08-10 09:30:11,223 [INFO] OS/2 subsetting not needed
+2025-08-10 09:30:11,224 [INFO] hmtx subsetted
+2025-08-10 09:30:11,226 [INFO] cmap subsetted
+2025-08-10 09:30:11,227 [INFO] fpgm subsetting not needed
+2025-08-10 09:30:11,227 [INFO] prep subsetting not needed
+2025-08-10 09:30:11,228 [INFO] cvt  subsetting not needed
+2025-08-10 09:30:11,233 [INFO] loca subsetting not needed
+2025-08-10 09:30:11,233 [INFO] post subsetted
+2025-08-10 09:30:11,234 [INFO] gasp subsetting not needed
+2025-08-10 09:30:11,238 [INFO] name subsetting not needed
+2025-08-10 09:30:11,248 [INFO] glyf subsetted
+2025-08-10 09:30:11,253 [INFO] head pruned
+2025-08-10 09:30:11,255 [INFO] OS/2 Unicode ranges pruned: [0, 31, 56]
+2025-08-10 09:30:11,256 [INFO] OS/2 CodePage ranges pruned: [0]
+2025-08-10 09:30:11,262 [INFO] glyf pruned
+2025-08-10 09:30:11,264 [INFO] name pruned
+2025-08-10 09:30:11,295 [INFO] maxp pruned
+2025-08-10 09:30:11,296 [INFO] cmap pruned
+2025-08-10 09:30:11,300 [INFO] post pruned
+2025-08-10 09:30:11,301 [INFO] GPOS dropped
+2025-08-10 09:30:11,305 [INFO] GSUB dropped
+2025-08-10 09:30:11,306 [INFO] glyf pruned
+2025-08-10 09:30:11,308 [INFO] Added gid0 to subset
+2025-08-10 09:30:11,308 [INFO] Added first four glyphs to subset
+2025-08-10 09:30:11,309 [INFO] Closing glyph list over 'glyf': 24 glyphs before
+2025-08-10 09:30:11,310 [INFO] Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'exclam', 'numbersign', 'quotedbl', 'space', 'uniAC04', 'uniB4C8', 'uniB9AC', 'uniBAA8', 'uniC0AC', 'uniC0C1', 'uniC57D', 'uniC694', 'uniC774', 'uniC778', 'uniC8FC', 'uniD0DC', 'uniD2B8', 'uniD3EC']
+2025-08-10 09:30:11,311 [INFO] Glyph IDs:   [0, 1, 2, 3, 37, 44, 47, 51, 54, 495, 1028, 1258, 1324, 1597, 1609, 1872, 1970, 2040, 2042, 2144, 2500, 2574, 2647, 13532]
+2025-08-10 09:30:11,313 [INFO] Closed glyph list over 'glyf': 24 glyphs after
+2025-08-10 09:30:11,317 [INFO] Glyph names: ['.notdef', 'E', 'L', 'O', 'S', 'V', 'exclam', 'numbersign', 'quotedbl', 'space', 'uniAC04', 'uniB4C8', 'uniB9AC', 'uniBAA8', 'uniC0AC', 'uniC0C1', 'uniC57D', 'uniC694', 'uniC774', 'uniC778', 'uniC8FC', 'uniD0DC', 'uniD2B8', 'uniD3EC']
+2025-08-10 09:30:11,321 [INFO] Glyph IDs:   [0, 1, 2, 3, 37, 44, 47, 51, 54, 495, 1028, 1258, 1324, 1597, 1609, 1872, 1970, 2040, 2042, 2144, 2500, 2574, 2647, 13532]
+2025-08-10 09:30:11,322 [INFO] Retaining 24 glyphs
+2025-08-10 09:30:11,323 [INFO] head subsetting not needed
+2025-08-10 09:30:11,323 [INFO] hhea subsetting not needed
+2025-08-10 09:30:11,324 [INFO] maxp subsetting not needed
+2025-08-10 09:30:11,324 [INFO] OS/2 subsetting not needed
+2025-08-10 09:30:11,325 [INFO] hmtx subsetted
+2025-08-10 09:30:11,329 [INFO] cmap subsetted
+2025-08-10 09:30:11,332 [INFO] fpgm subsetting not needed
+2025-08-10 09:30:11,334 [INFO] prep subsetting not needed
+2025-08-10 09:30:11,342 [INFO] cvt  subsetting not needed
+2025-08-10 09:30:11,348 [INFO] loca subsetting not needed
+2025-08-10 09:30:11,349 [INFO] post subsetted
+2025-08-10 09:30:11,351 [INFO] gasp subsetting not needed
+2025-08-10 09:30:11,354 [INFO] name subsetting not needed
+2025-08-10 09:30:11,360 [INFO] glyf subsetted
+2025-08-10 09:30:11,362 [INFO] head pruned
+2025-08-10 09:30:11,365 [INFO] OS/2 Unicode ranges pruned: [0, 56]
+2025-08-10 09:30:11,366 [INFO] OS/2 CodePage ranges pruned: [0]
+2025-08-10 09:30:11,371 [INFO] glyf pruned
+2025-08-10 09:30:11,373 [INFO] name pruned
+2025-08-10 09:30:11,407 [INFO] CoT 평가 실행 시작
+2025-08-10 09:30:11,422 [INFO] CoT 평가 결과 - 점수: 95.2, 순위: 1
+2025-08-10 09:30:11,425 [INFO] 🚀 Advanced RAG 시스템 효율성 테스트 시작
+2025-08-10 09:30:11,434 [INFO] API 호출 효율성 테스트 완료 - 호출 횟수: 20, 감소율: 80.0%
+2025-08-10 09:30:11,451 [INFO] Adaptive Reasoning Agent 실행 시작
+2025-08-10 09:30:11,454 [INFO] 적응형 추론 작업 정상 완료
+2025-08-10 09:30:11,455 [INFO] Threshold Optimizer 실행 시작
+2025-08-10 09:30:11,457 [INFO] Threshold 값을 정상적으로 최적화했습니다.
+2025-08-10 09:30:11,458 [INFO] Rule Optimizer 실행 시작
+2025-08-10 09:30:11,460 [INFO] Rule 최적화 및 압축이 정상적으로 완료되었습니다.
+2025-08-10 09:30:11,464 [INFO] Weekly summary created in: C:\giwanos\data\reports
+2025-08-10 09:30:11,487 [INFO] === VELOS 통합 마스터 루프 종료 ===
+2025-08-10 10:30:35,588 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 7:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 10:30:44,245 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 10:31:11,618 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 10:31:11,636 [INFO] [summary] NTP 상태: NTP 서비스는 실행 중이며, 보조 참조로 (S)NTP와 동기화되어 있지만, 재동기화 시 "access_denied_or_policy" 오류가 발생하고 있습니다. 이는 권한 문제나 정책 설정을 확인해야 함을 의미합니다.
+
+환경 상태: SLACK_BOT_TOKEN, EMAIL_ENABLED, NOTION_TOKEN은 설정되어 있으나, OPENAI_MODEL이 비어 있습니다. OPENAI_MODEL의 설정이 필요합니다.
+2025-08-10 10:31:11,642 [INFO] ✅ 메모리 저장 완료
+2025-08-10 10:31:12,069 [WARNING] [notify] 실패: upload_summary_to_notion() missing 1 required positional argument: 'summary_path'
+2025-08-10 10:33:27,588 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 7:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 10:33:35,994 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 10:33:54,302 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-08-10 10:33:54,305 [WARNING] [summary] 실패: Error code: 400 - {'error': {'message': "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}
+2025-08-10 10:33:54,689 [WARNING] [notify] 실패: upload_summary_to_notion() missing 1 required positional argument: 'summary_path'
+2025-08-10 10:40:43,980 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 7:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 10:40:52,504 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 10:41:08,477 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-08-10 10:41:08,481 [WARNING] [summary] 실패: Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0.2 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+2025-08-10 10:49:38,988 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 7:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 10:49:47,494 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 10:50:17,637 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 10:50:17,646 [INFO] [summary] 
+2025-08-10 11:49:53,653 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 8:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 11:50:04,278 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 11:50:29,429 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 11:50:30,857 [INFO] [summary room=# 비워두면 자동 계산(컴퓨터/유저 조합 해] 
+2025-08-10 12:05:41,501 [INFO] [ntp] {"w32time_running": true, "resync_rc": 0, "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:05:41", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 0, "type": null}
+2025-08-10 12:05:50,111 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:06:27,929 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:06:27,938 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:36:54,344 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:37:04,893 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:37:43,920 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:37:43,934 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:40:11,606 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:40:19,971 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:40:48,133 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:40:48,141 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:40:56,479 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:41:05,557 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:41:33,485 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:41:33,498 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:41:33,498 [INFO] [weekly] 주간 보고 모드 실행 완료(구현 모듈 연계 지점)
+2025-08-10 12:48:04,814 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:48:13,232 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:48:38,842 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:48:38,856 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:48:41,600 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:48:50,016 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:49:18,288 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:49:18,301 [INFO] [summary room=de9167d3fc931323c5ab007a] 
+2025-08-10 12:49:18,301 [INFO] [weekly] 주간 보고 모드 실행 완료(구현 모듈 연계 지점)
+2025-08-10 12:50:29,897 [INFO] [ntp] {"w32time_running": true, "resync_rc": 2147942405, "resync_error": "access_denied_or_policy", "status_rc": 0, "stratum": "4(보조 참조 - (S)NTP로 동기화됨)", "precision": "-23(틱당 119.209ns)", "last_sync": "2025-08-10 오후 9:30:02", "poll_interval": "10(1024s)", "peers_rc": 0, "peer_list": ["3", "time.google.com,0x9", "time.windows.com,0x9", "time.cloudflare.com,0x9"], "config_rc": 2147942405, "type": null}
+2025-08-10 12:50:38,814 [INFO] Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-08-10 12:51:04,566 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-10 12:51:04,579 [INFO] [summary room=de9167d3fc931323c5ab007a] 

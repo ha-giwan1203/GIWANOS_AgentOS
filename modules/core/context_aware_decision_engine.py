@@ -1,100 +1,61 @@
-﻿# =============================================================================
-# 🧠 VELOS 컨텍스트‑기반 의사결정 엔진 (하드코딩 제거 + ChatSyncGuard 연동)
-#     경로: C:/giwanos/modules/core/context_aware_decision_engine.py
-# =============================================================================
+﻿# -*- coding: utf-8 -*-
 from __future__ import annotations
-
 import os
-import sys
 from typing import List, Dict
+from dotenv import load_dotenv; load_dotenv("C:/giwanos/configs/.env")
 
-from dotenv import load_dotenv
+# 임베딩 검색 + 룸 라우팅
+from modules.core.memory_retriever import search as retrieve_memory
+from modules.core.chat_rooms import base_room_id
 
-# 공통 설정/경로
-from modules.core.config import BASE_DIR, get_setting
-from modules.automation.sync.chat_sync_guard import ChatSyncGuard
-# 메모리 검색은 프로젝트 내 실제 구현으로 유지
-from modules.core.memory_retriever import search as retrieve_memory  # noqa
+# OpenAI (v1.x)
+import openai
+client = openai.OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL") or None
+)
 
-# 마스터 루프의 저장 루틴 재사용(파일명 변경 금지)
-from scripts.run_giwanos_master_loop import save_dialog_memory
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+TOP_K = int(os.getenv("TOP_K_MEMORY", "5"))
+MAX_COMP_TOK = int(os.getenv("OPENAI_MAX_TOKENS", "900"))
+MAX_SNIPPET = int(os.getenv("MAX_SNIPPET_CHARS", "800"))
 
-# OpenAI
-load_dotenv()
-import openai  # type: ignore
-
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-TOP_K_MEMORY = int(os.getenv("TOP_K_MEMORY", get_setting("TOP_K_MEMORY", 5)))
-TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", get_setting("OPENAI_TEMPERATURE", 0.4)))
-MAX_TOKENS = int(os.getenv("OPENAI_MAX_TOKENS", get_setting("OPENAI_MAX_TOKENS", 800)))
-MODEL_NAME = os.getenv("OPENAI_MODEL", get_setting("OPENAI_MODEL", "gpt-4o"))
-
-# 경로 보정
-if str(BASE_DIR) not in sys.path:
-    sys.path.append(str(BASE_DIR))
-
-
-def _build_messages(user_prompt: str, recalled: List[Dict]) -> List[Dict]:
-    system_msg = {
-        "role": "system",
-        "content": "당신은 VELOS 시스템의 판단 에이전트입니다."
-    }
-    mem_block = "\n".join(
-        f"[MEM] {m.get('insight','')}" for m in recalled if isinstance(m, dict)
-    )
-    messages: List[Dict] = [system_msg]
-    if mem_block.strip():
-        messages.append({"role": "system", "content": mem_block})
-    messages.append({"role": "user", "content": user_prompt})
-    return messages
-
+def _build_messages(prompt: str, mems: List[Dict]) -> List[Dict]:
+    sys = [{"role": "system", "content": "당신은 VELOS 시스템의 판단 에이전트입니다."}]
+    if mems:
+        block = "\n".join((f"[MEM] {m.get('insight','')}"[:MAX_SNIPPET]) for m in mems if isinstance(m, dict))
+        if block.strip():
+            sys.append({"role": "system", "content": block})
+    return [*sys, {"role": "user", "content": prompt}]
 
 def generate_gpt_response(prompt: str) -> str:
-    """기존 GPT 호출 함수. 다른 모듈이 이미 사용 중일 수 있어 보존."""
+    # 임베딩 기억 가져오기 실패해도 호출은 계속
     try:
-        recalled = retrieve_memory(prompt, k=TOP_K_MEMORY)
-        messages = _build_messages(prompt, recalled)
-        response = client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=messages,
-            temperature=TEMPERATURE,
-            max_tokens=MAX_TOKENS,
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"[GPT 판단 실패: {e}]"
+        mems = retrieve_memory(prompt, k=TOP_K)
+    except Exception:
+        mems = []
+    msgs = _build_messages(prompt, mems)
 
-
-# ────────────────────────────────────────────────────────────────────────────
-# ChatSyncGuard 연동 래퍼
-_guard = ChatSyncGuard(mirror_slack=True, mirror_notion=True)
-
+    # gpt-5 규격: max_completion_tokens 사용, temperature는 기본값(모델 강제)
+    kwargs = dict(model=MODEL, messages=msgs, max_completion_tokens=MAX_COMP_TOK)
+    rsp = client.chat.completions.create(**kwargs)
+    return (rsp.choices[0].message.content or "").strip()
 
 def generate_gpt_response_with_guard(prompt: str, conversation_id: str | None = None) -> str:
-    def _gpt_call(p: str) -> str:
+    # ChatSyncGuard 있으면 거쳐서 호출 (Slack 미러/Notion 미러 플래그는 여기서 제어)
+    try:
+        from modules.automation.sync.chat_sync_guard import ChatSyncGuard
+    except Exception:
+        return generate_gpt_response(prompt)
+
+    room = conversation_id or base_room_id()
+    guard = ChatSyncGuard(mirror_slack=True, mirror_notion=False, conversation_id=room)
+
+    def _call(p: str) -> str:
         return generate_gpt_response(p)
 
-    def _local_save(resp: str) -> bool:
-        try:
-            save_dialog_memory(resp)
-            return True
-        except Exception:
-            return False
+    def _save(r: str) -> bool:
+        return isinstance(r, str) and len(r) > 0
 
-    ok, rsp = _guard.call(prompt, _gpt_call, _local_save, conversation_id=conversation_id)
-    if not ok:
-        raise RuntimeError(f"ChatSyncGuard failed: {rsp}")
-    return rsp  # type: ignore[str-bytes-safe]
-
-
-# ────────────────────────────────────────────────────────────────────────────
-# 자체 검증
-def _self_test():
-    assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY 누락"
-    print("[context_aware_decision_engine] self-test OK")
-
-
-if __name__ == "__main__":
-    _self_test()
-    print("▶️", generate_gpt_response("시스템 상태를 요약해줘"))
+    ok, out = guard.call(prompt, _call, _save, conversation_id=room)
+    return out if ok else str(out)
