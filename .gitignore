@@ -15,3 +15,7 @@ node_modules/
 data/logs/
 data/reports/*.pdf
 interface/judgment_dashboard/node_modules/
+
+giwan-reboot-65698a5b45ca.json
+
+tools/notion_integration/notion_config.json

@@ -1,2 +1,0 @@
-﻿# log_refactor_agent.py content
-
