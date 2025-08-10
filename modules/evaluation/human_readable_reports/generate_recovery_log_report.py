@@ -1,4 +1,5 @@
 ﻿import json
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import os
 from datetime import datetime
 import logging
@@ -16,7 +17,7 @@ def generate_recovery_log_report():
         logger.setLevel(logging.INFO)
 
     recovery_log_path = os.path.join(log_dir, "recovery_log.json")
-    report_path = os.path.join(report_dir, f"recovery_log_{datetime.now().strftime('%Y%m%d')}.md")
+    report_path = os.path.join(report_dir, f"recovery_log_{now_kst().strftime('%Y%m%d')}.md")
 
     if not os.path.exists(recovery_log_path):
         logger.error("복구 이력 파일이 존재하지 않습니다.")
@@ -26,7 +27,7 @@ def generate_recovery_log_report():
         recovery_logs = json.load(file)
 
     report_content = f"# 🚨 장애 복구 이력 보고서\n\n"
-    report_content += f"**보고서 생성 시각:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+    report_content += f"**보고서 생성 시각:** {now_kst().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     report_content += "## 최근 장애 복구 이력:\n\n"
 
     for idx, log in enumerate(recovery_logs[-5:], 1):
@@ -46,5 +47,6 @@ def generate_recovery_log_report():
 
 if __name__ == '__main__':
     generate_recovery_log_report()
+
 
 

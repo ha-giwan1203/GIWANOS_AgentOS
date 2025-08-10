@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import logging
 from datetime import datetime
@@ -12,7 +13,7 @@ feedback_file_path = 'C:/giwanos/data/reports/evaluation_feedback.json'
 def evaluate_system_performance():
     # 시스템 성능 평가 (실제 평가 로직을 여기에 구현)
     performance = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": now_utc().isoformat(),
         "cpu_usage_percent": random.uniform(10, 20),
         "memory_usage_percent": random.uniform(30, 50),
         "disk_usage_percent": random.uniform(70, 90),
@@ -51,5 +52,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

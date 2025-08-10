@@ -1,92 +1,58 @@
-﻿# VELOS 시스템 - Notion 연동 모듈
-from modules.core import config
-import os
-import json
+﻿# =============================================
+# VELOS: Notion Uploader (path required)
+# =============================================
+from __future__ import annotations
+import os, json
+from pathlib import Path
 import requests
-from datetime import datetime
-from dotenv import load_dotenv
 
-# VELOS 경로 기준으로 .env 강제 로드
-load_dotenv(dotenv_path="C:/giwanos/.env")
-
-NOTION_API_KEY = os.getenv("NOTION_TOKEN")
-NOTION_PAGE_ID = os.getenv("NOTION_PAGE_ID")
+NOTION_API = "https://api.notion.com/v1/pages"
 NOTION_VERSION = "2022-06-28"
 
-def upload_summary_to_notion(summary_path):
-    """
-    Markdown 요약 파일을 Notion 페이지에 업로드하는 함수.
-    """
-    if NOTION_API_KEY is None or NOTION_PAGE_ID is None:
-        print("❌ Notion API 키 또는 Page ID가 설정되어 있지 않습니다.")
-        return False
+def _headers():
+    return {
+        "Authorization": f"Bearer {os.environ['NOTION_TOKEN']}",
+        "Notion-Version": NOTION_VERSION,
+        "Content-Type": "application/json",
+    }
 
-    try:
-        with open(summary_path, "r", encoding="utf-8") as file:
-            markdown_content = file.read()
+def _parent():
+    # 페이지 ID를 부모로 사용
+    pid = os.environ.get("NOTION_PAGE_ID")
+    if not pid:
+        raise RuntimeError("NOTION_PAGE_ID 미설정")
+    return {"type": "page_id", "page_id": pid}
 
-        headers = {
-            "Authorization": f"Bearer {NOTION_API_KEY}",
-            "Content-Type": "application/json",
-            "Notion-Version": NOTION_VERSION
-        }
+def _title_block(title: str):
+    return [{"type": "heading_2", "heading_2": {"rich_text": [{"type": "text", "text": {"content": title[:100]}}]}}]
 
-        data = {
-            "parent": {"type": "page_id", "page_id": NOTION_PAGE_ID},
-            "properties": {
-                "title": [
-                    {
-                        "text": {
-                            "content": f"VELOS 요약 ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})"
-                        }
-                    }
-                ]
-            },
-            "children": [
-                {
-                    "object": "block",
-                    "type": "paragraph",
-                    "paragraph": {
-                        "rich_text": [{"type": "text", "text": {"content": markdown_content[:2000]}}]
-                    }
-                }
-            ]
-        }
+def upload_summary_to_notion(summary_path: str) -> bool:
+    p = Path(summary_path)
+    if not p.exists():
+        raise FileNotFoundError(summary_path)
 
-        response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
+    title = f"VELOS Report: {p.name}"
+    children = _title_block(title)
 
-        if response.status_code == 200 or response.status_code == 201:
-            print("✅ Notion 업로드 완료:", response.json().get("url", "링크 없음"))
-            return True
-        else:
-            print(f"❌ Notion 업로드 실패: {response.status_code}")
-            print(response.text)
-            return False
+    if p.suffix.lower() == ".md":
+        try:
+            txt = p.read_text(encoding="utf-8")[:1900]  # 블록 길이 보호
+        except Exception:
+            txt = f"(읽기 실패) {p}"
+        children.append({"type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": txt}}]}})
+    else:
+        children.append({"type": "paragraph", "paragraph": {"rich_text": [{"type": "text", "text": {"content": f"로컬 경로: {p}"}}]}})
 
-    except Exception as e:
-        print("❌ 예외 발생 (Notion 업로드):", e)
-        return False
+    payload = {
+        "parent": _parent(),
+        "properties": {"title": [{"type": "text", "text": {"content": title}}]},
+        "children": children,
+    }
+    r = requests.post(NOTION_API, headers=_headers(), data=json.dumps(payload))
+    if r.status_code in (200, 201):
+        return True
+    raise RuntimeError(f"Notion 업로드 실패: {r.status_code} {r.text}")
 
-# === VELOS shim: make summary_path optional ===
-try:
-    _velos_orig_upload = upload_summary_to_notion
-    def upload_summary_to_notion(summary_path=None, *args, **kwargs):
-        from pathlib import Path
-        root = Path(__file__).resolve().parents[2]
-        if summary_path is None:
-            reports = root / "data" / "reports"
-            candidates = []
-            if reports.exists():
-                candidates += list(reports.glob("weekly_summary_*.md"))
-                candidates += list(reports.glob("weekly_report_*.md"))
-                candidates += list(reports.glob("summary_dashboard.json"))
-            if not candidates:
-                raise FileNotFoundError("요약 파일을 찾을 수 없습니다. summary_path를 명시적으로 넘겨주세요.")
-            latest = max(candidates, key=lambda p: p.stat().st_mtime)
-            summary_path = str(latest)
-        return _velos_orig_upload(summary_path, *args, **kwargs)
-except Exception:
-    pass
-# === END shim ===
-
-
+if __name__ == "__main__":
+    import sys
+    print(upload_summary_to_notion(sys.argv[1]))

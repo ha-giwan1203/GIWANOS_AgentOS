@@ -1,4 +1,5 @@
 ﻿import shutil
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import datetime
 import os
 import filecmp
@@ -8,7 +9,7 @@ SOURCE_DIR = "C:/giwanos/modules/core"
 
 
 def create_full_snapshot():
-    snapshot_name = datetime.datetime.now().strftime("full_snapshot_%Y%m%d")
+    snapshot_name = datetime.now_kst().strftime("full_snapshot_%Y%m%d")
     snapshot_path = os.path.join(SNAPSHOT_DIR, snapshot_name)
     shutil.copytree(SOURCE_DIR, snapshot_path)
     print(f"Full snapshot created at: {snapshot_path}")
@@ -24,7 +25,7 @@ def create_incremental_snapshot():
         return
 
     latest_full_snapshot_path = os.path.join(SNAPSHOT_DIR, latest_full_snapshot[-1])
-    incremental_snapshot_name = datetime.datetime.now().strftime("incremental_snapshot_%Y%m%d")
+    incremental_snapshot_name = datetime.now_kst().strftime("incremental_snapshot_%Y%m%d")
     incremental_snapshot_path = os.path.join(SNAPSHOT_DIR, incremental_snapshot_name)
 
     os.makedirs(incremental_snapshot_path, exist_ok=True)
@@ -40,7 +41,7 @@ def create_incremental_snapshot():
 
 
 def manage_snapshots():
-    today = datetime.datetime.now().day
+    today = datetime.now_utc().day
 
     if today == 1:
         create_full_snapshot()
@@ -51,4 +52,5 @@ def manage_snapshots():
 if __name__ == "__main__":
     os.makedirs(SNAPSHOT_DIR, exist_ok=True)
     manage_snapshots()
+
 

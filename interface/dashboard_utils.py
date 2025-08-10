@@ -1,4 +1,5 @@
 ﻿# VELOS 대시보드 유틸리티
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 
 import os
 import json
@@ -39,5 +40,6 @@ def get_mock_dashboard_status():
         "memory_usage": "50.5%",
         "disk_usage": "82.9%"
     }
+
 
 

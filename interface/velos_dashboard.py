@@ -4,49 +4,57 @@ import json
 import sys
 from pathlib import Path
 from datetime import datetime
+
 import psutil
 
-# 경로 설정
-sys.path.append("C:/giwanos/interface")
-sys.path.append("C:/giwanos/tools/notifications")
-sys.path.append("C:/giwanos/tools/notion_integration")
+# 경로/설정 공용 모듈
+from modules.core.config import BASE_DIR, REPORTS_DIR, API_COST_LOG, path, get_setting
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic  # 기존 모듈
 
-from dashboard_utils import load_dashboard_data, load_memory_summary
-from send_email import send_email_report
-from send_pushbullet_notification import send_pushbullet_notification
-from slack_api_post_message import send_slack_message
-from upload_summary_to_notion import upload_summary_to_notion
+# 인터페이스 유틸 + 알림 모듈 (기존 경로 유지)
+sys.path.append(str(BASE_DIR / "interface"))
+sys.path.append(str(BASE_DIR / "tools" / "notifications"))
+sys.path.append(str(BASE_DIR / "tools" / "notion_integration"))
 
-# 📁 경로 정의
-BASE_DIR = Path("C:/giwanos")
-REPORTS_DIR = BASE_DIR / "data/reports"
-SUMMARY_FILE = BASE_DIR / "data/reports/summary_dashboard.json"
-LOG_FILE = BASE_DIR / "data/logs/api_cost_log.json"
-MEMORY_FILE = BASE_DIR / "data/memory/learning_summary.json"
+from dashboard_utils import load_dashboard_data, load_memory_summary  # type: ignore
+from send_email import send_email_report  # type: ignore
+from send_pushbullet_notification import send_pushbullet_notification  # type: ignore
+from slack_api_post_message import send_slack_message  # type: ignore
+from upload_summary_to_notion import upload_summary_to_notion  # type: ignore
+
+# 동적 경로
+SUMMARY_FILE = path("data", "reports", "summary_dashboard.json")
+LOG_FILE     = API_COST_LOG
+MEMORY_FILE  = path("data", "memory", "learning_summary.json")
 
 # 🔁 전송 루프 함수
 def send_all_notifications(summary_path, report_path):
     results = {}
+    slack_channel = os.getenv("SLACK_CHANNEL_ID") or get_setting("SLACK_CHANNEL_ID", "#general")
+    email_to      = os.getenv("EMAIL_TO") or get_setting("EMAIL_TO", None)
 
     try:
         slack_response = send_slack_message(
-            channel="#velos-alerts",
+            channel=slack_channel,
             message="📊 VELOS 대시보드에서 보고서 전송됨."
         )
-        if slack_response.get("ok"):
+        if isinstance(slack_response, dict) and slack_response.get("ok"):
             results["Slack"] = "✅"
         else:
-            results["Slack"] = f"❌ {slack_response.get('error', 'Slack 전송 실패')}"
+            results["Slack"] = f"❌ {getattr(slack_response,'error', 'Slack 전송 실패')}"
     except Exception as e:
         results["Slack"] = f"❌ 예외 발생: {e}"
 
     try:
-        success = send_email_report(
-            subject="VELOS 시스템 리포트",
-            body="VELOS 자동 보고서입니다. 첨부 파일 확인 요망.",
-            to_email="you@example.com"
-        )
-        results["Email"] = "✅" if success else "❌ 이메일 전송 실패"
+        if email_to:
+            success = send_email_report(
+                subject="VELOS 시스템 리포트",
+                body="VELOS 자동 보고서입니다. 첨부 파일 확인 요망.",
+                to_email=email_to
+            )
+            results["Email"] = "✅" if success else "❌ 이메일 전송 실패"
+        else:
+            results["Email"] = "⚠️ EMAIL_TO 미설정"
     except Exception as e:
         results["Email"] = f"❌ 예외 발생: {e}"
 
@@ -67,26 +75,20 @@ def send_all_notifications(summary_path, report_path):
 
     return results
 
+
 # 🔧 Streamlit 설정
 st.set_page_config(page_title="📊 VELOS 시스템 대시보드", layout="wide")
-
 tabs = st.tabs(["📟 시스템 상태", "📄 주간 보고서", "🧠 Memory Insight Viewer", "⚙️ 마스터 루프 실행", "📈 사고 성능 분석"])
 
 # 1. 시스템 상태 + 철학 선언문
 with tabs[0]:
     st.header("🖥 시스템 상태")
-
     st.markdown("""
     <div style='padding: 1rem; border-left: 5px solid #4CAF50; background-color: #f9f9f9'>
-    <h4>🧠 <b>VELOS 시스템 철학</b></h4>
-    <p>
-    기억을 기반으로 <b>구조적 사고</b>를 수행하며,<br>
-    판단 → 실행 → 회고 → 전송을 반복함으로써,<br>
-    스스로 개선되는 <b>자율 운영 AI 시스템</b>을 지향한다.
-    </p>
+      <h4>🧠 <b>VELOS 시스템 철학</b></h4>
+      <p>기억 기반 <b>구조적 사고</b>로 판단→실행→회고→전송 루프를 유지하는 자율 운영 시스템.</p>
     </div>
     """, unsafe_allow_html=True)
-
     try:
         cpu = psutil.cpu_percent(interval=1)
         mem = psutil.virtual_memory().percent
@@ -114,7 +116,9 @@ with tabs[2]:
         memory_summary = load_memory_summary(MEMORY_FILE)
         if memory_summary and isinstance(memory_summary, list):
             for item in reversed(memory_summary[-10:]):
-                st.markdown(f"**{item.get('timestamp', '')}** - {item.get('insight', '')}")
+                ts = item.get("timestamp", "")
+                insight = item.get("insight", "")
+                st.markdown(f"**{ts}** - {insight}")
         else:
             st.warning("🔍 메모리 요약 없음")
     except Exception as e:
@@ -146,9 +150,10 @@ with tabs[3]:
 with tabs[4]:
     st.header("🧪 사고 성능 분석 시각화")
     try:
-        with open(LOG_FILE, "r", encoding="utf-8") as f:
-            log_data = json.load(f)
-
+        if LOG_FILE.exists():
+            log_data = json.loads(LOG_FILE.read_text(encoding="utf-8"))
+        else:
+            log_data = {}
         evaluation_data = log_data.get("evaluation_scores", {})
         chart_data = evaluation_data.get("CoT", [])
 
@@ -166,5 +171,3 @@ with tabs[4]:
             st.warning("📉 평가 데이터 없음 또는 형식 오류")
     except Exception as e:
         st.error(f"❌ 시각화 실패: {e}")
-
-

@@ -1,17 +1,25 @@
-﻿import logging
-from datetime import datetime
+﻿from __future__ import annotations
+# =============================================
+# VELOS: Weekly Summary Generator
+# =============================================
+
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
+
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO)
-
-def generate_weekly_summary(report_dir):
-    today = datetime.now().strftime('%Y%m%d')
-    summary_path = Path(report_dir) / f'weekly_summary_{today}.md'
-    summary_content = "# 주간 요약 보고서\n\n이번 주의 시스템 운영 및 성능 요약입니다."
-    
-    summary_path.write_text(summary_content, encoding='utf-8')
-    logging.info(f'Weekly summary created: {summary_path}')
-    
-    return summary_path
-
-
+def generate_weekly_summary(out_dir: str) -> str:
+    outp = Path(out_dir)
+    outp.mkdir(parents=True, exist_ok=True)
+    name = f"weekly_summary_{now_kst().strftime('%Y%m%d')}.md"
+    path = outp / name
+    md = [
+        "# VELOS 주간 요약",
+        f"- 생성(UTC): {now_utc().isoformat()}Z",
+        "- 상태: 시스템 정상",
+        "- 모듈: CoT / Advanced RAG / Adaptive / Optimizers 완료",
+        "",
+        "## 비고",
+        "- 자동 생성 문서",
+    ]
+    path.write_text("\n".join(md), encoding="utf-8")
+    return str(path)

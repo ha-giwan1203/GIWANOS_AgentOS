@@ -1,4 +1,5 @@
 ﻿import os
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 from datetime import datetime
 import logging
 
@@ -15,10 +16,10 @@ def generate_adaptive_reflection_report():
         logger.setLevel(logging.INFO)
 
     recent_reflection_files = sorted(os.listdir(reflections_dir))[-3:]
-    report_path = os.path.join(report_dir, f"adaptive_reflection_{datetime.now().strftime('%Y%m%d')}.md")
+    report_path = os.path.join(report_dir, f"adaptive_reflection_{now_kst().strftime('%Y%m%d')}.md")
 
     report_content = f"# 🔍 자동 회고 보고서\n\n"
-    report_content += f"**보고서 생성 시각:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+    report_content += f"**보고서 생성 시각:** {now_kst().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
     report_content += "## 최근 자동 회고 내용:\n\n"
 
     for reflection_file in recent_reflection_files:
@@ -40,5 +41,6 @@ def generate_adaptive_reflection_report():
 
 if __name__ == '__main__':
     generate_adaptive_reflection_report()
+
 
 

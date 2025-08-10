@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 from datetime import datetime
 import os
@@ -10,7 +11,7 @@ def generate_system_health_report():
     os.makedirs(report_dir, exist_ok=True)
 
     system_health_path = os.path.join(log_dir, "system_health.json")
-    report_path = os.path.join(report_dir, f"system_health_{datetime.now().strftime('%Y%m%d')}.md")
+    report_path = os.path.join(report_dir, f"system_health_{now_kst().strftime('%Y%m%d')}.md")
 
     if not os.path.exists(system_health_path):
         return False
@@ -21,7 +22,7 @@ def generate_system_health_report():
     report_content = f"""
 # 🖥️ 시스템 상태 보고서
 
-**보고서 생성 시각:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+**보고서 생성 시각:** {now_kst().strftime('%Y-%m-%d %H:%M:%S')}
 
 | 항목                 | 값              |
 |----------------------|-----------------|
@@ -38,5 +39,6 @@ def generate_system_health_report():
 
 if __name__ == '__main__':
     print(generate_system_health_report())
+
 
 

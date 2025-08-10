@@ -1,4 +1,5 @@
 ﻿# 🚀 VELOS 회고 생성기 - generate_memory_reflection.py
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 # 최근 memory 내용을 기반으로 요약 + 인사이트 추출 + 위험/중요도 태그 자동 분류
 
 import json
@@ -15,7 +16,7 @@ def generate_reflection():
     summary = manager.get_summary()
 
     reflection = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": now_utc().isoformat(),
         "summary": {
             "user_commands": summary["user_commands"],
             "system_responses": summary["system_responses"]
@@ -33,7 +34,7 @@ def generate_reflection():
         reflection["tags"].append("중복_명령")
 
     # 저장
-    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+    timestamp = now_kst().strftime("%Y-%m-%dT%H-%M-%SZ")
     reflection_path = REFLECTION_DIR / f"reflection_memory_{timestamp}.json"
 
     try:
@@ -45,5 +46,6 @@ def generate_reflection():
 
 if __name__ == "__main__":
     generate_reflection()
+
 
 

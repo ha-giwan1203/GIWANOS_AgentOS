@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 """
 VELOS 시스템 정리 루프 (중간 상세 출력 버전)
 
@@ -25,7 +26,7 @@ LOG_FILE = "C:/giwanos/data/logs/report_cleanup_log.json"
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def cleanup_old_files(directory, days_to_keep=30, extensions=None, log_records=None, label=None):
-    cutoff = datetime.now() - timedelta(days=days_to_keep)
+    cutoff = now_utc() - timedelta(days=days_to_keep)
     deleted = []
     if not os.path.exists(directory):
         logging.info(f"📂 {label or directory}: 디렉토리 없음")
@@ -45,8 +46,8 @@ def cleanup_old_files(directory, days_to_keep=30, extensions=None, log_records=N
                         log_records.append({
                             "file": file,
                             "path": path,
-                            "deleted_at": datetime.now().isoformat(),
-                            "age_days": (datetime.now() - modified).days,
+                            "deleted_at": now_utc().isoformat(),
+                            "age_days": (now_utc() - modified).days,
                             "folder": directory
                         })
             except:
@@ -98,7 +99,7 @@ def save_cleanup_log(log_records):
 def backup_reports_zip():
     source_dir = "C:/giwanos/data/reports"
     backup_dir = "C:/giwanos/data/backups"
-    date_str = datetime.now().strftime("%Y%m%d")
+    date_str = now_kst().strftime("%Y%m%d")
     zip_path = os.path.join(backup_dir, f"weekly_report_{date_str}.zip")
     included = []
 
@@ -131,5 +132,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

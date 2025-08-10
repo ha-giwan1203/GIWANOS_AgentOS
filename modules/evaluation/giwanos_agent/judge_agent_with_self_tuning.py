@@ -1,4 +1,5 @@
 ﻿"""
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 judge_agent.py (자기 튜닝 루프 포함 버전)
 
 - 평가 점수를 바탕으로 루프 순서를 자동 조정하는 기능 포함
@@ -39,5 +40,6 @@ class JudgeAgent:
         for task in plan:
             print(f"→ 실행 예정: {task}")
             # 실제 함수는 루프에 연결되어 있어야 함
+
 
 

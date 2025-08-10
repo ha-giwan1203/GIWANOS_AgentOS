@@ -1,4 +1,5 @@
 ﻿# gpt4o_turbo_decision_engine.py 내의 정확한 호출 코드 예시
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 
 from openai import OpenAI
 import json
@@ -30,7 +31,7 @@ class GPT4oTurboDecisionEngine:
     def record_api_usage(self, usage, model_name, analysis_result):
         log_path = "C:/giwanos/data/logs/api_cost_log.json"
         record = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": now_utc().isoformat(),
             "model": model_name,
             "prompt_tokens": usage.prompt_tokens,
             "completion_tokens": usage.completion_tokens,
@@ -56,5 +57,6 @@ class GPT4oTurboDecisionEngine:
 
         with open(log_path, 'w', encoding='utf-8') as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
+
 
 

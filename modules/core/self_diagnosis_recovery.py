@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import logging
 import psutil
 import shutil
@@ -36,7 +37,7 @@ def critical_condition_handler(health_status):
         logging.warning('Critical memory usage detected, consider terminating unnecessary processes.')
 
 def cleanup_old_snapshots(days_to_keep=1):
-    cutoff_date = datetime.now().timestamp() - (days_to_keep * 86400)
+    cutoff_date = now_utc().timestamp() - (days_to_keep * 86400)
     removed_snapshots = 0
 
     for root, dirs, files in os.walk(SNAPSHOT_DIR):
@@ -50,7 +51,7 @@ def cleanup_old_snapshots(days_to_keep=1):
     logging.info(f'Total removed snapshots: {removed_snapshots}')
 
 def create_emergency_snapshot():
-    snapshot_name = datetime.now().strftime('emergency_snapshot_%Y%m%d%H%M%S')
+    snapshot_name = now_kst().strftime('emergency_snapshot_%Y%m%d%H%M%S')
     snapshot_path = os.path.join(SNAPSHOT_DIR, snapshot_name)
     os.makedirs(snapshot_path, exist_ok=True)
     shutil.copytree('C:/giwanos/core', os.path.join(snapshot_path, 'core'))
@@ -67,5 +68,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

@@ -1,4 +1,5 @@
 ﻿import os
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 from fpdf import FPDF
 import logging
 from datetime import datetime
@@ -29,7 +30,7 @@ def test_pdf_generation():
         pdf.set_font("NanumGothic", size=12)
         
         pdf.cell(200, 10, txt="VELOS 주간 보고서", ln=True, align='C')
-        report_content = f"생성 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        report_content = f"생성 시간: {now_kst().strftime('%Y-%m-%d %H:%M:%S')}"
         pdf.cell(200, 10, txt=report_content, ln=True)
 
         pdf_path = os.path.join(pdf_dir, "weekly_report_test.pdf")
@@ -42,5 +43,6 @@ def test_pdf_generation():
 
 if __name__ == '__main__':
     test_pdf_generation()
+
 
 

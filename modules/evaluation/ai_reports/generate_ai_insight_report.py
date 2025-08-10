@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import logging
 import os
@@ -32,7 +33,7 @@ def generate_insights(evaluation_data):
 
 def save_insights(insights):
     report = {
-        "generated_at": datetime.now().isoformat(),
+        "generated_at": now_utc().isoformat(),
         "insights": insights
     }
     os.makedirs(os.path.dirname(INSIGHT_REPORT_PATH), exist_ok=True)
@@ -47,5 +48,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

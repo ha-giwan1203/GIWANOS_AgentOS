@@ -1,4 +1,5 @@
 ﻿# modules/automation/scheduling/system_monitoring_alert.py
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import psutil
 import requests
 import os
@@ -35,7 +36,7 @@ def check_system_status():
         alert_message.append(f"🚨 높은 디스크 사용량: {disk_usage}%")
 
     if alert_message:
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = now_kst().strftime('%Y-%m-%d %H:%M:%S')
         full_message = f"[{timestamp}] 시스템 리소스 경고:\n" + "\n".join(alert_message)
         send_alert(full_message)
         print(full_message)
@@ -45,5 +46,6 @@ def check_system_status():
 
 if __name__ == '__main__':
     check_system_status()
+
 
 

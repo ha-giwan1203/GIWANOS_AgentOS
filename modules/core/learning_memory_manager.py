@@ -1,4 +1,5 @@
 ﻿# VELOS 학습 메모리 관리자 - 리팩터링 완료
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 # 사용자/시스템 인사이트를 memory에 명확히 구분 저장하고,
 # 중복 저장 방지 및 구조 일관성을 유지하며 판단 시 재활용을 가능케 함.
 
@@ -33,7 +34,7 @@ class LearningMemoryManager:
 
     def save_insight(self, insight_text, source="system", tags=None):
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": now_utc().isoformat(),
             "from": source,
             "insight": insight_text.strip(),
             "tags": tags or []
@@ -70,5 +71,6 @@ class LearningMemoryManager:
 # manager.save_insight("Check system health", source="user", tags=["명령", "점검"])
 # manager.save_insight("System OK", source="system", tags=["결과"])
 # print(manager.get_summary())
+
 
 

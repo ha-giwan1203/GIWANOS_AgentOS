@@ -1,4 +1,5 @@
 ﻿from datetime import datetime
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 from pathlib import Path
 
@@ -15,7 +16,7 @@ def generate_reflection(content):
     reflections_dir = GIWANOS_ROOT / "data" / "reflections"
     reflections_dir.mkdir(parents=True, exist_ok=True)
     
-    reflection_filename = datetime.now().strftime("reflection_%Y%m%d_%H%M%S.md")
+    reflection_filename = now_kst().strftime("reflection_%Y%m%d_%H%M%S.md")
     reflection_path = reflections_dir / reflection_filename
 
     with open(reflection_path, "w", encoding="utf-8") as file:
@@ -31,4 +32,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import logging
 import json
 import os
@@ -28,12 +29,13 @@ def detect_failure():
 
     if failure_detected:
         with open(FAILURE_FLAG_PATH, 'w', encoding='utf-8') as flag_file:
-            flag_file.write(f"Failure detected at {datetime.now().isoformat()}")
+            flag_file.write(f"Failure detected at {now_utc().isoformat()}")
         logging.info("🚨 장애 감지 플래그가 생성되었습니다.")
     else:
         logging.info("✅ 시스템 상태 정상. 장애 미감지.")
 
 if __name__ == "__main__":
     detect_failure()
+
 
 

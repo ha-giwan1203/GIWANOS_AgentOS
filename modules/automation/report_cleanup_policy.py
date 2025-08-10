@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 from datetime import datetime
 import os
 import time
@@ -30,7 +31,7 @@ def cleanup_by_policy():
                     deleted_total.append({
                         "filename": fname,
                         "path": fpath,
-                        "deleted_at": datetime.now().isoformat(),
+                        "deleted_at": now_utc().isoformat(),
                         "age_days": round(age_days),
                         "folder": folder
                     })
@@ -58,5 +59,6 @@ def cleanup_by_policy():
 
 if __name__ == "__main__":
     cleanup_by_policy()
+
 
 

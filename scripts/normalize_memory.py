@@ -1,4 +1,5 @@
 ﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 from modules.core import config
 """📄  scripts/normalize_memory.py
 
@@ -21,7 +22,7 @@ def parse_dialog(fp):
             yield {
                 "id": conv.get("id") or str(uuid.uuid4()),
                 "text": conv.get("message", ""),
-                "ts": conv.get("timestamp", datetime.utcnow().isoformat() + "Z"),
+                "ts": conv.get("timestamp", now_utc().isoformat() + "Z"),
                 "meta": {"source": sid,
                          "tags": ["dialog", conv.get("role", "")],
                          "role": conv.get("role", "user")}
@@ -34,7 +35,7 @@ def parse_learning(fp):
         yield {
             "id": ins.get("id") or str(uuid.uuid4()),
             "text": ins.get("insight", ""),
-            "ts": ins.get("ts", datetime.utcnow().isoformat() + "Z"),
+            "ts": ins.get("ts", now_utc().isoformat() + "Z"),
             "meta": {"source": "learning_memory",
                      "tags": ins.get("tags", ["learning"])}
         }
@@ -45,7 +46,7 @@ def parse_reflection(fp):
     yield {
         "id": obj.get("id") or str(uuid.uuid4()),
         "text": obj.get("summary", ""),
-        "ts": obj.get("timestamp", datetime.utcnow().isoformat() + "Z"),
+        "ts": obj.get("timestamp", now_utc().isoformat() + "Z"),
         "meta": {"source": str(fp), "tags": obj.get("tags", ["reflection"])}
     }
 
@@ -64,7 +65,7 @@ def iter_records():
                 obj = json.loads(fp.read_text(encoding="utf-8"))
                 yield {"id": str(uuid.uuid4()),
                        "text": json.dumps(obj, ensure_ascii=False),
-                       "ts": datetime.utcnow().isoformat() + "Z",
+                       "ts": now_utc().isoformat() + "Z",
                        "meta": {"source": str(fp), "tags": ["raw"]}}
 
 
@@ -86,6 +87,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

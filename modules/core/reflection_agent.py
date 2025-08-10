@@ -1,4 +1,5 @@
 ﻿from datetime import datetime
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import os
 
@@ -47,7 +48,7 @@ def generate_reflection():
         return "\n".join(summary_lines), level
 
     def save_reflection(summary, level):
-        timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+        timestamp = now_kst().strftime("%Y-%m-%dT%H-%M-%SZ")
         filename = f"reflection_{timestamp}.json"
         path = os.path.join(REFLECTION_DIR, filename)
         os.makedirs(REFLECTION_DIR, exist_ok=True)
@@ -67,5 +68,6 @@ def generate_reflection():
 
 # ✅ 마스터 루프 호환성 유지용 alias
 run_reflection = generate_reflection
+
 
 

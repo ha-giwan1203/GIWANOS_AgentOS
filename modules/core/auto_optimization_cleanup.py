@@ -1,4 +1,5 @@
 ﻿import os
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import shutil
 from datetime import datetime
@@ -21,7 +22,7 @@ def optimize_judgment_rules():
         with open(rules_path, "w", encoding="utf-8") as file:
             json.dump(list(optimized_rules), file, indent=4, ensure_ascii=False)
 
-        print(f"Optimized judgment rules at: {datetime.now()}")
+        print(f"Optimized judgment rules at: {now_utc()}")
 
 # 임시 파일 및 불필요 데이터 정리 함수
 def cleanup_temp_files():
@@ -34,7 +35,7 @@ def cleanup_temp_files():
         print(f"Deleted temporary directory at: {temp_dir}")
 
     # 오래된 로그 파일 정리 (30일 이상된 파일 삭제)
-    now = datetime.now().timestamp()
+    now = now_utc().timestamp()
     for log_file in logs_dir.glob("*.log"):
         if (now - log_file.stat().st_mtime) > 2592000:  # 30일
             log_file.unlink()
@@ -47,4 +48,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

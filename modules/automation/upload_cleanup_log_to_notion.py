@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 """
 VELOS 삭제 로그 Notion 업로드 스크립트
 
@@ -38,7 +39,7 @@ def upload_cleanup_log_to_notion():
             return
 
     # 오늘 삭제된 항목만 필터
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_str = now_kst().strftime("%Y-%m-%d")
     today_logs = [l for l in logs if l["deleted_at"].startswith(today_str)]
 
     if not today_logs:
@@ -54,7 +55,7 @@ def upload_cleanup_log_to_notion():
             "제목": { "title": [{ "text": { "content": f"VELOS 삭제 로그 - {today_str}" } }] },
             "삭제 요약": { "rich_text": [{ "text": { "content": summary_text } }] },
             "삭제 수": { "number": len(today_logs) },
-            "업로드 시간": { "date": { "start": datetime.now().isoformat() } }
+            "업로드 시간": { "date": { "start": now_utc().isoformat() } }
         }
     }
 
@@ -63,5 +64,6 @@ def upload_cleanup_log_to_notion():
 
 if __name__ == "__main__":
     upload_cleanup_log_to_notion()
+
 
 

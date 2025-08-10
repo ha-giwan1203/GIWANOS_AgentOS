@@ -1,4 +1,5 @@
 ﻿import logging
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import shutil
 import datetime
 import os
@@ -11,7 +12,7 @@ class SmartBackupRecovery:
         
     def perform_backup(self):
         latest_backup = self.get_latest_backup_date()
-        today = datetime.datetime.now()
+        today = datetime.now_utc()
 
         if latest_backup and (today - latest_backup).days < self.backup_interval_days:
             logging.info("최근 백업이 이미 존재하여 추가 백업을 생략합니다.")
@@ -45,7 +46,7 @@ class SmartBackupRecovery:
 
     def cleanup_old_backups(self, retention_days=15):
         backups = os.listdir(self.backup_folder)
-        today = datetime.datetime.now()
+        today = datetime.now_utc()
         for backup in backups:
             backup_date_str = backup.split('_')[1]
             backup_date = datetime.datetime.strptime(backup_date_str, "%Y%m%d")
@@ -53,5 +54,7 @@ class SmartBackupRecovery:
                 backup_path = os.path.join(self.backup_folder, backup)
                 shutil.rmtree(backup_path)
                 logging.info(f"🗑️ 오래된 백업 삭제 완료: {backup}")
+
+
 
 

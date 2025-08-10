@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import os
 import zipfile
 from datetime import datetime
@@ -6,7 +7,7 @@ from datetime import datetime
 def backup_reports_zip():
     source_dir = "C:/giwanos/data/reports"
     backup_dir = "C:/giwanos/data/backups"
-    date_str = datetime.now().strftime("%Y%m%d")
+    date_str = now_kst().strftime("%Y%m%d")
     zip_path = os.path.join(backup_dir, f"weekly_report_{date_str}.zip")
 
     if not os.path.exists(source_dir):
@@ -24,5 +25,6 @@ def backup_reports_zip():
                 print(f"[백업 포함] {arcname}")
 
     print(f"[✅ 보고서 압축 완료] → {zip_path}")
+
 
 

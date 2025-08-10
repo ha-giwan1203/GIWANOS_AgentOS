@@ -1,4 +1,5 @@
 ﻿import sys
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 try:
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 except AttributeError:
@@ -18,8 +19,8 @@ def run_git(commands):
         subprocess.run(cmd, shell=True, check=True)
 
 def main():
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    version_tag = TAG_PREFIX + datetime.datetime.now().strftime("%Y%m%d%H%M")
+    timestamp = datetime.now_kst().strftime("%Y-%m-%d %H:%M:%S")
+    version_tag = TAG_PREFIX + datetime.now_kst().strftime("%Y%m%d%H%M")
     message = f"Release {version_tag} - Automated GIWANOS Release"
 
     # Dummy 커밋 유도
@@ -45,5 +46,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

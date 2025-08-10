@@ -1,4 +1,5 @@
 ﻿#!config.PROJECT_HOMEbin/env python3
+from modules.core.time_utils import now_utc, iso_utc
 from modules.core import config
 """
 fix_missing.py  (ASCII‑safe)
@@ -62,7 +63,7 @@ def ensure_snapshots_dir(root: Path):
     tgt = root / SNAPSHOTS_DIR
     if tgt.exists() and tgt.is_file():
         backup = tgt.with_name(
-            f"snapshots_old_{dt.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}"
+            f"snapshots_old_{now_utc().strftime('%Y%m%dT%H%M%SZ')}"
         )
         tgt.rename(backup)
         print(f"[rename] snapshots file -> {backup.name}")
@@ -102,6 +103,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

@@ -1,4 +1,5 @@
 ﻿"""VELOS OpenAI 비용 최적화 래퍼"""
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import os, json, hashlib, datetime, pathlib, tiktoken, openai
 
 BASE_DIR = pathlib.Path(__file__).resolve().parents[2]
@@ -26,7 +27,7 @@ def optimized_call(prompt: str, *, complexity: str = "low", **kwargs) -> str:
     """
     cache = _load_cache()
     key = _hash(prompt)
-    if key in cache and (datetime.datetime.utcnow() - datetime.datetime.fromisoformat(cache[key]['ts'])).total_seconds() < 86_400:
+    if key in cache and (now_utc() - datetime.datetime.fromisoformat(cache[key]['ts'])).total_seconds() < 86_400:
         return cache[key]['resp']
 
     model = "gpt-4o-turbo" if complexity == "high" else "gpt-3.5-turbo-0125"
@@ -44,8 +45,9 @@ def optimized_call(prompt: str, *, complexity: str = "low", **kwargs) -> str:
         **kwargs
     ).choices[0].message.content.strip()
 
-    cache[key] = {"resp": resp, "ts": datetime.datetime.utcnow().isoformat()}
+    cache[key] = {"resp": resp, "ts": now_utc().isoformat()}
     _save_cache(cache)
     return resp
+
 
 

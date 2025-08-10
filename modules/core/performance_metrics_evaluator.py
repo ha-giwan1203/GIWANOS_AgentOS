@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import logging
 import os
@@ -31,7 +32,7 @@ def evaluate_performance():
     system_health = random.choice(["Excellent", "Good", "Fair"])
 
     performance_metrics = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": now_utc().isoformat(),
         "accuracy": accuracy,
         "response_time_sec": response_time,
         "system_health": system_health
@@ -50,5 +51,6 @@ def evaluate_performance():
 
 if __name__ == "__main__":
     evaluate_performance()
+
 
 

@@ -1,4 +1,5 @@
 ﻿
+from modules.core.time_utils import now_utc, now_kst, iso_utc, monotonic
 import json
 import os
 import logging
@@ -26,7 +27,7 @@ def save_learning_memory(memory_data):
 
 def auto_update_learning_memory(event, insight):
     memory = load_learning_memory()
-    timestamp = datetime.now().isoformat()
+    timestamp = now_utc().isoformat()
 
     # 이벤트 및 인사이트 추가
     memory["recent_events"].append({"timestamp": timestamp, "event": event})
@@ -43,5 +44,6 @@ if __name__ == "__main__":
     example_event = "자동 학습 루틴 실행됨"
     example_insight = "학습 루틴이 정상적으로 동작하여 메모리를 업데이트했습니다."
     auto_update_learning_memory(example_event, example_insight)
+
 
 
