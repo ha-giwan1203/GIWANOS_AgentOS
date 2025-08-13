@@ -1,3 +1,6 @@
 ﻿# --- local secrets & backups (never commit) ---
 configs/.env
 data/backups/
+# local secrets & backups
+configs/.env
+data/backups/
