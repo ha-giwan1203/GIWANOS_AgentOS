@@ -1,2 +1,0 @@
-﻿# Daily log backup placeholder
-

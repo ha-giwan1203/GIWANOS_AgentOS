@@ -1,4 +1,4 @@
-{
+﻿{
   "_ve": "VELOS",
   "_version": "v2.0",
   "_declaration": "실제 운영 메모리 업데이트",
@@ -948,6 +948,67 @@
           "timestamp": "2025-08-10T10:31:11.637799Z"
         }
       ]
+    },
+    {
+      "session_id": "20250811_103143",
+      "created_at": "2025-08-11T01:31:43.373557Z",
+      "room_id": "de9167d3fc931323c5ab007a",
+      "conversations": [
+        {
+          "role": "system",
+          "message": "NTP: Windows Time 서비스 중지 및 정책/권한으로 동기화/상태 조회 거부(resync/status/peers rc=2147943462), 동기화 정보 없음; ENV: 필수 토큰/설정 모두 존재 — 이상: NTP 서비스 중지·권한/정책 차단.",
+          "timestamp": "2025-08-11T01:31:43.373557Z"
+        }
+      ]
+    },
+    {
+      "session_id": "20250811_103348",
+      "created_at": "2025-08-11T01:33:48.199487Z",
+      "room_id": "de9167d3fc931323c5ab007a",
+      "conversations": [
+        {
+          "role": "system",
+          "message": "NTP: w32time 미동작, 액세스 거부/정책으로 재동기화·상태/피어 조회 실패(rc=2147943462), 마지막 동기화/stratum/precision 정보 없음; ENV: 필수 키/토큰 설정됨; 이상: NTP 서비스 중지 및 정책/권한 차단.",
+          "timestamp": "2025-08-11T01:33:48.199487Z"
+        }
+      ]
+    },
+    {
+      "session_id": "20250811_103745",
+      "created_at": "2025-08-11T01:37:45.626471Z",
+      "room_id": "de9167d3fc931323c5ab007a",
+      "conversations": [
+        {
+          "role": "system",
+          "message": "NTP: w32time 중지, resync/status/peers 권한 거부(2147943462, access_denied_or_policy), stratum/last_sync 없음; ENV: 필수 변수 모두 설정 — 이상: 서비스 중지 및 권한/정책으로 NTP 동기화 불가.",
+          "timestamp": "2025-08-11T01:37:45.626471Z"
+        }
+      ]
+    },
+    {
+      "session_id": "20250811_105057",
+      "created_at": "2025-08-11T01:50:57.834816Z",
+      "room_id": "de9167d3fc931323c5ab007a",
+      "conversations": [
+        {
+          "role": "system",
+          "message": "NTP: 서비스 실행 중이며 stratum 4로 10:39:16에 동기화, 폴링 1024s, 피어 time.windows.com(1개); ENV: 필수 토큰/키 모두 설정됨; 이상: 수동 재동기화 실패(Access denied/정책), 단일 피어 구성.",
+          "timestamp": "2025-08-11T01:50:57.834816Z"
+        }
+      ]
+    },
+    {
+      "session_id": "20250811_113019",
+      "created_at": "2025-08-11T02:30:19.518653Z",
+      "room_id": "95a6d1045e7fb36b4a8f7986",
+      "conversations": [
+        {
+          "role": "system",
+          "message": "NTP 동기화 정상(stratum 4, source=time.windows.com, 마지막 동기화 10:39:16, poll 1024s, peers=1); ENV 필수 키 모두 설정. 이상: 루트 분산 8.16s로 다소 큼, 단일 피어 구성은 위험.",
+          "timestamp": "2025-08-11T02:30:19.518653Z"
+        }
+      ]
     }
   ]
 }
+

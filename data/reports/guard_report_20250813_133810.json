@@ -1,0 +1,9 @@
+﻿{
+    "error":  "hash mismatch: C:/giwanos/scripts/gpt_code_guard.ps1",
+    "root":  "C:\\giwanos",
+    "timestamp":  "2025-08-13T13:38:10.5202571+09:00",
+    "ok":  false,
+    "override":  false,
+    "summary":  "검사 실패",
+    "codePath":  "C:\\giwanos"
+}

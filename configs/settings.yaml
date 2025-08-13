@@ -1,1 +1,15 @@
-# settings.yaml
+﻿paths:
+  root: "C:/giwanos"
+  memory_db: "C:/giwanos/data/memory/velos.db"
+  memory_jsonl: "C:/giwanos/data/memory/learning_memory.jsonl"
+  backups: "C:/giwanos/data/backups"
+  reports: "C:/giwanos/data/reports"
+  reflections: "C:/giwanos/data/reflections"
+  logs: "C:/giwanos/data/logs"
+features:
+  use_embeddings: false
+  autosave: true
+  integrity_guard: true
+
+
+

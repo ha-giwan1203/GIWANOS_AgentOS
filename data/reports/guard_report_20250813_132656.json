@@ -1,0 +1,11 @@
+﻿{
+    "error":  "The term \u0027bandit\u0027 is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.",
+    "root":  "C:\\giwanos",
+    "timestamp":  "2025-08-13T13:26:59.3895962+09:00",
+    "ok":  false,
+    "override":  false,
+    "summary":  "검사 실패",
+    "codePath":  "C:\\giwanos"
+}
+
+

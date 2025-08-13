@@ -1,0 +1,20 @@
+﻿[
+  {
+    "timestamp": "2025-08-11 22:06:38",
+    "from": "user",
+    "raw": "이건 테스트 문장입니다.",
+    "insight": "",
+    "tags": []
+  },
+  {
+    "timestamp": "2025-08-11 22:06:39",
+    "from": "user",
+    "raw": "오늘 VELOS DB 재생성 테스트 완료",
+    "insight": "오늘 VELOS DB 재생성 테스트 완료",
+    "tags": [
+      "manual",
+      "trigger"
+    ]
+  }
+]
+

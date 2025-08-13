@@ -1,9 +1,13 @@
-{
-  "timestamp_utc": "2025-08-10T09:29:49.366053+00:00Z",
-  "timestamp_kst": "2025-08-10T18:29:49.366053+09:00",
-  "status": "Healthy",
-  "summary": "System operating within normal parameters.",
-  "level": "info",
-  "diagnostics": {},
-  "loop_ended_at": "2025-08-10T09:30:11.485229+00:00"
+﻿{
+  "status": "OK",
+  "bridge_flush_ok": true,
+  "timestamp": "2025-08-13T04:31:00+00:00",
+  "timestamp_utc": "2025-08-13T04:31:00+00:00",
+  "timestamp_local": "2025-08-13T13:31:00+09:00",
+  "local_tz": "대한민국 표준시",
+  "local_utc_offset_sec": 32400,
+  "epoch_utc": 1755059460,
+  "inserted": 0,
+  "mode": "flush"
 }
+

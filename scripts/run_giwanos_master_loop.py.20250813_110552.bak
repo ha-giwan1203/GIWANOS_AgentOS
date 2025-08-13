@@ -1,0 +1,96 @@
+﻿# VELOS 운영 철학 선언문
+# - 파일명 절대 변경 금지 · 모든 수정 후 자가 검증 필수
+# - 결정·기억·보고의 모든 흐름은 구조적 사고와 기록을 기반으로 유지한다.
+
+from __future__ import annotations
+import argparse, json, os, subprocess, sys
+from pathlib import Path
+from datetime import datetime
+
+ROOT     = Path(r'C:\giwanos')
+SCRIPTS  = ROOT / 'scripts'
+LOGS_DIR = ROOT / r'data\logs'
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+BOOT_LOG = LOGS_DIR / 'master_loop_boot.log'
+
+def write_log(msg: str) -> None:
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        with BOOT_LOG.open('a', encoding='utf-8') as f:
+            f.write(f'[{ts}] {msg}\n')
+    except Exception:
+        pass
+
+def precheck() -> int:
+    info = {
+        'root_exists': ROOT.exists(),
+        'logs_exists': LOGS_DIR.exists(),
+        'snapshots_exists': (ROOT / r'data\snapshots').exists(),
+        'pythonpath_contains_giwanos': 'C:\\giwanos' in os.environ.get('PYTHONPATH', ''),
+        'missing': []
+    }
+    print(json.dumps(info, ensure_ascii=False, indent=2))
+    return 0
+
+def _run_python(script: str, env_extra: dict | None = None) -> int:
+    env = os.environ.copy()
+    env.setdefault('PYTHONPATH', str(ROOT))
+    if env_extra:
+        env.update(env_extra)
+    cmd = [sys.executable, str(SCRIPTS / script)]
+    write_log(f'run: {cmd}')
+    try:
+        return subprocess.call(cmd, cwd=str(ROOT), env=env)
+    except Exception as e:
+        write_log(f'run failed: {e}')
+        return 2
+
+def run_report_once() -> int:
+    # 보고서 생성
+    rc = _run_python('velos_ai_insights_report.py')
+    return rc
+
+def maybe_slack_send() -> None:
+    # SLACK_AUTOSEND=1 이면 슬랙 전송
+    val = os.environ.get('SLACK_AUTOSEND', '').lower()
+    if val in ('1', 'true', 'yes', 'y'):
+        _run_python('notify_slack_api.py')
+
+def main_loop(dry_run: bool = False) -> int:
+    write_log(f'master loop start (dry_run={dry_run})')
+    if dry_run:
+        print('[DRY-RUN] VELOS master loop would execute tasks here.')
+        write_log('master loop end')
+        return 0
+
+    # TODO: 여기에 실제 작업(step)들을 순차 호출
+    # 예: _run_python('normalize_reflections.py')
+
+    # 루프 종료 시 보고서 생성 + (옵션) 슬랙 전송
+    _ = run_report_once()
+    maybe_slack_send()
+
+    write_log('master loop end')
+    return 0
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description='VELOS master loop')
+    p.add_argument('--precheck', action='store_true', help='환경 점검만 수행')
+    p.add_argument('--dry-run',  action='store_true', help='실행 대신 시뮬레이션 출력')
+    p.add_argument('--make-report', action='store_true', help='보고서 생성 후 종료')
+    return p.parse_args()
+
+def main() -> int:
+    args = parse_args()
+    if args.precheck:
+        return precheck()
+    if args.make_report:
+        rc = run_report_once()
+        maybe_slack_send()
+        return rc
+    return main_loop(dry_run=args.dry_run)
+
+if __name__ == '__main__':
+    raise SystemExit(main())
+
+

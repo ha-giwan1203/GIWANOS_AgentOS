@@ -1,2 +1,3 @@
-﻿# Config encryption logic placeholder
+# Config encryption logic placeholder
+
 

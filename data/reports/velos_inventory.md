@@ -1,0 +1,156 @@
+﻿# VELOS Inventory Report
+
+- Scanned at: 2025-08-12 12:37:00
+- Root: `C:\giwanos`
+- Total files: 6428
+- Python files: 350
+- Total size: 589.75 MB
+
+## Top Imports (20)
+- __future__: 40
+- json: 35
+- pathlib: 34
+- os: 29
+- typing: 23
+- time: 18
+- datetime: 16
+- sys: 15
+- argparse: 10
+- modules.core.velos_context: 9
+- hashlib: 7
+- modules.core.io_safety: 7
+- dataclasses: 5
+- shutil: 5
+- dotenv: 5
+- requests: 3
+- re: 3
+- subprocess: 3
+- sqlite3: 3
+- logging: 3
+
+## Hardcoded Path Suspects
+- check_env.py:4 — - C:/giwanos/configs/.env 로드
+- check_env.py:12 — BASE = Path("C:/giwanos")
+- check_env.py:13 — ENV_PATH = BASE / "configs/.env"
+- check_env.py:19 — # .env 로드
+- check_env.py:27 — print(f"❌ .env 없음: {ENV_PATH}")
+- check_env.py:64 — cache = Path(os.getenv("HF_HOME") or "C:/giwanos/vector_cache")
+- dialog_memory_logger.py:3 — 저장 위치: C:/giwanos/data/memory/dialog_memory.json
+- dialog_memory_logger.py:13 — DIALOG_MEMORY_PATH = Path("C:/giwanos/data/memory/dialog_memory.json")
+- generate_memory_reflection.py:41 — self.memory_file = memory_file or os.getenv("MEMORY_FILE") or "C:/giwanos/data/memory/learning_memory.json"
+- giwanos_file_list.txt:1 — ﻿C:\giwanos\.patch_backups\20250810_033909\C__giwanos_configs_env_test.py
+- giwanos_file_list.txt:2 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_modules_automation_maintenance_cleanup_snapshots.py
+- giwanos_file_list.txt:3 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_modules_core_internet_search_module.py
+- giwanos_file_list.txt:4 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_modules_core_path_utils.py
+- giwanos_file_list.txt:5 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_activate_test_cohere_api.py
+- giwanos_file_list.txt:6 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_audit_memory.py
+- giwanos_file_list.txt:7 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_cohere_latest_model.py
+- giwanos_file_list.txt:8 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_embed_test.py
+- giwanos_file_list.txt:9 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_init_vector_cache.py
+- giwanos_file_list.txt:10 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_normalize_memory.py
+- giwanos_file_list.txt:11 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_velos_rag_poc.py
+- giwanos_file_list.txt:12 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_scripts_verify_structure.py
+- giwanos_file_list.txt:13 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_test_cohere_api.py
+- giwanos_file_list.txt:14 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_test_cohere_latest.py
+- giwanos_file_list.txt:15 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_test_cohere_newest.py
+- giwanos_file_list.txt:16 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_fix_missing.py
+- giwanos_file_list.txt:17 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notifications_send_pushbullet_notification.py
+- giwanos_file_list.txt:18 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notifications_slack_api.py
+- giwanos_file_list.txt:19 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notion_integration_detect_notion_properties.py
+- giwanos_file_list.txt:20 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notion_integration_notion_integration.py
+- giwanos_file_list.txt:21 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notion_integration_upload_notion_reflection.py
+- giwanos_file_list.txt:22 — C:\giwanos\.patch_backups\20250810_033909\C__giwanos_tools_notion_integration_upload_summary_to_notion.py
+- giwanos_file_list.txt:23 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\ai_reports\generate_ai_insight_report.py
+- giwanos_file_list.txt:24 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\ai_reports\insights_to_report.py
+- giwanos_file_list.txt:25 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\giwanos_agent\judge_agent.py
+- giwanos_file_list.txt:26 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\giwanos_agent\judge_agent_with_self_tuning.py
+- giwanos_file_list.txt:27 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\human_readable_reports\generate_adaptive_reflection_report.py
+- giwanos_file_list.txt:28 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\human_readable_reports\generate_recovery_log_report.py
+- giwanos_file_list.txt:29 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\human_readable_reports\system_health_report.py
+- giwanos_file_list.txt:30 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\human_readable_reports\__init__.py
+- giwanos_file_list.txt:31 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\insight\system_insight_agent.py
+- giwanos_file_list.txt:32 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\insight\__init__.py
+- giwanos_file_list.txt:33 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\system\system_monitor.py
+- giwanos_file_list.txt:34 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\xai\models\xai_explanation_model.py
+- giwanos_file_list.txt:35 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\xai\xai_exporter.py
+- giwanos_file_list.txt:36 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\advanced_xai_features.py
+- giwanos_file_list.txt:37 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\api_usage_optimizer.py
+- giwanos_file_list.txt:38 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\evaluation_feedback_loop.py
+- giwanos_file_list.txt:39 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\xai_feature_enhancement.py
+- giwanos_file_list.txt:40 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\xai_logger.py
+- giwanos_file_list.txt:41 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\evaluation\__init__.py
+- giwanos_file_list.txt:42 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\user_personalization\user_personalization_model.py
+- giwanos_file_list.txt:43 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\dashboard.py
+- giwanos_file_list.txt:44 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\dashboard_unified.py
+- giwanos_file_list.txt:45 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\dashboard_utils.py
+- giwanos_file_list.txt:46 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\evaluation_dashboard.py
+- giwanos_file_list.txt:47 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\mobile_notification_integration.py
+- giwanos_file_list.txt:48 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\status_dashboard.py
+- giwanos_file_list.txt:49 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\streamlit_summary_dashboard.py
+- giwanos_file_list.txt:50 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\velos_dashboard.py
+- giwanos_file_list.txt:51 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\interface\__init__.py
+- giwanos_file_list.txt:52 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_modules\advanced_rag.py
+- giwanos_file_list.txt:53 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_modules\cot_evaluator.py
+- giwanos_file_list.txt:54 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\reasoning\adaptive_reasoning_agent.py
+- giwanos_file_list.txt:55 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_api_cost_management.py
+- giwanos_file_list.txt:56 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_module_integration.py
+- giwanos_file_list.txt:57 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_performance_monitoring.py
+- giwanos_file_list.txt:58 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_reranker.py
+- giwanos_file_list.txt:59 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_rl_autonomy.py
+- giwanos_file_list.txt:60 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_vectordb.py
+- giwanos_file_list.txt:61 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\advanced_vectordb_rag.py
+- giwanos_file_list.txt:62 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\ai_auto_error_correction.py
+- giwanos_file_list.txt:63 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\auto_summary_agent.py
+- giwanos_file_list.txt:64 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\data_optimizer.py
+- giwanos_file_list.txt:65 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\incremental_indexing.py
+- giwanos_file_list.txt:66 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\local_embedding.py
+- giwanos_file_list.txt:67 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\module_integration_optimization.py
+- giwanos_file_list.txt:68 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\reinforcement_learning_autonomy.py
+- giwanos_file_list.txt:69 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\semantic_cache.py
+- giwanos_file_list.txt:70 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\advanced\vectordb_rag_optimization.py
+- giwanos_file_list.txt:71 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\git_management\git_sync.py
+- giwanos_file_list.txt:72 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\git_management\__init__.py
+- giwanos_file_list.txt:73 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\maintenance\cleanup_snapshots.py
+- giwanos_file_list.txt:74 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\auto_run_weekly_summary.py
+- giwanos_file_list.txt:75 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\cleanup_archives.py
+- giwanos_file_list.txt:76 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\cost_logger.py
+- giwanos_file_list.txt:77 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\daily_log_backup.py
+- giwanos_file_list.txt:78 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\openai_client.py
+- giwanos_file_list.txt:79 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\system_health_logger.py
+- giwanos_file_list.txt:80 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\system_monitoring_alert.py
+- giwanos_file_list.txt:81 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\task_scheduler.py
+- giwanos_file_list.txt:82 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\scheduling\weekly_summary.py
+- giwanos_file_list.txt:83 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\adaptive_api_optimization.py
+- giwanos_file_list.txt:84 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\advanced_api_cost_automation.py
+- giwanos_file_list.txt:85 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\advanced_auto_code_optimization.py
+- giwanos_file_list.txt:86 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\advanced_cost_manager.py
+- giwanos_file_list.txt:87 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\api_usage_optimizer.py
+- giwanos_file_list.txt:88 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\automated_alert_workflow.py
+- giwanos_file_list.txt:89 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\automated_fault_handling.py
+- giwanos_file_list.txt:90 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\automated_user_interview.py
+- giwanos_file_list.txt:91 — C:\giwanos\.patch_backups\refactor_time_20250810_160430\modules\automation\auto_rule_ab_testing.py
+- ... and 23290 more lines
+
+## Largest Python Files (Top 20)
+- modules/automation/synchronization/session_memory_bridge.py  (0.02 MB)
+- verify_and_save_doc.py  (0.01 MB)
+- data/snapshots/full_snapshot_20250804/hybrid_decision_engine.py  (0.01 MB)
+- interface/velos_dashboard.py  (0.01 MB)
+- modules/automation/multitool_agent.py  (0.01 MB)
+- modules/automation/git_management/git_sync.py  (0.01 MB)
+- modules/core/context_aware_decision_engine.py  (0.01 MB)
+- modules/core/hybrid_decision_engine.py  (0.01 MB)
+- modules/core/io_safety.py  (0.01 MB)
+- modules/core/ntp_smart_sync.py  (0.01 MB)
+- scripts/run_giwanos_master_loop.py  (0.01 MB)
+- scripts/velos_inventory_scan.py  (0.01 MB)
+- scripts/velos_rag_poc.py  (0.01 MB)
+- scripts/verify_structure.py  (0.01 MB)
+- tools/diagnostics/preflight_inspector.py  (0.01 MB)
+- tools/notion_integration/upload_cleanup_log_to_notion.py  (0.01 MB)
+- check_env.py  (0.0 MB)
+- dialog_memory_logger.py  (0.0 MB)
+- generate_memory_reflection.py  (0.0 MB)
+- gpt_guard_smoke.py  (0.0 MB)
+
+

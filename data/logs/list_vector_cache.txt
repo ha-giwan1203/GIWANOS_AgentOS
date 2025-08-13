@@ -1,0 +1,14 @@
+﻿
+FullName                                     Length LastWriteTime         
+--------                                     ------ -------------         
+C:\giwanos\vector_cache\cache_responses.json    951 2025-08-03 오후 1:15:16 
+C:\giwanos\vector_cache\cache_responses.npy       0 2025-08-04 오전 12:15:02
+C:\giwanos\vector_cache\embeddings.json        6671 2025-08-07 오후 1:30:05 
+C:\giwanos\vector_cache\embeddings.npy         6728 2025-08-07 오후 1:06:30 
+C:\giwanos\vector_cache\local_index.faiss      1581 2025-08-07 오후 1:30:05 
+C:\giwanos\vector_cache\vector_db_setup.py       35 2025-08-10 오전 9:57:24 
+
+
+
+
+

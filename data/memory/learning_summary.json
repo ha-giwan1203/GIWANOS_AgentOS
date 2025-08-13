@@ -1,19 +1,11 @@
-{
-  "cpu_usage": "12.1%",
-  "memory_usage": "61.5%",
-  "disk_usage": "73.8%",
-  "memory": [
-    {
-      "timestamp": "2025-08-06 09:25:10",
-      "from": "user",
-      "insight": "시스템 상태 확인 요청",
-      "tags": ["요청", "상태확인"]
-    },
-    {
-      "timestamp": "2025-08-06 09:25:22",
-      "from": "system",
-      "insight": "CPU 12.1%, 메모리 61.5%, 디스크 73.8%로 판단됨",
-      "tags": ["응답", "상태"]
-    }
-  ]
+﻿{
+  "summary": "최근 메모리 항목 22개 중 대표: 파일명은 절대 변경하지 않는다., 검증되지 않은 결과는 배포하지 않는다., loop_heartbeat, loop_heartbeat, loop_heartbeat, loop_heartbeat, 마스터 루프 중심 고정, 실시간 메모리 반영, 데이터 근거 기반 보고서/알림 자동화,…, 설계 전환 요지, 테스트: 로컬 자동저장 경로 확인, 자동저장 데몬 테스트, 데몬 동작 확인, _ve",
+  "count": 22,
+  "sources": {
+    "learning_memory.json": 11,
+    "dialog_memory.json": 4,
+    "autosave_inbox.jsonl": 7
+  },
+  "timestamp": "2025-08-12T20:29:37"
 }
+

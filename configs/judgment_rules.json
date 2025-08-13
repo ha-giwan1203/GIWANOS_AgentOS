@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "id": "velos_adaptive_resource_management",
         "conditions": {
@@ -26,3 +26,5 @@
         }
     }
 ]
+
+

@@ -1,7 +1,0 @@
-# 예외로 허용할 추가 경로 (대소문자 스펙과 동일 형태)
-extra_dirs:
-  - fonts/NotoSans                 # 새 글꼴 디렉터리
-  - data/tmp                       # 임시 데이터
-
-extra_files:
-  - configs/local_override.yaml

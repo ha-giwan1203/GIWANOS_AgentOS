@@ -1,0 +1,102 @@
+﻿# VELOS 운영 철학 선언문
+from __future__ import annotations
+import os, json, sqlite3, time
+from pathlib import Path
+from datetime import datetime, timezone
+
+GIWANOS = Path("C:/giwanos")
+DB_PATH = GIWANOS / "data" / "velos.db"
+BUF_PATH = GIWANOS / "data" / "memory" / "memory_buffer.jsonl"
+HEALTH_PATH = GIWANOS / "data" / "logs" / "system_health.json"
+
+def utc_ts() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+def ensure_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(DB_PATH)
+    con.execute("PRAGMA journal_mode=WAL;")
+    con.execute("PRAGMA synchronous=NORMAL;")
+    con.execute("""
+    CREATE TABLE IF NOT EXISTS messages(
+      conversation_id TEXT,
+      message_id TEXT PRIMARY KEY,
+      role TEXT,
+      body TEXT,
+      created_utc INTEGER,
+      author_device TEXT,
+      client_seq INTEGER,
+      edit_of TEXT NULL,
+      meta_json TEXT,
+      idempotency_key TEXT UNIQUE
+    );
+    """)
+    con.execute("CREATE INDEX IF NOT EXISTS ix_conv_order ON messages(conversation_id, created_utc, client_seq);")
+    con.commit()
+    return con
+
+def flush_buffer_to_db(con: sqlite3.Connection):
+    BUF_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if not BUF_PATH.exists():
+        return 0
+    inserted = 0
+    with con:
+        with open(BUF_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except Exception:
+                    continue
+                rec.setdefault("created_utc", int(time.time()))
+                rec.setdefault("client_seq", 0)
+                rec.setdefault("author_device", "unknown")
+                rec.setdefault("role", "user")
+                rec.setdefault("body", "")
+                rec.setdefault("meta_json", None)
+                rec.setdefault("edit_of", None)
+                try:
+                    con.execute("""
+                    INSERT OR IGNORE INTO messages(
+                      conversation_id, message_id, role, body, created_utc, author_device,
+                      client_seq, edit_of, meta_json, idempotency_key
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        rec.get("conversation_id"),
+                        rec.get("message_id"),
+                        rec.get("role"),
+                        rec.get("body"),
+                        rec.get("created_utc"),
+                        rec.get("author_device"),
+                        rec.get("client_seq"),
+                        rec.get("edit_of"),
+                        json.dumps(rec.get("meta_json")) if rec.get("meta_json") is not None else None,
+                        rec.get("idempotency_key"),
+                    ))
+                    inserted += con.total_changes
+                except sqlite3.IntegrityError:
+                    pass
+    try:
+        open(BUF_PATH, "w", encoding="utf-8").close()
+    except Exception:
+        pass
+    return inserted
+
+def write_health(ok: bool, extra: dict | None = None):
+    HEALTH_PATH.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"status": "OK" if ok else "ERROR", "bridge_flush_ok": bool(ok), "timestamp": utc_ts()}
+    if extra: payload.update(extra)
+    with open(HEALTH_PATH, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+def main():
+    con = ensure_db()
+    inserted = flush_buffer_to_db(con)
+    write_health(True, {"inserted": inserted})
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
