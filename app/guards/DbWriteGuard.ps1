@@ -1,5 +1,0 @@
-﻿if (1 -eq "1") {
-  function Invoke-DbWrite { throw "DB direct write blocked by VELOS policy" }
-  Set-Alias -Name dbwrite -Value Invoke-DbWrite -Force
-}
-

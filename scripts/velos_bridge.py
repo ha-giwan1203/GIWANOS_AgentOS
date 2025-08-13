@@ -1,83 +1,161 @@
-﻿import json, os, time, glob, subprocess, sys, pathlib
+﻿# coding: utf-8
+"""
+velos_bridge.py (BOM-safe + soft-fail)
+- 소비 위치:
+    1) <ROOT>/data/dispatch/_queue
+    2) <ROOT>/data/reports/_dispatch
+- 판정 규칙:
+    - 채널 전송 성공(True) >= 1개면 OK
+    - 전송 자체를 시도 못해서(None=SKIP)만 있었다면 OK
+    - 전송을 시도했으나(False) 전부 실패면 FAILED
+- UTF-8 with BOM/without BOM 모두 파싱되도록 read_json_any() 적용
+"""
 
-ROOT = r"C:\giwanos"
-DISPATCH_DIR = os.path.join(ROOT, "data", "reports", "_dispatch")
-PROCESSED_DIR = os.path.join(DISPATCH_DIR, "_processed")
-FAILED_DIR = os.path.join(DISPATCH_DIR, "_failed")
-os.makedirs(DISPATCH_DIR, exist_ok=True)
-os.makedirs(PROCESSED_DIR, exist_ok=True)
-os.makedirs(FAILED_DIR, exist_ok=True)
+import json, os, shutil, time, traceback
+from pathlib import Path
 
-# 선택적으로 존재할 수 있는 전송 스크립트 경로
-SLACK_PY = os.path.join(ROOT, "scripts", "notify_slack.py")
-NOTION_PY = os.path.join(ROOT, "tools", "notion_integration", "__init__.py")  # placeholder
-PUSH_PY = os.path.join(ROOT, "scripts", "notify_push.py")  # (없으면 건너뜀)
-EMAIL_PY = os.path.join(ROOT, "scripts", "notify_email.py")  # (없으면 건너뜀)
+from modules.report_paths import ROOT, P
+INBOXES = [
+    ROOT / "data" / "dispatch" / "_queue",
+    ROOT / "data" / "reports" / "_dispatch",
+]
+OUTS = {
+    str(ROOT / "data" / "dispatch" / "_queue"): (
+        ROOT / "data" / "dispatch" / "_processed",
+        ROOT / "data" / "dispatch" / "_failed",
+    ),
+    str(ROOT / "data" / "reports" / "_dispatch"): (
+        ROOT / "data" / "reports" / "_dispatch_processed",
+        ROOT / "data" / "reports" / "_dispatch_failed",
+    ),
+}
 
-def try_send(cmd):
-  try:
-    print(f"[BRIDGE] run: {cmd}")
-    # Windows: 파이썬 실행 우선순위 -> py -3 > python
-    if cmd[0] == "PYTHON":
-      exe = "py" if pathlib.Path(r"C:\Windows\py.exe").exists() else "python"
-      cmd = [exe, "-3"] + cmd[1:]
-    completed = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-    print(completed.stdout)
-    if completed.returncode != 0:
-      print(completed.stderr, file=sys.stderr)
-      return False
-    return True
-  except Exception as e:
-    print(f"[BRIDGE][ERR] {e}", file=sys.stderr)
+LOGDIR = ROOT / "logs"
+LOGDIR.mkdir(parents=True, exist_ok=True)
+LOG = LOGDIR / "velos_bridge.log"
+
+def log(msg: str):
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(f"[{ts}] {msg}\n")
+    print(msg)
+
+def try_import(module_name):
+    try:
+        return __import__(module_name.replace("/", ".").replace("\\", "."))
+    except Exception:
+        return None
+
+# Optional senders (있으면 사용)
+# - scripts/notify_slack_api.py : def send_message(token, channel, text) -> None
+# - scripts/notify_slack.py     : def send(text, channel=None, token=None) -> None
+# - tools/notion_integration/__init__.py : def send_page(token, parent_id, title, md_content=None) -> None
+slack_api    = try_import("scripts.notify_slack_api")
+slack_legacy = try_import("scripts.notify_slack")
+notion_mod   = try_import("tools.notion_integration")
+
+SLACK_TOKEN  = os.getenv("SLACK_BOT_TOKEN") or os.getenv("SLACK_TOKEN")
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+
+def send_slack(text, channel=None):
+    # True=성공, False=시도 실패, None=시도 불가(SKIP)
+    if slack_api and hasattr(slack_api, "send_message") and SLACK_TOKEN and channel:
+        try:
+            slack_api.send_message(SLACK_TOKEN, channel, text)
+            return True
+        except Exception as e:
+            log(f"Slack 실패: {e}")
+            return False
+    if slack_legacy and hasattr(slack_legacy, "send"):
+        try:
+            slack_legacy.send(text, channel=channel, token=SLACK_TOKEN)
+            return True
+        except Exception as e:
+            log(f"Slack(legacy) 실패: {e}")
+            return False
+    log("SKIP slack: sender/token/channel 미존재")
+    return None
+
+def send_notion(title, md_content=None, parent_id=None):
+    if notion_mod and hasattr(notion_mod, "send_page") and NOTION_TOKEN and parent_id:
+        try:
+            notion_mod.send_page(NOTION_TOKEN, parent_id, title, md_content=md_content)
+            return True
+        except Exception as e:
+            log(f"Notion 실패: {e}")
+            return False
+    log("SKIP notion: sender/token/parent_id 미존재")
+    return None
+
+def read_json_any(p: Path):
+    # BOM 안전: 우선 utf-8-sig로 시도, 실패 시 utf-8
+    try:
+        return json.loads(p.read_text(encoding="utf-8-sig"))
+    except Exception:
+        return json.loads(p.read_text(encoding="utf-8"))
+
+def process_ticket(p: Path):
+    data = read_json_any(p)
+    title = data.get("title") or "GIWANOS Update"
+    text  = data.get("message") or data.get("text") or ""
+    report_md = data.get("report_md")
+    channels = data.get("channels") or {}
+
+    success = 0
+    attempted = 0
+
+    # Slack
+    sl = channels.get("slack") or {}
+    if sl.get("enabled"):
+        ch = sl.get("channel") or "#general"
+        r = send_slack(text, channel=ch)
+        if r is True: success += 1
+        if r is False: attempted += 1
+
+    # Notion
+    nt = channels.get("notion") or {}
+    if nt.get("enabled"):
+        parent = nt.get("parent_page_id") or nt.get("database_id")
+        r = send_notion(title=title, md_content=report_md or text, parent_id=parent)
+        if r is True: success += 1
+        if r is False: attempted += 1
+
+    # 판정: 성공 1개 이상이면 OK, 시도 자체가 없었으면 OK, 그 외(모두 실패) FAILED
+    if success >= 1:
+        return True
+    if attempted == 0:
+        return True
     return False
 
-def handle_ticket(ticket_path):
-  with open(ticket_path, "r", encoding="utf-8") as f:
-    t = json.load(f)
+def handle_file(p: Path):
+    inbox_key = str(p.parent)
+    ok_dir, ng_dir = OUTS[inbox_key]
+    ok_dir.mkdir(parents=True, exist_ok=True)
+    ng_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        log(f"처리 시작: {p.name} @ {p.parent}")
+        ok = process_ticket(p)
+        dst = (ok_dir if ok else ng_dir) / p.name
+        shutil.move(str(p), str(dst))
+        log(f"처리 결과: {p.name} -> {'OK' if ok else 'FAILED'}")
+    except Exception:
+        log(f"예외: {p.name} -> FAILED\n{traceback.format_exc()}")
+        try:
+            shutil.move(str(p), str((ng_dir / p.name)))
+        except Exception:
+            pass
 
-  ok_all = True
-  send = t.get("send", {})
-  arts = t.get("artifacts", [])
-
-  # Slack
-  if send.get("slack") and os.path.exists(SLACK_PY):
-    for a in arts:
-      if a.get("type") in ("markdown","pdf","txt","html"):
-        ok = try_send(["PYTHON", SLACK_PY, "--title", a.get("title","artifact"), "--file", a["path"]])
-        ok_all = ok_all and ok
-
-  # Notion (여긴 적합한 통합 스크립트가 있으면 교체)
-  if send.get("notion") and os.path.exists(NOTION_PY):
-    # 예시: 별도 업로더가 있다면 여기서 호출
-    pass
-
-  # Push / Email - 스크립트 존재 시만 시도
-  if send.get("push") and os.path.exists(PUSH_PY):
-    for a in arts:
-      try_send(["PYTHON", PUSH_PY, "--title", a.get("title","artifact"), "--file", a["path"]])
-
-  if send.get("email") and os.path.exists(EMAIL_PY):
-    for a in arts:
-      try_send(["PYTHON", EMAIL_PY, "--title", a.get("title","artifact"), "--file", a["path"]])
-
-  # 결과 정리
-  target_dir = PROCESSED_DIR if ok_all else FAILED_DIR
-  base = os.path.basename(ticket_path)
-  os.replace(ticket_path, os.path.join(target_dir, base))
-  print(f"[BRIDGE] {'OK' if ok_all else 'FAIL'} -> {base}")
-
-def main(once=False):
-  while True:
-    tickets = sorted(glob.glob(os.path.join(DISPATCH_DIR, "dispatch_*.json")))
-    if not tickets and once:
-      print("[BRIDGE] no tickets. exit once-mode.")
-      return
-    for t in tickets:
-      handle_ticket(t)
-    if once:
-      return
-    time.sleep(5)
+def main():
+    for inbox in INBOXES:
+        inbox.mkdir(parents=True, exist_ok=True)
+        files = sorted([x for x in inbox.glob("*.json") if x.is_file()])
+        if not files:
+            log(f"queue 비어있음: {inbox}")
+            continue
+        for f in files:
+            handle_file(f)
 
 if __name__ == "__main__":
-  once = "--once" in sys.argv
-  main(once=once)
+    main()
+
+

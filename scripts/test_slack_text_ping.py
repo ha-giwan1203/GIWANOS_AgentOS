@@ -1,4 +1,4 @@
-# ------------------------------------------------------------
+﻿# ------------------------------------------------------------
 # test_slack_text_ping.py
 # - chat.postMessage로 채널에 텍스트 전송
 # ------------------------------------------------------------
@@ -7,7 +7,7 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
-ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos"))
+from modules.report_paths import ROOT, P
 ENV = ROOT / "configs" / ".env"
 if not ENV.exists():
     print(f"[ERROR] .env 없음: {ENV}")
@@ -28,3 +28,4 @@ r = requests.post(
     timeout=15,
 )
 print("[API]", r.status_code, r.text[:400])
+

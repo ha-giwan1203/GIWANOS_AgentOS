@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문: 파일명 고정, 하드코딩 금지, 실행 전 이중검증, 실패는 기록 후 차단
+﻿# VELOS 운영 철학 선언문: 파일명 고정, 하드코딩 금지, 실행 전 이중검증, 실패는 기록 후 차단
 from __future__ import annotations
 
 import json
@@ -32,7 +32,7 @@ def materialize_from_json(data: dict, root: str) -> list[str]:
 
 
 def main():
-    root = os.getenv("VELOS_ROOT") or r"C:\giwanos"
+    from modules.report_paths import ROOT, P`nroot = str(ROOT)
     payload = sys.stdin.read().strip()
     if not payload:
         print("No input JSON provided", file=sys.stderr)
@@ -48,3 +48,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

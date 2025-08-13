@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import os
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 REPORTS = ROOT / r"data\reports"
 ENV = ROOT / r"configs\.env"
 
@@ -50,3 +50,4 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

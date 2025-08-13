@@ -1,4 +1,4 @@
-"""
+﻿"""
 VELOS 보고서 퍼블리셔
 - 타임스탬프 파일로 영구 보관: velos_report_YYYYMMDD_HHMMSS.pdf
 - 업로드 편의를 위한 별칭: velos_report_latest.pdf (항상 덮어씀)
@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 # 루트/경로
-ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos"))
+from modules.report_paths import ROOT, P
 REPORT_DIR = ROOT / "data" / "reports"
 ALIAS = REPORT_DIR / "velos_report_latest.pdf"
 STATE_FILE = REPORT_DIR / ".last_upload.json"
@@ -125,3 +125,4 @@ def main(argv):
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
+

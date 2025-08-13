@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import time
 import json
@@ -13,7 +13,7 @@ except Exception:
     load_dotenv = None  # 없는 환경에서도 돌아가게
 
 # ----- 고정 경로 및 .env 로드 -----
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 ENV = ROOT / "configs" / ".env"
 if load_dotenv and ENV.exists():
     load_dotenv(dotenv_path=str(ENV))
@@ -162,3 +162,5 @@ if __name__ == "__main__":
         sys.exit(0)
     print(f"[INFO] 업로드 대상: {f}")
     sys.exit(0 if send_report(f, title=f"VELOS Report - {f.name}") else 1)
+
+

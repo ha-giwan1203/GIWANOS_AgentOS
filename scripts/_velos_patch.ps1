@@ -33,7 +33,7 @@ function VELOS-SelfTest {
     }
 }
 function VELOS-Log {
-    param([Parameter(Mandatory=$true)][hashtable]$Record,[string]$LogPath="C:\giwanos\data\logs\ops_patch_log.jsonl")
+    param([Parameter(Mandatory=$true)][hashtable]$Record,[string]$LogPath=$(Join-Path (Join-Path $env:VELOS_ROOT "data\logs") "ops_patch_log.jsonl"))
     VELOS-EnsureDir -Path $LogPath
     $json = ($Record | ConvertTo-Json -Depth 6 -Compress)
     Add-Content -Path $LogPath -Value $json
@@ -48,5 +48,6 @@ function VELOS-Patch {
     if ($Run -and ([IO.Path]::GetExtension($Path).ToLowerInvariant() -eq ".py")) { & cmd /c $Run; if ($LASTEXITCODE -ne 0) { throw "Run 커맨드 실패: $Run" } }
     $record.result="ok"; VELOS-Log -Record $record; return $record
 }
+
 
 

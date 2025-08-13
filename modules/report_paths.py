@@ -1,19 +1,14 @@
-# report_paths.py — 보고서 경로/헬퍼 통일
+﻿# C:\giwanos\modules\report_paths.py
 import os
 from pathlib import Path
 
-ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos"))
-REPORT_DIR = ROOT / "data" / "reports"
-LATEST_NAME = "velos_report_latest.pdf"
-LATEST_PATH = REPORT_DIR / LATEST_NAME
-
-
-def latest_timestamped():
-    if not REPORT_DIR.exists():
-        return None
-    files = sorted(
-        REPORT_DIR.glob("velos_report_*.pdf"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return files[0] if files else None
+def get_base_path():
+    """
+    VELOS 시스템의 기본 경로를 반환.
+    - 반드시 환경변수 VELOS_ROOT를 사용.
+    - 환경변수가 없으면 예외 발생.
+    """
+    root = os.getenv("VELOS_ROOT")
+    if not root:
+        raise EnvironmentError("환경변수 VELOS_ROOT가 설정되지 않았습니다.")
+    return Path(root)

@@ -1,11 +1,11 @@
-import os
+﻿import os
 import mimetypes
 import json
 from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos"))
+from modules.report_paths import ROOT, P
 ENV = ROOT / "configs" / ".env"
 if not ENV.exists():
     print(f"[ERROR] .env 없음: {ENV}")
@@ -158,3 +158,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

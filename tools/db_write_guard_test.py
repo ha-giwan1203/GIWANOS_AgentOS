@@ -1,15 +1,15 @@
-import json
+﻿import json
 import os
 import sqlite3
 import sys
 
-# 여기선 C:\giwanos를 루트로 쓰므로 app.guards로 임포트
-sys.path.insert(0, r"C:\giwanos")
+# 경로 하드코딩 제거, report_paths 모듈 사용
+from modules.report_paths import ROOT, P`nsys.path.insert(0, str(ROOT))
 os.environ.setdefault("VELOS_DB_WRITE_FORBIDDEN", "1")
 import app.guards.db_write_guard  # noqa
 
-DB = r"C:\giwanos\data\velos.db"
-OPS = r"C:\giwanos\data\logs\ops_patch_log.jsonl"
+DB = str(P("data/velos.db"))
+OPS = str(P("data/logs/ops_patch_log.jsonl"))
 
 
 def log(**rec):
@@ -37,3 +37,5 @@ try:
 except Exception as e:
     print("EXPECTED_INSERT_BLOCK", type(e).__name__, str(e)[:120])
     log(step="insert", result="blocked", error=str(e)[:120])
+
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import platform
@@ -11,7 +11,7 @@ try:
 except Exception:
     psutil = None  # 없어도 죽지 않게
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 LOGS = ROOT / r"data\logs"
 LOGS.mkdir(parents=True, exist_ok=True)
 
@@ -45,3 +45,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

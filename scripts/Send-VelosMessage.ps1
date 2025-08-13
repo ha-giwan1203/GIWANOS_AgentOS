@@ -5,7 +5,8 @@
         [string]$User = "local"
     )
     $py = "python"
-    & $py "C:\giwanos\scripts\velos_client_write.py" $Room $Body $User
+    & $py "$(Join-Path (Join-Path $env:VELOS_ROOT "scripts") "velos_client_write.py")" $Room $Body $User
 }
 Set-Alias svm Send-VelosMessage
+
 

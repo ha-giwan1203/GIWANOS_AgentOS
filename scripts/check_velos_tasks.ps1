@@ -1,4 +1,5 @@
-﻿param(
+﻿$DefaultRoot = if ($env:VELOS_ROOT) { $env:VELOS_ROOT } else { (Resolve-Path (Join-Path $PSScriptRoot "..")) }
+param(
   [string[]]$Tasks = @("VELOS Bridge Flush","VELOS Daily Report","VELOS DB Backup"),
   [switch]$RunFlushNow  # 지정하면 Flush 태스크를 즉시 1회 실행해줌
 )
@@ -8,7 +9,6 @@ $ErrorActionPreference = "Stop"
 function HL($t){ Write-Host $t -ForegroundColor Cyan }
 
 # --- 0. 환경/경로 ---
-$root   = "C:\giwanos"
 $health = Join-Path $root "data\logs\system_health.json"
 $bkdir  = Join-Path $root "data\backups"
 $rpdir  = Join-Path $root "data\reports"
@@ -68,5 +68,14 @@ HL "`n=== ops_patch_log.jsonl tail(10) ==="
 if(Test-Path $opslog){ Get-Content $opslog -Tail 10 -ErrorAction SilentlyContinue } else { "(no ops log)" }
 
 # 끝
+
+
+
+
+
+
+
+
+
 
 

@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문
+﻿# VELOS 운영 철학 선언문
 from __future__ import annotations
 
 import json
@@ -8,7 +8,7 @@ import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 
-GIWANOS = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P`nGIWANOS = ROOT
 BUF_PATH = GIWANOS / "data" / "memory" / "memory_buffer.jsonl"
 META_PATH = GIWANOS / "data" / "memory" / "client_seq.json"
 
@@ -81,3 +81,4 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
+

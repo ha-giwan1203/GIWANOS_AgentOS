@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import contextlib
 import json
@@ -7,7 +7,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 DB = ROOT / "data" / "velos.db"
 HEALTH = ROOT / "data" / "logs" / "system_health.json"
 OUTDIR = ROOT / "data" / "reports"
@@ -57,3 +57,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -1,6 +1,6 @@
-﻿# VELOS 운영 철학 선언문: 파일명 고정, 하드코딩 금지, 실행 전 이중검증, 실패는 기록 후 차단
+﻿$DefaultRoot = if ($env:VELOS_ROOT) { $env:VELOS_ROOT } else { (Resolve-Path (Join-Path $PSScriptRoot "..")) }
+# VELOS 운영 철학 선언문: 파일명 고정, 하드코딩 금지, 실행 전 이중검증, 실패는 기록 후 차단
 param(
-  [string]$Root = $(if ($env:VELOS_ROOT) { $env:VELOS_ROOT } else { "C:\giwanos" }),
   [string]$CodePath = "$($env:VELOS_CODE_PATH)",
   [string]$ReportPath = "$Root\data\reports\guard_report_$(Get-Date -f yyyyMMdd_HHmmss).json"
 )
@@ -15,7 +15,7 @@ try {
   if (-not (Test-Path $CodePath)) { throw "CodePath not found: $CodePath" }
 
   $override = [bool]($env:VELOS_GUARD_OVERRIDE)
-  $manifest = "C:\giwanos\configs\security\guard_hashes.json"
+  $manifest = "$(Join-Path $Root "configs\security\guard_hashes.json")"
   if (-not $override) {
     if (-not (Test-Path $manifest)) { throw "hash manifest missing: $manifest (set VELOS_GUARD_OVERRIDE=1 to bypass)" }
     $m = Get-Content $manifest -Raw | ConvertFrom-Json
@@ -34,7 +34,7 @@ try {
 
   W "[lint]";   python -m ruff check "$CodePath"
   W "[format]"; python -m ruff format "$CodePath"
-  W "[security]"; bandit -r "$CodePath" -x "venv,C:\Users\User\venvs"
+  W "[security]"; bandit -r "$CodePath" -x "venv,$env:VELOS_VENV_PATH"
   W "[type]";   python -m mypy "$CodePath"
 
   $cov = "no-tests"
@@ -65,5 +65,13 @@ try {
   } | ConvertTo-Json -Depth 5 | Out-File -Encoding utf8 $ReportPath
   Write-Error "FAIL :: $ReportPath"; exit 1
 }
+
+
+
+
+
+
+
+
 
 

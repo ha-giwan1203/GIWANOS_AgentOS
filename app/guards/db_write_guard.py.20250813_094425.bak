@@ -1,7 +1,0 @@
-﻿import os, sys
-if os.getenv("VELOS_DB_WRITE_FORBIDDEN") == "1":
-    class _Nope:
-        def __getattr__(self, k): raise RuntimeError("DB direct write blocked by VELOS policy")
-        def __call__(self, *a, **kw): raise RuntimeError("DB direct write blocked by VELOS policy")
-    sys.modules["db_writer"] = _Nope()  # 네가 쓰던 DB 쓰기 모듈명과 맞춰 사용
-

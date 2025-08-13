@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문
+﻿# VELOS 운영 철학 선언문
 # - 파일명 절대 변경 금지 · 모든 수정 후 자가 검증 필수 · 실행 결과 직접 테스트
 # - 결정·기억·보고의 모든 흐름은 구조적 사고와 기록을 기반으로 유지해야 한다.
 
@@ -9,7 +9,7 @@ import py_compile
 import sys
 from pathlib import Path
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 SNAPSHOT_DIR = ROOT / r"data\snapshots"
 
 REQUIRED_DIRS = [
@@ -40,7 +40,7 @@ def check_dirs():
     for d in REQUIRED_DIRS:
         if not d.exists():
             fail(f"필수 폴더 누락: {d}")
-    if str(SNAPSHOT_DIR).lower() != r"c:\giwanos\data\snapshots":
+    if str(SNAPSHOT_DIR).lower() != str(P("data/snapshots")).lower():
         fail("스냅샷 경로가 고정값과 불일치")
     ok("필수 폴더 및 스냅샷 경로 확인")
 
@@ -65,7 +65,7 @@ def compile_all():
 
 def main():
     if not ROOT.exists():
-        fail("C:\\giwanos 루트 없음")
+        fail(""{0} 루트 없음" -f ROOT")
     check_dirs()
     compile_all()
     ok("프리플라이트 통과")
@@ -73,3 +73,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+

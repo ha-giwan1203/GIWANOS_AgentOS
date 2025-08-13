@@ -1,11 +1,11 @@
-import os
+﻿import os
 import sys
 import json
 from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos"))
+from modules.report_paths import ROOT, P
 ENV = ROOT / "configs" / ".env"
 if not ENV.exists():
     print(f"[ERR] no .env: {ENV}")
@@ -46,3 +46,4 @@ else:
 # 3) 메서드 가용성 샘플 콜
 call("files.uploadV2")  # 의도적으로 파라미터 없이 호출 -> error code 확인용
 call("files.getUploadURLExternal", filename="probe.txt", length=5)
+

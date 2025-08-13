@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import glob
 import json
 from pathlib import Path
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 LOGS = ROOT / r"data\logs"
 LOGS.mkdir(parents=True, exist_ok=True)
 
@@ -36,3 +36,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

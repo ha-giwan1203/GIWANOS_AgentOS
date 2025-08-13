@@ -1,7 +1,7 @@
-import re
+﻿import re
 import pathlib
 
-ROOT = pathlib.Path(r"C:\giwanos\scripts")
+from modules.report_paths import P`nROOT = P("scripts")
 
 # requests.get/post/put(...) 호출만 잡는다. 중첩 괄호는 안 다루지만 이 코드베이스엔 충분.
 CALL = re.compile(
@@ -51,3 +51,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

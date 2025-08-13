@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import contextlib
 import json
@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 MEM = ROOT / r"data\memory"
 MEM.mkdir(parents=True, exist_ok=True)
 
@@ -124,3 +124,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

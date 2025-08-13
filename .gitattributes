@@ -1,36 +1,20 @@
-﻿# === 기본 ===
+﻿# 텍스트 자동 정규화
 * text=auto
 
-# === OS별 EOL 정책 ===
-# PowerShell & 배치 스크립트 (Windows CRLF)
-*.ps1  text eol=crlf
-*.psm1 text eol=crlf
-*.psd1 text eol=crlf
-*.cmd  text eol=crlf
-*.bat  text eol=crlf
+# 파이썬/셸/유닉스 스크립트는 LF
+*.py  text eol=lf
+*.sh  text eol=lf
+*.md  text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
 
-# Python / Shell / Markdown / 설정 파일 (LF)
-*.py    text eol=lf
-*.sh    text eol=lf
-*.md    text eol=lf
-*.toml  text eol=lf
-*.yml   text eol=lf
-*.yaml  text eol=lf
-*.json  text eol=lf
-*.jsonl text eol=lf
-*.js    text eol=lf
-*.ts    text eol=lf
-*.css   text eol=lf
+# 파워셀/배치/윈도 스크립트는 CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
 
-# === 바이너리 변환 금지 ===
-*.pdf   binary
-*.png   binary
-*.jpg   binary
-*.jpeg  binary
-*.gif   binary
-*.ico   binary
-*.ttf   binary
-*.woff  binary
-*.woff2 binary
-*.db    binary
-*.faiss binary
+# 바이너리
+*.db  binary
+*.png binary
+*.jpg binary
+*.exe binary

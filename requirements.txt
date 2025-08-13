@@ -1,9 +1,0 @@
-﻿ruff==0.6.9
-mypy==1.10.0
-pytest==8.3.2
-coverage==7.6.1
-bandit==1.7.9
-pip-audit==2.7.3
-
-types-requests==2.32.0.20240712
-

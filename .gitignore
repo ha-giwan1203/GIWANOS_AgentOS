@@ -1,6 +1,11 @@
-﻿# --- local secrets & backups (never commit) ---
+﻿# secrets
 configs/.env
+
+# backups
 data/backups/
-# local secrets & backups
-configs/.env
-data/backups/
+data/reports/_dispatch/_failed/
+data/reports/_dispatch_processed/
+
+# runtime artifacts
+data/memory/learning_memory.json
+docs/CONTEXT_PACK.md

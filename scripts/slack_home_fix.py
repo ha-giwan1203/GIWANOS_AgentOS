@@ -1,4 +1,4 @@
-# ------------------------------------------------------------
+﻿# ------------------------------------------------------------
 # slack_home_fix.py
 # - Slack App Home 무한 로딩 복구용 최소 핸들러
 # - Socket Mode 사용 (외부 URL/서명비밀 불필요)
@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
+from modules.report_paths import ROOT, P`nROOT = str(ROOT)
 ENV = os.path.join(ROOT, "configs", ".env")
 if not os.path.exists(ENV):
     print(f"[ERROR] .env 없음: {ENV}")
@@ -89,3 +89,4 @@ def ping_btn(ack, body, client):
 if __name__ == "__main__":
     print("[INFO] Socket Mode 시작… (Ctrl+C로 종료)")
     SocketModeHandler(app, APP).start()
+

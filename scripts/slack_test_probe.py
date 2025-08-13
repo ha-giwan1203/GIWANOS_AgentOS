@@ -1,7 +1,7 @@
-import os
+﻿import os
 import sys
 
-sys.path.append(os.path.abspath(r"C:\giwanos"))
+from modules.report_paths import ROOT`nsys.path.append(str(ROOT))
 
 from scripts.notify_slack_api import ROOT, send_report
 
@@ -12,3 +12,4 @@ print("[INFO] 테스트 파일 생성 완료:", p)
 
 ok = send_report(p, title=f"VELOS Dummy - {p.name}")
 print("[RESULT]", "OK" if ok else "FAIL")
+

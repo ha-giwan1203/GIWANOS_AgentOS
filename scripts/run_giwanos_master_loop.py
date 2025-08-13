@@ -1,6 +1,6 @@
 ﻿import json, os, sys, time, datetime, pathlib, uuid
 
-ROOT = r"C:\giwanos"
+from modules.report_paths import ROOT, P
 REPORT_DIR = os.path.join(ROOT, "data", "reports", "auto")
 DISPATCH_DIR = os.path.join(ROOT, "data", "reports", "_dispatch")
 os.makedirs(REPORT_DIR, exist_ok=True)
@@ -44,3 +44,4 @@ with open(ticket_path, "w", encoding="utf-8") as f:
 
 print(f"[MASTER] Report -> {report_md}")
 print(f"[MASTER] Dispatch -> {ticket_path}")
+

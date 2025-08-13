@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import contextlib
 import json
@@ -12,7 +12,7 @@ from pathlib import Path
 # fpdf 경고 소음 제거
 warnings.filterwarnings("ignore", category=UserWarning, module="fpdf")
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 LOGS = ROOT / r"data\logs"
 REPORTS = ROOT / r"data\reports"
 MEMORY = ROOT / r"data\memory"
@@ -234,9 +234,9 @@ def main():
             env = os.environ.copy()
             env.setdefault("PYTHONPATH", str(ROOT))
             subprocess.run(
-                [sys.executable, r"C:\giwanos\scripts\notify_slack_api.py"],
+                [sys.executable, str(P("scripts/notify_slack_api.py"))],
                 check=False,
-                cwd=r"C:\giwanos",
+                cwd=str(ROOT),
                 env=env,
             )
         except Exception as e:
@@ -246,3 +246,4 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

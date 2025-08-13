@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import re
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(r"C:\giwanos")
+from modules.report_paths import ROOT, P
 REFLECT = ROOT / r"data\reflections"
 OUTIDX = REFLECT / "reflections_index.json"
 
@@ -108,3 +108,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
