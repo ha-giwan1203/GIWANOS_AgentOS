@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Master Loop",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_giwanos_master_loop.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "VELOS_ROOT": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Python: VELOS Bridge",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/velos_bridge.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "VELOS_ROOT": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Python: Memory Adapter Test",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/modules/core/memory_adapter.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "VELOS_ROOT": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "PowerShell: VELOS Postrun",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/velos-postrun.ps1",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "VELOS_ROOT": "${workspaceFolder}"
+      }
+    }
+  ]
+}

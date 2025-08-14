@@ -1,0 +1,43 @@
+{
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "search.exclude": {
+    "**/.git": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/vector_cache": true,
+    "**/data/reports": true,
+    "**/data/logs": false
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/.venv/**": true,
+    "**/venv/**": true,
+    "**/vector_cache/**": true,
+    "**/data/reports/**": true
+  },
+
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "python.testing.pytestEnabled": true,
+  "python.formatting.provider": "black",
+  "python.analysis.autoImportCompletions": true,
+
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
+
+  "powershell.powerShellAdditionalExePaths": {
+    "PowerShell7": "C:/Program Files/PowerShell/7/pwsh.exe"
+  },
+  "powershell.powerShellDefaultVersion": "PowerShell7",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell": {
+      "path": "C:/Program Files/PowerShell/7/pwsh.exe",
+      "args": ["-NoLogo"]
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Master Loop",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/run_giwanos_master_loop.py"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "VELOS_ROOT": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "Run VELOS Bridge",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/velos_bridge.py"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "VELOS_ROOT": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "Generate Daily Report",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/velos_report.py"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "VELOS_ROOT": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "Run Postrun Script",
+      "type": "shell",
+      "command": "pwsh",
+      "args": ["-File", "scripts/velos-postrun.ps1"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "VELOS_ROOT": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "Code Quality Check",
+      "type": "shell",
+      "command": "python",
+      "args": ["scripts/preflight_verify.py"],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "VELOS_ROOT": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "Lint with Ruff",
+      "type": "shell",
+      "command": "ruff",
+      "args": ["check", "."],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Format with Ruff",
+      "type": "shell",
+      "command": "ruff",
+      "args": ["format", "."],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Fix with Ruff",
+      "type": "shell",
+      "command": "ruff",
+      "args": ["check", ".", "--fix"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}
