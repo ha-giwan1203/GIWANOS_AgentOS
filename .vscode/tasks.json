@@ -1,134 +1,43 @@
 {
   "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}"
+  },
   "tasks": [
     {
-      "label": "Run Master Loop",
-      "type": "shell",
-      "command": "python",
-      "args": ["scripts/run_giwanos_master_loop.py"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "options": {
-        "env": {
-          "VELOS_ROOT": "${workspaceFolder}"
-        }
-      }
-    },
-    {
-      "label": "Run VELOS Bridge",
-      "type": "shell",
-      "command": "python",
-      "args": ["scripts/velos_bridge.py"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "options": {
-        "env": {
-          "VELOS_ROOT": "${workspaceFolder}"
-        }
-      }
-    },
-    {
-      "label": "Generate Daily Report",
-      "type": "shell",
-      "command": "python",
-      "args": ["scripts/velos_report.py"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "options": {
-        "env": {
-          "VELOS_ROOT": "${workspaceFolder}"
-        }
-      }
-    },
-    {
-      "label": "Run Postrun Script",
+      "label": "preflight: quickcheck",
       "type": "shell",
       "command": "pwsh",
-      "args": ["-File", "scripts/velos-postrun.ps1"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "options": {
-        "env": {
-          "VELOS_ROOT": "${workspaceFolder}"
-        }
-      }
+      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/preflight_quickcheck.ps1"],
+      "problemMatcher": []
     },
     {
-      "label": "Code Quality Check",
+      "label": "velos: master loop",
       "type": "shell",
       "command": "python",
-      "args": ["scripts/preflight_verify.py"],
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "options": {
-        "env": {
-          "VELOS_ROOT": "${workspaceFolder}"
-        }
-      }
+      "args": ["scripts/run_giwanos_master_loop.py","--verbose"],
+      "problemMatcher": []
     },
     {
-      "label": "Lint with Ruff",
+      "label": "velos: run-all (ps1)",
       "type": "shell",
-      "command": "ruff",
-      "args": ["check", "."],
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
+      "command": "pwsh",
+      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/velos-run-all.ps1"],
+      "problemMatcher": []
     },
     {
-      "label": "Format with Ruff",
+      "label": "autosave: runner (foreground)",
       "type": "shell",
-      "command": "ruff",
-      "args": ["format", "."],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
+      "command": "pwsh",
+      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/autosave_runner.ps1"],
+      "problemMatcher": []
     },
     {
-      "label": "Fix with Ruff",
+      "label": "test: ping event",
       "type": "shell",
-      "command": "ruff",
-      "args": ["check", ".", "--fix"],
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      }
+      "command": "pwsh",
+      "args": ["-Command","\"'d=1' | Out-File 'modules/_autosave_ping__.py' -Encoding UTF8\""],
+      "problemMatcher": []
     }
   ]
 }
