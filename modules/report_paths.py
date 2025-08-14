@@ -21,3 +21,19 @@ if __name__ == "__main__":
     print("VELOS_ROOT=", p["ROOT"])
     print("learning_memory.json=", "ok" if ok else "failed")
     print("env=", env_presence())
+
+
+# --- BACKWARD COMPAT SHIM (VELOS) ---
+# 기존 코드 호환: run_giwanos_master_loop.py 등에서 기대하는 ROOT, P 제공
+try:
+    from modules.velos_common import paths as _velos_paths
+    _P = _velos_paths()
+    ROOT = _P["ROOT"]
+    P = _P  # dict-like: ROOT/DATA/REPORTS/AUTO/DISPATCH/LOGS/MEMORY/...
+except Exception as _e:
+    # 최후의 안전장치
+    import os
+    from pathlib import Path
+    ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos")).resolve()
+    P = {"ROOT": ROOT}
+# --- END SHIM ---

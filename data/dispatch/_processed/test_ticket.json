@@ -1,6 +1,6 @@
 {
-    "report_md":  "# 테스트 리포트\n- 항목 A\n- 항목 B",
-    "title":  "VELOS 자동 보고 테스트",
+    "report_md":  "# 테스트\\n- 항목 A\\n- 항목 B",
+    "title":  "VELOS 파이프라인 테스트",
     "channels":  {
                      "slack":  {
                                    "channel":  "#general",
@@ -11,5 +11,5 @@
                                     "enabled":  false
                                 }
                  },
-    "message":  "마스터-브릿지 파이프라인 점검 메시지"
+    "message":  "마스터→브릿지 venv 고정 실행 테스트"
 }

@@ -1,0 +1,13 @@
+[2025-08-14 15:01:02] 처리 시작: test_ticket.json @ C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:01:02] SKIP slack: sender/token/channel 미존재
+[2025-08-14 15:01:02] 처리 결과: test_ticket.json -> OK
+[2025-08-14 15:01:02] 처리 시작: dispatch_20250814_035828.json @ C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:01:02] 처리 결과: dispatch_20250814_035828.json -> OK
+[2025-08-14 15:01:02] 처리 시작: dispatch_20250814_041639.json @ C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:01:02] 처리 결과: dispatch_20250814_041639.json -> OK
+[2025-08-14 15:01:02] 처리 시작: dispatch_20250814_060020.json @ C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:01:02] 처리 결과: dispatch_20250814_060020.json -> OK
+[2025-08-14 15:02:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:02:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:03:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:03:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
