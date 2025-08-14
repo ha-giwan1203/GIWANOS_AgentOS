@@ -1,4 +1,6 @@
-﻿import json, os, sys, time, datetime, pathlib, uuid
+import sys, os
+sys.path.append(os.getenv("VELOS_ROOT", r"C:\giwanos"))
+import json, os, sys, time, datetime, pathlib, uuid
 
 from modules.report_paths import ROOT, P
 REPORT_DIR = os.path.join(ROOT, "data", "reports", "auto")
@@ -44,4 +46,5 @@ with open(ticket_path, "w", encoding="utf-8") as f:
 
 print(f"[MASTER] Report -> {report_md}")
 print(f"[MASTER] Dispatch -> {ticket_path}")
+
 

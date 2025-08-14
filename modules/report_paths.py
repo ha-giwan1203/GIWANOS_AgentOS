@@ -1,4 +1,16 @@
-﻿# C:\giwanos\modules\report_paths.py
+# ---- injected by fix (do not remove) ----
+import os
+from pathlib import Path
+
+ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
+
+def P(*parts) -> Path:
+    """프로젝트 루트 기준 경로 합성"""
+    return Path(ROOT).joinpath(*parts)
+# ---- end injected header ----
+import os
+ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
+# C:\giwanos\modules\report_paths.py
 import os
 from pathlib import Path
 
@@ -12,3 +24,5 @@ def get_base_path():
     if not root:
         raise EnvironmentError("환경변수 VELOS_ROOT가 설정되지 않았습니다.")
     return Path(root)
+
+

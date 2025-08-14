@@ -115,3 +115,6 @@
 {"from":"system","ts":"2025-08-14T08:48:34","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:48:34"}
 {"from":"system","ts":"2025-08-14T08:50:03","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:50:03"}
 {"from":"system","ts":"2025-08-14T08:58:26","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:58:26"}
+{"ts":"2025-08-14T10:18:10","from":"system","insight":"[MWA_PROBE] heartbeat 2025-08-14T10:18:10"}
+{"insight":"[MWA_PROBE] heartbeat 2025-08-14T12:30:35","ts":"2025-08-14T12:30:35","from":"system"}
+{"insight":"[MWA_PROBE] heartbeat 2025-08-14T13:21:11","from":"system","ts":"2025-08-14T13:21:11"}
