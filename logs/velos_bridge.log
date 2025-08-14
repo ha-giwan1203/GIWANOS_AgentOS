@@ -31,3 +31,10 @@
 [2025-08-14 15:11:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
 [2025-08-14 15:12:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
 [2025-08-14 15:12:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:13:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:13:01] 처리 시작: dispatch_20250814_061235.json @ C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:13:01] 처리 결과: dispatch_20250814_061235.json -> OK
+[2025-08-14 15:14:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:14:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
+[2025-08-14 15:15:01] queue 비어있음: C:\giwanos\data\dispatch\_queue
+[2025-08-14 15:15:01] queue 비어있음: C:\giwanos\data\reports\_dispatch
