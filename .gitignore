@@ -42,3 +42,4 @@ logs/
 test_*.py
 *.tmp
 *.bak
+.venv_link/

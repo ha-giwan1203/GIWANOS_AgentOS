@@ -1,307 +1,473 @@
 [
   {
-    "from": "system",
-    "insight": "파일명은 절대 변경하지 않는다.",
+    "from": "user",
+    "insight": "ping 1",
     "tags": [
-      "명령",
-      "파일명_금지"
-    ],
-    "raw_message": "파일명은 절대 변경하지 않는다."
+      "test"
+    ]
   },
   {
     "from": "system",
-    "insight": "검증되지 않은 결과는 배포하지 않는다.",
+    "insight": "ping 2",
     "tags": [
-      "명령",
-      "검증_생략"
-    ],
-    "raw_message": "검증되지 않은 결과는 배포하지 않는다."
-  },
-  {
-    "from": "system",
-    "insight": "loop_heartbeat",
-    "tags": [
-      "system",
-      "loop"
-    ],
-    "ts": "2025-08-11T20:02:49",
-    "raw_message": "loop_heartbeat"
-  },
-  {
-    "from": "system",
-    "insight": "loop_heartbeat",
-    "tags": [
-      "system",
-      "loop"
-    ],
-    "ts": "2025-08-11T20:02:50",
-    "raw_message": "loop_heartbeat"
-  },
-  {
-    "from": "system",
-    "insight": "loop_heartbeat",
-    "tags": [
-      "system",
-      "loop"
-    ],
-    "ts": "2025-08-11T20:08:22",
-    "raw_message": "loop_heartbeat"
-  },
-  {
-    "from": "system",
-    "insight": "loop_heartbeat",
-    "tags": [
-      "system",
-      "loop"
-    ],
-    "ts": "2025-08-11T20:10:55",
-    "raw_message": "loop_heartbeat"
+      "test"
+    ]
   },
   {
     "from": "user",
-    "insight": "마스터 루프 중심 고정, 실시간 메모리 반영, 데이터 근거 기반 보고서/알림 자동화, 강제 저장 지양, 예외 내성·자가복구 설계로 전환",
+    "insight": "ping 3",
     "tags": [
-      "설계",
-      "autosave"
-    ],
-    "ts": "2025-08-11T20:46:15",
-    "raw_message": "마스터 루프 중심 고정, 실시간 메모리 반영, 데이터 근거 기반 보고서/알림 자동화, 강제 저장 지양, 예외 내성·자가복구 설계로 전환"
-  },
-  {
-    "from": "user",
-    "insight": "설계 전환 요지",
-    "tags": [
-      "설계",
-      "autosave"
-    ],
-    "ts": "2025-08-11T20:53:25",
-    "raw_message": "설계 전환: 마스터 고정+실시간 메모리+자동화 보고/알림",
-    "thread": "설계-전환",
-    "id": "619950f904124039138bb6e1e7aaaf734d494d416a53a63c4bb8a52b1e1cf16c"
-  },
-  {
-    "from": "user",
-    "insight": "테스트: 로컬 자동저장 경로 확인",
-    "tags": [
-      "check"
-    ],
-    "ts": "2025-08-11T21:11:25",
-    "raw_message": "테스트: 로컬 자동저장 경로 확인",
-    "id": "f224a9820c925bf7b20aba0ecb1de78e7c8ad54e48d3beef8c702b3096edb600"
-  },
-  {
-    "from": "user",
-    "insight": "자동저장 데몬 테스트",
-    "tags": [
-      "probe"
-    ],
-    "ts": "2025-08-11T21:23:30",
-    "raw_message": "자동저장 데몬 테스트",
-    "id": "f8d7a5bb049578d2bab2e84794c45fb69543fd2a3db362d6fb819ec560b40a0d"
-  },
-  {
-    "from": "user",
-    "insight": "데몬 동작 확인",
-    "tags": [
-      "probe"
-    ],
-    "ts": "2025-08-11T21:24:08",
-    "raw_message": "데몬 동작 확인",
-    "id": "8cf968881d60285c1464bbdea35f84908d75d37afe7ff8e305df9e849a559091"
+      "test"
+    ]
   },
   {
     "from": "system",
-    "ts": "2025-08-14T08:44:25",
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:44:25"
-  },
-  {
-    "from": "system",
-    "ts": "2025-08-14T08:48:34",
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:48:34"
-  },
-  {
-    "from": "system",
-    "ts": "2025-08-14T08:50:03",
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:50:03"
-  },
-  {
-    "from": "system",
-    "ts": "2025-08-14T08:58:26",
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:58:26"
-  },
-  {
-    "ts": "2025-08-14T10:18:10",
-    "from": "system",
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T10:18:10"
-  },
-  {
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T12:30:35",
-    "ts": "2025-08-14T12:30:35",
-    "from": "system"
-  },
-  {
-    "insight": "[MWA_PROBE] heartbeat 2025-08-14T13:21:11",
-    "from": "system",
-    "ts": "2025-08-14T13:21:11"
-  },
-  {
-    "from": "user",
-    "insight": "트",
-    "ts": "2025-08-14T16:05:47.792870",
-    "raw_message": "트",
+    "insight": "dummy_0",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "6d113a0a-e24c-427e-afc9-b51c1a7f9376"
-  },
-  {
-    "from": "user",
-    "insight": "번",
-    "ts": "2025-08-14T16:05:47.792870",
-    "raw_message": "번",
-    "tags": [
-      "auto"
-    ],
-    "id": "d9870ceb-175f-4254-ba2b-c2a5d9765b3a"
-  },
-  {
-    "from": "user",
-    "insight": "간",
-    "ts": "2025-08-14T16:06:06.578827",
-    "raw_message": "간",
-    "tags": [
-      "auto"
-    ],
-    "id": "92194f63-7487-472c-a81b-ce31bc3b0504"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "파일 생성: test_integration.py",
-    "ts": "2025-08-14T16:15:08.746192",
-    "raw_message": "파일 생성: test_integration.py",
+    "insight": "dummy_1",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "6db57fc9-fd86-4061-b065-31da2285f9d1"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "파일 생성: test_check.py",
-    "ts": "2025-08-14T16:33:31.981634",
-    "raw_message": "파일 생성: test_check.py",
+    "insight": "dummy_2",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "3d0f9196-fcc8-4cb1-a81b-26103c22e675"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_check.py",
-    "ts": "2025-08-14T16:33:45.377586",
-    "raw_message": "명령 실행: 테스트 test_check.py",
+    "insight": "dummy_3",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "941390e9-5ef9-4c5a-b111-7ed7a11f3766"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "파일 생성: test_improved.py",
-    "ts": "2025-08-14T16:34:43.910607",
-    "raw_message": "파일 생성: test_improved.py",
+    "insight": "dummy_4",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "9a363c10-0f16-4892-95b3-335267e07720"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "파일 생성: test_final.py",
-    "ts": "2025-08-14T16:35:25.851558",
-    "raw_message": "파일 생성: test_final.py",
+    "insight": "dummy_5",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "f9777a00-b95b-4dad-a522-34f982dc79df"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_final.py",
-    "ts": "2025-08-14T16:35:33.929448",
-    "raw_message": "명령 실행: 테스트 test_final.py",
+    "insight": "dummy_6",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "24d21fef-9193-4d7e-8f85-abab89bf94fc"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_final.py",
-    "ts": "2025-08-14T16:35:57.764840",
-    "raw_message": "명령 실행: 테스트 test_final.py",
+    "insight": "dummy_7",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "4571dc53-9ec0-4dc5-b067-810a68807dd6"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_final.py",
-    "ts": "2025-08-14T16:36:04.073550",
-    "raw_message": "명령 실행: 테스트 test_final.py",
+    "insight": "dummy_8",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "691365a8-e263-4236-9a25-fe7baa4c933d"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_final.py",
-    "ts": "2025-08-14T16:36:27.021352",
-    "raw_message": "명령 실행: 테스트 test_final.py",
+    "insight": "dummy_9",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "7a07f203-7292-4454-a30d-3044b41ea91e"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "파일 생성: test_complete.py",
-    "ts": "2025-08-14T19:48:21.126484",
-    "raw_message": "파일 생성: test_complete.py",
+    "insight": "dummy_10",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "c685159f-d644-442f-a189-9fb42e1ae354"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_complete.py",
-    "ts": "2025-08-14T19:48:27.957623",
-    "raw_message": "명령 실행: 테스트 test_complete.py",
+    "insight": "dummy_11",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "156dc132-bc08-46a9-8750-57796e403467"
+      "dummy",
+      "report"
+    ]
   },
   {
     "from": "system",
-    "insight": "명령 실행: 테스트 test_complete.py",
-    "ts": "2025-08-14T19:48:41.153792",
-    "raw_message": "명령 실행: 테스트 test_complete.py",
+    "insight": "dummy_12",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "5d553848-af78-455e-8555-638c5478edb9"
+      "dummy",
+      "report"
+    ]
   },
   {
-    "from": "user",
-    "insight": "실시간 대화 테스트 메시지",
-    "ts": "2025-08-14T19:55:52.753080",
-    "raw_message": "실시간 대화 테스트 메시지",
+    "from": "system",
+    "insight": "dummy_13",
+    "ts": 1755186927.6900198,
     "tags": [
-      "auto"
-    ],
-    "id": "2f9fc243-5083-4ef2-bbe5-8cb29fdf647a"
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_14",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_15",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_16",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_17",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_18",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_19",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_20",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_21",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_22",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_23",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_24",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_25",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_26",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_27",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_28",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_29",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_30",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_31",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_32",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_33",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_34",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_35",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_36",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_37",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_38",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_39",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_40",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_41",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_42",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_43",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_44",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_45",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_46",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_47",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_48",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
+  },
+  {
+    "from": "system",
+    "insight": "dummy_49",
+    "ts": 1755186927.6900198,
+    "tags": [
+      "dummy",
+      "report"
+    ]
   }
 ]

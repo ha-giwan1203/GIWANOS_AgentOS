@@ -10,15 +10,28 @@ $ROOT = $env:VELOS_ROOT; if (-not $ROOT) { $ROOT = "C:\giwanos" }
 $ROOT = [IO.Path]::GetFullPath($ROOT)
 Set-Location $ROOT
 
-function Info($m){ Write-Host "[run-all] $m" }
-function Warn($m){ Write-Host "[run-all][WARN] $m" -ForegroundColor Yellow }
+# 환경 변수 로드
+$envFile = Join-Path $ROOT "configs\.env"
+if (Test-Path $envFile) {
+  Get-Content $envFile | ForEach-Object {
+    if ($_ -match '^([^#][^=]+)=(.*)$') {
+      $key = $matches[1].Trim()
+      $value = $matches[2].Trim()
+      Set-Item -Path "env:$key" -Value $value
+    }
+  }
+}
+
+function Info($m) { Write-Host "[run-all] $m" }
+function Warn($m) { Write-Host "[run-all][WARN] $m" -ForegroundColor Yellow }
 
 # 0) venv 활성화(있으면)
 $venv = Join-Path $ROOT "venv\Scripts\Activate.ps1"
 if (Test-Path $venv) {
   . $venv
   Info "venv activated: $venv"
-} else {
+}
+else {
   Warn "venv not found. system python 사용"
 }
 
@@ -31,13 +44,26 @@ if ($py -and (Test-Path $loopPy)) {
   $args = @()
   if ($VerbosePy) { $args += "--verbose" }
   Info "run python loop..."
-  & python $loopPy @args
+  
+  # VENV_PATH 환경 변수를 사용하여 Python 경로 결정
+  $venvPython = Join-Path $ROOT ".venv_link\Scripts\python.exe"
+  if (Test-Path $venvPython) {
+    Info "using venv python: $venvPython"
+  }
+  else {
+    Write-Warning "[run-all] venv python not found -> system python"
+    $venvPython = "python"
+  }
+  
+  & $venvPython $loopPy @args
   $code = $LASTEXITCODE
-} elseif (Test-Path $loopPs) {
+}
+elseif (Test-Path $loopPs) {
   Info "run velos-run.ps1 -Once..."
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File $loopPs -Once
   $code = $LASTEXITCODE
-} else {
+}
+else {
   throw "마스터 루프 엔트리 없음: $loopPy / $loopPs"
 }
 
@@ -56,3 +82,4 @@ if ($NoPush) { $prArgs += "-NoPush" }
 Info "postrun..."
 pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File $post @prArgs
 Info "done."
+

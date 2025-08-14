@@ -51,7 +51,7 @@ print(f'JSON 동기화: {json_processed}개, DB 동기화: {db_processed}개')
         $gitStatus = git status --porcelain
         if ($gitStatus) {
             Write-VelosLog "변경사항 발견, 자동 커밋 실행" "INFO"
-            git add .
+            git add -- "."
             git commit -m "VELOS Auto Update - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
             
             # 원격 저장소가 설정된 경우 푸시
@@ -133,3 +133,4 @@ print('버퍼: ' + str(stats['buffer_size']) + ', DB: ' + str(stats['db_records'
 # 성공적으로 완료
 Write-VelosLog "VELOS Postrun 스크립트가 성공적으로 완료되었습니다" "SUCCESS"
 exit 0
+

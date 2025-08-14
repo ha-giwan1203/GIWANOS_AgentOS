@@ -1,0 +1,5 @@
+[
+  {"from":"user","insight":"ping 1","tags":["test"]},
+  {"from":"system","insight":"ping 2","tags":["test"]},
+  {"from":"user","insight":"ping 3","tags":["test"]}
+]

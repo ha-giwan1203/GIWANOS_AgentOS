@@ -45,7 +45,7 @@ $files = Get-Eligible
 if (-not $files -or $files.Count -eq 0) { Info "변경 없음. 종료."; exit 0 }
 
 Info ("스테이징 {0}개" -f $files.Count)
-git add -- $files
+git add -- "-- $files"
 
 # pre-commit 훅이 self_check/민감파일을 자동 차단함
 $tag = Get-Date -Format "yyyy-MM-dd HH:mm:ss"

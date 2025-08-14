@@ -47,7 +47,8 @@ Write-Host "`nChecking required directories..." -ForegroundColor Green
 foreach ($dir in $requiredDirs) {
     if (Test-Path $dir) {
         Write-Host "  ✓ $dir" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "  ✗ $dir (will be created)" -ForegroundColor Yellow
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }

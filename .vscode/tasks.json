@@ -1,43 +1,70 @@
 {
-  "version": "2.0.0",
-  "options": {
-    "cwd": "${workspaceFolder}"
-  },
-  "tasks": [
-    {
-      "label": "preflight: quickcheck",
-      "type": "shell",
-      "command": "pwsh",
-      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/preflight_quickcheck.ps1"],
-      "problemMatcher": []
+    "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}"
     },
-    {
-      "label": "velos: master loop",
-      "type": "shell",
-      "command": "python",
-      "args": ["scripts/run_giwanos_master_loop.py","--verbose"],
-      "problemMatcher": []
-    },
-    {
-      "label": "velos: run-all (ps1)",
-      "type": "shell",
-      "command": "pwsh",
-      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/velos-run-all.ps1"],
-      "problemMatcher": []
-    },
-    {
-      "label": "autosave: runner (foreground)",
-      "type": "shell",
-      "command": "pwsh",
-      "args": ["-NoLogo","-NoProfile","-ExecutionPolicy","Bypass","-File","scripts/autosave_runner.ps1"],
-      "problemMatcher": []
-    },
-    {
-      "label": "test: ping event",
-      "type": "shell",
-      "command": "pwsh",
-      "args": ["-Command","\"'d=1' | Out-File 'modules/_autosave_ping__.py' -Encoding UTF8\""],
-      "problemMatcher": []
-    }
-  ]
+    "tasks": [
+        {
+            "label": "preflight: quickcheck",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/preflight_quickcheck.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "velos: master loop",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "scripts/run_giwanos_master_loop.py",
+                "--verbose"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "velos: run-all (ps1)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/velos-run-all.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "autosave: runner (foreground)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/autosave_runner.ps1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "test: ping event",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "\"'d=1' | Out-File 'modules/_autosave_ping__.py' -Encoding UTF8\""
+            ],
+            "problemMatcher": []
+        }
+    ]
 }

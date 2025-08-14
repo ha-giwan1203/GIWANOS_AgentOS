@@ -22,13 +22,19 @@ def ymd():
 
 
 def count_since(sec: int) -> int:
-    con = sqlite3.connect(DB)
+    if not DB.exists():
+        return 0
+    
     try:
+        con = sqlite3.connect(DB)
         t = int(time.time()) - sec
         (n,) = con.execute("select count(*) from messages where created_utc>=?", (t,)).fetchone()
         return n
+    except (sqlite3.DatabaseError, sqlite3.OperationalError):
+        return 0
     finally:
-        con.close()
+        if 'con' in locals():
+            con.close()
 
 
 def main():

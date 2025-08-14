@@ -1,26 +1,28 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Python: master loop",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/scripts/run_giwanos_master_loop.py",
-      "args": ["--verbose"],
-      "console": "integratedTerminal",
-      "justMyCode": false
-    },
-    {
-      "name": "PowerShell: velos-run-all",
-      "type": "PowerShell",
-      "request": "launch",
-      "script": "${workspaceFolder}/scripts/velos-run-all.ps1"
-    },
-    {
-      "name": "PowerShell: autosave_runner",
-      "type": "PowerShell",
-      "request": "launch",
-      "script": "${workspaceFolder}/scripts/autosave_runner.ps1"
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: master loop",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/run_giwanos_master_loop.py",
+            "args": [
+                "--verbose"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "PowerShell: velos-run-all",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/velos-run-all.ps1"
+        },
+        {
+            "name": "PowerShell: autosave_runner",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/autosave_runner.ps1"
+        }
+    ]
 }
