@@ -41,3 +41,45 @@ function Invoke-VelosOnce{
 
 if($Once){ Invoke-VelosOnce; exit 0 }
 while($true){ try{ Invoke-VelosOnce } catch { $log.Warn($_) }; Start-Sleep -Seconds 300 }
+
+# auto: sync changes to remote
+pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File ".\scripts\git_auto_sync.ps1" -Message "auto-sync: after velos-run"
+
+
+# === auto-generate: create timestamped report & index ===
+$env:PYTHONPATH = "$ROOT;$ROOT\modules"
+try {
+  python ".\scripts\auto_generate_runner.py" | Out-Null
+  Write-Host "[auto-generate] ok"
+} catch {
+  Write-Host "[auto-generate] skipped: $($_.Exception.Message)"
+}
+
+
+# === auto-generate: create timestamped report & index (hardened) ===
+try {
+  $Python = (Get-Command python -ErrorAction SilentlyContinue).Source
+  if (-not $Python) { $Python = (Get-Command py -ErrorAction SilentlyContinue).Source }
+  if (-not $Python) { throw "python not found in PATH" }
+
+  Push-Location $ROOT
+  $env:PYTHONPATH = "$ROOT;$ROOT\modules"
+  $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+  $pinfo.FileName = $Python
+  $pinfo.Arguments = ".\scripts\auto_generate_runner.py"
+  $pinfo.WorkingDirectory = $ROOT
+  $pinfo.UseShellExecute = $false
+  $pinfo.RedirectStandardOutput = $true
+  $p = [System.Diagnostics.Process]::Start($pinfo)
+  $null = $p.WaitForExit(60*1000)
+  if ($p.HasExited -and $p.ExitCode -eq 0) {
+    Write-Host "[auto-generate] ok"
+  } else {
+    Write-Host "[auto-generate][WARN] exit=$($p.ExitCode)"
+  }
+} catch {
+  Write-Host "[auto-generate][FAIL] $($_.Exception.Message)"
+} finally {
+  Pop-Location
+}
+
