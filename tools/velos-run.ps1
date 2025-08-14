@@ -18,7 +18,7 @@ if(-not $NoGit){
 
 function Invoke-VelosOnce{
   $py="python"; $script=Join-Path $ROOT "scripts\run_giwanos_master_loop.py"
-  $env:PYTHONPATH=$ROOT
+  $env:PYTHONPATH="$ROOT;$ROOT\modules"
   $log.Info("start")
   try{
     $out = & $py $script 2>&1

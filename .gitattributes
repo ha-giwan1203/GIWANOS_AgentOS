@@ -1,20 +1,7 @@
-﻿# 텍스트 자동 정규화
 * text=auto
-
-# 파이썬/셸/유닉스 스크립트는 LF
+*.ps1 text eol=lf
+*.psm1 text eol=lf
 *.py  text eol=lf
 *.sh  text eol=lf
-*.md  text eol=lf
-*.json text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
-
-# 파워셀/배치/윈도 스크립트는 CRLF
-*.ps1 text eol=crlf
+*.cmd text eol=crlf
 *.bat text eol=crlf
-
-# 바이너리
-*.db  binary
-*.png binary
-*.jpg binary
-*.exe binary

@@ -11,7 +11,7 @@ $autofixLog = Join-Path $logs "autofix.log"
 Ensure-Dirs -Paths @($logs, (Split-Path $summary -Parent))
 
 $log = New-VelosLogger -Name "self_check" -LogPath $autofixLog
-$env:PYTHONPATH = $ROOT
+$env:PYTHONPATH="$ROOT;$ROOT\modules"
 
 $probe = & $py (Join-Path $ROOT "modules\report_paths.py") 2>&1
 

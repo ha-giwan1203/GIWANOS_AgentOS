@@ -1,7 +1,7 @@
 # VELOS 운영 철학 선언문
 from __future__ import annotations
 import json
-from velos_common import paths, ensure_dirs, env_presence
+from modules.velos_common import paths, ensure_dirs, env_presence
 
 def memory_file_ready() -> bool:
     p = paths()
