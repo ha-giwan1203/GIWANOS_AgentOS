@@ -1,11 +1,28 @@
-# VELOS 운영 철학 선언문
+# VELOS 운영: report_paths (호환 고정판)
+# - 상단에서 ROOT, P를 반드시 내보냄 (legacy 코드 호환)
+
 from __future__ import annotations
 import json
-from modules.velos_common import paths, ensure_dirs, env_presence
+from typing import Dict
+from pathlib import Path
+import os
+
+# 공통 유틸 가져오기
+from modules.velos_common import paths as _paths, ensure_dirs as _ensure_dirs, env_presence as _env_presence
+
+# --- Export: 레거시 호환 필수 심볼 ---
+P: Dict[str, Path] = _paths()
+ROOT: Path = P["ROOT"]
+# -------------------------------------
+
+def ensure_dirs() -> None:
+    _ensure_dirs()
+
+def env_presence(keys=("OPENAI_API_KEY","NOTION_TOKEN","SLACK_BOT_TOKEN")) -> Dict[str, str]:
+    return _env_presence(keys)
 
 def memory_file_ready() -> bool:
-    p = paths()
-    mm = p["LEARNING_MEMORY"]
+    mm = P["LEARNING_MEMORY"]
     if mm.exists():
         return True
     try:
@@ -17,23 +34,6 @@ def memory_file_ready() -> bool:
 if __name__ == "__main__":
     ensure_dirs()
     ok = memory_file_ready()
-    p = paths()
-    print("VELOS_ROOT=", p["ROOT"])
+    print("VELOS_ROOT=", ROOT)
     print("learning_memory.json=", "ok" if ok else "failed")
     print("env=", env_presence())
-
-
-# --- BACKWARD COMPAT SHIM (VELOS) ---
-# 기존 코드 호환: run_giwanos_master_loop.py 등에서 기대하는 ROOT, P 제공
-try:
-    from modules.velos_common import paths as _velos_paths
-    _P = _velos_paths()
-    ROOT = _P["ROOT"]
-    P = _P  # dict-like: ROOT/DATA/REPORTS/AUTO/DISPATCH/LOGS/MEMORY/...
-except Exception as _e:
-    # 최후의 안전장치
-    import os
-    from pathlib import Path
-    ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos")).resolve()
-    P = {"ROOT": ROOT}
-# --- END SHIM ---
