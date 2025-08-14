@@ -83,3 +83,9 @@ try {
   Pop-Location
 }
 
+
+# [postrun] report:
+try {
+  pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "C:\giwanos\tools\velos-postrun.ps1"
+} catch { Write-Host "[postrun][WARN] " }
+
