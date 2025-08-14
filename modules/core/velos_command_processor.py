@@ -127,7 +127,17 @@ class VELOSCommandProcessor:
             # 따옴표가 없으면 파일명 이후의 모든 내용을 사용
             parts = command.split()
             if len(parts) >= 3:
-                content = " ".join(parts[2:])  # "파일 생성" 이후의 모든 내용
+                # 파일명을 제외한 나머지 내용
+                file_name_index = -1
+                for i, part in enumerate(parts):
+                    if '.' in part and any(ext in part for ext in ['.py', '.md', '.json', '.txt', '.yaml', '.yml']):
+                        file_name_index = i
+                        break
+                
+                if file_name_index >= 0 and file_name_index + 1 < len(parts):
+                    content = " ".join(parts[file_name_index + 1:])
+                else:
+                    content = ""
             else:
                 content = ""
         
