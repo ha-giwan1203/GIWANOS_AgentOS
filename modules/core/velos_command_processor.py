@@ -12,6 +12,7 @@ from datetime import datetime
 
 from modules.core.cursor_integration import CursorIntegration, CursorIntegrationError
 from modules.core.memory_adapter import create_memory_adapter
+from modules.core.velos_chat_memory import get_chat_memory, add_chat_message
 
 
 class CommandProcessorError(Exception):
@@ -31,6 +32,7 @@ class VELOSCommandProcessor:
         from modules.core.cursor_integration import create_cursor_integration
         self.cursor = create_cursor_integration()
         self.memory = create_memory_adapter()
+        self.chat_memory = get_chat_memory()
         self.command_history = []
     
     def process_command(self, command: str) -> Dict:
@@ -44,6 +46,9 @@ class VELOSCommandProcessor:
             처리 결과
         """
         try:
+            # 실시간 채팅 메모리에 사용자 명령 저장
+            add_chat_message(command, "user", {"command_type": "velos_command"})
+            
             # 명령 기록
             self.command_history.append({
                 "command": command,
@@ -60,6 +65,13 @@ class VELOSCommandProcessor:
             # 결과 기록
             self.command_history[-1]["status"] = "completed"
             self.command_history[-1]["result"] = result
+            
+            # 실시간 채팅 메모리에 결과 저장
+            response_message = result.get("message", "명령이 실행되었습니다.")
+            add_chat_message(response_message, "assistant", {
+                "command_type": "velos_response",
+                "success": result.get("success", False)
+            })
             
             return result
         except Exception as e:
