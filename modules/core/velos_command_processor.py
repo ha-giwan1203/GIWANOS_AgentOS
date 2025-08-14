@@ -119,9 +119,17 @@ class VELOSCommandProcessor:
         path_match = re.search(r'([a-zA-Z0-9_\-\.\/\\]+\.(py|md|json|txt|yaml|yml))', command)
         file_path = path_match.group(1) if path_match else "new_file.py"
         
-        # 파일 내용 추출 (따옴표 안의 내용)
+        # 파일 내용 추출 (따옴표 안의 내용 또는 마지막 부분)
         content_match = re.search(r'["\']([^"\']+)["\']', command)
-        content = content_match.group(1) if content_match else ""
+        if content_match:
+            content = content_match.group(1)
+        else:
+            # 따옴표가 없으면 파일명 이후의 모든 내용을 사용
+            parts = command.split()
+            if len(parts) >= 3:
+                content = " ".join(parts[2:])  # "파일 생성" 이후의 모든 내용
+            else:
+                content = ""
         
         # 파일 타입 추출
         file_type = "auto"

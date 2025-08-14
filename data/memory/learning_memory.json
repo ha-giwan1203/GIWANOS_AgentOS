@@ -173,5 +173,35 @@
       "auto"
     ],
     "id": "92194f63-7487-472c-a81b-ce31bc3b0504"
+  },
+  {
+    "from": "system",
+    "insight": "파일 생성: test_integration.py",
+    "ts": "2025-08-14T16:15:08.746192",
+    "raw_message": "파일 생성: test_integration.py",
+    "tags": [
+      "auto"
+    ],
+    "id": "6db57fc9-fd86-4061-b065-31da2285f9d1"
+  },
+  {
+    "from": "system",
+    "insight": "파일 생성: test_check.py",
+    "ts": "2025-08-14T16:33:31.981634",
+    "raw_message": "파일 생성: test_check.py",
+    "tags": [
+      "auto"
+    ],
+    "id": "3d0f9196-fcc8-4cb1-a81b-26103c22e675"
+  },
+  {
+    "from": "system",
+    "insight": "명령 실행: 테스트 test_check.py",
+    "ts": "2025-08-14T16:33:45.377586",
+    "raw_message": "명령 실행: 테스트 test_check.py",
+    "tags": [
+      "auto"
+    ],
+    "id": "941390e9-5ef9-4c5a-b111-7ed7a11f3766"
   }
 ]
