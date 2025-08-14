@@ -287,3 +287,4 @@ if __name__ == "__main__":
     # 통계 확인
     stats = chat_memory.get_stats()
     print(f"채팅 메모리 통계: {stats}")
+
