@@ -29,3 +29,16 @@ logs/
 test_*.py
 *.tmp
 *.bak
+
+# Python 바이트코드 캐시
+__pycache__/
+*.pyc
+
+# 로그 파일
+logs/
+*.log
+
+# 임시/테스트 파일
+test_*.py
+*.tmp
+*.bak
