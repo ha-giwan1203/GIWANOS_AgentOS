@@ -9,3 +9,10 @@ data/reports/_dispatch_processed/
 # runtime artifacts
 data/memory/learning_memory.json
 docs/CONTEXT_PACK.md
+# ===== VELOS SENSITIVES =====
+configs/.env
+*.env
+data/logs/
+data/reports/_dispatch/
+*.key
+*.pem

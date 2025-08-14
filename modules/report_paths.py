@@ -1,28 +1,23 @@
-# ---- injected by fix (do not remove) ----
-import os
-from pathlib import Path
+# VELOS 운영 철학 선언문
+from __future__ import annotations
+import json
+from velos_common import paths, ensure_dirs, env_presence
 
-ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
+def memory_file_ready() -> bool:
+    p = paths()
+    mm = p["LEARNING_MEMORY"]
+    if mm.exists():
+        return True
+    try:
+        mm.write_text(json.dumps({"meta":{"created_by":"report_paths.py","version":1},"records":[]}, ensure_ascii=False), encoding="utf-8")
+        return True
+    except Exception:
+        return False
 
-def P(*parts) -> Path:
-    """프로젝트 루트 기준 경로 합성"""
-    return Path(ROOT).joinpath(*parts)
-# ---- end injected header ----
-import os
-ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
-# C:\giwanos\modules\report_paths.py
-import os
-from pathlib import Path
-
-def get_base_path():
-    """
-    VELOS 시스템의 기본 경로를 반환.
-    - 반드시 환경변수 VELOS_ROOT를 사용.
-    - 환경변수가 없으면 예외 발생.
-    """
-    root = os.getenv("VELOS_ROOT")
-    if not root:
-        raise EnvironmentError("환경변수 VELOS_ROOT가 설정되지 않았습니다.")
-    return Path(root)
-
-
+if __name__ == "__main__":
+    ensure_dirs()
+    ok = memory_file_ready()
+    p = paths()
+    print("VELOS_ROOT=", p["ROOT"])
+    print("learning_memory.json=", "ok" if ok else "failed")
+    print("env=", env_presence())
