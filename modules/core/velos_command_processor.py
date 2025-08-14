@@ -184,6 +184,14 @@ class VELOSCommandProcessor:
         path_match = re.search(r'([a-zA-Z0-9_\-\.\/\\]+\.py)', command)
         file_path = path_match.group(1) if path_match else None
         
+        # 파일 경로가 없으면 명령에서 파일명 추출
+        if not file_path:
+            parts = command.split()
+            for part in parts:
+                if part.endswith('.py'):
+                    file_path = part
+                    break
+        
         return {
             "type": "execute",
             "file_path": file_path,
