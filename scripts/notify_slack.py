@@ -2,10 +2,9 @@
 
 import json
 import os
-from pathlib import Path
 from urllib.request import Request, urlopen
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 REPORTS = ROOT / r"data\reports"
 ENV = ROOT / r"configs\.env"
 

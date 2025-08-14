@@ -4,14 +4,13 @@ import json
 import platform
 import time
 from datetime import datetime
-from pathlib import Path
 
 try:
     import psutil
 except Exception:
     psutil = None  # 없어도 죽지 않게
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 LOGS = ROOT / r"data\logs"
 LOGS.mkdir(parents=True, exist_ok=True)
 

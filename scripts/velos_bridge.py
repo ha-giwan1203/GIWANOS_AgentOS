@@ -11,10 +11,14 @@ velos_bridge.py (BOM-safe + soft-fail)
 - UTF-8 with BOM/without BOM 모두 파싱되도록 read_json_any() 적용
 """
 
-import json, os, shutil, time, traceback
+import json
+import os
+import shutil
+import time
+import traceback
 from pathlib import Path
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 INBOXES = [
     ROOT / "data" / "dispatch" / "_queue",
     ROOT / "data" / "reports" / "_dispatch",
@@ -109,16 +113,20 @@ def process_ticket(p: Path):
     if sl.get("enabled"):
         ch = sl.get("channel") or "#general"
         r = send_slack(text, channel=ch)
-        if r is True: success += 1
-        if r is False: attempted += 1
+        if r is True:
+            success += 1
+        if r is False:
+            attempted += 1
 
     # Notion
     nt = channels.get("notion") or {}
     if nt.get("enabled"):
         parent = nt.get("parent_page_id") or nt.get("database_id")
         r = send_notion(title=title, md_content=report_md or text, parent_id=parent)
-        if r is True: success += 1
-        if r is False: attempted += 1
+        if r is True:
+            success += 1
+        if r is False:
+            attempted += 1
 
     # 판정: 성공 1개 이상이면 OK, 시도 자체가 없었으면 OK, 그 외(모두 실패) FAILED
     if success >= 1:

@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from typing import Dict
 from pathlib import Path
-import os
 
 # 공통 유틸 가져오기
 from modules.velos_common import paths as _paths, ensure_dirs as _ensure_dirs, env_presence as _env_presence

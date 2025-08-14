@@ -2,9 +2,8 @@
 
 import glob
 import json
-from pathlib import Path
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 LOGS = ROOT / r"data\logs"
 LOGS.mkdir(parents=True, exist_ok=True)
 

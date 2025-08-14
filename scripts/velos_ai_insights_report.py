@@ -9,10 +9,10 @@ import warnings
 from datetime import datetime
 from pathlib import Path
 
+from modules.report_paths import ROOT, P
+
 # fpdf 경고 소음 제거
 warnings.filterwarnings("ignore", category=UserWarning, module="fpdf")
-
-from modules.report_paths import ROOT, P
 LOGS = ROOT / r"data\logs"
 REPORTS = ROOT / r"data\reports"
 MEMORY = ROOT / r"data\memory"

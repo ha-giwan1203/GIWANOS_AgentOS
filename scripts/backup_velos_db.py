@@ -2,9 +2,9 @@
 
 import sqlite3
 import time
-from pathlib import Path
 
-from modules.report_paths import P`nDB = P("data/velos.db")
+from modules.report_paths import P
+DB = P("data/velos.db")
 OUT = P("data/backups")
 OUT.mkdir(parents=True, exist_ok=True)
 ts = time.strftime("%Y%m%d_%H%M%S")

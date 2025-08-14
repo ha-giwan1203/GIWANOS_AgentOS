@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 MEM = ROOT / r"data\memory"
 MEM.mkdir(parents=True, exist_ok=True)
 

@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 REFLECT = ROOT / r"data\reflections"
 OUTIDX = REFLECT / "reflections_index.json"
 

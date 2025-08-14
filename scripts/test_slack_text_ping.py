@@ -4,10 +4,9 @@
 # ------------------------------------------------------------
 import os
 import requests
-from pathlib import Path
 from dotenv import load_dotenv
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 ENV = ROOT / "configs" / ".env"
 if not ENV.exists():
     print(f"[ERROR] .env 없음: {ENV}")

@@ -13,7 +13,7 @@ except Exception:
     load_dotenv = None  # 없는 환경에서도 돌아가게
 
 # ----- 고정 경로 및 .env 로드 -----
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 ENV = ROOT / "configs" / ".env"
 if load_dotenv and ENV.exists():
     load_dotenv(dotenv_path=str(ENV))

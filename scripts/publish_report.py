@@ -7,14 +7,13 @@ VELOS 보고서 퍼블리셔
 
 import hashlib
 import json
-import os
 import shutil
 import sys
 import time
 from pathlib import Path
 
 # 루트/경로
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 REPORT_DIR = ROOT / "data" / "reports"
 ALIAS = REPORT_DIR / "velos_report_latest.pdf"
 STATE_FILE = REPORT_DIR / ".last_upload.json"

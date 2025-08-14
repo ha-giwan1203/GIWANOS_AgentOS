@@ -1,7 +1,7 @@
-﻿import os
-import sys
+﻿import sys
 
-from modules.report_paths import ROOT`nsys.path.append(str(ROOT))
+from modules.report_paths import ROOT
+sys.path.append(str(ROOT))
 
 from scripts.notify_slack_api import ROOT, send_report
 

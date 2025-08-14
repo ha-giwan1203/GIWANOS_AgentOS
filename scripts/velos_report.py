@@ -5,9 +5,8 @@ import json
 import sqlite3
 import time
 from datetime import UTC, datetime
-from pathlib import Path
 
-from modules.report_paths import ROOT, P
+from modules.report_paths import ROOT
 DB = ROOT / "data" / "velos.db"
 HEALTH = ROOT / "data" / "logs" / "system_health.json"
 OUTDIR = ROOT / "data" / "reports"

@@ -6,9 +6,9 @@ import os
 import sys
 import uuid
 from datetime import UTC, datetime
-from pathlib import Path
 
-from modules.report_paths import ROOT, P`nGIWANOS = ROOT
+from modules.report_paths import ROOT
+GIWANOS = ROOT
 BUF_PATH = GIWANOS / "data" / "memory" / "memory_buffer.jsonl"
 META_PATH = GIWANOS / "data" / "memory" / "client_seq.json"
 

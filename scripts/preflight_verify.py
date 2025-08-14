@@ -7,7 +7,6 @@ from __future__ import annotations
 import glob
 import py_compile
 import sys
-from pathlib import Path
 
 from modules.report_paths import ROOT, P
 SNAPSHOT_DIR = ROOT / r"data\snapshots"
@@ -65,7 +64,7 @@ def compile_all():
 
 def main():
     if not ROOT.exists():
-        fail(""{0} 루트 없음" -f ROOT")
+        fail(f"{ROOT} 루트 없음")
     check_dirs()
     compile_all()
     ok("프리플라이트 통과")

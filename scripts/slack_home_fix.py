@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from modules.report_paths import ROOT, P`nROOT = str(ROOT)
+from modules.report_paths import ROOT
+ROOT = str(ROOT)
 ENV = os.path.join(ROOT, "configs", ".env")
 if not os.path.exists(ENV):
     print(f"[ERROR] .env 없음: {ENV}")

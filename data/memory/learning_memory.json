@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "from": "system",
     "insight": "파일명은 절대 변경하지 않는다.",
@@ -108,13 +108,70 @@
     "ts": "2025-08-11T21:24:08",
     "raw_message": "데몬 동작 확인",
     "id": "8cf968881d60285c1464bbdea35f84908d75d37afe7ff8e305df9e849a559091"
+  },
+  {
+    "from": "system",
+    "ts": "2025-08-14T08:44:25",
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:44:25"
+  },
+  {
+    "from": "system",
+    "ts": "2025-08-14T08:48:34",
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:48:34"
+  },
+  {
+    "from": "system",
+    "ts": "2025-08-14T08:50:03",
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:50:03"
+  },
+  {
+    "from": "system",
+    "ts": "2025-08-14T08:58:26",
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T08:58:26"
+  },
+  {
+    "ts": "2025-08-14T10:18:10",
+    "from": "system",
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T10:18:10"
+  },
+  {
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T12:30:35",
+    "ts": "2025-08-14T12:30:35",
+    "from": "system"
+  },
+  {
+    "insight": "[MWA_PROBE] heartbeat 2025-08-14T13:21:11",
+    "from": "system",
+    "ts": "2025-08-14T13:21:11"
+  },
+  {
+    "from": "user",
+    "insight": "트",
+    "ts": "2025-08-14T16:05:47.792870",
+    "raw_message": "트",
+    "tags": [
+      "auto"
+    ],
+    "id": "6d113a0a-e24c-427e-afc9-b51c1a7f9376"
+  },
+  {
+    "from": "user",
+    "insight": "번",
+    "ts": "2025-08-14T16:05:47.792870",
+    "raw_message": "번",
+    "tags": [
+      "auto"
+    ],
+    "id": "d9870ceb-175f-4254-ba2b-c2a5d9765b3a"
+  },
+  {
+    "from": "user",
+    "insight": "간",
+    "ts": "2025-08-14T16:06:06.578827",
+    "raw_message": "간",
+    "tags": [
+      "auto"
+    ],
+    "id": "92194f63-7487-472c-a81b-ce31bc3b0504"
   }
 ]
-
-{"from":"system","ts":"2025-08-14T08:44:25","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:44:25"}
-{"from":"system","ts":"2025-08-14T08:48:34","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:48:34"}
-{"from":"system","ts":"2025-08-14T08:50:03","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:50:03"}
-{"from":"system","ts":"2025-08-14T08:58:26","insight":"[MWA_PROBE] heartbeat 2025-08-14T08:58:26"}
-{"ts":"2025-08-14T10:18:10","from":"system","insight":"[MWA_PROBE] heartbeat 2025-08-14T10:18:10"}
-{"insight":"[MWA_PROBE] heartbeat 2025-08-14T12:30:35","ts":"2025-08-14T12:30:35","from":"system"}
-{"insight":"[MWA_PROBE] heartbeat 2025-08-14T13:21:11","from":"system","ts":"2025-08-14T13:21:11"}
