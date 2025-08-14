@@ -2,47 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Master Loop",
+      "name": "Python: master loop",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/scripts/run_giwanos_master_loop.py",
+      "args": ["--verbose"],
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
-      "env": {
-        "VELOS_ROOT": "${workspaceFolder}"
-      }
+      "justMyCode": false
     },
     {
-      "name": "Python: VELOS Bridge",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/scripts/velos_bridge.py",
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
-      "env": {
-        "VELOS_ROOT": "${workspaceFolder}"
-      }
-    },
-    {
-      "name": "Python: Memory Adapter Test",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/modules/core/memory_adapter.py",
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
-      "env": {
-        "VELOS_ROOT": "${workspaceFolder}"
-      }
-    },
-    {
-      "name": "PowerShell: VELOS Postrun",
+      "name": "PowerShell: velos-run-all",
       "type": "PowerShell",
       "request": "launch",
-      "script": "${workspaceFolder}/scripts/velos-postrun.ps1",
-      "cwd": "${workspaceFolder}",
-      "env": {
-        "VELOS_ROOT": "${workspaceFolder}"
-      }
+      "script": "${workspaceFolder}/scripts/velos-run-all.ps1"
+    },
+    {
+      "name": "PowerShell: autosave_runner",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/autosave_runner.ps1"
     }
   ]
 }
