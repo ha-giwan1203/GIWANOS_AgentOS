@@ -90,7 +90,7 @@ sys.path.append('.')
 from modules.core.memory_adapter import create_memory_adapter
 adapter = create_memory_adapter()
 stats = adapter.get_stats()
-print(f'버퍼: {stats[\"buffer_size\"]}, DB: {stats[\"db_records\"]}, JSON: {stats[\"json_records\"]}')
+print('버퍼: ' + str(stats['buffer_size']) + ', DB: ' + str(stats['db_records']) + ', JSON: ' + str(stats['json_records']))
 "
         
         # 7. 완료 보고서 생성
