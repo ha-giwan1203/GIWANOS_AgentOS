@@ -1,0 +1,70 @@
+# VELOS Workspace Rules (강제 운영 원칙)
+version: 1
+
+rules:
+  - name: "파일명 절대 변경 금지"
+    match: "**/*"
+    instruction: >
+      파일/모듈/스크립트 이름을 절대 바꾸지 마라. 새 파일 생성 시에도 기존 명명 규칙을 유지해라.
+
+  - name: "VELOS 운영 선언문 유지"
+    match: "**/*.py"
+    instruction: >
+      모든 Python 실행 스크립트 상단에 VELOS 운영 철학 선언문을 포함해라. 
+      기존 선언문이 있으면 보존하고, 없으면 추가해라.
+
+  - name: "경로 하드코딩 금지"
+    match: "**/*"
+    instruction: >
+      절대 경로 하드코딩을 금지한다. 경로는 우선순위로 로드: 
+      ENV > configs/settings.yaml > C:\giwanos. 
+      os.getenv 및 설정 로딩 유틸을 사용해라.
+
+  - name: "자가 검증 필수"
+    match: "**/*.py"
+    instruction: >
+      수정 후 반드시 다음 검증을 통과하도록 코드를 보정하라:
+      1) python -m py_compile 대상파일
+      2) 관련 selftest 또는 --dry-run 모드 실행
+      3) 핵심 출력(요약/레벨/경로 존재) 확인
+      실패 시 자동으로 수정하고 재시도한다.
+
+  - name: "루프/스케줄러 안정성"
+    match: "scripts/**/*.ps1"
+    instruction: >
+      스케줄러 등록/수정 시 -WindowStyle Hidden 옵션을 강제한다.
+      등록된 태스크 XML 질의로 창 노출 여부를 점검하고 문제 있으면 수정한다.
+
+  - name: "세션/메모리 정책"
+    match: "modules/**"
+    instruction: >
+      session은 append-only(JSONL). 루프 종료 시 merge + snapshot을 보장하라.
+      사용자 지시와 시스템 응답을 {from, insight, tags} 구조로 기록한다.
+
+  - name: "대시보드 임포트 안전화"
+    match: "interface/**/*.py"
+    instruction: >
+      import 실패 시 sys.path.append(ENV('VELOS_ROOT') or 'C:/giwanos')로 복구 경로를 추가한다.
+      실행 전/후 간단한 run-check를 포함한다.
+
+  - name: "테스트 가능한 변경만"
+    match: "**/*"
+    instruction: >
+      실행 가능한 재현 명령어를 함께 제시하라.
+      Pull Request 수준의 변경 설명을 제공하라.
+
+  - name: "한국어 응답 필수"
+    match: "**/*"
+    instruction: >
+      모든 응답은 한국어로만 작성하라. 영어와 한국어를 혼용하지 마라.
+
+  - name: "VELOS 운영 철학 준수"
+    match: "**/*"
+    instruction: >
+      "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
+      이 철학을 모든 작업에 적용하라.
+
+  - name: "코어 삭제 금지"
+    match: "{modules,scripts,interface}/**/*"
+    instruction: >
+      삭제/이동 금지. 변경 필요 시 격리 폴더로 이동하고 리포트 갱신 후 PR로 처리.
