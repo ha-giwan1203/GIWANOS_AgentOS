@@ -1,0 +1,25 @@
+{
+  "slack": {
+    "ok": false,
+    "detail": "files.upload: {'ok': False, 'error': 'method_deprecated'}",
+    "ts": 1755324291
+  },
+  "notion": {
+    "ok": false,
+    "detail": "status=400",
+    "ts": 1755324292
+  },
+  "email": {
+    "ok": false,
+    "detail": "missing SMTP configs",
+    "ts": 1755324292
+  },
+  "push": {
+    "ok": false,
+    "detail": "missing PUSHBULLET_TOKEN",
+    "ts": 1755324292
+  },
+  "channel": "C098JPKSQEP",
+  "database": "223fee670be8803cafbcdd27aec799f4",
+  "file": "C:\\giwanos\\data\\reports\\auto\\velos_auto_report_20250816_145754_ko.pdf"
+}

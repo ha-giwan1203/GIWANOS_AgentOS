@@ -1,0 +1,26 @@
+[MASTER] Initializing VELOS session...
+[VELOS] Session memory bootstrap starting...
+[VELOS] Session bootstrap completed
+   Context length: 1098 chars
+   Mandates count: 5
+   Session ID: session_1755352049
+[VELOS] Core policies validation passed
+[MASTER] ✅ VELOS session ready: session_1755352049
+[MASTER] 메모리 어댑터 초기화 완료
+[MASTER] 메모리 통계: 버퍼=0, DB=18, JSON=0
+[MASTER] 컨텍스트 블록 생성 완료: 13줄
+<<VELOS_CONTEXT:BEGIN>>
+[CONTEXT] migrated=0 items; window=24h; pulled=10
+[CONTEXT] [1755350188] (system) selftest-1 | tags=selftest
+[CONTEXT] [1755350176] (system) demo | tags=demo,heartbeat
+[CONTEXT] [1755350176] (system) demo | tags=demo,heartbeat
+[CONTEXT] [1755349966] (system) selftest-1 | tags=selftest
+[CONTEXT] [1755349966] (system) selftest-1 | tags=selftest
+[CONTEXT] [1755349966] (system) selftest-1 | tags=selftest
+[CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
+[CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
+[CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
+[CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
+<<VELOS_CONTEXT:END>>
+[MASTER] Report -> C:/giwanos\data\reports\auto\velos_auto_report_20250816_134730.md
+[MASTER] Dispatch -> C:/giwanos\data\reports\_dispatch\dispatch_20250816_134730.json

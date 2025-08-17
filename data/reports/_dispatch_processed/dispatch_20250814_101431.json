@@ -1,0 +1,21 @@
+{
+  "id": "794957a6-0b16-4893-8480-c0f20ca80059",
+  "created_utc": "20250814_101431",
+  "artifacts": [
+    {
+      "type": "markdown",
+      "path": "C:\\giwanos\\data\\reports\\auto\\velos_auto_report_20250814_101431.md",
+      "title": "VELOS Report 20250814_101431"
+    }
+  ],
+  "send": {
+    "slack": true,
+    "notion": true,
+    "push": false,
+    "email": false
+  },
+  "meta": {
+    "source": "master",
+    "note": "auto generated with memory sync"
+  }
+}

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\giwanos\scripts\run_giwanos_master_loop.py", line 5, in <module>
+    from modules.report_paths import ROOT, P
+ImportError: cannot import name 'ROOT' from 'modules.report_paths' (C:\giwanos\modules\report_paths.py)

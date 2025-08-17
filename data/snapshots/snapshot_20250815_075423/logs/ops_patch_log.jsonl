@@ -1,0 +1,13 @@
+﻿{"step": "create", "result": "ok"}
+{"step": "insert", "result": "blocked", "error": "not authorized"}
+{"action": "ingest", "room": "roomA", "user": "local", "idempotency_key": "pulse-20250813112014", "body_preview": "pulse_fc848597-d6af-4405-a093-0c01158efd", "timestamp": "2025-08-13T02:20:14+00:00"}
+{"step": "create", "result": "ok"}
+{"step": "insert", "result": "blocked", "error": "not authorized"}
+{"action": "ingest", "room": "roomA", "user": "local", "idempotency_key": "pulse-20250813112350", "body_preview": "pulse_a5ca5d79-1493-4149-865e-391ca5d678", "timestamp": "2025-08-13T02:23:50+00:00"}
+{"size":6921,"action":"patch","timestamp":"2025-08-13T11:27:33","result":"ok","run":"","backup":"C:\\giwanos\\scripts\\velos_bridge.py.20250813_112733.bak","path":"C:\\giwanos\\scripts\\velos_bridge.py","sha256":"EE7DCCB8E0E32473D61B1429736265B4D9ED13993FCEE691A8279FEE4757354C"}
+{"action": "ingest", "room": "roomA", "user": "local", "idempotency_key": "tzfix-20250813112744", "body_preview": "tz_check_dad30406-a33e-4c0d-942b-9cc40a3", "timestamp": "2025-08-13T02:27:44+00:00", "timestamp_local": "2025-08-13T11:27:44+09:00", "local_tz": "대한민국 표준시", "local_utc_offset_sec": 32400}
+{"action": "ingest", "room": "roomA", "user": "local", "idempotency_key": "cron-20250813113149", "body_preview": "cron_pulse_c9cd53a1-437e-4bc4-b47a-518bb", "timestamp": "2025-08-13T02:31:49+00:00", "timestamp_local": "2025-08-13T11:31:49+09:00", "local_tz": "대한민국 표준시", "local_utc_offset_sec": 32400}
+{"action": "probe", "result": "ok", "timestamp": "2025-08-13T03:17:11+00:00", "timestamp_local": "2025-08-13T12:17:11+09:00", "local_tz": "대한민국 표준시", "local_utc_offset_sec": 32400}
+{"action": "ingest", "room": "roomA", "user": "local", "idempotency_key": "smoke-20250813121711", "body_preview": "pipeline_smoke_f265c8f4-5f26-4793-ad68-c", "timestamp": "2025-08-13T03:17:11+00:00", "timestamp_local": "2025-08-13T12:17:11+09:00", "local_tz": "대한민국 표준시", "local_utc_offset_sec": 32400}
+
+

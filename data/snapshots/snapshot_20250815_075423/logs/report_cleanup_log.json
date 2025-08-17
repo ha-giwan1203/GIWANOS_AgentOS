@@ -1,0 +1,29 @@
+﻿{
+  "meta": {
+    "started": "2025-08-12T15:15:43+09:00",
+    "finished": "2025-08-12T15:15:43+09:00",
+    "cwd": "C:/WINDOWS/system32",
+    "project_root": "C:/giwanos",
+    "search_root": "C:/giwanos",
+    "output_dir": "C:/giwanos/data/logs",
+    "days": 30,
+    "patterns": [
+      "*.log",
+      "*.tmp",
+      "*.bak"
+    ],
+    "dry_run": false,
+    "version": "1.0.0"
+  },
+  "candidates": [],
+  "deleted": [],
+  "warnings": [],
+  "errors": [],
+  "summary": {
+    "candidates": 0,
+    "deleted": 0,
+    "warnings": 0,
+    "errors": 0
+  }
+}
+

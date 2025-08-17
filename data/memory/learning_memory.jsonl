@@ -176,3 +176,27 @@
 {"ts": 1755439812.1333702, "ts_iso": "2025-08-17T23:10:12", "session_id": "session_1755439812", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
 {"ts": 1755439812.136448, "ts_iso": "2025-08-17T23:10:12", "session_id": "session_1755439812", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
 {"ts": 1755440111.0817792, "ts_iso": "2025-08-17T23:15:11", "session_id": "session_1755440111", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "job"}
+{"ts": 1755440112.487027, "ts_iso": "2025-08-17T23:15:12", "session_id": "session_1755440112", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "job"}
+{"ts": 1755440112.4950056, "ts_iso": "2025-08-17T23:15:12", "session_id": "session_1755440112", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440112.508963, "ts_iso": "2025-08-17T23:15:12", "session_id": "session_1755440112", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440128.800599, "ts_iso": "2025-08-17T23:15:28", "session_id": "session_1755440128", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440411.000417, "ts_iso": "2025-08-17T23:20:11", "session_id": "session_1755440411", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440411.0143783, "ts_iso": "2025-08-17T23:20:11", "session_id": "session_1755440411", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440708.2663534, "ts_iso": "2025-08-17T23:25:08", "session_id": "session_1755440708", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755440708.2723625, "ts_iso": "2025-08-17T23:25:08", "session_id": "session_1755440708", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441010.3208804, "ts_iso": "2025-08-17T23:30:10", "session_id": "session_1755441010", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "job"}
+{"ts": 1755441011.140832, "ts_iso": "2025-08-17T23:30:11", "session_id": "session_1755441011", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "job"}
+{"ts": 1755441011.1478124, "ts_iso": "2025-08-17T23:30:11", "session_id": "session_1755441011", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441011.150803, "ts_iso": "2025-08-17T23:30:11", "session_id": "session_1755441011", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441308.310008, "ts_iso": "2025-08-17T23:35:08", "session_id": "session_1755441308", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441308.3127797, "ts_iso": "2025-08-17T23:35:08", "session_id": "session_1755441308", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441608.5809734, "ts_iso": "2025-08-17T23:40:08", "session_id": "session_1755441608", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441608.584383, "ts_iso": "2025-08-17T23:40:08", "session_id": "session_1755441608", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441909.1239095, "ts_iso": "2025-08-17T23:45:09", "session_id": "session_1755441909", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755441909.1298373, "ts_iso": "2025-08-17T23:45:09", "session_id": "session_1755441909", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755442209.4315677, "ts_iso": "2025-08-17T23:50:09", "session_id": "session_1755442209", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755442209.5532405, "ts_iso": "2025-08-17T23:50:09", "session_id": "session_1755442209", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755442508.8008385, "ts_iso": "2025-08-17T23:55:08", "session_id": "session_1755442508", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755442508.8048275, "ts_iso": "2025-08-17T23:55:08", "session_id": "session_1755442508", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "system"}
+{"ts": 1755442809.8988266, "ts_iso": "2025-08-18T00:00:09", "session_id": "session_1755442809", "from": "scheduler", "insight": "스케줄러 info", "tags": ["master_scheduler", "info"], "kind": "job"}
+{"ts": 1755442852.9305375, "ts_iso": "2025-08-18T00:00:52", "session_id": "session_1755442852", "from": "system", "insight": "selftest-1", "tags": ["selftest"], "kind": "test"}

@@ -1,49 +1,64 @@
-# secrets
-configs/.env
+# ==========================
+# 🔐 보안 민감정보 완전 차단
+# ==========================
 
-# backups
-data/backups/
-data/reports/_dispatch/_failed/
-data/reports/_dispatch_processed/
-
-# runtime artifacts
-data/memory/learning_memory.json
-docs/CONTEXT_PACK.md
-# ===== VELOS SENSITIVES =====
-configs/.env
+# 환경 변수 / API 키 / 인증 토큰
 *.env
-data/logs/
-data/reports/_dispatch/
+*.env.*
 *.key
 *.pem
+*.crt
+*.cer
+*.pfx
+*.asc
+*.gpg
+*.keystore
+*.secrets
+*.credentials
+*secret*
+*token*
+*apikey*
+*api_key*
+*openai*
 
-# Python 바이트코드 캐시
-__pycache__/
-*.pyc
-
-# 로그 파일
-logs/
+# 개인/임시 설정 파일
 *.log
-
-# 임시/테스트 파일
-test_*.py
 *.tmp
 *.bak
+*.old
+*.swp
+*.swo
+*.DS_Store
+Thumbs.db
 
-# Python 바이트코드 캐시
+# Python 캐시/빌드 산출물
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
 
-# 로그 파일
-logs/
-*.log
+# Node.js (혹시 있을 경우)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# 임시/테스트 파일
-test_*.py
-*.tmp
-*.bak
+# 가상환경
+.venv/
 .venv_link/
-.mypy_cache/
-# volatile runtime outputs
-/data/logs/
-/data/reports/report_cursor.json
+venv/
+.envrc
+
+# IDE/Editor 설정
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# 프로젝트 내부 보안 폴더
+secrets/
+private/
+config/private/

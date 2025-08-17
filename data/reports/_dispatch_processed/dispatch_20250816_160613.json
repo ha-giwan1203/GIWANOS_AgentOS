@@ -1,0 +1,25 @@
+{
+  "slack": {
+    "ok": true,
+    "detail": "webhook: status=200",
+    "ts": 1755327971
+  },
+  "notion": {
+    "ok": false,
+    "detail": "status=400",
+    "ts": 1755327972
+  },
+  "email": {
+    "ok": true,
+    "detail": "sent",
+    "ts": 1755327973
+  },
+  "push": {
+    "ok": true,
+    "detail": "status=200",
+    "ts": 1755327973
+  },
+  "channel": "C098JPKSQEP",
+  "database": "223fee670be8803cafbcdd27aec799f4",
+  "file": "C:\\giwanos\\data\\reports\\auto\\velos_auto_report_20250816_150547_ko.pdf"
+}

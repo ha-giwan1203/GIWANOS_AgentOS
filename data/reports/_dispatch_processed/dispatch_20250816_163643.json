@@ -1,0 +1,25 @@
+{
+  "slack": {
+    "ok": true,
+    "detail": "webhook: status=200",
+    "ts": 1755329763
+  },
+  "notion": {
+    "ok": true,
+    "detail": "status=200",
+    "ts": 1755329764
+  },
+  "email": {
+    "ok": true,
+    "detail": "sent",
+    "ts": 1755329765
+  },
+  "push": {
+    "ok": false,
+    "detail": "exception: HTTPSConnectionPool(host='api.pushbullet.com', port=443): Read timed out. (read timeout=20)",
+    "ts": 1755329803
+  },
+  "channel": "C098JPKSQEP",
+  "database": "223fee670be8803cafbcdd27aec799f4",
+  "file": "C:\\giwanos\\data\\reports\\auto\\velos_auto_report_20250816_150547_ko.pdf"
+}

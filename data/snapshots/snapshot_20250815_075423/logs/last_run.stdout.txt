@@ -1,0 +1,4 @@
+[MASTER] 메모리 어댑터 초기화 완료
+[MASTER] 메모리 통계: 버퍼=0, DB=0, JSON=30
+[MASTER] Report -> C:\giwanos\data\reports\auto\velos_auto_report_20250814_103432.md
+[MASTER] Dispatch -> C:\giwanos\data\reports\_dispatch\dispatch_20250814_103432.json

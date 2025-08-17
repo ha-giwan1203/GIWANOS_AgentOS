@@ -1,0 +1,44 @@
+{
+  "timestamp": 1755212063,
+  "system_integrity": {
+    "check_time": 1755212061,
+    "file_issues": 0,
+    "db_issues": 0,
+    "process_issues": 1,
+    "total_issues": 1,
+    "integrity_ok": false,
+    "details": {
+      "file_issues": [],
+      "db_issues": [],
+      "process_issues": [
+        "process_missing:autosave_runner"
+      ]
+    },
+    "autosave_runner_count": 0,
+    "autosave_runner_ok": false,
+    "warnings": [
+      "autosave_runner not running (required)"
+    ]
+  },
+  "data_integrity": {
+    "check_time": 1755212063,
+    "memory_issues": 0,
+    "db_issues": 0,
+    "report_issues": 0,
+    "total_issues": 0,
+    "data_integrity_ok": true,
+    "details": {
+      "memory_issues": [],
+      "db_issues": [],
+      "report_issues": []
+    }
+  },
+  "context_guard": {
+    "flush_age_min": 264,
+    "context_age_min": 262,
+    "flush_ok": false,
+    "context_ok": false,
+    "checked_ts": 1755212063
+  },
+  "overall_status": "OK"
+}
