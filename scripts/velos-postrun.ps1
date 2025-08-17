@@ -1,3 +1,16 @@
+﻿# =========================================================
+# VELOS 운영 철학 선언문
+# 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
+# 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
+# 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
+# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
+# 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
+# 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
+# 8) 중복/오류 제거: 불필요/중복 로직 제거, 단일 진실원칙 유지
+# 9) 지능형 처리: 자동 복구·경고 등 방어적 설계 우선
+# 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
+# =========================================================
 # VELOS Postrun Script
 # VELOS 마스터 루프 실행 후 자동 실행되는 후처리 스크립트
 
@@ -21,15 +34,15 @@ function Write-VelosLog {
 
 try {
     Write-VelosLog "VELOS Postrun 스크립트 시작" "INFO"
-    
+
     # 1. 최신 보고서 확인
-    $latestReport = Get-ChildItem "$VELOS_ROOT\data\reports\auto\velos_auto_report_*.md" | 
-                   Sort-Object LastWriteTime -Descending | 
+    $latestReport = Get-ChildItem "$VELOS_ROOT\data\reports\auto\velos_auto_report_*.md" |
+                   Sort-Object LastWriteTime -Descending |
                    Select-Object -First 1
-    
+
     if ($latestReport) {
         Write-VelosLog "최신 보고서 발견: $($latestReport.Name)" "INFO"
-        
+
         # 2. 메모리 동기화
         Write-VelosLog "메모리 동기화 시작" "INFO"
         python -c "
@@ -41,11 +54,11 @@ json_processed = adapter.flush_jsonl_to_json()
 db_processed = adapter.flush_jsonl_to_db()
 print(f'JSON 동기화: {json_processed}개, DB 동기화: {db_processed}개')
 "
-        
+
         # 3. 시스템 상태 확인
         Write-VelosLog "시스템 상태 확인" "INFO"
         python scripts\velos_cursor_interface.py --status
-        
+
         # 4. Git 자동 커밋 (변경사항이 있는 경우)
         Write-VelosLog "Git 상태 확인" "INFO"
         $gitStatus = git status --porcelain
@@ -53,7 +66,7 @@ print(f'JSON 동기화: {json_processed}개, DB 동기화: {db_processed}개')
             Write-VelosLog "변경사항 발견, 자동 커밋 실행" "INFO"
             git add -- "."
             git commit -m "VELOS Auto Update - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-            
+
             # 원격 저장소가 설정된 경우 푸시
             $remoteUrl = git config --get remote.origin.url
             if ($remoteUrl) {
@@ -63,10 +76,10 @@ print(f'JSON 동기화: {json_processed}개, DB 동기화: {db_processed}개')
         } else {
             Write-VelosLog "변경사항 없음" "INFO"
         }
-        
+
         # 5. 시스템 정리
         Write-VelosLog "시스템 정리 시작" "INFO"
-        
+
         # 오래된 로그 파일 정리 (30일 이상)
         $logFiles = Get-ChildItem "$VELOS_ROOT\logs\*.log" -ErrorAction SilentlyContinue
         $oldLogs = $logFiles | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) }
@@ -74,14 +87,14 @@ print(f'JSON 동기화: {json_processed}개, DB 동기화: {db_processed}개')
             Write-VelosLog "오래된 로그 파일 정리: $($oldLogs.Count)개" "INFO"
             $oldLogs | Remove-Item -Force
         }
-        
+
         # 임시 파일 정리
         $tempFiles = Get-ChildItem "$VELOS_ROOT\*.tmp" -ErrorAction SilentlyContinue
         if ($tempFiles) {
             Write-VelosLog "임시 파일 정리: $($tempFiles.Count)개" "INFO"
             $tempFiles | Remove-Item -Force
         }
-        
+
         # 6. 성능 통계 수집
         Write-VelosLog "성능 통계 수집" "INFO"
         $memoryStats = python -c "
@@ -92,7 +105,7 @@ adapter = create_memory_adapter()
 stats = adapter.get_stats()
 print('버퍼: ' + str(stats['buffer_size']) + ', DB: ' + str(stats['db_records']) + ', JSON: ' + str(stats['json_records']))
 "
-        
+
         # 7. 완료 보고서 생성
         $postrunReport = @"
 # VELOS Postrun Report
@@ -112,18 +125,18 @@ print('버퍼: ' + str(stats['buffer_size']) + ', DB: ' + str(stats['db_records'
 ---
 *이 보고서는 velos-postrun.ps1에 의해 자동 생성되었습니다.*
 "@
-        
+
         $postrunReportPath = "$VELOS_ROOT\data\reports\auto\velos_postrun_$(Get-Date -Format 'yyyyMMdd_HHmmss').md"
         $postrunReport | Out-File -FilePath $postrunReportPath -Encoding UTF8
-        
+
         Write-VelosLog "Postrun 보고서 생성: $postrunReportPath" "INFO"
-        
+
     } else {
         Write-VelosLog "최신 보고서를 찾을 수 없습니다" "WARN"
     }
-    
+
     Write-VelosLog "VELOS Postrun 스크립트 완료" "INFO"
-    
+
 } catch {
     Write-VelosLog "오류 발생: $($_.Exception.Message)" "ERROR"
     Write-VelosLog "스택 트레이스: $($_.ScriptStackTrace)" "ERROR"
@@ -133,4 +146,3 @@ print('버퍼: ' + str(stats['buffer_size']) + ', DB: ' + str(stats['db_records'
 # 성공적으로 완료
 Write-VelosLog "VELOS Postrun 스크립트가 성공적으로 완료되었습니다" "SUCCESS"
 exit 0
-

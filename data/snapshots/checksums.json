@@ -1,0 +1,98 @@
+{
+  "snapshot_20250815_0756.zip": {
+    "sha256": "d58cacd1964504014006eb38f3cda4b83a7d3e958dd2472059988a23bb7d91df",
+    "recorded_ts": 1755217264,
+    "file_size": 148192,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0756.zip"
+  },
+  "snapshot_20250815_0757.zip": {
+    "sha256": "d58cacd1964504014006eb38f3cda4b83a7d3e958dd2472059988a23bb7d91df",
+    "recorded_ts": 1755217264,
+    "file_size": 148192,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0757.zip"
+  },
+  "snapshot_20250815_0758.zip": {
+    "sha256": "d58cacd1964504014006eb38f3cda4b83a7d3e958dd2472059988a23bb7d91df",
+    "recorded_ts": 1755217264,
+    "file_size": 148192,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0758.zip"
+  },
+  "snapshot_20250815_0759.zip": {
+    "sha256": "d58cacd1964504014006eb38f3cda4b83a7d3e958dd2472059988a23bb7d91df",
+    "recorded_ts": 1755217264,
+    "file_size": 148192,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0759.zip"
+  },
+  "snapshot_20250815_0802.zip": {
+    "sha256": "d58cacd1964504014006eb38f3cda4b83a7d3e958dd2472059988a23bb7d91df",
+    "recorded_ts": 1755217264,
+    "file_size": 148192,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0802.zip"
+  },
+  "snapshot_20250815_0823.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0823.zip"
+  },
+  "snapshot_20250815_0824.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0824.zip"
+  },
+  "snapshot_20250815_0829.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0829.zip"
+  },
+  "snapshot_20250815_0838.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0838.zip"
+  },
+  "snapshot_20250815_0841.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0841.zip"
+  },
+  "snapshot_20250815_0848.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0848.zip"
+  },
+  "snapshot_20250815_0849.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0849.zip"
+  },
+  "snapshot_20250815_0850.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0850.zip"
+  },
+  "snapshot_20250815_0901.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0901.zip"
+  },
+  "snapshot_20250815_0905.zip": {
+    "sha256": "b593c33642e4ad7c22278764d002f8281996d76ca4e5e44c147b96ceca5dbda9",
+    "recorded_ts": 1755217264,
+    "file_size": 148811,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0905.zip"
+  },
+  "snapshot_fixpack_v1_pass_20250816_0844_20250816_0844.zip": {
+    "sha256": "931304715c00d4088e9a5169ff5a48815c5c75fc4e051576d9b3c0aea6329261",
+    "recorded_ts": 1755367381,
+    "file_size": 149396,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_fixpack_v1_pass_20250816_0844_20250816_0844.zip"
+  }
+}

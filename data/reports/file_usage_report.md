@@ -1,0 +1,63 @@
+# VELOS 파일 사용성 감사 보고서
+- 생성 시각: 2025-08-17T01:02:00
+- 루트: `C:\giwanos`
+## 요약
+- **whitelist_protected**: 120
+- **core_active**: 0
+- **runtime_accessed**: 17
+- **statically_referenced**: 100
+- **recently_touched**: 0
+- **snapshot_generated**: 0
+- **orphan_candidate**: 59
+
+## Orphan 후보 상위 50개
+- `data\reflections\reflection_latest.json` | mtime=2025-08-13T13:32:00 | size=107 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-37-37Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-37-39Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T16-15-01Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T16-59-16Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-08-29Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-18-43Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-25-53Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T18-30-11Z.json` | mtime=2025-08-13T13:32:00 | size=154 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-25-47Z.json` | mtime=2025-08-13T13:32:00 | size=172 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-44-58Z.json` | mtime=2025-08-13T13:32:00 | size=172 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-48-10Z.json` | mtime=2025-08-13T13:32:00 | size=172 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-56-36Z.json` | mtime=2025-08-13T13:32:00 | size=172 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_latest_norm.json` | mtime=2025-08-13T13:32:00 | size=194 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T08-47-25Z.json` | mtime=2025-08-13T13:32:00 | size=206 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T08-56-23Z.json` | mtime=2025-08-13T13:32:00 | size=220 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-23-11Z.json` | mtime=2025-08-13T13:32:00 | size=227 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-23-14Z.json` | mtime=2025-08-13T13:32:00 | size=227 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-12-54Z.json` | mtime=2025-08-13T13:32:00 | size=228 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-17-45Z.json` | mtime=2025-08-13T13:32:00 | size=228 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-34-55Z.json` | mtime=2025-08-13T13:32:00 | size=228 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-35-22Z.json` | mtime=2025-08-13T13:32:00 | size=228 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-36-11Z.json` | mtime=2025-08-13T13:32:00 | size=228 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-37-37Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-37-39Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T16-15-01Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T16-59-16Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-08-29Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-18-43Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T17-25-53Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T18-30-11Z_norm.json` | mtime=2025-08-13T13:32:00 | size=255 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-06-56Z.json` | mtime=2025-08-13T13:32:00 | size=268 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-17-07Z.json` | mtime=2025-08-13T13:32:00 | size=268 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-21-15Z.json` | mtime=2025-08-13T13:32:00 | size=268 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-25-47Z_norm.json` | mtime=2025-08-13T13:32:00 | size=280 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-44-58Z_norm.json` | mtime=2025-08-13T13:32:00 | size=280 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-48-10Z_norm.json` | mtime=2025-08-13T13:32:00 | size=280 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-56-36Z_norm.json` | mtime=2025-08-13T13:32:00 | size=280 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T08-47-25Z_norm.json` | mtime=2025-08-13T13:32:00 | size=314 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-31-26Z.json` | mtime=2025-08-13T13:32:00 | size=316 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-23-11Z_norm.json` | mtime=2025-08-13T13:32:00 | size=328 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T06-23-14Z_norm.json` | mtime=2025-08-13T13:32:00 | size=328 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T08-56-23Z_norm.json` | mtime=2025-08-13T13:32:00 | size=328 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-04-18Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-12-54Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-17-45Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-34-55Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-35-22Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_2025-08-10T05-36-11Z_norm.json` | mtime=2025-08-13T13:32:00 | size=329 | last_commit=2025-08-13 14:09:48 +0900
+- `data\reflections\reflection_memory_2025-08-05T09-35-35Z.json` | mtime=2025-08-13T13:32:00 | size=364 | last_commit=2025-08-13 14:09:48 +0900

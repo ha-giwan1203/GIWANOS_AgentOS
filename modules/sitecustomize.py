@@ -2,6 +2,34 @@ from __future__ import annotations
 import atexit, json, os, sys, time, traceback
 from pathlib import Path
 
+# UTF-8 인코딩 강제 설정 (모든 Python 프로세스에 적용)
+for stream in ("stdout", "stderr"):
+    s = getattr(sys, stream, None)
+    try:
+        s.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+os.environ.setdefault("PYTHONUTF8", "1")
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+
+# ---- optional .env loader (opt-in via VELOS_LOAD_ENV=1) ----
+if os.getenv("VELOS_LOAD_ENV") == "1":
+    for p in (Path("C:/giwanos/configs/.env"), Path("configs/.env"), Path(".env")):
+        try:
+            if p.exists():
+                try:
+                    from dotenv import load_dotenv
+                    load_dotenv(p, override=True, encoding="utf-8")
+                except Exception:
+                    for ln in p.read_text(encoding="utf-8").splitlines():
+                        if ln.strip() and not ln.lstrip().startswith("#") and "=" in ln:
+                            k, v = ln.split("=", 1)
+                            os.environ[k.strip()] = v.strip()
+                break
+        except Exception:
+            pass
+
 ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos")).resolve()
 DATA = ROOT / "data"
 LOGS = DATA / "logs"

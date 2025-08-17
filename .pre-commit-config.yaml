@@ -1,0 +1,35 @@
+default_stages: [commit]
+exclude: |
+  (?x)(
+    ^data/ |
+    ^\.mypy_cache/ |
+    ^venv/ | ^\.venv/ |
+    ^.*\.zip$ |
+    ^velos\.db$ |
+    ^data/snapshots/ |
+    ^data/reports/ |
+    ^data/logs/
+  )
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+        files: ^.*\.(ya?ml)$
+
+  - repo: local
+    hooks:
+      - id: mypy-minimal
+        name: mypy (router only)
+        entry: python -m mypy
+        language: system
+        pass_filenames: false         # ← pre-commit이 파일 목록을 넘기지 않게
+        args:
+          - --config-file
+          - mypy.ini
+          # 검사 대상을 명시적으로 강제
+          - modules/core/memory_adapter
+          - modules/memory/router/velos_router_adapter.py

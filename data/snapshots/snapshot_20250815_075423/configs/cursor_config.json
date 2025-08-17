@@ -1,0 +1,36 @@
+{
+  "cursor_path": "cursor",
+  "auto_commit": true,
+  "auto_test": true,
+  "workspace_path": "C:\\giwanos",
+  "git_auto_push": true,
+  "file_watch_enabled": true,
+  "default_file_type": "python",
+  "backup_enabled": true,
+  "log_level": "INFO",
+  "max_file_size": 10485760,
+  "allowed_extensions": [
+    ".py",
+    ".md",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".txt",
+    ".js",
+    ".html",
+    ".css"
+  ],
+  "exclude_patterns": [
+    "**/__pycache__/**",
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/*.log",
+    "**/*.tmp"
+  ],
+  "integration_settings": {
+    "memory_sync_interval": 300,
+    "auto_backup_interval": 3600,
+    "command_timeout": 30,
+    "max_history_size": 1000
+  }
+}

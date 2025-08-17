@@ -1,6 +1,0 @@
-{
-  "defaultLanguage": "ko",
-  "defaultTone": "informal",
-  "codeCommentLanguage": "ko",
-  "systemPrompt": "너는 한국어를 기본 언어로 사용하며, 모든 설명·해설·주석을 한국어로 제공한다. 코드 작성 시 함수·변수·클래스 이름은 원문(영문)을 유지하되, 주석과 설명은 모두 한국어로 작성한다. 코드 변경 이유와 동작 원리도 간단히 덧붙인다."
-}

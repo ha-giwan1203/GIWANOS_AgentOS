@@ -1,0 +1,9 @@
+﻿{
+    "error":  "hash mismatch: C:/giwanos/scripts/materialize_gpt_output.py",
+    "root":  "C:\\giwanos",
+    "timestamp":  "2025-08-13T13:55:02.2942674+09:00",
+    "ok":  false,
+    "override":  false,
+    "summary":  "검사 실패",
+    "codePath":  "C:\\giwanos"
+}

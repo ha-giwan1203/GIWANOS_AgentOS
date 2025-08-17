@@ -1,20 +1,15 @@
 ﻿
-FullName                                                                  Length LastWriteTime         
---------                                                                  ------ -------------         
+FullName                                                                  Length LastWriteTime
+--------                                                                  ------ -------------
 C:\giwanos\data\memory\archive\2025-08\dialog_memory.json                 157621 2025-08-11 오전 11:30:19
 C:\giwanos\data\memory\archive\2025-08\identity_memory.json                  166 2025-08-04 오전 11:31:54
-C:\giwanos\data\memory\archive\2025-08\learning_memory.json                 2899 2025-08-11 오후 9:24:08 
+C:\giwanos\data\memory\archive\2025-08\learning_memory.json                 2899 2025-08-11 오후 9:24:08
 C:\giwanos\data\memory\archive\2025-08\learning_summary.json                 476 2025-08-06 오전 12:44:03
 C:\giwanos\data\memory\archive\2025-08\manual_memory.jsonl                    34 2025-08-12 오전 11:08:18
 C:\giwanos\data\memory\archive\2025-08\tasks_history.jsonl                   663 2025-08-12 오전 11:08:18
-C:\giwanos\data\memory\backup\learning_memory_backup_20250811_131041.json    259 2025-08-11 오후 1:08:11 
+C:\giwanos\data\memory\backup\learning_memory_backup_20250811_131041.json    259 2025-08-11 오후 1:08:11
 C:\giwanos\data\memory\db\velos_memory.bak_20250811_220800.db              24576 2025-08-11 오후 10:03:26
 C:\giwanos\data\memory\db\velos_memory.db                                  24576 2025-08-12 오전 11:08:18
-C:\giwanos\data\memory\inbox\autosave_inbox.jsonl                            258 2025-08-11 오후 9:24:08 
-C:\giwanos\data\memory\logs\loop_history.csv                                1528 2025-07-30 오후 3:27:56 
+C:\giwanos\data\memory\inbox\autosave_inbox.jsonl                            258 2025-08-11 오후 9:24:08
+C:\giwanos\data\memory\logs\loop_history.csv                                1528 2025-07-30 오후 3:27:56
 C:\giwanos\data\memory\manual\manual_memory.json                             410 2025-08-11 오후 10:06:39
-
-
-
-
-

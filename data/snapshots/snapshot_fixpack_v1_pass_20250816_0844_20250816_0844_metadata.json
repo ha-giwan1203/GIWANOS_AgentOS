@@ -1,0 +1,25 @@
+{
+  "label": "fixpack_v1_pass_20250816_0844",
+  "timestamp": "20250816_0844",
+  "created_at": "2025-08-16T08:44:36.590844",
+  "snapshot_path": "C:\\giwanos\\data\\snapshots\\snapshot_fixpack_v1_pass_20250816_0844_20250816_0844.zip",
+  "total_files": 178,
+  "total_size_bytes": 419750,
+  "targets": [
+    {
+      "target": "memory",
+      "files": 21,
+      "size_bytes": 233063
+    },
+    {
+      "target": "reflections",
+      "files": 132,
+      "size_bytes": 160266
+    },
+    {
+      "target": "configs",
+      "files": 25,
+      "size_bytes": 26421
+    }
+  ]
+}

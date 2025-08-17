@@ -4,4 +4,3 @@ setlocal
 set PY=python
 %PY% "C:\giwanos\scripts\velos_client_write.py" %*
 endlocal
-

@@ -1,0 +1,22 @@
+{
+  "generated_at": "2025-08-17T21:50:54",
+  "root": "C:\\giwanos",
+  "source_file": "C:\\giwanos\\data\\memory\\learning_memory.jsonl",
+  "output_file": "C:\\giwanos\\data\\memory\\learning_memory_cleaned.jsonl",
+  "counts": {
+    "source": 95,
+    "after_exact": 7,
+    "after_near": 7,
+    "removed_exact": 88,
+    "removed_near": 0,
+    "removed_noise": 4,
+    "kept": 3
+  },
+  "params": {
+    "min_words": 3,
+    "sim_threshold": 0.9,
+    "recency_half_life_days": 14.0
+  },
+  "written": 3,
+  "sqlite_error": "OperationalError('table memory has no column named score')"
+}

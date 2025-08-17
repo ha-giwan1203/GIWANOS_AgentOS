@@ -1,0 +1,3 @@
+[state] pwsh=PowerShell 7.5.2, root=C:\giwanos, venv_act=
+[state] db=C:\giwanos\data\velos.db
+[state] schedule=present, last_log= 

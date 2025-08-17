@@ -14,4 +14,3 @@ def get_base_path():
     if not root:
         raise EnvironmentError("환경변수 VELOS_ROOT가 설정되지 않았습니다.")
     return Path(root)
-

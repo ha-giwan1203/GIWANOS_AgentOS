@@ -65,6 +65,736 @@
                 "\"'d=1' | Out-File 'modules/_autosave_ping__.py' -Encoding UTF8\""
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 풀 헬스체크(원클릭)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoLogo",
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/velos_health_check.ps1"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 파일 사용성 감사 보고서",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                "python tools/analysis/file_usage_audit.py"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 파일 사용성 리스크 보고서",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\run_file_usage_risk_audit.ps1'"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 런타임 트레이스 스위트",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\run_runtime_trace_suite.ps1'"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+                            "problemMatcher": []
+            },
+            {
+                "label": "VELOS: 런타임 트레이스 + 매니페스트 동기화",
+                "type": "shell",
+                "command": "powershell",
+                "args": [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                    "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                    "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\run_runtime_trace_and_sync.ps1'"
+                ],
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": true,
+                    "clear": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "VELOS: 파일 사용성 리스크 보고서",
+                "type": "shell",
+                "command": "powershell",
+                "args": [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                    "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                    "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\run_file_usage_risk_audit.ps1'"
+                ],
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": true,
+                    "clear": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "VELOS: QUARANTINE_CANDIDATE 격리",
+                "type": "shell",
+                "command": "powershell",
+                "args": [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                    "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                    "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\quarantine_orphans.ps1'"
+                ],
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": true,
+                    "clear": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "VELOS: 운영 상태 종합 점검",
+                "type": "shell",
+                "command": "powershell",
+                "args": [
+                    "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+                    "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                    "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\velos_operational_sanity.ps1'"
+                ],
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared",
+                    "showReuseMessage": true,
+                    "clear": false
+                },
+                "problemMatcher": []
+            },
+                    {
+            "label": "VELOS: 리스크 리포트 보장",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile","-ExecutionPolicy","Bypass","-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; $env:VELOS_SETTINGS='C:\\giwanos\\configs\\settings.yaml'; " +
+                "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\ensure_risk_report.ps1'"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 메모리 클리너 (Dry-run)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "modules/automation/memory_cleaner.py",
+                "--dry-run"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 메모리 클리너 (실행)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "modules/automation/memory_cleaner.py",
+                "--run-clean"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 메모리 클리너 러너 (전체)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/run_memory_cleaner.ps1"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: 리스크 태거 러너 (전체)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/run_reflection_risk_tagger.ps1"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: Reflection Risk Tagger",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; " +
+                "powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\run_reflection_risk_tagger.ps1'"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: Daily Hygiene Pipeline",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$env:VELOS_ROOT='C:\\giwanos'; powershell -NoProfile -ExecutionPolicy Bypass -File 'C:\\giwanos\\scripts\\velos_daily_hygiene.ps1'"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: UTF-8 설정",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/set_utf8.ps1"],
+            "options": {
+                "env": { "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8" }
+            }
+        },
+        {
+            "label": "VELOS: 환경 변수 설정",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/set_velos_env.ps1"],
+            "options": {
+                "env": { "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8" }
+            }
+        },
+        {
+            "label": "VELOS: 환경 변수 확인",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python ${workspaceFolder}/scripts/check_env.py"]
+        },
+        {
+            "label": "VELOS: UTF-8 유틸리티 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python ${workspaceFolder}/utils/utf8_force.py"]
+        },
+        {
+            "label": "VELOS: UTF-8 설정 검증",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python -c \"import sys, os; print('stdout encoding:', sys.stdout.encoding); print('stderr encoding:', sys.stderr.encoding); print('PYTHONUTF8:', os.environ.get('PYTHONUTF8')); print('PYTHONIOENCODING:', os.environ.get('PYTHONIOENCODING')); print('한글 테스트: 안녕하세요! 🚀✨🎉')\""]
+        },
+        {
+            "label": "VELOS: BOM 검증",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","[System.IO.File]::ReadAllBytes('${workspaceFolder}/scripts/set_utf8.ps1')[0..2] | ForEach-Object { '{0:X2}' -f $_ }; Write-Host 'Expected: EF BB BF (UTF-8 BOM)'"]
+        },
+        {
+            "label": "VELOS: 모든 스크립트에 BOM 추가",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/add_utf8_bom.ps1"]
+        },
+        {
+            "label": "VELOS: Python/JSON 파일에서 BOM 제거",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/remove_utf8_bom.ps1"]
+        },
+        {
+            "label": "VELOS: 종합 UTF-8 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '=== A) 셸 상태 ==='; Write-Host \"PS=$($PSVersionTable.PSVersion) Host=$($Host.Name)\"; Write-Host \"[Out:$([Console]::OutputEncoding.WebName)] [In:$([Console]::InputEncoding.WebName)] [Var:$($OutputEncoding.WebName)]\"; chcp; Write-Host '=== B) PowerShell 파일 라운드트립 ==='; '한글-파워셸-로그' | Out-File \"$env:TEMP\\utf8_ps.txt\" -Encoding UTF8; Get-Content \"$env:TEMP\\utf8_ps.txt\"; Write-Host '=== C) Python 라운드트립 ==='; python '${workspaceFolder}/scripts/test_utf8_roundtrip.py'"]
+        },
+        {
+            "label": "VELOS: Git Attributes 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python '${workspaceFolder}/scripts/test_git_attributes.py'"]
+        },
+        {
+            "label": "VELOS: Pre-commit 훅 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python '${workspaceFolder}/scripts/test_pre_commit.py'"]
+        },
+        {
+            "label": "VELOS: VS Code 설정 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python '${workspaceFolder}/scripts/test_vscode_settings.py'"]
+        },
+        {
+            "label": "VELOS: 명령어 출력 캡처 유틸리티",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/capture_output.ps1"]
+        },
+        {
+            "label": "VELOS: 간단한 명령어 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: .\\scripts\\simple_capture.ps1 \"your-command\"'; Write-Host '예시: .\\scripts\\simple_capture.ps1 \"python -c \\\"print(\\\"Hello\\\")\\\"\"'"]
+        },
+        {
+            "label": "VELOS: 출력 디버깅 유틸리티",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/debug_output.ps1"]
+        },
+        {
+            "label": "VELOS: 특수 문자 디버깅 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: (Get-Content \"$env:TEMP\\raw.txt\" -Raw) -replace \"`r\",\"<CR>\" -replace \"`n\",\"<LF>`n\" -replace \"`t\",\"<TAB>\" -replace ([char]27),\"<ESC>\"'; Write-Host '이 패턴은 특수 문자를 시각적으로 표시합니다.'"]
+        },
+        {
+            "label": "VELOS: 특수 문자 디버깅 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python '${workspaceFolder}/scripts/test_debug_pattern.py' 2>&1 | Out-File -Encoding UTF8 -FilePath \"$env:TEMP\\raw.txt\"; Write-Host '=== 원본 출력 ==='; Get-Content \"$env:TEMP\\raw.txt\" -Raw; Write-Host '=== 디버그 출력 ==='; (Get-Content \"$env:TEMP\\raw.txt\" -Raw) -replace \"`r\",\"<CR>\" -replace \"`n\",\"<LF>`n\" -replace \"`t\",\"<TAB>\" -replace ([char]27),\"<ESC>\""]
+        },
+        {
+            "label": "VELOS: 16진수 바이트 디버깅",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/hex_debug.ps1"]
+        },
+        {
+            "label": "VELOS: 16진수 디버깅 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: $bytes = [System.IO.File]::ReadAllBytes(\"$env:TEMP\\raw.txt\"); ($bytes | ForEach-Object { \"{0:X2}\" -f $_ }) -join \" \"'; Write-Host '이 패턴은 파일의 바이트를 16진수로 표시합니다.'"]
+        },
+        {
+            "label": "VELOS: 16진수 디버깅 통합 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python '${workspaceFolder}/scripts/test_hex_debug.py' 2>&1 | Out-File -Encoding UTF8 -FilePath \"$env:TEMP\\raw.txt\"; Write-Host '=== 16진수 분석 ==='; $bytes = [System.IO.File]::ReadAllBytes(\"$env:TEMP\\raw.txt\"); ($bytes | ForEach-Object { '{0:X2}' -f $_ }) -join ' '"]
+        },
+        {
+            "label": "VELOS: 외부 PowerShell 7 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/external_capture.ps1"]
+        },
+        {
+            "label": "VELOS: 간단한 외부 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: .\\scripts\\simple_external.ps1 \"your-command\"'; Write-Host '예시: .\\scripts\\simple_external.ps1 \"python -c \\\"print(\\\"Hello\\\")\\\"\"'"]
+        },
+        {
+            "label": "VELOS: 외부 실행 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: pwsh -NoProfile -Command \"your-command 2>&1 | Out-File -Encoding UTF8 $env:TEMP\\raw2.txt\"'; Write-Host '이 패턴은 외부 PowerShell 7에서 깨끗한 환경으로 명령어를 실행합니다.'"]
+        },
+        {
+            "label": "VELOS: 외부 실행 통합 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '=== 내부 실행 ==='; python '${workspaceFolder}/scripts/test_external_execution.py'; Write-Host '=== 외부 실행 ==='; .\\scripts\\simple_external.ps1 \"python '${workspaceFolder}/scripts/test_external_execution.py'\""]
+        },
+        {
+            "label": "VELOS: 표준 입력 덤프 도구",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/dump_stdout_wrapper.ps1"]
+        },
+        {
+            "label": "VELOS: 덤프 도구 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '=== 기본 덤프 테스트 ==='; echo '안녕하세요! 🚀✨' | python '${workspaceFolder}/scripts/dump_stdout.py'; Write-Host '=== 고급 덤프 테스트 ==='; echo '안녕하세요! 🚀✨' | python '${workspaceFolder}/scripts/dump_stdout_advanced.py'"]
+        },
+        {
+            "label": "VELOS: 덤프 패턴 사용법",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: echo \"입력텍스트\" | python scripts/dump_stdout.py'; Write-Host '또는: python scripts/dump_stdout.py < input.txt'; Write-Host '이 패턴은 표준 입력을 받아서 REPR과 JSON 형태로 출력합니다.'"]
+        },
+        {
+            "label": "VELOS: 스모크 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_smoke_test.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 스모크 테스트",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","cd C:\\giwanos; $env:PYTHONPATH='C:\\giwanos'; python .\\scripts\\memory_only_smoke_test.py"]
+        },
+        {
+            "label": "VELOS: 스모크 테스트 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: cd C:\\giwanos; $env:PYTHONPATH=\"C:\\giwanos\"; python .\\scripts\\memory_only_smoke_test.py'; Write-Host '이 패턴은 VELOS 환경에서 Python 경로를 설정하고 스모크 테스트를 실행합니다.'"]
+        },
+        {
+            "label": "VELOS: 마스터 루프 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_master_loop.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 마스터 루프 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","cd C:\\giwanos; $env:PYTHONPATH='C:\\giwanos'; python .\\scripts\\run_giwanos_master_loop.py"]
+        },
+        {
+            "label": "VELOS: 백그라운드 마스터 루프",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_master_loop.ps1", "-Background"]
+        },
+        {
+            "label": "VELOS: 마스터 루프 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: cd C:\\giwanos; $env:PYTHONPATH=\"C:\\giwanos\"; python .\\scripts\\run_giwanos_master_loop.py'; Write-Host '이 패턴은 VELOS 환경에서 Python 경로를 설정하고 마스터 루프를 실행합니다.'"]
+        },
+        {
+            "label": "VELOS: 워커 알림 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_worker_notify.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 워커 알림 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","cd C:\\giwanos; $env:PYTHONPATH='C:\\giwanos'; python .\\scripts\\worker_notify.py"]
+        },
+        {
+            "label": "VELOS: 워커 알림 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: cd C:\\giwanos; $env:PYTHONPATH=\"C:\\giwanos\"; python .\\scripts\\worker_notify.py'; Write-Host '이 패턴은 VELOS 환경에서 Python 경로를 설정하고 워커 알림을 실행합니다.'"]
+        },
+        {
+            "label": "VELOS: 워커 메모리 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_worker_memory.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 워커 메모리 실행",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","cd C:\\giwanos; $env:PYTHONPATH='C:\\giwanos'; python .\\scripts\\worker_memory.py"]
+        },
+        {
+            "label": "VELOS: 백그라운드 워커 메모리",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_worker_memory.ps1", "-Background"]
+        },
+        {
+            "label": "VELOS: 워커 메모리 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: cd C:\\giwanos; $env:PYTHONPATH=\"C:\\giwanos\"; python .\\scripts\\worker_memory.py'; Write-Host '이 패턴은 VELOS 환경에서 Python 경로를 설정하고 워커 메모리를 실행합니다.'"]
+        },
+        {
+            "label": "VELOS: 작업 큐 관리",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_job_queue.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 작업 큐 삽입",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","python - <<'PY'; import os, sqlite3, json; db=os.getenv('VELOS_DB','C:\\\\giwanos\\\\velos.db'); con=sqlite3.connect(db); cur=con.cursor(); cur.execute('INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)',('decide',json.dumps({'task':'테스트 입력','notify':True},ensure_ascii=False),10)); cur.execute('INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)',('report',json.dumps({'period':'weekly'},ensure_ascii=False),100)); cur.execute('INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)',('notify',json.dumps({'msg':'테스트 알림'},ensure_ascii=False),100)); con.commit(); con.close(); print('[OK] queued decide/report/notify'); PY"]
+        },
+        {
+            "label": "VELOS: 작업 큐 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: python - <<''PY''; import os, sqlite3, json; db=os.getenv(\"VELOS_DB\",\"C:\\\\giwanos\\\\velos.db\"); con=sqlite3.connect(db); cur=con.cursor(); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\",(\"decide\",json.dumps({\"task\":\"테스트 입력\",\"notify\":True},ensure_ascii=False),10)); con.commit(); con.close(); print(\"[OK] queued job\"); PY'; Write-Host '이 패턴은 VELOS 데이터베이스에 작업을 큐에 삽입합니다.'"]
+        },
+        {
+            "label": "VELOS: 로그 디렉토리 설정",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_log_setup.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 로그 디렉토리 생성",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","$logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; Write-Host \"로그 디렉토리 확인/생성 완료: $logDir\""]
+        },
+        {
+            "label": "VELOS: 로그 디렉토리 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: $logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; Write-Host \"로그 디렉토리 확인/생성 완료: $logDir\"'; Write-Host '이 패턴은 VELOS 로그 디렉토리를 확인하고 필요시 생성합니다.'"]
+        },
+        {
+            "label": "VELOS: 간단한 로그 디렉토리 생성",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/simple_log_setup.ps1"]
+        },
+        {
+            "label": "VELOS: 로그 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_log_capture.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 로그 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","$logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; $ts = Get-Date -Format \"yyyyMMdd_HHmmss\"; $stdout = Join-Path $logDir \"run_$ts.out.txt\"; $stderr = Join-Path $logDir \"run_$ts.err.txt\"; @'print(\"hello stdout\"); import sys; print(\"hello stderr\", file=sys.stderr)'@ | python - 1> $stdout 2> $stderr; Write-Host \"STDOUT=$stdout\"; Write-Host \"STDERR=$stderr\"; Get-Content $stdout -Raw; Get-Content $stderr -Raw"]
+        },
+        {
+            "label": "VELOS: 간단한 로그 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/simple_log_capture.ps1"]
+        },
+        {
+            "label": "VELOS: 로그 캡처 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: $logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; $ts = Get-Date -Format \"yyyyMMdd_HHmmss\"; $stdout = Join-Path $logDir \"run_$ts.out.txt\"; $stderr = Join-Path $logDir \"run_$ts.err.txt\"; @''print(\"hello stdout\"); import sys; print(\"hello stderr\", file=sys.stderr)''@ | python - 1> $stdout 2> $stderr; Write-Host \"STDOUT=$stdout\"; Write-Host \"STDERR=$stderr\"; Get-Content $stdout -Raw; Get-Content $stderr -Raw'; Write-Host '이 패턴은 타임스탬프 기반 로그 파일 생성 및 Python 출력을 stdout/stderr로 분리하여 캡처합니다.'"]
+        },
+        {
+            "label": "VELOS: 타임아웃 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_timeout_capture.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 타임아웃 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","param($TimeoutSec = 30); $logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; $ts = Get-Date -Format \"yyyyMMdd_HHmmss\"; $stdout = Join-Path $logDir \"run_$ts.out.txt\"; $stderr = Join-Path $logDir \"run_$ts.err.txt\"; $psi = New-Object System.Diagnostics.ProcessStartInfo; $psi.FileName = \"python\"; $psi.Arguments = \"-\"; $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true; $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.StandardOutputEncoding = [Text.UTF8Encoding]::new($false); $psi.StandardErrorEncoding = [Text.UTF8Encoding]::new($false); $proc = New-Object System.Diagnostics.Process; $proc.StartInfo = $psi; $null = $proc.Start(); $code = @'import time; print(\"start\"); time.sleep(999); print(\"end\")'@; $proc.StandardInput.Write($code); $proc.StandardInput.Close(); if (-not $proc.WaitForExit($TimeoutSec*1000)) { try { $proc.Kill($true) } catch {}; \"TIMEOUT $TimeoutSec sec. Killed PID=$($proc.Id)\" | Tee-Object -FilePath $stderr }; $proc.StandardOutput.ReadToEnd() | Out-File -FilePath $stdout -Encoding UTF8; $proc.StandardError.ReadToEnd() | Out-File -FilePath $stderr -Encoding UTF8; \"STDOUT=$stdout\"; \"STDERR=$stderr\""]
+        },
+        {
+            "label": "VELOS: 간단한 타임아웃 캡처",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/simple_timeout_capture.ps1"]
+        },
+        {
+            "label": "VELOS: 타임아웃 캡처 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: param($TimeoutSec = 30); $logDir = \"C:\\giwanos\\data\\logs\"; if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }; $ts = Get-Date -Format \"yyyyMMdd_HHmmss\"; $stdout = Join-Path $logDir \"run_$ts.out.txt\"; $stderr = Join-Path $logDir \"run_$ts.err.txt\"; $psi = New-Object System.Diagnostics.ProcessStartInfo; $psi.FileName = \"python\"; $psi.Arguments = \"-\"; $psi.UseShellExecute = $false; $psi.RedirectStandardInput = $true; $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true; $psi.StandardOutputEncoding = [Text.UTF8Encoding]::new($false); $psi.StandardErrorEncoding = [Text.UTF8Encoding]::new($false); $proc = New-Object System.Diagnostics.Process; $proc.StartInfo = $psi; $null = $proc.Start(); $code = @''import time; print(\"start\"); time.sleep(999); print(\"end\")''@; $proc.StandardInput.Write($code); $proc.StandardInput.Close(); if (-not $proc.WaitForExit($TimeoutSec*1000)) { try { $proc.Kill($true) } catch {}; \"TIMEOUT $TimeoutSec sec. Killed PID=$($proc.Id)\" | Tee-Object -FilePath $stderr }; $proc.StandardOutput.ReadToEnd() | Out-File -FilePath $stdout -Encoding UTF8; $proc.StandardError.ReadToEnd() | Out-File -FilePath $stderr -Encoding UTF8; \"STDOUT=$stdout\"; \"STDERR=$stderr\"'; Write-Host '이 패턴은 타임아웃 기능이 있는 고급 프로세스 실행 및 비동기 출력 캡처입니다.'"]
+        },
+        {
+            "label": "VELOS: Python 실행 함수",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_py_invoke.ps1"]
+        },
+        {
+            "label": "VELOS: 스키마 초기화",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_py_invoke.ps1","-InitSchema"]
+        },
+        {
+            "label": "VELOS: 간단한 Python 실행 함수",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/simple_py_invoke.ps1"]
+        },
+        {
+            "label": "VELOS: Python 실행 함수 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: function Invoke-VelosPy { param([Parameter(Mandatory=$true)][string]$Code, [int]$TimeoutSec = 45, [string]$Tag = \"run\"); $ts = Get-Date -Format \"yyyyMMdd_HHmmss\"; $out = Join-Path $logDir \"$Tag`_$ts.out.txt\"; $err = Join-Path $logDir \"$Tag`_$ts.err.txt\"; try { $psi = New-Object System.Diagnostics.ProcessStartInfo; $psi.FileName = \"python\"; $psi.Arguments = \"-\"; $psi.UseShellExecute = $false; $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true; $psi.StandardOutputEncoding=[Text.UTF8Encoding]::new($false); $psi.StandardErrorEncoding=[Text.UTF8Encoding]::new($false); $p = New-Object System.Diagnostics.Process; $p.StartInfo = $psi; $null=$p.Start(); $p.StandardInput.Write($Code); $p.StandardInput.Close(); if (-not $p.WaitForExit($TimeoutSec*1000)) { try{ $p.Kill($true) }catch{}; \"TIMEOUT $TimeoutSec sec\" | Out-File -FilePath $err -Encoding UTF8 }; $p.StandardOutput.ReadToEnd() | Out-File -FilePath $out -Encoding UTF8; $p.StandardError.ReadToEnd() | Out-File -FilePath $err -Append -Encoding UTF8; \"OK: $out`nERR: $err\" } catch { $_ | Out-File -FilePath $err -Encoding UTF8; \"ERR: $err\" } }'; Write-Host '이 패턴은 재사용 가능한 Python 실행 함수입니다.'"]
+        },
+        {
+            "label": "VELOS: 작업 큐 삽입",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-ExecutionPolicy","Bypass","-File","${workspaceFolder}/scripts/velos_enqueue_jobs.ps1"]
+        },
+        {
+            "label": "VELOS: 직접 작업 큐 삽입",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","$code = @'import os, sqlite3, json; db=os.getenv(\"VELOS_DB\",\"C:\\\\giwanos\\\\velos.db\"); con=sqlite3.connect(db); cur=con.cursor(); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"decide\", json.dumps({\"task\":\"테스트 입력\",\"notify\":True}, ensure_ascii=False), 10)); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"report\", json.dumps({\"period\":\"weekly\"}, ensure_ascii=False), 100)); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"notify\", json.dumps({\"msg\":\"테스트 알림\"}, ensure_ascii=False), 100)); con.commit(); con.close(); print(\"[OK] queued decide/report/notify\")'@; Invoke-VelosPy -Code $code -TimeoutSec 20 -Tag \"enqueue\""]
+        },
+        {
+            "label": "VELOS: 작업 큐 삽입 패턴",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["-NoExit","-Command","Write-Host '사용법: $code = @''import os, sqlite3, json; db=os.getenv(\"VELOS_DB\",\"C:\\\\giwanos\\\\velos.db\"); con=sqlite3.connect(db); cur=con.cursor(); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"decide\", json.dumps({\"task\":\"테스트 입력\",\"notify\":True}, ensure_ascii=False), 10)); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"report\", json.dumps({\"period\":\"weekly\"}, ensure_ascii=False), 100)); cur.execute(\"INSERT INTO job_queue(kind,payload,priority) VALUES (?,?,?)\", (\"notify\", json.dumps({\"msg\":\"테스트 알림\"}, ensure_ascii=False), 100)); con.commit(); con.close(); print(\"[OK] queued decide/report/notify\")''@; Invoke-VelosPy -Code $code -TimeoutSec 20 -Tag \"enqueue\"'; Write-Host '이 패턴은 VELOS 데이터베이스에 작업을 큐에 삽입합니다.'"]
+        },
+        {
+            "label": "VELOS: PowerShell 프로파일 설정",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "scripts/setup_powershell_profile.ps1"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VELOS: PowerShell 환경 정보 확인",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "scripts/check_powershell_env.py"
+            ],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": []
         }
-    ]
+        ]
 }

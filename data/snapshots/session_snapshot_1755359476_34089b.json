@@ -1,0 +1,542 @@
+{
+  "count": 44,
+  "events": [
+    {
+      "ts": 1755349954.5664895,
+      "ts_iso": "2025-08-16T22:12:34",
+      "session_id": "session_1755349954",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755349966.411471,
+      "ts_iso": "2025-08-16T22:12:46",
+      "session_id": "session_1755349966",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755350176.0286725,
+      "ts_iso": "2025-08-16T22:16:16",
+      "session_id": "session_1755350176",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755350188.2477272,
+      "ts_iso": "2025-08-16T22:16:28",
+      "session_id": "session_1755350188",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352050.0134456,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "init",
+      "text": "VELOS 마스터 루프 시작",
+      "insight": "세션 초기화 완료",
+      "tags": [
+        "master_loop",
+        "init"
+      ]
+    },
+    {
+      "ts": 1755352050.038341,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "memory_sync",
+      "text": "메모리 동기화 및 컨텍스트 블록 생성 완료",
+      "insight": "메모리 어댑터를 통한 데이터 동기화 완료",
+      "tags": [
+        "master_loop",
+        "memory_sync",
+        "context_block"
+      ]
+    },
+    {
+      "ts": 1755352050.0707085,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "complete",
+      "text": "VELOS 마스터 루프 완료",
+      "insight": "보고서 생성 및 디스패치 완료",
+      "tags": [
+        "master_loop",
+        "complete",
+        "report_generated"
+      ]
+    },
+    {
+      "ts": 1755352634.3173356,
+      "ts_iso": "2025-08-16T22:57:14",
+      "session_id": "session_1755352634",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352708.604733,
+      "ts_iso": "2025-08-16T22:58:28",
+      "session_id": "session_1755352708",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352799.821505,
+      "ts_iso": "2025-08-16T22:59:59",
+      "session_id": "session_1755352799",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352856.981348,
+      "ts_iso": "2025-08-16T23:00:56",
+      "session_id": "session_1755352856",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352935.9409568,
+      "ts_iso": "2025-08-16T23:02:15",
+      "session_id": "session_1755352935",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352999.62291,
+      "ts_iso": "2025-08-16T23:03:19",
+      "session_id": "session_1755352999",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353070.929757,
+      "ts_iso": "2025-08-16T23:04:30",
+      "session_id": "session_1755353070",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353136.2251322,
+      "ts_iso": "2025-08-16T23:05:36",
+      "session_id": "session_1755353136",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353220.2161143,
+      "ts_iso": "2025-08-16T23:07:00",
+      "session_id": "session_1755353220",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353290.0575266,
+      "ts_iso": "2025-08-16T23:08:10",
+      "session_id": "session_1755353290",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353367.5756392,
+      "ts_iso": "2025-08-16T23:09:27",
+      "session_id": "session_1755353367",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353447.9765403,
+      "ts_iso": "2025-08-16T23:10:47",
+      "session_id": "session_1755353447",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353513.3351986,
+      "ts_iso": "2025-08-16T23:11:53",
+      "session_id": "session_1755353513",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353577.9234242,
+      "ts_iso": "2025-08-16T23:12:57",
+      "session_id": "session_1755353577",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353645.0802999,
+      "ts_iso": "2025-08-16T23:14:05",
+      "session_id": "session_1755353645",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353783.2642555,
+      "ts_iso": "2025-08-16T23:16:23",
+      "session_id": "session_1755353783",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353860.1640832,
+      "ts_iso": "2025-08-16T23:17:40",
+      "session_id": "session_1755353860",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353929.0514147,
+      "ts_iso": "2025-08-16T23:18:49",
+      "session_id": "session_1755353929",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354042.1992025,
+      "ts_iso": "2025-08-16T23:20:42",
+      "session_id": "session_1755354042",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354163.6227617,
+      "ts_iso": "2025-08-16T23:22:43",
+      "session_id": "session_1755354163",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354234.6554093,
+      "ts_iso": "2025-08-16T23:23:54",
+      "session_id": "session_1755354234",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354466.5004132,
+      "ts_iso": "2025-08-16T23:27:46",
+      "session_id": "session_1755354466",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354562.084374,
+      "ts_iso": "2025-08-16T23:29:22",
+      "session_id": "session_1755354562",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354630.5599556,
+      "ts_iso": "2025-08-16T23:30:30",
+      "session_id": "session_1755354630",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354698.1492846,
+      "ts_iso": "2025-08-16T23:31:38",
+      "session_id": "session_1755354698",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354768.2750788,
+      "ts_iso": "2025-08-16T23:32:48",
+      "session_id": "session_1755354768",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354838.65007,
+      "ts_iso": "2025-08-16T23:33:58",
+      "session_id": "session_1755354838",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354967.3846185,
+      "ts_iso": "2025-08-16T23:36:07",
+      "session_id": "session_1755354967",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355035.387511,
+      "ts_iso": "2025-08-16T23:37:15",
+      "session_id": "session_1755355035",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355113.1515076,
+      "ts_iso": "2025-08-16T23:38:33",
+      "session_id": "session_1755355113",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355295.941283,
+      "ts_iso": "2025-08-16T23:41:35",
+      "session_id": "session_1755355295",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755357572.3112314,
+      "ts_iso": "2025-08-17T00:19:32",
+      "session_id": "session_1755357572",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358780.0504723,
+      "ts_iso": "2025-08-17T00:39:40",
+      "session_id": "session_1755358780",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358864.7075484,
+      "ts_iso": "2025-08-17T00:41:04",
+      "session_id": "session_1755358864",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358913.5364068,
+      "ts_iso": "2025-08-17T00:41:53",
+      "session_id": "session_1755358913",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755359249.99344,
+      "ts_iso": "2025-08-17T00:47:29",
+      "session_id": "session_1755359249",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755359475.9477577,
+      "ts_iso": "2025-08-17T00:51:15",
+      "session_id": "session_1755359475",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    }
+  ]
+}

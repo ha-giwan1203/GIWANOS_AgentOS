@@ -1,0 +1,13 @@
+{
+  "os": "Windows",
+  "shell": "PowerShell7",
+  "root": "C:\\giwanos",
+  "venv": null,
+  "db": "C:\\giwanos\\data\\velos.db",
+  "rules": [
+    "no hardcoding",
+    "env-first",
+    "no-popup schedule",
+    "Cursor-friendly"
+  ]
+}

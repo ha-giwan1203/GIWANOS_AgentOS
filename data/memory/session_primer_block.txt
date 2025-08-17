@@ -1,0 +1,8 @@
+[VELOS Session Primer]
+- OS: Windows, Shell: PowerShell 7 (Core)
+- Project root: C:\giwanos (ENV VELOS_ROOT)
+- Venv: 
+- DB: C:\giwanos\data\velos.db
+- 요구사항: 하드코딩 금지, 환경변수 우선, Cursor 복붙, 스케줄 무창
+- 실행: C:\giwanos\scripts\Start-Velos.ps1 → 스케줄러 "VELOS Master Loop"(5분)
+- 우선순위: ① 스케줄 무창 ② 리스크 태거 ≥1건 ③ .gitattributes 적용

@@ -1,0 +1,13 @@
+=== VELOS Self Check Summary ===
+Timestamp: 2025-08-14 19:34:33
+VELOS_ROOT: C:\giwanos
+
+[Probe Output]
+VELOS_ROOT= C:\giwanos
+learning_memory.json= ok
+env= {'OPENAI_API_KEY': 'present', 'NOTION_TOKEN': 'present', 'SLACK_BOT_TOKEN': 'present'}
+
+[Checks]
+VELOS_ROOT: C:\giwanos (ok)
+OPENAI_API_KEY: present (ok)
+Python: python (ok)

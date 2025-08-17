@@ -1,0 +1,194 @@
+{
+  "count": 15,
+  "events": [
+    {
+      "ts": 1755349954.5664895,
+      "ts_iso": "2025-08-16T22:12:34",
+      "session_id": "session_1755349954",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755349966.411471,
+      "ts_iso": "2025-08-16T22:12:46",
+      "session_id": "session_1755349966",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755350176.0286725,
+      "ts_iso": "2025-08-16T22:16:16",
+      "session_id": "session_1755350176",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755350188.2477272,
+      "ts_iso": "2025-08-16T22:16:28",
+      "session_id": "session_1755350188",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352050.0134456,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "init",
+      "text": "VELOS 마스터 루프 시작",
+      "insight": "세션 초기화 완료",
+      "tags": [
+        "master_loop",
+        "init"
+      ]
+    },
+    {
+      "ts": 1755352050.038341,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "memory_sync",
+      "text": "메모리 동기화 및 컨텍스트 블록 생성 완료",
+      "insight": "메모리 어댑터를 통한 데이터 동기화 완료",
+      "tags": [
+        "master_loop",
+        "memory_sync",
+        "context_block"
+      ]
+    },
+    {
+      "ts": 1755352050.0707085,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "complete",
+      "text": "VELOS 마스터 루프 완료",
+      "insight": "보고서 생성 및 디스패치 완료",
+      "tags": [
+        "master_loop",
+        "complete",
+        "report_generated"
+      ]
+    },
+    {
+      "ts": 1755352634.3173356,
+      "ts_iso": "2025-08-16T22:57:14",
+      "session_id": "session_1755352634",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352708.604733,
+      "ts_iso": "2025-08-16T22:58:28",
+      "session_id": "session_1755352708",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352799.821505,
+      "ts_iso": "2025-08-16T22:59:59",
+      "session_id": "session_1755352799",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352856.981348,
+      "ts_iso": "2025-08-16T23:00:56",
+      "session_id": "session_1755352856",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352935.9409568,
+      "ts_iso": "2025-08-16T23:02:15",
+      "session_id": "session_1755352935",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352999.62291,
+      "ts_iso": "2025-08-16T23:03:19",
+      "session_id": "session_1755352999",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353070.929757,
+      "ts_iso": "2025-08-16T23:04:30",
+      "session_id": "session_1755353070",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353136.2251322,
+      "ts_iso": "2025-08-16T23:05:36",
+      "session_id": "session_1755353136",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    }
+  ]
+}

@@ -10,14 +10,14 @@ rules:
   - name: "VELOS 운영 선언문 유지"
     match: "**/*.py"
     instruction: >
-      모든 Python 실행 스크립트 상단에 VELOS 운영 철학 선언문을 포함해라. 
+      모든 Python 실행 스크립트 상단에 VELOS 운영 철학 선언문을 포함해라.
       기존 선언문이 있으면 보존하고, 없으면 추가해라.
 
   - name: "경로 하드코딩 금지"
     match: "**/*"
     instruction: >
-      절대 경로 하드코딩을 금지한다. 경로는 우선순위로 로드: 
-      ENV > configs/settings.yaml > C:\giwanos. 
+      절대 경로 하드코딩을 금지한다. 경로는 우선순위로 로드:
+      ENV > configs/settings.yaml > C:\giwanos.
       os.getenv 및 설정 로딩 유틸을 사용해라.
 
   - name: "자가 검증 필수"

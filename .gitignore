@@ -1,4 +1,4 @@
-﻿# secrets
+# secrets
 configs/.env
 
 # backups
@@ -43,3 +43,7 @@ test_*.py
 *.tmp
 *.bak
 .venv_link/
+.mypy_cache/
+# volatile runtime outputs
+/data/logs/
+/data/reports/report_cursor.json

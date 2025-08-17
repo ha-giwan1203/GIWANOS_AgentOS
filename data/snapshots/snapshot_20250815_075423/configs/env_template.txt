@@ -1,0 +1,20 @@
+# VELOS Environment Variables Template
+# Copy this file to .env in the project root and modify as needed
+
+VELOS_ROOT=C:/giwanos
+VELOS_MODE=dev
+VELOS_REPORT_DIR=C:/giwanos/data/reports
+EMAIL_ENABLED=0
+
+# Optional: API Keys (keep these secure)
+# OPENAI_API_KEY=your_openai_api_key_here
+# SLACK_BOT_TOKEN=your_slack_bot_token_here
+# NOTION_TOKEN=your_notion_token_here
+
+# Optional: Database Settings
+# VELOS_DB_PATH=C:/giwanos/data/velos.db
+# VELOS_MEMORY_DB_PATH=C:/giwanos/data/memory/velos_memory.db
+
+# Optional: Logging
+# VELOS_LOG_LEVEL=INFO
+# VELOS_LOG_FILE=C:/giwanos/logs/velos.log

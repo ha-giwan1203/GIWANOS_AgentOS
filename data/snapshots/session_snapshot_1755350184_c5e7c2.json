@@ -1,0 +1,45 @@
+{
+  "count": 3,
+  "events": [
+    {
+      "ts": 1755349954.5664895,
+      "ts_iso": "2025-08-16T22:12:34",
+      "session_id": "session_1755349954",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755349966.411471,
+      "ts_iso": "2025-08-16T22:12:46",
+      "session_id": "session_1755349966",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755350176.0286725,
+      "ts_iso": "2025-08-16T22:16:16",
+      "session_id": "session_1755350176",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    }
+  ]
+}

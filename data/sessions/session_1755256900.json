@@ -1,0 +1,13 @@
+{
+  "context_block": "<<VELOS_CONTEXT:BEGIN>>\nwindow=48h; pulled=4\n[1755196178] (user) [boot-test] 새 방에서 맥락 복구 동작 확인 | tags=명령,기억_유지,pipeline,test\n[1755196109] (user) [boot-test] 새 방에서 맥락 복구 동작 확인 | tags=명령,기억_유지,pipeline,test\n[1755195796] (system) [test] flush pipeline ok? ts=1755195796 | tags=test,pipeline,memory\n[1755195701] (user) VELOS 운영 철학 테스트 | tags=test,philosophy\n<<VELOS_CONTEXT:END>>",
+  "mandates": {
+    "FILE_NAMES_IMMUTABLE": true,
+    "NO_FAKE_CODE": true,
+    "ROOT_FIXED": "C:/giwanos",
+    "SELF_TEST_REQUIRED": true,
+    "PROMPT_ALWAYS_INCLUDE_CONTEXT": true
+  },
+  "session_start_ts": 1755256900,
+  "hotbuf_created_ts": 1755256434,
+  "session_id": "session_1755256900"
+}

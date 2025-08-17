@@ -1,0 +1,36 @@
+{"ts":"2025-08-17T10:04:12.5923915Z","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"present"}
+{"ts":"2025-08-17T10:06:02.8110022Z","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"present"}
+{"ts":"2025-08-17T10:22:07.0107970Z","phase":"begin","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"missing"}
+{"ts":"2025-08-17T10:22:31.9031319Z","phase":"end","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"missing"}
+{"ts":"2025-08-17T10:26:02.3643251Z","phase":"begin","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown"}
+{"ts":"2025-08-17T10:26:09.0945499Z","phase":"end","pwsh":"PowerShell 7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown"}
+{"ts":"2025-08-17T10:32:19.5944119Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:32:22.2090716Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:35:03.0885913Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:35:05.7585133Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:36:06.1430728Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:36:08.0540081Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:39:54.0807530Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:39:56.2132427Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:40:02.7390961Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:40:05.7565331Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T10:45:59.6662192Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:46:02.5783729Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:/giwanos/data/velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:51:02.8665312Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T10:51:05.0943356Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"unknown","taskCtx":false}
+{"ts":"2025-08-17T11:01:35.2530208Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:01:37.4132372Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:07:43.8194068Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:07:45.6387908Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:08:26.5438570Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:08:29.9164499Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:10:42.8133707Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:10:45.4632484Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:11:33.8577054Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:11:36.3094210Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:15:41.8062893Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:15:44.0511727Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:20:41.8784059Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:20:43.7387418Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:25:43.4298903Z","phase":"begin","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}
+{"ts":"2025-08-17T11:25:45.6880785Z","phase":"end","pwsh":"7.5.2","root":"C:\\giwanos","db":"C:\\giwanos\\data\\velos.db","schedule":"present","taskCtx":false}

@@ -65,13 +65,3 @@ try {
   } | ConvertTo-Json -Depth 5 | Out-File -Encoding utf8 $ReportPath
   Write-Error "FAIL :: $ReportPath"; exit 1
 }
-
-
-
-
-
-
-
-
-
-

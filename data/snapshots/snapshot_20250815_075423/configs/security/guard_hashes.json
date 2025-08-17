@@ -1,0 +1,13 @@
+﻿{
+    "files":  [
+                  {
+                      "path":  "C:/giwanos/scripts/gpt_code_guard.ps1",
+                      "sha256":  "2f3cf230b6126022f229ad08955a09d9ecc854a3bbe295ce22b09bcdc8b4149b"
+                  },
+                  {
+                      "path":  "C:/giwanos/scripts/materialize_gpt_output.py",
+                      "sha256":  "16dde5d7218deadc28162222c88bb3c5a35a8c0e68c2dda2875b690fc61e348f"
+                  }
+              ],
+    "updated_at":  "2025-08-13T13:55:10.8555205+09:00"
+}

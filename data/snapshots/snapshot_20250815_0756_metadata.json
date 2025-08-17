@@ -1,0 +1,24 @@
+{
+  "timestamp": "20250815_0756",
+  "created_at": "2025-08-15T07:56:43.317177",
+  "snapshot_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250815_0756.zip",
+  "total_files": 176,
+  "total_size_bytes": 418360,
+  "targets": [
+    {
+      "target": "memory",
+      "files": 19,
+      "size_bytes": 231673
+    },
+    {
+      "target": "reflections",
+      "files": 132,
+      "size_bytes": 160266
+    },
+    {
+      "target": "configs",
+      "files": 25,
+      "size_bytes": 26421
+    }
+  ]
+}
