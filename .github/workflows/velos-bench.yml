@@ -18,7 +18,7 @@ on:
       - "modules/**"
       - "tests/perf/**"
   schedule:
-    - cron: "0 18 * * *"   # 매일 18:00 UTC
+    - cron: "0 18 * * *"   # UTC 18:00 = KST 03:00(+9)
 
 concurrency:
   group: velos-bench-${{ github.ref }}
@@ -110,6 +110,18 @@ jobs:
           MAX_SEARCH_SEC: ${{ github.event.inputs.max_search_sec || '0.50' }}
         run: |
           python tests/perf/benchmark_regression.py
+
+      - name: Housekeeping
+        if: always()
+        run: |
+          python - << 'PY'
+          import os,sqlite3
+          db=os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
+          con=sqlite3.connect(db, timeout=5, isolation_level=None)
+          con.execute("DELETE FROM memory WHERE role IN ('bench','benchmix')")
+          con.execute("INSERT INTO memory_fts(memory_fts) VALUES('optimize')")
+          con.close()
+          PY
 
       - name: Upload artifacts
         if: always()
