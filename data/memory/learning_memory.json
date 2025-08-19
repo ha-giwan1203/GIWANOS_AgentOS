@@ -11332,7 +11332,763 @@
         "info"
       ],
       "kind": "job"
+    },
+    {
+      "ts": 1755569721.7281547,
+      "ts_iso": "2025-08-19T11:15:21",
+      "session_id": "session_1755569721",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755569721.7361324,
+      "ts_iso": "2025-08-19T11:15:21",
+      "session_id": "session_1755569721",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755569722.0851998,
+      "ts_iso": "2025-08-19T11:15:22",
+      "session_id": "session_1755569722",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755569722.097168,
+      "ts_iso": "2025-08-19T11:15:22",
+      "session_id": "session_1755569722",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755569722.105147,
+      "ts_iso": "2025-08-19T11:15:22",
+      "session_id": "session_1755569722",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755569779.6786532,
+      "ts_iso": "2025-08-19T11:16:19",
+      "session_id": "session_1755569779",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755569779.9060354,
+      "ts_iso": "2025-08-19T11:16:19",
+      "session_id": "session_1755569779",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755569779.911019,
+      "ts_iso": "2025-08-19T11:16:19",
+      "session_id": "session_1755569779",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755569779.9170072,
+      "ts_iso": "2025-08-19T11:16:19",
+      "session_id": "session_1755569779",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585200.563539,
+      "ts_iso": "2025-08-19T15:33:20",
+      "session_id": "session_1755585200",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585200.8986437,
+      "ts_iso": "2025-08-19T15:33:20",
+      "session_id": "session_1755585200",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585200.9086175,
+      "ts_iso": "2025-08-19T15:33:20",
+      "session_id": "session_1755585200",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585204.9657729,
+      "ts_iso": "2025-08-19T15:33:24",
+      "session_id": "session_1755585204",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585204.9767437,
+      "ts_iso": "2025-08-19T15:33:24",
+      "session_id": "session_1755585204",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585206.5525298,
+      "ts_iso": "2025-08-19T15:33:26",
+      "session_id": "session_1755585206",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585206.5615067,
+      "ts_iso": "2025-08-19T15:33:26",
+      "session_id": "session_1755585206",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585206.8706794,
+      "ts_iso": "2025-08-19T15:33:26",
+      "session_id": "session_1755585206",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585206.8806522,
+      "ts_iso": "2025-08-19T15:33:26",
+      "session_id": "session_1755585206",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585206.888631,
+      "ts_iso": "2025-08-19T15:33:26",
+      "session_id": "session_1755585206",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585360.753418,
+      "ts_iso": "2025-08-19T15:36:00",
+      "session_id": "session_1755585360",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585361.8563259,
+      "ts_iso": "2025-08-19T15:36:01",
+      "session_id": "session_1755585361",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585361.8643045,
+      "ts_iso": "2025-08-19T15:36:01",
+      "session_id": "session_1755585361",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585361.8692899,
+      "ts_iso": "2025-08-19T15:36:01",
+      "session_id": "session_1755585361",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585585.6392963,
+      "ts_iso": "2025-08-19T15:39:45",
+      "session_id": "session_1755585585",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585635.9786422,
+      "ts_iso": "2025-08-19T15:40:35",
+      "session_id": "session_1755585635",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585637.4507072,
+      "ts_iso": "2025-08-19T15:40:37",
+      "session_id": "session_1755585637",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585637.4606802,
+      "ts_iso": "2025-08-19T15:40:37",
+      "session_id": "session_1755585637",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585637.4736469,
+      "ts_iso": "2025-08-19T15:40:37",
+      "session_id": "session_1755585637",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585872.6199238,
+      "ts_iso": "2025-08-19T15:44:32",
+      "session_id": "session_1755585872",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585873.4277635,
+      "ts_iso": "2025-08-19T15:44:33",
+      "session_id": "session_1755585873",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755585873.4437222,
+      "ts_iso": "2025-08-19T15:44:33",
+      "session_id": "session_1755585873",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755585873.4626715,
+      "ts_iso": "2025-08-19T15:44:33",
+      "session_id": "session_1755585873",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586166.1523905,
+      "ts_iso": "2025-08-19T15:49:26",
+      "session_id": "session_1755586166",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586166.7118938,
+      "ts_iso": "2025-08-19T15:49:26",
+      "session_id": "session_1755586166",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586166.7288492,
+      "ts_iso": "2025-08-19T15:49:26",
+      "session_id": "session_1755586166",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586166.755777,
+      "ts_iso": "2025-08-19T15:49:26",
+      "session_id": "session_1755586166",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586446.1563401,
+      "ts_iso": "2025-08-19T15:54:06",
+      "session_id": "session_1755586446",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586446.500421,
+      "ts_iso": "2025-08-19T15:54:06",
+      "session_id": "session_1755586446",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586446.5083985,
+      "ts_iso": "2025-08-19T15:54:06",
+      "session_id": "session_1755586446",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586446.517376,
+      "ts_iso": "2025-08-19T15:54:06",
+      "session_id": "session_1755586446",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586746.9706345,
+      "ts_iso": "2025-08-19T15:59:06",
+      "session_id": "session_1755586746",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586750.8373835,
+      "ts_iso": "2025-08-19T15:59:10",
+      "session_id": "session_1755586750",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586750.8483522,
+      "ts_iso": "2025-08-19T15:59:10",
+      "session_id": "session_1755586750",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586750.879269,
+      "ts_iso": "2025-08-19T15:59:10",
+      "session_id": "session_1755586750",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586885.0221877,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586885.4021723,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586885.4131424,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586885.7801623,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755586885.7901363,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755586885.7981138,
+      "ts_iso": "2025-08-19T16:01:25",
+      "session_id": "session_1755586885",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587026.49519,
+      "ts_iso": "2025-08-19T16:03:46",
+      "session_id": "session_1755587026",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587027.074641,
+      "ts_iso": "2025-08-19T16:03:47",
+      "session_id": "session_1755587027",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587027.0836163,
+      "ts_iso": "2025-08-19T16:03:47",
+      "session_id": "session_1755587027",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587027.1015677,
+      "ts_iso": "2025-08-19T16:03:47",
+      "session_id": "session_1755587027",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587320.295634,
+      "ts_iso": "2025-08-19T16:08:40",
+      "session_id": "session_1755587320",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587320.7469668,
+      "ts_iso": "2025-08-19T16:08:40",
+      "session_id": "session_1755587320",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587320.7778869,
+      "ts_iso": "2025-08-19T16:08:40",
+      "session_id": "session_1755587320",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587320.791847,
+      "ts_iso": "2025-08-19T16:08:40",
+      "session_id": "session_1755587320",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587438.3510816,
+      "ts_iso": "2025-08-19T16:10:38",
+      "session_id": "session_1755587438",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587438.772955,
+      "ts_iso": "2025-08-19T16:10:38",
+      "session_id": "session_1755587438",
+      "from": "scheduler",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ],
+      "kind": "job"
+    },
+    {
+      "ts": 1755587438.780931,
+      "ts_iso": "2025-08-19T16:10:38",
+      "session_id": "session_1755587438",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587438.7889125,
+      "ts_iso": "2025-08-19T16:10:38",
+      "session_id": "session_1755587438",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "system"
+    },
+    {
+      "ts": 1755587719.899184,
+      "ts_iso": "2025-08-19T16:15:19",
+      "session_id": "session_1755587719",
+      "from": "scheduler",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ],
+      "kind": "job"
     }
   ],
-  "count": 950
+  "count": 1013
 }

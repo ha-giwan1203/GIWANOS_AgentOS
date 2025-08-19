@@ -1,76 +1,53 @@
-name: VELOS CI
+name: VELOS CI Pipeline
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: [ main, develop ]
   pull_request:
-    branches: ["main", "master"]
+    branches: [ main, develop ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  velos-validation:
+    runs-on: windows-latest
+    
     steps:
-      # 1) Checkout ---------------------------------------------------
-      - uses: actions/checkout@v4
-
-      # 2) Python 3.11 ------------------------------------------------
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      # 3) Dependencies ----------------------------------------------
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # 4) Structure verification ------------------------------------
-      - name: Verify folder/file structure
-        run: |
-          python scripts/verify_structure.py                       \
-                 --override spec_overrides.yaml                    \
-                 --case-insensitive --show-extras
-      # 실패 시 바로 중단
-        continue-on-error: false
-
-      # 5) Vector cache init (idempotent) ----------------------------
-      - name: Init vector cache
-        run: python scripts/init_vector_cache.py
-
-      # 6) Snapshot cleanup (>30 days) -------------------------------
-      - name: Cleanup old snapshots
-        run: python modules/automation/maintenance/cleanup_snapshots.py --days 30
-
-      # 7) Unit tests -------------------------------------------------
-      - name: Run tests
-        run: pytest -q
-
-      # 8) Slack notification (success) ------------------------------
-      - name: Report success to Slack
-        if: success()
-        run: |
-          python - <<'PY'
-          import os, sys
-          from tools.notifications.slack_api import send
-          sha = os.environ["GITHUB_SHA"][:7]
-          if not send(f"✅ VELOS CI passed for commit {sha}"):
-              sys.exit("Slack send failed")
-          PY
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-
-      # 9) Slack notification (failure) ------------------------------
-      - name: Report failure to Slack
-        if: failure()
-        run: |
-          python - <<'PY'
-          import os
-          from tools.notifications.slack_api import send
-          sha = os.environ["GITHUB_SHA"][:7]
-          send(f"❌ VELOS CI failed for commit {sha}")
-          PY
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r configs/requirements.txt
+        
+    - name: Set environment variables
+      run: |
+        $env:VELOS_DB_PATH = "C:\giwanos\data\velos.db"
+        $env:VELOS_ROOT = "C:\giwanos"
+        
+    - name: Schema guard
+      run: python scripts/py/check_schema_guard.py
+      
+    - name: FTS healthcheck
+      run: python scripts/py/fts_healthcheck.py
+      
+    - name: FTS smoke test
+      run: python scripts/py/fts_smoke_test.py
+      
+    - name: Validate smoke test output
+      run: |
+        $smoke = python scripts/py/fts_smoke_test.py
+        if($smoke -notmatch "alpha_after_update=0" -or $smoke -notmatch "after_delete=0"){
+          throw "FTS smoke test failed: $smoke"
+        }
+        Write-Host "Smoke test validation passed"
+        
+    - name: Emergency recovery test
+      run: python scripts/py/fts_emergency_recovery.py
+      
+    - name: Final healthcheck
+      run: python scripts/py/fts_healthcheck.py

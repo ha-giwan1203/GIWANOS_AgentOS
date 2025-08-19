@@ -79,3 +79,9 @@ print('VELOS_LOG:', get_setting('logging.path'))
 **검증**: 자가 검증 완료
 
 
+
+
+
+
+
+

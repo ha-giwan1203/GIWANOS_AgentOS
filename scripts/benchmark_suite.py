@@ -209,6 +209,20 @@ def run_suite():
     for role in ("bench", "benchmix"):
         r = delete_role(role)
         print(f"delete_{role}: n={r.n}, {r.seconds:.2f}s")
+    
+    # 백업 청소 화이트리스트: velos_*.bench.db만 삭제, velos_golden_*.db는 보호
+    print("\n=== cleanup backup bench files ===")
+    backup_dir = Path("backup")
+    if backup_dir.exists():
+        bench_files = list(backup_dir.glob("velos_*.bench.db"))
+        golden_files = list(backup_dir.glob("velos_golden_*.db"))
+        print(f"Found {len(bench_files)} bench files, {len(golden_files)} golden files (protected)")
+        for f in bench_files:
+            try:
+                f.unlink()
+                print(f"Deleted: {f.name}")
+            except Exception as e:
+                print(f"Failed to delete {f.name}: {e}")
 
     # Summary table
     print("\n====== SUMMARY ======")

@@ -1,0 +1,13 @@
+{
+  "context_block": "<<VELOS_CONTEXT:BEGIN>>\nwindow=48h; pulled=2\n[1755584663] (system) VELOS 데이터베이스 재생성 완료 | tags=[,]\n[1755584663] (user) FTS5 검색 테스트 데이터 | tags=[,]\n<<VELOS_CONTEXT:END>>",
+  "mandates": {
+    "FILE_NAMES_IMMUTABLE": true,
+    "NO_FAKE_CODE": true,
+    "ROOT_FIXED": "C:/giwanos",
+    "SELF_TEST_REQUIRED": true,
+    "PROMPT_ALWAYS_INCLUDE_CONTEXT": true
+  },
+  "session_start_ts": 1755586446,
+  "hotbuf_created_ts": 1755585200,
+  "session_id": "session_1755586446"
+}

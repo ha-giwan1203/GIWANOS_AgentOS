@@ -173,3 +173,9 @@ export NOTION_DATABASE_ID="your_database_id"
 **검증**: 자가 검증 완료
 
 
+
+
+
+
+
+

@@ -166,3 +166,9 @@ echo "테스트 내용" | python scripts/dump_stdout_advanced.py
 **검증**: 자가 검증 완료
 
 
+
+
+
+
+
+

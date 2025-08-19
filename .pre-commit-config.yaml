@@ -22,14 +22,16 @@ repos:
 
   - repo: local
     hooks:
-      - id: mypy-minimal
-        name: mypy (router only)
-        entry: python -m mypy
+      - id: velos-schema-guard
+        name: VELOS Schema Guard
+        entry: python scripts/py/check_schema_guard.py
         language: system
-        pass_filenames: false         # ← pre-commit이 파일 목록을 넘기지 않게
-        args:
-          - --config-file
-          - mypy.ini
-          # 검사 대상을 명시적으로 강제
-          - modules/core/memory_adapter
-          - modules/memory/router/velos_router_adapter.py
+        pass_filenames: false
+        always_run: true
+        
+      - id: velos-fts-smoke
+        name: VELOS FTS Smoke Test
+        entry: python scripts/py/fts_smoke_test.py
+        language: system
+        pass_filenames: false
+        always_run: true

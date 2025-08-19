@@ -1,92 +1,99 @@
-# VELOS
+# VELOS - Vector Enhanced Learning and Operations System
 
-[![VELOS Bench](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml/badge.svg?branch=main)](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml)
+## VELOS 운영 철학 선언문
+판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
-VELOS는 "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다" 철학을 따르는 AI 메모리 시스템입니다.
+## 의존성 핀
 
-## 빠른 시작
-```powershell
-$env:VELOS_DB_PATH="C:\giwanos\data\velos.db"
-python .\scripts\memory_tick.py
+### SQLite 버전 요구사항
+- **최소 버전**: SQLite 3.35.0+ (FTS5 지원)
+- **권장 버전**: SQLite 3.40.0+ (BM25 함수 지원)
+- **현재 테스트 환경**: SQLite 3.42.0
+- **호환성**: fts5_integrity_check가 없는 빌드도 자동 폴백으로 지원
+
+### Python 요구사항
+- **Python**: 3.9+
+- **주요 패키지**: sqlite3, pathlib, typing
+
+## 검색 품질 메트릭
+
+### 성능 지표
+- **search.qps**: 초당 검색 쿼리 수
+- **search.latency_p50**: 검색 응답 시간 중간값 (밀리초)
+- **fts.rebuild_count**: FTS 재색인 횟수
+
+### 현재 기준값 (v2-fts-lockin)
+- search.qps: > 1000/s
+- search.latency_p50: < 50ms
+- fts.rebuild_count: < 1/주
+
+## 장애 퀵런북
+
+### 6줄 복구 절차
+```bash
+# 1. 헬스체크
+python scripts\py\fts_healthcheck.py
+
+# 2. 실패시 긴급 복구
+python scripts\py\fts_emergency_recovery.py
+
+# 3. 재검증
+python scripts\py\fts_healthcheck.py
+
+# 4. 그래도 실패시 DB 재생성
+python scripts\py\recreate_velos_db.py
+
+# 5. 스모크 테스트
+python scripts\py\fts_smoke_test.py
+# 기대값: alpha_after_update=0, after_delete=0
+
+# 6. 최악의 경우 골든 스냅샷 복원
+# backup\velos_golden_*.db로 스왑
 ```
 
-## 🚀 VELOS 운영 철학
+### 중요 규칙
+- **CI/러너가 빨간불이면 배포 중단. 변명 금지.**
+- **접두사 검색은 꼭 별(*) 붙인다**: `search_memory(cur, "deploy*")`
+- **LIKE의 %는 금지**: FTS의 `term*` 패턴 사용
 
-> "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
-
-VELOS는 지능형 에이전트 운영 시스템으로, 다음과 같은 핵심 원칙을 따릅니다:
-
-### 📋 핵심 원칙
-1. **파일명 고정**: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
-2. **자가 검증 필수**: 수정/배포 전 자동·수동 테스트를 통과해야 함
-3. **실행 결과 직접 테스트**: 코드 제공 시 실행 결과를 동봉/기록
-4. **저장 경로 고정**: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
-5. **실패 기록·회고**: 실패 로그를 남기고 후속 커밋/문서에 반영
-6. **기억 반영**: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
-7. **구조 기반 판단**: 프로젝트 구조 기준으로만 판단 (추측 금지)
-8. **중복/오류 제거**: 불필요/중복 로직 제거, 단일 진실원칙 유지
-9. **지능형 처리**: 자동 복구·경고 등 방어적 설계 우선
-10. **거짓 코드 절대 불가**: 실행 불가·미검증·허위 출력 일체 금지
-
-## 🏗️ 시스템 구조
-
-```
-C:\giwanos\
-├── modules/          # 핵심 모듈
-├── scripts/          # 실행 스크립트
-├── interface/        # 사용자 인터페이스
-├── tests/           # 테스트 및 벤치마크
-├── data/            # 데이터 저장소
-├── configs/         # 설정 파일
-└── tools/           # 유틸리티 도구
+## E2E 테스트 예시
+```python
+# 호출부에서 접두사는 꼭 별(*) 붙인다
+results = search_memory(cur, "deploy*")
+assert isinstance(results, list)
 ```
 
-## 🔧 주요 기능
-
-### 📊 성능 모니터링
-- **자동 벤치마크**: GitHub Actions를 통한 일일 성능 테스트
-- **FTS5 검색**: SQLite Full-Text Search 기반 고성능 검색
-- **메모리 관리**: 자동 메모리 정리 및 최적화
-
-### 🤖 자동화 시스템
-- **마스터 스케줄러**: 중앙 집중식 작업 관리
-- **디스패치 시스템**: Slack, Notion, Email 자동 전송
-- **상태 모니터링**: 실시간 시스템 상태 추적
-
-### 🔍 검색 및 분석
-- **REPORT_KEY 검색**: 통합 검색 인터페이스
-- **로그 분석**: 구조화된 로그 처리 및 분석
-- **메모리 인사이트**: 학습 데이터 기반 인사이트 생성
-
-## 🚀 빠른 시작
+## 설치 및 실행
 
 ### 환경 설정
 ```powershell
-# 환경변수 설정
 $env:VELOS_DB = "C:\giwanos\data\velos.db"
-
-# VELOS 실행
-powershell -ExecutionPolicy Bypass -File scripts\run_velos_search.ps1
+$env:VELOS_ROOT = "C:\giwanos"
 ```
 
-### 대시보드 실행
+### 검증 스위트
 ```powershell
-# Streamlit 대시보드
-streamlit run apps\search_app.py
+python scripts\py\check_schema_guard.py
+python scripts\py\fts_healthcheck.py
+python scripts\py\fts_smoke_test.py
 ```
 
-## 📈 성능 벤치마크
+### 주간 유지보수
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\ps\fts_weekly_maintenance.ps1
+```
 
-VELOS는 지속적인 성능 모니터링을 통해 시스템 안정성을 보장합니다:
+## 릴리즈 정보
 
-- **Insert 성능**: 2000행 삽입 최소 500 QPS
-- **Search 성능**: 40회 검색 최대 0.5초
-- **자동 테스트**: 매일 UTC 18:00 (KST 03:00) 자동 실행
+### v2-fts-lockin (2025-08-19)
+- FTS5 검색 시스템 완전 고정
+- 스키마 버전 2로 업그레이드
+- 자동 복구 시스템 구현
+- 주간 유지보수 스케줄러 등록
+- 골든 스냅샷 보존: `backup/velos_golden_20250819_171455.db`
 
-## 📝 라이선스
+### v1.0-stable
+- 초기 안정 버전
 
-이 프로젝트는 VELOS 운영 철학에 따라 개발되었습니다.
-
-## 🤝 기여
-
-VELOS 운영 철학을 준수하며 기여해 주세요. 모든 변경사항은 자가 검증을 거쳐야 합니다.
+## 라이선스
+MIT License

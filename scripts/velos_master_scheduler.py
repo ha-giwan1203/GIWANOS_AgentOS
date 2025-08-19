@@ -1,6 +1,63 @@
 # [ACTIVE] VELOS 마스터 스케줄러 - 중앙 작업 관리 시스템
 # VELOS 운영 철학 선언문
 # "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
+
+# 카나리아 헬스체크 - 프로세스 시작 시 자체 점검
+import subprocess
+import sys
+
+def canary_healthcheck():
+    """FTS 헬스체크 수행 및 필요시 긴급 복구"""
+    try:
+        # 환경 변수 설정
+        os.environ["VELOS_DB_PATH"] = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
+        
+        # 1차 헬스체크
+        result = subprocess.run([
+            sys.executable, 
+            os.path.join(os.path.dirname(__file__), "py", "fts_healthcheck.py")
+        ], capture_output=True, text=True, cwd=os.path.dirname(__file__))
+        
+        if result.returncode != 0:
+            print(f"[WARN] FTS healthcheck failed → emergency recovery...")
+            print(f"Error: {result.stderr}")
+            print("FTS_HEALTH failed")
+            
+            # 긴급 복구 실행
+            recovery_result = subprocess.run([
+                sys.executable,
+                os.path.join(os.path.dirname(__file__), "py", "fts_emergency_recovery.py")
+            ], capture_output=True, text=True, cwd=os.path.dirname(__file__))
+            
+            if recovery_result.returncode != 0:
+                print(f"[ERROR] Emergency recovery failed: {recovery_result.stderr}")
+                return False
+            
+            # 2차 헬스체크
+            result2 = subprocess.run([
+                sys.executable,
+                os.path.join(os.path.dirname(__file__), "py", "fts_healthcheck.py")
+            ], capture_output=True, text=True, cwd=os.path.dirname(__file__))
+            
+            if result2.returncode != 0:
+                print(f"[ERROR] FTS healthcheck failed after recovery: {result2.stderr}")
+                return False
+            
+            print("[INFO] Emergency recovery successful")
+            print("FTS_RECOVERY applied")
+        
+        print("FTS_HEALTH ok")
+        return True
+        
+    except Exception as e:
+        print(f"[ERROR] Canary healthcheck failed: {e}")
+        print("FTS_HEALTH failed")
+        return False
+
+# 시작 시 카나리아 헬스체크 실행
+if not canary_healthcheck():
+    print("[FATAL] Canary healthcheck failed - exiting")
+    sys.exit(1)
 """
 VELOS: Single Python Master Loop
 - Windows Task Scheduler는 5분마다 이 파일만 실행
@@ -245,26 +302,23 @@ def _run_job(job: Dict[str, Any], dry_run: bool = False) -> bool:
             _log(f"Script not found: {full_path}", "ERROR")
             return False
             
-        # BridgeDispatch 전용 실행 방식
-        if name == "BridgeDispatch":
+        # 모든 작업을 완전히 숨겨진 창에서 실행
+        if script_path.endswith('.ps1'):
             result = subprocess.run([
-                "pwsh", "-NoProfile", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass",
-                "-Command", f"Set-Location '{ROOT}'; $env:PYTHONPATH='{ROOT}'; python .\\scripts\\velos_bridge.py"
-            ], capture_output=True, text=True, timeout=300)
-
-        # 파일 확장자에 따른 실행 방법 결정
-        elif script_path.endswith('.ps1'):
-            result = subprocess.run([
-                "pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", full_path
-            ], capture_output=True, text=True, timeout=300)
+                "pwsh", "-NoProfile", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-File", full_path
+            ], capture_output=True, text=True, timeout=300, creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS)
         elif script_path.endswith('.bat'):
             result = subprocess.run([
-                full_path
-            ], capture_output=True, text=True, timeout=300)
+                "cmd", "/c", full_path
+            ], capture_output=True, text=True, timeout=300, creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS)
         else:
+            # Python 스크립트는 pythonw.exe로 실행하여 창 숨김
+            pythonw_exe = sys.executable.replace("python.exe", "pythonw.exe")
+            if not os.path.exists(pythonw_exe):
+                pythonw_exe = sys.executable  # fallback
             result = subprocess.run([
-                sys.executable, full_path
-            ], capture_output=True, text=True, timeout=300)
+                pythonw_exe, full_path
+            ], capture_output=True, text=True, timeout=300, creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS)
             
         if result.returncode == 0:
             _log(f"RUN {name} ok")

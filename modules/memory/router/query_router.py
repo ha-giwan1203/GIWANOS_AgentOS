@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
+# [ACTIVE] VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
 import os
@@ -89,6 +89,7 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
     try:
         if _is_keyword(query):
             # 키워드 검색: 최근 N일 + LIKE 우선 (빠른 라이트 쿼리)
+            # 주의: LIKE의 %는 접두사 검색이 아닌 부분 문자열 검색용
             since = _recent_since_epoch(RECENT_DAYS)
             cur.execute("""
                 SELECT id, ts, role, insight, raw, tags
@@ -108,17 +109,30 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                     "insight": insight, "raw": raw, "tags": tags
                 })
 
-            # 필요 시 FTS 보강 (개선된 패턴)
+            # 필요 시 FTS 보강 (BM25 폴백 지원)
             if not rows:
-                cur.execute("""
-                    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
-                    FROM memory_fts
-                    JOIN memory_text t ON t.id = memory_fts.rowid
-                    JOIN memory m ON m.id = memory_fts.rowid
-                    WHERE memory_fts MATCH ?
-                    ORDER BY score
-                    LIMIT ?
-                """, (query, FTS_LIMIT))
+                try:
+                    # BM25 함수가 있는 경우 사용
+                    cur.execute("""
+                        SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+                        FROM memory_fts
+                        JOIN memory_text t ON t.id = memory_fts.rowid
+                        JOIN memory m ON m.id = memory_fts.rowid
+                        WHERE memory_fts MATCH ?
+                        ORDER BY score
+                        LIMIT ?
+                    """, (query, FTS_LIMIT))
+                except Exception:
+                    # BM25 함수가 없는 경우 시간순으로 폴백
+                    cur.execute("""
+                        SELECT m.id, m.ts, t.text_norm
+                        FROM memory_fts
+                        JOIN memory_text t ON t.id = memory_fts.rowid
+                        JOIN memory m ON m.id = memory_fts.rowid
+                        WHERE memory_fts MATCH ?
+                        ORDER BY m.ts DESC
+                        LIMIT ?
+                    """, (query, FTS_LIMIT))
 
                 for r in cur.fetchall():
                     id_, ts, text_norm, score = r
@@ -129,16 +143,29 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                         "score": score
                     })
         else:
-            # 깊은 쿼리: FTS 우선 (개선된 패턴)
-            cur.execute("""
-                SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
-                FROM memory_fts
-                JOIN memory_text t ON t.id = memory_fts.rowid
-                JOIN memory m ON m.id = memory_fts.rowid
-                WHERE memory_fts MATCH ?
-                ORDER BY score
-                LIMIT ?
-            """, (query, FTS_LIMIT))
+            # 깊은 쿼리: FTS 우선 (BM25 폴백 지원)
+            try:
+                # BM25 함수가 있는 경우 사용
+                cur.execute("""
+                    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+                    FROM memory_fts
+                    JOIN memory_text t ON t.id = memory_fts.rowid
+                    JOIN memory m ON m.id = memory_fts.rowid
+                    WHERE memory_fts MATCH ?
+                    ORDER BY score
+                    LIMIT ?
+                """, (query, FTS_LIMIT))
+            except Exception:
+                # BM25 함수가 없는 경우 시간순으로 폴백
+                cur.execute("""
+                    SELECT m.id, m.ts, t.text_norm
+                    FROM memory_fts
+                    JOIN memory_text t ON t.id = memory_fts.rowid
+                    JOIN memory m ON m.id = memory_fts.rowid
+                    WHERE memory_fts MATCH ?
+                    ORDER BY m.ts DESC
+                    LIMIT ?
+                """, (query, FTS_LIMIT))
 
             for r in cur.fetchall():
                 id_, ts, text_norm, score = r
