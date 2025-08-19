@@ -1,13 +1,14 @@
-# VELOS (VELOS Operating System)
+# VELOS
 
-<!-- 상태 -->
 [![VELOS Bench](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml/badge.svg?branch=main)](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml)
 
-<!-- 파이썬 버전 -->
-![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+VELOS는 "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다" 철학을 따르는 AI 메모리 시스템입니다.
 
-<!-- 라이선스(있을 경우) -->
-![License](https://img.shields.io/badge/license-MIT-green)
+## 빠른 시작
+```powershell
+$env:VELOS_DB_PATH="C:\giwanos\data\velos.db"
+python .\scripts\memory_tick.py
+```
 
 ## 🚀 VELOS 운영 철학
 
