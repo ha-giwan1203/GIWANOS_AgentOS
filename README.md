@@ -1,6 +1,13 @@
 # VELOS (VELOS Operating System)
 
-[![VELOS Bench](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml/badge.svg)](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml)
+<!-- 상태 -->
+[![VELOS Bench](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml/badge.svg?branch=main)](https://github.com/ha-giwan1203/GIWANOS_AgentOS/actions/workflows/velos-bench.yml)
+
+<!-- 파이썬 버전 -->
+![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
+
+<!-- 라이선스(있을 경우) -->
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 🚀 VELOS 운영 철학
 
