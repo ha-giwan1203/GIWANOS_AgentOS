@@ -1,0 +1,197 @@
+{
+  "database_id": "223fee670be8803cafbcdd27aec799f4",
+  "generated_at": "2025-08-19T20:50:53.180395",
+  "fields": {
+    "설명": {
+      "notion_field": "설명",
+      "velos_field": "summary",
+      "type": "rich_text",
+      "priority": "high",
+      "description": "보고서 요약",
+      "required": true,
+      "safe_values": []
+    },
+    "날짜": {
+      "notion_field": "날짜",
+      "velos_field": "created_at",
+      "type": "date",
+      "priority": "medium",
+      "description": "생성 날짜",
+      "required": true,
+      "safe_values": []
+    },
+    "상태": {
+      "notion_field": "상태",
+      "velos_field": "status",
+      "type": "status",
+      "priority": "medium",
+      "description": "처리 상태",
+      "required": false,
+      "safe_values": [
+        "보관",
+        "진행 중",
+        "업로드 완료",
+        "완료",
+        "실패",
+        "예외"
+      ]
+    },
+    "결과 ID": {
+      "notion_field": "결과 ID",
+      "velos_field": "결과_id",
+      "type": "rich_text",
+      "priority": "low",
+      "description": "자동 매핑: rich_text",
+      "required": false,
+      "safe_values": []
+    },
+    "장소": {
+      "notion_field": "장소",
+      "velos_field": "category",
+      "type": "select",
+      "priority": "medium",
+      "description": "카테고리",
+      "required": false,
+      "safe_values": [
+        "모바일",
+        "회사",
+        "집",
+        "PC",
+        "Mirror ZIP",
+        "MD",
+        "JSON",
+        "PDF",
+        "완료",
+        "VELOS_Report"
+      ]
+    },
+    "태그": {
+      "notion_field": "태그",
+      "velos_field": "tags",
+      "type": "multi_select",
+      "priority": "low",
+      "description": "분류 태그",
+      "required": false,
+      "safe_values": [
+        "계약",
+        "고객A",
+        "예외",
+        "이미지",
+        "에러",
+        "자동",
+        "기억",
+        "정산",
+        "자동화",
+        "엑셀",
+        "회고",
+        "v40",
+        "자동 업로드",
+        "GIWANOS",
+        "루프",
+        "정상",
+        "ZIP",
+        "Notion",
+        "Slack",
+        "테스트",
+        "VELOS",
+        "학습_메모리",
+        "전문",
+        "Auto",
+        "통합",
+        "보고서",
+        "Report",
+        "자동생성"
+      ]
+    },
+    "첨부파일": {
+      "notion_field": "첨부파일",
+      "velos_field": "첨부파일",
+      "type": "files",
+      "priority": "low",
+      "description": "자동 매핑: files",
+      "required": false,
+      "safe_values": []
+    },
+    "메타": {
+      "notion_field": "메타",
+      "velos_field": "메타",
+      "type": "rich_text",
+      "priority": "low",
+      "description": "자동 매핑: rich_text",
+      "required": false,
+      "safe_values": []
+    },
+    "경로": {
+      "notion_field": "경로",
+      "velos_field": "경로",
+      "type": "rich_text",
+      "priority": "low",
+      "description": "자동 매핑: rich_text",
+      "required": false,
+      "safe_values": []
+    },
+    "예측요약": {
+      "notion_field": "예측요약",
+      "velos_field": "예측요약",
+      "type": "rich_text",
+      "priority": "low",
+      "description": "자동 매핑: rich_text",
+      "required": false,
+      "safe_values": []
+    },
+    "작업": {
+      "notion_field": "작업",
+      "velos_field": "작업",
+      "type": "rich_text",
+      "priority": "low",
+      "description": "자동 매핑: rich_text",
+      "required": false,
+      "safe_values": []
+    },
+    "크기": {
+      "notion_field": "크기",
+      "velos_field": "크기",
+      "type": "number",
+      "priority": "low",
+      "description": "자동 매핑: number",
+      "required": false,
+      "safe_values": []
+    },
+    "유형": {
+      "notion_field": "유형",
+      "velos_field": "type",
+      "type": "select",
+      "priority": "medium",
+      "description": "보고서 유형",
+      "required": false,
+      "safe_values": [
+        "문서",
+        "기타",
+        "이미지",
+        "정산",
+        "엑셀",
+        "ZIP",
+        "Mirror ZIP",
+        "MD",
+        "JSON",
+        "PDF",
+        "회고 보고서",
+        "TXT",
+        "결과",
+        "회고",
+        "VELOS_Report"
+      ]
+    },
+    "제목": {
+      "notion_field": "제목",
+      "velos_field": "title",
+      "type": "title",
+      "priority": "high",
+      "description": "보고서 제목",
+      "required": true,
+      "safe_values": []
+    }
+  },
+  "auto_mapping": true,
+  "fixed_issues": []
+}
