@@ -43,23 +43,23 @@ def cleanup_all_fts():
         # 트리거 생성
         cur.execute("""
             CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
@@ -71,7 +71,7 @@ def cleanup_all_fts():
         print(f"✓ Found {total_records} records in memory table")
         
         cur.execute("""
-            INSERT INTO memory_fts(rowid, text) 
+            INSERT INTO memory_fts(rowid, insight, raw) 
             SELECT id, COALESCE(insight, raw, '') FROM memory
         """)
         
@@ -90,3 +90,5 @@ def cleanup_all_fts():
 
 if __name__ == "__main__":
     cleanup_all_fts()
+
+

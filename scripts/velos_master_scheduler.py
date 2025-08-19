@@ -3,6 +3,7 @@
 # "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
 
 # 카나리아 헬스체크 - 프로세스 시작 시 자체 점검
+import os
 import subprocess
 import sys
 
@@ -12,10 +13,10 @@ def canary_healthcheck():
         # 환경 변수 설정
         os.environ["VELOS_DB_PATH"] = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
         
-        # 1차 헬스체크
+        # 1차 헬스체크 (수정된 경로)
         result = subprocess.run([
             sys.executable, 
-            os.path.join(os.path.dirname(__file__), "py", "fts_healthcheck.py")
+            os.path.join(os.path.dirname(__file__), "check_fts_health.py")
         ], capture_output=True, text=True, cwd=os.path.dirname(__file__))
         
         if result.returncode != 0:
@@ -33,10 +34,10 @@ def canary_healthcheck():
                 print(f"[ERROR] Emergency recovery failed: {recovery_result.stderr}")
                 return False
             
-            # 2차 헬스체크
+            # 2차 헬스체크 (수정된 경로)
             result2 = subprocess.run([
                 sys.executable,
-                os.path.join(os.path.dirname(__file__), "py", "fts_healthcheck.py")
+                os.path.join(os.path.dirname(__file__), "check_fts_health.py")
             ], capture_output=True, text=True, cwd=os.path.dirname(__file__))
             
             if result2.returncode != 0:

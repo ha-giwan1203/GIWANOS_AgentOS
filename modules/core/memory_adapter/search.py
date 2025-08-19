@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
+# [ACTIVE] VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
 """
@@ -188,7 +188,7 @@ def search_by_role_with_keyword(cur: sqlite3.Cursor, role: str, keyword: str, li
     sql = """
     SELECT id, ts, role, source, text
     FROM memory_roles
-    WHERE role = ? AND text LIKE ?
+    WHERE insight LIKE ?
     ORDER BY ts DESC
     LIMIT ?
     """
@@ -246,7 +246,7 @@ def search_with_normalized_query(cur: sqlite3.Cursor, query: str, limit: int = 1
         sql = """
         SELECT id, ts, role, source, text
         FROM memory_roles
-        WHERE text LIKE ?
+        WHERE insight LIKE ?
         ORDER BY ts DESC
         LIMIT ?
         """
@@ -353,3 +353,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ 테스트 실패: {e}")
         exit(1)
+

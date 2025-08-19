@@ -172,3 +172,4 @@ echo "테스트 내용" | python scripts/dump_stdout_advanced.py
 
 
 
+

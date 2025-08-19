@@ -411,3 +411,5 @@ if __name__ == "__main__":
     print(f"최근 레코드: {len(recent)}개")
 
     print("=== 자가 검증 완료 ===")
+
+

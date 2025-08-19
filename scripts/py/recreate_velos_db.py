@@ -165,3 +165,5 @@ time.sleep(0.05)
 b2=hit("beta",rid)
 print(f"[probe] alpha_pre={int(a0)} alpha_after_update={int(a1)} beta_after_update={int(b1)} beta_after_delete={int(b2)}")
 con.close()
+
+

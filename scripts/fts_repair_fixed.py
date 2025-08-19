@@ -24,19 +24,19 @@ CREATE VIRTUAL TABLE memory_fts USING fts5(
 
 -- 3) 트리거 재생성
 CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-  INSERT INTO memory_fts(rowid, text)
+  INSERT INTO memory_fts(rowid, insight, raw)
   VALUES (new.id, COALESCE(new.insight, new.raw, ''));
 END;
 
 CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-  INSERT INTO memory_fts(memory_fts, rowid, text)
+  INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
   VALUES ('delete', old.id, COALESCE(old.insight, old.raw, ''));
 END;
 
 CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-  INSERT INTO memory_fts(memory_fts, rowid, text)
+  INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
   VALUES ('delete', old.id, COALESCE(old.insight, old.raw, ''));
-  INSERT INTO memory_fts(rowid, text)
+  INSERT INTO memory_fts(rowid, insight, raw)
   VALUES (new.id, COALESCE(new.insight, new.raw, ''));
 END;
 """
@@ -83,7 +83,7 @@ def main():
 
         # 3) 전체 재색인
         cur.execute("""
-            INSERT INTO memory_fts(rowid, text)
+            INSERT INTO memory_fts(rowid, insight, raw)
             SELECT id, COALESCE(insight, raw, '')
             FROM memory
             WHERE COALESCE(insight, raw, '') <> '';
@@ -99,7 +99,7 @@ def main():
     finally:
         # 검증 리포트
         cnt = cur.execute("SELECT COUNT(*) FROM memory_fts;").fetchone()[0]
-        sample = cur.execute("SELECT rowid, substr(text,1,60) FROM memory_fts LIMIT 3;").fetchall()
+        sample = cur.execute("SELECT insight, raw FROM memory_fts LIMIT 3;").fetchall()
         print(f"[fts_repair] fts rows: {cnt}")
         for i, r in enumerate(sample, 1):
             print(f"[fts_repair] sample {i}: rowid={r[0]} text={r[1]!r}")
@@ -113,3 +113,5 @@ if __name__ == "__main__":
     except Exception as e:
         print("[fts_repair] FAILED:", e)
         sys.exit(1)
+
+

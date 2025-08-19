@@ -34,9 +34,9 @@ def search_fts(term: str, limit: int = 20) -> List[Tuple]:
     cur = con.cursor()
 
     sql = """
-    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+    SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm, bm25(memory_fts) AS score
     FROM memory_fts
-    JOIN memory_text t ON t.id = memory_fts.rowid
+    LEFT JOIN memory t ON t.id = memory_fts.rowid
     JOIN memory m ON m.id = memory_fts.rowid
     WHERE memory_fts MATCH ?
     ORDER BY score
@@ -62,9 +62,9 @@ def search_fts_with_metadata(term: str, limit: int = 20) -> List[Dict[str, Any]]
     cur = con.cursor()
 
     sql = """
-    SELECT m.id, m.ts, m.role, t.text_norm, m.tags, bm25(memory_fts) AS score
+    SELECT m.id, m.ts, m.role, COALESCE(m.insight, m.raw) AS text_norm, m.tags, bm25(memory_fts) AS score
     FROM memory_fts
-    JOIN memory_text t ON t.id = memory_fts.rowid
+    LEFT JOIN memory t ON t.id = memory_fts.rowid
     JOIN memory m ON m.id = memory_fts.rowid
     WHERE memory_fts MATCH ?
     ORDER BY score
@@ -109,9 +109,8 @@ def search_fts_by_role(term: str, role: str, limit: int = 20) -> List[Tuple]:
     cur = con.cursor()
 
     sql = """
-    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+    SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm, bm25(memory_fts) AS score
     FROM memory_fts
-    JOIN memory_text t ON t.id = memory_fts.rowid
     JOIN memory m ON m.id = memory_fts.rowid
     WHERE memory_fts MATCH ? AND m.role = ?
     ORDER BY score
@@ -141,9 +140,8 @@ def search_fts_recent(term: str, hours: int = 24, limit: int = 20) -> List[Tuple
     cur = con.cursor()
 
     sql = """
-    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+    SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm, bm25(memory_fts) AS score
     FROM memory_fts
-    JOIN memory_text t ON t.id = memory_fts.rowid
     JOIN memory m ON m.id = memory_fts.rowid
     WHERE memory_fts MATCH ? AND m.ts >= ?
     ORDER BY score
@@ -265,6 +263,8 @@ if __name__ == "__main__":
         print(f"점수: {stats['score_stats']}")
 
     print("\n✅ FTS 검색 유틸리티 테스트 완료")
+
+
 
 
 

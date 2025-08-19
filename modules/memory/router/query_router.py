@@ -114,9 +114,8 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                 try:
                     # BM25 함수가 있는 경우 사용
                     cur.execute("""
-                        SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+                        SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm, bm25(memory_fts) AS score
                         FROM memory_fts
-                        JOIN memory_text t ON t.id = memory_fts.rowid
                         JOIN memory m ON m.id = memory_fts.rowid
                         WHERE memory_fts MATCH ?
                         ORDER BY score
@@ -125,9 +124,8 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                 except Exception:
                     # BM25 함수가 없는 경우 시간순으로 폴백
                     cur.execute("""
-                        SELECT m.id, m.ts, t.text_norm
+                        SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm
                         FROM memory_fts
-                        JOIN memory_text t ON t.id = memory_fts.rowid
                         JOIN memory m ON m.id = memory_fts.rowid
                         WHERE memory_fts MATCH ?
                         ORDER BY m.ts DESC
@@ -147,9 +145,8 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
             try:
                 # BM25 함수가 있는 경우 사용
                 cur.execute("""
-                    SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
+                    SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm, bm25(memory_fts) AS score
                     FROM memory_fts
-                    JOIN memory_text t ON t.id = memory_fts.rowid
                     JOIN memory m ON m.id = memory_fts.rowid
                     WHERE memory_fts MATCH ?
                     ORDER BY score
@@ -158,9 +155,8 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
             except Exception:
                 # BM25 함수가 없는 경우 시간순으로 폴백
                 cur.execute("""
-                    SELECT m.id, m.ts, t.text_norm
+                    SELECT m.id, m.ts, COALESCE(m.insight, m.raw) AS text_norm
                     FROM memory_fts
-                    JOIN memory_text t ON t.id = memory_fts.rowid
                     JOIN memory m ON m.id = memory_fts.rowid
                     WHERE memory_fts MATCH ?
                     ORDER BY m.ts DESC
@@ -318,3 +314,5 @@ if __name__ == "__main__":
     import json
     test_query_router()
     print("=== 모든 자가 검증 완료 ===")
+
+

@@ -95,8 +95,8 @@ def check_basic_stats():
 
             # 최근 데이터 확인 (새로운 패턴)
             cursor = conn.execute("""
-                SELECT ts, role, substr(text, 1, 50) as preview
-                FROM memory_roles
+                SELECT ts, role, substr(insight, 1, 50) as preview
+                FROM memory
                 ORDER BY ts DESC
                 LIMIT 3
             """)
@@ -195,3 +195,5 @@ if __name__ == "__main__":
     check_query_cache_stats()
 
     print("\n✅ 통계 확인 완료")
+
+

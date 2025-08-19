@@ -1,0 +1,41 @@
+name: VELOS FTS CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  fts-tests:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: FTS E2E
+      run: python scripts/py/fts_e2e.py
+      
+    - name: Lint for deprecated FTS columns
+      run: |
+        pwsh -c "Select-String -Path 'scripts/**/*.py','modules/**/*.py','scripts/**/*.ps1' -Pattern '(?i)\bmemory_fts\b.*\btext\b|SELECT\s+text\s+FROM\s+memory_fts' | % { Write-Host $_.Path ':' $_.Line; $global:found=$true } ; if($global:found){ exit 1 }"
+        
+    - name: Enforce sunset of compat views
+      run: |
+        python - <<'PY'
+        import sqlite3, os, datetime
+        db = r"C:\giwanos\data\velos.db"
+        now = datetime.date.today()
+        sunset = datetime.date(2025,10,19)
+        con = sqlite3.connect(db)
+        views = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='view'")}
+        con.close()
+        if now >= sunset and ({"memory_fts_text","memory_fts_compat"} & views):
+            raise SystemExit("Compat views must be dropped after sunset date")
+        print("sunset check: OK")
+        PY

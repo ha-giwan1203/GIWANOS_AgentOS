@@ -1,4 +1,4 @@
-# =========================================================
+# [ACTIVE] =========================================================
 # VELOS 운영 철학 선언문
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
@@ -22,7 +22,25 @@ import warnings
 from datetime import datetime
 from pathlib import Path
 
-from modules.report_paths import ROOT, P
+# VELOS 모듈 경로 추가
+current_dir = Path(__file__).parent
+root_dir = current_dir.parent
+modules_dir = root_dir / "modules"
+if str(modules_dir) not in sys.path:
+    sys.path.insert(0, str(modules_dir))
+
+try:
+    from modules.report_paths import ROOT, P
+except ImportError:
+    # Fallback: 직접 경로 설정
+    ROOT = Path(r"C:\giwanos")
+    P = {
+        "ROOT": ROOT,
+        "LOGS": ROOT / "data" / "logs",
+        "REPORTS": ROOT / "data" / "reports",
+        "MEMORY": ROOT / "data" / "memory",
+        "REFLECT": ROOT / "data" / "reflections"
+    }
 
 # fpdf 경고 소음 제거
 warnings.filterwarnings("ignore", category=UserWarning, module="fpdf")

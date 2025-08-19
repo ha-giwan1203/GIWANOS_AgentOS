@@ -52,23 +52,23 @@ def final_fts_fix():
         # 트리거 생성
         cur.execute("""
             CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
@@ -81,7 +81,7 @@ def final_fts_fix():
         
         # 데이터 색인
         cur.execute("""
-            INSERT INTO memory_fts(rowid, text) 
+            INSERT INTO memory_fts(rowid, insight, raw) 
             SELECT id, COALESCE(insight, raw, '') FROM memory
         """)
         
@@ -98,7 +98,7 @@ def final_fts_fix():
         print("✓ All changes committed")
         
         # 테스트 검색
-        cur.execute("SELECT rowid, text FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
+        cur.execute("SELECT insight, raw FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
         test_results = cur.fetchall()
         print(f"✓ Test search found {len(test_results)} results")
         
@@ -110,3 +110,5 @@ def final_fts_fix():
 
 if __name__ == "__main__":
     final_fts_fix()
+
+

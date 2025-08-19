@@ -30,7 +30,7 @@ def test_fts_triggers():
         con.commit()
         print(f"Updated record {mid}")
         
-        n2 = c.execute("SELECT COUNT(*) FROM memory_fts WHERE rowid=? AND text LIKE '%updated%'", (mid,)).fetchone()[0]
+        n2 = c.execute("SELECT COUNT(*) FROM memory_fts WHERE insight LIKE '%updated%'", (mid,)).fetchone()[0]
         print(f"After update, FTS updated seen: {n2}")
         
         # 4) delete
@@ -49,3 +49,5 @@ def test_fts_triggers():
 
 if __name__ == "__main__":
     test_fts_triggers()
+
+

@@ -59,23 +59,23 @@ def complete_fts_rebuild_v2():
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
@@ -90,7 +90,7 @@ def complete_fts_rebuild_v2():
         
         # 데이터 색인 (빈 문자열 제외)
         cur.execute("""
-            INSERT INTO memory_fts(rowid, text) 
+            INSERT INTO memory_fts(rowid, insight, raw) 
             SELECT id, COALESCE(insight, raw, '') 
             FROM memory 
             WHERE COALESCE(insight, raw, '') <> ''
@@ -131,7 +131,7 @@ def complete_fts_rebuild_v2():
         
         # 샘플 검색 결과
         try:
-            cur.execute("SELECT rowid, text FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
+            cur.execute("SELECT insight, raw FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
             results = cur.fetchall()
             print(f"\nSample search results for 'test':")
             for i, (rowid, text) in enumerate(results, 1):
@@ -168,3 +168,5 @@ def complete_fts_rebuild_v2():
 
 if __name__ == "__main__":
     complete_fts_rebuild_v2()
+
+

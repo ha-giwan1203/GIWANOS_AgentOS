@@ -20,7 +20,7 @@ def check_fts_data():
     print(f"\nFTS table record count: {fts_count}")
     
     # FTS 테이블 샘플 데이터
-    cur.execute("SELECT rowid, text FROM memory_fts LIMIT 5")
+    cur.execute("SELECT insight, raw FROM memory_fts LIMIT 5")
     rows = cur.fetchall()
     print(f"\nFTS sample data ({len(rows)} rows):")
     for i, (rowid, text) in enumerate(rows, 1):
@@ -42,3 +42,5 @@ def check_fts_data():
 
 if __name__ == "__main__":
     check_fts_data()
+
+

@@ -49,9 +49,7 @@ def fts_structure_fix():
         print("\n3. Creating new FTS table without external content...")
         
         cur.execute("""
-            CREATE VIRTUAL TABLE memory_fts USING fts5(
-                text
-            )
+            CREATE VIRTUAL TABLE memory_fts USING fts5(insight, raw)
         """)
         print("✓ FTS table created")
         
@@ -60,23 +58,23 @@ def fts_structure_fix():
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-                INSERT INTO memory_fts(text) 
+                INSERT INTO memory_fts(insight, raw) 
                 VALUES (COALESCE(new.insight, new.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, text)
+                INSERT INTO memory_fts(memory_fts, insight, raw)
                 VALUES('delete', COALESCE(old.insight, old.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, text)
+                INSERT INTO memory_fts(memory_fts, insight, raw)
                 VALUES('delete', COALESCE(old.insight, old.raw, ''));
-                INSERT INTO memory_fts(text) 
+                INSERT INTO memory_fts(insight, raw) 
                 VALUES (COALESCE(new.insight, new.raw, ''));
             END
         """)
@@ -91,7 +89,7 @@ def fts_structure_fix():
         
         # 데이터 색인 (빈 문자열 제외)
         cur.execute("""
-            INSERT INTO memory_fts(text) 
+            INSERT INTO memory_fts(insight, raw) 
             SELECT COALESCE(insight, raw, '') 
             FROM memory 
             WHERE COALESCE(insight, raw, '') <> ''
@@ -132,7 +130,7 @@ def fts_structure_fix():
         
         # 샘플 검색 결과
         try:
-            cur.execute("SELECT rowid, text FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
+            cur.execute("SELECT insight, raw FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
             results = cur.fetchall()
             print(f"\nSample search results for 'test':")
             for i, (rowid, text) in enumerate(results, 1):
@@ -169,3 +167,5 @@ def fts_structure_fix():
 
 if __name__ == "__main__":
     fts_structure_fix()
+
+

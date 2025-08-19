@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
+# [ACTIVE] VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
 import os
@@ -225,3 +225,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ 검증 실패: {e}")
         raise
+
+

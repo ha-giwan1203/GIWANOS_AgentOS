@@ -53,23 +53,23 @@ def complete_fts_rebuild():
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
             END
         """)
         
         cur.execute("""
             CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
-                INSERT INTO memory_fts(memory_fts, rowid, text)
+                INSERT INTO memory_fts(memory_fts, rowid, insight, raw)
                 VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-                INSERT INTO memory_fts(rowid, text) 
+                INSERT INTO memory_fts(rowid, insight, raw) 
                 VALUES (new.id, COALESCE(new.insight, new.raw, ''));
             END
         """)
@@ -84,7 +84,7 @@ def complete_fts_rebuild():
         
         # 데이터 색인
         cur.execute("""
-            INSERT INTO memory_fts(rowid, text) 
+            INSERT INTO memory_fts(rowid, insight, raw) 
             SELECT id, COALESCE(insight, raw, '') FROM memory
         """)
         
@@ -119,7 +119,7 @@ def complete_fts_rebuild():
             print(f"✓ Search for '{term}': {count} results")
         
         # 샘플 검색 결과
-        cur.execute("SELECT rowid, text FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
+        cur.execute("SELECT insight, raw FROM memory_fts WHERE memory_fts MATCH 'test' LIMIT 3")
         results = cur.fetchall()
         print(f"\nSample search results for 'test':")
         for i, (rowid, text) in enumerate(results, 1):
@@ -135,3 +135,5 @@ def complete_fts_rebuild():
 
 if __name__ == "__main__":
     complete_fts_rebuild()
+
+

@@ -9,7 +9,7 @@ def test_fts_search(search_term="검색어"):
     
     try:
         # FTS 검색 실행
-        query = "SELECT rowid, text FROM memory_fts WHERE memory_fts MATCH ?"
+        query = "SELECT insight, raw FROM memory_fts WHERE memory_fts MATCH ?"
         cur.execute(query, (search_term,))
         results = cur.fetchall()
         
@@ -35,3 +35,5 @@ if __name__ == "__main__":
     
     print("\n" + "="*50)
     test_fts_search("ingest")
+
+

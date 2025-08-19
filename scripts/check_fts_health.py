@@ -26,6 +26,10 @@ def check_fts_health():
         columns = cur.fetchall()
         has_text_column = any(col[1] == 'text' for col in columns)
         
+        # 호환 뷰 확인 (구식 코드 대응)
+        cur.execute("SELECT 1 FROM sqlite_master WHERE type='view' AND name='memory_fts_compat'")
+        compat_view_exists = cur.fetchone() is not None
+        
         # 테스트 검색 실행
         test_success = False
         try:
@@ -37,15 +41,15 @@ def check_fts_health():
         
         conn.close()
         
-        # 상태 판정
-        if fts_exists and has_text_column and test_success:
+        # 상태 판정 (호환 뷰 고려)
+        if fts_exists and (has_text_column or compat_view_exists) and test_success:
             print(f"FTS status=OK, rows={fts_rows}")
         else:
             issues = []
             if not fts_exists:
                 issues.append("table_missing")
-            if not has_text_column:
-                issues.append("no_text_column")
+            if not has_text_column and not compat_view_exists:
+                issues.append("Deprecated column reference: expected insight/raw, got text")
             if not test_success:
                 issues.append("search_failed")
             print(f"FTS status=ERROR, issues={','.join(issues)}, rows={fts_rows}")
@@ -55,3 +59,5 @@ def check_fts_health():
 
 if __name__ == "__main__":
     check_fts_health()
+
+

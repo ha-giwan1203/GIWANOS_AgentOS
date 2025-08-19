@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Memory Storage Bootstrap
 import os
 import sqlite3
 
@@ -21,7 +22,7 @@ def ensure_fts():
         print("FTS 테이블이 없습니다. 새로 생성합니다...")
 
     # FTS5 테이블 생성 (표준 스키마)
-    cur.execute("CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(text)")
+    cur.execute("CREATE VIRTUAL TABLE memory_fts USING fts5(insight, raw)")
 
     # 기존 트리거 삭제
     cur.execute("DROP TRIGGER IF EXISTS trg_mem_ai")
@@ -30,22 +31,22 @@ def ensure_fts():
 
     # INSERT 트리거 (안전한 패턴)
     cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_ai AFTER INSERT ON memory BEGIN
-      INSERT INTO memory_fts(rowid, text) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
+      INSERT INTO memory_fts(rowid, insight, raw) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
     END;""")
 
     # DELETE 트리거 (안전한 패턴)
     cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_ad AFTER DELETE ON memory BEGIN
-      INSERT INTO memory_fts(memory_fts, rowid, text) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
+      INSERT INTO memory_fts(memory_fts, rowid, insight, raw) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
     END;""")
 
     # UPDATE 트리거 (안전한 패턴)
     cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_au AFTER UPDATE ON memory BEGIN
-      INSERT INTO memory_fts(memory_fts, rowid, text) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-      INSERT INTO memory_fts(rowid, text) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
+      INSERT INTO memory_fts(memory_fts, rowid, insight, raw) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
+      INSERT INTO memory_fts(rowid, insight, raw) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
     END;""")
 
     # 누락된 데이터 백필 (안전한 패턴)
-    cur.execute("""INSERT INTO memory_fts(rowid, text)
+    cur.execute("""INSERT INTO memory_fts(rowid, insight, raw)
                    SELECT id, COALESCE(insight, raw, '')
                    FROM memory
                    WHERE id NOT IN (SELECT rowid FROM memory_fts)""")
@@ -68,3 +69,5 @@ if __name__ == "__main__":
     print("VELOS FTS 부트스트랩 시작...")
     ensure_fts()
     print("✅ FTS 부트스트랩 완료")
+
+
