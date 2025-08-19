@@ -1,3 +1,4 @@
+# [EXPERIMENT] VELOS 메모리 캐시 - 성능 최적화 모듈
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
@@ -210,3 +211,6 @@ if __name__ == "__main__":
     print()
     test_velos_cache_manager()
     print("=== 모든 자가 검증 완료 ===")
+
+
+

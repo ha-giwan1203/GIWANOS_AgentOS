@@ -1,4 +1,4 @@
-# scripts/notion_schema_check.py
+# [EXPERIMENT] scripts/notion_schema_check.py
 import os
 import requests
 from dotenv import load_dotenv
@@ -103,3 +103,6 @@ def check_notion_schema():
 
 if __name__ == "__main__":
     check_notion_schema()
+
+
+

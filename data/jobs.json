@@ -7,5 +7,6 @@
   { "name": "SnapshotBackup",  "interval": "weekly", "day": "sunday", "time": "02:00" },
   { "name": "SnapshotCatalog",  "interval": "daily",  "time": "03:03" },
   { "name": "SnapshotIntegrity",  "interval": "daily",  "time": "03:07" },
-  { "name": "SessionMerge",  "interval": "hourly",  "minute": 15 }
+  { "name": "SessionMerge",  "interval": "hourly",  "minute": 15 },
+  { "name": "BenchmarkDaily",  "interval": "daily",  "time": "09:00" }
 ]

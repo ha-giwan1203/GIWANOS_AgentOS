@@ -1,0 +1,96 @@
+# [ACTIVE] VELOS 벤치마크 자동화 워크플로우
+name: VELOS Bench
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "modules/**"
+      - "tests/perf/**"
+  schedule:
+    - cron: "0 18 * * *"   # 매일 18:00 UTC
+
+jobs:
+  bench-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        # 원하는 버전으로 바꿔도 됨
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Prepare DB
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force C:\giwanos\data\ | Out-Null
+          # 리포에 샘플 DB를 두지 않는다면, 테스트용 빈 DB 생성 스크립트를 호출
+          python - << 'PY'
+          import sqlite3, os
+          db=r"C:\giwanos\data\velos.db"
+          os.makedirs(os.path.dirname(db), exist_ok=True)
+          con=sqlite3.connect(db)
+          cur=con.cursor()
+          # 최소 스키마
+          cur.executescript("""
+          PRAGMA journal_mode=WAL;
+          PRAGMA synchronous=NORMAL;
+          PRAGMA busy_timeout=5000;
+          PRAGMA foreign_keys=ON;
+          
+          CREATE TABLE IF NOT EXISTS memory(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ts INTEGER NOT NULL,
+            role TEXT NOT NULL,
+            insight TEXT NOT NULL,
+            raw TEXT,
+            tags TEXT
+          );
+          
+          CREATE INDEX IF NOT EXISTS idx_memory_ts ON memory(ts DESC);
+          
+          CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(
+            insight, raw, content='memory', content_rowid='id', tokenize='unicode61'
+          );
+          
+          DROP TRIGGER IF EXISTS trg_mem_ai;
+          DROP TRIGGER IF EXISTS trg_mem_ad;
+          DROP TRIGGER IF EXISTS trg_mem_au;
+          
+          CREATE TRIGGER trg_mem_ai AFTER INSERT ON memory BEGIN
+            INSERT INTO memory_fts(insight, raw)
+            VALUES (COALESCE(new.insight, ''), COALESCE(new.raw, ''));
+          END;
+          
+          CREATE TRIGGER trg_mem_ad AFTER DELETE ON memory BEGIN
+            DELETE FROM memory_fts WHERE rowid = old.id;
+          END;
+          
+          CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
+            DELETE FROM memory_fts WHERE rowid = new.id;
+            INSERT INTO memory_fts(insight, raw)
+            VALUES (COALESCE(new.insight, ''), COALESCE(new.raw, ''));
+          END;
+          """)
+          con.commit(); con.close()
+          PY
+
+      - name: Run bench suite
+        env:
+          VELOS_DB_PATH: C:\giwanos\data\velos.db
+        run: |
+          python tests/perf/benchmark_regression.py
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-artifacts
+          path: artifacts/bench

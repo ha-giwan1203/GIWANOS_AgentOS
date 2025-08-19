@@ -1,0 +1,5843 @@
+{
+  "count": 453,
+  "events": [
+    {
+      "ts": 1755349954.5664895,
+      "ts_iso": "2025-08-16T22:12:34",
+      "session_id": "session_1755349954",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755349966.411471,
+      "ts_iso": "2025-08-16T22:12:46",
+      "session_id": "session_1755349966",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755350176.0286725,
+      "ts_iso": "2025-08-16T22:16:16",
+      "session_id": "session_1755350176",
+      "from": "system",
+      "kind": "heartbeat",
+      "text": "demo append",
+      "insight": "demo",
+      "tags": [
+        "demo",
+        "heartbeat"
+      ],
+      "level": "info"
+    },
+    {
+      "ts": 1755350188.2477272,
+      "ts_iso": "2025-08-16T22:16:28",
+      "session_id": "session_1755350188",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352050.0134456,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "init",
+      "text": "VELOS 마스터 루프 시작",
+      "insight": "세션 초기화 완료",
+      "tags": [
+        "master_loop",
+        "init"
+      ]
+    },
+    {
+      "ts": 1755352050.038341,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "memory_sync",
+      "text": "메모리 동기화 및 컨텍스트 블록 생성 완료",
+      "insight": "메모리 어댑터를 통한 데이터 동기화 완료",
+      "tags": [
+        "master_loop",
+        "memory_sync",
+        "context_block"
+      ]
+    },
+    {
+      "ts": 1755352050.0707085,
+      "ts_iso": "2025-08-16T22:47:30",
+      "session_id": "session_1755352050",
+      "from": "system",
+      "kind": "complete",
+      "text": "VELOS 마스터 루프 완료",
+      "insight": "보고서 생성 및 디스패치 완료",
+      "tags": [
+        "master_loop",
+        "complete",
+        "report_generated"
+      ]
+    },
+    {
+      "ts": 1755352634.3173356,
+      "ts_iso": "2025-08-16T22:57:14",
+      "session_id": "session_1755352634",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352708.604733,
+      "ts_iso": "2025-08-16T22:58:28",
+      "session_id": "session_1755352708",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352799.821505,
+      "ts_iso": "2025-08-16T22:59:59",
+      "session_id": "session_1755352799",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352856.981348,
+      "ts_iso": "2025-08-16T23:00:56",
+      "session_id": "session_1755352856",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352935.9409568,
+      "ts_iso": "2025-08-16T23:02:15",
+      "session_id": "session_1755352935",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755352999.62291,
+      "ts_iso": "2025-08-16T23:03:19",
+      "session_id": "session_1755352999",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353070.929757,
+      "ts_iso": "2025-08-16T23:04:30",
+      "session_id": "session_1755353070",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353136.2251322,
+      "ts_iso": "2025-08-16T23:05:36",
+      "session_id": "session_1755353136",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353220.2161143,
+      "ts_iso": "2025-08-16T23:07:00",
+      "session_id": "session_1755353220",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353290.0575266,
+      "ts_iso": "2025-08-16T23:08:10",
+      "session_id": "session_1755353290",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353367.5756392,
+      "ts_iso": "2025-08-16T23:09:27",
+      "session_id": "session_1755353367",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353447.9765403,
+      "ts_iso": "2025-08-16T23:10:47",
+      "session_id": "session_1755353447",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353513.3351986,
+      "ts_iso": "2025-08-16T23:11:53",
+      "session_id": "session_1755353513",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353577.9234242,
+      "ts_iso": "2025-08-16T23:12:57",
+      "session_id": "session_1755353577",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353645.0802999,
+      "ts_iso": "2025-08-16T23:14:05",
+      "session_id": "session_1755353645",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353783.2642555,
+      "ts_iso": "2025-08-16T23:16:23",
+      "session_id": "session_1755353783",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353860.1640832,
+      "ts_iso": "2025-08-16T23:17:40",
+      "session_id": "session_1755353860",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755353929.0514147,
+      "ts_iso": "2025-08-16T23:18:49",
+      "session_id": "session_1755353929",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354042.1992025,
+      "ts_iso": "2025-08-16T23:20:42",
+      "session_id": "session_1755354042",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354163.6227617,
+      "ts_iso": "2025-08-16T23:22:43",
+      "session_id": "session_1755354163",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354234.6554093,
+      "ts_iso": "2025-08-16T23:23:54",
+      "session_id": "session_1755354234",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354466.5004132,
+      "ts_iso": "2025-08-16T23:27:46",
+      "session_id": "session_1755354466",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354562.084374,
+      "ts_iso": "2025-08-16T23:29:22",
+      "session_id": "session_1755354562",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354630.5599556,
+      "ts_iso": "2025-08-16T23:30:30",
+      "session_id": "session_1755354630",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354698.1492846,
+      "ts_iso": "2025-08-16T23:31:38",
+      "session_id": "session_1755354698",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354768.2750788,
+      "ts_iso": "2025-08-16T23:32:48",
+      "session_id": "session_1755354768",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354838.65007,
+      "ts_iso": "2025-08-16T23:33:58",
+      "session_id": "session_1755354838",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755354967.3846185,
+      "ts_iso": "2025-08-16T23:36:07",
+      "session_id": "session_1755354967",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355035.387511,
+      "ts_iso": "2025-08-16T23:37:15",
+      "session_id": "session_1755355035",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355113.1515076,
+      "ts_iso": "2025-08-16T23:38:33",
+      "session_id": "session_1755355113",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755355295.941283,
+      "ts_iso": "2025-08-16T23:41:35",
+      "session_id": "session_1755355295",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755357572.3112314,
+      "ts_iso": "2025-08-17T00:19:32",
+      "session_id": "session_1755357572",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358780.0504723,
+      "ts_iso": "2025-08-17T00:39:40",
+      "session_id": "session_1755358780",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358864.7075484,
+      "ts_iso": "2025-08-17T00:41:04",
+      "session_id": "session_1755358864",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755358913.5364068,
+      "ts_iso": "2025-08-17T00:41:53",
+      "session_id": "session_1755358913",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755359249.99344,
+      "ts_iso": "2025-08-17T00:47:29",
+      "session_id": "session_1755359249",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755359475.9477577,
+      "ts_iso": "2025-08-17T00:51:15",
+      "session_id": "session_1755359475",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755360489.3615863,
+      "ts_iso": "2025-08-17T01:08:09",
+      "session_id": "session_1755360489",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755361941.484918,
+      "ts_iso": "2025-08-17T01:32:21",
+      "session_id": "session_1755361941",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755362496.6121142,
+      "ts_iso": "2025-08-17T01:41:36",
+      "session_id": "session_1755362496",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755369011.5534701,
+      "ts_iso": "2025-08-17T03:30:11",
+      "session_id": "session_1755369011",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755387681.6197894,
+      "ts_iso": "2025-08-17T08:41:21",
+      "session_id": "session_1755387681",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755387691.8444607,
+      "ts_iso": "2025-08-17T08:41:31",
+      "session_id": "session_1755387691",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755395779.0154302,
+      "ts_iso": "2025-08-17T10:56:19",
+      "session_id": "session_1755395779",
+      "from": "system",
+      "kind": "init",
+      "text": "VELOS 마스터 루프 시작",
+      "insight": "세션 초기화 완료",
+      "tags": [
+        "master_loop",
+        "init"
+      ]
+    },
+    {
+      "ts": 1755395779.0293908,
+      "ts_iso": "2025-08-17T10:56:19",
+      "session_id": "session_1755395779",
+      "from": "system",
+      "kind": "memory_sync",
+      "text": "메모리 동기화 및 컨텍스트 블록 생성 완료",
+      "insight": "메모리 어댑터를 통한 데이터 동기화 완료",
+      "tags": [
+        "master_loop",
+        "memory_sync",
+        "context_block"
+      ]
+    },
+    {
+      "ts": 1755395779.0403638,
+      "ts_iso": "2025-08-17T10:56:19",
+      "session_id": "session_1755395779",
+      "from": "system",
+      "kind": "complete",
+      "text": "VELOS 마스터 루프 완료",
+      "insight": "보고서 생성 및 디스패치 완료",
+      "tags": [
+        "master_loop",
+        "complete",
+        "report_generated"
+      ]
+    },
+    {
+      "ts": 1755430764.8160338,
+      "ts_iso": "2025-08-17T20:39:24",
+      "session_id": "session_1755430764",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430768.113514,
+      "ts_iso": "2025-08-17T20:39:28",
+      "session_id": "session_1755430768",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430768.1224916,
+      "ts_iso": "2025-08-17T20:39:28",
+      "session_id": "session_1755430768",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430771.1703491,
+      "ts_iso": "2025-08-17T20:39:31",
+      "session_id": "session_1755430771",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430771.6617234,
+      "ts_iso": "2025-08-17T20:39:31",
+      "session_id": "session_1755430771",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430771.6756828,
+      "ts_iso": "2025-08-17T20:39:31",
+      "session_id": "session_1755430771",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430771.7037592,
+      "ts_iso": "2025-08-17T20:39:31",
+      "session_id": "session_1755430771",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430853.394431,
+      "ts_iso": "2025-08-17T20:40:53",
+      "session_id": "session_1755430853",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755430853.40241,
+      "ts_iso": "2025-08-17T20:40:53",
+      "session_id": "session_1755430853",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433537.2684183,
+      "ts_iso": "2025-08-17T21:25:37",
+      "session_id": "session_1755433537",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433540.4848332,
+      "ts_iso": "2025-08-17T21:25:40",
+      "session_id": "session_1755433540",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433541.0612931,
+      "ts_iso": "2025-08-17T21:25:41",
+      "session_id": "session_1755433541",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433541.0652819,
+      "ts_iso": "2025-08-17T21:25:41",
+      "session_id": "session_1755433541",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433541.0722728,
+      "ts_iso": "2025-08-17T21:25:41",
+      "session_id": "session_1755433541",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433579.880128,
+      "ts_iso": "2025-08-17T21:26:19",
+      "session_id": "session_1755433579",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433579.8841157,
+      "ts_iso": "2025-08-17T21:26:19",
+      "session_id": "session_1755433579",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433584.7699714,
+      "ts_iso": "2025-08-17T21:26:24",
+      "session_id": "session_1755433584",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433585.1898487,
+      "ts_iso": "2025-08-17T21:26:25",
+      "session_id": "session_1755433585",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433585.1918416,
+      "ts_iso": "2025-08-17T21:26:25",
+      "session_id": "session_1755433585",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "JSON save error (C:\\giwanos\\data\\job_state.json): unsupported operand type(s) for +: 'WindowsPath' and 'str'",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ]
+    },
+    {
+      "ts": 1755433585.1958315,
+      "ts_iso": "2025-08-17T21:26:25",
+      "session_id": "session_1755433585",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Failed to save job state",
+      "insight": "스케줄러 error",
+      "tags": [
+        "master_scheduler",
+        "error"
+      ]
+    },
+    {
+      "ts": 1755433619.2711759,
+      "ts_iso": "2025-08-17T21:26:59",
+      "session_id": "session_1755433619",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433619.6554353,
+      "ts_iso": "2025-08-17T21:26:59",
+      "session_id": "session_1755433619",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433619.6608582,
+      "ts_iso": "2025-08-17T21:26:59",
+      "session_id": "session_1755433619",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755433619.6659606,
+      "ts_iso": "2025-08-17T21:26:59",
+      "session_id": "session_1755433619",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434215.8541615,
+      "ts_iso": "2025-08-17T21:36:55",
+      "session_id": "session_1755434215",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434215.8571525,
+      "ts_iso": "2025-08-17T21:36:55",
+      "session_id": "session_1755434215",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434466.421337,
+      "ts_iso": "2025-08-17T21:41:06",
+      "session_id": "session_1755434466",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434466.4245093,
+      "ts_iso": "2025-08-17T21:41:06",
+      "session_id": "session_1755434466",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434651.7762146,
+      "ts_iso": "2025-08-17T21:44:11",
+      "session_id": "session_1755434651",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434667.100968,
+      "ts_iso": "2025-08-17T21:44:27",
+      "session_id": "session_1755434667",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434670.7466047,
+      "ts_iso": "2025-08-17T21:44:30",
+      "session_id": "session_1755434670",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434672.3225808,
+      "ts_iso": "2025-08-17T21:44:32",
+      "session_id": "session_1755434672",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434672.3295763,
+      "ts_iso": "2025-08-17T21:44:32",
+      "session_id": "session_1755434672",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434672.3365438,
+      "ts_iso": "2025-08-17T21:44:32",
+      "session_id": "session_1755434672",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434702.871533,
+      "ts_iso": "2025-08-17T21:45:02",
+      "session_id": "session_1755434702",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434702.8737924,
+      "ts_iso": "2025-08-17T21:45:02",
+      "session_id": "session_1755434702",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434873.7723193,
+      "ts_iso": "2025-08-17T21:47:53",
+      "session_id": "session_1755434873",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434877.4519444,
+      "ts_iso": "2025-08-17T21:47:57",
+      "session_id": "session_1755434877",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotCatalog start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434877.7840683,
+      "ts_iso": "2025-08-17T21:47:57",
+      "session_id": "session_1755434877",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotCatalog ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434877.7910407,
+      "ts_iso": "2025-08-17T21:47:57",
+      "session_id": "session_1755434877",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotIntegrity start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434878.099215,
+      "ts_iso": "2025-08-17T21:47:58",
+      "session_id": "session_1755434878",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotIntegrity ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434878.1022074,
+      "ts_iso": "2025-08-17T21:47:58",
+      "session_id": "session_1755434878",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434879.47779,
+      "ts_iso": "2025-08-17T21:47:59",
+      "session_id": "session_1755434879",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434879.4827764,
+      "ts_iso": "2025-08-17T21:47:59",
+      "session_id": "session_1755434879",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 3 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434879.4847713,
+      "ts_iso": "2025-08-17T21:47:59",
+      "session_id": "session_1755434879",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434997.0194957,
+      "ts_iso": "2025-08-17T21:49:57",
+      "session_id": "session_1755434997",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755434997.0224862,
+      "ts_iso": "2025-08-17T21:49:57",
+      "session_id": "session_1755434997",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435008.2044735,
+      "ts_iso": "2025-08-17T21:50:08",
+      "session_id": "session_1755435008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435008.2079532,
+      "ts_iso": "2025-08-17T21:50:08",
+      "session_id": "session_1755435008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435018.2570705,
+      "ts_iso": "2025-08-17T21:50:18",
+      "session_id": "session_1755435018",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435041.113455,
+      "ts_iso": "2025-08-17T21:50:41",
+      "session_id": "session_1755435041",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435051.4701917,
+      "ts_iso": "2025-08-17T21:50:51",
+      "session_id": "session_1755435051",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN MemoryCleanup start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435055.083388,
+      "ts_iso": "2025-08-17T21:50:55",
+      "session_id": "session_1755435055",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN MemoryCleanup ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435055.0883725,
+      "ts_iso": "2025-08-17T21:50:55",
+      "session_id": "session_1755435055",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotBackup start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435055.7107105,
+      "ts_iso": "2025-08-17T21:50:55",
+      "session_id": "session_1755435055",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotBackup ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435055.7166944,
+      "ts_iso": "2025-08-17T21:50:55",
+      "session_id": "session_1755435055",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 2 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435055.7216809,
+      "ts_iso": "2025-08-17T21:50:55",
+      "session_id": "session_1755435055",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435308.8156774,
+      "ts_iso": "2025-08-17T21:55:08",
+      "session_id": "session_1755435308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435308.8186698,
+      "ts_iso": "2025-08-17T21:55:08",
+      "session_id": "session_1755435308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435370.531103,
+      "ts_iso": "2025-08-17T21:56:10",
+      "session_id": "session_1755435370",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435370.533192,
+      "ts_iso": "2025-08-17T21:56:10",
+      "session_id": "session_1755435370",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435609.2361174,
+      "ts_iso": "2025-08-17T22:00:09",
+      "session_id": "session_1755435609",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435609.5502765,
+      "ts_iso": "2025-08-17T22:00:09",
+      "session_id": "session_1755435609",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435609.5533097,
+      "ts_iso": "2025-08-17T22:00:09",
+      "session_id": "session_1755435609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435609.5572982,
+      "ts_iso": "2025-08-17T22:00:09",
+      "session_id": "session_1755435609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435705.5835226,
+      "ts_iso": "2025-08-17T22:01:45",
+      "session_id": "session_1755435705",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435705.5865164,
+      "ts_iso": "2025-08-17T22:01:45",
+      "session_id": "session_1755435705",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435909.1846888,
+      "ts_iso": "2025-08-17T22:05:09",
+      "session_id": "session_1755435909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755435909.190674,
+      "ts_iso": "2025-08-17T22:05:09",
+      "session_id": "session_1755435909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436125.990195,
+      "ts_iso": "2025-08-17T22:08:45",
+      "session_id": "session_1755436125",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436125.9934952,
+      "ts_iso": "2025-08-17T22:08:45",
+      "session_id": "session_1755436125",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436209.0958562,
+      "ts_iso": "2025-08-17T22:10:09",
+      "session_id": "session_1755436209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436209.098847,
+      "ts_iso": "2025-08-17T22:10:09",
+      "session_id": "session_1755436209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436510.19765,
+      "ts_iso": "2025-08-17T22:15:10",
+      "session_id": "session_1755436510",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436511.017867,
+      "ts_iso": "2025-08-17T22:15:11",
+      "session_id": "session_1755436511",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436511.0223732,
+      "ts_iso": "2025-08-17T22:15:11",
+      "session_id": "session_1755436511",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436511.0239499,
+      "ts_iso": "2025-08-17T22:15:11",
+      "session_id": "session_1755436511",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436808.9092238,
+      "ts_iso": "2025-08-17T22:20:08",
+      "session_id": "session_1755436808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755436808.9132128,
+      "ts_iso": "2025-08-17T22:20:08",
+      "session_id": "session_1755436808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437111.669836,
+      "ts_iso": "2025-08-17T22:25:11",
+      "session_id": "session_1755437111",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437111.7466297,
+      "ts_iso": "2025-08-17T22:25:11",
+      "session_id": "session_1755437111",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437401.3215086,
+      "ts_iso": "2025-08-17T22:30:01",
+      "session_id": "session_1755437401",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755437409.8276308,
+      "ts_iso": "2025-08-17T22:30:09",
+      "session_id": "session_1755437409",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437411.1939795,
+      "ts_iso": "2025-08-17T22:30:11",
+      "session_id": "session_1755437411",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437411.1989665,
+      "ts_iso": "2025-08-17T22:30:11",
+      "session_id": "session_1755437411",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437411.200963,
+      "ts_iso": "2025-08-17T22:30:11",
+      "session_id": "session_1755437411",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437681.6011002,
+      "ts_iso": "2025-08-17T22:34:41",
+      "session_id": "session_1755437681",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437708.8729744,
+      "ts_iso": "2025-08-17T22:35:08",
+      "session_id": "session_1755437708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437708.8753622,
+      "ts_iso": "2025-08-17T22:35:08",
+      "session_id": "session_1755437708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437868.2386913,
+      "ts_iso": "2025-08-17T22:37:48",
+      "session_id": "session_1755437868",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437880.0182092,
+      "ts_iso": "2025-08-17T22:38:00",
+      "session_id": "session_1755437880",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437881.5231876,
+      "ts_iso": "2025-08-17T22:38:01",
+      "session_id": "session_1755437881",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437881.5301702,
+      "ts_iso": "2025-08-17T22:38:01",
+      "session_id": "session_1755437881",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755437881.5351558,
+      "ts_iso": "2025-08-17T22:38:01",
+      "session_id": "session_1755437881",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438015.7726388,
+      "ts_iso": "2025-08-17T22:40:15",
+      "session_id": "session_1755438015",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438015.7748837,
+      "ts_iso": "2025-08-17T22:40:15",
+      "session_id": "session_1755438015",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438054.5082781,
+      "ts_iso": "2025-08-17T22:40:54",
+      "session_id": "session_1755438054",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438054.9546623,
+      "ts_iso": "2025-08-17T22:40:54",
+      "session_id": "session_1755438054",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438054.9606438,
+      "ts_iso": "2025-08-17T22:40:54",
+      "session_id": "session_1755438054",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438054.9631515,
+      "ts_iso": "2025-08-17T22:40:54",
+      "session_id": "session_1755438054",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438180.9098687,
+      "ts_iso": "2025-08-17T22:43:00",
+      "session_id": "session_1755438180",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438265.2286844,
+      "ts_iso": "2025-08-17T22:44:25",
+      "session_id": "session_1755438265",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438314.0170112,
+      "ts_iso": "2025-08-17T22:45:14",
+      "session_id": "session_1755438314",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438314.020994,
+      "ts_iso": "2025-08-17T22:45:14",
+      "session_id": "session_1755438314",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438384.7796094,
+      "ts_iso": "2025-08-17T22:46:24",
+      "session_id": "session_1755438384",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438456.1005313,
+      "ts_iso": "2025-08-17T22:47:36",
+      "session_id": "session_1755438456",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755438459.8615165,
+      "ts_iso": "2025-08-17T22:47:39",
+      "session_id": "session_1755438459",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438459.8675134,
+      "ts_iso": "2025-08-17T22:47:39",
+      "session_id": "session_1755438459",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438459.8714645,
+      "ts_iso": "2025-08-17T22:47:39",
+      "session_id": "session_1755438459",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438609.2826247,
+      "ts_iso": "2025-08-17T22:50:09",
+      "session_id": "session_1755438609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438609.2876384,
+      "ts_iso": "2025-08-17T22:50:09",
+      "session_id": "session_1755438609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438910.488599,
+      "ts_iso": "2025-08-17T22:55:10",
+      "session_id": "session_1755438910",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438910.492592,
+      "ts_iso": "2025-08-17T22:55:10",
+      "session_id": "session_1755438910",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755438962.4713597,
+      "ts_iso": "2025-08-17T22:56:02",
+      "session_id": "session_1755438962",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439046.9367094,
+      "ts_iso": "2025-08-17T22:57:26",
+      "session_id": "session_1755439046",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439209.279705,
+      "ts_iso": "2025-08-17T23:00:09",
+      "session_id": "session_1755439209",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439291.247948,
+      "ts_iso": "2025-08-17T23:01:31",
+      "session_id": "session_1755439291",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755439296.9100976,
+      "ts_iso": "2025-08-17T23:01:36",
+      "session_id": "session_1755439296",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439296.9190729,
+      "ts_iso": "2025-08-17T23:01:36",
+      "session_id": "session_1755439296",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439296.9215753,
+      "ts_iso": "2025-08-17T23:01:36",
+      "session_id": "session_1755439296",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439510.1067586,
+      "ts_iso": "2025-08-17T23:05:10",
+      "session_id": "session_1755439510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439510.1101294,
+      "ts_iso": "2025-08-17T23:05:10",
+      "session_id": "session_1755439510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439812.1333702,
+      "ts_iso": "2025-08-17T23:10:12",
+      "session_id": "session_1755439812",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755439812.136448,
+      "ts_iso": "2025-08-17T23:10:12",
+      "session_id": "session_1755439812",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440111.0817792,
+      "ts_iso": "2025-08-17T23:15:11",
+      "session_id": "session_1755440111",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440112.487027,
+      "ts_iso": "2025-08-17T23:15:12",
+      "session_id": "session_1755440112",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440112.4950056,
+      "ts_iso": "2025-08-17T23:15:12",
+      "session_id": "session_1755440112",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440112.508963,
+      "ts_iso": "2025-08-17T23:15:12",
+      "session_id": "session_1755440112",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440128.800599,
+      "ts_iso": "2025-08-17T23:15:28",
+      "session_id": "session_1755440128",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440411.000417,
+      "ts_iso": "2025-08-17T23:20:11",
+      "session_id": "session_1755440411",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440411.0143783,
+      "ts_iso": "2025-08-17T23:20:11",
+      "session_id": "session_1755440411",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440708.2663534,
+      "ts_iso": "2025-08-17T23:25:08",
+      "session_id": "session_1755440708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755440708.2723625,
+      "ts_iso": "2025-08-17T23:25:08",
+      "session_id": "session_1755440708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441010.3208804,
+      "ts_iso": "2025-08-17T23:30:10",
+      "session_id": "session_1755441010",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441011.140832,
+      "ts_iso": "2025-08-17T23:30:11",
+      "session_id": "session_1755441011",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441011.1478124,
+      "ts_iso": "2025-08-17T23:30:11",
+      "session_id": "session_1755441011",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441011.150803,
+      "ts_iso": "2025-08-17T23:30:11",
+      "session_id": "session_1755441011",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441308.310008,
+      "ts_iso": "2025-08-17T23:35:08",
+      "session_id": "session_1755441308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441308.3127797,
+      "ts_iso": "2025-08-17T23:35:08",
+      "session_id": "session_1755441308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441608.5809734,
+      "ts_iso": "2025-08-17T23:40:08",
+      "session_id": "session_1755441608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441608.584383,
+      "ts_iso": "2025-08-17T23:40:08",
+      "session_id": "session_1755441608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441909.1239095,
+      "ts_iso": "2025-08-17T23:45:09",
+      "session_id": "session_1755441909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755441909.1298373,
+      "ts_iso": "2025-08-17T23:45:09",
+      "session_id": "session_1755441909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442209.4315677,
+      "ts_iso": "2025-08-17T23:50:09",
+      "session_id": "session_1755442209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442209.5532405,
+      "ts_iso": "2025-08-17T23:50:09",
+      "session_id": "session_1755442209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442508.8008385,
+      "ts_iso": "2025-08-17T23:55:08",
+      "session_id": "session_1755442508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442508.8048275,
+      "ts_iso": "2025-08-17T23:55:08",
+      "session_id": "session_1755442508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442809.8988266,
+      "ts_iso": "2025-08-18T00:00:09",
+      "session_id": "session_1755442809",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442852.9305375,
+      "ts_iso": "2025-08-18T00:00:52",
+      "session_id": "session_1755442852",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755442857.2868948,
+      "ts_iso": "2025-08-18T00:00:57",
+      "session_id": "session_1755442857",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442857.2958705,
+      "ts_iso": "2025-08-18T00:00:57",
+      "session_id": "session_1755442857",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755442857.3008568,
+      "ts_iso": "2025-08-18T00:00:57",
+      "session_id": "session_1755442857",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443108.5917919,
+      "ts_iso": "2025-08-18T00:05:08",
+      "session_id": "session_1755443108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443108.595467,
+      "ts_iso": "2025-08-18T00:05:08",
+      "session_id": "session_1755443108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443409.1899457,
+      "ts_iso": "2025-08-18T00:10:09",
+      "session_id": "session_1755443409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443409.1939356,
+      "ts_iso": "2025-08-18T00:10:09",
+      "session_id": "session_1755443409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443715.1564786,
+      "ts_iso": "2025-08-18T00:15:15",
+      "session_id": "session_1755443715",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443716.6063662,
+      "ts_iso": "2025-08-18T00:15:16",
+      "session_id": "session_1755443716",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443716.6223264,
+      "ts_iso": "2025-08-18T00:15:16",
+      "session_id": "session_1755443716",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755443716.6522443,
+      "ts_iso": "2025-08-18T00:15:16",
+      "session_id": "session_1755443716",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444009.5825129,
+      "ts_iso": "2025-08-18T00:20:09",
+      "session_id": "session_1755444009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444009.5865018,
+      "ts_iso": "2025-08-18T00:20:09",
+      "session_id": "session_1755444009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444452.3791895,
+      "ts_iso": "2025-08-18T00:27:32",
+      "session_id": "session_1755444452",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444453.7046452,
+      "ts_iso": "2025-08-18T00:27:33",
+      "session_id": "session_1755444453",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444609.6091585,
+      "ts_iso": "2025-08-18T00:30:09",
+      "session_id": "session_1755444609",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444610.4340405,
+      "ts_iso": "2025-08-18T00:30:10",
+      "session_id": "session_1755444610",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444610.438838,
+      "ts_iso": "2025-08-18T00:30:10",
+      "session_id": "session_1755444610",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444610.4428298,
+      "ts_iso": "2025-08-18T00:30:10",
+      "session_id": "session_1755444610",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444920.3524685,
+      "ts_iso": "2025-08-18T00:35:20",
+      "session_id": "session_1755444920",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755444920.3570998,
+      "ts_iso": "2025-08-18T00:35:20",
+      "session_id": "session_1755444920",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445226.6800222,
+      "ts_iso": "2025-08-18T00:40:26",
+      "session_id": "session_1755445226",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445226.6850092,
+      "ts_iso": "2025-08-18T00:40:26",
+      "session_id": "session_1755445226",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445510.305474,
+      "ts_iso": "2025-08-18T00:45:10",
+      "session_id": "session_1755445510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445510.310225,
+      "ts_iso": "2025-08-18T00:45:10",
+      "session_id": "session_1755445510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445809.548634,
+      "ts_iso": "2025-08-18T00:50:09",
+      "session_id": "session_1755445809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755445809.5516384,
+      "ts_iso": "2025-08-18T00:50:09",
+      "session_id": "session_1755445809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446110.3712215,
+      "ts_iso": "2025-08-18T00:55:10",
+      "session_id": "session_1755446110",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446110.37563,
+      "ts_iso": "2025-08-18T00:55:10",
+      "session_id": "session_1755446110",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446410.7704287,
+      "ts_iso": "2025-08-18T01:00:10",
+      "session_id": "session_1755446410",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446454.8332875,
+      "ts_iso": "2025-08-18T01:00:54",
+      "session_id": "session_1755446454",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755446458.7398632,
+      "ts_iso": "2025-08-18T01:00:58",
+      "session_id": "session_1755446458",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446458.744867,
+      "ts_iso": "2025-08-18T01:00:58",
+      "session_id": "session_1755446458",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446458.7473698,
+      "ts_iso": "2025-08-18T01:00:58",
+      "session_id": "session_1755446458",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446709.7469077,
+      "ts_iso": "2025-08-18T01:05:09",
+      "session_id": "session_1755446709",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755446709.7518947,
+      "ts_iso": "2025-08-18T01:05:09",
+      "session_id": "session_1755446709",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447008.8375874,
+      "ts_iso": "2025-08-18T01:10:08",
+      "session_id": "session_1755447008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447008.8405898,
+      "ts_iso": "2025-08-18T01:10:08",
+      "session_id": "session_1755447008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447296.9275692,
+      "ts_iso": "2025-08-18T01:14:56",
+      "session_id": "session_1755447296",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447310.0051265,
+      "ts_iso": "2025-08-18T01:15:10",
+      "session_id": "session_1755447310",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447311.286702,
+      "ts_iso": "2025-08-18T01:15:11",
+      "session_id": "session_1755447311",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447311.293436,
+      "ts_iso": "2025-08-18T01:15:11",
+      "session_id": "session_1755447311",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447311.2974315,
+      "ts_iso": "2025-08-18T01:15:11",
+      "session_id": "session_1755447311",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447610.4065988,
+      "ts_iso": "2025-08-18T01:20:10",
+      "session_id": "session_1755447610",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447610.409589,
+      "ts_iso": "2025-08-18T01:20:10",
+      "session_id": "session_1755447610",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447909.5992842,
+      "ts_iso": "2025-08-18T01:25:09",
+      "session_id": "session_1755447909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755447909.6032743,
+      "ts_iso": "2025-08-18T01:25:09",
+      "session_id": "session_1755447909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448230.8752913,
+      "ts_iso": "2025-08-18T01:30:30",
+      "session_id": "session_1755448230",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448241.422099,
+      "ts_iso": "2025-08-18T01:30:41",
+      "session_id": "session_1755448241",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448241.4290802,
+      "ts_iso": "2025-08-18T01:30:41",
+      "session_id": "session_1755448241",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448241.4330692,
+      "ts_iso": "2025-08-18T01:30:41",
+      "session_id": "session_1755448241",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448509.8900957,
+      "ts_iso": "2025-08-18T01:35:09",
+      "session_id": "session_1755448509",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448509.894088,
+      "ts_iso": "2025-08-18T01:35:09",
+      "session_id": "session_1755448509",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448811.3953383,
+      "ts_iso": "2025-08-18T01:40:11",
+      "session_id": "session_1755448811",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755448811.4023433,
+      "ts_iso": "2025-08-18T01:40:11",
+      "session_id": "session_1755448811",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449109.40198,
+      "ts_iso": "2025-08-18T01:45:09",
+      "session_id": "session_1755449109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449109.4059715,
+      "ts_iso": "2025-08-18T01:45:09",
+      "session_id": "session_1755449109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449419.3421142,
+      "ts_iso": "2025-08-18T01:50:19",
+      "session_id": "session_1755449419",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449419.3454616,
+      "ts_iso": "2025-08-18T01:50:19",
+      "session_id": "session_1755449419",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449716.8076901,
+      "ts_iso": "2025-08-18T01:55:16",
+      "session_id": "session_1755449716",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755449716.8116765,
+      "ts_iso": "2025-08-18T01:55:16",
+      "session_id": "session_1755449716",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450008.9801407,
+      "ts_iso": "2025-08-18T02:00:08",
+      "session_id": "session_1755450008",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450038.5861466,
+      "ts_iso": "2025-08-18T02:00:38",
+      "session_id": "session_1755450038",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755450042.7669075,
+      "ts_iso": "2025-08-18T02:00:42",
+      "session_id": "session_1755450042",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450042.7718947,
+      "ts_iso": "2025-08-18T02:00:42",
+      "session_id": "session_1755450042",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450042.774249,
+      "ts_iso": "2025-08-18T02:00:42",
+      "session_id": "session_1755450042",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450308.9728842,
+      "ts_iso": "2025-08-18T02:05:08",
+      "session_id": "session_1755450308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450308.975903,
+      "ts_iso": "2025-08-18T02:05:08",
+      "session_id": "session_1755450308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450608.967585,
+      "ts_iso": "2025-08-18T02:10:08",
+      "session_id": "session_1755450608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450608.9725132,
+      "ts_iso": "2025-08-18T02:10:08",
+      "session_id": "session_1755450608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450909.0949867,
+      "ts_iso": "2025-08-18T02:15:09",
+      "session_id": "session_1755450909",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450909.9192076,
+      "ts_iso": "2025-08-18T02:15:09",
+      "session_id": "session_1755450909",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450909.9239392,
+      "ts_iso": "2025-08-18T02:15:09",
+      "session_id": "session_1755450909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755450909.9259331,
+      "ts_iso": "2025-08-18T02:15:09",
+      "session_id": "session_1755450909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451209.1453302,
+      "ts_iso": "2025-08-18T02:20:09",
+      "session_id": "session_1755451209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451209.1478138,
+      "ts_iso": "2025-08-18T02:20:09",
+      "session_id": "session_1755451209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451508.8885336,
+      "ts_iso": "2025-08-18T02:25:08",
+      "session_id": "session_1755451508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451508.8924298,
+      "ts_iso": "2025-08-18T02:25:08",
+      "session_id": "session_1755451508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451809.0278423,
+      "ts_iso": "2025-08-18T02:30:09",
+      "session_id": "session_1755451809",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451809.8791645,
+      "ts_iso": "2025-08-18T02:30:09",
+      "session_id": "session_1755451809",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451809.884485,
+      "ts_iso": "2025-08-18T02:30:09",
+      "session_id": "session_1755451809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755451809.887123,
+      "ts_iso": "2025-08-18T02:30:09",
+      "session_id": "session_1755451809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452108.8587008,
+      "ts_iso": "2025-08-18T02:35:08",
+      "session_id": "session_1755452108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452108.8616326,
+      "ts_iso": "2025-08-18T02:35:08",
+      "session_id": "session_1755452108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452409.046814,
+      "ts_iso": "2025-08-18T02:40:09",
+      "session_id": "session_1755452409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452409.0507755,
+      "ts_iso": "2025-08-18T02:40:09",
+      "session_id": "session_1755452409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452715.136456,
+      "ts_iso": "2025-08-18T02:45:15",
+      "session_id": "session_1755452715",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755452715.14045,
+      "ts_iso": "2025-08-18T02:45:15",
+      "session_id": "session_1755452715",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453009.1039457,
+      "ts_iso": "2025-08-18T02:50:09",
+      "session_id": "session_1755453009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453009.1079662,
+      "ts_iso": "2025-08-18T02:50:09",
+      "session_id": "session_1755453009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453308.8945136,
+      "ts_iso": "2025-08-18T02:55:08",
+      "session_id": "session_1755453308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453308.8965068,
+      "ts_iso": "2025-08-18T02:55:08",
+      "session_id": "session_1755453308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453609.1155546,
+      "ts_iso": "2025-08-18T03:00:09",
+      "session_id": "session_1755453609",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453635.5975242,
+      "ts_iso": "2025-08-18T03:00:35",
+      "session_id": "session_1755453635",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755453637.8296094,
+      "ts_iso": "2025-08-18T03:00:37",
+      "session_id": "session_1755453637",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453637.8316042,
+      "ts_iso": "2025-08-18T03:00:37",
+      "session_id": "session_1755453637",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN MemoryCleanup start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453638.9404638,
+      "ts_iso": "2025-08-18T03:00:38",
+      "session_id": "session_1755453638",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN MemoryCleanup ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453638.9451103,
+      "ts_iso": "2025-08-18T03:00:38",
+      "session_id": "session_1755453638",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 2 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453638.9476664,
+      "ts_iso": "2025-08-18T03:00:38",
+      "session_id": "session_1755453638",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453909.168257,
+      "ts_iso": "2025-08-18T03:05:09",
+      "session_id": "session_1755453909",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotCatalog start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453909.2940574,
+      "ts_iso": "2025-08-18T03:05:09",
+      "session_id": "session_1755453909",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotCatalog ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453909.2987962,
+      "ts_iso": "2025-08-18T03:05:09",
+      "session_id": "session_1755453909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755453909.3027859,
+      "ts_iso": "2025-08-18T03:05:09",
+      "session_id": "session_1755453909",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454209.9523344,
+      "ts_iso": "2025-08-18T03:10:09",
+      "session_id": "session_1755454209",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotIntegrity start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454210.089496,
+      "ts_iso": "2025-08-18T03:10:10",
+      "session_id": "session_1755454210",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SnapshotIntegrity ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454210.0933542,
+      "ts_iso": "2025-08-18T03:10:10",
+      "session_id": "session_1755454210",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454210.0963404,
+      "ts_iso": "2025-08-18T03:10:10",
+      "session_id": "session_1755454210",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454508.9773257,
+      "ts_iso": "2025-08-18T03:15:08",
+      "session_id": "session_1755454508",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454510.703918,
+      "ts_iso": "2025-08-18T03:15:10",
+      "session_id": "session_1755454510",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454510.7101822,
+      "ts_iso": "2025-08-18T03:15:10",
+      "session_id": "session_1755454510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454510.7144632,
+      "ts_iso": "2025-08-18T03:15:10",
+      "session_id": "session_1755454510",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454809.1262252,
+      "ts_iso": "2025-08-18T03:20:09",
+      "session_id": "session_1755454809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755454809.1286504,
+      "ts_iso": "2025-08-18T03:20:09",
+      "session_id": "session_1755454809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455109.0133584,
+      "ts_iso": "2025-08-18T03:25:09",
+      "session_id": "session_1755455109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455109.0171337,
+      "ts_iso": "2025-08-18T03:25:09",
+      "session_id": "session_1755455109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455409.2373633,
+      "ts_iso": "2025-08-18T03:30:09",
+      "session_id": "session_1755455409",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455409.8978143,
+      "ts_iso": "2025-08-18T03:30:09",
+      "session_id": "session_1755455409",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455409.9028008,
+      "ts_iso": "2025-08-18T03:30:09",
+      "session_id": "session_1755455409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455409.9059005,
+      "ts_iso": "2025-08-18T03:30:09",
+      "session_id": "session_1755455409",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455708.9619381,
+      "ts_iso": "2025-08-18T03:35:08",
+      "session_id": "session_1755455708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755455708.9659274,
+      "ts_iso": "2025-08-18T03:35:08",
+      "session_id": "session_1755455708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456009.3023949,
+      "ts_iso": "2025-08-18T03:40:09",
+      "session_id": "session_1755456009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456009.3044174,
+      "ts_iso": "2025-08-18T03:40:09",
+      "session_id": "session_1755456009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456309.895137,
+      "ts_iso": "2025-08-18T03:45:09",
+      "session_id": "session_1755456309",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456309.8981364,
+      "ts_iso": "2025-08-18T03:45:09",
+      "session_id": "session_1755456309",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456609.1886363,
+      "ts_iso": "2025-08-18T03:50:09",
+      "session_id": "session_1755456609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456609.191669,
+      "ts_iso": "2025-08-18T03:50:09",
+      "session_id": "session_1755456609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456908.994549,
+      "ts_iso": "2025-08-18T03:55:08",
+      "session_id": "session_1755456908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755456908.9986162,
+      "ts_iso": "2025-08-18T03:55:08",
+      "session_id": "session_1755456908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457209.1947196,
+      "ts_iso": "2025-08-18T04:00:09",
+      "session_id": "session_1755457209",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457237.9171538,
+      "ts_iso": "2025-08-18T04:00:37",
+      "session_id": "session_1755457237",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755457246.9613872,
+      "ts_iso": "2025-08-18T04:00:46",
+      "session_id": "session_1755457246",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457246.9669287,
+      "ts_iso": "2025-08-18T04:00:46",
+      "session_id": "session_1755457246",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457246.9697216,
+      "ts_iso": "2025-08-18T04:00:46",
+      "session_id": "session_1755457246",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457509.0368052,
+      "ts_iso": "2025-08-18T04:05:09",
+      "session_id": "session_1755457509",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457509.0407166,
+      "ts_iso": "2025-08-18T04:05:09",
+      "session_id": "session_1755457509",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457809.2273424,
+      "ts_iso": "2025-08-18T04:10:09",
+      "session_id": "session_1755457809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755457809.2312214,
+      "ts_iso": "2025-08-18T04:10:09",
+      "session_id": "session_1755457809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458108.8370996,
+      "ts_iso": "2025-08-18T04:15:08",
+      "session_id": "session_1755458108",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458109.77958,
+      "ts_iso": "2025-08-18T04:15:09",
+      "session_id": "session_1755458109",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458109.7835705,
+      "ts_iso": "2025-08-18T04:15:09",
+      "session_id": "session_1755458109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458109.7865624,
+      "ts_iso": "2025-08-18T04:15:09",
+      "session_id": "session_1755458109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458408.438394,
+      "ts_iso": "2025-08-18T04:20:08",
+      "session_id": "session_1755458408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458408.4427269,
+      "ts_iso": "2025-08-18T04:20:08",
+      "session_id": "session_1755458408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458708.3468702,
+      "ts_iso": "2025-08-18T04:25:08",
+      "session_id": "session_1755458708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755458708.3508613,
+      "ts_iso": "2025-08-18T04:25:08",
+      "session_id": "session_1755458708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459008.3172278,
+      "ts_iso": "2025-08-18T04:30:08",
+      "session_id": "session_1755459008",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459009.0523896,
+      "ts_iso": "2025-08-18T04:30:09",
+      "session_id": "session_1755459009",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459009.0565183,
+      "ts_iso": "2025-08-18T04:30:09",
+      "session_id": "session_1755459009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459009.0595176,
+      "ts_iso": "2025-08-18T04:30:09",
+      "session_id": "session_1755459009",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459308.2532887,
+      "ts_iso": "2025-08-18T04:35:08",
+      "session_id": "session_1755459308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459308.2563102,
+      "ts_iso": "2025-08-18T04:35:08",
+      "session_id": "session_1755459308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459608.388756,
+      "ts_iso": "2025-08-18T04:40:08",
+      "session_id": "session_1755459608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459608.3917487,
+      "ts_iso": "2025-08-18T04:40:08",
+      "session_id": "session_1755459608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459908.3719726,
+      "ts_iso": "2025-08-18T04:45:08",
+      "session_id": "session_1755459908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755459908.3749666,
+      "ts_iso": "2025-08-18T04:45:08",
+      "session_id": "session_1755459908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460214.6555204,
+      "ts_iso": "2025-08-18T04:50:14",
+      "session_id": "session_1755460214",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460214.6585054,
+      "ts_iso": "2025-08-18T04:50:14",
+      "session_id": "session_1755460214",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460508.5047102,
+      "ts_iso": "2025-08-18T04:55:08",
+      "session_id": "session_1755460508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460508.508703,
+      "ts_iso": "2025-08-18T04:55:08",
+      "session_id": "session_1755460508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460809.4077063,
+      "ts_iso": "2025-08-18T05:00:09",
+      "session_id": "session_1755460809",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460835.9191773,
+      "ts_iso": "2025-08-18T05:00:35",
+      "session_id": "session_1755460835",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755460839.156246,
+      "ts_iso": "2025-08-18T05:00:39",
+      "session_id": "session_1755460839",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460839.1612313,
+      "ts_iso": "2025-08-18T05:00:39",
+      "session_id": "session_1755460839",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755460839.1636302,
+      "ts_iso": "2025-08-18T05:00:39",
+      "session_id": "session_1755460839",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461109.390115,
+      "ts_iso": "2025-08-18T05:05:09",
+      "session_id": "session_1755461109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461109.393106,
+      "ts_iso": "2025-08-18T05:05:09",
+      "session_id": "session_1755461109",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461408.7034311,
+      "ts_iso": "2025-08-18T05:10:08",
+      "session_id": "session_1755461408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461408.7084184,
+      "ts_iso": "2025-08-18T05:10:08",
+      "session_id": "session_1755461408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461708.507054,
+      "ts_iso": "2025-08-18T05:15:08",
+      "session_id": "session_1755461708",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461709.2606666,
+      "ts_iso": "2025-08-18T05:15:09",
+      "session_id": "session_1755461709",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461709.265586,
+      "ts_iso": "2025-08-18T05:15:09",
+      "session_id": "session_1755461709",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755461709.2695754,
+      "ts_iso": "2025-08-18T05:15:09",
+      "session_id": "session_1755461709",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462008.5903187,
+      "ts_iso": "2025-08-18T05:20:08",
+      "session_id": "session_1755462008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462008.5943086,
+      "ts_iso": "2025-08-18T05:20:08",
+      "session_id": "session_1755462008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462308.469925,
+      "ts_iso": "2025-08-18T05:25:08",
+      "session_id": "session_1755462308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462308.4736054,
+      "ts_iso": "2025-08-18T05:25:08",
+      "session_id": "session_1755462308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462608.761447,
+      "ts_iso": "2025-08-18T05:30:08",
+      "session_id": "session_1755462608",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462609.4739132,
+      "ts_iso": "2025-08-18T05:30:09",
+      "session_id": "session_1755462609",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462609.4784896,
+      "ts_iso": "2025-08-18T05:30:09",
+      "session_id": "session_1755462609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462609.481438,
+      "ts_iso": "2025-08-18T05:30:09",
+      "session_id": "session_1755462609",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462908.5123575,
+      "ts_iso": "2025-08-18T05:35:08",
+      "session_id": "session_1755462908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755462908.5152042,
+      "ts_iso": "2025-08-18T05:35:08",
+      "session_id": "session_1755462908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463208.637884,
+      "ts_iso": "2025-08-18T05:40:08",
+      "session_id": "session_1755463208",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463208.641401,
+      "ts_iso": "2025-08-18T05:40:08",
+      "session_id": "session_1755463208",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463508.5170918,
+      "ts_iso": "2025-08-18T05:45:08",
+      "session_id": "session_1755463508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463508.5208075,
+      "ts_iso": "2025-08-18T05:45:08",
+      "session_id": "session_1755463508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463808.7932653,
+      "ts_iso": "2025-08-18T05:50:08",
+      "session_id": "session_1755463808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755463808.797028,
+      "ts_iso": "2025-08-18T05:50:08",
+      "session_id": "session_1755463808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464108.5662518,
+      "ts_iso": "2025-08-18T05:55:08",
+      "session_id": "session_1755464108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464108.569243,
+      "ts_iso": "2025-08-18T05:55:08",
+      "session_id": "session_1755464108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464408.7789335,
+      "ts_iso": "2025-08-18T06:00:08",
+      "session_id": "session_1755464408",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464436.3158913,
+      "ts_iso": "2025-08-18T06:00:36",
+      "session_id": "session_1755464436",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755464438.493276,
+      "ts_iso": "2025-08-18T06:00:38",
+      "session_id": "session_1755464438",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464438.4984586,
+      "ts_iso": "2025-08-18T06:00:38",
+      "session_id": "session_1755464438",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464438.5005286,
+      "ts_iso": "2025-08-18T06:00:38",
+      "session_id": "session_1755464438",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464708.655364,
+      "ts_iso": "2025-08-18T06:05:08",
+      "session_id": "session_1755464708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755464708.6593487,
+      "ts_iso": "2025-08-18T06:05:08",
+      "session_id": "session_1755464708",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465008.8099136,
+      "ts_iso": "2025-08-18T06:10:08",
+      "session_id": "session_1755465008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465008.8129063,
+      "ts_iso": "2025-08-18T06:10:08",
+      "session_id": "session_1755465008",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465308.5117784,
+      "ts_iso": "2025-08-18T06:15:08",
+      "session_id": "session_1755465308",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465309.2798262,
+      "ts_iso": "2025-08-18T06:15:09",
+      "session_id": "session_1755465309",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465309.2844794,
+      "ts_iso": "2025-08-18T06:15:09",
+      "session_id": "session_1755465309",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465309.2867603,
+      "ts_iso": "2025-08-18T06:15:09",
+      "session_id": "session_1755465309",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465608.8548074,
+      "ts_iso": "2025-08-18T06:20:08",
+      "session_id": "session_1755465608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465608.8583837,
+      "ts_iso": "2025-08-18T06:20:08",
+      "session_id": "session_1755465608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465908.4949653,
+      "ts_iso": "2025-08-18T06:25:08",
+      "session_id": "session_1755465908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755465908.4986615,
+      "ts_iso": "2025-08-18T06:25:08",
+      "session_id": "session_1755465908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466208.88,
+      "ts_iso": "2025-08-18T06:30:08",
+      "session_id": "session_1755466208",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466209.5392442,
+      "ts_iso": "2025-08-18T06:30:09",
+      "session_id": "session_1755466209",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466209.5432324,
+      "ts_iso": "2025-08-18T06:30:09",
+      "session_id": "session_1755466209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466209.5469456,
+      "ts_iso": "2025-08-18T06:30:09",
+      "session_id": "session_1755466209",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466508.5829668,
+      "ts_iso": "2025-08-18T06:35:08",
+      "session_id": "session_1755466508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466508.5859585,
+      "ts_iso": "2025-08-18T06:35:08",
+      "session_id": "session_1755466508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466808.264921,
+      "ts_iso": "2025-08-18T06:40:08",
+      "session_id": "session_1755466808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755466808.2688348,
+      "ts_iso": "2025-08-18T06:40:08",
+      "session_id": "session_1755466808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467108.0788069,
+      "ts_iso": "2025-08-18T06:45:08",
+      "session_id": "session_1755467108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467108.0808017,
+      "ts_iso": "2025-08-18T06:45:08",
+      "session_id": "session_1755467108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467408.1424024,
+      "ts_iso": "2025-08-18T06:50:08",
+      "session_id": "session_1755467408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467408.1453943,
+      "ts_iso": "2025-08-18T06:50:08",
+      "session_id": "session_1755467408",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467714.3113098,
+      "ts_iso": "2025-08-18T06:55:14",
+      "session_id": "session_1755467714",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755467714.3153048,
+      "ts_iso": "2025-08-18T06:55:14",
+      "session_id": "session_1755467714",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468008.2711046,
+      "ts_iso": "2025-08-18T07:00:08",
+      "session_id": "session_1755468008",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468034.71633,
+      "ts_iso": "2025-08-18T07:00:34",
+      "session_id": "session_1755468034",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    },
+    {
+      "ts": 1755468037.1547222,
+      "ts_iso": "2025-08-18T07:00:37",
+      "session_id": "session_1755468037",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468037.1587107,
+      "ts_iso": "2025-08-18T07:00:37",
+      "session_id": "session_1755468037",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468037.1621897,
+      "ts_iso": "2025-08-18T07:00:37",
+      "session_id": "session_1755468037",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468308.2228324,
+      "ts_iso": "2025-08-18T07:05:08",
+      "session_id": "session_1755468308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468308.2268226,
+      "ts_iso": "2025-08-18T07:05:08",
+      "session_id": "session_1755468308",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468608.2893229,
+      "ts_iso": "2025-08-18T07:10:08",
+      "session_id": "session_1755468608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468608.293312,
+      "ts_iso": "2025-08-18T07:10:08",
+      "session_id": "session_1755468608",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468908.1480978,
+      "ts_iso": "2025-08-18T07:15:08",
+      "session_id": "session_1755468908",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468908.8937962,
+      "ts_iso": "2025-08-18T07:15:08",
+      "session_id": "session_1755468908",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN SessionMerge ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468908.8976378,
+      "ts_iso": "2025-08-18T07:15:08",
+      "session_id": "session_1755468908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755468908.9008088,
+      "ts_iso": "2025-08-18T07:15:08",
+      "session_id": "session_1755468908",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469208.2792587,
+      "ts_iso": "2025-08-18T07:20:08",
+      "session_id": "session_1755469208",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469208.2832513,
+      "ts_iso": "2025-08-18T07:20:08",
+      "session_id": "session_1755469208",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469508.2228339,
+      "ts_iso": "2025-08-18T07:25:08",
+      "session_id": "session_1755469508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469508.227821,
+      "ts_iso": "2025-08-18T07:25:08",
+      "session_id": "session_1755469508",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469808.3105104,
+      "ts_iso": "2025-08-18T07:30:08",
+      "session_id": "session_1755469808",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469808.9780362,
+      "ts_iso": "2025-08-18T07:30:08",
+      "session_id": "session_1755469808",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN BridgeDispatch ok",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469808.9979806,
+      "ts_iso": "2025-08-18T07:30:08",
+      "session_id": "session_1755469808",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Scheduler completed: 1 jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755469809.016239,
+      "ts_iso": "2025-08-18T07:30:09",
+      "session_id": "session_1755469809",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755470108.1532788,
+      "ts_iso": "2025-08-18T07:35:08",
+      "session_id": "session_1755470108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755470108.1571596,
+      "ts_iso": "2025-08-18T07:35:08",
+      "session_id": "session_1755470108",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471007.610927,
+      "ts_iso": "2025-08-18T07:50:07",
+      "session_id": "session_1755471007",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471007.6137846,
+      "ts_iso": "2025-08-18T07:50:07",
+      "session_id": "session_1755471007",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471307.5122132,
+      "ts_iso": "2025-08-18T07:55:07",
+      "session_id": "session_1755471307",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "No jobs executed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471307.515744,
+      "ts_iso": "2025-08-18T07:55:07",
+      "session_id": "session_1755471307",
+      "from": "scheduler",
+      "kind": "system",
+      "text": "Master body execution completed",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471607.6154542,
+      "ts_iso": "2025-08-18T08:00:07",
+      "session_id": "session_1755471607",
+      "from": "scheduler",
+      "kind": "job",
+      "text": "RUN HealthCheck start",
+      "insight": "스케줄러 info",
+      "tags": [
+        "master_scheduler",
+        "info"
+      ]
+    },
+    {
+      "ts": 1755471633.4544275,
+      "ts_iso": "2025-08-18T08:00:33",
+      "session_id": "session_1755471633",
+      "from": "system",
+      "kind": "test",
+      "text": "selftest-1",
+      "insight": null,
+      "tags": [
+        "selftest"
+      ]
+    }
+  ]
+}

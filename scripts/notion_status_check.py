@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Notion 상태 확인 시스템 - Notion DB 상태 검사 스크립트
 # -*- coding: utf-8 -*-
 """
 Notion DB 상태 옵션 확인 스크립트
@@ -68,3 +69,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

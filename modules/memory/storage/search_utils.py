@@ -1,3 +1,4 @@
+# [EXPERIMENT] VELOS 검색 유틸리티 - 메모리 검색 모듈
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -264,3 +265,6 @@ if __name__ == "__main__":
         print(f"점수: {stats['score_stats']}")
 
     print("\n✅ FTS 검색 유틸리티 테스트 완료")
+
+
+

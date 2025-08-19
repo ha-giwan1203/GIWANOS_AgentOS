@@ -1,7 +1,7 @@
+# [ACTIVE] VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 # -*- coding: utf-8 -*-
-# VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
-# VELOS Reflection Risk Tagger
+# [ACTIVE] VELOS Reflection Risk Tagger
 # - 자동 리스크 레벨 태깅 (HIGH/MED/LOW)
 # - 최근성 40% + 키워드/시그널 60% 점수
 # - 장애 징후, 보안, 데드라인 등 고위험 항목 탐지

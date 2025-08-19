@@ -1,0 +1,69 @@
+# VELOS 운영 철학 선언문
+# "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
+
+# VELOS 시스템 기본 설정
+# 환경 변수 우선순위: ENV > configs/settings.yaml > C:\giwanos
+
+# 시스템 기본 경로 설정
+# 경로 우선순위: ENV > configs/settings.yaml > 기본값
+root: "C:/giwanos"
+venv_path: "C:/Users/User/venvs/velos"
+python_path: "C:/Users/User/venvs/velos/Scripts/python.exe"
+
+# 데이터베이스 설정
+database:
+  path: "C:/giwanos/data/velos.db"
+  backup_path: "C:/giwanos/data/backups"
+  max_backups: 10
+
+# 로그 설정
+logging:
+  level: "INFO"
+  path: "C:/giwanos/data/logs"
+  max_size: "10MB"
+  backup_count: 5
+  # 로그 파일별 설정
+  files:
+    bridge: "bridge_%Y%m%d.log"
+    healthcheck: "healthcheck_%Y%m%d_%H%M%S.log"
+    launcher: "launcher_%Y%m%d_%H%M%S.log"
+    system: "system_%Y%m%d.log"
+    jobs: "jobs.log"
+    velos_bridge: "velos_bridge.log"
+
+# 메모리 관리 설정
+memory:
+  max_sessions: 1000
+  cleanup_interval: 3600  # 1시간
+  hot_context_size: 100
+
+# API 설정
+api:
+  timeout: 30
+  max_retries: 3
+  rate_limit: 100  # 요청/분
+
+# 알림 설정
+notifications:
+  email_enabled: true
+  slack_enabled: true
+  pushbullet_enabled: true
+  notion_enabled: true
+
+# 보안 설정
+security:
+  encryption_enabled: true
+  hash_algorithm: "sha256"
+  session_timeout: 86400  # 24시간
+
+# 성능 설정
+performance:
+  max_workers: 4
+  queue_size: 100
+  cache_size: 1000
+
+# 개발 설정
+development:
+  debug_mode: false
+  auto_reload: false
+  test_mode: false

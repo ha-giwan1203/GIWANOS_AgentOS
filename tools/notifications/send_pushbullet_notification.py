@@ -1,4 +1,4 @@
-# VELOS 운영 철학 적용
+# [ACTIVE] VELOS 운영 철학 적용
 from __future__ import annotations
 import os, sys, json
 from pathlib import Path

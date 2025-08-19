@@ -1,4 +1,5 @@
-# VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
+# [ACTIVE] VELOS 메모리 어댑터 - 핵심 데이터 관리 모듈
+# [ACTIVE] VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 import os
 import json
@@ -7,6 +8,13 @@ import sqlite3
 import threading
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
+
+# VELOS 표준 데이터베이스 연결 사용
+try:
+    from ..db_util import db_open
+    USE_DB_UTIL = True
+except ImportError:
+    USE_DB_UTIL = False
 
 ROOT = "C:/giwanos"
 PATHS = {
@@ -210,12 +218,47 @@ class MemoryAdapter:
         return out
 
     def search(self, keyword: str, limit: int = 50) -> List[Dict[str, Any]]:
-        out = []
         try:
-            conn = sqlite3.connect(self.db, timeout=5)
+            if USE_DB_UTIL:
+                conn = db_open(self.db)
+            else:
+                conn = sqlite3.connect(self.db, timeout=5)
             _ensure_schema(conn)
             cur = conn.cursor()
+            
+            # FTS 테이블 존재 확인
+            has_fts = cur.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='memory_fts'"
+            ).fetchone() is not None
+            
+            if has_fts:
+                try:
+                    # FTS 검색 시도
+                    rows = cur.execute("""
+                      SELECT m.id, m.ts, m.role, m.insight, m.raw, m.tags
+                      FROM memory_fts f JOIN memory m ON f.rowid = m.id
+                      WHERE f.text MATCH ?
+                      ORDER BY m.ts DESC
+                      LIMIT ?""", (keyword, limit)).fetchall()
+                    
+                    out = []
+                    for row in rows:
+                        id_val, ts, role, insight, raw, tags = row
+                        try:
+                            raw = json.loads(raw) if raw else ""
+                            tags = json.loads(tags) if tags else []
+                        except Exception:
+                            pass
+                        out.append({"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags})
+                    
+                    conn.close()
+                    return out
+                except sqlite3.Error:
+                    pass  # FTS 실패 시 LIKE 검색으로 폴백
+            
+            # LIKE 검색 (폴백)
             q = f"%{keyword}%"
+            out = []
             for row in cur.execute(
                 "SELECT ts, role, insight, raw, tags FROM memory WHERE insight LIKE ? OR raw LIKE ? ORDER BY ts DESC LIMIT ?",
                 (q, q, limit),
@@ -227,10 +270,11 @@ class MemoryAdapter:
                 except Exception:
                     pass
                 out.append({"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags})
+            
             conn.close()
+            return out
         except Exception:
-            pass
-        return out
+            return []
 
     def get_roles_unified(self, limit: int = 10) -> Dict[str, List[Dict[str, Any]]]:
         """

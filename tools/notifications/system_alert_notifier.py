@@ -1,11 +1,8 @@
+# [ACTIVE] VELOS System Alert Notifier
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""
-VELOS System Alert Notifier
-
-시스템 알림을 처리하는 모듈입니다.
-"""
+# 
+# 시스템 알림을 처리하는 모듈입니다.
 
 import os
 import sys

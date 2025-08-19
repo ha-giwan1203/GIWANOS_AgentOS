@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 메모리 인사이트 뷰어 - 메모리 데이터 시각화 시스템
 # ---------------- Memory Insight Viewer (고도화) ----------------
 # 요구 라이브러리: streamlit, python-dateutil (선택), dotenv(선택)
 # pip install python-dateutil python-dotenv streamlit

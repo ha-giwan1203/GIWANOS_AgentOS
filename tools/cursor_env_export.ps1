@@ -1,4 +1,4 @@
-# VELOS 운영 철학 선언문
+# [ACTIVE] VELOS 운영 철학 선언문
 [CmdletBinding()]
 param(
   [string]$EnvPath,

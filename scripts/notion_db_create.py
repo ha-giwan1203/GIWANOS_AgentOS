@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Notion 데이터베이스 생성 시스템 - Notion DB 생성 스크립트
 # -*- coding: utf-8 -*-
 """
 VELOS Notion DB 생성 스크립트

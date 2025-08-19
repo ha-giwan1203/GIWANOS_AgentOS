@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 마스터 스케줄러 태스크 생성 시스템 - Windows Task Scheduler 등록 스크립트
 # =========================================================
 # VELOS 운영 철학 선언문
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
@@ -101,7 +102,7 @@ function Test-VelosPrerequisites {
         }
         
         # 마스터 스케줄러 파일 확인
-        $masterSchedulerPath = Join-Path $VELOS_ROOT "scripts\run_giwanos_master_loop.py"
+        $masterSchedulerPath = Join-Path $VELOS_ROOT "scripts\velos_master_scheduler.py"
         if (-not (Test-Path $masterSchedulerPath)) {
             throw "Master scheduler not found: $masterSchedulerPath"
         }

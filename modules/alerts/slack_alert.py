@@ -1,3 +1,4 @@
+# [EXPERIMENT] VELOS Slack 알림 - 외부 통합 모듈
 # -*- coding: utf-8 -*-
 import os, re, time, requests
 from pathlib import Path
@@ -16,3 +17,6 @@ def error_burst_alert(threshold=50, window_secs=3600):
             count += 1
     if count >= threshold:
         requests.post(WEBHOOK, json={"text": f"⚠️ VELOS 오류 급증 감지: {count}건/최근1h"})
+
+
+

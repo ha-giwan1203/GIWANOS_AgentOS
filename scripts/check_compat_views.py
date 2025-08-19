@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 호환성 뷰 검증 시스템 - 데이터베이스 뷰 검증 스크립트
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """

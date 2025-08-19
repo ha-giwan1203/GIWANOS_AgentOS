@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 대화 스트림 로거 - 대화 로깅 시스템
 import os, json, time
 from pathlib import Path
 from datetime import datetime
@@ -25,3 +26,6 @@ if __name__ == "__main__":
     # 예시: 테스트용 더미 입력
     write("user", "이건 테스트 메시지")
     write("assistant", "테스트 응답입니다.")
+
+
+

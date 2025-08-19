@@ -1,4 +1,4 @@
-# scripts/dispatch_report.py
+# [ACTIVE] scripts/dispatch_report.py
 from __future__ import annotations
 import os, json, time, smtplib, mimetypes
 from pathlib import Path
@@ -18,7 +18,7 @@ _load_dotenv()
 
 try:
     import requests  # venv에 이미 있을 가능성 높음
-    from utils.net import post_with_retry, get_with_retry
+    from modules.utils.net import post_with_retry, get_with_retry
 except Exception:
     requests = None  # 없으면 해당 채널은 자동 스킵
     post_with_retry = None
@@ -216,3 +216,4 @@ if __name__ == "__main__":
         print(json.dumps(dispatch_report(latest, md), ensure_ascii=False, indent=2))
     else:
         print("no pdf found in", AUTO)
+

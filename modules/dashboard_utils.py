@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 대시보드 유틸리티 - 대시보드 공통 모듈
 import os, json, time, re, threading, queue, base64, urllib.parse
 from pathlib import Path
 from datetime import datetime

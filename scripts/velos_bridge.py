@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Bridge - 메시지 디스패치 시스템
 # =========================================================
 # VELOS 운영 철학 선언문
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
@@ -24,30 +25,48 @@ velos_bridge.py (BOM-safe + soft-fail)
 - UTF-8 with BOM/without BOM 모두 파싱되도록 read_json_any() 적용
 """
 
+import os, sys
+HERE = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.abspath(os.path.join(HERE, ".."))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+try:
+    from modules.report_paths import ROOT as REPORT_ROOT
+except Exception as e:
+    # 최소한의 디버그
+    print("[WARN] import modules.report_paths failed:", e)
+    # 필요시 대체 경로 지정
+    REPORT_ROOT = ROOT
+
+# 작업 폴더도 루트로 고정
+try:
+    os.chdir(ROOT)
+except Exception:
+    pass
+
 import json
-import os
 import shutil
 import time
 import traceback
 from pathlib import Path
 
-from modules.report_paths import ROOT
+# ROOT는 위에서 설정됨
 INBOXES = [
-    ROOT / "data" / "dispatch" / "_queue",
-    ROOT / "data" / "reports" / "_dispatch",
+    Path(ROOT) / "data" / "dispatch" / "_queue",
+    Path(ROOT) / "data" / "reports" / "_dispatch",
 ]
 OUTS = {
-    str(ROOT / "data" / "dispatch" / "_queue"): (
-        ROOT / "data" / "dispatch" / "_processed",
-        ROOT / "data" / "dispatch" / "_failed",
+    str(Path(ROOT) / "data" / "dispatch" / "_queue"): (
+        Path(ROOT) / "data" / "dispatch" / "_processed",
+        Path(ROOT) / "data" / "dispatch" / "_failed",
     ),
-    str(ROOT / "data" / "reports" / "_dispatch"): (
-        ROOT / "data" / "reports" / "_dispatch_processed",
-        ROOT / "data" / "reports" / "_dispatch_failed",
+    str(Path(ROOT) / "data" / "reports" / "_dispatch"): (
+        Path(ROOT) / "data" / "reports" / "_dispatch_processed",
+        Path(ROOT) / "data" / "reports" / "_dispatch_failed",
     ),
 }
 
-LOGDIR = ROOT / "logs"
+LOGDIR = Path(ROOT) / "logs"
 LOGDIR.mkdir(parents=True, exist_ok=True)
 LOG = LOGDIR / "velos_bridge.log"
 

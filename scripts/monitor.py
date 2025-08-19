@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 모니터링 대시보드 - 시스템 모니터링 인터페이스
 import os, json, time, re, threading, queue, base64, urllib.parse
 from pathlib import Path
 from datetime import datetime

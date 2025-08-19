@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Notion 동기화 시스템 - Notion 상태 동기화 스크립트
 # -*- coding: utf-8 -*-
 import os
 import requests
@@ -18,3 +19,6 @@ def update_status(page_id: str, status: str):
     data = {"properties": {"상태": {"status": {"name": status}}}}
     r = requests.patch(url, headers=headers, json=data, timeout=15)
     return r.ok
+
+
+

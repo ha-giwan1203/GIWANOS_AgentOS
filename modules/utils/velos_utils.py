@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 유틸리티 - 공통 기능 모듈
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -141,3 +142,6 @@ if __name__ == "__main__":
     print(f"JSONL 디렉토리: {get_jsonl_dir()}")
 
     print("✅ 자가 검증 완료")
+
+
+

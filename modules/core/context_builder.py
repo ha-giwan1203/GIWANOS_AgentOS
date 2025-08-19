@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 컨텍스트 빌더 - 세션 컨텍스트 관리 모듈
 # VELOS 운영 철학 선언문: 파일명 절대 변경 금지. 수정 시 자가 검증 포함. 
 # 실행 결과 기록. 경로/구조 불변. 실패는 로깅하고 자동 복구를 시도한다.
 import os
@@ -11,7 +12,7 @@ ROOT = "C:/giwanos"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
-from utils.memory_adapter import MemoryAdapter  # shim을 통한 import
+from modules.utils.memory_adapter import MemoryAdapter  # shim을 통한 import
 
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
@@ -109,3 +110,4 @@ if __name__ == "__main__":
     )
 
     print("=== 자가 검증 완료 ===")
+

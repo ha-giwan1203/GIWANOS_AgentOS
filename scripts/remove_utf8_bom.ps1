@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS UTF-8 BOM 제거 시스템 - UTF-8 BOM 제거 유틸리티
 # -*- coding: utf-8 -*-
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
@@ -70,3 +71,6 @@ Write-Host "오류 발생: $errorCount"
 Write-Host "총 파일: $($filesWithBOM.Count)"
 
 Write-Host "`n[DONE] UTF-8 BOM 제거 완료!"
+
+
+

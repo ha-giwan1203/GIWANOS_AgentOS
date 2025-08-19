@@ -98,3 +98,7 @@ python scripts/unified_roles_query_example.py
 - `scripts/sql/compat_views.sql`: memory_roles 뷰 정의
 - `scripts/unified_roles_query_example.py`: 사용 예제
 - `scripts/apply_compat_views.py`: 뷰 생성 스크립트
+
+
+
+

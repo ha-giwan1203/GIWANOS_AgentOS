@@ -1,4 +1,4 @@
-# scripts/auto_dispatch.py
+# [ACTIVE] scripts/auto_dispatch.py
 from __future__ import annotations
 import os, sys, time
 from pathlib import Path

@@ -1,15 +1,6 @@
-# [ACTIVE] VELOS 운영 철학 선언문
-# 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
-# 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
-# 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
-# 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
-# 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
-# 7) 구조 기반 판단: 프로젝트 기준으로만 판단 (추측 금지)
-# 8) 중복/오류 제거: 불필요/중복 로직 제거, 단일 진실원칙 유지
-# 9) 지능형 처리: 자동 복구·경고 등 방어적 설계 우선
-# 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
-# =========================================================
+# [ACTIVE] VELOS 마스터 스케줄러 - 중앙 작업 관리 시스템
+# VELOS 운영 철학 선언문
+# "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
 """
 VELOS: Single Python Master Loop
 - Windows Task Scheduler는 5분마다 이 파일만 실행
@@ -34,23 +25,37 @@ import datetime as _dt
 from typing import Dict, Any, List
 from pathlib import Path
 
-# ROOT 경로 설정 (VELOS 운영 철학 준수)
-ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
-if ROOT not in sys.path:
-    sys.path.append(ROOT)
-
-# VELOS 모듈 import (안전화)
+# VELOS 공용 설정 유틸리티 사용
 try:
-    from modules.core.session_store import append_session_event
-    from modules.core.velos_session_init import init_velos_session
-    VELOS_AVAILABLE = True
+    # 현재 디렉토리를 sys.path에 추가
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(current_dir)
+    if root_dir not in sys.path:
+        sys.path.insert(0, root_dir)
+    
+    from modules.utils.settings_bootstrap import VELOS_ROOT, LOG_PATH
+    ROOT = str(VELOS_ROOT)
+    
+    # VELOS 모듈 import (안전화)
+    try:
+        from modules.core.session_store import append_session_event
+        from modules.core.velos_session_init import init_velos_session
+        VELOS_AVAILABLE = True
+    except ImportError:
+        VELOS_AVAILABLE = False
+        print("[WARN] VELOS modules not available, running in standalone mode")
+        
 except ImportError:
+    # 폴백: 기본 설정 사용
+    ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
+    if ROOT not in sys.path:
+        sys.path.append(ROOT)
     VELOS_AVAILABLE = False
-    print("[WARN] VELOS modules not available, running in standalone mode")
+    print("[WARN] settings_bootstrap not available, using fallback")
 
 # ------------------- 경로/파일 -------------------
 DATA = Path(ROOT) / "data"
-LOGD = DATA / "logs"
+LOGD = Path(ROOT) / "data" / "logs" if 'LOG_PATH' not in locals() else LOG_PATH
 LOGD.mkdir(parents=True, exist_ok=True)
 
 JOBS_FILE = DATA / "jobs.json"
@@ -218,15 +223,16 @@ def _run_job(job: Dict[str, Any], dry_run: bool = False) -> bool:
     try:
         # VELOS 스크립트 매핑
         script_map = {
-            "DailyReport": "generate_velos_report.py",
-            "WeeklyAudit": "run_file_usage_audit.ps1", 
-            "HealthCheck": "run_healthcheck.ps1",
-            "MemoryCleanup": "run_memory_cleaner.ps1",
+            "DailyReport": "generate_velos_report_ko.py",
+            "WeeklyAudit": "check_velos_stats.py", 
+            "HealthCheck": "check_velos_stats.py",
+            "MemoryCleanup": "memory_tick.py",
             "SnapshotBackup": "create_velos_snapshot.py",
             "BridgeDispatch": "velos_bridge.py",
             "SnapshotCatalog": "snapshot_catalog.py",
             "SnapshotIntegrity": "verify_snapshots.py",
             "SessionMerge": "velos_session_merge.bat",
+            "BenchmarkDaily": "benchmark_regression.py",
         }
         
         script_path = script_map.get(name)
@@ -239,8 +245,15 @@ def _run_job(job: Dict[str, Any], dry_run: bool = False) -> bool:
             _log(f"Script not found: {full_path}", "ERROR")
             return False
             
+        # BridgeDispatch 전용 실행 방식
+        if name == "BridgeDispatch":
+            result = subprocess.run([
+                "pwsh", "-NoProfile", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass",
+                "-Command", f"Set-Location '{ROOT}'; $env:PYTHONPATH='{ROOT}'; python .\\scripts\\velos_bridge.py"
+            ], capture_output=True, text=True, timeout=300)
+
         # 파일 확장자에 따른 실행 방법 결정
-        if script_path.endswith('.ps1'):
+        elif script_path.endswith('.ps1'):
             result = subprocess.run([
                 "pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", full_path
             ], capture_output=True, text=True, timeout=300)
@@ -356,6 +369,7 @@ def run_internal_scheduler(argv: List[str]) -> int:
         _log("No jobs executed")
 
     return 0
+
 
 # ------------------- 메인 -------------------
 def _master_body() -> None:

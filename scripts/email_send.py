@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 이메일 전송 시스템 - 이메일 발송 스크립트
 # -*- coding: utf-8 -*-
 """
 VELOS 이메일 전송 스크립트
@@ -174,3 +175,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+

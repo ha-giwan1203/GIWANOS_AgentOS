@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 마크다운 PDF 변환 시스템 - 한국어 PDF 생성 스크립트
 from pathlib import Path
 import sys, glob, datetime
 
@@ -80,3 +81,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+

@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 사이트커스터마이즈 - Python 환경 초기화 모듈
 from __future__ import annotations
 import atexit, json, os, sys, time, traceback
 from pathlib import Path

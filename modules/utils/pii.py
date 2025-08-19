@@ -1,3 +1,4 @@
+# [EXPERIMENT] VELOS PII 처리 - 개인정보 보호 모듈
 # -*- coding: utf-8 -*-
 import re
 
@@ -12,3 +13,6 @@ def scrub_text(t: str) -> str:
     t = PAT_EMAIL.sub("[email]", t)
     t = PAT_PHONE.sub("[phone]", t)
     return t
+
+
+

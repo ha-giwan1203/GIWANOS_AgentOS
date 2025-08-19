@@ -1,0 +1,5 @@
+{
+  "ok": false,
+  "detail": "exception: 'ascii' codec can't encode characters in position 19-21: ordinal not in range(128)",
+  "ts": 1755449715
+}

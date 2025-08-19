@@ -1,9 +1,16 @@
-﻿# VELOS 통합 메모리 스키마
-id_field: id
-content_field: text
-timestamp_field: ts
-meta:
-  source: string
-  tags: list[string]
-  role: optional[string]
-  importance: optional[string]
+# VELOS 메모리 스키마 정의
+memory_types:
+  session:
+    fields:
+      - id: string
+      - timestamp: datetime
+      - content: text
+      - tags: array
+  reflection:
+    fields:
+      - id: string
+      - timestamp: datetime
+      - insight: text
+      - confidence: float
+
+

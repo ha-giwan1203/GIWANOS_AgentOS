@@ -1,4 +1,5 @@
-﻿# VELOS REPORT_KEY 검색 Streamlit 앱 실행 스크립트
+﻿# [ACTIVE] VELOS 검색 앱 실행 시스템 - REPORT_KEY 검색 Streamlit 앱 실행 스크립트
+# VELOS REPORT_KEY 검색 Streamlit 앱 실행 스크립트
 # Streamlit 기반 웹 인터페이스로 REPORT_KEY 검색
 
 $ErrorActionPreference = "Stop"
@@ -52,3 +53,6 @@ try {
     Write-Host "   오류: $($_.Exception.Message)" -ForegroundColor Yellow
     exit 1
 }
+
+
+

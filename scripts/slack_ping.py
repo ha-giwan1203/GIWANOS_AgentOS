@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Slack 핑 시스템 - Slack 연결 테스트 스크립트
 import os, json, urllib.request
 
 tok = os.getenv("SLACK_BOT_TOKEN")
@@ -15,3 +16,6 @@ req = urllib.request.Request(
 )
 
 print(urllib.request.urlopen(req).read().decode("utf-8"))
+
+
+

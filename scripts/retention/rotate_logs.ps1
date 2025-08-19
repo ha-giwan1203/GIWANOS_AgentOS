@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 로그 로테이션 스크립트
 # UTF-8
 $root = "C:\giwanos\data\logs"
 $days = 90
@@ -9,3 +10,7 @@ Get-ChildItem $root -File | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDa
     }
 
 Write-Host "로그 로테이션 완료($days일 이전 → zip 압축)."
+
+
+
+

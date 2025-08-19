@@ -1,181 +1,302 @@
-# VELOS 운영 철학 선언문: 파일명 고정, 자가 검증 필수, 결과 기록, 경로/구조 불변, 실패 시 안전 복구와 알림.
-import os, sys, json, time, sqlite3
+# [ACTIVE] VELOS 시스템 무결성 체크 - 시스템 무결성 검증
+# -*- coding: utf-8 -*-
+"""
+VELOS 운영 철학 선언문
+"판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
+
+VELOS 시스템 무결성 체크
+- 핵심 파일들의 존재 여부 확인
+- 데이터베이스 무결성 검증
+- 설정 파일 유효성 검사
+"""
+
+import os
+import sys
+import json
+import sqlite3
+import hashlib
 from pathlib import Path
+from typing import Dict, List, Tuple
 
-ROOT = "C:/giwanos"
-HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
+# VELOS 루트 경로
+VELOS_ROOT = Path(r"C:\giwanos")
+DATA_DIR = VELOS_ROOT / "data"
+CONFIGS_DIR = VELOS_ROOT / "configs"
+SCRIPTS_DIR = VELOS_ROOT / "scripts"
+MODULES_DIR = VELOS_ROOT / "modules"
 
-AUTOSAVE_REQUIRED = os.getenv("VELOS_AUTOSAVE_REQUIRED", "0") in ("1","true","True","YES","yes")
-
-def _log_info(h, key, value):
-    h[key] = value
-    h.setdefault("notes", []).append(f"{key}: {value}")
-
-def jload(p):
-    try:
-        with open(p, "r", encoding="utf-8-sig") as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-def jwrite(p, data):
-    try:
-        with open(p, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"[ERROR] Failed to write {p}: {e}")
-
-def check_file_integrity():
-    """핵심 파일들의 존재성과 접근 가능성 점검"""
-    critical_files = [
-        "data/memory/memory_buffer.jsonl",
-        "data/memory/learning_memory.json",
-        "data/memory/velos.db",
-        "data/logs/system_health.json",
-        "scripts/run_giwanos_master_loop.py",
-        "scripts/velos_bridge.py",
-        "modules/core/memory_adapter.py",
-        "modules/core/context_builder.py"
-    ]
-
-    issues = []
-    for file_path in critical_files:
-        full_path = os.path.join(ROOT, file_path)
-        if not os.path.exists(full_path):
-            issues.append(f"missing:{file_path}")
-        elif not os.access(full_path, os.R_OK):
-            issues.append(f"no_read:{file_path}")
-
-    return issues
-
-def check_db_integrity():
-    """데이터베이스 무결성 점검"""
-    issues = []
-
-    # velos.db 점검 (올바른 DB 파일)
-    db_path = os.path.join(ROOT, "data", "memory", "velos.db")
-    if os.path.exists(db_path):
+class SystemIntegrityChecker:
+    """시스템 무결성 검증기"""
+    
+    def __init__(self):
+        self.root = VELOS_ROOT
+        self.data_dir = DATA_DIR
+        self.configs_dir = CONFIGS_DIR
+        self.scripts_dir = SCRIPTS_DIR
+        self.modules_dir = MODULES_DIR
+        self.errors = []
+        self.warnings = []
+        
+    def check_core_directories(self) -> bool:
+        """핵심 디렉토리 존재 여부 확인"""
+        print("🔍 핵심 디렉토리 확인...")
+        
+        required_dirs = [
+            self.root,
+            self.data_dir,
+            self.configs_dir,
+            self.scripts_dir,
+            self.modules_dir,
+            self.data_dir / "memory",
+            self.data_dir / "logs",
+            self.data_dir / "reports",
+            self.data_dir / "snapshots",
+            self.modules_dir / "core",
+            self.modules_dir / "utils"
+        ]
+        
+        all_exist = True
+        for dir_path in required_dirs:
+            if dir_path.exists():
+                print(f"  ✅ {dir_path.name}/")
+            else:
+                print(f"  ❌ {dir_path.name}/ - 없음")
+                self.errors.append(f"필수 디렉토리 없음: {dir_path}")
+                all_exist = False
+                
+        return all_exist
+    
+    def check_core_files(self) -> bool:
+        """핵심 파일 존재 여부 확인"""
+        print("\n🔍 핵심 파일 확인...")
+        
+        required_files = [
+            self.data_dir / "velos.db",
+            self.configs_dir / "settings.yaml",
+            self.configs_dir / "__init__.py",
+            self.scripts_dir / "velos_master_scheduler.py",
+            self.scripts_dir / "Start-Velos.ps1",
+            self.modules_dir / "__init__.py",
+            self.modules_dir / "core" / "__init__.py"
+        ]
+        
+        all_exist = True
+        for file_path in required_files:
+            if file_path.exists():
+                print(f"  ✅ {file_path.name}")
+            else:
+                print(f"  ❌ {file_path.name} - 없음")
+                self.errors.append(f"필수 파일 없음: {file_path}")
+                all_exist = False
+                
+        return all_exist
+    
+    def check_database_integrity(self) -> bool:
+        """데이터베이스 무결성 확인"""
+        print("\n🔍 데이터베이스 무결성 확인...")
+        
+        db_path = self.data_dir / "velos.db"
+        if not db_path.exists():
+            print("  ❌ velos.db 파일 없음")
+            self.errors.append("데이터베이스 파일 없음")
+            return False
+            
         try:
             conn = sqlite3.connect(db_path, timeout=5)
-            cur = conn.cursor()
-            cur.execute("SELECT COUNT(*) FROM memory")
-            count = cur.fetchone()[0]
+            cursor = conn.cursor()
+            
+            # 테이블 존재 여부 확인
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = [row[0] for row in cursor.fetchall()]
+            
+            required_tables = ["memory", "memory_fts"]
+            missing_tables = [table for table in required_tables if table not in tables]
+            
+            if missing_tables:
+                print(f"  ❌ 누락된 테이블: {missing_tables}")
+                self.errors.append(f"누락된 테이블: {missing_tables}")
+                conn.close()
+                return False
+            else:
+                print("  ✅ 모든 필수 테이블 존재")
+                
+            # 데이터 개수 확인
+            cursor.execute("SELECT COUNT(*) FROM memory")
+            memory_count = cursor.fetchone()[0]
+            print(f"  📊 메모리 레코드 수: {memory_count}")
+            
+            if memory_count == 0:
+                self.warnings.append("메모리 테이블이 비어있음")
+                
             conn.close()
+            return True
+            
         except Exception as e:
-            issues.append(f"db_corrupt:velos_memory.db - {e}")
-    else:
-        issues.append("missing:velos_memory.db")
-
-    return issues
-
-def check_process_health():
-    """프로세스 상태 점검"""
-    issues = []
-
-    # autosave_runner 프로세스 점검
-    try:
-        import subprocess, json
-        # PowerShell로 프로세스 조회
-        cmd = [
-            "powershell", "-NoProfile", "-Command",
-            "Get-CimInstance Win32_Process | ? { $_.CommandLine -match 'autosave_runner\\.ps1' } | "
-            "Select-Object ProcessId,CommandLine | ConvertTo-Json"
-        ]
-        out = subprocess.check_output(cmd, encoding="utf-8", stderr=subprocess.DEVNULL)
-        procs = json.loads(out) if out.strip() else []
-        count = (len(procs) if isinstance(procs, list) else (1 if procs else 0))
-
-        if count >= 1:
-            # 프로세스가 실행 중이면 정상
-            pass
-        else:
-            if AUTOSAVE_REQUIRED:
-                issues.append("process_missing:autosave_runner")
+            print(f"  ❌ 데이터베이스 오류: {e}")
+            self.errors.append(f"데이터베이스 오류: {e}")
+            return False
+    
+    def check_settings_validity(self) -> bool:
+        """설정 파일 유효성 확인"""
+        print("\n🔍 설정 파일 유효성 확인...")
+        
+        settings_path = self.configs_dir / "settings.yaml"
+        if not settings_path.exists():
+            print("  ❌ settings.yaml 파일 없음")
+            self.errors.append("설정 파일 없음")
+            return False
+            
+        try:
+            import yaml
+            with open(settings_path, 'r', encoding='utf-8') as f:
+                settings = yaml.safe_load(f)
+                
+            required_keys = ["root", "database", "logging"]
+            missing_keys = [key for key in required_keys if key not in settings]
+            
+            if missing_keys:
+                print(f"  ❌ 누락된 설정 키: {missing_keys}")
+                self.errors.append(f"누락된 설정 키: {missing_keys}")
+                return False
             else:
-                # 기본은 INFO로 처리 (경고하지 않음)
-                pass
-    except Exception as e:
-        issues.append(f"process_check_failed:{e}")
-
-    return issues
-
-def check_autosave_runner(h):
-    """
-    autosave_runner 프로세스 존재 여부 확인.
-    기본: 없어도 정상(INFO). 필요 시 환경변수로 강제.
-    """
-    try:
-        import subprocess, json
-        # PowerShell로 프로세스 조회
-        cmd = [
-            "powershell", "-NoProfile", "-Command",
-            "Get-CimInstance Win32_Process | ? { $_.CommandLine -match 'autosave_runner\\.ps1' } | "
-            "Select-Object ProcessId,CommandLine | ConvertTo-Json"
+                print("  ✅ 설정 파일 구조 정상")
+                return True
+                
+        except Exception as e:
+            print(f"  ❌ 설정 파일 오류: {e}")
+            self.errors.append(f"설정 파일 오류: {e}")
+            return False
+    
+    def check_python_syntax(self) -> bool:
+        """Python 파일 구문 검사"""
+        print("\n🔍 Python 파일 구문 검사...")
+        
+        python_files = [
+            self.scripts_dir / "velos_master_scheduler.py",
+            self.scripts_dir / "notion_memory_integrated.py",
+            self.scripts_dir / "check_environment_integrated.py",
+            self.configs_dir / "__init__.py",
+            self.modules_dir / "__init__.py"
         ]
-        out = subprocess.check_output(cmd, encoding="utf-8", stderr=subprocess.DEVNULL)
-        procs = json.loads(out) if out.strip() else []
-        count = (len(procs) if isinstance(procs, list) else (1 if procs else 0))
-        h["autosave_runner_count"] = count
-
-        if count >= 1:
-            h["autosave_runner_ok"] = True
+        
+        all_valid = True
+        for file_path in python_files:
+            if not file_path.exists():
+                continue
+                
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    compile(f.read(), str(file_path), 'exec')
+                print(f"  ✅ {file_path.name}")
+            except Exception as e:
+                print(f"  ❌ {file_path.name} - 구문 오류: {e}")
+                self.errors.append(f"Python 구문 오류 {file_path.name}: {e}")
+                all_valid = False
+                
+        return all_valid
+    
+    def check_file_hashes(self) -> bool:
+        """파일 해시 무결성 확인"""
+        print("\n🔍 파일 해시 무결성 확인...")
+        
+        hash_file = self.configs_dir / "security" / "guard_hashes.json"
+        if not hash_file.exists():
+            print("  ⚠️ 해시 파일 없음 - 건너뜀")
+            return True
+            
+        try:
+            with open(hash_file, 'r', encoding='utf-8-sig') as f:
+                hash_data = json.load(f)
+                
+            all_valid = True
+            for file_info in hash_data.get("files", []):
+                file_path = Path(file_info["path"])
+                expected_hash = file_info["sha256"]
+                
+                if not file_path.exists():
+                    print(f"  ❌ {file_path.name} - 파일 없음")
+                    self.errors.append(f"해시 파일에서 참조하는 파일 없음: {file_path}")
+                    all_valid = False
+                    continue
+                    
+                with open(file_path, 'rb') as f:
+                    content = f.read()
+                actual_hash = hashlib.sha256(content).hexdigest()
+                
+                if actual_hash != expected_hash:
+                    print(f"  ❌ {file_path.name} - 해시 불일치")
+                    self.errors.append(f"파일 해시 불일치: {file_path}")
+                    all_valid = False
+                else:
+                    print(f"  ✅ {file_path.name}")
+                    
+            return all_valid
+            
+        except Exception as e:
+            print(f"  ❌ 해시 검증 오류: {e}")
+            self.errors.append(f"해시 검증 오류: {e}")
+            return False
+    
+    def run_full_check(self) -> Dict[str, any]:
+        """전체 무결성 검사 실행"""
+        print("🔍 VELOS 시스템 무결성 검사 시작")
+        print("=" * 50)
+        
+        results = {
+            "core_directories": self.check_core_directories(),
+            "core_files": self.check_core_files(),
+            "database_integrity": self.check_database_integrity(),
+            "settings_validity": self.check_settings_validity(),
+            "python_syntax": self.check_python_syntax(),
+            "file_hashes": self.check_file_hashes()
+        }
+        
+        print("\n" + "=" * 50)
+        print("📊 검사 결과 요약")
+        print("=" * 50)
+        
+        success_count = sum(1 for result in results.values() if result)
+        total_count = len(results)
+        
+        for check_name, result in results.items():
+            status = "✅ 통과" if result else "❌ 실패"
+            print(f"  {check_name}: {status}")
+            
+        print(f"\n🎯 전체 결과: {success_count}/{total_count} 통과")
+        
+        if self.errors:
+            print(f"\n❌ 오류 ({len(self.errors)}개):")
+            for error in self.errors:
+                print(f"  - {error}")
+                
+        if self.warnings:
+            print(f"\n⚠️ 경고 ({len(self.warnings)}개):")
+            for warning in self.warnings:
+                print(f"  - {warning}")
+                
+        overall_success = success_count == total_count and not self.errors
+        
+        if overall_success:
+            print("\n🎉 시스템 무결성 검사 통과!")
         else:
-            if AUTOSAVE_REQUIRED:
-                h["autosave_runner_ok"] = False    # 강제 모드일 때만 문제로 간주
-                h.setdefault("warnings", []).append("autosave_runner not running (required)")
-            else:
-                h["autosave_runner_ok"] = True     # 기본은 INFO로 통과
-                _log_info(h, "autosave_runner_info", "not running (treated as normal)")
-    except Exception as e:
-        h.setdefault("warnings", []).append(f"autosave_runner_check_error: {e}")
+            print("\n💥 시스템 무결성 검사 실패!")
+            
+        return {
+            "success": overall_success,
+            "results": results,
+            "errors": self.errors,
+            "warnings": self.warnings
+        }
 
 def main():
-    print("=== VELOS System Integrity Check ===")
-
-    # 각종 무결성 점검
-    file_issues = check_file_integrity()
-    db_issues = check_db_integrity()
-    process_issues = check_process_health()
-
-    all_issues = file_issues + db_issues + process_issues
-
-    # 기본 상태 구조 생성
-    status = {
-        "check_time": int(time.time()),
-        "file_issues": len(file_issues),
-        "db_issues": len(db_issues),
-        "process_issues": len(process_issues),
-        "total_issues": len(all_issues),
-        "integrity_ok": len(all_issues) == 0,
-        "details": {
-            "file_issues": file_issues,
-            "db_issues": db_issues,
-            "process_issues": process_issues
-        }
-    }
-
-    # autosave_runner 상태 추가
-    check_autosave_runner(status)
-
-    print(json.dumps(status, ensure_ascii=False, indent=2))
-
-    # 헬스 로그 업데이트
-    health = jload(HEALTH)
-    health.update({
-        "system_integrity_last_check": int(time.time()),
-        "system_integrity_ok": status["integrity_ok"],
-        "system_integrity_issues": all_issues
-    })
-    jwrite(HEALTH, health)
-
-    if all_issues:
-        print(f"[WARNING] System integrity issues found: {len(all_issues)}")
-        for issue in all_issues:
-            print(f"  - {issue}")
-        return 1
-    else:
-        print("[OK] System integrity check passed")
-        return 0
+    """메인 실행 함수"""
+    checker = SystemIntegrityChecker()
+    result = checker.run_full_check()
+    
+    if not result["success"]:
+        sys.exit(1)
+    
+    sys.exit(0)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

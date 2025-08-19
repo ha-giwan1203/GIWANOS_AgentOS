@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 한국어 종합 보고서 생성기 - 한국어 보고서 생성 시스템
 # -*- coding: utf-8 -*-
 """
 VELOS 한국어 종합 보고서 생성기 (pro+ enhanced)
@@ -59,7 +60,7 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
     from matplotlib.patches import Rectangle
-    plt.rcParams['font.family'] = ['DejaVu Sans', 'Arial', 'sans-serif']
+    plt.rcParams['font.family'] = ['NanumGothic', 'Malgun Gothic', 'DejaVu Sans', 'Arial', 'sans-serif']
     plt.rcParams['font.size'] = 10
     plt.rcParams['axes.unicode_minus'] = False
 except Exception as e:
@@ -407,6 +408,10 @@ def get_key_risks() -> List[Dict[str, str]]:
     ])
 
     return risks[:3]  # 상위 3개만 반환
+
+def safe_div(a, b, default=0):
+    """안전한 나눗셈 함수."""
+    return a / b if b != 0 else default
 
 def get_weekly_changes() -> Dict[str, Dict[str, Any]]:
     """지난주 대비 변화 데이터 (실제 데이터 기반)."""

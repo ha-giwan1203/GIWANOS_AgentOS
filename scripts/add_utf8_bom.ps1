@@ -1,4 +1,5 @@
-﻿# -*- coding: utf-8 -*-
+﻿# [ACTIVE] VELOS UTF-8 BOM 추가 시스템 - UTF-8 BOM 추가 유틸리티
+# -*- coding: utf-8 -*-
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
 # PowerShell 스크립트들에 UTF-8 BOM 추가 유틸리티

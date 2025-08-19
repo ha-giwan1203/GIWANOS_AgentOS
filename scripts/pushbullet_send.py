@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Pushbullet 알림 시스템 - 푸시 알림 발송 스크립트
 # -*- coding: utf-8 -*-
 """
 VELOS Pushbullet 알림 스크립트
@@ -157,3 +158,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+

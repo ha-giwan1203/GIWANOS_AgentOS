@@ -1,4 +1,5 @@
-﻿# VELOS Windows 작업 스케줄러 등록 스크립트
+﻿# [ACTIVE] VELOS 스케줄러 설정 시스템 - Windows 작업 스케줄러 등록 스크립트
+# VELOS Windows 작업 스케줄러 등록 스크립트
 # VELOS 최종 완전 통합 워크플로우를 자동으로 실행하도록 스케줄링
 
 param(
@@ -178,3 +179,6 @@ Write-Host "   🗑️  작업 제거: Unregister-ScheduledTask -TaskName '$Task
 
 Write-Host "`n✨ VELOS 작업 스케줄러 설정 완료!" -ForegroundColor Green
 Write-Host "매일 $Time에 VELOS 최종 완전 통합 워크플로우가 자동으로 실행됩니다." -ForegroundColor Yellow
+
+
+

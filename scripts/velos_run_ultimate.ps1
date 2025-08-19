@@ -1,4 +1,5 @@
-﻿# VELOS 최종 완전 통합 워크플로우 실행 스크립트
+﻿# [ACTIVE] VELOS 최종 워크플로우 실행 시스템 - 최종 완전 통합 워크플로우 실행 스크립트
+# VELOS 최종 완전 통합 워크플로우 실행 스크립트
 # 사용자가 제공한 명령어를 기반으로 작업 스케줄러 등록 및 실행
 
 $ErrorActionPreference = "Stop"
@@ -52,3 +53,6 @@ Write-Host "   .\scripts\velos_ultimate_workflow.ps1" -ForegroundColor Green
 
 Write-Host "`n✨ VELOS 최종 완전 통합 워크플로우 준비 완료!" -ForegroundColor Green
 Write-Host "위의 명령어를 사용하여 작업 스케줄러에 등록하거나 즉시 실행하세요." -ForegroundColor Yellow
+
+
+

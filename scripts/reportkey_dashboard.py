@@ -1,5 +1,5 @@
-# file: scripts/reportkey_dashboard.py
-# 실행: streamlit run scripts/reportkey_dashboard.py --server.port=8501
+# [ACTIVE] file: scripts/reportkey_dashboard.py
+# [ACTIVE] 실행: streamlit run scripts/reportkey_dashboard.py --server.port=8501
 
 from __future__ import annotations
 import os

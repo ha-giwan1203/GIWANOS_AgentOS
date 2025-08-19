@@ -1,4 +1,5 @@
-﻿# scripts/auto_dispatch.ps1
+﻿# [ACTIVE] VELOS 자동 디스패치 - 작업 자동 실행 시스템
+# scripts/auto_dispatch.ps1
 $ErrorActionPreference = "Stop"
 
 Write-Host "🚀 VELOS 자동 디스패치 시작" -ForegroundColor Green
@@ -90,3 +91,6 @@ except Exception as e:
     Write-Host "`n❌ 자동 디스패치 오류: $_" -ForegroundColor Red
     exit 1
 }
+
+
+

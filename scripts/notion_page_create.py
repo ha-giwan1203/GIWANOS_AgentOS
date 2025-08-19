@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Notion 페이지 생성 시스템 - Notion 페이지 생성 스크립트
 # -*- coding: utf-8 -*-
 """
 VELOS Notion Page 생성 스크립트
@@ -218,3 +219,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+

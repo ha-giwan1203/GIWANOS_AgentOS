@@ -1,4 +1,5 @@
-# monitor_utils.py
+# [EXPERIMENT] VELOS 모니터링 유틸리티 - 시스템 모니터링 모듈
+# [EXPERIMENT] monitor_utils.py
 from __future__ import annotations
 import pandas as pd
 from typing import Iterable, Optional, Union, Literal
@@ -163,3 +164,6 @@ def _safe_attach(
         keep="left" if conflict == "keep_left" else "right"
     )
     return attached
+
+
+

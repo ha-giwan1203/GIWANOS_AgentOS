@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 작업 큐 관리 시스템 - 작업 큐 관리 스크립트
 # -*- coding: utf-8 -*-
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
@@ -154,3 +155,6 @@ print("[SUCCESS] All jobs queued successfully")
 Add-VelosJobQueue -JobType $JobType -Task $Task -Message $Message -Period $Period -DecidePriority $DecidePriority -ReportPriority $ReportPriority -NotifyPriority $NotifyPriority -Verbose:$Verbose -KeepOutput:$KeepOutput
 
 Write-Host "`n=== VELOS 작업 큐 관리 완료 ==="
+
+
+

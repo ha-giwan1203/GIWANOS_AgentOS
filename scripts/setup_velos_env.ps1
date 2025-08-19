@@ -1,48 +1,67 @@
-# VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
-# 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
+# [ACTIVE] VELOS 환경 설정 시스템 - 통합 환경변수 설정 스크립트
+# VELOS 운영 철학 선언문
+# "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
 
-# VELOS 환경 변수 설정
-Write-Host "=== VELOS 환경 변수 설정 ===" -ForegroundColor Green
+Write-Host "=== VELOS 통합 환경변수 설정 ===" -ForegroundColor Yellow
 
-# 기본 환경 변수 설정
-$env:VELOS_ROOT = "C:\giwanos"
-$env:VELOS_DB = "C:\giwanos\data\velos.db"
-$env:VELOS_JSONL_DIR = "C:\giwanos\data\memory"
-
-# 추가 환경 변수 설정
-$env:VELOS_RECENT_DAYS = "3"
-$env:VELOS_KEYWORD_MAXLEN = "24"
-$env:VELOS_FTS_LIMIT = "20"
-
-Write-Host "환경 변수 설정 완료:" -ForegroundColor Yellow
-Write-Host "  VELOS_ROOT: $env:VELOS_ROOT" -ForegroundColor Cyan
-Write-Host "  VELOS_DB: $env:VELOS_DB" -ForegroundColor Cyan
-Write-Host "  VELOS_JSONL_DIR: $env:VELOS_JSONL_DIR" -ForegroundColor Cyan
-Write-Host "  VELOS_RECENT_DAYS: $env:VELOS_RECENT_DAYS" -ForegroundColor Cyan
-Write-Host "  VELOS_KEYWORD_MAXLEN: $env:VELOS_KEYWORD_MAXLEN" -ForegroundColor Cyan
-Write-Host "  VELOS_FTS_LIMIT: $env:VELOS_FTS_LIMIT" -ForegroundColor Cyan
-
-# 디렉토리 존재 확인
-Write-Host "`n디렉토리 확인:" -ForegroundColor Yellow
-if (Test-Path $env:VELOS_ROOT) {
-    Write-Host "  ✅ VELOS_ROOT 존재: $env:VELOS_ROOT" -ForegroundColor Green
-} else {
-    Write-Host "  ❌ VELOS_ROOT 없음: $env:VELOS_ROOT" -ForegroundColor Red
+# VELOS 시스템 환경변수 설정
+$envVars = @{
+    "VELOS_ROOT" = "C:\giwanos"
+    "VELOS_VENV" = "C:\Users\User\venvs\velos"
+    "VELOS_PYTHON" = "C:\Users\User\venvs\velos\Scripts\python.exe"
+    "VELOS_DB" = "C:\giwanos\data\velos.db"
+    "VELOS_LOG_PATH" = "C:\giwanos\data\logs"
+    "VELOS_BACKUP" = "C:\giwanos\data\backups"
+    "VELOS_LOG_LEVEL" = "INFO"
+    "VELOS_API_TIMEOUT" = "30"
+    "VELOS_API_RETRIES" = "3"
+    "VELOS_MAX_WORKERS" = "4"
+    "VELOS_DEBUG" = "false"
+    # 디스패치 채널 설정
+    "DISPATCH_EMAIL" = "1"
+    "DISPATCH_SLACK" = "1"
+    "DISPATCH_NOTION" = "1"
+    "DISPATCH_PUSH" = "1"
 }
 
-if (Test-Path $env:VELOS_JSONL_DIR) {
-    Write-Host "  ✅ VELOS_JSONL_DIR 존재: $env:VELOS_JSONL_DIR" -ForegroundColor Green
-} else {
-    Write-Host "  ❌ VELOS_JSONL_DIR 없음: $env:VELOS_JSONL_DIR" -ForegroundColor Red
+Write-Host "`n[1] 현재 세션 환경변수 설정..." -ForegroundColor Cyan
+foreach ($key in $envVars.Keys) {
+    Set-Item -Path "env:$key" -Value $envVars[$key]
+    Write-Host "  $key = $($envVars[$key])" -ForegroundColor Green
 }
 
-# DB 파일 확인
-if (Test-Path $env:VELOS_DB) {
-    Write-Host "  ✅ VELOS_DB 존재: $env:VELOS_DB" -ForegroundColor Green
-    $dbSize = (Get-Item $env:VELOS_DB).Length
-    Write-Host "  📊 DB 크기: $([math]::Round($dbSize/1KB, 2)) KB" -ForegroundColor Cyan
-} else {
-    Write-Host "  ⚠️ VELOS_DB 없음 (ingest에서 생성됨): $env:VELOS_DB" -ForegroundColor Yellow
+Write-Host "`n[2] 시스템 환경변수 영구 설정..." -ForegroundColor Cyan
+foreach ($key in $envVars.Keys) {
+    try {
+        [Environment]::SetEnvironmentVariable($key, $envVars[$key], "User")
+        Write-Host "  $key 영구 설정 완료" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "  $key 설정 실패: $($_.Exception.Message)" -ForegroundColor Red
+    }
 }
 
-Write-Host "`n=== 환경 변수 설정 완료 ===" -ForegroundColor Green
+Write-Host "`n[3] 로그 디렉토리 설정..." -ForegroundColor Cyan
+$logDir = Join-Path $envVars["VELOS_ROOT"] "data\logs"
+if (!(Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    Write-Host "  ✅ 로그 디렉토리 생성: $logDir" -ForegroundColor Green
+} else {
+    Write-Host "  ✅ 로그 디렉토리 존재: $logDir" -ForegroundColor Green
+}
+
+Write-Host "`n[4] 환경변수 설정 검증..." -ForegroundColor Cyan
+python -c "import sys; sys.path.append('.'); from configs import get_setting; print('VELOS_ROOT:', get_setting('root')); print('VELOS_DB:', get_setting('database.path')); print('VELOS_LOG:', get_setting('logging.path'))"
+
+Write-Host "`n[5] 채널 설정 상태 확인..." -ForegroundColor Cyan
+$channels = @("DISPATCH_EMAIL", "DISPATCH_SLACK", "DISPATCH_NOTION", "DISPATCH_PUSH")
+foreach ($channel in $channels) {
+    $value = [Environment]::GetEnvironmentVariable($channel, "User")
+    $status = if ($value -eq "1") { "✅ 활성화" } else { "❌ 비활성화" }
+    Write-Host "  $channel : $status" -ForegroundColor $(if ($value -eq "1") { "Green" } else { "Red" })
+}
+
+Write-Host "`n=== VELOS 통합 환경변수 설정 완료 ===" -ForegroundColor Green
+Write-Host "새 터미널 세션에서 환경변수가 적용됩니다." -ForegroundColor Yellow
+
+

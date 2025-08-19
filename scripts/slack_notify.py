@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS Slack 알림 시스템 - Slack 메시지 발송 스크립트
 # -*- coding: utf-8 -*-
 """
 VELOS Slack 알림 스크립트
@@ -128,3 +129,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+

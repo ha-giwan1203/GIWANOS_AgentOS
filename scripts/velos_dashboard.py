@@ -1,9 +1,7 @@
+# [ACTIVE] VELOS 대시보드: REPORT_KEY로 관련 리포트/로그/메모리/노션/슬랙을 한 번에 검색
 # -*- coding: utf-8 -*-
-"""
-VELOS 대시보드: REPORT_KEY로 관련 리포트/로그/메모리/노션/슬랙을 한 번에 검색
-실행: streamlit run velos_dashboard.py
-필요(선택): NOTION_TOKEN, NOTION_DATABASE_ID, SLACK_BOT_TOKEN
-"""
+# 실행: streamlit run velos_dashboard.py
+# 필요(선택): NOTION_TOKEN, NOTION_DATABASE_ID, SLACK_BOT_TOKEN
 import os
 import re
 import json
@@ -17,7 +15,7 @@ import streamlit as st
 
 # UTF-8 인코딩 강제 설정
 try:
-    from utils.utf8_force import setup_utf8_environment
+    from modules.utils.utf8_force import setup_utf8_environment
     setup_utf8_environment()
 except ImportError:
     # utils 모듈을 찾을 수 없는 경우 직접 설정
@@ -446,3 +444,4 @@ else:
 # 푸터
 st.markdown("---")
 st.markdown("*VELOS REPORT_KEY 대시보드 - 모든 관련 정보를 한 번에 검색하세요*")
+

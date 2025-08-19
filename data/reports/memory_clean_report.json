@@ -1,13 +1,13 @@
 {
-  "generated_at": "2025-08-17T21:50:54",
+  "generated_at": "2025-08-18T03:00:38",
   "root": "C:\\giwanos",
   "source_file": "C:\\giwanos\\data\\memory\\learning_memory.jsonl",
   "output_file": "C:\\giwanos\\data\\memory\\learning_memory_cleaned.jsonl",
   "counts": {
-    "source": 95,
+    "source": 296,
     "after_exact": 7,
     "after_near": 7,
-    "removed_exact": 88,
+    "removed_exact": 289,
     "removed_near": 0,
     "removed_noise": 4,
     "kept": 3

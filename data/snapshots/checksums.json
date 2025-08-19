@@ -94,5 +94,11 @@
     "recorded_ts": 1755367381,
     "file_size": 149396,
     "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_fixpack_v1_pass_20250816_0844_20250816_0844.zip"
+  },
+  "snapshot_20250817_2150.zip": {
+    "sha256": "54424e6544addbcbdff9d600539fb56e34e771c59142eaa2998cbb56dfd3dfd7",
+    "recorded_ts": 1755453909,
+    "file_size": 144237,
+    "file_path": "C:\\giwanos\\data\\snapshots\\snapshot_20250817_2150.zip"
   }
 }

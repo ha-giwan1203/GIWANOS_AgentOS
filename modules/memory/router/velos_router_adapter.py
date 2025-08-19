@@ -1,3 +1,4 @@
+# [EXPERIMENT] VELOS 라우터 어댑터 - 메모리 라우팅 모듈
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
@@ -26,7 +27,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'core', 'mem
 from search import search_by_role_dict, search_roles_unified, search_with_normalized_query
 
 # 명시적으로 utils 레벨 memory_adapter에서 import
-from utils.memory_adapter import normalize_query
+from modules.utils.memory_adapter import normalize_query
 
 
 class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
@@ -205,3 +206,4 @@ def test_router_adapter():
 if __name__ == "__main__":
     test_router_adapter()
     print("=== 모든 자가 검증 완료 ===")
+

@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 시스템 통계 확인 - 시스템 통계 분석 스크립트
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """

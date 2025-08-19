@@ -1,4 +1,5 @@
-﻿# VELOS REPORT_KEY 대시보드 실행 스크립트
+﻿# [ACTIVE] VELOS 대시보드 실행 시스템 - REPORT_KEY 대시보드 실행 스크립트
+# VELOS REPORT_KEY 대시보드 실행 스크립트
 # 종합적인 REPORT_KEY 검색 및 분석 도구
 
 $ErrorActionPreference = "Stop"
@@ -69,3 +70,6 @@ try {
     Write-Host "   오류: $($_.Exception.Message)" -ForegroundColor Yellow
     exit 1
 }
+
+
+

@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 자동 복구 시스템 - 데이터베이스 자동 복구 스크립트
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """

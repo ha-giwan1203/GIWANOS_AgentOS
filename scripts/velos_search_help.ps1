@@ -1,4 +1,5 @@
-﻿# VELOS REPORT_KEY 검색 도구 사용법 안내
+﻿# [ACTIVE] VELOS 검색 도움말 시스템 - REPORT_KEY 검색 도구 사용법 안내
+# VELOS REPORT_KEY 검색 도구 사용법 안내
 # 다양한 방법으로 REPORT_KEY 검색
 
 $ErrorActionPreference = "Stop"
@@ -45,3 +46,6 @@ Write-Host "   - 웹 앱은 시각적 결과와 상세 정보에 적합" -Foregr
 Write-Host "   - Notion DB는 별도로 검색 필요" -ForegroundColor Gray
 
 Write-Host "`n✨ VELOS REPORT_KEY 검색 도구 준비 완료!" -ForegroundColor Green
+
+
+

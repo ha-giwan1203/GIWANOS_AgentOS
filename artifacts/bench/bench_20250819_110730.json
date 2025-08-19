@@ -1,0 +1,13 @@
+{
+  "ts": "20250819_110730",
+  "sanity": {
+    "mode": "wal",
+    "sync": 1,
+    "busy": 5000
+  },
+  "metrics": {
+    "insert_2000_sec": 1.28,
+    "insert_2000_qps": 1568.0,
+    "search_40_sec": 0.263
+  }
+}

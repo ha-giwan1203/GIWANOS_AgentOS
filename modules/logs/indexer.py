@@ -1,3 +1,4 @@
+# [ACTIVE] VELOS 로그 인덱서 - 로그 처리 및 검색 모듈
 # -*- coding: utf-8 -*-
 import os
 import json

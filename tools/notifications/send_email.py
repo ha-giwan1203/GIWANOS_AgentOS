@@ -1,4 +1,4 @@
-# VELOS 운영 철학: 파일명/경로 불변 · 거짓 코드 금지 · 자가 검증 · 로그 증빙
+# [ACTIVE] VELOS 운영 철학: 파일명/경로 불변 · 거짓 코드 금지 · 자가 검증 · 로그 증빙
 from __future__ import annotations
 import os, sys, smtplib, mimetypes, json
 from email.message import EmailMessage

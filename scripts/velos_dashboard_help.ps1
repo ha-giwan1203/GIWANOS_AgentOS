@@ -1,4 +1,5 @@
-﻿# VELOS REPORT_KEY 대시보드 사용법 안내
+﻿# [ACTIVE] VELOS 대시보드 도움말 시스템 - REPORT_KEY 대시보드 사용법 안내
+# VELOS REPORT_KEY 대시보드 사용법 안내
 # 종합적인 REPORT_KEY 검색 및 분석 도구
 
 $ErrorActionPreference = "Stop"
@@ -80,3 +81,6 @@ Write-Host "   - 권한 문제: 관리자 권한으로 실행" -ForegroundColor 
 
 Write-Host "`n✨ VELOS REPORT_KEY 대시보드 준비 완료!" -ForegroundColor Green
 Write-Host "REPORT_KEY 하나로 모든 관련 정보를 한 번에 검색하세요!" -ForegroundColor Yellow
+
+
+

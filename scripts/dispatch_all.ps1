@@ -1,4 +1,5 @@
-﻿# scripts/dispatch_all.ps1
+﻿# [ACTIVE] VELOS 전체 디스패치 시스템 - 전체 디스패치 스크립트
+# scripts/dispatch_all.ps1
 $ErrorActionPreference = "Stop"
 
 Write-Host "🚀 VELOS 전체 디스패치 시작" -ForegroundColor Green
@@ -100,3 +101,6 @@ if ($success_count -eq 4) {
     Write-Host "`n💥 대부분 실패" -ForegroundColor Red
     exit 2
 }
+
+
+
