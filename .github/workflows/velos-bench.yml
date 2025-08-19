@@ -3,6 +3,15 @@ name: VELOS Bench
 
 on:
   workflow_dispatch:
+    inputs:
+      min_insert_qps:
+        description: "insert_2000 최소 QPS"
+        required: false
+        default: "500"
+      max_search_sec:
+        description: "search_40 최대 초"
+        required: false
+        default: "0.50"
   push:
     branches: [main]
     paths:
@@ -85,6 +94,8 @@ jobs:
       - name: Run bench suite
         env:
           VELOS_DB_PATH: C:\giwanos\data\velos.db
+          MIN_INSERT_QPS: ${{ github.event.inputs.min_insert_qps || '500' }}
+          MAX_SEARCH_SEC: ${{ github.event.inputs.max_search_sec || '0.50' }}
         run: |
           python tests/perf/benchmark_regression.py
 

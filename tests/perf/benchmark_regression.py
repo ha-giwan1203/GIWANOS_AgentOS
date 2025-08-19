@@ -18,8 +18,8 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # 회귀 기준(느슨하게 시작해서 필요하면 조이세요)
 THRESHOLDS = {
-    "insert_2000_min_qps": 500,      # 초당 500행 미만이면 실패
-    "search_40_max_sec": 0.50,       # 40회 검색에 0.5초 초과면 실패
+    "insert_2000_min_qps": int(os.environ.get("MIN_INSERT_QPS", "500")),      # 초당 500행 미만이면 실패
+    "search_40_max_sec": float(os.environ.get("MAX_SEARCH_SEC", "0.50")),       # 40회 검색에 0.5초 초과면 실패
 }
 
 
