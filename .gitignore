@@ -62,3 +62,36 @@ venv/
 secrets/
 private/
 config/private/
+
+# ==========================
+# 🚀 VELOS 런타임 데이터 제외
+# ==========================
+
+# VELOS 데이터 폴더들 (자동 생성되는 런타임 데이터)
+data/logs/
+data/reports/auto/
+data/sessions/
+data/memory/
+data/dispatch/
+data/reflections/
+data/snapshots/
+data/performance_results/
+data/backups/
+data/job_state.json
+data/jobs.json
+
+# VELOS 로그 및 증거 파일들
+logs/veracity/
+logs/events-jsonl/
+logs/runtime_trace/
+logs/archive/
+
+# 백업 및 임시 파일들
+backup/
+artifacts/
+vector_cache/
+
+# VELOS 임시 스크립트들
+temp_*.py
+temp_*.ps1
+temp_*.xml
