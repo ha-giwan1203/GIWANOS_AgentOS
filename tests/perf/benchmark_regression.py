@@ -73,7 +73,7 @@ def main():
     if data["metrics"].get("search_40_sec", 0.0) > THRESHOLDS["search_40_max_sec"]:
         fail_msgs.append(f"search_40_sec>{THRESHOLDS['search_40_max_sec']}")
 
-    if data["sanity"].get("mode") != "wal" or data["sanity"].get("sync") != 1:
+    if data["sanity"].get("mode") != "wal" or data["sanity"].get("sync") != 2:
         fail_msgs.append("PRAGMA sanity failed (mode/sync)")
 
     if fail_msgs:

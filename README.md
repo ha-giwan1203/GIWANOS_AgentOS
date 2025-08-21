@@ -63,7 +63,7 @@ C:\giwanos\
 ### 환경 설정
 ```powershell
 # 환경변수 설정
-$env:VELOS_DB = "C:\giwanos\data\velos.db"
+$env:VELOS_DB_PATH = "C:\giwanos\data\velos.db"
 
 # VELOS 실행
 powershell -ExecutionPolicy Bypass -File scripts\run_velos_search.ps1
