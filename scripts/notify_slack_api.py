@@ -26,10 +26,19 @@ except Exception:
     load_dotenv = None  # 없는 환경에서도 돌아가게
 
 # ----- 고정 경로 및 .env 로드 -----
-from modules.report_paths import ROOT
+try:
+    from modules.report_paths import ROOT
+except ImportError:
+    # Fallback: 현재 스크립트 기준으로 ROOT 추정
+    HERE = Path(__file__).parent
+    ROOT = HERE.parent
+
 ENV = ROOT / "configs" / ".env"
 if load_dotenv and ENV.exists():
-    load_dotenv(dotenv_path=str(ENV))
+    load_dotenv(dotenv_path=str(ENV), override=True)
+    print(f"[INFO] 환경 설정 로드: {ENV}")
+elif ENV.exists():
+    print(f"[WARN] python-dotenv 없음, 환경 설정 로드 실패: {ENV}")
 
 SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN", "").strip()
 RAW_CHANNEL = (
@@ -39,8 +48,25 @@ RAW_CHANNEL = (
     or ""
 ).strip()
 
-if not SLACK_BOT_TOKEN or not RAW_CHANNEL:
-    print("[ERROR] SLACK_BOT_TOKEN/채널 설정 누락")
+def validate_slack_config() -> bool:
+    """Slack 설정 검증"""
+    if not SLACK_BOT_TOKEN or SLACK_BOT_TOKEN.startswith("xoxb-your-"):
+        print("[ERROR] SLACK_BOT_TOKEN이 설정되지 않았거나 데모 값입니다")
+        print("실제 토큰으로 configs/.env 파일을 수정해주세요")
+        return False
+    if not RAW_CHANNEL or RAW_CHANNEL in ("C1234567890", "C0123456789"):
+        print("[ERROR] SLACK_CHANNEL_ID가 설정되지 않았거나 데모 값입니다") 
+        print("실제 채널 ID로 configs/.env 파일을 수정해주세요")
+        return False
+    return True
+
+# 설정 검증 (스크립트 직접 실행시에만)
+if __name__ == "__main__" and not validate_slack_config():
+    print("\n📖 설정 방법:")
+    print("1. https://api.slack.com/apps 에서 Slack App 생성")
+    print("2. Bot Token (xoxb-...) 발급")
+    print("3. configs/.env 파일에서 SLACK_BOT_TOKEN, SLACK_CHANNEL_ID 수정")
+    print("4. Slack 채널에 봇 초대: /invite @your-bot-name")
     sys.exit(1)
 
 API = "https://slack.com/api"
@@ -53,17 +79,29 @@ def _mime(p: Path) -> str:
 
 
 def _ready(p: Path, tries: int = 6) -> bool:
+    """파일 준비 상태 확인 (개선된 버전)"""
+    if not p.exists():
+        print(f"[ERROR] 파일 존재하지 않음: {p}")
+        return False
+        
     last = -1
-    for _ in range(tries):
-        if not p.exists():
+    for i in range(tries):
+        sz = p.stat().st_size
+        if sz == 0:
+            print(f"[WARN] 파일 크기 0 (시도 {i+1}/{tries})")
             time.sleep(0.5)
             continue
-        sz = p.stat().st_size
-        if sz > 0 and sz == last:
+        if sz == last and sz > 0:
+            print(f"[OK] 파일 준비 완료: {sz:,} bytes")
             return True
         last = sz
+        print(f"[INFO] 파일 크기 변화 감지: {sz:,} bytes (시도 {i+1}/{tries})")
         time.sleep(0.5)
-    return p.exists() and p.stat().st_size > 0
+    
+    final_size = p.stat().st_size
+    is_ready = final_size > 0
+    print(f"[{'OK' if is_ready else 'WARN'}] 최종 상태: {final_size:,} bytes")
+    return is_ready
 
 
 def resolve_channel_id(raw: str) -> str:
@@ -100,61 +138,178 @@ def send_text(ch: str, text: str) -> None:
 
 
 def upload_external_form(p: Path, title: str, comment: Optional[str] = None) -> Tuple[bool, dict]:
-    # 1) 업로드 URL 발급
-    r1 = SESSION.post(
-        f"{API}/files.getUploadURLExternal",
-        data={"filename": p.name, "length": str(p.stat().st_size)},
-    )
+    """개선된 External Form API 업로드 (v2)"""
     try:
-        j1 = r1.json()
-    except Exception:
-        return False, {
-            "where": "getUploadURLExternal",
-            "status": r1.status_code,
-            "raw": r1.text[:300],
+        # 1) 업로드 URL 발급
+        r1 = SESSION.post(
+            f"{API}/files.getUploadURLExternal",
+            data={
+                "filename": p.name, 
+                "length": str(p.stat().st_size),
+                "alt_txt": title or "VELOS 업로드 파일"
+            },
+            timeout=30
+        )
+        
+        if r1.status_code != 200:
+            return False, {
+                "where": "getUploadURLExternal",
+                "status": r1.status_code,
+                "raw": r1.text[:300],
+            }
+            
+        try:
+            j1 = r1.json()
+        except Exception as e:
+            return False, {
+                "where": "getUploadURLExternal",
+                "status": r1.status_code,
+                "error": f"JSON 파싱 실패: {e}",
+                "raw": r1.text[:300],
+            }
+            
+        if not j1.get("ok"):
+            return False, {"where": "getUploadURLExternal", **j1}
+
+        url, fid = j1["upload_url"], j1["file_id"]
+
+        # 2) PUT 업로드 (개선된 헤더)
+        with open(p, "rb") as fp:
+            file_data = fp.read()
+            
+        headers = {
+            "Content-Type": _mime(p),
+            "Content-Length": str(len(file_data))
         }
-    if not (r1.status_code == 200 and j1.get("ok")):
-        return False, {"where": "getUploadURLExternal", **j1}
+        
+        put = requests.put(url, data=file_data, headers=headers, timeout=60)
+        
+        if not (200 <= put.status_code < 300):
+            return False, {
+                "where": "PUT", 
+                "status": put.status_code,
+                "response": put.text[:300] if put.text else "No response"
+            }
 
-    url, fid = j1["upload_url"], j1["file_id"]
+        # 3) 완료 호출 (개선된 데이터 구조)
+        files_data = [{
+            "id": fid, 
+            "title": title,
+            "alt_txt": title or "VELOS 파일"
+        }]
+        
+        complete_data = {
+            "files": json.dumps(files_data, ensure_ascii=False),
+            "channel_id": CHANNEL_ID
+        }
+        
+        if comment:
+            complete_data["initial_comment"] = comment
+            
+        r3 = SESSION.post(f"{API}/files.completeUploadExternal", data=complete_data, timeout=30)
+        
+        if r3.status_code != 200:
+            return False, {
+                "where": "completeUploadExternal",
+                "status": r3.status_code,
+                "raw": r3.text[:300],
+            }
+            
+        try:
+            j3 = r3.json()
+        except Exception as e:
+            return False, {
+                "where": "completeUploadExternal",
+                "status": r3.status_code,
+                "error": f"JSON 파싱 실패: {e}",
+                "raw": r3.text[:300],
+            }
+            
+        return j3.get("ok", False), j3
+        
+    except Exception as e:
+        return False, {
+            "where": "upload_external_form",
+            "error": f"전체 예외: {e}",
+            "type": type(e).__name__
+        }
 
-    # 2) PUT 업로드
-    with open(p, "rb") as fp:
-        put = requests.put(url, data=fp, headers={"Content-Type": _mime(p)})
-    if not (200 <= put.status_code < 300):
-        return False, {"where": "PUT", "status": put.status_code}
 
-    # 3) 완료 호출
-    files_field = json.dumps([{"id": fid, "title": title}], ensure_ascii=False)
-    data = {"files": files_field, "channel_id": CHANNEL_ID}
-    if comment:
-        data["initial_comment"] = comment
-    r3 = SESSION.post(f"{API}/files.completeUploadExternal", data=data)
+def upload_legacy_files_api(p: Path, title: str, comment: Optional[str] = None) -> Tuple[bool, dict]:
+    """Legacy files.upload API (fallback)"""
     try:
-        j3 = r3.json()
-    except Exception:
-        return False, {
-            "where": "completeUploadExternal",
-            "status": r3.status_code,
-            "raw": r3.text[:300],
-        }
-    return (r3.status_code == 200 and j3.get("ok", False)), j3
+        with open(p, "rb") as fp:
+            files = {"file": (p.name, fp, _mime(p))}
+            data = {
+                "channels": CHANNEL_ID,
+                "title": title,
+                "filename": p.name
+            }
+            if comment:
+                data["initial_comment"] = comment
+                
+            r = SESSION.post(f"{API}/files.upload", files=files, data=data, timeout=120)
+            
+        if r.status_code != 200:
+            return False, {"where": "files.upload", "status": r.status_code, "raw": r.text[:300]}
+            
+        try:
+            j = r.json()
+        except Exception as e:
+            return False, {"where": "files.upload", "error": f"JSON 파싱: {e}", "raw": r.text[:300]}
+            
+        return j.get("ok", False), j
+        
+    except Exception as e:
+        return False, {"where": "upload_legacy_files_api", "error": str(e)}
 
 
 def send_report(p: Path, title: str = "VELOS Report", comment: Optional[str] = None) -> bool:
+    """개선된 파일 전송 (multiple fallback 방식)"""
     if not p.exists():
         print(f"[ERROR] 파일 없음: {p}")
         return False
     if not _ready(p):
         print(f"[ERROR] 파일 준비 안 됨(잠김/0바이트): {p}")
         return False
+    
+    # 파일 크기 체크
+    file_size = p.stat().st_size
+    print(f"[INFO] 파일 크기: {file_size:,} bytes ({file_size/1024/1024:.1f} MB)")
+    
+    # 1차 시도: External Form API (v2)
+    print(f"[INFO] 1차 시도: External Form API")
     ok, info = upload_external_form(p, title, comment)
     if ok:
         print(f"[OK] 업로드 성공: external(form) → {p}")
-        send_text(CHANNEL_ID, f"VELOS 업로드 완료: {p.name}")
+        send_text(CHANNEL_ID, f"✅ VELOS 업로드 완료: {p.name}")
         return True
-    print(f"[WARN] external(form) 실패: {info}")
-    return False
+    
+    print(f"[WARN] External Form 실패: {info}")
+    
+    # 2차 시도: Legacy Files API
+    print(f"[INFO] 2차 시도: Legacy Files API")
+    ok2, info2 = upload_legacy_files_api(p, title, comment)
+    if ok2:
+        print(f"[OK] 업로드 성공: legacy(files) → {p}")
+        send_text(CHANNEL_ID, f"✅ VELOS 업로드 완료 (Legacy): {p.name}")
+        return True
+        
+    print(f"[WARN] Legacy Files 실패: {info2}")
+    
+    # 3차 시도: 메시지만 전송 (파일 링크 포함)
+    print(f"[INFO] 3차 시도: 메시지 전송 (파일 업로드 실패)")
+    try:
+        fallback_msg = f"📄 VELOS 보고서: {p.name}\n" \
+                      f"크기: {file_size:,} bytes\n" \
+                      f"⚠️ 파일 업로드 실패 - 수동 확인 필요\n" \
+                      f"경로: {p.absolute()}"
+        send_text(CHANNEL_ID, fallback_msg)
+        print(f"[OK] 대안 메시지 전송 완료")
+        return True
+    except Exception as e:
+        print(f"[ERROR] 모든 전송 방식 실패: {e}")
+        return False
 
 
 def _find_latest() -> Optional[Path]:

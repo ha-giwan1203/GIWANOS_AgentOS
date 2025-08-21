@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -12,20 +12,21 @@
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
 
-import os
-import zipfile
 import datetime
-import sys
 import json
-from typing import List, Dict, Any
+import os
+import sys
+import zipfile
+from typing import Any, Dict, List
 
-ROOT = r"C:\giwanos"
+ROOT = r"/home/user/webapp"
 SNAPSHOT_DIR = os.path.join(ROOT, "data", "snapshots")
 TARGETS = [
     os.path.join(ROOT, "data", "memory"),
     os.path.join(ROOT, "data", "reflections"),
     os.path.join(ROOT, "configs"),
 ]
+
 
 def create_snapshot() -> Dict[str, Any]:
     """VELOS 시스템 스냅샷 생성"""
@@ -43,7 +44,7 @@ def create_snapshot() -> Dict[str, Any]:
         file_details = []
 
         # ZIP 파일 생성
-        with zipfile.ZipFile(snap_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+        with zipfile.ZipFile(snap_path, "w", zipfile.ZIP_DEFLATED) as zf:
             for target in TARGETS:
                 if not os.path.exists(target):
                     continue
@@ -72,11 +73,9 @@ def create_snapshot() -> Dict[str, Any]:
                         except Exception as e:
                             print(f"[WARNING] 파일 추가 실패: {full_path} - {e}")
 
-                file_details.append({
-                    "target": target_name,
-                    "files": target_files,
-                    "size_bytes": target_size
-                })
+                file_details.append(
+                    {"target": target_name, "files": target_files, "size_bytes": target_size}
+                )
 
         # 자가 검증
         if not zipfile.is_zipfile(snap_path):
@@ -89,26 +88,24 @@ def create_snapshot() -> Dict[str, Any]:
             "snapshot_path": snap_path,
             "total_files": total_files,
             "total_size_bytes": total_size,
-            "targets": file_details
+            "targets": file_details,
         }
 
         # 메타데이터 저장
-        metadata_path = snap_path.replace('.zip', '_metadata.json')
-        with open(metadata_path, 'w', encoding='utf-8') as f:
+        metadata_path = snap_path.replace(".zip", "_metadata.json")
+        with open(metadata_path, "w", encoding="utf-8") as f:
             json.dump(metadata, f, ensure_ascii=False, indent=2)
 
         return {
             "success": True,
             "snapshot_path": snap_path,
             "metadata_path": metadata_path,
-            "metadata": metadata
+            "metadata": metadata,
         }
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
 
 def main():
     """메인 실행 함수"""
@@ -121,6 +118,7 @@ def main():
     else:
         print(f"❌ Snapshot creation failed: {result['error']}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

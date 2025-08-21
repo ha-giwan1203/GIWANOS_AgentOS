@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -27,12 +27,44 @@ from pathlib import Path
 
 # 루트/경로
 from modules.report_paths import ROOT
+
 REPORT_DIR = ROOT / "data" / "reports"
 ALIAS = REPORT_DIR / "velos_report_latest.pdf"
 STATE_FILE = REPORT_DIR / ".last_upload.json"
 
-# 업로드 함수 (이미 너희 쪽에 존재)
-from scripts.notify_slack_api import send_report  # noqa: E402
+# 통합전송 큐 생성 함수
+def create_dispatch_message(file_path: Path, title: str) -> bool:
+    """통합전송 시스템용 메시지 생성"""
+    try:
+        dispatch_queue = ROOT / "data" / "dispatch" / "_queue" 
+        dispatch_queue.mkdir(parents=True, exist_ok=True)
+        
+        message = {
+            "title": title,
+            "message": f"📊 VELOS 보고서가 생성되었습니다.\n\n파일: {file_path.name}\n크기: {file_path.stat().st_size:,} bytes\n생성시간: {time.strftime('%Y-%m-%d %H:%M:%S')}",
+            "file_path": str(file_path),
+            "channels": {
+                "slack": {
+                    "enabled": True,
+                    "channel": "#general",
+                    "upload_file": True
+                },
+                "notion": {
+                    "enabled": False
+                }
+            }
+        }
+        
+        # 큐에 메시지 저장
+        queue_file = dispatch_queue / f"report_publish_{time.strftime('%Y%m%d_%H%M%S')}.json"
+        queue_file.write_text(json.dumps(message, ensure_ascii=False, indent=2), encoding="utf-8")
+        
+        print(f"[INFO] 통합전송 큐에 추가: {queue_file.name}")
+        return True
+        
+    except Exception as e:
+        print(f"[ERROR] 통합전송 큐 생성 실패: {e}")
+        return False
 
 
 def nowstamp() -> str:
@@ -118,8 +150,8 @@ def main(argv):
         print("[SKIP] 내용 동일 → 업로드 생략")
         return 0
 
-    # 4) 업로드
-    ok = send_report(alias, title=f"VELOS Report - {alias.name}")
+    # 4) 통합전송 큐에 추가 (Bridge에게 위임)
+    ok = create_dispatch_message(alias, f"VELOS Report - {alias.name}")
     if ok:
         save_state(
             {
@@ -128,10 +160,11 @@ def main(argv):
                 "file": str(ts_file),
             }
         )
-        print("[OK] 업로드 완료 및 상태 저장")
+        print("[OK] 통합전송 큐 추가 완료 및 상태 저장")
+        print("[INFO] Bridge 시스템이 자동으로 전송 처리할 예정")
         return 0
     else:
-        print("[FAIL] 업로드 실패")
+        print("[FAIL] 통합전송 큐 추가 실패")
         return 2
 
 

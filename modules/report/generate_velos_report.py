@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -11,17 +11,18 @@
 # 9) 지능형 처리: 자동 복구·경고 등 방어적 설계 우선
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
-import os
-import sys
 import json
-import time
+import os
 import sqlite3
+import sys
+import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-ROOT = "C:/giwanos"
+ROOT = "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
+
 
 def get_system_stats() -> Dict[str, Any]:
     """시스템 통계 수집"""
@@ -30,6 +31,7 @@ def get_system_stats() -> Dict[str, Any]:
         memory_stats = {"error": "memory_adapter_not_available"}
         try:
             from modules.core.memory_adapter import MemoryAdapter
+
             adapter = MemoryAdapter()
             memory_stats = adapter.get_stats()
         except Exception as e:
@@ -61,63 +63,57 @@ def get_system_stats() -> Dict[str, Any]:
             "memory_stats": memory_stats,
             "health_log": health_log,
             "recent_snapshots": snapshots[:5],  # 최근 5개만
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
     except Exception as e:
         return {"error": str(e)}
+
 
 def generate_markdown_report(stats: Dict[str, Any]) -> str:
     """Markdown 형식 보고서 생성"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    report_lines = [
-        f"# VELOS System Report - {timestamp}",
-        "",
-        "## 📊 System Statistics",
-        ""
-    ]
+    report_lines = [f"# VELOS System Report - {timestamp}", "", "## 📊 System Statistics", ""]
 
     # 메모리 통계
     if "memory_stats" in stats:
         mem_stats = stats["memory_stats"]
         if "error" not in mem_stats:
-            report_lines.extend([
-                "### Memory Status",
-                f"- Buffer Size: {mem_stats.get('buffer_size', 'N/A')}",
-                f"- DB Records: {mem_stats.get('db_records', 'N/A')}",
-                f"- JSON Records: {mem_stats.get('json_records', 'N/A')}",
-                ""
-            ])
+            report_lines.extend(
+                [
+                    "### Memory Status",
+                    f"- Buffer Size: {mem_stats.get('buffer_size', 'N/A')}",
+                    f"- DB Records: {mem_stats.get('db_records', 'N/A')}",
+                    f"- JSON Records: {mem_stats.get('json_records', 'N/A')}",
+                    "",
+                ]
+            )
         else:
-            report_lines.extend([
-                "### Memory Status",
-                f"- Error: {mem_stats['error']}",
-                ""
-            ])
+            report_lines.extend(["### Memory Status", f"- Error: {mem_stats['error']}", ""])
 
     # 헬스 로그
     if "health_log" in stats:
         health = stats["health_log"]
         if "error" not in health:
-            report_lines.extend([
-                "### Health Status",
-                f"- System Integrity: {health.get('system_integrity_ok', 'Unknown')}",
-                f"- Data Integrity: {health.get('data_integrity_ok', 'Unknown')}",
-                ""
-            ])
+            report_lines.extend(
+                [
+                    "### Health Status",
+                    f"- System Integrity: {health.get('system_integrity_ok', 'Unknown')}",
+                    f"- Data Integrity: {health.get('data_integrity_ok', 'Unknown')}",
+                    "",
+                ]
+            )
         else:
-            report_lines.extend([
-                "### Health Status",
-                f"- Error: {health['error']}",
-                ""
-            ])
+            report_lines.extend(["### Health Status", f"- Error: {health['error']}", ""])
 
     # 스냅샷 정보
     if "recent_snapshots" in stats:
         snapshots = stats["recent_snapshots"]
-        report_lines.extend([
-            "### Recent Snapshots",
-        ])
+        report_lines.extend(
+            [
+                "### Recent Snapshots",
+            ]
+        )
         if snapshots:
             for snapshot in snapshots:
                 report_lines.append(f"- {snapshot}")
@@ -126,13 +122,16 @@ def generate_markdown_report(stats: Dict[str, Any]) -> str:
         report_lines.append("")
 
     # 생성 정보
-    report_lines.extend([
-        "---",
-        f"*Generated by VELOS Report Generator at {timestamp}*",
-        "*Based on VELOS Operating Philosophy*"
-    ])
+    report_lines.extend(
+        [
+            "---",
+            f"*Generated by VELOS Report Generator at {timestamp}*",
+            "*Based on VELOS Operating Philosophy*",
+        ]
+    )
 
     return "\n".join(report_lines)
+
 
 def save_report(report_content: str) -> Dict[str, Any]:
     """보고서 저장"""
@@ -148,16 +147,10 @@ def save_report(report_content: str) -> Dict[str, Any]:
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)
 
-        return {
-            "success": True,
-            "report_path": report_path,
-            "filename": report_filename
-        }
+        return {"success": True, "report_path": report_path, "filename": report_filename}
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
 
 def main():
     print("=== VELOS Report Generator ===")
@@ -184,13 +177,14 @@ def main():
             "success": True,
             "report_path": save_result["report_path"],
             "filename": save_result["filename"],
-            "stats": stats
+            "stats": stats,
         }
         print(json.dumps(result, ensure_ascii=False, indent=2))
         sys.exit(0)
     else:
         print(f"❌ Report generation failed: {save_result['error']}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

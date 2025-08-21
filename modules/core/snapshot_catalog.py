@@ -6,12 +6,12 @@ VELOS Snapshot Catalog Module
 스냅샷 파일들의 체크섬을 관리하는 카탈로그 시스템입니다.
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
-import hashlib
 import time
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 # VELOS 운영 철학 선언문
 # - 파일명 절대 변경 금지
@@ -131,15 +131,13 @@ def update_snapshot_catalog(backfill_all: bool = False) -> Dict[str, Any]:
                         "sha256": digest,
                         "recorded_ts": int(time.time()),
                         "file_size": file_size,
-                        "file_path": file_path
+                        "file_path": file_path,
                     }
 
                     updated_count += 1
-                    processed_files.append({
-                        "filename": filename,
-                        "sha256": digest,
-                        "file_size": file_size
-                    })
+                    processed_files.append(
+                        {"filename": filename, "sha256": digest, "file_size": file_size}
+                    )
 
                     print(f"   ✅ {filename}: {digest[:16]}... ({file_size} bytes)")
 
@@ -166,15 +164,12 @@ def update_snapshot_catalog(backfill_all: bool = False) -> Dict[str, Any]:
             "total_files": len(zip_files),
             "updated_count": updated_count,
             "processed_files": processed_files,
-            "catalog_path": CATALOG
+            "catalog_path": CATALOG,
         }
 
     except Exception as e:
         print(f"[VELOS] Catalog update failed: {e}")
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def verify_snapshot_integrity(filename: str) -> Dict[str, Any]:
@@ -191,17 +186,11 @@ def verify_snapshot_integrity(filename: str) -> Dict[str, Any]:
         catalog = load_json(CATALOG)
 
         if filename not in catalog:
-            return {
-                "success": False,
-                "error": f"File {filename} not found in catalog"
-            }
+            return {"success": False, "error": f"File {filename} not found in catalog"}
 
         file_path = os.path.join(SNAP_DIR, filename)
         if not os.path.exists(file_path):
-            return {
-                "success": False,
-                "error": f"File {filename} not found on disk"
-            }
+            return {"success": False, "error": f"File {filename} not found on disk"}
 
         # 현재 해시 계산
         current_sha256 = sha256_hash(file_path)
@@ -216,14 +205,11 @@ def verify_snapshot_integrity(filename: str) -> Dict[str, Any]:
             "expected_sha256": expected_sha256,
             "integrity_ok": is_valid,
             "file_size": os.path.getsize(file_path),
-            "catalog_entry": catalog[filename]
+            "catalog_entry": catalog[filename],
         }
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def get_catalog_status() -> Dict[str, Any]:
@@ -246,13 +232,11 @@ def get_catalog_status() -> Dict[str, Any]:
             "catalog_path": CATALOG,
             "snapshot_dir": SNAP_DIR,
             "files_in_catalog": list(catalog.keys()),
-            "files_on_disk": zip_files
+            "files_on_disk": zip_files,
         }
 
     except Exception as e:
-        return {
-            "error": str(e)
-        }
+        return {"error": str(e)}
 
 
 def main(backfill_all: bool = False) -> int:

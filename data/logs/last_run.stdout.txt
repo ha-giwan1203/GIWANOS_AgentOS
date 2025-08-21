@@ -22,5 +22,5 @@
 [CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
 [CONTEXT] [1755349954] (system) demo | tags=demo,heartbeat
 <<VELOS_CONTEXT:END>>
-[MASTER] Report -> C:/giwanos\data\reports\auto\velos_auto_report_20250816_134730.md
-[MASTER] Dispatch -> C:/giwanos\data\reports\_dispatch\dispatch_20250816_134730.json
+[MASTER] Report -> /home/user/webapp\data\reports\auto\velos_auto_report_20250816_134730.md
+[MASTER] Dispatch -> /home/user/webapp\data\reports\_dispatch\dispatch_20250816_134730.json

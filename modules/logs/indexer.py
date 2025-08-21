@@ -1,15 +1,17 @@
 # [ACTIVE] VELOS 로그 인덱서 - 로그 처리 및 검색 모듈
 # -*- coding: utf-8 -*-
-import os
 import json
+import os
 import re
 import time
 from pathlib import Path
+
 import pandas as pd
 
 try:
     import pyarrow as pa
     import pyarrow.feather as feather
+
     HAVE_ARROW = True
 except Exception:
     HAVE_ARROW = False
@@ -49,11 +51,13 @@ def _read_sources(days: int, limit: int) -> pd.DataFrame:
             pass
     df = pd.DataFrame(rows)
     if not df.empty:
-        df = df.rename(columns={
-            "timestamp": "time",
-            "speaker": "role",
-            "message": "content",
-        })
+        df = df.rename(
+            columns={
+                "timestamp": "time",
+                "speaker": "role",
+                "message": "content",
+            }
+        )
         # 필요한 컬럼 강제 보정
         for c in ["time", "role", "content", "session", "turn", "source_path"]:
             if c not in df.columns:
@@ -81,8 +85,3 @@ def load_conversations(days=7, limit=1000, role=None, query: str | None = None) 
 def load_system_metrics():
     # 간단한 더미 – 필요시 실제 시스템 측정 코드로 교체
     return {"mem": "2.4 GB", "cpu": "23%", "sessions": "3"}
-
-
-
-
-

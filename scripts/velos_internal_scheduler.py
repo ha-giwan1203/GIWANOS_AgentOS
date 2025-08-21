@@ -1,20 +1,26 @@
 # ==== VELOS INTERNAL SCHEDULER BEGIN ====
-import os, sys, json, subprocess, datetime as _dt
-from typing import Dict, Any, List
+import datetime as _dt
+import json
+import os
+import subprocess
+import sys
+from typing import Any, Dict, List
 
 ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
 DATA = os.path.join(ROOT, "data")
 LOGD = os.path.join(DATA, "logs")
 os.makedirs(LOGD, exist_ok=True)
 
-JOBS_FILE  = os.path.join(DATA, "jobs.json")
+JOBS_FILE = os.path.join(DATA, "jobs.json")
 STATE_FILE = os.path.join(DATA, "job_state.json")
-RUN_LOG    = os.path.join(LOGD, "jobs.log")
+RUN_LOG = os.path.join(LOGD, "jobs.log")
+
 
 def _log(msg: str):
     ts = _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(RUN_LOG, "a", encoding="utf-8") as f:
         f.write(f"[{ts}] {msg}\n")
+
 
 def _load_json(path: str, default):
     try:
@@ -26,36 +32,42 @@ def _load_json(path: str, default):
         _log(f"[WARN] load_json({path}) -> {e}")
         return default
 
+
 def _save_json(path: str, obj):
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
 
+
 def _ensure_default_jobs():
     if not os.path.exists(JOBS_FILE):
         default_jobs = [
-            {"name": "DailyReport", "interval": "daily",  "time": "09:05"},
+            {"name": "DailyReport", "interval": "daily", "time": "09:05"},
             {"name": "WeeklyAudit", "interval": "weekly", "day": "monday", "time": "09:30"},
             {"name": "HealthCheck", "interval": "hourly", "minute": 0},
         ]
         _save_json(JOBS_FILE, default_jobs)
         _log("jobs.json created with defaults")
 
+
 def _parse_hhmm(s: str):
     hh, mm = s.split(":")
     return int(hh), int(mm)
 
-DAYS = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+
+DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
 
 def _should_run(job: Dict[str, Any], last_iso: str, now: _dt.datetime) -> bool:
     """주기별 실행여부 계산. now는 로컬시간."""
-    interval = str(job.get("interval","")).lower()
+    interval = str(job.get("interval", "")).lower()
     last = _dt.datetime.fromisoformat(last_iso) if last_iso else None
 
     if interval == "daily":
         t = job.get("time")
-        if not t: return False
+        if not t:
+            return False
         hh, mm = _parse_hhmm(t)
         target = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
         if last is None:
@@ -63,13 +75,16 @@ def _should_run(job: Dict[str, Any], last_iso: str, now: _dt.datetime) -> bool:
         return (last.date() < now.date()) and (now >= target)
 
     if interval == "weekly":
-        day = str(job.get("day","")).lower()
+        day = str(job.get("day", "")).lower()
         t = job.get("time")
-        if day not in DAYS or not t: return False
+        if day not in DAYS or not t:
+            return False
         hh, mm = _parse_hhmm(t)
         # 이번 주 가장 최근 해당 요일 시각
         offset = (DAYS.index(day) - now.weekday()) % 7
-        target = now.replace(hour=hh, minute=mm, second=0, microsecond=0) + _dt.timedelta(days=offset)
+        target = now.replace(hour=hh, minute=mm, second=0, microsecond=0) + _dt.timedelta(
+            days=offset
+        )
         if target > now:
             target -= _dt.timedelta(days=7)
         if last is None:
@@ -89,6 +104,7 @@ def _should_run(job: Dict[str, Any], last_iso: str, now: _dt.datetime) -> bool:
 
     return False
 
+
 def _run_job(job: Dict[str, Any]) -> None:
     """여기서 실제 작업 분기. 네 환경에 맞게만 바꿔라."""
     name = str(job.get("name"))
@@ -101,17 +117,27 @@ def _run_job(job: Dict[str, Any]) -> None:
 
         # 2) 외부 스크립트 호출식 예시 (PowerShell/py 혼용)
         if name == "DailyReport":
-            subprocess.run(["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "report_daily.ps1")], check=True)
+            subprocess.run(
+                ["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "report_daily.ps1")],
+                check=True,
+            )
         elif name == "WeeklyAudit":
-            subprocess.run(["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "weekly_audit.ps1")], check=True)
+            subprocess.run(
+                ["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "weekly_audit.ps1")],
+                check=True,
+            )
         elif name == "HealthCheck":
-            subprocess.run(["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "health_check.ps1")], check=True)
+            subprocess.run(
+                ["pwsh", "-NoProfile", "-File", os.path.join(ROOT, "scripts", "health_check.ps1")],
+                check=True,
+            )
         else:
             _log(f"SKIP unknown job: {name}")
             return
         _log(f"RUN {name} ok")
     except Exception as e:
         _log(f"RUN {name} fail: {e}")
+
 
 def run_internal_scheduler(argv: List[str]) -> None:
     """스케줄러 엔트리포인트. 5분마다 한 번 이걸 호출하면 끝."""
@@ -125,15 +151,17 @@ def run_internal_scheduler(argv: List[str]) -> None:
         return
     if "--force" in argv:
         i = argv.index("--force")
-        if i+1 < len(argv): force = argv[i+1]
+        if i + 1 < len(argv):
+            force = argv[i + 1]
     if "--now" in argv:
         i = argv.index("--now")
-        if i+1 < len(argv): frozen_now = _dt.datetime.fromisoformat(argv[i+1])
+        if i + 1 < len(argv):
+            frozen_now = _dt.datetime.fromisoformat(argv[i + 1])
 
     os.makedirs(DATA, exist_ok=True)
     _ensure_default_jobs()
 
-    jobs  = _load_json(JOBS_FILE, [])
+    jobs = _load_json(JOBS_FILE, [])
     state = _load_json(STATE_FILE, {})
 
     now = frozen_now or _dt.datetime.now()  # 로컬시간
@@ -156,6 +184,8 @@ def run_internal_scheduler(argv: List[str]) -> None:
 
     if updated:
         _save_json(STATE_FILE, state)
+
+
 # ==== VELOS INTERNAL SCHEDULER END ====
 
 if __name__ == "__main__":

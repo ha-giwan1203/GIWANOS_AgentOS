@@ -1,7 +1,15 @@
-﻿{
+{
   "identity": {
     "project": "VELOS",
-    "version": "v2.0-stable",
-    "description": "GPT-4o 기반 초고도화 AI 자동화 및 자가학습 시스템"
+    "version": "v2.1-gpt5",
+    "description": "GPT-5 기반 초고도화 AI 자동화 및 자가학습 시스템",
+    "ai_model": "gpt-5",
+    "upgrade_date": "2025-08-21",
+    "features": [
+      "GPT-5 최신 언어모델 통합",
+      "고성능 외장메모리 시스템",
+      "실시간 맥락유지 및 학습",
+      "지능형 자동화 워크플로우"
+    ]
   }
 }

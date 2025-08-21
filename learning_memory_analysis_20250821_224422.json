@@ -1,0 +1,538 @@
+{
+  "sqlite_databases": [
+    {
+      "path": "/home/user/webapp/data/memory/velos.db",
+      "name": "velos.db",
+      "size": 143360,
+      "tables": [
+        "memory",
+        "sqlite_sequence",
+        "locks",
+        "memory_fts",
+        "memory_fts_data",
+        "memory_fts_idx",
+        "memory_fts_docsize",
+        "memory_fts_config"
+      ],
+      "learning_content": [],
+      "record_count": 2878,
+      "schema_info": {
+        "memory": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "pk": 1
+          },
+          {
+            "name": "ts",
+            "type": "INTEGER",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "role",
+            "type": "TEXT",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "insight",
+            "type": "TEXT",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "raw",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 0
+          },
+          {
+            "name": "tags",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "sqlite_sequence": [
+          {
+            "name": "name",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          },
+          {
+            "name": "seq",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "locks": [
+          {
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 1
+          },
+          {
+            "name": "owner",
+            "type": "TEXT",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "ts",
+            "type": "INTEGER",
+            "notnull": 1,
+            "pk": 0
+          }
+        ],
+        "memory_fts": [
+          {
+            "name": "insight",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          },
+          {
+            "name": "raw",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "memory_fts_data": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "pk": 1
+          },
+          {
+            "name": "block",
+            "type": "BLOB",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "memory_fts_idx": [
+          {
+            "name": "segid",
+            "type": "",
+            "notnull": 1,
+            "pk": 1
+          },
+          {
+            "name": "term",
+            "type": "",
+            "notnull": 1,
+            "pk": 2
+          },
+          {
+            "name": "pgno",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "memory_fts_docsize": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "pk": 1
+          },
+          {
+            "name": "sz",
+            "type": "BLOB",
+            "notnull": 0,
+            "pk": 0
+          }
+        ],
+        "memory_fts_config": [
+          {
+            "name": "k",
+            "type": "",
+            "notnull": 1,
+            "pk": 1
+          },
+          {
+            "name": "v",
+            "type": "",
+            "notnull": 0,
+            "pk": 0
+          }
+        ]
+      }
+    },
+    {
+      "path": "/home/user/webapp/data/memory/velos_memory.bak_20250811_220800.db",
+      "name": "velos_memory.bak_20250811_220800.db",
+      "size": 24667,
+      "tables": [],
+      "learning_content": [],
+      "record_count": 0,
+      "schema_info": {},
+      "error": "데이터베이스 분석 오류: file is not a database"
+    },
+    {
+      "path": "/home/user/webapp/data/memory/velos_memory.db",
+      "name": "velos_memory.db",
+      "size": 20480,
+      "tables": [
+        "memory"
+      ],
+      "learning_content": [],
+      "record_count": 1,
+      "schema_info": {
+        "memory": [
+          {
+            "name": "id",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 1
+          },
+          {
+            "name": "content",
+            "type": "TEXT",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "timestamp",
+            "type": "TEXT",
+            "notnull": 1,
+            "pk": 0
+          },
+          {
+            "name": "metadata",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 0
+          },
+          {
+            "name": "created_at",
+            "type": "TEXT",
+            "notnull": 0,
+            "pk": 0
+          }
+        ]
+      }
+    }
+  ],
+  "json_files": [
+    {
+      "path": "/home/user/webapp/data/memory/backup_3.json",
+      "name": "backup_3.json",
+      "size": 167,
+      "structure": "array",
+      "record_count": 3,
+      "learning_content": [],
+      "sample_data": [
+        {
+          "from": "user",
+          "insight": "ping 1",
+          "tags": [
+            "test"
+          ]
+        },
+        {
+          "from": "system",
+          "insight": "ping 2",
+          "tags": [
+            "test"
+          ]
+        },
+        {
+          "from": "user",
+          "insight": "ping 3",
+          "tags": [
+            "test"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/client_seq.json",
+      "name": "client_seq.json",
+      "size": 64,
+      "structure": "object",
+      "record_count": 4,
+      "learning_content": [],
+      "sample_data": [
+        [
+          "스::",
+          1
+        ],
+        [
+          " :째",
+          1
+        ],
+        [
+          "시: ",
+          1
+        ]
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/dialog_memory.json",
+      "name": "dialog_memory.json",
+      "size": 156613,
+      "structure": "unknown",
+      "record_count": 0,
+      "learning_content": [],
+      "sample_data": [],
+      "error": "JSON 분석 오류: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+    },
+    {
+      "path": "/home/user/webapp/data/memory/hot_context.json",
+      "name": "hot_context.json",
+      "size": 4512,
+      "structure": "object",
+      "record_count": 5,
+      "learning_content": [
+        {
+          "type": "full_object",
+          "content": {
+            "created_ts": 1755567951,
+            "ttl_sec": 7200,
+            "context_block": "<<VELOS_CONTEXT:BEGIN>>\nwindow=48h; pulled=60\n[1755567949] (user) VELOS 마스터 메모리 통합 테스트 | tags=test,master,memory\n[1755567828] (user) PRAGMA 설정 테스트 with WAL mode | tags=test,pragma,wal\n[1755567714] (user) VELOS memory adapter search test with FTS | tags=test,fts,search\n[1755567536] (test) trigger test | tags=\n[1755567522] (test) fts trigger self-check | tags=\n[1755567504] (test) fts trigger self-check | tags=\n[1755567196] (test) fts trigger self-check | tags=\n[1755567176] (test) fts trigger self-check | tags=\n[1755567161] (test) fts trigger self-check | tags=\n[1755567090] (test) fts trigger self-check | tags=\n[1755567072] (test) fts trigger self-check | tags=\n[1755567052] (test) debug fts error | tags=\n[1755567028] (test) fts trigger self-check | tags=\n[1755566948] (test) fts trigger self-check | tags=\n[1755565969] (test) fts trigger self-check | tags=\n[1755563903] (test_user) unique ingest test at 1755563903 | tags=unique_test,ingest_check\n[1755563840] (test_user) unique ingest test at 1755563840 | tags=unique_test,ingest_check\n[1755563797] (test_user) unique ingest test at 1755563797 | tags=unique_test,ingest_check\n[1755563766] (test_user) unique ingest test at 1755563766 | tags=unique_test,ingest_check\n[1755563739] (test_user) unique ingest test at 1755563739 | tags=unique_test,ingest_check\n[1755563693] (system) ingest layer check | tags=test,ingest\n[1755563670] (system) ingest layer check | tags=test,ingest\n[1755563622] (system) ingest layer check | tags=test,ingest\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 error | tags=master_scheduler,error\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560723] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560723] (scheduler) 스케줄러 error | tags=master_scheduler,error\n[1755560723] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560699] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560549] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560423] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755553502] (system) selftest-1 | tags=selftest\n[1755535724] (system) selftest-1 | tags=selftest\n[1755535125] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755535112] (system) selftest-1 | tags=selftest\n[1755517902] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517902] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517886] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517886] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755513878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512247] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512247] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512246] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512246] (scheduler) 스케줄러 info | tags=master_scheduler,info\n<<VELOS_CONTEXT:END>>",
+            "mandates": {
+              "FILE_NAMES_IMMUTABLE": true,
+              "NO_FAKE_CODE": true,
+              "ROOT_FIXED": "/home/user/webapp",
+              "SELF_TEST_REQUIRED": true,
+              "PROMPT_ALWAYS_INCLUDE_CONTEXT": true
+            },
+            "rebuild_reason": "manual_rebuild"
+          }
+        }
+      ],
+      "sample_data": [
+        [
+          "created_ts",
+          1755567951
+        ],
+        [
+          "ttl_sec",
+          7200
+        ],
+        [
+          "context_block",
+          "<<VELOS_CONTEXT:BEGIN>>\nwindow=48h; pulled=60\n[1755567949] (user) VELOS 마스터 메모리 통합 테스트 | tags=test,master,memory\n[1755567828] (user) PRAGMA 설정 테스트 with WAL mode | tags=test,pragma,wal\n[1755567714] (user) VELOS memory adapter search test with FTS | tags=test,fts,search\n[1755567536] (test) trigger test | tags=\n[1755567522] (test) fts trigger self-check | tags=\n[1755567504] (test) fts trigger self-check | tags=\n[1755567196] (test) fts trigger self-check | tags=\n[1755567176] (test) fts trigger self-check | tags=\n[1755567161] (test) fts trigger self-check | tags=\n[1755567090] (test) fts trigger self-check | tags=\n[1755567072] (test) fts trigger self-check | tags=\n[1755567052] (test) debug fts error | tags=\n[1755567028] (test) fts trigger self-check | tags=\n[1755566948] (test) fts trigger self-check | tags=\n[1755565969] (test) fts trigger self-check | tags=\n[1755563903] (test_user) unique ingest test at 1755563903 | tags=unique_test,ingest_check\n[1755563840] (test_user) unique ingest test at 1755563840 | tags=unique_test,ingest_check\n[1755563797] (test_user) unique ingest test at 1755563797 | tags=unique_test,ingest_check\n[1755563766] (test_user) unique ingest test at 1755563766 | tags=unique_test,ingest_check\n[1755563739] (test_user) unique ingest test at 1755563739 | tags=unique_test,ingest_check\n[1755563693] (system) ingest layer check | tags=test,ingest\n[1755563670] (system) ingest layer check | tags=test,ingest\n[1755563622] (system) ingest layer check | tags=test,ingest\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 error | tags=master_scheduler,error\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560725] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560723] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560723] (scheduler) 스케줄러 error | tags=master_scheduler,error\n[1755560723] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560699] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560549] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755560423] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755553502] (system) selftest-1 | tags=selftest\n[1755535724] (system) selftest-1 | tags=selftest\n[1755535125] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755535112] (system) selftest-1 | tags=selftest\n[1755517902] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517902] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517886] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517886] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755517842] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755513878] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512248] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512247] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512247] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512246] (scheduler) 스케줄러 info | tags=master_scheduler,info\n[1755512246] (scheduler) 스케줄러 info | tags=master_scheduler,info\n<<VELOS_CONTEXT:END>>"
+        ]
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/identity_memory.json",
+      "name": "identity_memory.json",
+      "size": 421,
+      "structure": "object",
+      "record_count": 1,
+      "learning_content": [
+        {
+          "type": "full_object",
+          "content": {
+            "identity": {
+              "project": "VELOS",
+              "version": "v2.1-gpt5",
+              "description": "GPT-5 기반 초고도화 AI 자동화 및 자가학습 시스템",
+              "ai_model": "gpt-5",
+              "upgrade_date": "2025-08-21",
+              "features": [
+                "GPT-5 최신 언어모델 통합",
+                "고성능 외장메모리 시스템",
+                "실시간 맥락유지 및 학습",
+                "지능형 자동화 워크플로우"
+              ]
+            }
+          }
+        }
+      ],
+      "sample_data": [
+        [
+          "identity",
+          {
+            "project": "VELOS",
+            "version": "v2.1-gpt5",
+            "description": "GPT-5 기반 초고도화 AI 자동화 및 자가학습 시스템",
+            "ai_model": "gpt-5",
+            "upgrade_date": "2025-08-21",
+            "features": [
+              "GPT-5 최신 언어모델 통합",
+              "고성능 외장메모리 시스템",
+              "실시간 맥락유지 및 학습",
+              "지능형 자동화 워크플로우"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/learning_memory.json",
+      "name": "learning_memory.json",
+      "size": 242513,
+      "structure": "array",
+      "record_count": 950,
+      "learning_content": [
+        {
+          "index": 5,
+          "content": {
+            "ts": 1755352050.038341,
+            "ts_iso": "2025-08-16T22:47:30",
+            "session_id": "session_1755352050",
+            "from": "system",
+            "insight": "메모리 어댑터를 통한 데이터 동기화 완료",
+            "tags": [
+              "master_loop",
+              "memory_sync",
+              "context_block"
+            ],
+            "kind": "memory_sync"
+          }
+        }
+      ],
+      "sample_data": [
+        {
+          "ts": 1755349954.5664895,
+          "ts_iso": "2025-08-16T22:12:34",
+          "session_id": "session_1755349954",
+          "from": "system",
+          "insight": "demo",
+          "tags": [
+            "demo",
+            "heartbeat"
+          ],
+          "kind": "heartbeat"
+        },
+        {
+          "ts": 1755349966.411471,
+          "ts_iso": "2025-08-16T22:12:46",
+          "session_id": "session_1755349966",
+          "from": "system",
+          "insight": "selftest-1",
+          "tags": [
+            "selftest"
+          ],
+          "kind": "test"
+        },
+        {
+          "ts": 1755350176.0286725,
+          "ts_iso": "2025-08-16T22:16:16",
+          "session_id": "session_1755350176",
+          "from": "system",
+          "insight": "demo",
+          "tags": [
+            "demo",
+            "heartbeat"
+          ],
+          "kind": "heartbeat"
+        }
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/learning_memory_backup_20250811_131041.json",
+      "name": "learning_memory_backup_20250811_131041.json",
+      "size": 242,
+      "structure": "unknown",
+      "record_count": 0,
+      "learning_content": [],
+      "sample_data": [],
+      "error": "JSON 분석 오류: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+    },
+    {
+      "path": "/home/user/webapp/data/memory/learning_summary.json",
+      "name": "learning_summary.json",
+      "size": 633,
+      "structure": "unknown",
+      "record_count": 0,
+      "learning_content": [],
+      "sample_data": [],
+      "error": "JSON 분석 오류: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+    },
+    {
+      "path": "/home/user/webapp/data/memory/manual_memory.json",
+      "name": "manual_memory.json",
+      "size": 396,
+      "structure": "unknown",
+      "record_count": 0,
+      "learning_content": [],
+      "sample_data": [],
+      "error": "JSON 분석 오류: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+    },
+    {
+      "path": "/home/user/webapp/data/memory/memory_cursor.json",
+      "name": "memory_cursor.json",
+      "size": 61,
+      "structure": "object",
+      "record_count": 2,
+      "learning_content": [],
+      "sample_data": [
+        [
+          "created",
+          "2025-08-14T17:07:44"
+        ],
+        [
+          "last_read_pos",
+          0
+        ]
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/runtime_state.json",
+      "name": "runtime_state.json",
+      "size": 118,
+      "structure": "object",
+      "record_count": 4,
+      "learning_content": [],
+      "sample_data": [
+        [
+          "schema_version",
+          1
+        ],
+        [
+          "cursor_in_use",
+          true
+        ],
+        [
+          "source",
+          "cursor"
+        ]
+      ]
+    },
+    {
+      "path": "/home/user/webapp/data/memory/session_primer.json",
+      "name": "session_primer.json",
+      "size": 231,
+      "structure": "object",
+      "record_count": 6,
+      "learning_content": [],
+      "sample_data": [
+        [
+          "os",
+          "Windows"
+        ],
+        [
+          "shell",
+          "PowerShell7"
+        ],
+        [
+          "root",
+          "C:\\giwanos"
+        ]
+      ]
+    }
+  ],
+  "learning_records": [],
+  "memory_states": [],
+  "summary": {
+    "timestamp": "2025-08-21 22:44:22 KST",
+    "total_sqlite_databases": 3,
+    "total_json_files": 12,
+    "total_learning_records": 3,
+    "total_memory_states": 0,
+    "analysis_quality": "C+"
+  }
+}

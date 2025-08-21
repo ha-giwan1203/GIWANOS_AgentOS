@@ -16,42 +16,48 @@ VELOS: Single Python Master Loop
   --verbose              상세 로그 출력
 """
 
-import os
-import sys
-import json
-import subprocess
 import atexit
+import time
 import datetime as _dt
-from typing import Dict, Any, List
+import json
+import os
+import subprocess
+import sys
 from pathlib import Path
+from typing import Any, Dict, List
 
-# VELOS 공용 설정 유틸리티 사용
+# Phase 3: Use VELOS import manager for optimized imports
 try:
-    # 현재 디렉토리를 sys.path에 추가
+    # Import manager approach (Phase 3 optimization)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(current_dir)
-    if root_dir not in sys.path:
-        sys.path.insert(0, root_dir)
+    # Replaced with import manager - Phase 3 optimization
     
-    from modules.utils.settings_bootstrap import VELOS_ROOT, LOG_PATH
-    ROOT = str(VELOS_ROOT)
+    from modules.core.import_manager import ensure_velos_imports, get_velos_root, import_velos
+    from modules.core.path_manager import get_velos_root as get_path_root
     
-    # VELOS 모듈 import (안전화)
+    ROOT = str(get_path_root())
+    
+    # VELOS 모듈 import (import manager 사용)
     try:
-        from modules.core.session_store import append_session_event
-        from modules.core.velos_session_init import init_velos_session
+        session_store = import_velos('core.session_store')
+        velos_session = import_velos('core.velos_session_init')
+        append_session_event = getattr(session_store, 'append_session_event', None)
+        init_velos_session = getattr(velos_session, 'init_velos_session', None)
         VELOS_AVAILABLE = True
-    except ImportError:
+    except Exception:
         VELOS_AVAILABLE = False
         print("[WARN] VELOS modules not available, running in standalone mode")
         
 except ImportError:
-    # 폴백: 기본 설정 사용
+    # 폴백: 기본 설정 사용 (하위 호환성)
     ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
-    if ROOT not in sys.path:
-        sys.path.append(ROOT)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(current_dir)
+    if root_dir not in sys.path:
+        # Replaced with import manager - Phase 3 optimization
     VELOS_AVAILABLE = False
-    print("[WARN] settings_bootstrap not available, using fallback")
+    print("[WARN] Import manager not available, using fallback")
 
 # ------------------- 경로/파일 -------------------
 DATA = Path(ROOT) / "data"
@@ -65,11 +71,21 @@ LOCK_FILE = DATA / ".velos.py.lock"
 
 # ------------------- 싱글톤 락 -------------------
 def acquire_lock():
-    """Python 레벨 싱글톤 락 획득"""
+    """Python 레벨 싱글톤 락 획득 (타임아웃 안전장치 포함)"""
     try:
+        # 기존 락 파일이 5분 이상 오래된 경우 자동 정리
+        if LOCK_FILE.exists():
+            try:
+                stat = LOCK_FILE.stat()
+                if time.time() - stat.st_mtime > 300:  # 5분
+                    LOCK_FILE.unlink()
+                    _log("오래된 락 파일 자동 정리", "WARN")
+            except Exception:
+                pass
+        
         # O_EXCL: 이미 있으면 실패. 윈도우에서도 동작.
         fd = os.open(str(LOCK_FILE), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        os.write(fd, str(os.getpid()).encode())
+        os.write(fd, f"{os.getpid()}:{int(time.time())}".encode())
         os.close(fd)
         def _cleanup():
             try: 

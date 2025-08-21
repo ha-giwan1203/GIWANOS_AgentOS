@@ -1,0 +1,12 @@
+{
+  "title": "📊 시스템 건강 대시보드 생성 완료",
+  "message": "새로운 보고서가 생성되었습니다.\n\n📋 **보고서 정보**\n- 유형: 시스템 건강 대시보드\n- 파일: velos_health_report_20250821_152609.md\n- 크기: 328 문자\n- 생성시간: 20250821_152609\n\n📊 **주요 내용 미리보기**\n# ❌ VELOS 시스템 모니터링 오류 - 2025-08-21 15:26\n\n## 📊 시스템 요약\n- **전체 상태**: ERROR\n- **발견된 이슈**: 1건 (긴급 1건, 주의 0건)\n- **메모리 DB**: 0개 레코드\n\n## 🚨 긴급 조치 필요\n- 시스템 헬스 데이터 없음 - 모니터링 시스템 점검 필요\n\n## ⚡ 성능 상태\n- **메모리 효율성**: unknown\n- **I/O 성능**: unknown\n\n## 🔄 최근 활동\n- ⚠️ 24시간 내 활성 로그 0개\n\n---\n*생성시간: 2025-08-21T15:26:09.0468...\n\n상세 내용은 첨부된 보고서 파일을 확인해주세요.",
+  "file_path": "/home/user/webapp/data/reports/enhanced/velos_health_report_20250821_152609.md",
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "channel": "#general",
+      "upload_file": false
+    }
+  }
+}

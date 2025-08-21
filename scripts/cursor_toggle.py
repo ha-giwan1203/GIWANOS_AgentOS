@@ -7,14 +7,14 @@ VELOS Cursor State Toggle Script
 Cursor 상태를 켜고 끄는 간단한 스크립트입니다.
 """
 
+import json
 import os
 import sys
-import json
 import time
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path("/home/user/webapp")
 
 # 상수 정의
 SCHEMA_VERSION = 1
@@ -45,7 +45,7 @@ def _is_expired(last_iso: str | None) -> bool:
     """TTL 만료 여부 확인"""
     if not last_iso:
         return True
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
 
     try:
         ts = datetime.fromisoformat(last_iso.replace("Z", "+00:00"))
@@ -117,8 +117,7 @@ def get_cursor_in_use() -> bool:
             import psutil
 
             has_cursor = any(
-                "cursor" in (p.name() or "").lower()
-                for p in psutil.process_iter(["name"])
+                "cursor" in (p.name() or "").lower() for p in psutil.process_iter(["name"])
             )
         except Exception:
             has_cursor = False
@@ -145,8 +144,7 @@ def reconcile_env_file_state() -> dict:
             import psutil
 
             has_cursor = any(
-                "cursor" in (p.name() or "").lower()
-                for p in psutil.process_iter(["name"])
+                "cursor" in (p.name() or "").lower() for p in psutil.process_iter(["name"])
             )
         except Exception:
             has_cursor = False

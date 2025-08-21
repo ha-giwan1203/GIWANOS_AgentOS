@@ -47,9 +47,9 @@
 ### **새로운 settings.yaml 구조**:
 ```yaml
 # 경로 우선순위: ENV > configs/settings.yaml > 기본값
-root: "${VELOS_ROOT:-C:/giwanos}"
+root: "${VELOS_ROOT:-/home/user/webapp}"
 venv_path: "${VELOS_VENV:-C:/Users/User/venvs/velos}"
-python_path: "${VELOS_PYTHON:-C:/Users/User/venvs/velos/Scripts/python.exe}"
+python_path: "${VELOS_PYTHON:-/usr/bin/python3}"
 
 database:
   path: "${VELOS_DB:-data/velos.db}"
@@ -83,8 +83,8 @@ development:
 ### **설정 로드 테스트**: ✅ 성공
 ```python
 from configs import get_setting, get_root_path
-print('루트 경로:', get_root_path())  # C:\giwanos
-print('DB 경로:', get_setting('database.path'))  # C:\giwanos\data\velos.db
+print('루트 경로:', get_root_path())  # /home/user/webapp
+print('DB 경로:', get_setting('database.path'))  # /home/user/webapp\data\velos.db
 ```
 
 ### **환경 변수 테스트**: ✅ 성공

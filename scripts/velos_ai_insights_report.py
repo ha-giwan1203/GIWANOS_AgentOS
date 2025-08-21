@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -241,19 +241,34 @@ def main():
         pdf_path if ok_pdf else "",
     )
 
-    # 환경변수로 자동 슬랙 전송 트리거 (이미 별도 notify 스크립트 있어도 백업용)
-    if os.environ.get("SLACK_AUTOSEND") in ("1", "true", "True"):
+    # 통합전송 시스템으로 자동 전송 (Bridge 위임)
+    if os.environ.get("SLACK_AUTOSEND") in ("1", "true", "True") and ok_pdf:
         try:
-            env = os.environ.copy()
-            env.setdefault("PYTHONPATH", str(ROOT))
-            subprocess.run(
-                [sys.executable, str(P("scripts/notify_slack_api.py"))],
-                check=False,
-                cwd=str(ROOT),
-                env=env,
-            )
+            dispatch_queue = ROOT / "data" / "dispatch" / "_queue"
+            dispatch_queue.mkdir(parents=True, exist_ok=True)
+            
+            message = {
+                "title": "🤖 VELOS AI Insights Report",
+                "message": f"📈 AI 인사이트 보고서가 생성되었습니다.\n\n파일: {pdf_path.name if pdf_path else 'N/A'}\n생성시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n🔍 주요 내용:\n- 시스템 건강 상태\n- API 비용 분석\n- 학습 메모리 요약\n- 성찰 데이터 분석",
+                "file_path": str(pdf_path) if pdf_path else None,
+                "channels": {
+                    "slack": {
+                        "enabled": True,
+                        "channel": "#general",
+                        "upload_file": True if pdf_path else False
+                    }
+                }
+            }
+            
+            # 큐에 메시지 저장
+            import time
+            queue_file = dispatch_queue / f"ai_insights_{time.strftime('%Y%m%d_%H%M%S')}.json"
+            queue_file.write_text(json.dumps(message, ensure_ascii=False, indent=2), encoding="utf-8")
+            
+            print(f"[INFO] 통합전송 큐에 추가: {queue_file.name}")
+            
         except Exception as e:
-            print("[WARN] Slack auto-send failed:", e)
+            print(f"[WARN] 통합전송 큐 추가 실패: {e}")
     return 0
 
 

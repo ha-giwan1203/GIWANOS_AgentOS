@@ -7,29 +7,29 @@
 ## 📋 로그 통합 개요
 
 ### 기존 상황
-- **`C:\giwanos\logs\`**: 단일 파일 `velos_bridge.log` (7.9KB)
-- **`C:\giwanos\data\logs\`**: 대량의 로그 파일들 (289개 .log 파일)
+- **`/home/user/webapp\logs\`**: 단일 파일 `velos_bridge.log` (7.9KB)
+- **`/home/user/webapp\data\logs\`**: 대량의 로그 파일들 (289개 .log 파일)
 
 ### 통합 결과
-- **통합 대상**: `C:\giwanos\data\logs\`
+- **통합 대상**: `/home/user/webapp\data\logs\`
 - **이동된 파일**: `velos_bridge.log`
-- **삭제된 디렉토리**: `C:\giwanos\logs\`
+- **삭제된 디렉토리**: `/home/user/webapp\logs\`
 
 ## ✅ 통합 작업 상세
 
 ### 1. 로그 파일 이동
 ```
-C:\giwanos\logs\velos_bridge.log
+/home/user/webapp\logs\velos_bridge.log
     ↓
-C:\giwanos\data\logs\velos_bridge.log
+/home/user/webapp\data\logs\velos_bridge.log
 ```
 
 ### 2. 백업 생성
-- **백업 디렉토리**: `C:\giwanos\data\logs\backup_20250819_003501`
+- **백업 디렉토리**: `/home/user/webapp\data\logs\backup_20250819_003501`
 - **백업 내용**: 기존 로그 파일들의 안전한 보관
 
 ### 3. 빈 디렉토리 정리
-- **삭제된 디렉토리**: `C:\giwanos\logs\`
+- **삭제된 디렉토리**: `/home/user/webapp\logs\`
 - **정리 이유**: 중복 디렉토리 제거로 구조 단순화
 
 ## 🔧 설정 업데이트
@@ -39,7 +39,7 @@ C:\giwanos\data\logs\velos_bridge.log
 # 로그 설정
 logging:
   level: "${VELOS_LOG_LEVEL:-INFO}"
-  path: "${VELOS_LOG_PATH:-C:/giwanos/data/logs}"
+  path: "${VELOS_LOG_PATH:-/home/user/webapp/data/logs}"
   max_size: "${VELOS_LOG_MAX_SIZE:-10MB}"
   backup_count: 5
   # 로그 파일별 설정
@@ -53,7 +53,7 @@ logging:
 ```
 
 ### 환경변수 설정
-- `VELOS_LOG_PATH`: `C:\giwanos\data\logs`
+- `VELOS_LOG_PATH`: `/home/user/webapp\data\logs`
 - 모든 로그 파일이 통합된 경로로 저장
 
 ## 📊 통합 후 로그 구조

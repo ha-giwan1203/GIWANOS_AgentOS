@@ -5,8 +5,10 @@ Notion DB 상태 옵션 확인 스크립트
 """
 
 import os
+
 import requests
 from env_loader import load_env
+
 
 def main():
     load_env()
@@ -26,8 +28,7 @@ def main():
     try:
         # 데이터베이스 메타데이터 가져오기
         response = requests.get(
-            f"https://api.notion.com/v1/databases/{database_id}",
-            headers=headers
+            f"https://api.notion.com/v1/databases/{database_id}", headers=headers
         )
 
         if response.status_code != 200:
@@ -67,8 +68,6 @@ def main():
     except Exception as e:
         print(f"❌ 오류: {e}")
 
+
 if __name__ == "__main__":
     main()
-
-
-

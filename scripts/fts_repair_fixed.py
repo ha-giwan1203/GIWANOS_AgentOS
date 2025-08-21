@@ -1,7 +1,7 @@
 # [EXPERIMENT] scripts/fts_repair_fixed.py
+import os
 import sqlite3
 import sys
-import os
 
 DB = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
 
@@ -82,12 +82,14 @@ def main():
         cur.executescript(ddl)
 
         # 3) 전체 재색인
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO memory_fts(rowid, text)
             SELECT id, COALESCE(insight, raw, '')
             FROM memory
             WHERE COALESCE(insight, raw, '') <> '';
-        """)
+        """
+        )
 
         # 4) 최적화
         cur.execute("INSERT INTO memory_fts(memory_fts) VALUES ('optimize');")

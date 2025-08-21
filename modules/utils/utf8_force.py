@@ -6,8 +6,8 @@ UTF-8 인코딩 강제 설정 유틸리티
 Python 스크립트에서 일관된 UTF-8 인코딩을 보장합니다.
 """
 
-import sys
 import os
+import sys
 
 
 def force_utf8_encoding():
@@ -30,8 +30,8 @@ def setup_utf8_environment():
     환경 변수와 인코딩을 모두 설정합니다.
     """
     # 환경 변수 설정
-    os.environ.setdefault('PYTHONUTF8', '1')
-    os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
+    os.environ.setdefault("PYTHONUTF8", "1")
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
     # 인코딩 강제 설정
     success = force_utf8_encoding()

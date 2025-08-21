@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -12,28 +12,42 @@
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
 
-import re
 import os
+import re
 import sys
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 # ROOT 경로 설정
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "/home/user/webapp"
 
-ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
 HEADER_BEGIN = "<<VELOS_MANDATES:BEGIN>>"
 HEADER_END = "<<VELOS_MANDATES:END>>"
+
 
 def mandates_header(mandates: Dict[str, Any]) -> str:
     """
@@ -44,6 +58,7 @@ def mandates_header(mandates: Dict[str, Any]) -> str:
         lines.append(f"{k}={v}")
     lines.append(HEADER_END)
     return "\n".join(lines)
+
 
 def inject_mandates(system_prompt: str, mandates: Dict[str, Any]) -> str:
     """
@@ -56,12 +71,7 @@ def inject_mandates(system_prompt: str, mandates: Dict[str, Any]) -> str:
             # 기존 헤더를 최신으로 교체
             pattern = re.escape(HEADER_BEGIN) + r".*?" + re.escape(HEADER_END)
             replacement = mandates_header(mandates)
-            return re.sub(
-                pattern,
-                replacement,
-                system_prompt,
-                flags=re.DOTALL
-            )
+            return re.sub(pattern, replacement, system_prompt, flags=re.DOTALL)
         else:
             # 새로운 헤더 추가
             return mandates_header(mandates) + "\n" + system_prompt
@@ -70,6 +80,7 @@ def inject_mandates(system_prompt: str, mandates: Dict[str, Any]) -> str:
         # 오류 발생 시 원본 프롬프트 반환
         return system_prompt
 
+
 def assert_core_policies(mandates: Dict[str, Any], root_path: str = ROOT) -> bool:
     """
     핵심 운영 철학 검증
@@ -77,11 +88,12 @@ def assert_core_policies(mandates: Dict[str, Any], root_path: str = ROOT) -> boo
     try:
         assert mandates.get("FILE_NAMES_IMMUTABLE", True), "file names must be immutable"
         assert mandates.get("NO_FAKE_CODE", True), "fake code not allowed"
-        assert mandates.get("ROOT_FIXED", "C:/giwanos") == root_path, "ROOT mismatch"
+        assert mandates.get("ROOT_FIXED", "/home/user/webapp") == root_path, "ROOT mismatch"
         return True
     except AssertionError as e:
         print(f"[VELOS] Core policy violation: {e}")
         return False
+
 
 def get_mandates_from_hotbuf() -> Dict[str, Any]:
     """
@@ -89,16 +101,18 @@ def get_mandates_from_hotbuf() -> Dict[str, Any]:
     """
     try:
         from modules.core.hotbuf_manager import get_mandates
+
         return get_mandates()
     except Exception as e:
         # 기본 규칙 반환
         return {
             "FILE_NAMES_IMMUTABLE": True,
             "NO_FAKE_CODE": True,
-            "ROOT_FIXED": "C:/giwanos",
+            "ROOT_FIXED": "/home/user/webapp",
             "SELF_TEST_REQUIRED": True,
             "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
         }
+
 
 def inject_velos_context(system_prompt: str) -> str:
     """
@@ -106,6 +120,7 @@ def inject_velos_context(system_prompt: str) -> str:
     """
     try:
         from modules.core.hotbuf_manager import get_context_block
+
         context = get_context_block()
 
         # 컨텍스트가 이미 포함되어 있는지 확인
@@ -119,12 +134,7 @@ def inject_velos_context(system_prompt: str) -> str:
         if context_header in system_prompt and context_footer in system_prompt:
             # 기존 컨텍스트 교체
             pattern = re.escape(context_header) + r".*?" + re.escape(context_footer)
-            return re.sub(
-                pattern,
-                context,
-                system_prompt,
-                flags=re.DOTALL
-            )
+            return re.sub(pattern, context, system_prompt, flags=re.DOTALL)
         else:
             # 새로운 컨텍스트 추가
             return context + "\n" + system_prompt
@@ -132,6 +142,7 @@ def inject_velos_context(system_prompt: str) -> str:
     except Exception as e:
         # 오류 발생 시 원본 프롬프트 반환
         return system_prompt
+
 
 def create_velos_system_prompt(base_prompt: str = "") -> str:
     """
@@ -160,6 +171,7 @@ def create_velos_system_prompt(base_prompt: str = "") -> str:
         print(f"[VELOS] Error creating system prompt: {e}")
         return base_prompt
 
+
 def validate_mandates_injection(system_prompt: str) -> Dict[str, Any]:
     """
     시스템 프롬프트에 강제 규칙이 올바르게 주입되었는지 검증
@@ -169,7 +181,7 @@ def validate_mandates_injection(system_prompt: str) -> Dict[str, Any]:
         "context_present": False,
         "mandates_count": 0,
         "context_length": 0,
-        "validation_ok": False
+        "validation_ok": False,
     }
 
     try:
@@ -181,7 +193,9 @@ def validate_mandates_injection(system_prompt: str) -> Dict[str, Any]:
             start_idx = system_prompt.find(HEADER_BEGIN) + len(HEADER_BEGIN)
             end_idx = system_prompt.find(HEADER_END)
             mandates_section = system_prompt[start_idx:end_idx].strip()
-            validation_result["mandates_count"] = len([line for line in mandates_section.split('\n') if '=' in line])
+            validation_result["mandates_count"] = len(
+                [line for line in mandates_section.split("\n") if "=" in line]
+            )
 
         # 컨텍스트 검증
         if "<<VELOS_CONTEXT:BEGIN>>" in system_prompt and "<<VELOS_CONTEXT:END>>" in system_prompt:
@@ -195,9 +209,9 @@ def validate_mandates_injection(system_prompt: str) -> Dict[str, Any]:
 
         # 전체 검증 결과
         validation_result["validation_ok"] = (
-            validation_result["mandates_present"] and
-            validation_result["context_present"] and
-            validation_result["mandates_count"] > 0
+            validation_result["mandates_present"]
+            and validation_result["context_present"]
+            and validation_result["mandates_count"] > 0
         )
 
         return validation_result

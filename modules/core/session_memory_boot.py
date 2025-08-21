@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -15,22 +15,36 @@
 import os
 import sys
 import time
-from typing import Dict, Any
+from typing import Any, Dict
 
 # ROOT 경로 설정
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "/home/user/webapp"
 
-ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
+
 
 def session_bootstrap() -> Dict[str, Any]:
     """
@@ -60,7 +74,7 @@ def session_bootstrap() -> Dict[str, Any]:
             "mandates": hotbuf_result.get("mandates", {}),
             "session_start_ts": int(time.time()),
             "hotbuf_created_ts": hotbuf_result.get("created_ts", 0),
-            "session_id": f"session_{int(time.time())}"
+            "session_id": f"session_{int(time.time())}",
         }
 
         # 세션 메모리 저장
@@ -82,15 +96,16 @@ def session_bootstrap() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": "/home/user/webapp",
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },
             "session_start_ts": int(time.time()),
             "hotbuf_created_ts": 0,
             "session_id": f"session_error_{int(time.time())}",
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def _save_session_memory(session_data: Dict[str, Any]):
     """세션 메모리 상태 저장"""
@@ -101,11 +116,13 @@ def _save_session_memory(session_data: Dict[str, Any]):
         session_file = os.path.join(session_dir, f"{session_data['session_id']}.json")
 
         import json
+
         with open(session_file, "w", encoding="utf-8") as f:
             json.dump(session_data, f, ensure_ascii=False, indent=2)
 
     except Exception as e:
         print(f"[VELOS] Failed to save session memory: {e}")
+
 
 def get_current_session() -> Dict[str, Any]:
     """현재 세션 정보 반환"""
@@ -119,12 +136,13 @@ def get_current_session() -> Dict[str, Any]:
             "mandates": hotbuf_data.get("mandates", {}),
             "session_start_ts": int(time.time()),
             "hotbuf_created_ts": hotbuf_data.get("created_ts", 0),
-            "session_id": f"current_{int(time.time())}"
+            "session_id": f"current_{int(time.time())}",
         }
 
     except Exception as e:
         print(f"[VELOS] Failed to get current session: {e}")
         return {}
+
 
 def validate_session_memory(session_data: Dict[str, Any]) -> bool:
     """세션 메모리 유효성 검증"""

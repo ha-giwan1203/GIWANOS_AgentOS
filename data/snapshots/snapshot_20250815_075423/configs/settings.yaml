@@ -1,11 +1,11 @@
 ﻿paths:
-  root: "C:/giwanos"
-  memory_db: "C:/giwanos/data/memory/velos.db"
-  memory_jsonl: "C:/giwanos/data/memory/learning_memory.jsonl"
-  backups: "C:/giwanos/data/backups"
-  reports: "C:/giwanos/data/reports"
-  reflections: "C:/giwanos/data/reflections"
-  logs: "C:/giwanos/data/logs"
+  root: "/home/user/webapp"
+  memory_db: "/home/user/webapp/data/memory/velos.db"
+  memory_jsonl: "/home/user/webapp/data/memory/learning_memory.jsonl"
+  backups: "/home/user/webapp/data/backups"
+  reports: "/home/user/webapp/data/reports"
+  reflections: "/home/user/webapp/data/reflections"
+  logs: "/home/user/webapp/data/logs"
 features:
   use_embeddings: false
   autosave: true

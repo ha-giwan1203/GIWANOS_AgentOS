@@ -33,6 +33,7 @@ def materialize_from_json(data: dict, root: str) -> list[str]:
 
 def main():
     from modules.report_paths import ROOT
+
     root = str(ROOT)
     payload = sys.stdin.read().strip()
     if not payload:

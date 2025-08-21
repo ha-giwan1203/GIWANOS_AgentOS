@@ -1,7 +1,11 @@
 # [ACTIVE] VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
 from __future__ import annotations
-import os, sys, json, time
+
+import json
+import os
+import sys
+import time
 from pathlib import Path
 from typing import Dict, List, Set
 
@@ -10,16 +14,17 @@ def _root() -> Path:
     root = os.getenv("VELOS_ROOT")
     if root and Path(root).is_dir():
         return Path(root)
-    sett = os.getenv("VELOS_SETTINGS") or "C:/giwanos/configs/settings.yaml"
+    sett = os.getenv("VELOS_SETTINGS") or "/home/user/webapp/configs/settings.yaml"
     try:
         import yaml  # type: ignore
+
         y = yaml.safe_load(Path(sett).read_text(encoding="utf-8"))
         base = (y or {}).get("paths", {}).get("base_dir")
         if base and Path(base).is_dir():
             return Path(base)
     except Exception:
         pass
-    return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+    return Path("/home/user/webapp") if Path("/home/user/webapp").is_dir() else Path.cwd()
 
 
 ROOT = _root()
@@ -37,11 +42,13 @@ def load_manifest() -> Dict:
     if not CONF.exists():
         return {"features": []}
     import yaml  # type: ignore
+
     return yaml.safe_load(CONF.read_text(encoding="utf-8")) or {"features": []}
 
 
 def save_manifest(data: Dict) -> None:
     import yaml  # type: ignore
+
     backup = CONF.with_suffix(".bak.yaml")
     if CONF.exists():
         backup.write_text(CONF.read_text(encoding="utf-8"), encoding="utf-8")
@@ -127,15 +134,17 @@ def main(argv=None) -> int:
         new_patterns_text.append("- (없음)")
 
     outm.write_text(
-        "\n".join([
-            "# Manifest 동기화 보고서",
-            f"- 생성: {rep['generated_at']}",
-            f"- 추출된 경로 개수: {rep['used_paths_count']}",
-            "## 신규 패턴",
-            *new_patterns_text,
-            f"\nManifest: `{rep['manifest_path']}`"
-        ]),
-        encoding="utf-8"
+        "\n".join(
+            [
+                "# Manifest 동기화 보고서",
+                f"- 생성: {rep['generated_at']}",
+                f"- 추출된 경로 개수: {rep['used_paths_count']}",
+                "## 신규 패턴",
+                *new_patterns_text,
+                f"\nManifest: `{rep['manifest_path']}`",
+            ]
+        ),
+        encoding="utf-8",
     )
     print("[OK] manifest synced", outj)
     return 0

@@ -7,16 +7,18 @@ VELOS Notion DB 생성 스크립트
 - 환경변수 기반 유연한 설정
 """
 
+import datetime
+import json
 import os
 import sys
-import json
-import datetime
-import requests
 from pathlib import Path
+
+import requests
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -71,9 +73,7 @@ def check_existing_report(report_key):
         search_payload = {
             "filter": {
                 "property": os.getenv("NOTION_RESULTID_PROP", "결과 ID"),
-                "rich_text": {
-                    "equals": report_key
-                }
+                "rich_text": {"equals": report_key},
             }
         }
 
@@ -81,7 +81,7 @@ def check_existing_report(report_key):
             f"https://api.notion.com/v1/databases/{db_id}/query",
             headers=notion_headers(),
             json=search_payload,
-            timeout=15
+            timeout=15,
         )
 
         if response.status_code == 200:
@@ -118,17 +118,23 @@ def main():
         if existing_report:
             print("⚠️  이미 존재하는 REPORT_KEY입니다!")
             print(f"   기존 페이지 ID: {existing_report.get('id')}")
-            print(f"   기존 제목: {existing_report.get('properties', {}).get('제목', {}).get('title', [{}])[0].get('text', {}).get('content', 'N/A')}")
+            print(
+                f"   기존 제목: {existing_report.get('properties', {}).get('제목', {}).get('title', [{}])[0].get('text', {}).get('content', 'N/A')}"
+            )
 
             # 기존 결과 반환
             result = {
                 "ok": True,
-                "page_id": existing_report.get('id'),
-                "title": existing_report.get('properties', {}).get('제목', {}).get('title', [{}])[0].get('text', {}).get('content', 'N/A'),
+                "page_id": existing_report.get("id"),
+                "title": existing_report.get("properties", {})
+                .get("제목", {})
+                .get("title", [{}])[0]
+                .get("text", {})
+                .get("content", "N/A"),
                 "status": "이미 존재",
                 "report_key": report_key,
-                "created_at": existing_report.get('created_time'),
-                "message": "기존 리포트가 이미 존재합니다"
+                "created_at": existing_report.get("created_time"),
+                "message": "기존 리포트가 이미 존재합니다",
             }
             print(json.dumps(result, ensure_ascii=False))
             return 0
@@ -137,7 +143,11 @@ def main():
     title = os.getenv("VELOS_TITLE", "VELOS 자동 보고서")
     path = os.getenv("VELOS_REPORT_PATH", "")
     status = os.getenv("VELOS_STATUS", "완료")
-    tags = (os.getenv("VELOS_TAGS", "Auto,VELOS").split(",") if os.getenv("VELOS_TAGS") else ["Auto", "VELOS"])
+    tags = (
+        os.getenv("VELOS_TAGS", "Auto,VELOS").split(",")
+        if os.getenv("VELOS_TAGS")
+        else ["Auto", "VELOS"]
+    )
     now_iso = datetime.datetime.now().astimezone().isoformat()
 
     print("📝 생성 정보:")
@@ -152,17 +162,16 @@ def main():
     # 페이로드 생성
     payload = {
         "parent": {"database_id": db_id},
-        "properties": build_props(title, path, status, now_iso, [t.strip() for t in tags], report_key),
+        "properties": build_props(
+            title, path, status, now_iso, [t.strip() for t in tags], report_key
+        ),
     }
 
     print("📤 Notion API 호출 중...")
 
     try:
         response = requests.post(
-            "https://api.notion.com/v1/pages",
-            headers=notion_headers(),
-            json=payload,
-            timeout=15
+            "https://api.notion.com/v1/pages", headers=notion_headers(), json=payload, timeout=15
         )
 
         if response.status_code not in (200, 201):
@@ -187,7 +196,7 @@ def main():
             "tags": tags,
             "created_at": now_iso,
             "report_key": report_key,
-            "url": f"https://notion.so/{page_id.replace('-', '')}"
+            "url": f"https://notion.so/{page_id.replace('-', '')}",
         }
 
         print(json.dumps(success_result, ensure_ascii=False))

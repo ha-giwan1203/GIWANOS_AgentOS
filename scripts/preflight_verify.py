@@ -9,6 +9,7 @@ import py_compile
 import sys
 
 from modules.report_paths import ROOT, P
+
 SNAPSHOT_DIR = ROOT / r"data\snapshots"
 
 REQUIRED_DIRS = [

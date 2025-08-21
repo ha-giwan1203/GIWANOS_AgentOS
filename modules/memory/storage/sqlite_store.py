@@ -1,24 +1,37 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
+
+import contextlib
+import json
 import os
 import sqlite3
-import json
 import time
-import contextlib
 from pathlib import Path
 from typing import Optional
 
-
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
 
 def _env(name: str, default: Optional[str] = None) -> str:
     """VELOS 환경 변수 로딩: ENV > path_manager > configs/settings.yaml > 기본값 순서"""
@@ -28,25 +41,33 @@ def _env(name: str, default: Optional[str] = None) -> str:
         try:
             if name == "VELOS_DB_PATH":
                 from ...core.path_manager import get_db_path
+
                 v = get_db_path()
             elif name == "VELOS_ROOT_PATH":
                 from ...core.path_manager import get_velos_root
+
                 v = get_velos_root()
         except ImportError:
             pass
-        
+
         if not v:
             # 설정 파일에서 로드 시도 (path manager 사용)
             try:
                 import yaml
+
                 try:
                     from ...core.path_manager import get_config_path
+
                     config_path = Path(get_config_path("settings.yaml"))
                 except ImportError:
-                    config_path = Path(get_config_path("settings.yaml") if "get_config_path" in locals() else "C:/giwanos/configs/settings.yaml")
-                    
+                    config_path = Path(
+                        get_config_path("settings.yaml")
+                        if "get_config_path" in locals()
+                        else "/home/user/webapp/configs/settings.yaml"
+                    )
+
                 if config_path.exists():
-                    with open(config_path, 'r', encoding='utf-8') as f:
+                    with open(config_path, "r", encoding="utf-8") as f:
                         config = yaml.safe_load(f)
                         v = config.get(name, default)
             except Exception:
@@ -55,10 +76,19 @@ def _env(name: str, default: Optional[str] = None) -> str:
             if not v:
                 # 기본값 설정
                 if name == "VELOS_DB_PATH":
-                    v = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
+                    v = (
+                        get_db_path()
+                        if "get_db_path" in locals()
+                        else (
+                            get_data_path("memory/velos.db")
+                            if "get_data_path" in locals()
+                            else "/home/user/webapp/data/memory/velos.db"
+                        )
+                    )
                 else:
                     raise RuntimeError(f"Missing env: {name}")
     return v
+
 
 def connect_db() -> sqlite3.Connection:
     db_path = Path(_env("VELOS_DB_PATH"))
@@ -72,6 +102,7 @@ def connect_db() -> sqlite3.Connection:
     cur.execute("PRAGMA foreign_keys=ON;")
     cur.execute("PRAGMA busy_timeout=5000;")  # 5초
     return con
+
 
 SCHEMA = """
 -- 기존 VELOS 메모리 테이블 (호환성 유지)
@@ -116,6 +147,7 @@ CREATE TABLE IF NOT EXISTS locks(
 );
 """
 
+
 def init_schema(con: sqlite3.Connection) -> None:
     # 기존 FTS 테이블이 있으면 삭제 (스키마 변경 시)
     try:
@@ -125,6 +157,7 @@ def init_schema(con: sqlite3.Connection) -> None:
 
     con.executescript(SCHEMA)
 
+
 @contextlib.contextmanager
 def advisory_lock(con: sqlite3.Connection, name: str, owner: str, ttl: int = 60):
     """SQLite 테이블을 이용한 크로스프로세스 락"""
@@ -132,14 +165,17 @@ def advisory_lock(con: sqlite3.Connection, name: str, owner: str, ttl: int = 60)
     while True:
         try:
             with con:
-                con.execute("INSERT INTO locks(name, owner, ts) VALUES(?,?,?)",
-                            (name, owner, int(time.time())))
+                con.execute(
+                    "INSERT INTO locks(name, owner, ts) VALUES(?,?,?)",
+                    (name, owner, int(time.time())),
+                )
             break
         except sqlite3.IntegrityError:
             # 이미 잡혀있으면 만료된 락 청소 후 재시도
             with con:
-                con.execute("DELETE FROM locks WHERE name=? AND ts<?",
-                           (name, int(time.time()) - ttl))
+                con.execute(
+                    "DELETE FROM locks WHERE name=? AND ts<?", (name, int(time.time()) - ttl)
+                )
             if time.time() - start > ttl:
                 raise TimeoutError(f"lock timeout: {name}")
             time.sleep(0.1)
@@ -166,42 +202,90 @@ class VelosMemoryStore:
         if self.con:
             self.con.close()
 
-    def insert_memory(self, ts: int, role: str, insight: str,
-                     raw: str = "", tags: list = None) -> int:
-        """메모리 삽입 - FTS 자동 인덱싱"""
+    def insert_memory(
+        self, ts: int, role: str, insight: str, raw: str = "", tags: list = None
+    ) -> int:
+        """메모리 삽입 - FTS 자동 인덱싱 (보안 검증 포함)"""
         if tags is None:
             tags = []
+
+        # Security validation
+        try:
+            from ...core.security_validator import sanitize_memory_record, validate_memory_record
+
+            record = {"ts": ts, "role": role, "insight": insight, "raw": raw, "tags": tags}
+
+            # Validate and sanitize input
+            if not validate_memory_record(record):
+                record = sanitize_memory_record(record)
+                print(f"⚠️ Memory record sanitized for security")
+
+            ts, role, insight, raw, tags = (
+                record["ts"],
+                record["role"],
+                record["insight"],
+                record.get("raw", ""),
+                record.get("tags", []),
+            )
+
+        except ImportError:
+            # Fallback if security validator not available
+            print("⚠️ Security validator not available, proceeding without validation")
 
         cur = self.con.cursor()
         cur.execute(
             "INSERT INTO memory(ts, role, insight, raw, tags) VALUES (?, ?, ?, ?, ?)",
-            (ts, role, insight, raw, json.dumps(tags, ensure_ascii=False))
+            (ts, role, insight, raw, json.dumps(tags, ensure_ascii=False)),
         )
         self.con.commit()
         return cur.lastrowid
 
     def search_fts(self, query: str, limit: int = 50) -> list:
-        """FTS5 전체 텍스트 검색"""
+        """FTS5 전체 텍스트 검색 (보안 검증 포함)"""
+        # Security validation for search query
+        try:
+            from ...core.security_validator import sanitize_for_sql, validate_sql_safe
+
+            if not validate_sql_safe(query):
+                print(f"⚠️ Potentially dangerous search query detected, sanitizing")
+                query = sanitize_for_sql(query)
+
+            # Limit to reasonable values
+            limit = max(1, min(1000, int(limit)))
+
+        except ImportError:
+            print("⚠️ Security validator not available for search validation")
+
         cur = self.con.cursor()
         results = []
 
         # FTS 검색 실행
-        for row in cur.execute(
-            "SELECT id, ts, role, insight, raw, tags FROM memory "
-            "WHERE id IN (SELECT rowid FROM memory_fts WHERE memory_fts MATCH ?) "
-            "ORDER BY ts DESC LIMIT ?",
-            (query, limit)
-        ):
-            id_, ts, role, insight, raw, tags = row
-            try:
-                tags = json.loads(tags) if tags else []
-            except Exception:
-                tags = []
+        try:
+            for row in cur.execute(
+                "SELECT id, ts, role, insight, raw, tags FROM memory "
+                "WHERE id IN (SELECT rowid FROM memory_fts WHERE memory_fts MATCH ?) "
+                "ORDER BY ts DESC LIMIT ?",
+                (query, limit),
+            ):
+                id_, ts, role, insight, raw, tags = row
+                try:
+                    tags = json.loads(tags) if tags else []
+                except Exception:
+                    tags = []
 
-            results.append({
-                "id": id_, "ts": ts, "from": role, "insight": insight,
-                "raw": raw, "tags": tags
-            })
+                results.append(
+                    {
+                        "id": id_,
+                        "ts": ts,
+                        "from": role,
+                        "insight": insight,
+                        "raw": raw,
+                        "tags": tags,
+                    }
+                )
+        except sqlite3.Error as e:
+            print(f"⚠️ FTS search error (possible injection attempt): {e}")
+            return []
 
         return results
 
@@ -211,9 +295,8 @@ class VelosMemoryStore:
         results = []
 
         for row in cur.execute(
-            "SELECT id, ts, role, insight, raw, tags FROM memory "
-            "ORDER BY ts DESC LIMIT ?",
-            (limit,)
+            "SELECT id, ts, role, insight, raw, tags FROM memory " "ORDER BY ts DESC LIMIT ?",
+            (limit,),
         ):
             id_, ts, role, insight, raw, tags = row
             try:
@@ -221,10 +304,9 @@ class VelosMemoryStore:
             except Exception:
                 tags = []
 
-            results.append({
-                "id": id_, "ts": ts, "from": role, "insight": insight,
-                "raw": raw, "tags": tags
-            })
+            results.append(
+                {"id": id_, "ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags}
+            )
 
         return results
 
