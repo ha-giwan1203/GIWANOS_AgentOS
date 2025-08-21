@@ -1,6 +1,16 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS 메모리 역할별 검색 유틸리티
 
@@ -290,7 +300,7 @@ if __name__ == "__main__":
     import os
 
     # VELOS DB 경로 설정
-    db_path = os.getenv('VELOS_DB', 'C:/giwanos/data/velos.db')
+    db_path = os.getenv('VELOS_DB_PATH', get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
 
     if not os.path.exists(db_path):
         print(f"❌ 데이터베이스 파일이 존재하지 않습니다: {db_path}")

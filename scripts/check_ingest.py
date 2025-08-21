@@ -5,6 +5,16 @@ import os
 import json
 import sqlite3
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 adapter = MemoryAdapter()
 
 # 완전히 새로운 테스트 입력 생성
@@ -25,7 +35,7 @@ stats_before = adapter.get_stats()
 print("Before flush:", stats_before)
 
 # JSONL 파일 직접 확인
-jsonl_path = "C:/giwanos/data/memory/learning_memory.jsonl"
+jsonl_path = get_data_path("memory/learning_memory.jsonl") if "get_data_path" in locals() else "C:/giwanos/data/memory/learning_memory.jsonl"
 print(f"\nJSONL file exists: {os.path.exists(jsonl_path)}")
 if os.path.exists(jsonl_path):
     with open(jsonl_path, "r", encoding="utf-8") as f:
@@ -45,7 +55,7 @@ try:
             print(f"Parsed object: {obj}")
             
             # DB에 직접 삽입 시도
-            db_path = "C:/giwanos/data/velos.db"
+            db_path = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
             

@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS Snapshot Integrity Module
 스냅샷 파일의 SHA256 무결성 해시를 계산하고 헬스 로그에 기록합니다.
@@ -17,7 +27,7 @@ from typing import Dict, Any
 # - 거짓코드 절대 금지
 # - 모든 결과는 자가 검증 후 저장
 
-ROOT = "C:/giwanos"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 

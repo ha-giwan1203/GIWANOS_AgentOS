@@ -18,7 +18,17 @@ import time
 import argparse
 from typing import Dict, Any
 
-ROOT = "C:/giwanos"
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

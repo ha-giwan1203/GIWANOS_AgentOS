@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS Hotbuf Preload Script
 세션 핫버퍼를 미리 생성하고 상태를 확인합니다.
@@ -11,7 +21,7 @@ import os
 import json
 
 # ROOT 경로 설정
-ROOT = "C:/giwanos"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
