@@ -14,18 +14,31 @@ import os
 import sys
 from pathlib import Path
 
+# Phase 3: Import manager integration for optimized imports
+try:
+    from modules.core.import_manager import add_velos_path, ensure_velos_imports, import_velos
+
+    _IMPORT_MANAGER_AVAILABLE = True
+except ImportError:
+    _IMPORT_MANAGER_AVAILABLE = False
+
+    # Fallback for backward compatibility
+    def import_velos(module_name):
+        raise ImportError(f"Import manager not available for {module_name}")
+
+
 # 모듈 경로 추가
-sys.path.append(str(Path(__file__).parent.parent))
+# Replaced with import manager - Phase 3 optimization)
 
 try:
-    from modules.memory.router.query_router import get_cache_stats
     from modules.memory.cache.velos_cache_adapter import VelosCachedMemoryAdapter
+    from modules.memory.router.query_router import get_cache_stats
 except ImportError:
     print("⚠️ 일부 모듈을 불러올 수 없습니다. 기본 통계만 확인합니다.")
 
 
 def _env(key, default=None):
-    """환경 변수 로드 (ENV > configs/settings.yaml > 기본값)"""
+    """환경 변수 로드 (ENV > path_manager > configs/settings.yaml > 기본값)"""
     import yaml
 
     # 1. 환경 변수 확인
@@ -33,27 +46,52 @@ def _env(key, default=None):
     if value:
         return value
 
-    # 2. configs/settings.yaml 확인
+    # 2. Path manager 사용 시도
     try:
-        config_path = (Path(__file__).parent.parent / 'configs' /
-                      'settings.yaml')
+        if key == "VELOS_DB_PATH":
+            # Replaced with import manager - Phase 3 optimization)
+            from modules.core.path_manager import get_db_path
+
+            return get_db_path()
+        elif key == "VELOS_ROOT_PATH" or key == "root":
+            # Replaced with import manager - Phase 3 optimization)
+            from modules.core.path_manager import get_velos_root
+
+            return get_velos_root()
+    except ImportError:
+        pass
+
+    # 3. configs/settings.yaml 확인
+    try:
+        config_path = Path(__file__).parent.parent / "configs" / "settings.yaml"
         if config_path.exists():
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
                 if config and key in config:
                     return str(config[key])
     except Exception:
         pass
 
-    # 3. 기본값 반환
-    return default or 'C:/giwanos'
+    # 4. 기본값 반환
+    return default or "/home/user/webapp"
 
 
 def check_basic_stats():
     """기본 DB 통계 확인"""
     import sqlite3
 
-    db_path = _env('VELOS_DB', 'C:/giwanos/data/velos.db')
+    db_path = _env(
+        "VELOS_DB_PATH",
+        (
+            get_db_path()
+            if "get_db_path" in locals()
+            else (
+                get_data_path("memory/velos.db")
+                if "get_data_path" in locals()
+                else "/home/user/webapp/data/memory/velos.db"
+            )
+        ),
+    )
 
     print(f"VELOS DB 경로: {db_path}")
 
@@ -76,30 +114,34 @@ def check_basic_stats():
             print(f"호환성 뷰: {views}")
 
             # memory_text 뷰 테스트
-            if 'memory_text' in views:
+            if "memory_text" in views:
                 cursor = conn.execute("SELECT COUNT(*) FROM memory_text")
                 view_count = cursor.fetchone()[0]
                 print(f"memory_text 뷰 레코드: {view_count}")
 
                 # 뷰 샘플 데이터 확인
-                cursor = conn.execute("""
+                cursor = conn.execute(
+                    """
                     SELECT id, substr(text_norm, 1, 40) as preview
                     FROM memory_text
                     ORDER BY ts DESC
                     LIMIT 2
-                """)
+                """
+                )
                 samples = cursor.fetchall()
                 print("뷰 샘플:")
                 for row in samples:
                     print(f"  ID {row[0]}: {row[1]}...")
 
             # 최근 데이터 확인 (새로운 패턴)
-            cursor = conn.execute("""
+            cursor = conn.execute(
+                """
                 SELECT ts, role, substr(text, 1, 50) as preview
                 FROM memory_roles
                 ORDER BY ts DESC
                 LIMIT 3
-            """)
+            """
+            )
             recent = cursor.fetchall()
             print(f"\n최근 데이터 ({len(recent)}개):")
             for row in recent:
@@ -107,7 +149,7 @@ def check_basic_stats():
 
             # 역할별 통계 (새로운 패턴)
             print(f"\n역할별 통계:")
-            roles = ['user', 'system', 'test']
+            roles = ["user", "system", "test"]
             for role in roles:
                 cursor = conn.execute("SELECT COUNT(*) FROM memory_roles WHERE role=?", (role,))
                 count = cursor.fetchone()[0]
@@ -140,9 +182,7 @@ def check_advanced_stats():
         )
         recent_days = stats.get("recent_days", 7)
         recent_records = (
-            stats.get("recent_records")
-            or stats.get("memory", {}).get("recent_records")
-            or 0
+            stats.get("recent_records") or stats.get("memory", {}).get("recent_records") or 0
         )
 
         print(f"총 레코드: {total:,}")
@@ -154,10 +194,10 @@ def check_advanced_stats():
         print(f"\n=== 캐시 통계 ===")
         for cache_name, stats in cache_stats.items():
             # 안전한 캐시 통계 추출
-            hits = stats.get('hits', 0)
-            misses = stats.get('misses', 0)
-            sets = stats.get('sets', 0)
-            evictions = stats.get('evictions', 0)
+            hits = stats.get("hits", 0)
+            misses = stats.get("misses", 0)
+            sets = stats.get("sets", 0)
+            evictions = stats.get("evictions", 0)
 
             hit_rate = (hits / (hits + misses) * 100) if (hits + misses) > 0 else 0
             print(f"{cache_name}:")
@@ -173,8 +213,8 @@ def check_query_cache_stats():
     try:
         cache_stats = get_cache_stats()
         print(f"\n=== 쿼리 캐시 통계 ===")
-        hits = cache_stats.get('hits', 0)
-        misses = cache_stats.get('misses', 0)
+        hits = cache_stats.get("hits", 0)
+        misses = cache_stats.get("misses", 0)
         total = hits + misses
         hit_rate = (hits / total * 100) if total > 0 else 0
 

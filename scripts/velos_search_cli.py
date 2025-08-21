@@ -6,11 +6,11 @@ VELOS REPORT_KEY 명령줄 검색 도구
 - 간단한 명령줄 인터페이스
 """
 
+import glob
 import os
 import sys
-import glob
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
 def search_in_file(file_path, search_key):
@@ -39,10 +39,10 @@ def search_report_key(report_key):
         "reflections": [],
         "memory": [],
         "sessions": [],
-        "snapshots": []
+        "snapshots": [],
     }
 
-    base_path = Path("C:/giwanos")
+    base_path = Path("/home/user/webapp")
 
     # 로그 파일 검색
     for log_file in glob.glob(str(base_path / "data/logs/*.json")):
@@ -116,7 +116,9 @@ def main():
             for file_path in files:
                 try:
                     size = format_file_size(os.path.getsize(file_path))
-                    modified = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime("%Y-%m-%d %H:%M:%S")
+                    modified = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
                     file_name = os.path.basename(file_path)
                     print(f"   📄 {file_name}")
                     print(f"      📏 크기: {size}")
@@ -134,7 +136,9 @@ def main():
     if notion_db_id:
         print("📋 NOTION DB:")
         print(f"   Database ID: {notion_db_id}")
-        print(f"   검색 URL: https://notion.so/{notion_db_id.replace('-', '')}?v=search&q={report_key}")
+        print(
+            f"   검색 URL: https://notion.so/{notion_db_id.replace('-', '')}?v=search&q={report_key}"
+        )
         print()
 
     print("🔍 검색 완료!")
@@ -142,6 +146,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

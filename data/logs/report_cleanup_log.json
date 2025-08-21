@@ -1,11 +1,11 @@
-﻿{
+{
   "meta": {
     "started": "2025-08-12T15:15:43+09:00",
     "finished": "2025-08-12T15:15:43+09:00",
     "cwd": "C:/WINDOWS/system32",
-    "project_root": "C:/giwanos",
-    "search_root": "C:/giwanos",
-    "output_dir": "C:/giwanos/data/logs",
+    "project_root": "/home/user/webapp",
+    "search_root": "/home/user/webapp",
+    "output_dir": "/home/user/webapp/data/logs",
     "days": 30,
     "patterns": [
       "*.log",

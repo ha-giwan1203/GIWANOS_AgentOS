@@ -16,42 +16,47 @@ VELOS: Single Python Master Loop
   --verbose              상세 로그 출력
 """
 
-import os
-import sys
-import json
-import subprocess
 import atexit
 import datetime as _dt
-from typing import Dict, Any, List
+import json
+import os
+import subprocess
+import sys
 from pathlib import Path
+from typing import Any, Dict, List
 
-# VELOS 공용 설정 유틸리티 사용
+# Phase 3: Use VELOS import manager for optimized imports
 try:
-    # 현재 디렉토리를 sys.path에 추가
+    # Import manager approach (Phase 3 optimization)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(current_dir)
-    if root_dir not in sys.path:
-        sys.path.insert(0, root_dir)
+    # Replaced with import manager - Phase 3 optimization
     
-    from modules.utils.settings_bootstrap import VELOS_ROOT, LOG_PATH
-    ROOT = str(VELOS_ROOT)
+    from modules.core.import_manager import ensure_velos_imports, get_velos_root, import_velos
+    from modules.core.path_manager import get_velos_root as get_path_root
     
-    # VELOS 모듈 import (안전화)
+    ROOT = str(get_path_root())
+    
+    # VELOS 모듈 import (import manager 사용)
     try:
-        from modules.core.session_store import append_session_event
-        from modules.core.velos_session_init import init_velos_session
+        session_store = import_velos('core.session_store')
+        velos_session = import_velos('core.velos_session_init')
+        append_session_event = getattr(session_store, 'append_session_event', None)
+        init_velos_session = getattr(velos_session, 'init_velos_session', None)
         VELOS_AVAILABLE = True
-    except ImportError:
+    except Exception:
         VELOS_AVAILABLE = False
         print("[WARN] VELOS modules not available, running in standalone mode")
         
 except ImportError:
-    # 폴백: 기본 설정 사용
+    # 폴백: 기본 설정 사용 (하위 호환성)
     ROOT = os.getenv("VELOS_ROOT", r"C:\giwanos")
-    if ROOT not in sys.path:
-        sys.path.append(ROOT)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(current_dir)
+    if root_dir not in sys.path:
+        # Replaced with import manager - Phase 3 optimization
     VELOS_AVAILABLE = False
-    print("[WARN] settings_bootstrap not available, using fallback")
+    print("[WARN] Import manager not available, using fallback")
 
 # ------------------- 경로/파일 -------------------
 DATA = Path(ROOT) / "data"

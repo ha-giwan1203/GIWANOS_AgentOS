@@ -1,11 +1,11 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
+import json
 import os
 import sys
-import json
 import time
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 # 기존 VELOS 모듈 경로 추가
 from modules.core.memory_adapter import MemoryAdapter
@@ -48,8 +48,9 @@ class VelosEnhancedMemoryAdapter(MemoryAdapter):
             # 폴백: 기존 조회 사용
             return self.recent(limit)
 
-    def insert_direct(self, ts: int, role: str, insight: str,
-                     raw: str = "", tags: list = None) -> int:
+    def insert_direct(
+        self, ts: int, role: str, insight: str, raw: str = "", tags: list = None
+    ) -> int:
         """직접 DB 삽입 (JSONL 우회)"""
         try:
             with self._get_fts_store() as store:
@@ -57,10 +58,7 @@ class VelosEnhancedMemoryAdapter(MemoryAdapter):
         except Exception as e:
             print(f"직접 삽입 실패: {e}")
             # 폴백: JSONL 사용
-            item = {
-                "ts": ts, "from": role, "insight": insight,
-                "raw": raw, "tags": tags or []
-            }
+            item = {"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags or []}
             self.append_jsonl(item)
             return -1  # ID 알 수 없음
 
@@ -72,15 +70,11 @@ class VelosEnhancedMemoryAdapter(MemoryAdapter):
             with self._get_fts_store() as store:
                 # FTS 테이블 크기 확인
                 cur = store.con.cursor()
-                (fts_count,) = cur.execute(
-                    "SELECT COUNT(*) FROM memory_fts"
-                ).fetchone()
+                (fts_count,) = cur.execute("SELECT COUNT(*) FROM memory_fts").fetchone()
                 stats["fts_records"] = fts_count
 
                 # 락 테이블 상태 확인
-                (lock_count,) = cur.execute(
-                    "SELECT COUNT(*) FROM locks"
-                ).fetchone()
+                (lock_count,) = cur.execute("SELECT COUNT(*) FROM locks").fetchone()
                 stats["active_locks"] = lock_count
 
         except Exception as e:
@@ -117,7 +111,7 @@ def test_enhanced_adapter():
         role="test",
         insight="향상된 어댑터 테스트",
         raw="직접 DB 삽입 테스트",
-        tags=["test", "enhanced"]
+        tags=["test", "enhanced"],
     )
     print(f"   삽입된 ID: {memory_id}")
 

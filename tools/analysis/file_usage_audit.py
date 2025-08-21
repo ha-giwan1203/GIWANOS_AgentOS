@@ -1,15 +1,17 @@
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
 from __future__ import annotations
-import os
-import sys
-import re
-import json
-import time
-import subprocess
+
 import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import time
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Optional, Set, Tuple
+
 
 # ---------------------------
 # 설정/경로 로딩 (하드코딩 금지)
@@ -19,16 +21,18 @@ def _root() -> Path:
     if root and Path(root).is_dir():
         return Path(root)
     # settings.yaml에서 base_dir 읽기(없어도 진행)
-    sett = os.getenv("VELOS_SETTINGS") or str(Path("C:/giwanos/configs/settings.yaml"))
+    sett = os.getenv("VELOS_SETTINGS") or str(Path("/home/user/webapp/configs/settings.yaml"))
     try:
         import yaml  # type: ignore
+
         y = yaml.safe_load(Path(sett).read_text(encoding="utf-8"))
         base = (y or {}).get("paths", {}).get("base_dir")
         if base and Path(base).is_dir():
             return Path(base)
     except Exception:
         pass
-    return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+    return Path("/home/user/webapp") if Path("/home/user/webapp").is_dir() else Path.cwd()
+
 
 ROOT = _root()
 
@@ -58,7 +62,22 @@ SCAN_DIRS = [
 ]
 
 # Python/PS/Config/MD 등 전반 스캔
-CODE_EXT = {".py", ".ps1", ".cmd", ".bat", ".psm1", ".json", ".yaml", ".yml", ".md", ".txt", ".css", ".js", ".ts"}
+CODE_EXT = {
+    ".py",
+    ".ps1",
+    ".cmd",
+    ".bat",
+    ".psm1",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".txt",
+    ".css",
+    ".js",
+    ".ts",
+}
+
 
 # ---------------------------
 # 유틸
@@ -70,12 +89,14 @@ def sh(cmd: List[str]) -> Tuple[int, str]:
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output.decode("utf-8", errors="ignore")
 
+
 def is_git_repo(path: Path) -> bool:
     try:
         code, _ = sh(["git", "-C", str(path), "rev-parse", "--is-inside-work-tree"])
         return code == 0
     except Exception:
         return False
+
 
 def git_last_commit(path: Path) -> Optional[str]:
     try:
@@ -86,6 +107,7 @@ def git_last_commit(path: Path) -> Optional[str]:
     except Exception:
         return None
 
+
 def file_hash(path: Path, limit: int = 2 * 1024 * 1024) -> str:
     h = hashlib.sha256()
     try:
@@ -95,14 +117,17 @@ def file_hash(path: Path, limit: int = 2 * 1024 * 1024) -> str:
     except Exception:
         return ""
 
+
 def now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
 
 # ---------------------------
 # 정적 분석: import/참조 그래프
 # ---------------------------
-py_import_re = re.compile(r'^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))', re.MULTILINE)
+py_import_re = re.compile(r"^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))", re.MULTILINE)
 path_hint_re = re.compile(r'["\']([A-Za-z]:\\\\[^"\']+|\/mnt\/data\/[^"\']+|C:\/[^"\']+)["\']')
+
 
 def scan_files() -> List[Path]:
     targets: List[Path] = []
@@ -114,10 +139,15 @@ def scan_files() -> List[Path]:
         for p in d.rglob("*"):
             if count >= 100:
                 break
-            if p.is_file() and (p.suffix.lower() in CODE_EXT or p.suffix.lower() == "" and p.name.lower().endswith(".md")):
+            if p.is_file() and (
+                p.suffix.lower() in CODE_EXT
+                or p.suffix.lower() == ""
+                and p.name.lower().endswith(".md")
+            ):
                 targets.append(p)
                 count += 1
     return targets
+
 
 def analyze_static(files: List[Path]) -> Dict:
     py_files = [p for p in files if p.suffix.lower() == ".py"]
@@ -131,7 +161,8 @@ def analyze_static(files: List[Path]) -> Dict:
         imps: Set[str] = set()
         for m in py_import_re.finditer(text):
             pkg = m.group(1) or m.group(2)
-            if pkg: imps.add(pkg.split(".")[0])
+            if pkg:
+                imps.add(pkg.split(".")[0])
         imports[str(p.relative_to(ROOT))] = imps
 
         refs = set()
@@ -140,6 +171,7 @@ def analyze_static(files: List[Path]) -> Dict:
         path_refs[str(p.relative_to(ROOT))] = refs
 
     return {"imports": imports, "path_refs": path_refs}
+
 
 # ---------------------------
 # 동적 단서: 로그/리포트/세션 접근 흔적
@@ -161,6 +193,7 @@ def dynamic_hints() -> Dict[str, List[str]]:
             hits.setdefault(str(lp.relative_to(ROOT)), []).append(p)
     return hits
 
+
 # ---------------------------
 # 분류 로직
 # ---------------------------
@@ -171,6 +204,7 @@ ENTRY_POINTS = {
     "modules/report/generate_pdf_report.py",
 }
 
+
 def load_feature_whitelist() -> Dict:
     """기능 화이트리스트 로드"""
     whitelist_path = ROOT / "configs" / "feature_manifest.yaml"
@@ -179,10 +213,12 @@ def load_feature_whitelist() -> Dict:
 
     try:
         import yaml
-        with open(whitelist_path, 'r', encoding='utf-8') as f:
+
+        with open(whitelist_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f) or {"features": [], "global": {"exclude_patterns": []}}
     except Exception:
         return {"features": [], "global": {"exclude_patterns": []}}
+
 
 def is_whitelisted(file_path: str, whitelist: Dict) -> bool:
     """파일이 화이트리스트에 포함되는지 확인"""
@@ -203,16 +239,18 @@ def is_whitelisted(file_path: str, whitelist: Dict) -> bool:
 
     return False
 
+
 def classify(files: List[Path], static_info: Dict, dyn: Dict[str, List[str]]) -> Dict:
     # 화이트리스트 로드
     whitelist = load_feature_whitelist()
 
     # 기준 1: 엔트리포인트가 import하는 연쇄
     imports = static_info["imports"]  # file -> set(pkg)
-    file_by_module = { Path(f).with_suffix("").name: f for f in imports.keys() }
+    file_by_module = {Path(f).with_suffix("").name: f for f in imports.keys()}
 
     # 정적 그래프 걸어 활성 후보 만들기
     active_candidates: Set[str] = set()
+
     def mark_active(start_file: str):
         if start_file in active_candidates:
             return
@@ -253,7 +291,11 @@ def classify(files: List[Path], static_info: Dict, dyn: Dict[str, List[str]]) ->
         rel = str(p.relative_to(ROOT))
         meta = {
             "size": p.stat().st_size if p.exists() else 0,
-            "mtime": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(p.stat().st_mtime)) if p.exists() else None,
+            "mtime": (
+                time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(p.stat().st_mtime))
+                if p.exists()
+                else None
+            ),
             "hash": file_hash(p),
             "git_last_commit": git_last_commit(p),
             "kind": p.suffix.lower() or "other",
@@ -285,6 +327,7 @@ def classify(files: List[Path], static_info: Dict, dyn: Dict[str, List[str]]) ->
 
     return res
 
+
 # ---------------------------
 # 리포트 저장
 # ---------------------------
@@ -295,13 +338,25 @@ def save_report(rows: Dict) -> Tuple[Path, Path]:
         "root": str(ROOT),
         "summary": {
             "total": len(rows),
-            "whitelist_protected": sum(1 for v in rows.values() if v["category"] == "whitelist_protected"),
+            "whitelist_protected": sum(
+                1 for v in rows.values() if v["category"] == "whitelist_protected"
+            ),
             "core_active": sum(1 for v in rows.values() if v["category"] == "core_active"),
-            "runtime_accessed": sum(1 for v in rows.values() if v["category"] == "runtime_accessed"),
-            "statically_referenced": sum(1 for v in rows.values() if v["category"] == "statically_referenced"),
-            "recently_touched": sum(1 for v in rows.values() if v["category"] == "recently_touched"),
-            "snapshot_generated": sum(1 for v in rows.values() if v["category"] == "snapshot_generated"),
-            "orphan_candidate": sum(1 for v in rows.values() if v["category"] == "orphan_candidate"),
+            "runtime_accessed": sum(
+                1 for v in rows.values() if v["category"] == "runtime_accessed"
+            ),
+            "statically_referenced": sum(
+                1 for v in rows.values() if v["category"] == "statically_referenced"
+            ),
+            "recently_touched": sum(
+                1 for v in rows.values() if v["category"] == "recently_touched"
+            ),
+            "snapshot_generated": sum(
+                1 for v in rows.values() if v["category"] == "snapshot_generated"
+            ),
+            "orphan_candidate": sum(
+                1 for v in rows.values() if v["category"] == "orphan_candidate"
+            ),
         },
         "files": rows,
     }
@@ -313,6 +368,7 @@ def save_report(rows: Dict) -> Tuple[Path, Path]:
     # Markdown 요약
     def line(cat):
         return f"- **{cat}**: {js['summary'][cat]}"
+
     md = [
         f"# VELOS 파일 사용성 감사 보고서",
         f"- 생성 시각: {js['generated_at']}",
@@ -329,13 +385,16 @@ def save_report(rows: Dict) -> Tuple[Path, Path]:
         "## Orphan 후보 상위 50개",
     ]
     # 크기/최근 수정 오래된 순 정렬
-    orphans = [ (k,v) for k,v in rows.items() if v["category"]=="orphan_candidate" ]
+    orphans = [(k, v) for k, v in rows.items() if v["category"] == "orphan_candidate"]
     orphans.sort(key=lambda kv: (kv[1]["mtime"] or "", kv[1]["size"]), reverse=False)
-    for k,v in orphans[:50]:
-        md.append(f"- `{k}` | mtime={v['mtime']} | size={v['size']} | last_commit={v['git_last_commit'] or 'N/A'}")
+    for k, v in orphans[:50]:
+        md.append(
+            f"- `{k}` | mtime={v['mtime']} | size={v['size']} | last_commit={v['git_last_commit'] or 'N/A'}"
+        )
 
     out_md.write_text("\n".join(md), encoding="utf-8")
     return out_json, out_md
+
 
 # ---------------------------
 # 메인/자가검증
@@ -356,6 +415,7 @@ def main() -> int:
     print("[report]", j)
     print("[summary]", s)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

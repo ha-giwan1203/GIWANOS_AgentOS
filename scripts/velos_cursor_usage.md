@@ -26,7 +26,7 @@ You are the workspace auditor. Follow .cursorrules strictly. Task: 1) Run the VS
 ### 4. 스케줄러 창 숨김 강제
 마지막으로 -FixHidden 옵션으로 스케줄러 창 숨김을 강제:
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\giwanos\scripts\velos_health_check.ps1" -FixHidden
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "/home/user/webapp\scripts\velos_health_check.ps1" -FixHidden
 ```
 
 ## 📋 체크리스트 항목
@@ -53,10 +53,10 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\giwanos\scripts\velo
 ### 헬스체크
 ```powershell
 # 기본 헬스체크
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\giwanos\scripts\velos_health_check.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "/home/user/webapp\scripts\velos_health_check.ps1"
 
 # 창 숨김 강제 수정
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\giwanos\scripts\velos_health_check.ps1" -FixHidden
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "/home/user/webapp\scripts\velos_health_check.ps1" -FixHidden
 ```
 
 ### 세션/메모리 테스트
@@ -70,7 +70,7 @@ python -m modules.core.session_store --merge
 
 ### 대시보드 임포트 테스트
 ```bash
-python -c "import os,sys; sys.path.append(os.environ.get('VELOS_ROOT', 'C:/giwanos')); import interface.velos_dashboard; print('[OK] import 성공')"
+python -c "import os,sys; sys.path.append(os.environ.get('VELOS_ROOT', '/home/user/webapp')); import interface.velos_dashboard; print('[OK] import 성공')"
 ```
 
 ## 🎯 목표 상태

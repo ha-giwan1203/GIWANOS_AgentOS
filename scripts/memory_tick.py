@@ -1,14 +1,41 @@
 # VELOS 운영 철학 선언문: 파일명 고정, 자가 검증 필수, 결과 기록, 경로/구조 불변, 실패 시 안전 복구.
-import os, sys, json, time
-from typing import Dict, Any
+import json
+import os
+import sys
+import time
+from typing import Any, Dict
 
-ROOT = "C:/giwanos"
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
 from modules.core.memory_adapter import MemoryAdapter
 
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
+
 
 def _read_json(path: str) -> Dict[str, Any]:
     try:
@@ -17,11 +44,13 @@ def _read_json(path: str) -> Dict[str, Any]:
     except Exception:
         return {}
 
+
 def _write_json(path: str, obj: Dict[str, Any]) -> None:
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
+
 
 def memory_tick():
     """메모리 틱 처리: JSONL에서 DB로 플러시 및 상태 업데이트"""
@@ -36,29 +65,36 @@ def memory_tick():
 
         # 헬스 로그 업데이트
         h = _read_json(HEALTH)
-        h.update({
-            "memory_tick_last_ts": int(time.time()),
-            "memory_tick_last_moved": moved,
-            "memory_tick_last_ok": True,
-            "memory_tick_stats": stats
-        })
+        h.update(
+            {
+                "memory_tick_last_ts": int(time.time()),
+                "memory_tick_last_moved": moved,
+                "memory_tick_last_ok": True,
+                "memory_tick_stats": stats,
+            }
+        )
         _write_json(HEALTH, h)
 
-        print(f"[MEMORY_TICK] 플러시 완료: {moved}개 레코드, 버퍼={stats['buffer_size']}, DB={stats['db_records']}")
+        print(
+            f"[MEMORY_TICK] 플러시 완료: {moved}개 레코드, 버퍼={stats['buffer_size']}, DB={stats['db_records']}"
+        )
         return True
 
     except Exception as e:
         # 실패 시에도 헬스 로그 업데이트
         h = _read_json(HEALTH)
-        h.update({
-            "memory_tick_last_ts": int(time.time()),
-            "memory_tick_last_ok": False,
-            "memory_tick_last_error": str(e)
-        })
+        h.update(
+            {
+                "memory_tick_last_ts": int(time.time()),
+                "memory_tick_last_ok": False,
+                "memory_tick_last_error": str(e),
+            }
+        )
         _write_json(HEALTH, h)
 
         print(f"[MEMORY_TICK] 오류: {e}")
         return False
+
 
 if __name__ == "__main__":
     print("=== VELOS Memory Tick ===")

@@ -7,16 +7,18 @@ VELOS Pushbullet 알림 스크립트
 - 환경변수 기반 유연한 설정
 """
 
+import json
 import os
 import sys
-import json
-import requests
 import time
 from pathlib import Path
+
+import requests
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -29,12 +31,7 @@ def post_with_retry(url, headers, json_body, timeout=10, retries=3):
 
     for i in range(retries):
         try:
-            response = requests.post(
-                url,
-                headers=headers,
-                json=json_body,
-                timeout=timeout
-            )
+            response = requests.post(url, headers=headers, json=json_body, timeout=timeout)
 
             if response.ok:
                 return response
@@ -51,7 +48,7 @@ def post_with_retry(url, headers, json_body, timeout=10, retries=3):
 
         # 마지막 시도가 아니면 대기 후 재시도
         if i < retries - 1:
-            wait_time = 1.5 ** i
+            wait_time = 1.5**i
             print(f"   ⏳ 재시도 대기 중... ({wait_time:.1f}초)")
             time.sleep(wait_time)
 
@@ -63,16 +60,9 @@ def send_pushbullet_notification(token, title, body, timeout=15, retries=3):
     """Pushbullet 알림 전송"""
     try:
         url = "https://api.pushbullet.com/v2/pushes"
-        headers = {
-            "Access-Token": token,
-            "Content-Type": "application/json"
-        }
+        headers = {"Access-Token": token, "Content-Type": "application/json"}
 
-        payload = {
-            "type": "note",
-            "title": title,
-            "body": body
-        }
+        payload = {"type": "note", "title": title, "body": body}
 
         response = post_with_retry(url, headers, payload, timeout, retries)
 
@@ -80,20 +70,13 @@ def send_pushbullet_notification(token, title, body, timeout=15, retries=3):
             return {
                 "ok": True,
                 "status_code": response.status_code,
-                "response": response.json() if response.content else None
+                "response": response.json() if response.content else None,
             }
         else:
-            return {
-                "ok": False,
-                "status_code": response.status_code,
-                "error": response.text[:200]
-            }
+            return {"ok": False, "status_code": response.status_code, "error": response.text[:200]}
 
     except Exception as e:
-        return {
-            "ok": False,
-            "error": str(e)
-        }
+        return {"ok": False, "error": str(e)}
 
 
 def main():
@@ -131,7 +114,7 @@ def main():
             "title": title,
             "body": body,
             "status_code": result.get("status_code"),
-            "response": result.get("response")
+            "response": result.get("response"),
         }
 
         print(json.dumps(success_result, ensure_ascii=False))
@@ -149,7 +132,7 @@ def main():
             "error": result.get("error"),
             "status_code": result.get("status_code"),
             "title": title,
-            "body": body
+            "body": body,
         }
 
         print(json.dumps(error_result, ensure_ascii=False), file=sys.stderr)
@@ -158,6 +141,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

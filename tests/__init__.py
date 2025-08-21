@@ -1,6 +1,15 @@
-# [ACTIVE] VELOS 운영 철학 선언문
-# "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
+"""
+VELOS Test Suite
+Comprehensive testing infrastructure for VELOS system components.
+"""
 
-# [ACTIVE] VELOS 테스트 모듈
-# 테스트 파일들을 체계적으로 관리합니다.
+import os
+import sys
+from pathlib import Path
 
+# Add VELOS root to path for testing
+test_root = Path(__file__).parent.parent
+sys.path.insert(0, str(test_root))
+
+__version__ = "1.0.0"
+__author__ = "VELOS Development Team"

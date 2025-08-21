@@ -8,15 +8,16 @@ VELOS 완전 통합 워크플로우 스크립트
 4. Slack 알림 (Notion 링크 포함)
 """
 
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -33,28 +34,18 @@ def run_script(script_name, env_vars=None):
         env.update(env_vars)
 
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            env=env,
-            timeout=30
-        )
+        result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=30)
 
         if result.returncode == 0:
             # JSON 출력 파싱
             try:
-                output_lines = result.stdout.strip().split('\n')
+                output_lines = result.stdout.strip().split("\n")
                 json_line = output_lines[-1]  # 마지막 줄이 JSON
                 return json.loads(json_line)
             except (json.JSONDecodeError, IndexError):
                 return {"ok": True, "output": result.stdout}
         else:
-            return {
-                "ok": False,
-                "error": result.stderr,
-                "returncode": result.returncode
-            }
+            return {"ok": False, "error": result.stderr, "returncode": result.returncode}
 
     except subprocess.TimeoutExpired:
         return {"ok": False, "error": "타임아웃"}
@@ -96,7 +87,7 @@ def main():
     db_env = {
         "VELOS_TITLE": f"VELOS 보고서 - {Path(pdf_path).stem}",
         "VELOS_STATUS": "완료",
-        "VELOS_TAGS": "자동화,보고서,VELOS"
+        "VELOS_TAGS": "자동화,보고서,VELOS",
     }
 
     db_result = run_script("notion_db_create.py", db_env)
@@ -116,7 +107,7 @@ def main():
     page_env = {
         "VELOS_TITLE": f"VELOS 상세 보고서 - {Path(pdf_path).stem}",
         "VELOS_MD_PATH": md_path,
-        "VELOS_PDF_PATH": pdf_path
+        "VELOS_PDF_PATH": pdf_path,
     }
 
     page_result = run_script("notion_page_create.py", page_env)
@@ -138,7 +129,7 @@ def main():
     email_env = {
         "EMAIL_SUBJECT": f"VELOS 보고서 - {Path(pdf_path).stem}",
         "EMAIL_BODY": f"VELOS 시스템에서 자동 생성된 보고서입니다.\n\nNotion 링크: {page_result.get('url')}",
-        "VELOS_PDF_PATH": pdf_path
+        "VELOS_PDF_PATH": pdf_path,
     }
 
     email_result = run_script("email_send.py", email_env)
@@ -161,7 +152,7 @@ def main():
     slack_env = {
         "SLACK_TEXT": f"VELOS 보고서 생성 완료! 📊",
         "NOTION_PAGE_URL": page_result.get("url"),
-        "SLACK_ADDITIONAL_INFO": f"블록 수: {page_result.get('blocks_count')}개, 파일: {Path(pdf_path).name}"
+        "SLACK_ADDITIONAL_INFO": f"블록 수: {page_result.get('blocks_count')}개, 파일: {Path(pdf_path).name}",
     }
 
     slack_result = run_script("slack_notify.py", slack_env)
@@ -188,16 +179,13 @@ def main():
     final_result = {
         "ok": True,
         "workflow_type": "velos_complete_integrated",
-        "files": {
-            "pdf": str(pdf_path),
-            "md": str(md_path)
-        },
+        "files": {"pdf": str(pdf_path), "md": str(md_path)},
         "results": {
             "database": db_result,
             "page": page_result,
             "email": email_result,
-            "slack": slack_result
-        }
+            "slack": slack_result,
+        },
     }
 
     print(f"\n📋 워크플로우 결과 JSON:")
@@ -208,6 +196,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

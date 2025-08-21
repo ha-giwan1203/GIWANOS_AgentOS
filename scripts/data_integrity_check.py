@@ -1,9 +1,37 @@
 # VELOS 운영 철학 선언문: 파일명 고정, 자가 검증 필수, 결과 기록, 경로/구조 불변, 실패 시 안전 복구와 알림.
-import os, sys, json, time, sqlite3
+import json
+import os
+import sqlite3
+import sys
+import time
 from pathlib import Path
 
-ROOT = "C:/giwanos"
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
+
 
 def jload(p):
     try:
@@ -12,12 +40,14 @@ def jload(p):
     except Exception:
         return {}
 
+
 def jwrite(p, data):
     try:
         with open(p, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"[ERROR] Failed to write {p}: {e}")
+
 
 def check_memory_data_integrity():
     """메모리 데이터 무결성 점검"""
@@ -56,6 +86,7 @@ def check_memory_data_integrity():
         issues.append("missing:learning_memory.json")
 
     return issues
+
 
 def check_database_data_integrity():
     """데이터베이스 데이터 무결성 점검"""
@@ -107,6 +138,7 @@ def check_database_data_integrity():
 
     return issues
 
+
 def check_report_data_integrity():
     """보고서 데이터 무결성 점검"""
     issues = []
@@ -118,7 +150,7 @@ def check_report_data_integrity():
             report_files = []
             for root, dirs, files in os.walk(reports_dir):
                 for file in files:
-                    if file.endswith(('.md', '.json', '.pdf')):
+                    if file.endswith((".md", ".json", ".pdf")):
                         report_files.append(os.path.join(root, file))
 
             # 최근 10개 파일만 점검
@@ -126,11 +158,11 @@ def check_report_data_integrity():
 
             for file_path in recent_files:
                 try:
-                    if file_path.endswith('.json'):
-                        with open(file_path, 'r', encoding='utf-8') as f:
+                    if file_path.endswith(".json"):
+                        with open(file_path, "r", encoding="utf-8") as f:
                             json.load(f)
-                    elif file_path.endswith('.md'):
-                        with open(file_path, 'r', encoding='utf-8') as f:
+                    elif file_path.endswith(".md"):
+                        with open(file_path, "r", encoding="utf-8") as f:
                             content = f.read()
                             if len(content) < 10:  # 너무 작은 파일
                                 issues.append(f"empty_report:{os.path.basename(file_path)}")
@@ -142,6 +174,7 @@ def check_report_data_integrity():
         issues.append("missing:data/reports")
 
     return issues
+
 
 def main():
     print("=== VELOS Data Integrity Check ===")
@@ -163,19 +196,21 @@ def main():
         "details": {
             "memory_issues": memory_issues,
             "db_issues": db_issues,
-            "report_issues": report_issues
-        }
+            "report_issues": report_issues,
+        },
     }
 
     print(json.dumps(status, ensure_ascii=False, indent=2))
 
     # 헬스 로그 업데이트
     health = jload(HEALTH)
-    health.update({
-        "data_integrity_last_check": int(time.time()),
-        "data_integrity_ok": status["data_integrity_ok"],
-        "data_integrity_issues": all_issues
-    })
+    health.update(
+        {
+            "data_integrity_last_check": int(time.time()),
+            "data_integrity_ok": status["data_integrity_ok"],
+            "data_integrity_issues": all_issues,
+        }
+    )
     jwrite(HEALTH, health)
 
     if all_issues:
@@ -186,6 +221,7 @@ def main():
     else:
         print("[OK] Data integrity check passed")
         return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

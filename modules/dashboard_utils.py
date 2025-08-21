@@ -1,10 +1,18 @@
 # [ACTIVE] VELOS 대시보드 유틸리티 - 대시보드 공통 모듈
-import os, json, time, re, threading, queue, base64, urllib.parse
-from pathlib import Path
+import base64
+import json
+import os
+import queue
+import re
+import threading
+import time
+import urllib.parse
 from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
 
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
+ROOT = Path(os.getenv("VELOS_ROOT", "/home/user/webapp"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"
@@ -47,8 +55,9 @@ def _safe_attach(df: pd.DataFrame, value, prefix: str = "반환") -> pd.DataFram
 
 def resolve_report_key(key: str):
     # key 예: 20250816_150544
-    pdf = next(REPORTS.glob(f"velos_auto_report_{key}_*_ko.pdf"), None) or \
-          next(REPORTS.glob(f"velos_auto_report_{key}_ko.pdf"), None)
+    pdf = next(REPORTS.glob(f"velos_auto_report_{key}_*_ko.pdf"), None) or next(
+        REPORTS.glob(f"velos_auto_report_{key}_ko.pdf"), None
+    )
     dispatch = list(DISPATCH.glob(f"dispatch_{key[:8]}*.json"))
     return {"pdf": pdf, "dispatch": dispatch}
 

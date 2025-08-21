@@ -1,14 +1,37 @@
 # [ACTIVE] VELOS 컨텍스트 빌더 - 세션 컨텍스트 관리 모듈
-# VELOS 운영 철학 선언문: 파일명 절대 변경 금지. 수정 시 자가 검증 포함. 
+# VELOS 운영 철학 선언문: 파일명 절대 변경 금지. 수정 시 자가 검증 포함.
 # 실행 결과 기록. 경로/구조 불변. 실패는 로깅하고 자동 복구를 시도한다.
+import json
 import os
 import sys
-import json
 import time
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 # 고정 경로 주입
-ROOT = "C:/giwanos"
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -63,10 +86,7 @@ def build_context_block(
     # 프롬프트 블록 조립
     lines = []
     lines.append("<<VELOS_CONTEXT:BEGIN>>")
-    lines.append(
-        f"migrated={moved} items; window={hours}h; "
-        f"pulled={min(len(recent), limit)}"
-    )
+    lines.append(f"migrated={moved} items; window={hours}h; " f"pulled={min(len(recent), limit)}")
     for r in recent[:limit]:
         ts = r.get("ts", 0)
         role = r.get("from", "system")
@@ -96,18 +116,12 @@ if __name__ == "__main__":
     print(context)
 
     # 태그 필터링 테스트
-    tagged_context = build_context_block(
-        limit=5, hours=24, required_tags=["test"]
-    )
+    tagged_context = build_context_block(limit=5, hours=24, required_tags=["test"])
     print("\n태그 필터링된 컨텍스트 블록:")
     print(tagged_context)
 
     # 헬스 로그 확인
     health = _read_json(HEALTH)
-    print(
-        f"\n헬스 로그 업데이트: "
-        f"context_build_last_ok={health.get('context_build_last_ok')}"
-    )
+    print(f"\n헬스 로그 업데이트: " f"context_build_last_ok={health.get('context_build_last_ok')}")
 
     print("=== 자가 검증 완료 ===")
-

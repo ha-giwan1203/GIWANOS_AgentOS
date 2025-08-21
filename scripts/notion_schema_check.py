@@ -1,8 +1,10 @@
 # [EXPERIMENT] scripts/notion_schema_check.py
 import os
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
-from pathlib import Path
+
 
 # 환경변수 로딩
 def _load_dotenv():
@@ -11,10 +13,13 @@ def _load_dotenv():
     except Exception:
         return
     root = Path(r"C:\giwanos")
-    for p in (root/"configs/.env", root/".env"):
+    for p in (root / "configs/.env", root / ".env"):
         if p.exists():
             load_dotenv(dotenv_path=p, override=False, encoding="utf-8")
+
+
 _load_dotenv()
+
 
 def check_notion_schema():
     token = os.getenv("NOTION_TOKEN")
@@ -39,7 +44,7 @@ def check_notion_schema():
             headers={
                 "Authorization": f"Bearer {token}",
                 "Notion-Version": "2022-06-28",
-            }
+            },
         )
 
         if meta.status_code != 200:
@@ -51,7 +56,9 @@ def check_notion_schema():
         props = meta_data.get("properties", {})
 
         print("\n=== Notion DB Properties ===")
-        print(f"데이터베이스 제목: {meta_data.get('title', [{}])[0].get('text', {}).get('content', 'N/A')}")
+        print(
+            f"데이터베이스 제목: {meta_data.get('title', [{}])[0].get('text', {}).get('content', 'N/A')}"
+        )
         print(f"속성 개수: {len(props)}")
         print()
 
@@ -89,10 +96,12 @@ def check_notion_schema():
         print("\n=== dispatch_report.py 수정 제안 ===")
         if title_props and text_props:
             print("다음과 같이 수정하세요:")
-            print(f'props = {{')
+            print(f"props = {{")
             print(f'    "{title_props[0]}": {{"title": [{{"text": {{"content": title}}}}]}},')
-            print(f'    "{text_props[0]}": {{"rich_text": [{{"text": {{"content": f"PDF 파일: {{pdf_path.name}}"}}}}]}},')
-            print(f'}}')
+            print(
+                f'    "{text_props[0]}": {{"rich_text": [{{"text": {{"content": f"PDF 파일: {{pdf_path.name}}"}}}}]}},'
+            )
+            print(f"}}")
         else:
             print("필요한 속성이 없습니다. Notion 데이터베이스에 다음 속성을 추가하세요:")
             print("- 제목 속성 (title): 'Name' 또는 'Title'")
@@ -101,8 +110,6 @@ def check_notion_schema():
     except Exception as e:
         print(f"❌ 오류 발생: {e}")
 
+
 if __name__ == "__main__":
     check_notion_schema()
-
-
-

@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
-import sys
 import json
 import os
+import sys
+
 
 def setup_utf8():
     """UTF-8 인코딩 설정"""
@@ -14,6 +15,7 @@ def setup_utf8():
     except Exception:
         pass
 
+
 def analyze_input(s):
     """입력 문자열을 분석합니다."""
     print("=== 입력 분석 ===")
@@ -21,14 +23,14 @@ def analyze_input(s):
     print(f"바이트 길이: {len(s.encode('utf-8'))} 바이트")
 
     # 줄 수 계산
-    lines = s.split('\n')
+    lines = s.split("\n")
     print(f"줄 수: {len(lines)}")
 
     # 특수 문자 개수
-    cr_count = s.count('\r')
-    lf_count = s.count('\n')
-    tab_count = s.count('\t')
-    esc_count = s.count('\033')
+    cr_count = s.count("\r")
+    lf_count = s.count("\n")
+    tab_count = s.count("\t")
+    esc_count = s.count("\033")
 
     print(f"CR (\\r): {cr_count}")
     print(f"LF (\\n): {lf_count}")
@@ -38,6 +40,7 @@ def analyze_input(s):
     # 인코딩 정보
     print(f"입력 인코딩: {sys.stdin.encoding}")
     print(f"출력 인코딩: {sys.stdout.encoding}")
+
 
 def dump_formats(s):
     """다양한 형태로 입력을 덤프합니다."""
@@ -50,15 +53,16 @@ def dump_formats(s):
     print("JSON:", json.dumps(s, ensure_ascii=False))
 
     # 16진수 형태
-    print("HEX:", ' '.join(f'{ord(c):02X}' for c in s[:100]))  # 처음 100자만
+    print("HEX:", " ".join(f"{ord(c):02X}" for c in s[:100]))  # 처음 100자만
 
     # 바이트 형태
-    print("BYTES:", s.encode('utf-8')[:100])  # 처음 100바이트만
+    print("BYTES:", s.encode("utf-8")[:100])  # 처음 100바이트만
 
     # 라인별 분석
     print("\n=== 라인별 분석 ===")
-    for i, line in enumerate(s.split('\n')[:10]):  # 처음 10줄만
+    for i, line in enumerate(s.split("\n")[:10]):  # 처음 10줄만
         print(f"라인 {i+1}: {repr(line)}")
+
 
 def main():
     """메인 함수"""
@@ -83,8 +87,6 @@ def main():
     except Exception as e:
         print(f"오류 발생: {e}")
 
+
 if __name__ == "__main__":
     main()
-
-
-

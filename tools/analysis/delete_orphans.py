@@ -22,11 +22,11 @@ def delete_orphan_candidates():
         print("[ERR] 파일 사용성 리포트가 없습니다")
         return False
 
-    with open(report_path, 'r', encoding='utf-8') as f:
+    with open(report_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     # orphan_candidate 파일들 추출
-    orphans = [k for k, v in data['files'].items() if v.get('category') == 'orphan_candidate']
+    orphans = [k for k, v in data["files"].items() if v.get("category") == "orphan_candidate"]
     print(f"[INFO] 삭제 대상: {len(orphans)}개 파일")
 
     # 사용자 확인
@@ -44,7 +44,7 @@ def delete_orphan_candidates():
     error_count = 0
 
     for file_path in orphans:
-        full_path = Path("C:/giwanos") / file_path
+        full_path = Path("/home/user/webapp") / file_path
         if full_path.exists():
             try:
                 full_path.unlink()

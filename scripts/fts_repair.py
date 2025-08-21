@@ -1,5 +1,8 @@
 # [EXPERIMENT] scripts/fts_repair.py
-import sqlite3, sys, os, textwrap
+import os
+import sqlite3
+import sys
+import textwrap
 
 DB = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
 
@@ -39,12 +42,15 @@ CREATE TRIGGER trg_mem_au AFTER UPDATE ON memory BEGIN
 END;
 """
 
+
 def compile_options(conn):
     return {r[0] for r in conn.execute("PRAGMA compile_options;")}
+
 
 def list_objs(conn, typ, like):
     sql = "SELECT name FROM sqlite_master WHERE type=? AND sql LIKE ?"
     return [r[0] for r in conn.execute(sql, (typ, f"%{like}%"))]
+
 
 def drop_list_sql(names, kind):
     if not names:
@@ -54,6 +60,7 @@ def drop_list_sql(names, kind):
         # SQLite는 IF EXISTS가 드물게 안 먹히는 버전이 있다. 안전하게 명시 드랍
         stmts.append(f"DROP {kind} {n};")
     return "\n".join(stmts) + "\n"
+
 
 def main():
     print(f"[fts_repair] DB: {DB}")
@@ -73,11 +80,11 @@ def main():
 
     # 1) 현재 FTS/트리거/뷰 조사
     triggers = list_objs(conn, "trigger", "memory_fts")
-    views    = list_objs(conn, "view",    "memory_fts")
+    views = list_objs(conn, "view", "memory_fts")
     print(f"[fts_repair] drop targets: triggers={triggers}, views={views}")
 
     drops_trg = drop_list_sql(triggers, "TRIGGER")
-    drops_vw  = drop_list_sql(views, "VIEW")
+    drops_vw = drop_list_sql(views, "VIEW")
 
     # 2) 트랜잭션 시작
     cur.execute("BEGIN IMMEDIATE;")
@@ -86,12 +93,14 @@ def main():
         cur.executescript(ddl)
 
         # 3) 전체 재색인
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO memory_fts(rowid, text)
             SELECT id, COALESCE(insight, raw, '')
             FROM memory
             WHERE COALESCE(insight, raw, '') <> '';
-        """)
+        """
+        )
 
         # 4) 최적화
         cur.execute("INSERT INTO memory_fts(memory_fts) VALUES ('optimize');")
@@ -108,6 +117,7 @@ def main():
         for i, r in enumerate(sample, 1):
             print(f"[fts_repair] sample {i}: rowid={r[0]} text={r[1]!r}")
         conn.close()
+
 
 if __name__ == "__main__":
     try:

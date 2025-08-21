@@ -1,7 +1,7 @@
-﻿{
-  "root": "C:/giwanos",
+{
+  "root": "/home/user/webapp",
   "venv_activate": "C:/Users/User/venvs/velos/Scripts/Activate.ps1",
-  "py_path": "C:/giwanos",
+  "py_path": "/home/user/webapp",
   "paths": {
     "tasks_history": "data/memory/tasks_history.jsonl",
     "file_jobs": "data/inbox/file_jobs.jsonl",

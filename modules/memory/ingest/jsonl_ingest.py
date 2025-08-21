@@ -1,44 +1,18 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
+
 import os
-import sys
-import json
-import time
+
+from modules.core.import_manager import ImportManager
+
+ImportManager.setup_imports()
+
 import hashlib
 from pathlib import Path
-from typing import Iterable, Dict, Any, Optional
+from typing import Any, Dict, Iterable
 
-
-# VELOS 환경 변수 로딩
-def _env(name: str, default: Optional[str] = None) -> str:
-    """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > C:\giwanos 순서"""
-    v = os.getenv(name, default)
-    if not v:
-        # 설정 파일에서 로드 시도
-        try:
-            import yaml
-            config_path = Path("C:/giwanos/configs/settings.yaml")
-            if config_path.exists():
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config = yaml.safe_load(f)
-                    v = config.get(name, default)
-        except Exception:
-            pass
-
-        if not v:
-            # 기본값 설정
-            if name == "VELOS_JSONL_DIR":
-                v = "C:/giwanos/data/memory"
-            elif name == "VELOS_DB":
-                v = "C:/giwanos/data/memory/velos.db"
-            else:
-                raise RuntimeError(f"Missing env: {name}")
-    return v
-
-# 기존 VELOS 스키마와 호환되는 저장소 모듈 import
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
-from sqlite_store import connect_db, init_schema, advisory_lock
+from sqlite_store import advisory_lock, connect_db, init_schema
 
 
 def sha1(s: str) -> str:
@@ -205,8 +179,8 @@ def test_ingest():
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    from modules.core.import_manager import ImportManager
+ImportManager.setup_imports())))
 
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
         test_ingest()

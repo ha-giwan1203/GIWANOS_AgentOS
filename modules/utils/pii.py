@@ -13,6 +13,3 @@ def scrub_text(t: str) -> str:
     t = PAT_EMAIL.sub("[email]", t)
     t = PAT_PHONE.sub("[phone]", t)
     return t
-
-
-

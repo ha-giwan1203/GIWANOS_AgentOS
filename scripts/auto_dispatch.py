@@ -1,11 +1,16 @@
 # [ACTIVE] scripts/auto_dispatch.py
 from __future__ import annotations
-import os, sys, time
+
+import os
+import sys
+import time
 from pathlib import Path
 
 # --- 환경변수 로딩 ---
 from env_loader import load_env
+
 load_env()
+
 
 def auto_dispatch():
     """자동 디스패치 실행"""
@@ -55,6 +60,7 @@ def auto_dispatch():
         print(f"❌ 디스패치 실패: {e}")
         return False
 
+
 def main():
     """메인 실행 함수"""
     success = auto_dispatch()
@@ -65,6 +71,7 @@ def main():
     else:
         print("\n❌ 자동 디스패치 실패")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,7 +1,11 @@
 # [ACTIVE] scripts/dispatch_push.py
 from __future__ import annotations
-import os, json, time
+
+import json
+import os
+import time
 from pathlib import Path
+
 
 # --- 환경변수 로딩 ---
 def _load_dotenv():
@@ -10,13 +14,16 @@ def _load_dotenv():
     except Exception:
         return
     root = Path(r"C:\giwanos")
-    for p in (root/"configs/.env", root/".env"):
+    for p in (root / "configs/.env", root / ".env"):
         if p.exists():
             load_dotenv(dotenv_path=p, override=False, encoding="utf-8")
+
+
 _load_dotenv()
 
 try:
     import requests
+
     from modules.utils.net import post_with_retry
 except Exception:
     requests = None
@@ -27,11 +34,14 @@ AUTO = ROOT / "data" / "reports" / "auto"
 DISP = ROOT / "data" / "reports" / "_dispatch"
 DISP.mkdir(parents=True, exist_ok=True)
 
+
 def _env(name, default=None):
     return os.getenv(name, default)
 
+
 # 호환 매핑
 PUSHBULLET_TOKEN = _env("PUSHBULLET_TOKEN") or _env("PUSHBULLET_API_KEY")
+
 
 def send_pushbullet_only(title: str, body: str) -> dict:
     """Pushbullet 전용 전송 함수"""
@@ -45,22 +55,31 @@ def send_pushbullet_only(title: str, body: str) -> dict:
         return {"ok": False, "detail": "requests not installed", "ts": int(time.time())}
 
     try:
-        resp = post_with_retry(
-            "https://api.pushbullet.com/v2/pushes",
-            headers={"Access-Token": token, "Content-Type": "application/json"},
-            data=json.dumps({"type":"note","title": title,"body": body}, ensure_ascii=False).encode("utf-8"),
-            timeout=20,
-            retries=2
-        ) if post_with_retry else requests.post(
-            "https://api.pushbullet.com/v2/pushes",
-            headers={"Access-Token": token, "Content-Type": "application/json"},
-            data=json.dumps({"type":"note","title": title,"body": body}, ensure_ascii=False).encode("utf-8"),
-            timeout=20
+        resp = (
+            post_with_retry(
+                "https://api.pushbullet.com/v2/pushes",
+                headers={"Access-Token": token, "Content-Type": "application/json"},
+                data=json.dumps(
+                    {"type": "note", "title": title, "body": body}, ensure_ascii=False
+                ).encode("utf-8"),
+                timeout=20,
+                retries=2,
+            )
+            if post_with_retry
+            else requests.post(
+                "https://api.pushbullet.com/v2/pushes",
+                headers={"Access-Token": token, "Content-Type": "application/json"},
+                data=json.dumps(
+                    {"type": "note", "title": title, "body": body}, ensure_ascii=False
+                ).encode("utf-8"),
+                timeout=20,
+            )
         )
         ok = resp.status_code < 300
         return {"ok": ok, "detail": f"status={resp.status_code}", "ts": int(time.time())}
     except Exception as e:
         return {"ok": False, "detail": f"exception: {e}", "ts": int(time.time())}
+
 
 def dispatch_pushbullet():
     """Pushbullet 디스패치 메인 함수"""
@@ -82,10 +101,7 @@ def dispatch_pushbullet():
 
     return result["ok"]
 
+
 if __name__ == "__main__":
     success = dispatch_pushbullet()
     exit(0 if success else 1)
-
-
-
-

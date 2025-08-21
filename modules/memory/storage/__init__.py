@@ -8,8 +8,4 @@ from .bootstrap import ensure_fts
 from .sqlite_store import VelosMemoryStore
 from .velos_adapter import VelosEnhancedMemoryAdapter
 
-__all__ = [
-    'ensure_fts',
-    'VelosMemoryStore',
-    'VelosEnhancedMemoryAdapter'
-]
+__all__ = ["ensure_fts", "VelosMemoryStore", "VelosEnhancedMemoryAdapter"]

@@ -31,7 +31,7 @@ jobs.json (잡 정의)
 ## 파일 구조
 
 ```
-C:\giwanos\
+/home/user/webapp\
 ├── scripts\
 │   ├── velos_master_scheduler.py           # 메인 스케줄러 (Windows Task Scheduler에서 실행)
 │   ├── Start-Velos-Hidden.vbs              # VBScript 숨겨진 실행 래퍼
@@ -185,31 +185,31 @@ pwsh -ExecutionPolicy Bypass -File scripts\test_velos_scheduler.ps1 -TestType fo
 
 ```powershell
 # 실시간 로그 확인
-Get-Content C:\giwanos\data\logs\jobs.log -Wait
+Get-Content /home/user/webapp\data\logs\jobs.log -Wait
 
 # 최근 로그 확인
-Get-Content C:\giwanos\data\logs\jobs.log -Tail 20
+Get-Content /home/user/webapp\data\logs\jobs.log -Tail 20
 ```
 
 ### VBScript 로그
 
 ```powershell
 # VBScript 실행 로그 확인
-Get-Content C:\giwanos\data\logs\velos_vbs.log -Tail 20
+Get-Content /home/user/webapp\data\logs\velos_vbs.log -Tail 20
 ```
 
 ### PowerShell 런처 로그
 
 ```powershell
 # 최근 런처 로그 확인
-Get-ChildItem C:\giwanos\data\logs\launcher_*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 20
+Get-ChildItem /home/user/webapp\data\logs\launcher_*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content -Tail 20
 ```
 
 ### 테스트 로그
 
 ```powershell
 # 테스트 로그 확인
-Get-Content C:\giwanos\data\logs\scheduler_test.log -Tail 20
+Get-Content /home/user/webapp\data\logs\scheduler_test.log -Tail 20
 ```
 
 ## 문제 해결
@@ -237,7 +237,7 @@ Get-Content C:\giwanos\data\logs\scheduler_test.log -Tail 20
 4. **VBScript 실행 문제**
    ```powershell
    # VBScript 로그 확인
-   Get-Content C:\giwanos\data\logs\velos_vbs.log -Tail 10
+   Get-Content /home/user/webapp\data\logs\velos_vbs.log -Tail 10
    ```
 
 ### 로그 분석
@@ -255,7 +255,7 @@ Get-Content C:\giwanos\data\logs\scheduler_test.log -Tail 20
 1. **파일명 고정**: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 2. **자가 검증 필수**: 수정/배포 전 자동·수동 테스트를 통과해야 함
 3. **실행 결과 직접 테스트**: 코드 제공 시 실행 결과를 동봉/기록
-4. **저장 경로 고정**: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+4. **저장 경로 고정**: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 5. **실패 기록·회고**: 실패 로그를 남기고 후속 커밋/문서에 반영
 
 ## 주요 개선사항 (2025-08-19 업데이트)

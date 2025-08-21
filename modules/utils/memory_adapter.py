@@ -12,9 +12,4 @@ create_memory_adapter = m.create_memory_adapter
 search_by_role = m.search_by_role
 normalize_query = m.normalize_query
 
-__all__ = [
-    "MemoryAdapter",
-    "create_memory_adapter",
-    "search_by_role",
-    "normalize_query"
-]
+__all__ = ["MemoryAdapter", "create_memory_adapter", "search_by_role", "normalize_query"]

@@ -1,7 +1,7 @@
 {
   "timestamp": "20250815_075423",
   "created_at": "2025-08-15T07:54:26.318900",
-  "snapshot_dir": "C:/giwanos\\data\\snapshots\\snapshot_20250815_075423",
+  "snapshot_dir": "/home/user/webapp\\data\\snapshots\\snapshot_20250815_075423",
   "copied_files": [
     {
       "source": "configs",

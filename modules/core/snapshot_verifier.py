@@ -6,12 +6,12 @@ VELOS Snapshot Verifier Module
 스냅샷 파일들의 무결성을 검증하는 시스템입니다.
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 # VELOS 운영 철학 선언문
 # - 파일명 절대 변경 금지
@@ -105,10 +105,7 @@ def verify_snapshots(max_check: int = 50) -> Dict[str, Any]:
         # 카탈로그 로드
         catalog = load_json(CATALOG)
         if not catalog:
-            return {
-                "success": False,
-                "error": "Catalog not found or empty"
-            }
+            return {"success": False, "error": "Catalog not found or empty"}
 
         # ZIP 파일 목록 조회 (최신 파일부터)
         zip_files = [f for f in os.listdir(SNAP_DIR) if f.lower().endswith(".zip")]
@@ -127,11 +124,9 @@ def verify_snapshots(max_check: int = 50) -> Dict[str, Any]:
 
             # 카탈로그에 없는 파일
             if filename not in catalog:
-                missing.append({
-                    "file": filename,
-                    "reason": "not_in_catalog",
-                    "file_path": file_path
-                })
+                missing.append(
+                    {"file": filename, "reason": "not_in_catalog", "file_path": file_path}
+                )
                 print(f"   ❌ {filename}: Missing from catalog")
                 continue
 
@@ -143,30 +138,36 @@ def verify_snapshots(max_check: int = 50) -> Dict[str, Any]:
                 checked += 1
 
                 if current_sha256 == expected_sha256:
-                    verified_files.append({
-                        "file": filename,
-                        "sha256": current_sha256,
-                        "file_size": os.path.getsize(file_path)
-                    })
+                    verified_files.append(
+                        {
+                            "file": filename,
+                            "sha256": current_sha256,
+                            "file_size": os.path.getsize(file_path),
+                        }
+                    )
                     print(f"   ✅ {filename}: Verified")
                 else:
-                    mismatches.append({
-                        "file": filename,
-                        "expected": expected_sha256,
-                        "actual": current_sha256,
-                        "file_path": file_path,
-                        "catalog_entry": catalog[filename]
-                    })
+                    mismatches.append(
+                        {
+                            "file": filename,
+                            "expected": expected_sha256,
+                            "actual": current_sha256,
+                            "file_path": file_path,
+                            "catalog_entry": catalog[filename],
+                        }
+                    )
                     print(f"   ❌ {filename}: Hash mismatch")
                     print(f"      Expected: {expected_sha256[:16]}...")
                     print(f"      Actual:   {current_sha256[:16]}...")
 
             except Exception as e:
-                missing.append({
-                    "file": filename,
-                    "reason": f"verification_error: {str(e)}",
-                    "file_path": file_path
-                })
+                missing.append(
+                    {
+                        "file": filename,
+                        "reason": f"verification_error: {str(e)}",
+                        "file_path": file_path,
+                    }
+                )
                 print(f"   ❌ {filename}: Verification error - {e}")
                 continue
 
@@ -176,7 +177,7 @@ def verify_snapshots(max_check: int = 50) -> Dict[str, Any]:
         health_data["snapshot_verify_checked"] = checked
         health_data["snapshot_verify_mismatches"] = mismatches
         health_data["snapshot_verify_missing"] = missing
-        health_data["snapshot_verify_ok"] = (len(mismatches) == 0 and len(missing) == 0)
+        health_data["snapshot_verify_ok"] = len(mismatches) == 0 and len(missing) == 0
         health_data["snapshot_verify_total_files"] = len(zip_files)
         health_data["snapshot_verify_verified_files"] = len(verified_files)
         save_json(HEALTH, health_data)
@@ -189,15 +190,12 @@ def verify_snapshots(max_check: int = 50) -> Dict[str, Any]:
             "mismatches": mismatches,
             "missing": missing,
             "integrity_ok": (len(mismatches) == 0 and len(missing) == 0),
-            "verification_ts": int(time.time())
+            "verification_ts": int(time.time()),
         }
 
     except Exception as e:
         print(f"[VELOS] Snapshot verification failed: {e}")
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def get_verification_status() -> Dict[str, Any]:
@@ -219,13 +217,11 @@ def get_verification_status() -> Dict[str, Any]:
             "missing_count": len(health_data.get("snapshot_verify_missing", [])),
             "integrity_ok": health_data.get("snapshot_verify_ok", False),
             "mismatches": health_data.get("snapshot_verify_mismatches", []),
-            "missing": health_data.get("snapshot_verify_missing", [])
+            "missing": health_data.get("snapshot_verify_missing", []),
         }
 
     except Exception as e:
-        return {
-            "error": str(e)
-        }
+        return {"error": str(e)}
 
 
 def main(max_check: int = 50) -> int:
@@ -257,8 +253,10 @@ def main(max_check: int = 50) -> int:
         print(f"   Integrity OK: {result['integrity_ok']}")
 
         # Exit code 정책: 불일치나 누락 있으면 2(경고), 없으면 0
-        if result['mismatches'] or result['missing']:
-            print(f"\n[verify] mismatches={len(result['mismatches'])} missing={len(result['missing'])}")
+        if result["mismatches"] or result["missing"]:
+            print(
+                f"\n[verify] mismatches={len(result['mismatches'])} missing={len(result['missing'])}"
+            )
             return 2
 
         print(f"\n[verify] ok, checked={result['checked']}")
