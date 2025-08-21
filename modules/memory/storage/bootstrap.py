@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-DB = os.getenv("VELOS_DB", r"C:\giwanos\data\velos.db")
+DB = os.getenv("VELOS_DB_PATH", r"C:\giwanos\data\memory\velos.db")
 
 
 def ensure_fts():

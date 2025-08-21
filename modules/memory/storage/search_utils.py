@@ -16,7 +16,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import json
 
 # 환경변수에서 DB 경로 가져오기
-DB = os.getenv("VELOS_DB", r"C:\giwanos\data\velos.db")
+DB = os.getenv("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
 
 
 def search_fts(term: str, limit: int = 20) -> List[Tuple]:

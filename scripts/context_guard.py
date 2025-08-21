@@ -1,7 +1,17 @@
 # [ACTIVE] VELOS 운영 철학 선언문: 파일명 고정, 자가 검증 필수, 결과 기록, 경로/구조 불변, 실패 시 안전 복구와 알림.
 import os, sys, json, time
 
-ROOT   = "C:/giwanos"
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 # 임계값(분): 환경변수로 오버라이드 가능

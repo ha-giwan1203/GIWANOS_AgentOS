@@ -3,8 +3,18 @@ import sqlite3
 import os
 import shutil
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 def complete_fts_rebuild():
-    db_path = 'C:/giwanos/data/velos.db'
+    db_path = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
     
     print("=== Complete FTS Rebuild ===")
     

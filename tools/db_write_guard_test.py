@@ -21,7 +21,7 @@ from modules.report_paths import ROOT, P`nsys.path.insert(0, str(ROOT))
 os.environ.setdefault("VELOS_DB_WRITE_FORBIDDEN", "1")
 import app.guards.db_write_guard  # noqa
 
-DB = str(P("data/velos.db"))
+DB = str(P("data/memory/velos.db"))
 OPS = str(P("data/logs/ops_patch_log.jsonl"))
 
 

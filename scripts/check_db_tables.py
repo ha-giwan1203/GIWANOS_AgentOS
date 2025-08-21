@@ -12,7 +12,7 @@ from pathlib import Path
 
 def check_database_tables():
     """데이터베이스 테이블 확인"""
-    db_path = Path("data/velos.db")
+    db_path = Path("data/memory/velos.db")
     
     if not db_path.exists():
         print("❌ 데이터베이스 파일이 없습니다")

@@ -1,4 +1,14 @@
 # ===== VELOS 공용 로거 설정 =====
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS 시스템 공용 로거 설정
 
@@ -11,7 +21,7 @@ from pathlib import Path
 from datetime import datetime
 
 # 로그 디렉토리 설정
-LOG_DIR = Path("C:/giwanos/data/logs")
+LOG_DIR = Path(get_data_path("logs") if "get_data_path" in locals() else "C:/giwanos/data/logs")
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # 로그 파일 경로

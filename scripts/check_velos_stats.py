@@ -25,7 +25,7 @@ except ImportError:
 
 
 def _env(key, default=None):
-    """환경 변수 로드 (ENV > configs/settings.yaml > 기본값)"""
+    """환경 변수 로드 (ENV > path_manager > configs/settings.yaml > 기본값)"""
     import yaml
 
     # 1. 환경 변수 확인
@@ -33,7 +33,20 @@ def _env(key, default=None):
     if value:
         return value
 
-    # 2. configs/settings.yaml 확인
+    # 2. Path manager 사용 시도
+    try:
+        if key == 'VELOS_DB_PATH':
+            sys.path.append(str(Path(__file__).parent.parent))
+            from modules.core.path_manager import get_db_path
+            return get_db_path()
+        elif key == 'VELOS_ROOT_PATH' or key == 'root':
+            sys.path.append(str(Path(__file__).parent.parent))
+            from modules.core.path_manager import get_velos_root
+            return get_velos_root()
+    except ImportError:
+        pass
+
+    # 3. configs/settings.yaml 확인
     try:
         config_path = (Path(__file__).parent.parent / 'configs' /
                       'settings.yaml')
@@ -45,7 +58,7 @@ def _env(key, default=None):
     except Exception:
         pass
 
-    # 3. 기본값 반환
+    # 4. 기본값 반환
     return default or 'C:/giwanos'
 
 
@@ -53,7 +66,7 @@ def check_basic_stats():
     """기본 DB 통계 확인"""
     import sqlite3
 
-    db_path = _env('VELOS_DB', 'C:/giwanos/data/velos.db')
+    db_path = _env('VELOS_DB_PATH', get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
 
     print(f"VELOS DB 경로: {db_path}")
 

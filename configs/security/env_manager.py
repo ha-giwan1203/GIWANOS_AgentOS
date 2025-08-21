@@ -143,7 +143,7 @@ class SecureEnvManager:
         
         # 일반 환경변수
         velos_vars = [
-            "VELOS_ROOT", "VELOS_DB", "VELOS_LOG_PATH", "VELOS_BACKUP",
+            "VELOS_ROOT", "VELOS_DB_PATH", "VELOS_LOG_PATH", "VELOS_BACKUP",
             "VELOS_LOG_LEVEL", "VELOS_API_TIMEOUT", "VELOS_API_RETRIES",
             "VELOS_MAX_WORKERS", "VELOS_DEBUG"
         ]
@@ -213,7 +213,7 @@ class SecureEnvManager:
         """VELOS 기본 환경변수 설정"""
         env_vars = {
             "VELOS_ROOT": str(self.root),
-            "VELOS_DB": str(self.root / "data" / "velos.db"),
+            "VELOS_DB_PATH": str(self.root / "data" / "velos.db"),
             "VELOS_LOG_PATH": str(self.root / "data" / "logs"),
             "VELOS_BACKUP": str(self.root / "data" / "backups"),
             "VELOS_LOG_LEVEL": "INFO",

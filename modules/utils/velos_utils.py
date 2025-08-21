@@ -115,7 +115,7 @@ def check_file_exists(file_path: str, create_dir: bool = True) -> bool:
 
 def get_db_path() -> str:
     """VELOS DB 경로 반환"""
-    return _env('VELOS_DB', 'C:/giwanos/data/velos.db')
+    return _env('VELOS_DB_PATH', 'C:/giwanos/data/memory/velos.db')
 
 
 def get_jsonl_dir() -> str:
