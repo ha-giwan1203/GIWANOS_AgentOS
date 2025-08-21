@@ -35,7 +35,7 @@ def check_velos_environment():
 
     velos_vars = [
         "VELOS_ROOT",
-        "VELOS_DB",
+        "VELOS_DB_PATH",
         "VELOS_MEM_FAST",
         "VELOS_LOG_DIR",
         "VELOS_REPORT_DIR",

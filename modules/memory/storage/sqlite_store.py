@@ -10,31 +10,58 @@ from pathlib import Path
 from typing import Optional
 
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 def _env(name: str, default: Optional[str] = None) -> str:
-    """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > C:\giwanos 순서"""
+    """VELOS 환경 변수 로딩: ENV > path_manager > configs/settings.yaml > 기본값 순서"""
     v = os.getenv(name, default)
     if not v:
-        # 설정 파일에서 로드 시도
+        # Path manager 사용 시도
         try:
-            import yaml
-            config_path = Path("C:/giwanos/configs/settings.yaml")
-            if config_path.exists():
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config = yaml.safe_load(f)
-                    v = config.get(name, default)
-        except Exception:
+            if name == "VELOS_DB_PATH":
+                from ...core.path_manager import get_db_path
+                v = get_db_path()
+            elif name == "VELOS_ROOT_PATH":
+                from ...core.path_manager import get_velos_root
+                v = get_velos_root()
+        except ImportError:
             pass
-
+        
         if not v:
-            # 기본값 설정
-            if name == "VELOS_DB":
-                v = "C:/giwanos/data/memory/velos.db"
-            else:
-                raise RuntimeError(f"Missing env: {name}")
+            # 설정 파일에서 로드 시도 (path manager 사용)
+            try:
+                import yaml
+                try:
+                    from ...core.path_manager import get_config_path
+                    config_path = Path(get_config_path("settings.yaml"))
+                except ImportError:
+                    config_path = Path(get_config_path("settings.yaml") if "get_config_path" in locals() else "C:/giwanos/configs/settings.yaml")
+                    
+                if config_path.exists():
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        config = yaml.safe_load(f)
+                        v = config.get(name, default)
+            except Exception:
+                pass
+
+            if not v:
+                # 기본값 설정
+                if name == "VELOS_DB_PATH":
+                    v = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
+                else:
+                    raise RuntimeError(f"Missing env: {name}")
     return v
 
 def connect_db() -> sqlite3.Connection:
-    db_path = Path(_env("VELOS_DB"))
+    db_path = Path(_env("VELOS_DB_PATH"))
     db_path.parent.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(str(db_path), check_same_thread=False, isolation_level=None)
     cur = con.cursor()
@@ -127,7 +154,7 @@ class VelosMemoryStore:
     """VELOS 메모리 저장소 - FTS5 검색 및 크로스프로세스 락 지원"""
 
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path or _env("VELOS_DB")
+        self.db_path = db_path or _env("VELOS_DB_PATH")
         self.con = None
 
     def __enter__(self):

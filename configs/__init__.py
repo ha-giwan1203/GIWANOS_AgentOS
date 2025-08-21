@@ -71,15 +71,30 @@ def get_setting(key: str, default: Any = None) -> Any:
 
 def get_root_path() -> str:
     """VELOS 루트 경로 조회"""
-    return get_setting('root', 'C:/giwanos')
+    # Use path manager for cross-platform compatibility
+    try:
+        from ..modules.core.path_manager import get_velos_root
+        return get_velos_root()
+    except ImportError:
+        return get_setting('root', 'C:/giwanos')
 
 def get_db_path() -> str:
     """데이터베이스 경로 조회"""
-    return get_setting('database.path', 'data/memory/velos.db')
+    # Use path manager for database path resolution
+    try:
+        from ..modules.core.path_manager import get_db_path as pm_get_db_path
+        return pm_get_db_path()
+    except ImportError:
+        return get_setting('database.path', 'data/memory/velos.db')
 
 def get_log_path() -> str:
     """로그 경로 조회"""
-    return get_setting('logging.path', 'data/logs')
+    # Use path manager for log path resolution
+    try:
+        from ..modules.core.path_manager import get_data_path
+        return get_data_path('logs')
+    except ImportError:
+        return get_setting('logging.path', 'data/logs')
 
 # 전역 설정 객체
 SETTINGS = load_settings()

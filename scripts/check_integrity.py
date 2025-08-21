@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS Integrity Check Script
 헬스 로그에서 무결성 정보를 확인합니다.
@@ -9,7 +19,7 @@ VELOS Integrity Check Script
 import json
 import os
 
-ROOT = "C:/giwanos"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 def main():

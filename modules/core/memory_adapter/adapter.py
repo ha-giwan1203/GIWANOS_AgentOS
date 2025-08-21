@@ -9,20 +9,46 @@ import threading
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
 
-# VELOS 표준 데이터베이스 연결 사용
+# VELOS 표준 데이터베이스 연결 및 경로 관리
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 try:
     from ..db_util import db_open
     USE_DB_UTIL = True
 except ImportError:
     USE_DB_UTIL = False
 
-ROOT = "C:/giwanos"
-PATHS = {
-    "jsonl": os.path.join(ROOT, "data", "memory", "learning_memory.jsonl"),
-    "db":    os.path.join(ROOT, "data", "velos.db"),
-    "lock":  os.path.join(ROOT, "data", "memory", "memory.flush.lock"),
-    "log":   os.path.join(ROOT, "data", "logs", "system_health.json"),
-}
+try:
+    from ..path_manager import get_velos_root, get_memory_path, get_data_path, get_logs_path
+    USE_PATH_MANAGER = True
+except ImportError:
+    USE_PATH_MANAGER = False
+
+# Path initialization with fallback
+if USE_PATH_MANAGER:
+    ROOT = get_velos_root()
+    PATHS = {
+        "jsonl": get_memory_path("learning_memory.jsonl"),
+        "db":    get_memory_path("velos.db"),
+        "lock":  get_memory_path("memory.flush.lock"),
+        "log":   get_logs_path("system_health.json"),
+    }
+else:
+    ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+    PATHS = {
+        "jsonl": os.path.join(ROOT, "data", "memory", "learning_memory.jsonl"),
+        "db":    os.path.join(ROOT, "data", "memory", "velos.db"),
+        "lock":  os.path.join(ROOT, "data", "memory", "memory.flush.lock"),
+        "log":   os.path.join(ROOT, "data", "logs", "system_health.json"),
+    }
 
 os.makedirs(os.path.dirname(PATHS["jsonl"]), exist_ok=True)
 os.makedirs(os.path.dirname(PATHS["db"]), exist_ok=True)
@@ -93,7 +119,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 def create_memory_adapter(db_path: Optional[str] = None, **kw: Any) -> "MemoryAdapter":
-    db_path = db_path or os.getenv("VELOS_DB", "C:/giwanos/data/memory/velos.db")
+    db_path = db_path or os.getenv("VELOS_DB_PATH", get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
     if db_path:
         _ensure_compat_views(db_path)
     return MemoryAdapter(db_path=db_path, **kw)

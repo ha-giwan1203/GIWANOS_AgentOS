@@ -1,6 +1,16 @@
 # [ACTIVE] VELOS 호환성 뷰 적용 시스템 - 데이터베이스 뷰 적용 스크립트
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Path manager imports (Phase 2 standardization)
+try:
+    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+except ImportError:
+    # Fallback functions for backward compatibility
+    def get_velos_root(): return "C:/giwanos"
+    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
+    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+
 """
 VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를
@@ -43,7 +53,7 @@ def _env(key, default=None):
 
 def apply_compat_views():
     """호환성 뷰를 VELOS DB에 적용"""
-    db_path = _env('VELOS_DB', 'C:/giwanos/data/velos.db')
+    db_path = _env('VELOS_DB_PATH', get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
 
     print(f"VELOS DB 경로: {db_path}")
 
