@@ -328,7 +328,7 @@ class SemanticSearchEngine:
                         COUNT(*) as total_memories,
                         COUNT(DISTINCT role) as unique_roles,
                         AVG(LENGTH(insight)) as avg_content_length
-                    FROM memories 
+                    FROM memory 
                     WHERE ts >= ?
                     """,
                     (cutoff_time,)
@@ -339,7 +339,7 @@ class SemanticSearchEngine:
                 cursor = conn.execute(
                     """
                     SELECT role, COUNT(*) as count 
-                    FROM memories 
+                    FROM memory 
                     WHERE ts >= ? 
                     GROUP BY role 
                     ORDER BY count DESC
@@ -354,7 +354,7 @@ class SemanticSearchEngine:
                     SELECT 
                         strftime('%H', datetime(ts, 'unixepoch')) as hour,
                         COUNT(*) as count
-                    FROM memories 
+                    FROM memory 
                     WHERE ts >= ?
                     GROUP BY hour
                     ORDER BY hour

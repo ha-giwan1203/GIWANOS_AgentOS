@@ -47,7 +47,7 @@ class TestSemanticSearch(unittest.TestCase):
         
         for ts, role, insight, tags in test_memories:
             conn.execute(
-                "INSERT INTO memories (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
+                "INSERT INTO memory (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
                 (ts, role, insight, tags)
             )
         
@@ -243,7 +243,7 @@ class TestSearchIntegration(unittest.TestCase):
         
         for ts, role, insight, tags_json in test_data:
             conn.execute(
-                "INSERT INTO memories (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
+                "INSERT INTO memory (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
                 (ts, role, insight, tags_json)
             )
         
@@ -300,7 +300,7 @@ class TestSearchIntegration(unittest.TestCase):
         base_time = 1623456800
         for i in range(50):
             conn.execute(
-                "INSERT INTO memories (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
+                "INSERT INTO memory (ts, role, insight, tags) VALUES (?, ?, ?, ?)",
                 (
                     base_time + i,
                     'user' if i % 2 == 0 else 'assistant',
