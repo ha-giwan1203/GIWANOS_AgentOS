@@ -28,7 +28,7 @@ def _env(name: str, default: Optional[str] = None) -> str:
         if not v:
             # 기본값 설정
             if name == "VELOS_DB":
-                v = "C:/giwanos/data/velos.db"
+                v = "C:/giwanos/data/memory/velos.db"
             else:
                 raise RuntimeError(f"Missing env: {name}")
     return v

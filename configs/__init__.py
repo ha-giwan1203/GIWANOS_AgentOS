@@ -75,7 +75,7 @@ def get_root_path() -> str:
 
 def get_db_path() -> str:
     """데이터베이스 경로 조회"""
-    return get_setting('database.path', 'data/velos.db')
+    return get_setting('database.path', 'data/memory/velos.db')
 
 def get_log_path() -> str:
     """로그 경로 조회"""

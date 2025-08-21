@@ -93,7 +93,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 def create_memory_adapter(db_path: Optional[str] = None, **kw: Any) -> "MemoryAdapter":
-    db_path = db_path or os.getenv("VELOS_DB", "C:/giwanos/data/velos.db")
+    db_path = db_path or os.getenv("VELOS_DB", "C:/giwanos/data/memory/velos.db")
     if db_path:
         _ensure_compat_views(db_path)
     return MemoryAdapter(db_path=db_path, **kw)

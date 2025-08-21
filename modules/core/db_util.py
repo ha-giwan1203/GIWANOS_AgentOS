@@ -16,7 +16,7 @@ def db_open(path=None):
     Returns:
         sqlite3.Connection: 최적화된 설정이 적용된 데이터베이스 연결
     """
-    db = path or os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
+    db = path or os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\memory\velos.db")
     conn = sqlite3.connect(db, timeout=5, isolation_level=None)
     
     # SQLite 성능 최적화 PRAGMA 설정

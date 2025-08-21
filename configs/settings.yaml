@@ -12,7 +12,7 @@ python_path: "C:/Users/User/venvs/velos/Scripts/python.exe"
 
 # 데이터베이스 설정
 database:
-  path: "C:/giwanos/data/velos.db"
+  path: "C:/giwanos/data/memory/velos.db"
   backup_path: "C:/giwanos/data/backups"
   max_backups: 10
 
