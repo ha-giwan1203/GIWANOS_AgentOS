@@ -69,10 +69,12 @@ try {
   $args += "--log-dir"
   $args += "`"$LogDir`""
 
-  Write-Host "=== VELOS 마스터 스케줄러 실행 ===" -ForegroundColor Yellow
+  if (-not $Background) {
+      Write-Host "=== VELOS 마스터 스케줄러 실행 ===" -ForegroundColor Yellow
   Write-Host "Python: $python" -ForegroundColor Cyan
   Write-Host "Arguments: $($args -join ' ')" -ForegroundColor Cyan
-  Write-Host "Log: $Log" -ForegroundColor Cyan
+      Write-Host "Log: $Log" -ForegroundColor Cyan
+  }
 
   $psi = New-Object System.Diagnostics.ProcessStartInfo
   $psi.FileName = $python
@@ -91,7 +93,9 @@ try {
   if ($err) { "[ERR] " + $err | Out-File -FilePath $Log -Encoding UTF8 -Append }
   
   if ($p.ExitCode -eq 0) {
-      Write-Host "[SUCCESS] VELOS 마스터 스케줄러 실행 완료" -ForegroundColor Green
+      if (-not $Background) {
+          Write-Host "[SUCCESS] VELOS 마스터 스케줄러 실행 완료" -ForegroundColor Green
+      }
       
       if (-not $Background) {
           Write-Host "`n=== VELOS 출력 ===" -ForegroundColor Cyan
@@ -105,7 +109,9 @@ try {
       
       if (-not $KeepOutput -and -not $LogFile) {
           Remove-Item $Log -Force -ErrorAction SilentlyContinue
-          Write-Host "[CLEANUP] 임시 로그 파일 삭제됨" -ForegroundColor Gray
+          if (-not $Background) {
+              Write-Host "[CLEANUP] 임시 로그 파일 삭제됨" -ForegroundColor Gray
+          }
       }
   } else {
       Write-Host "[ERROR] VELOS 마스터 스케줄러 실행 실패 (Exit Code: $($p.ExitCode))" -ForegroundColor Red
@@ -117,4 +123,6 @@ finally {
   Remove-Item $Lock -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "=== VELOS 마스터 스케줄러 완료 ===" -ForegroundColor Green
+if (-not $Background) {
+    Write-Host "=== VELOS 마스터 스케줄러 완료 ===" -ForegroundColor Green
+}

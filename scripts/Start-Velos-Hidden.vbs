@@ -60,7 +60,7 @@ Set WshShell = CreateObject("WScript.Shell")
 
 ' PowerShell 명령 구성
 ' 절대경로 필수. 공백 있으면 따옴표로 감쌈.
-cmd = "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File """ & VELOS_ROOT & "\scripts\Start-Velos.ps1"""
+cmd = "powershell.exe -NoProfile -NoLogo -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File """ & VELOS_ROOT & "\scripts\Start-Velos-Silent.ps1"""
 
 WriteLog "실행 명령: " & cmd
 

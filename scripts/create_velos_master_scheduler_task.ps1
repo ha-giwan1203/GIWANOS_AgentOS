@@ -174,11 +174,11 @@ function Create-VelosTask {
         }
         
         # VBScript를 통한 숨겨진 실행 (더 안정적)
-        $vbsCommand = "cscript.exe `"$VBS_PATH`""
+        $vbsCommand = "cscript.exe //NoLogo //B `"$VBS_PATH`""
         
         # 태스크 생성 명령
         $createCommand = @"
-schtasks /create /tn "$TASK_NAME" /tr "$vbsCommand" /sc minute /mo 5 /ru "SYSTEM" /f /rl highest
+schtasks /create /tn "$TASK_NAME" /tr "$vbsCommand" /sc minute /mo 5 /ru "SYSTEM" /f /rl highest /it
 "@
         
         Write-VelosLog "태스크 생성 명령 실행: $createCommand"
