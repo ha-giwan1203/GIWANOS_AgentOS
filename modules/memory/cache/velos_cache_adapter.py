@@ -4,10 +4,10 @@
 import os
 import sys
 import time
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 # VELOS 모듈 경로 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "storage"))
 from velos_adapter import VelosEnhancedMemoryAdapter
 
 # 캐시 모듈
@@ -94,8 +94,9 @@ class VelosCachedMemoryAdapter(VelosEnhancedMemoryAdapter):
         self.invalidate_recent_cache()
         self.invalidate_stats_cache()
 
-    def insert_direct(self, ts: int, role: str, insight: str,
-                     raw: str = "", tags: list = None) -> int:
+    def insert_direct(
+        self, ts: int, role: str, insight: str, raw: str = "", tags: list = None
+    ) -> int:
         """직접 삽입 + 캐시 무효화"""
         result = super().insert_direct(ts, role, insight, raw, tags)
         # 데이터 변경 시 관련 캐시 무효화

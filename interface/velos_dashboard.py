@@ -2,26 +2,29 @@
 # -*- coding: utf-8 -*-
 
 import warnings
+
 warnings.filterwarnings("ignore", module="streamlit")
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import os
-import sys
 import io
-import zipfile
-import time
 import json
+import os
 import re
+import sys
+import time
 import webbrowser
+import zipfile
 from pathlib import Path
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
+
 
 # VELOS 운영 원칙: interface/* 임포트는 절대 실패하지 않아야 함
 def _ensure_velos_path():
     """VELOS_ROOT 환경변수 또는 기본 경로를 sys.path에 추가"""
-    velos_root = os.environ.get('VELOS_ROOT')
+    velos_root = os.environ.get("VELOS_ROOT")
     if velos_root and os.path.isdir(velos_root):
         if velos_root not in sys.path:
             sys.path.insert(0, velos_root)
@@ -33,47 +36,61 @@ def _ensure_velos_path():
             sys.path.insert(0, fallback_path)
             print(f"[velos_dashboard] fallback 경로 추가됨: {fallback_path}")
 
+
 # 모듈 로드 시 자동으로 경로 보장
 _ensure_velos_path()
 
 # 내부 모듈 (선택적 로드)
 try:
     from modules.logs.indexer import load_conversations, load_system_metrics
+
     MODULES_AVAILABLE = True
 except ImportError:
     MODULES_AVAILABLE = False
+
     # 폴백 함수들
     def load_conversations(days=7, limit=1000, role=None, query=""):
         return pd.DataFrame()
+
     def load_system_metrics():
         return {"mem": "N/A", "cpu": "N/A", "sessions": "N/A"}
 
+
 try:
     from modules.utils.pii import scrub_text
+
     PII_AVAILABLE = True
 except ImportError:
     PII_AVAILABLE = False
+
     def scrub_text(text):
         return text
 
+
 try:
     from modules.tags.rules import auto_tags
+
     TAGS_AVAILABLE = True
 except ImportError:
     TAGS_AVAILABLE = False
+
     def auto_tags(text):
         return []
 
+
 try:
     from modules.vectors.search import embed_search
+
     VECTOR_AVAILABLE = True
 except ImportError:
     VECTOR_AVAILABLE = False
+
     def embed_search(query, topk=10, days=7):
         return [{"content": "벡터 검색 모듈을 사용할 수 없습니다.", "score": 0.0}]
 
+
 # 경로 설정 - 환경변수 우선, fallback 경로 사용
-velos_root = os.environ.get('VELOS_ROOT', r"C:\giwanos")
+velos_root = os.environ.get("VELOS_ROOT", r"C:\giwanos")
 ROOT = Path(velos_root)
 DATA = ROOT / "data"
 MEM = DATA / "memory"
@@ -106,7 +123,13 @@ if FILTER_DB.exists():
     presets = json.loads(FILTER_DB.read_text("utf-8"))
 else:
     presets = [
-        {"name": "최근오류(24h)", "q": "ERROR|Exception|Traceback", "role": "전체", "days": 1, "limit": 1000},
+        {
+            "name": "최근오류(24h)",
+            "q": "ERROR|Exception|Traceback",
+            "role": "전체",
+            "days": 1,
+            "limit": 1000,
+        },
         {"name": "사용자요청(7d)", "q": "", "role": "user", "days": 7, "limit": 1000},
     ]
 
@@ -187,22 +210,29 @@ with tab1:
 
         sdf["원본"] = sdf.apply(open_buttons, axis=1)
 
-        st.dataframe(sdf[["time", "role", "session", "content", "tags", "원본"]],
-                    use_container_width=True, height=600)
+        st.dataframe(
+            sdf[["time", "role", "session", "content", "tags", "원본"]],
+            use_container_width=True,
+            height=600,
+        )
 
         # 내보내기
         colx, coly = st.columns(2)
         with colx:
             if st.button("CSV 다운로드"):
-                st.download_button("download.csv", sdf.to_csv(index=False).encode("utf-8-sig"),
-                                 file_name="velos_export.csv")
+                st.download_button(
+                    "download.csv",
+                    sdf.to_csv(index=False).encode("utf-8-sig"),
+                    file_name="velos_export.csv",
+                )
         with coly:
             if st.button("Markdown+CSV ZIP"):
                 buff = io.BytesIO()
                 with zipfile.ZipFile(buff, "w", zipfile.ZIP_DEFLATED) as zf:
                     zf.writestr("velos_export.csv", sdf.to_csv(index=False))
-                    md = "\n\n".join([f"### {r.time} [{r.role}]  \n{r.content}"
-                                     for r in sdf.itertuples()])
+                    md = "\n\n".join(
+                        [f"### {r.time} [{r.role}]  \n{r.content}" for r in sdf.itertuples()]
+                    )
                     zf.writestr("velos_export.md", md)
                 st.download_button("download.zip", buff.getvalue(), file_name="velos_export.zip")
     else:
@@ -254,4 +284,6 @@ with tab4:
 
 # -------- 푸터 --------
 st.markdown("---")
-st.caption(f"VELOS ROOT: {ROOT} • 모듈 상태: {'✅' if MODULES_AVAILABLE else '⚠️'} • 마지막 갱신: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+st.caption(
+    f"VELOS ROOT: {ROOT} • 모듈 상태: {'✅' if MODULES_AVAILABLE else '⚠️'} • 마지막 갱신: {time.strftime('%Y-%m-%d %H:%M:%S')}"
+)

@@ -3,26 +3,40 @@
 
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
 
 """
 VELOS Snapshot Catalog Script
 스냅샷 카탈로그를 관리하는 스크립트입니다.
 """
 
-import sys
 import os
+import sys
 
 # ROOT 경로 설정
-ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
+
 
 def main():
     try:
@@ -51,6 +65,7 @@ def main():
     except Exception as e:
         print(f"[ERROR] Snapshot catalog script failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -4,7 +4,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -25,7 +25,9 @@ velos_bridge.py (BOM-safe + soft-fail)
 - UTF-8 with BOM/without BOM 모두 파싱되도록 read_json_any() 적용
 """
 
-import os, sys
+import os
+import sys
+
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, ".."))
 if ROOT not in sys.path:
@@ -70,11 +72,13 @@ LOGDIR = Path(ROOT) / "logs"
 LOGDIR.mkdir(parents=True, exist_ok=True)
 LOG = LOGDIR / "velos_bridge.log"
 
+
 def log(msg: str):
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     with LOG.open("a", encoding="utf-8") as f:
         f.write(f"[{ts}] {msg}\n")
     print(msg)
+
 
 def try_import(module_name):
     try:
@@ -82,16 +86,18 @@ def try_import(module_name):
     except Exception:
         return None
 
+
 # Optional senders (있으면 사용)
 # - scripts/notify_slack_api.py : def send_message(token, channel, text) -> None
 # - scripts/notify_slack.py     : def send(text, channel=None, token=None) -> None
 # - tools/notion_integration/__init__.py : def send_page(token, parent_id, title, md_content=None) -> None
-slack_api    = try_import("scripts.notify_slack_api")
+slack_api = try_import("scripts.notify_slack_api")
 slack_legacy = try_import("scripts.notify_slack")
-notion_mod   = try_import("tools.notion_integration")
+notion_mod = try_import("tools.notion_integration")
 
-SLACK_TOKEN  = os.getenv("SLACK_BOT_TOKEN") or os.getenv("SLACK_TOKEN")
+SLACK_TOKEN = os.getenv("SLACK_BOT_TOKEN") or os.getenv("SLACK_TOKEN")
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+
 
 def send_slack(text, channel=None):
     # True=성공, False=시도 실패, None=시도 불가(SKIP)
@@ -112,6 +118,7 @@ def send_slack(text, channel=None):
     log("SKIP slack: sender/token/channel 미존재")
     return None
 
+
 def send_notion(title, md_content=None, parent_id=None):
     if notion_mod and hasattr(notion_mod, "send_page") and NOTION_TOKEN and parent_id:
         try:
@@ -123,6 +130,7 @@ def send_notion(title, md_content=None, parent_id=None):
     log("SKIP notion: sender/token/parent_id 미존재")
     return None
 
+
 def read_json_any(p: Path):
     # BOM 안전: 우선 utf-8-sig로 시도, 실패 시 utf-8
     try:
@@ -130,10 +138,11 @@ def read_json_any(p: Path):
     except Exception:
         return json.loads(p.read_text(encoding="utf-8"))
 
+
 def process_ticket(p: Path):
     data = read_json_any(p)
     title = data.get("title") or "GIWANOS Update"
-    text  = data.get("message") or data.get("text") or ""
+    text = data.get("message") or data.get("text") or ""
     report_md = data.get("report_md")
     channels = data.get("channels") or {}
 
@@ -167,6 +176,7 @@ def process_ticket(p: Path):
         return True
     return False
 
+
 def handle_file(p: Path):
     inbox_key = str(p.parent)
     ok_dir, ng_dir = OUTS[inbox_key]
@@ -185,6 +195,7 @@ def handle_file(p: Path):
         except Exception:
             pass
 
+
 def main():
     for inbox in INBOXES:
         inbox.mkdir(parents=True, exist_ok=True)
@@ -194,6 +205,7 @@ def main():
             continue
         for f in files:
             handle_file(f)
+
 
 if __name__ == "__main__":
     main()

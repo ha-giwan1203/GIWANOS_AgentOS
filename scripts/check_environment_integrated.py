@@ -18,6 +18,7 @@ from pathlib import Path
 # UTF-8 인코딩 강제 설정
 try:
     from modules.utils.utf8_force import setup_utf8_environment
+
     setup_utf8_environment()
 except ImportError:
     # utils 모듈을 찾을 수 없는 경우 직접 설정
@@ -47,7 +48,7 @@ def check_velos_environment():
         "VELOS_API_TIMEOUT",
         "VELOS_API_RETRIES",
         "VELOS_MAX_WORKERS",
-        "VELOS_DEBUG"
+        "VELOS_DEBUG",
     ]
 
     for var in velos_vars:
@@ -77,34 +78,11 @@ def check_transport_environment():
     print("=" * 35)
 
     transport_vars = {
-        "Slack": [
-            "SLACK_BOT_TOKEN",
-            "SLACK_CHANNEL",
-            "SLACK_DEFAULT_CHANNEL",
-            "SLACK_CHANNEL_ID"
-        ],
-        "Notion": [
-            "NOTION_TOKEN",
-            "NOTION_DATABASE_ID",
-            "NOTION_PARENT_PAGE"
-        ],
-        "Email": [
-            "SMTP_HOST",
-            "SMTP_PORT",
-            "SMTP_USER",
-            "SMTP_PASS",
-            "EMAIL_TO",
-            "EMAIL_FROM"
-        ],
-        "Pushbullet": [
-            "PUSHBULLET_TOKEN"
-        ],
-        "Dispatch": [
-            "DISPATCH_EMAIL",
-            "DISPATCH_SLACK",
-            "DISPATCH_NOTION",
-            "DISPATCH_PUSH"
-        ]
+        "Slack": ["SLACK_BOT_TOKEN", "SLACK_CHANNEL", "SLACK_DEFAULT_CHANNEL", "SLACK_CHANNEL_ID"],
+        "Notion": ["NOTION_TOKEN", "NOTION_DATABASE_ID", "NOTION_PARENT_PAGE"],
+        "Email": ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "EMAIL_TO", "EMAIL_FROM"],
+        "Pushbullet": ["PUSHBULLET_TOKEN"],
+        "Dispatch": ["DISPATCH_EMAIL", "DISPATCH_SLACK", "DISPATCH_NOTION", "DISPATCH_PUSH"],
     }
 
     for channel, vars_list in transport_vars.items():
@@ -112,7 +90,7 @@ def check_transport_environment():
         for var in vars_list:
             value = os.getenv(var, "NOT_SET")
             # 민감한 정보는 마스킹
-            if any(keyword in var.upper() for keyword in ['TOKEN', 'PASS', 'KEY']):
+            if any(keyword in var.upper() for keyword in ["TOKEN", "PASS", "KEY"]):
                 if value != "NOT_SET":
                     print(f"  {var}: {'*' * min(len(value), 20)}...")
                 else:
@@ -126,42 +104,47 @@ def check_env_files():
     print("\n=== 환경변수 파일 상태 ===")
     print("=" * 30)
 
-    env_files = [
-        "configs/.env",
-        "C:/Users/User/venvs/velos/.env",
-        ".env"
-    ]
+    env_files = ["configs/.env", "C:/Users/User/venvs/velos/.env", ".env"]
 
     for env_file in env_files:
         file_path = Path(env_file)
         if file_path.exists():
             print(f"✅ {env_file} - 존재")
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     lines = f.readlines()
-                
+
                 # 전송 관련 환경변수만 필터링
                 transport_vars = []
                 for line in lines:
                     line = line.strip()
-                    if line and not line.startswith('#'):
-                        if any(keyword in line for keyword in ['SLACK_', 'NOTION_', 'EMAIL_', 'PUSHBULLET_', 'DISPATCH_']):
+                    if line and not line.startswith("#"):
+                        if any(
+                            keyword in line
+                            for keyword in [
+                                "SLACK_",
+                                "NOTION_",
+                                "EMAIL_",
+                                "PUSHBULLET_",
+                                "DISPATCH_",
+                            ]
+                        ):
                             transport_vars.append(line)
-                
+
                 print(f"  📊 총 {len(lines)}줄, 전송 관련 {len(transport_vars)}개")
-                
+
                 if transport_vars:
                     print("  📋 전송 관련 환경변수:")
                     for var in transport_vars[:5]:  # 처음 5개만 표시
-                        if any(keyword in var.upper() for keyword in ['TOKEN', 'PASS', 'KEY']):
-                            key, value = var.split('=', 1) if '=' in var else (var, '')
+                        if any(keyword in var.upper() for keyword in ["TOKEN", "PASS", "KEY"]):
+                            key, value = var.split("=", 1) if "=" in var else (var, "")
                             print(f"    {key}=***")
                         else:
                             print(f"    {var}")
-                    
+
                     if len(transport_vars) > 5:
                         print(f"    ... 및 {len(transport_vars) - 5}개 더")
-                        
+
             except Exception as e:
                 print(f"  ❌ 파일 읽기 오류: {e}")
         else:
@@ -173,31 +156,27 @@ def check_venv_health():
     print("\n=== 가상환경 상태 ===")
     print("=" * 20)
 
-    venv_paths = [
-        "C:/Users/User/venvs/velos",
-        "C:/giwanos/.venv",
-        ".venv"
-    ]
+    venv_paths = ["C:/Users/User/venvs/velos", "/home/user/webapp/.venv", ".venv"]
 
     for venv_path in venv_paths:
         path = Path(venv_path)
         if path.exists():
             print(f"✅ {venv_path} - 존재")
-            
+
             # Python 실행 파일 확인
             python_exe = path / "Scripts" / "python.exe"
             if python_exe.exists():
                 print(f"  🐍 Python: {python_exe}")
             else:
                 print(f"  ❌ Python: 없음")
-            
+
             # pip 확인
             pip_exe = path / "Scripts" / "pip.exe"
             if pip_exe.exists():
                 print(f"  📦 pip: {pip_exe}")
             else:
                 print(f"  ❌ pip: 없음")
-                
+
         else:
             print(f"❌ {venv_path} - 없음")
 
@@ -217,7 +196,7 @@ def check_current_environment():
         "Slack": bool(os.getenv("SLACK_BOT_TOKEN")),
         "Notion": bool(os.getenv("NOTION_TOKEN")),
         "Email": bool(os.getenv("SMTP_HOST")),
-        "Pushbullet": bool(os.getenv("PUSHBULLET_TOKEN"))
+        "Pushbullet": bool(os.getenv("PUSHBULLET_TOKEN")),
     }
 
     print("\n전송 채널 상태:")
@@ -226,8 +205,11 @@ def check_current_environment():
         print(f"  {channel}: {status}")
 
     # 디스패치 설정
-    dispatch_enabled = sum(1 for var in ["DISPATCH_EMAIL", "DISPATCH_SLACK", "DISPATCH_NOTION", "DISPATCH_PUSH"] 
-                          if os.getenv(var) == "1")
+    dispatch_enabled = sum(
+        1
+        for var in ["DISPATCH_EMAIL", "DISPATCH_SLACK", "DISPATCH_NOTION", "DISPATCH_PUSH"]
+        if os.getenv(var) == "1"
+    )
     print(f"\n디스패치 활성화: {dispatch_enabled}/4 채널")
 
 
@@ -255,4 +237,3 @@ def main():
 if __name__ == "__main__":
     success = main()
     sys.exit(0 if success else 1)
-

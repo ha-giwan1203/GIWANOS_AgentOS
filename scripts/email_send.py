@@ -7,20 +7,21 @@ VELOS 이메일 전송 스크립트
 - SMTP 인증 및 TLS 지원
 """
 
-import os
-import sys
 import json
-import smtplib
 import mimetypes
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import os
+import smtplib
+import sys
 from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from pathlib import Path
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -45,10 +46,7 @@ def attach_file(msg, file_path):
 
         # 파일명 설정
         filename = os.path.basename(file_path)
-        part.add_header(
-            "Content-Disposition",
-            f'attachment; filename="{filename}"'
-        )
+        part.add_header("Content-Disposition", f'attachment; filename="{filename}"')
 
         msg.attach(part)
         return True
@@ -58,8 +56,9 @@ def attach_file(msg, file_path):
         return False
 
 
-def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
-               to_email, subject, body, attachment_path=None):
+def send_email(
+    smtp_host, smtp_port, smtp_user, smtp_pass, to_email, subject, body, attachment_path=None
+):
     """이메일 전송"""
     try:
         # 이메일 메시지 구성
@@ -85,7 +84,7 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         return {
             "ok": True,
             "attachment_included": attachment_success,
-            "attachment_path": attachment_path if attachment_success else None
+            "attachment_path": attachment_path if attachment_success else None,
         }
 
     except smtplib.SMTPAuthenticationError:
@@ -136,8 +135,7 @@ def main():
 
     # 이메일 전송
     result = send_email(
-        smtp_host, smtp_port, smtp_user, smtp_pass,
-        to_email, subject, body, pdf_path
+        smtp_host, smtp_port, smtp_user, smtp_pass, to_email, subject, body, pdf_path
     )
 
     if result.get("ok"):
@@ -151,7 +149,11 @@ def main():
             "to": to_email,
             "subject": subject,
             "attachment_included": result.get("attachment_included"),
-            "attachment_file": os.path.basename(result.get("attachment_path")) if result.get("attachment_included") else None
+            "attachment_file": (
+                os.path.basename(result.get("attachment_path"))
+                if result.get("attachment_included")
+                else None
+            ),
         }
 
         print(json.dumps(success_result, ensure_ascii=False))
@@ -166,7 +168,7 @@ def main():
             "ok": False,
             "error": result.get("error"),
             "to": to_email,
-            "subject": subject
+            "subject": subject,
         }
 
         print(json.dumps(error_result, ensure_ascii=False), file=sys.stderr)
@@ -175,6 +177,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

@@ -3,7 +3,7 @@
   "mandates": {
     "FILE_NAMES_IMMUTABLE": true,
     "NO_FAKE_CODE": true,
-    "ROOT_FIXED": "C:/giwanos",
+    "ROOT_FIXED": "/home/user/webapp",
     "SELF_TEST_REQUIRED": true,
     "PROMPT_ALWAYS_INCLUDE_CONTEXT": true
   },

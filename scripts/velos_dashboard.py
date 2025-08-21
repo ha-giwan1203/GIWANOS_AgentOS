@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 # 실행: streamlit run velos_dashboard.py
 # 필요(선택): NOTION_TOKEN, NOTION_DATABASE_ID, SLACK_BOT_TOKEN
+import datetime as dt
+import glob
+import json
 import os
 import re
-import json
-import glob
 import sys
-import datetime as dt
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import streamlit as st
 
 # UTF-8 인코딩 강제 설정
 try:
     from modules.utils.utf8_force import setup_utf8_environment
+
     setup_utf8_environment()
 except ImportError:
     # utils 모듈을 찾을 수 없는 경우 직접 설정
@@ -36,6 +37,7 @@ DISP = REPORT / "_dispatch"
 MEMORY = ROOT / "data" / "memory"
 SESSIONS = ROOT / "data" / "sessions"
 SNAPSHOTS = ROOT / "data" / "snapshots"
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 유틸
@@ -110,6 +112,7 @@ def notion_search_by_report_key(report_key: str) -> Dict[str, Any]:
 
     try:
         import requests
+
         headers = {
             "Authorization": f"Bearer {token}",
             "Notion-Version": "2022-06-28",
@@ -117,23 +120,17 @@ def notion_search_by_report_key(report_key: str) -> Dict[str, Any]:
         }
         # 데이터베이스 쿼리(간단 필터)
         payload = {
-            "filter": {
-                "property": result_prop,
-                "rich_text": {"contains": report_key}
-            },
-            "page_size": 10
+            "filter": {"property": result_prop, "rich_text": {"contains": report_key}},
+            "page_size": 10,
         }
         r = requests.post(
             f"https://api.notion.com/v1/databases/{db_id}/query",
-            headers=headers, json=payload, timeout=15
+            headers=headers,
+            json=payload,
+            timeout=15,
         )
         if r.status_code not in (200, 201):
-            return {
-                "enabled": True,
-                "ok": False,
-                "status": r.status_code,
-                "body": r.text[:400]
-            }
+            return {"enabled": True, "ok": False, "status": r.status_code, "body": r.text[:400]}
 
         data = r.json()
         rows = []
@@ -145,17 +142,18 @@ def notion_search_by_report_key(report_key: str) -> Dict[str, Any]:
             for v in props.values():
                 if isinstance(v, dict) and "title" in v:
                     if v["title"]:
-                        title_txt = (
-                            v["title"][0].get("plain_text", "") or
-                            v["title"][0].get("text", {}).get("content", "")
-                        )
+                        title_txt = v["title"][0].get("plain_text", "") or v["title"][0].get(
+                            "text", {}
+                        ).get("content", "")
                         break
-            rows.append({
-                "page_id": page_id,
-                "url": to_notion_url(page_id) if page_id else "",
-                "title": title_txt,
-                "created_time": it.get("created_time", ""),
-            })
+            rows.append(
+                {
+                    "page_id": page_id,
+                    "url": to_notion_url(page_id) if page_id else "",
+                    "title": title_txt,
+                    "created_time": it.get("created_time", ""),
+                }
+            )
         return {"enabled": True, "ok": True, "rows": rows}
 
     except Exception as e:
@@ -172,13 +170,14 @@ def slack_search_by_report_key(report_key: str) -> Dict[str, Any]:
 
     try:
         import requests
+
         # search.messages 는 엔터프라이즈/권한에 따라 제한이 있을 수 있음.
         # 실패해도 대시보드 전체엔 영향 주지 않음.
         r = requests.get(
             "https://slack.com/api/search.messages",
             headers={"Authorization": f"Bearer {token}"},
             params={"query": report_key, "count": 10},
-            timeout=15
+            timeout=15,
         )
         data = r.json()
         if not data.get("ok"):
@@ -186,13 +185,15 @@ def slack_search_by_report_key(report_key: str) -> Dict[str, Any]:
 
         rows = []
         for m in data.get("messages", {}).get("matches", []):
-            rows.append({
-                "permalink": m.get("permalink", ""),
-                "channel": m.get("channel", {}).get("name", ""),
-                "username": m.get("username", ""),
-                "text": m.get("text", ""),
-                "ts": m.get("ts", ""),
-            })
+            rows.append(
+                {
+                    "permalink": m.get("permalink", ""),
+                    "channel": m.get("channel", {}).get("name", ""),
+                    "username": m.get("username", ""),
+                    "text": m.get("text", ""),
+                    "ts": m.get("ts", ""),
+                }
+            )
         return {"enabled": True, "ok": True, "rows": rows}
 
     except Exception as e:
@@ -201,11 +202,7 @@ def slack_search_by_report_key(report_key: str) -> Dict[str, Any]:
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Streamlit UI
-st.set_page_config(
-    page_title="VELOS REPORT_KEY 대시보드",
-    page_icon="🔍",
-    layout="wide"
-)
+st.set_page_config(page_title="VELOS REPORT_KEY 대시보드", page_icon="🔍", layout="wide")
 
 st.title("🔍 VELOS REPORT_KEY 대시보드")
 st.markdown("REPORT_KEY로 모든 관련 정보를 한 번에 검색하고 표시합니다.")
@@ -216,15 +213,11 @@ with c1:
     report_key = st.text_input(
         "REPORT_KEY 입력",
         placeholder="예: 20250816_170736_a45102c4",
-        help="검색할 REPORT_KEY를 입력하세요"
+        help="검색할 REPORT_KEY를 입력하세요",
     )
 with c2:
     tail_lines = st.number_input(
-        "로그 Tail 라인수",
-        min_value=20,
-        max_value=500,
-        value=120,
-        step=10
+        "로그 Tail 라인수", min_value=20, max_value=500, value=120, step=10
     )
 with c3:
     run_btn = st.button("🔍 검색 실행", type="primary")
@@ -256,7 +249,7 @@ if run_btn and report_key:
                     "메모리": [],
                     "세션": [],
                     "스냅샷": [],
-                    "기타": []
+                    "기타": [],
                 }
 
                 for p in hits[:100]:
@@ -282,7 +275,9 @@ if run_btn and report_key:
                             for p in files:
                                 try:
                                     size = format_file_size(p.stat().st_size)
-                                    modified = dt.datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+                                    modified = dt.datetime.fromtimestamp(
+                                        p.stat().st_mtime
+                                    ).strftime("%Y-%m-%d %H:%M:%S")
                                     st.write(f"📄 **{p.name}**")
                                     st.write(f"   📏 크기: {size} | 🕒 수정: {modified}")
                                     st.code(str(p))
@@ -295,7 +290,7 @@ if run_btn and report_key:
                 LOGS / "autosave_runner.log",
                 LOGS / "autosave_runner_20250815.log",
                 LOGS / "system_health.json",
-                LOGS / "loop_state_tracker.json"
+                LOGS / "loop_state_tracker.json",
             ]
 
             for lp in sample_logs:
@@ -313,7 +308,9 @@ if run_btn and report_key:
             if not nres.get("enabled"):
                 st.warning(f"⚠️ {nres.get('reason', 'Notion 비활성')}")
             elif not nres.get("ok"):
-                st.error(f"❌ Notion 검색 실패: {nres.get('status', '')} {nres.get('body', nres.get('error', ''))}")
+                st.error(
+                    f"❌ Notion 검색 실패: {nres.get('status', '')} {nres.get('body', nres.get('error', ''))}"
+                )
             else:
                 rows = nres.get("rows", [])
                 if not rows:
@@ -321,9 +318,9 @@ if run_btn and report_key:
                 else:
                     st.success(f"Notion DB에서 {len(rows)}개의 항목을 찾았습니다.")
                     for r in rows:
-                        title = r.get('title') or r.get('page_id', '제목 없음')
-                        url = r.get('url', '')
-                        created = r.get('created_time', '')
+                        title = r.get("title") or r.get("page_id", "제목 없음")
+                        url = r.get("url", "")
+                        created = r.get("created_time", "")
 
                         if url:
                             st.write(f"- [{title}]({url})")
@@ -374,7 +371,7 @@ if run_btn and report_key:
                 "report_key": report_key,
                 "local_files": {
                     "total": len(hits),
-                    "categories": {k: len(v) for k, v in categories.items() if v}
+                    "categories": {k: len(v) for k, v in categories.items() if v},
                 },
                 "notion_count": len(nres.get("rows", [])) if nres.get("ok") else 0,
                 "slack_count": len(sres.get("rows", [])) if sres.get("ok") else 0,
@@ -401,7 +398,8 @@ elif run_btn and not report_key:
 
 else:
     # 사용법 안내
-    st.markdown("""
+    st.markdown(
+        """
     ### 🚀 사용법
 
     1. **REPORT_KEY 입력**: 검색할 REPORT_KEY를 입력하세요
@@ -439,9 +437,9 @@ else:
     - **SLACK_BOT_TOKEN**: Slack 봇 토큰
 
     환경변수가 없어도 로컬 파일 검색은 정상 작동합니다.
-    """)
+    """
+    )
 
 # 푸터
 st.markdown("---")
 st.markdown("*VELOS REPORT_KEY 대시보드 - 모든 관련 정보를 한 번에 검색하세요*")
-

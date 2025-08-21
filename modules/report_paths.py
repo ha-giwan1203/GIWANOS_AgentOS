@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=/home/user/webapp 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -15,33 +15,46 @@
 # - 상단에서 ROOT, P를 반드시 내보냄 (legacy 코드 호환)
 
 from __future__ import annotations
+
 import json
-from typing import Dict
 from pathlib import Path
+from typing import Dict
 
 # 공통 유틸 가져오기
-from modules.velos_common import paths as _paths, ensure_dirs as _ensure_dirs, env_presence as _env_presence
+from modules.velos_common import ensure_dirs as _ensure_dirs
+from modules.velos_common import env_presence as _env_presence
+from modules.velos_common import paths as _paths
 
 # --- Export: 레거시 호환 필수 심볼 ---
 P: Dict[str, Path] = _paths()
 ROOT: Path = P["ROOT"]
 # -------------------------------------
 
+
 def ensure_dirs() -> None:
     _ensure_dirs()
 
-def env_presence(keys=("OPENAI_API_KEY","NOTION_TOKEN","SLACK_BOT_TOKEN")) -> Dict[str, str]:
+
+def env_presence(keys=("OPENAI_API_KEY", "NOTION_TOKEN", "SLACK_BOT_TOKEN")) -> Dict[str, str]:
     return _env_presence(keys)
+
 
 def memory_file_ready() -> bool:
     mm = P["LEARNING_MEMORY"]
     if mm.exists():
         return True
     try:
-        mm.write_text(json.dumps({"meta":{"created_by":"report_paths.py","version":1},"records":[]}, ensure_ascii=False), encoding="utf-8")
+        mm.write_text(
+            json.dumps(
+                {"meta": {"created_by": "report_paths.py", "version": 1}, "records": []},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
         return True
     except Exception:
         return False
+
 
 if __name__ == "__main__":
     ensure_dirs()

@@ -1,13 +1,14 @@
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
 from __future__ import annotations
+
+import io
+import json
 import os
 import sys
-import json
 import time
-import uuid
-import io
 import traceback
+import uuid
 from typing import Any, Dict, Iterable, Optional
 
 try:
@@ -20,8 +21,10 @@ except Exception:
 # 우선순위: ENV(개별) > settings.yaml > ENV(루트) > 기본 루트(C:\giwanos)
 # ----------------------------
 
+
 def _safe_join(*parts: str) -> str:
     return os.path.normpath(os.path.join(*parts))
+
 
 def _read_yaml(path: str) -> dict:
     if not path or not os.path.isfile(path) or not yaml:
@@ -32,13 +35,16 @@ def _read_yaml(path: str) -> dict:
     except Exception:
         return {}
 
+
 def _resolve_root() -> str:
     # 최상위 루트: VELOS_ROOT 환경변수 우선
     root = os.getenv("VELOS_ROOT")
     if root and os.path.isdir(root):
         return root
     # settings.yaml의 base_dir
-    settings_path = os.getenv("VELOS_SETTINGS") or _safe_join("C:", os.sep, "giwanos", "configs", "settings.yaml")
+    settings_path = os.getenv("VELOS_SETTINGS") or _safe_join(
+        "C:", os.sep, "giwanos", "configs", "settings.yaml"
+    )
     cfg = _read_yaml(settings_path)
     base = (cfg.get("paths") or {}).get("base_dir")
     if base and os.path.isdir(base):
@@ -46,6 +52,7 @@ def _resolve_root() -> str:
     # 최후의 기본값 (유지보수 편의상) - 절대 경로 하드코딩 회피 불가 상황 방어
     fallback = _safe_join("C:", os.sep, "giwanos")
     return fallback if os.path.isdir(fallback) else os.getcwd()
+
 
 def _paths() -> dict:
     root = _resolve_root()
@@ -68,28 +75,47 @@ def _paths() -> dict:
 
     return {
         "root": root,
-        "sessions_jsonl": pick("VELOS_SESSIONS_JSONL", ["paths", "sessions_jsonl"], _safe_join("data", "memory", "sessions.log.jsonl")),
-        "memory_jsonl": pick("VELOS_MEMORY_JSONL", ["paths", "memory_jsonl"], _safe_join("data", "memory", "learning_memory.jsonl")),
-        "memory_json": pick("VELOS_MEMORY_JSON", ["paths", "memory_json"], _safe_join("data", "memory", "learning_memory.json")),
-        "snapshots_dir": pick("VELOS_SNAP_DIR", ["paths", "snapshots_dir"], _safe_join("data", "snapshots")),
+        "sessions_jsonl": pick(
+            "VELOS_SESSIONS_JSONL",
+            ["paths", "sessions_jsonl"],
+            _safe_join("data", "memory", "sessions.log.jsonl"),
+        ),
+        "memory_jsonl": pick(
+            "VELOS_MEMORY_JSONL",
+            ["paths", "memory_jsonl"],
+            _safe_join("data", "memory", "learning_memory.jsonl"),
+        ),
+        "memory_json": pick(
+            "VELOS_MEMORY_JSON",
+            ["paths", "memory_json"],
+            _safe_join("data", "memory", "learning_memory.json"),
+        ),
+        "snapshots_dir": pick(
+            "VELOS_SNAP_DIR", ["paths", "snapshots_dir"], _safe_join("data", "snapshots")
+        ),
         "logs_dir": pick("VELOS_LOGS_DIR", ["paths", "logs_dir"], _safe_join("data", "logs")),
     }
+
 
 # ----------------------------
 # 세션 이벤트 append-only JSONL
 # 스키마: {ts, session_id, from, kind, text, insight, tags}
 # ----------------------------
 
+
 def _ensure_dir(path: str) -> None:
     d = path if os.path.splitext(path)[1] == "" else os.path.dirname(path)
     if d and not os.path.isdir(d):
         os.makedirs(d, exist_ok=True)
 
+
 def _now_ts() -> float:
     return time.time()
 
-def _iso(ts: Optional[float]=None) -> str:
+
+def _iso(ts: Optional[float] = None) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(ts or _now_ts()))
+
 
 def append_session_event(
     text: str,
@@ -136,9 +162,11 @@ def append_session_event(
 
     return record
 
+
 # ----------------------------
 # 메모리 병합: sessions.log.jsonl -> learning_memory.jsonl(+json)
 # ----------------------------
+
 
 def _iter_jsonl(path: str) -> Iterable[dict]:
     if not os.path.isfile(path):
@@ -152,6 +180,7 @@ def _iter_jsonl(path: str) -> Iterable[dict]:
                 yield json.loads(ln)
             except Exception:
                 continue
+
 
 def merge_sessions_into_memory(limit: Optional[int] = None) -> Dict[str, Any]:
     P = _paths()
@@ -215,11 +244,18 @@ def merge_sessions_into_memory(limit: Optional[int] = None) -> Dict[str, Any]:
     with open(P["memory_json"], "w", encoding="utf-8") as jf:
         json.dump({"items": items, "count": len(items)}, jf, ensure_ascii=False, indent=2)
 
-    return {"scanned": count, "existing_lines": existing, "appended": appended, "memory_count": len(items)}
+    return {
+        "scanned": count,
+        "existing_lines": existing,
+        "appended": appended,
+        "memory_count": len(items),
+    }
+
 
 # ----------------------------
 # 스냅샷 저장
 # ----------------------------
+
 
 def write_session_snapshot() -> str:
     P = _paths()
@@ -236,18 +272,24 @@ def write_session_snapshot() -> str:
         raise RuntimeError("[session_store] snapshot write failed")
     return out
 
+
 # ----------------------------
 # CLI 진입점 (자가 검증/데모)
 # ----------------------------
 
+
 def _print(s: str) -> None:
-    sys.stdout.write(s + "\n"); sys.stdout.flush()
+    sys.stdout.write(s + "\n")
+    sys.stdout.flush()
+
 
 def main(argv: Optional[Iterable[str]] = None) -> int:
     argv = list(argv or sys.argv[1:])
     try:
         if not argv or argv[0] in {"--help", "-h"}:
-            _print("usage: python -m modules.core.session_store [--append-demo] [--merge] [--snapshot] [--selftest]")
+            _print(
+                "usage: python -m modules.core.session_store [--append-demo] [--merge] [--snapshot] [--selftest]"
+            )
             return 0
 
         if "--append-demo" in argv:
@@ -263,7 +305,9 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
         if "--merge" in argv:
             res = merge_sessions_into_memory()
-            _print(f"[merge] scanned={res['scanned']} appended={res['appended']} memory={res['memory_count']}")
+            _print(
+                f"[merge] scanned={res['scanned']} appended={res['appended']} memory={res['memory_count']}"
+            )
 
         if "--snapshot" in argv:
             path = write_session_snapshot()
@@ -271,17 +315,22 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
 
         if "--selftest" in argv:
             # 1) append
-            r1 = append_session_event(text="selftest-1", from_="system", kind="test", tags=["selftest"])
+            r1 = append_session_event(
+                text="selftest-1", from_="system", kind="test", tags=["selftest"]
+            )
             # 2) merge
             r2 = merge_sessions_into_memory()
             # 3) snapshot
             p = write_session_snapshot()
             # 결과 요약
-            _print(f"[selftest] append_ts={r1['ts_iso']} merge_appended={r2['appended']} snapshot={os.path.basename(p)}")
+            _print(
+                f"[selftest] append_ts={r1['ts_iso']} merge_appended={r2['appended']} snapshot={os.path.basename(p)}"
+            )
         return 0
     except Exception:
         _print("[error]\n" + traceback.format_exc())
         return 1
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

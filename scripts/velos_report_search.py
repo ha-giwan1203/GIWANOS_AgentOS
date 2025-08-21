@@ -7,13 +7,14 @@ VELOS REPORT_KEY 검색 앱
 - Streamlit 기반 웹 인터페이스
 """
 
-import streamlit as st
-import os
-import json
 import glob
+import json
+import os
 import re
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import streamlit as st
 
 
 def search_in_file(file_path, search_key):
@@ -44,28 +45,26 @@ def search_report_key(report_key: str):
         "memory": [],
         "sessions": [],
         "snapshots": [],
-        "notion_entries": []
+        "notion_entries": [],
     }
 
     # 검색 경로 설정
-    base_path = Path("C:/giwanos")
+    base_path = Path("/home/user/webapp")
 
     # 1. 로그 파일 검색
-    log_patterns = [
-        "data/logs/*.json",
-        "data/logs/*.log",
-        "data/logs/*.txt"
-    ]
+    log_patterns = ["data/logs/*.json", "data/logs/*.log", "data/logs/*.txt"]
 
     for pattern in log_patterns:
         for log_file in glob.glob(str(base_path / pattern)):
             found, content = search_in_file(log_file, report_key)
             if found:
-                results["logs"].append({
-                    "file": log_file,
-                    "size": os.path.getsize(log_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(log_file)).isoformat()
-                })
+                results["logs"].append(
+                    {
+                        "file": log_file,
+                        "size": os.path.getsize(log_file),
+                        "modified": datetime.fromtimestamp(os.path.getmtime(log_file)).isoformat(),
+                    }
+                )
 
     # 2. 보고서 파일 검색
     report_patterns = [
@@ -73,88 +72,93 @@ def search_report_key(report_key: str):
         "data/reports/*.md",
         "data/reports/*.json",
         "data/reports/auto/*.pdf",
-        "data/reports/auto/*.md"
+        "data/reports/auto/*.md",
     ]
 
     for pattern in report_patterns:
         for report_file in glob.glob(str(base_path / pattern)):
             if report_key in report_file:
-                results["reports"].append({
-                    "file": report_file,
-                    "size": os.path.getsize(report_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(report_file)).isoformat()
-                })
+                results["reports"].append(
+                    {
+                        "file": report_file,
+                        "size": os.path.getsize(report_file),
+                        "modified": datetime.fromtimestamp(
+                            os.path.getmtime(report_file)
+                        ).isoformat(),
+                    }
+                )
 
     # 3. 회고 파일 검색
-    reflection_patterns = [
-        "data/reflections/*.json"
-    ]
+    reflection_patterns = ["data/reflections/*.json"]
 
     for pattern in reflection_patterns:
         for ref_file in glob.glob(str(base_path / pattern)):
             found, content = search_in_file(ref_file, report_key)
             if found:
-                results["reflections"].append({
-                    "file": ref_file,
-                    "size": os.path.getsize(ref_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(ref_file)).isoformat()
-                })
+                results["reflections"].append(
+                    {
+                        "file": ref_file,
+                        "size": os.path.getsize(ref_file),
+                        "modified": datetime.fromtimestamp(os.path.getmtime(ref_file)).isoformat(),
+                    }
+                )
 
     # 4. 메모리 파일 검색
-    memory_patterns = [
-        "data/memory/*.json",
-        "data/memory/*.jsonl",
-        "data/memory/*.db"
-    ]
+    memory_patterns = ["data/memory/*.json", "data/memory/*.jsonl", "data/memory/*.db"]
 
     for pattern in memory_patterns:
         for mem_file in glob.glob(str(base_path / pattern)):
             found, content = search_in_file(mem_file, report_key)
             if found:
-                results["memory"].append({
-                    "file": mem_file,
-                    "size": os.path.getsize(mem_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(mem_file)).isoformat()
-                })
+                results["memory"].append(
+                    {
+                        "file": mem_file,
+                        "size": os.path.getsize(mem_file),
+                        "modified": datetime.fromtimestamp(os.path.getmtime(mem_file)).isoformat(),
+                    }
+                )
 
     # 5. 세션 파일 검색
-    session_patterns = [
-        "data/sessions/*.json"
-    ]
+    session_patterns = ["data/sessions/*.json"]
 
     for pattern in session_patterns:
         for session_file in glob.glob(str(base_path / pattern)):
             found, content = search_in_file(session_file, report_key)
             if found:
-                results["sessions"].append({
-                    "file": session_file,
-                    "size": os.path.getsize(session_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(session_file)).isoformat()
-                })
+                results["sessions"].append(
+                    {
+                        "file": session_file,
+                        "size": os.path.getsize(session_file),
+                        "modified": datetime.fromtimestamp(
+                            os.path.getmtime(session_file)
+                        ).isoformat(),
+                    }
+                )
 
     # 6. 스냅샷 파일 검색
-    snapshot_patterns = [
-        "data/snapshots/*.json",
-        "data/snapshots/*.zip"
-    ]
+    snapshot_patterns = ["data/snapshots/*.json", "data/snapshots/*.zip"]
 
     for pattern in snapshot_patterns:
         for snap_file in glob.glob(str(base_path / pattern)):
             if report_key in snap_file:
-                results["snapshots"].append({
-                    "file": snap_file,
-                    "size": os.path.getsize(snap_file),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(snap_file)).isoformat()
-                })
+                results["snapshots"].append(
+                    {
+                        "file": snap_file,
+                        "size": os.path.getsize(snap_file),
+                        "modified": datetime.fromtimestamp(os.path.getmtime(snap_file)).isoformat(),
+                    }
+                )
 
     # 7. Notion DB 검색 (환경변수 확인)
     notion_db_id = os.getenv("NOTION_DATABASE_ID")
     if notion_db_id:
-        results["notion_entries"].append({
-            "database_id": notion_db_id,
-            "search_url": f"https://notion.so/{notion_db_id.replace('-', '')}?v=search&q={report_key}",
-            "note": "Notion DB에서 직접 검색 필요"
-        })
+        results["notion_entries"].append(
+            {
+                "database_id": notion_db_id,
+                "search_url": f"https://notion.so/{notion_db_id.replace('-', '')}?v=search&q={report_key}",
+                "note": "Notion DB에서 직접 검색 필요",
+            }
+        )
 
     return results
 
@@ -212,11 +216,7 @@ def display_search_results(results, report_key):
 
 def main():
     """메인 Streamlit 앱"""
-    st.set_page_config(
-        page_title="VELOS Report Key Search",
-        page_icon="🔍",
-        layout="wide"
-    )
+    st.set_page_config(page_title="VELOS Report Key Search", page_icon="🔍", layout="wide")
 
     st.title("🔍 VELOS Report Key Search")
     st.markdown("REPORT_KEY로 VELOS 시스템의 모든 관련 파일을 검색합니다.")
@@ -229,7 +229,7 @@ def main():
         report_key = st.text_input(
             "REPORT_KEY 입력",
             placeholder="예: 20250816_170736_a45102c4",
-            help="검색할 REPORT_KEY를 입력하세요"
+            help="검색할 REPORT_KEY를 입력하세요",
         )
 
         # 검색 버튼
@@ -242,7 +242,8 @@ def main():
 
         # 검색 범위 정보
         st.markdown("### 📂 검색 범위")
-        st.markdown("""
+        st.markdown(
+            """
         - 📄 **로그**: API 비용, 시스템 상태
         - 📊 **보고서**: PDF, Markdown, JSON
         - 🤔 **회고**: reflection_*.json
@@ -250,7 +251,8 @@ def main():
         - 📝 **세션**: session_*.json
         - 📸 **스냅샷**: backup_*.json, *.zip
         - 📋 **Notion**: DB 검색 링크
-        """)
+        """
+        )
 
     # 메인 영역
     if search_button and report_key:
@@ -267,7 +269,7 @@ def main():
             st.subheader("📊 검색 결과 요약")
             summary_data = {
                 "카테고리": list(results.keys()),
-                "파일 수": [len(files) for files in results.values()]
+                "파일 수": [len(files) for files in results.values()],
             }
             st.bar_chart(summary_data)
 
@@ -276,7 +278,8 @@ def main():
 
     # 사용법 안내
     else:
-        st.markdown("""
+        st.markdown(
+            """
         ### 🚀 사용법
 
         1. **REPORT_KEY 입력**: 검색할 REPORT_KEY를 입력하세요
@@ -309,7 +312,8 @@ def main():
         - **세션**: session_*.json 파일들
         - **스냅샷**: 백업 및 스냅샷 파일들
         - **Notion**: DB 검색 링크 제공
-        """)
+        """
+        )
 
     # 푸터
     st.markdown("---")
@@ -318,6 +322,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

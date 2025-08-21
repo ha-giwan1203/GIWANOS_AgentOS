@@ -1,9 +1,9 @@
 # VELOS Environment Variables Template
 # Copy this file to .env in the project root and modify as needed
 
-VELOS_ROOT=C:/giwanos
+VELOS_ROOT=/home/user/webapp
 VELOS_MODE=dev
-VELOS_REPORT_DIR=C:/giwanos/data/reports
+VELOS_REPORT_DIR=/home/user/webapp/data/reports
 EMAIL_ENABLED=0
 
 # Optional: API Keys (keep these secure)
@@ -12,9 +12,9 @@ EMAIL_ENABLED=0
 # NOTION_TOKEN=your_notion_token_here
 
 # Optional: Database Settings
-# VELOS_DB_PATH=C:/giwanos/data/velos.db
-# VELOS_MEMORY_DB_PATH=C:/giwanos/data/memory/velos_memory.db
+# VELOS_DB_PATH=/home/user/webapp/data/velos.db
+# VELOS_MEMORY_DB_PATH=/home/user/webapp/data/memory/velos_memory.db
 
 # Optional: Logging
 # VELOS_LOG_LEVEL=INFO
-# VELOS_LOG_FILE=C:/giwanos/logs/velos.log
+# VELOS_LOG_FILE=/home/user/webapp/logs/velos.log

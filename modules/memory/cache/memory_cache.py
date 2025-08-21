@@ -2,9 +2,10 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
+
 import time
 from collections import OrderedDict
-from typing import Any, Tuple, Optional, Dict
+from typing import Any, Dict, Optional, Tuple
 
 
 class TTLCache:
@@ -14,12 +15,7 @@ class TTLCache:
         self.maxsize = maxsize
         self.ttl = ttl
         self.store: "OrderedDict[str, Tuple[float, Any]]" = OrderedDict()
-        self.stats = {
-            "hits": 0,
-            "misses": 0,
-            "sets": 0,
-            "evictions": 0
-        }
+        self.stats = {"hits": 0, "misses": 0, "sets": 0, "evictions": 0}
 
     def get(self, key: str) -> Optional[Any]:
         """캐시에서 값 조회"""
@@ -52,20 +48,12 @@ class TTLCache:
     def clear(self) -> None:
         """캐시 전체 삭제"""
         self.store.clear()
-        self.stats = {
-            "hits": 0,
-            "misses": 0,
-            "sets": 0,
-            "evictions": 0
-        }
+        self.stats = {"hits": 0, "misses": 0, "sets": 0, "evictions": 0}
 
     def cleanup(self) -> int:
         """만료된 항목 정리"""
         now = time.monotonic()
-        expired_keys = [
-            key for key, (ts, _) in self.store.items()
-            if now - ts >= self.ttl
-        ]
+        expired_keys = [key for key, (ts, _) in self.store.items() if now - ts >= self.ttl]
         for key in expired_keys:
             self.store.pop(key)
         return len(expired_keys)
@@ -84,7 +72,7 @@ class TTLCache:
             "misses": self.stats["misses"],
             "sets": self.stats["sets"],
             "evictions": self.stats["evictions"],
-            "hit_rate": hit_rate
+            "hit_rate": hit_rate,
         }
 
     def keys(self) -> list:
@@ -118,10 +106,7 @@ class VelosMemoryCache:
 
     def get_all_stats(self) -> Dict[str, Dict[str, Any]]:
         """모든 캐시 통계 반환"""
-        return {
-            name: cache.get_stats()
-            for name, cache in self.caches.items()
-        }
+        return {name: cache.get_stats() for name, cache in self.caches.items()}
 
     def cleanup_all(self) -> Dict[str, int]:
         """모든 캐시에서 만료된 항목 정리"""
@@ -211,6 +196,3 @@ if __name__ == "__main__":
     print()
     test_velos_cache_manager()
     print("=== 모든 자가 검증 완료 ===")
-
-
-

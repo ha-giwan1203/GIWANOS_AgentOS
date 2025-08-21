@@ -14,7 +14,7 @@ def ensure_fts():
         print(f"현재 FTS 컬럼: {[col[1] for col in fts_cols]}")
 
         # text 컬럼이 없으면 테이블 재생성
-        if not any(col[1] == 'text' for col in fts_cols):
+        if not any(col[1] == "text" for col in fts_cols):
             print("FTS 테이블을 표준 스키마로 재생성합니다...")
             cur.execute("DROP TABLE IF EXISTS memory_fts")
     except Exception:
@@ -29,26 +29,34 @@ def ensure_fts():
     cur.execute("DROP TRIGGER IF EXISTS trg_mem_au")
 
     # INSERT 트리거 (안전한 패턴)
-    cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_ai AFTER INSERT ON memory BEGIN
+    cur.execute(
+        """CREATE TRIGGER IF NOT EXISTS trg_mem_ai AFTER INSERT ON memory BEGIN
       INSERT INTO memory_fts(rowid, text) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
-    END;""")
+    END;"""
+    )
 
     # DELETE 트리거 (안전한 패턴)
-    cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_ad AFTER DELETE ON memory BEGIN
+    cur.execute(
+        """CREATE TRIGGER IF NOT EXISTS trg_mem_ad AFTER DELETE ON memory BEGIN
       INSERT INTO memory_fts(memory_fts, rowid, text) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
-    END;""")
+    END;"""
+    )
 
     # UPDATE 트리거 (안전한 패턴)
-    cur.execute("""CREATE TRIGGER IF NOT EXISTS trg_mem_au AFTER UPDATE ON memory BEGIN
+    cur.execute(
+        """CREATE TRIGGER IF NOT EXISTS trg_mem_au AFTER UPDATE ON memory BEGIN
       INSERT INTO memory_fts(memory_fts, rowid, text) VALUES('delete', old.id, COALESCE(old.insight, old.raw, ''));
       INSERT INTO memory_fts(rowid, text) VALUES (new.id, COALESCE(new.insight, new.raw, ''));
-    END;""")
+    END;"""
+    )
 
     # 누락된 데이터 백필 (안전한 패턴)
-    cur.execute("""INSERT INTO memory_fts(rowid, text)
+    cur.execute(
+        """INSERT INTO memory_fts(rowid, text)
                    SELECT id, COALESCE(insight, raw, '')
                    FROM memory
-                   WHERE id NOT IN (SELECT rowid FROM memory_fts)""")
+                   WHERE id NOT IN (SELECT rowid FROM memory_fts)"""
+    )
 
     # 최적화
     cur.execute("INSERT INTO memory_fts(memory_fts) VALUES('optimize')")

@@ -1,13 +1,17 @@
 # [ACTIVE] VELOS 마크다운 PDF 변환 시스템 - 한국어 PDF 생성 스크립트
+import datetime
+import glob
+import sys
 from pathlib import Path
-import sys, glob, datetime
 
-# ReportLab 기본 설치되어 있다고 가정 (없으면: pip install reportlab)
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
+# ReportLab 기본 설치되어 있다고 가정 (없으면: pip install reportlab)
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
 
 def pick_font():
     # 1순위: 프로젝트 폰트, 2순위: 윈도우 시스템 폰트
@@ -19,13 +23,17 @@ def pick_font():
     for p in candidates:
         if p.exists():
             return p
-    raise SystemExit("사용 가능한 한글 폰트 파일을 찾지 못했습니다. NanumGothic.ttf 또는 C:\\Windows\\Fonts\\malgun.ttf 필요.")
+    raise SystemExit(
+        "사용 가능한 한글 폰트 파일을 찾지 못했습니다. NanumGothic.ttf 또는 C:\\Windows\\Fonts\\malgun.ttf 필요."
+    )
+
 
 def find_latest_md(dir_path: Path) -> Path:
     files = sorted(dir_path.glob("velos_auto_report_*.md"))
     if not files:
         raise SystemExit(f"리포트 .md 파일이 없습니다: {dir_path}")
     return files[-1]
+
 
 def md_to_paragraphs(md_text: str):
     # 마크다운을 단순 파싱해서 Paragraph로 보냄(간소화: 헤더, 리스트, 일반 텍스트만)
@@ -39,8 +47,16 @@ def md_to_paragraphs(md_text: str):
         if line.startswith("#"):
             level = len(line) - len(line.lstrip("#"))
             text = line[level:].strip()
-            size = {1:16, 2:14, 3:13}.get(level, 12)
-            style = ParagraphStyle(name=f"h{level}", fontName="KFont", fontSize=size, leading=size+3, spaceAfter=6, spaceBefore=8, bold=True)
+            size = {1: 16, 2: 14, 3: 13}.get(level, 12)
+            style = ParagraphStyle(
+                name=f"h{level}",
+                fontName="KFont",
+                fontSize=size,
+                leading=size + 3,
+                spaceAfter=6,
+                spaceBefore=8,
+                bold=True,
+            )
             paras.append(Paragraph(text, style))
             continue
         # 리스트 기호 처리
@@ -49,12 +65,10 @@ def md_to_paragraphs(md_text: str):
         else:
             text = line
         body = ParagraphStyle(name="body", fontName="KFont", fontSize=11, leading=15)
-        text = (text
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;"))
+        text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         paras.append(Paragraph(text, body))
     return paras
+
 
 def main():
     base = Path(r"C:\giwanos\data\reports\auto")
@@ -71,7 +85,9 @@ def main():
     pdfmetrics.registerFont(TTFont("KFont", str(font_path)))
 
     out_pdf = target_md.with_suffix(".pdf")
-    doc = SimpleDocTemplate(str(out_pdf), pagesize=A4, rightMargin=36, leftMargin=36, topMargin=42, bottomMargin=42)
+    doc = SimpleDocTemplate(
+        str(out_pdf), pagesize=A4, rightMargin=36, leftMargin=36, topMargin=42, bottomMargin=42
+    )
 
     md_text = target_md.read_text(encoding="utf-8")
     story = md_to_paragraphs(md_text)
@@ -79,8 +95,6 @@ def main():
 
     print(f"PDF OK -> {out_pdf}")
 
+
 if __name__ == "__main__":
     main()
-
-
-

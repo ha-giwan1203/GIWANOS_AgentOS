@@ -1,25 +1,45 @@
-import os, sys, json, glob, time, locale, importlib
+import glob
+import importlib
+import json
+import locale
+import os
+import sys
+import time
 from pathlib import Path
 
 FAIL, WARN, PASS = "FAIL", "WARN", "PASS"
 checks = []
 
+
 def add(name, ok, msg_ok, msg_bad, level=None):
     level = level or (PASS if ok else FAIL)
     checks.append({"name": name, "status": level, "detail": msg_ok if ok else msg_bad})
 
-def path(p): return str(Path(p).resolve())
+
+def path(p):
+    return str(Path(p).resolve())
+
 
 # 1) 파이썬/venv 일치
 venv_py = Path(r"C:\Users\User\venvs\velos\Scripts\python.exe")
-add("venv-exec", Path(sys.executable) == venv_py, f"exe={sys.executable}", f"exe={sys.executable} (!= {venv_py})")
+add(
+    "venv-exec",
+    Path(sys.executable) == venv_py,
+    f"exe={sys.executable}",
+    f"exe={sys.executable} (!= {venv_py})",
+)
 
 # 2) 로케일/인코딩
 enc = sys.stdout.encoding
 pref = locale.getpreferredencoding(False)
 lang = os.getenv("VELOS_LANG")
-ok_loc = (enc or "").lower()=="utf-8" and (pref or "").lower().startswith("utf") and lang=="ko"
-add("locale-utf8", ok_loc, f"stdout={enc}, pref={pref}, VELOS_LANG={lang}", f"stdout={enc}, pref={pref}, VELOS_LANG={lang}")
+ok_loc = (enc or "").lower() == "utf-8" and (pref or "").lower().startswith("utf") and lang == "ko"
+add(
+    "locale-utf8",
+    ok_loc,
+    f"stdout={enc}, pref={pref}, VELOS_LANG={lang}",
+    f"stdout={enc}, pref={pref}, VELOS_LANG={lang}",
+)
 
 # 3) MemoryAdapter 임포트
 try:
@@ -29,10 +49,13 @@ except Exception as e:
     add("memory-adapter", False, "", f"{e}")
 
 # 4) 보고서/디스패치 디렉터리 쓰기 가능
-rep = Path(r"C:\giwanos\data\reports\auto"); rep.mkdir(parents=True, exist_ok=True)
-disp = Path(r"C:\giwanos\data\reports\_dispatch"); disp.mkdir(parents=True, exist_ok=True)
+rep = Path(r"C:\giwanos\data\reports\auto")
+rep.mkdir(parents=True, exist_ok=True)
+disp = Path(r"C:\giwanos\data\reports\_dispatch")
+disp.mkdir(parents=True, exist_ok=True)
 try:
-    tfile = rep/"guardian_touch.txt"; tfile.write_text("ok", encoding="utf-8")
+    tfile = rep / "guardian_touch.txt"
+    tfile.write_text("ok", encoding="utf-8")
     add("reports-writable", True, path(tfile), "")
 except Exception as e:
     add("reports-writable", False, "", f"{e}")
@@ -44,8 +67,9 @@ if dlist:
     try:
         data = json.loads(latest.read_text(encoding="utf-8"))
         flags = []
-        for k in ("slack","notion","push","email","channel","database"):
-            if k in data: flags.append(f"{k}={data.get(k)}")
+        for k in ("slack", "notion", "push", "email", "channel", "database"):
+            if k in data:
+                flags.append(f"{k}={data.get(k)}")
         add("dispatch-latest", True, f"{latest.name} | {'; '.join(flags) or 'no flags'}", "")
     except Exception as e:
         add("dispatch-latest", False, "", f"{latest.name}: {e}")
@@ -58,7 +82,7 @@ if sh.exists():
     try:
         j = json.loads(sh.read_text(encoding="utf-8"))
         loc = j.get("locale")
-        ok = (loc in ("ko-KR","ko_KR","ko"))
+        ok = loc in ("ko-KR", "ko_KR", "ko")
         add("ui-locale", ok, f"locale={loc}", f"locale={loc}")
     except Exception as e:
         add("ui-locale", False, "", f"{e}")
@@ -70,6 +94,7 @@ font = Path(r"C:\giwanos\fonts\NanumGothic.ttf")
 if font.exists():
     try:
         from fontTools.ttLib import TTFont
+
         TTFont(str(font)).close()
         add("font-ttf", True, path(font), "")
     except Exception as e:
@@ -87,22 +112,23 @@ add("notion-env", no and nd, f"NT={no}, DB={nd}", f"NT={no}, DB={nd}")
 
 # 9) JSON 직렬화 기본 정책
 try:
-    s = json.dumps({"msg":"한글 OK"}, ensure_ascii=False)
+    s = json.dumps({"msg": "한글 OK"}, ensure_ascii=False)
     ok = "한글" in s
     add("json-ensure-ascii", ok, s, s)
 except Exception as e:
     add("json-ensure-ascii", False, "", f"{e}")
 
 # 10) PYTHONPATH 점검
-pp = os.getenv("PYTHONPATH","")
+pp = os.getenv("PYTHONPATH", "")
 ok_pp = ("C:\\giwanos" in pp) and ("modules" in pp)
 add("pythonpath", ok_pp, pp, pp)
 
 # 출력 요약
-summary = {"PASS":0,"WARN":0,"FAIL":0}
-for c in checks: summary[c["status"]] = summary.get(c["status"],0)+1
+summary = {"PASS": 0, "WARN": 0, "FAIL": 0}
+for c in checks:
+    summary[c["status"]] = summary.get(c["status"], 0) + 1
 print("=== VELOS Guardian Report ===")
 for c in checks:
-    tag = {"PASS":"✔","WARN":"⚠","FAIL":"✖"}[c["status"]]
+    tag = {"PASS": "✔", "WARN": "⚠", "FAIL": "✖"}[c["status"]]
     print(f"{tag} {c['name']}: {c['detail']}")
 print(f"--- Totals: PASS={summary['PASS']} WARN={summary['WARN']} FAIL={summary['FAIL']}")

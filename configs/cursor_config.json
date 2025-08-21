@@ -2,13 +2,13 @@
   "cursor_path": "cursor",
   "auto_commit": true,
   "auto_test": true,
-  "workspace_path": "${VELOS_ROOT:-C:/giwanos}",
+  "workspace_path": "${VELOS_ROOT:-/home/user/webapp}",
   "git_auto_push": true,
   "file_watch_enabled": true,
   "workspace_settings": {
     "auto_save": true,
     "format_on_save": true,
-    "python_interpreter": "${VELOS_PYTHON:-C:/Users/User/venvs/velos/Scripts/python.exe}"
+    "python_interpreter": "${VELOS_PYTHON:-/usr/bin/python3}"
   },
   "velos_integration": {
     "enabled": true,

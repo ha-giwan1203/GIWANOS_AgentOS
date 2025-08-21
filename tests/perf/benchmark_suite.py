@@ -3,16 +3,18 @@
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
 from __future__ import annotations
+
 import os
-import time
 import random
-import string
 import sqlite3
-import threading
 import statistics as stats
+import string
+import threading
+import time
 from dataclasses import dataclass
 
 DB = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # DB helpers
@@ -29,8 +31,7 @@ def open_conn(db: str = DB) -> sqlite3.Connection:
 def fts_match_count(conn: sqlite3.Connection, token: str) -> int:
     # FTS는 반드시 MATCH로
     return conn.execute(
-        "SELECT COUNT(*) FROM memory_fts WHERE memory_fts MATCH ?",
-        (token,)
+        "SELECT COUNT(*) FROM memory_fts WHERE memory_fts MATCH ?", (token,)
     ).fetchone()[0]
 
 
@@ -57,18 +58,22 @@ def insert_n(n: int) -> BenchResult:
     for i in range(n):
         cur.execute(
             "INSERT INTO memory(ts, role, insight) VALUES(?,?,?)",
-            (int(time.time()), "bench",
-             f"bench row {i} {_rand_token()} " + "".join(random.choices(string.ascii_lowercase, k=8)))
+            (
+                int(time.time()),
+                "bench",
+                f"bench row {i} {_rand_token()} "
+                + "".join(random.choices(string.ascii_lowercase, k=8)),
+            ),
         )
         # autocommit인데 너무 빠르면 WAL이 비대해질 수 있음. 2k마다 체크포인트 힌트.
-        if (i+1) % 2000 == 0:
+        if (i + 1) % 2000 == 0:
             try:
                 cur.execute("PRAGMA wal_checkpoint(PASSIVE);")
             except sqlite3.Error:
                 pass
     sec = time.time() - t0
     conn.close()
-    return BenchResult("insert", n, sec, n/max(sec, 1e-6))
+    return BenchResult("insert", n, sec, n / max(sec, 1e-6))
 
 
 def search_k(k: int, limit: int = 25) -> BenchResult:
@@ -83,32 +88,38 @@ def search_k(k: int, limit: int = 25) -> BenchResult:
             SELECT m.id, m.ts FROM memory_fts f
             JOIN memory m ON m.id=f.rowid
             WHERE f.insight MATCH ? ORDER BY m.ts DESC LIMIT ?
-            """, (tok, limit)
+            """,
+            (tok, limit),
         ).fetchall()
         counts.append(len(rows))
     sec = time.time() - t0
     conn.close()
     extra = f"avg_hits={sum(counts)/len(counts):.1f}"
-    return BenchResult("search", k, sec, k/max(sec, 1e-6), extra)
+    return BenchResult("search", k, sec, k / max(sec, 1e-6), extra)
 
 
 def update_n(n: int) -> BenchResult:
     conn = open_conn()
     cur = conn.cursor()
-    ids = [r[0] for r in cur.execute(
-        "SELECT id FROM memory WHERE role='bench' ORDER BY id DESC LIMIT ?", (n,)
-    ).fetchall()]
+    ids = [
+        r[0]
+        for r in cur.execute(
+            "SELECT id FROM memory WHERE role='bench' ORDER BY id DESC LIMIT ?", (n,)
+        ).fetchall()
+    ]
     t0 = time.time()
     for i, mid in enumerate(ids):
-        cur.execute("UPDATE memory SET insight=? WHERE id=?", (f"bench updated {_rand_token()}", mid))
-        if (i+1) % 2000 == 0:
+        cur.execute(
+            "UPDATE memory SET insight=? WHERE id=?", (f"bench updated {_rand_token()}", mid)
+        )
+        if (i + 1) % 2000 == 0:
             try:
                 cur.execute("PRAGMA wal_checkpoint(PASSIVE);")
             except sqlite3.Error:
                 pass
     sec = time.time() - t0
     conn.close()
-    return BenchResult("update", n, sec, n/max(sec, 1e-6))
+    return BenchResult("update", n, sec, n / max(sec, 1e-6))
 
 
 def delete_role(role: str = "bench") -> BenchResult:
@@ -119,7 +130,7 @@ def delete_role(role: str = "bench") -> BenchResult:
     cur.execute("DELETE FROM memory WHERE role=?", (role,))
     sec = time.time() - t0
     conn.close()
-    return BenchResult("delete", n, sec, n/max(sec, 1e-6))
+    return BenchResult("delete", n, sec, n / max(sec, 1e-6))
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -134,8 +145,10 @@ def concurrent_mix(writers: int = 2, readers: int = 4, seconds: int = 5) -> Benc
         i = 0
         try:
             while time.time() < stop:
-                c.execute("INSERT INTO memory(ts, role, insight) VALUES(?,?,?)",
-                          (int(time.time()), "benchmix", f"mix write {_rand_token()}"))
+                c.execute(
+                    "INSERT INTO memory(ts, role, insight) VALUES(?,?,?)",
+                    (int(time.time()), "benchmix", f"mix write {_rand_token()}"),
+                )
                 i += 1
         except Exception as e:
             errs.append(("w", str(e)))
@@ -156,8 +169,9 @@ def concurrent_mix(writers: int = 2, readers: int = 4, seconds: int = 5) -> Benc
             r_counts.append(i)
             c.close()
 
-    threads = [threading.Thread(target=w) for _ in range(writers)] + \
-              [threading.Thread(target=r) for _ in range(readers)]
+    threads = [threading.Thread(target=w) for _ in range(writers)] + [
+        threading.Thread(target=r) for _ in range(readers)
+    ]
     for t in threads:
         t.start()
     for t in threads:
@@ -166,7 +180,7 @@ def concurrent_mix(writers: int = 2, readers: int = 4, seconds: int = 5) -> Benc
     extra = f"writes/s={sum(w_counts)/seconds:.1f}, reads/s={sum(r_counts)/seconds:.1f}"
     if errs:
         extra += f", errors={errs!r}"
-    return BenchResult("concurrent_mix", writers+readers, seconds, 0.0, extra)
+    return BenchResult("concurrent_mix", writers + readers, seconds, 0.0, extra)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -191,12 +205,12 @@ def run_suite():
         print(f"insert_{n}: {r.seconds:.2f}s ({r.qps:.0f}/s)")
 
         print(f"=== search {n//50} queries ===")
-        r = search_k(n//50)
+        r = search_k(n // 50)
         results.append(r)
         print(f"search_{n//50}: {r.seconds:.3f}s ({r.qps:.0f}/s) {r.extra}")
 
         print(f"=== update {n//10} rows ===")
-        r = update_n(n//10)
+        r = update_n(n // 10)
         results.append(r)
         print(f"update_{n//10}: {r.seconds:.2f}s ({r.qps:.0f}/s)")
 

@@ -8,14 +8,16 @@
 # - 실시간 상태 표시
 # - 간단한 상태 체크
 
-import streamlit as st
-from pathlib import Path
 import json
 import time
 from datetime import datetime
+from pathlib import Path
+
+import streamlit as st
 
 # VELOS 루트 경로
 VELOS_ROOT = Path(r"C:\giwanos")
+
 
 def check_system_status():
     """시스템 상태 확인"""
@@ -25,21 +27,22 @@ def check_system_status():
         "logs": (VELOS_ROOT / "data" / "logs").exists(),
         "configs": (VELOS_ROOT / "configs").exists(),
         "scripts": (VELOS_ROOT / "scripts").exists(),
-        "modules": (VELOS_ROOT / "modules").exists()
+        "modules": (VELOS_ROOT / "modules").exists(),
     }
     return status
+
 
 def main():
     """메인 대시보드"""
     st.title("VELOS 상태 대시보드")
     st.write("시스템 상태 모니터링")
-    
+
     # 상태 확인
     status = check_system_status()
-    
+
     # 상태 표시
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.subheader("핵심 디렉토리")
         for name, exists in status.items():
@@ -47,20 +50,20 @@ def main():
                 st.success(f"✅ {name}")
             else:
                 st.error(f"❌ {name}")
-    
+
     with col2:
         st.subheader("시스템 정보")
         st.write(f"**VELOS 루트**: {VELOS_ROOT}")
         st.write(f"**현재 시간**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        
+
         # 자동 새로고침
         if st.button("새로고침"):
             st.rerun()
-    
+
     # 자동 새로고침 (5초마다)
     time.sleep(5)
     st.rerun()
 
+
 if __name__ == "__main__":
     main()
-

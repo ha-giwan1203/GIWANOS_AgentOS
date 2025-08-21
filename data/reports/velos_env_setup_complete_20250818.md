@@ -7,14 +7,14 @@
 ## 📋 설정된 환경변수
 
 ### 핵심 경로 설정
-- `VELOS_ROOT`: `C:\giwanos`
+- `VELOS_ROOT`: `/home/user/webapp`
 - `VELOS_VENV`: `C:\Users\User\venvs\velos`
-- `VELOS_PYTHON`: `C:\Users\User\venvs\velos\Scripts\python.exe`
-- `VELOS_DB`: `C:\giwanos\data\velos.db`
+- `VELOS_PYTHON`: `/usr/bin/python3`
+- `VELOS_DB`: `/home/user/webapp\data\velos.db`
 
 ### 로그 및 백업 설정
-- `VELOS_LOG_PATH`: `C:\giwanos\data\logs`
-- `VELOS_BACKUP`: `C:\giwanos\data\backups`
+- `VELOS_LOG_PATH`: `/home/user/webapp\data\logs`
+- `VELOS_BACKUP`: `/home/user/webapp\data\backups`
 - `VELOS_LOG_LEVEL`: `INFO`
 
 ### API 및 성능 설정
@@ -34,9 +34,9 @@ print('VELOS_LOG:', get_setting('logging.path'))
 ```
 
 **결과**:
-- VELOS_ROOT: C:\giwanos
-- VELOS_DB: C:\giwanos\data\velos.db
-- VELOS_LOG: C:\giwanos\data\logs
+- VELOS_ROOT: /home/user/webapp
+- VELOS_DB: /home/user/webapp\data\velos.db
+- VELOS_LOG: /home/user/webapp\data\logs
 
 ### 환경변수 주입 시스템
 - `configs/settings.yaml`에서 `${VAR:-default}` 구문 사용
@@ -46,9 +46,9 @@ print('VELOS_LOG:', get_setting('logging.path'))
 ## 🔧 적용된 변경사항
 
 ### 1. settings.yaml 수정
-- 데이터베이스 경로: `data/velos.db` → `C:/giwanos/data/velos.db`
-- 로그 경로: `data/logs` → `C:/giwanos/data/logs`
-- 백업 경로: `data/backups` → `C:/giwanos/data/backups`
+- 데이터베이스 경로: `data/velos.db` → `/home/user/webapp/data/velos.db`
+- 로그 경로: `data/logs` → `/home/user/webapp/data/logs`
+- 백업 경로: `data/backups` → `/home/user/webapp/data/backups`
 
 ### 2. 환경변수 영구 설정
 - 현재 세션 및 시스템 사용자 레벨에 환경변수 설정

@@ -1,15 +1,25 @@
 # [ACTIVE] VELOS 모니터링 대시보드 - 시스템 모니터링 인터페이스
-import os, json, time, re, threading, queue, base64, urllib.parse
-from pathlib import Path
+import base64
+import json
+import os
+import queue
+import re
+import threading
+import time
+import urllib.parse
 from datetime import datetime
-import streamlit as st
+from pathlib import Path
+
 import pandas as pd
+import streamlit as st
 
 st.set_page_config(page_title="VELOS 대시보드", layout="wide")
 
+
 # ---------- 공통 스타일 ----------
 def _inject_base_css():
-    st.markdown("""
+    st.markdown(
+        """
     <style>
       .role-badge {
         display:inline-block; padding:2px 8px; border-radius:10px;
@@ -27,13 +37,17 @@ def _inject_base_css():
       .log-info  { color:#bfdbfe; }
       .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
+
 
 # ---------- 파일 유틸 ----------
 def list_files(folder: Path, pattern: str):
     if not folder.exists():
         return []
     return sorted(folder.glob(pattern))
+
 
 def read_text(path: Path, tail_lines=None):
     if not path.exists():
@@ -43,19 +57,25 @@ def read_text(path: Path, tail_lines=None):
         return "\n".join(txt.splitlines()[-tail_lines:])
     return txt
 
+
 # ---------- 로그 파싱 ----------
-LOG_LINE = re.compile(r"(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?\s(?P<lvl>INFO|WARNING|ERROR)")
+LOG_LINE = re.compile(
+    r"(?P<ts>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?\s(?P<lvl>INFO|WARNING|ERROR)"
+)
+
 
 def parse_log_levels(text: str):
-    c = {"INFO":0,"WARNING":0,"ERROR":0}
+    c = {"INFO": 0, "WARNING": 0, "ERROR": 0}
     for m in LOG_LINE.finditer(text):
         c[m.group("lvl")] += 1
     return c
+
 
 # ---------- 컨텍스트 파싱 ----------
 CTX_LINE = re.compile(
     r"^\[(?P<ts>\d{9,})\]\s+\((?P<role>user|system|assistant)\)\s*(?:\[(?P<topic>.*?)\])?\s*(?P<content>.*?)(?:\s*\|\s*tags=(?P<tags>.*))?$"
 )
+
 
 def parse_context_block(block: str):
     rows = []
@@ -71,37 +91,46 @@ def parse_context_block(block: str):
             tstr = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
         except Exception:
             tstr = str(ts)
-        rows.append({
-            "time": tstr,
-            "role": m.group("role"),
-            "topic": m.group("topic") or "",
-            "content": (m.group("content") or "").strip(),
-            "tags": (m.group("tags") or "").strip(),
-        })
+        rows.append(
+            {
+                "time": tstr,
+                "role": m.group("role"),
+                "topic": m.group("topic") or "",
+                "content": (m.group("content") or "").strip(),
+                "tags": (m.group("tags") or "").strip(),
+            }
+        )
     return pd.DataFrame(rows)
+
 
 def load_context_df():
     hc = load_json_safe(LOGS / "hot_context.json")
     block = hc.get("context_block", "")
     return parse_context_block(block)
 
+
 # ---------- 렌더링 ----------
 def _role_badge(role: str):
     cls = "role-user"
-    if role == "assistant": cls = "role-assistant"
-    elif role == "system": cls = "role-system"
+    if role == "assistant":
+        cls = "role-assistant"
+    elif role == "system":
+        cls = "role-system"
     return f'<span class="role-badge {cls}">{role}</span>'
+
 
 def render_chat_stream(df, q: str = ""):
     if df.empty:
         st.info("표시할 대화가 없습니다.")
         return
     if q:
-        mask = df["content"].str.contains(q, case=False, regex=False) | df["tags"].str.contains(q, case=False, regex=False)
+        mask = df["content"].str.contains(q, case=False, regex=False) | df["tags"].str.contains(
+            q, case=False, regex=False
+        )
         df = df[mask]
     for _, r in df.iterrows():
         st.markdown(
-            f'''
+            f"""
             <div class="chat-item">
               {_role_badge(r["role"])}
               <span class="mono" style="opacity:.7">{r["time"]}</span>
@@ -109,47 +138,64 @@ def render_chat_stream(df, q: str = ""):
               <div style="margin-top:6px;white-space:pre-wrap">{st._escape_markdown(r["content"])}</div>
               {('<div class="mono" style="margin-top:6px;opacity:.6">tags: '+st._escape_markdown(r["tags"])+'</div>') if r["tags"] else ''}
             </div>
-            ''',
-            unsafe_allow_html=True
+            """,
+            unsafe_allow_html=True,
         )
+
 
 def render_log_tail(path: Path, tail_n: int, q: str = ""):
     txt = read_text(path, tail_lines=tail_n)
     if q:
         pattern = re.compile(re.escape(q), re.IGNORECASE)
+
         def _hl(line: str):
             return pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", line)
+
         txt = "\n".join(_hl(l) for l in txt.splitlines())
-    txt = txt.replace(" ERROR ", ' <span class="log-error">ERROR</span> ') \
-             .replace(" WARNING ", ' <span class="log-warn">WARNING</span> ') \
-             .replace(" INFO ", ' <span class="log-info">INFO</span> ')
-    st.markdown(f'<div class="mono" style="font-size:13px; line-height:1.35; white-space:pre-wrap">{txt}</div>', unsafe_allow_html=True)
+    txt = (
+        txt.replace(" ERROR ", ' <span class="log-error">ERROR</span> ')
+        .replace(" WARNING ", ' <span class="log-warn">WARNING</span> ')
+        .replace(" INFO ", ' <span class="log-info">INFO</span> ')
+    )
+    st.markdown(
+        f'<div class="mono" style="font-size:13px; line-height:1.35; white-space:pre-wrap">{txt}</div>',
+        unsafe_allow_html=True,
+    )
+
 
 # ---------- 요약 카드 ----------
 def summary_cards(app_log: Path, show_cols=3):
     txt = read_text(app_log, tail_lines=2000)
     lv = parse_log_levels(txt)
     col = st.columns(show_cols)
-    with col[0]: st.metric("최근 INFO",   lv["INFO"])
-    with col[1]: st.metric("최근 WARNING",lv["WARNING"])
-    with col[2]: st.metric("최근 ERROR",  lv["ERROR"])
+    with col[0]:
+        st.metric("최근 INFO", lv["INFO"])
+    with col[1]:
+        st.metric("최근 WARNING", lv["WARNING"])
+    with col[2]:
+        st.metric("최근 ERROR", lv["ERROR"])
     if lv["ERROR"] > 0:
         st.error("최근 로그에 ERROR가 감지되었습니다.")
 
 
 # ============== [NEW] 실시간 대화 뷰 ==============
 
-import json, glob, time, pathlib
+import glob
+import json
+import pathlib
+import time
 from datetime import datetime
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
 
 # ============== [NEW] 데이터 정규화 유틸리티 ==============
 
-POSSIBLE_ROLE_KEYS    = ("role", "author", "speaker", "who")
-POSSIBLE_TEXT_KEYS    = ("content", "text", "message", "body")
-POSSIBLE_TIME_KEYS    = ("ts", "time", "timestamp", "created_at")
+POSSIBLE_ROLE_KEYS = ("role", "author", "speaker", "who")
+POSSIBLE_TEXT_KEYS = ("content", "text", "message", "body")
+POSSIBLE_TIME_KEYS = ("ts", "time", "timestamp", "created_at")
 POSSIBLE_SESSION_KEYS = ("session", "session_id", "sid")
+
 
 def _to_dt(v):
     # 숫자(epoch)·문자 모두 허용
@@ -158,9 +204,10 @@ def _to_dt(v):
             return datetime.fromtimestamp(float(v))
         v = str(v)
         # ISO-like
-        return datetime.fromisoformat(v.replace("Z","+00:00"))
+        return datetime.fromisoformat(v.replace("Z", "+00:00"))
     except Exception:
         return None
+
 
 def normalize_record(raw: dict, src_path: str) -> dict:
     # role
@@ -180,7 +227,9 @@ def normalize_record(raw: dict, src_path: str) -> dict:
     content = next((raw.get(k) for k in POSSIBLE_TEXT_KEYS if k in raw and raw.get(k)), None)
     if content is None:
         # 마지막 보루: 사람이 읽을 수 있게 요약
-        content = raw.get("summary") or raw.get("event") or json.dumps(raw, ensure_ascii=False)[:2000]
+        content = (
+            raw.get("summary") or raw.get("event") or json.dumps(raw, ensure_ascii=False)[:2000]
+        )
 
     # timestamp
     ts = next((raw.get(k) for k in POSSIBLE_TIME_KEYS if k in raw and raw.get(k) is not None), None)
@@ -199,13 +248,15 @@ def normalize_record(raw: dict, src_path: str) -> dict:
         "_src": src_path,
     }
 
+
 # 실시간 수집 대상 패턴 (필요시 경로 맞춰 조정)
 CHAT_GLOBS = [
-    r"C:\giwanos\data\sessions\*.json",      # 세션 대화
-    r"C:\giwanos\data\memory\*buffer*.jsonl",# 실시간 버퍼
-    r"C:\giwanos\data\memory\tasks_*.jsonl", # 작업 히스토리
-    r"C:\giwanos\data\logs\chat_*.jsonl",    # 선택: 채팅 로그가 따로 있을 때
+    r"/home/user/webapp\data\sessions\*.json",  # 세션 대화
+    r"/home/user/webapp\data\memory\*buffer*.jsonl",  # 실시간 버퍼
+    r"/home/user/webapp\data\memory\tasks_*.jsonl",  # 작업 히스토리
+    r"/home/user/webapp\data\logs\chat_*.jsonl",  # 선택: 채팅 로그가 따로 있을 때
 ]
+
 
 def _find_chat_files() -> list[pathlib.Path]:
     files = []
@@ -213,6 +264,7 @@ def _find_chat_files() -> list[pathlib.Path]:
         files += [pathlib.Path(p) for p in glob.glob(pattern)]
     # 최근 것부터
     return sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)
+
 
 def load_records():
     """완전한 데이터 로딩 시스템 - JSON/JSONL 모두 지원"""
@@ -245,7 +297,7 @@ def load_records():
                             rows.append(normalize_record(data, p))
             except Exception as e:
                 # 파일 하나가 망가져도 전체는 계속
-                rows.append(normalize_record({"type":"parse_error","message":str(e)}, p))
+                rows.append(normalize_record({"type": "parse_error", "message": str(e)}, p))
 
     df = pd.DataFrame(rows)
     # 컬럼 강제 보정 (없어도 에러 안 나게)
@@ -256,6 +308,7 @@ def load_records():
         # 정렬 기본: 시간 오름차순
         df = df.sort_values("ts").reset_index(drop=True)
     return df
+
 
 def _load_messages(files: list[pathlib.Path], since_ts: float | None = None, limit: int = 500):
     """기존 호환성을 위한 래퍼 함수"""
@@ -271,11 +324,12 @@ def _load_messages(files: list[pathlib.Path], since_ts: float | None = None, lim
 
     return df
 
+
 def render_balloon(row):
-    mine = row["role"] in ("user","system")  # 왼/오른쪽 기준 원하는 대로
+    mine = row["role"] in ("user", "system")  # 왼/오른쪽 기준 원하는 대로
     align = "flex-end" if mine else "flex-start"
     bg = "#0ea5e9" if mine else "#334155"
-    txt = str(row["content"]).replace("\n","<br>")
+    txt = str(row["content"]).replace("\n", "<br>")
     st.markdown(
         f"""
         <div style="display:flex; justify-content:{align}; margin:4px 0;">
@@ -288,7 +342,7 @@ def render_balloon(row):
           </div>
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 
@@ -300,25 +354,30 @@ def _chat_bubble(role: str, text: str):
         with st.chat_message("assistant"):
             st.markdown(text)
 
+
 def page_live():
     st.header("🔴 실시간 대화 모니터")
 
     # 컨트롤 UI
-    col1, col2, col3, col4 = st.columns([1,1,1,1])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     with col1:
         refresh = st.slider("새로고침 주기(초)", 3, 60, 10, 1)
     with col2:
         show_last = st.selectbox("표시 범위", ["최근 100개", "최근 300개", "최근 500개"])
         limit = int(show_last.split()[1][:-1])
     with col3:
-        role_filter = st.multiselect("역할 필터", ["user", "assistant"], default=["user","assistant"])
+        role_filter = st.multiselect(
+            "역할 필터", ["user", "assistant"], default=["user", "assistant"]
+        )
     with col4:
         kw = st.text_input("키워드 포함", value="")
 
     # 데이터 로딩
     df = load_records()
     if df.empty:
-        st.warning("대화 로그를 찾지 못했습니다. `sessions/` 또는 `memory/*jsonl` 경로를 확인하세요.")
+        st.warning(
+            "대화 로그를 찾지 못했습니다. `sessions/` 또는 `memory/*jsonl` 경로를 확인하세요."
+        )
         return
 
     # 역할 필터가 있어도, 컬럼 없으면 죽지 않도록 가드
@@ -336,7 +395,7 @@ def page_live():
     # 상단 요약
     meta = st.container()
     with meta:
-        left, mid, right = st.columns([1,2,1])
+        left, mid, right = st.columns([1, 2, 1])
         with left:
             st.metric("로드된 메시지", len(df))
         with mid:
@@ -359,7 +418,8 @@ def page_live():
     st.caption("자동 새로고침 동작 중…")
     st.experimental_rerun() if st.autorefresh(interval=refresh * 1000, key="live_ref") else None
 
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
+
+ROOT = Path(os.getenv("VELOS_ROOT", "/home/user/webapp"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"
@@ -370,8 +430,9 @@ MEMORY = DATA / "memory"
 
 def resolve_report_key(key: str):
     # key 예: 20250816_150544
-    pdf = next(REPORTS.glob(f"velos_auto_report_{key}_*_ko.pdf"), None) or \
-          next(REPORTS.glob(f"velos_auto_report_{key}_ko.pdf"), None)
+    pdf = next(REPORTS.glob(f"velos_auto_report_{key}_*_ko.pdf"), None) or next(
+        REPORTS.glob(f"velos_auto_report_{key}_ko.pdf"), None
+    )
     dispatch = list(DISPATCH.glob(f"dispatch_{key[:8]}*.json"))
     return {"pdf": pdf, "dispatch": dispatch}
 
@@ -489,7 +550,7 @@ def main():
         summary_cards(app_log)
 
     tab_report, tab_dispatch, tab_logs, tab_memory, tab_live = st.tabs(
-        ["보고서","디스패처","로그","메모리","실시간"]
+        ["보고서", "디스패처", "로그", "메모리", "실시간"]
     )
 
     with tab_report:
@@ -505,9 +566,9 @@ def main():
             # 최근 10개 표시
             for i, report_file in enumerate(report_files[:10]):
                 with st.expander(f"{report_file.name} ({time.ctime(report_file.stat().st_mtime)})"):
-                    if report_file.suffix == '.md':
+                    if report_file.suffix == ".md":
                         try:
-                            content = report_file.read_text(encoding='utf-8')
+                            content = report_file.read_text(encoding="utf-8")
                             st.text_area("내용", content, height=200, key=f"report_{i}")
                         except Exception as e:
                             st.error(f"파일 읽기 오류: {e}")
@@ -530,7 +591,9 @@ def main():
 
             # 최근 5개 표시
             for i, dispatch_file in enumerate(dispatch_files[:5]):
-                with st.expander(f"{dispatch_file.name} ({time.ctime(dispatch_file.stat().st_mtime)})"):
+                with st.expander(
+                    f"{dispatch_file.name} ({time.ctime(dispatch_file.stat().st_mtime)})"
+                ):
                     try:
                         data = load_json_safe(dispatch_file)
                         st.json(data)
@@ -565,7 +628,9 @@ def main():
                 log_file = next(f for f in log_files if f.name == selected_log)
 
                 # 로그 검색 필터
-                log_search = st.text_input("🔍 로그 내용 검색", placeholder="로그에서 검색할 키워드...")
+                log_search = st.text_input(
+                    "🔍 로그 내용 검색", placeholder="로그에서 검색할 키워드..."
+                )
 
                 # 표시할 줄 수
                 tail_lines = st.slider("표시할 줄 수", 50, 500, 200, step=50)
@@ -594,7 +659,7 @@ def main():
             if selected_memory:
                 memory_file = next(f for f in memory_files if f.name == selected_memory)
                 try:
-                    if memory_file.suffix == '.json':
+                    if memory_file.suffix == ".json":
                         data = load_json_safe(memory_file)
                         st.json(data)
                     else:  # .jsonl
@@ -618,5 +683,5 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         st.error("렌더링 중 오류 발생")
-        st.exception(e)   # 화면에 스택트레이스 표시
+        st.exception(e)  # 화면에 스택트레이스 표시
         raise

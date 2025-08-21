@@ -1,17 +1,17 @@
 # [ACTIVE] VELOS System Alert Notifier
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# 
+#
 # 시스템 알림을 처리하는 모듈입니다.
 
+import argparse
+import json
 import os
 import sys
-import json
-import argparse
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path("/home/user/webapp")
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
@@ -61,13 +61,9 @@ def check_environment():
             print(f"   ⚠️  {var}: Not set")
 
     print(f"\n3. Summary:")
-    print(
-        f"   Required: {sum(1 for var in required_vars if os.getenv(var))}/{len(required_vars)}"
-    )
+    print(f"   Required: {sum(1 for var in required_vars if os.getenv(var))}/{len(required_vars)}")
     print(f"   Optional: {optional_count}/{len(optional_vars)}")
-    print(
-        f"   Overall: {'✅ OK' if all_required_ok else '❌ Missing required variables'}"
-    )
+    print(f"   Overall: {'✅ OK' if all_required_ok else '❌ Missing required variables'}")
 
     return all_required_ok
 
@@ -138,9 +134,7 @@ def main():
     parser = argparse.ArgumentParser(description="VELOS System Alert Notifier")
     parser.add_argument("--selfcheck", action="store_true", help="Run self check")
     parser.add_argument("--test", action="store_true", help="Test notifications")
-    parser.add_argument(
-        "--env", action="store_true", help="Check environment variables"
-    )
+    parser.add_argument("--env", action="store_true", help="Check environment variables")
 
     args = parser.parse_args()
 

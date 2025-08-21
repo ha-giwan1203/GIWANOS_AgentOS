@@ -7,15 +7,17 @@ VELOS Slack 알림 스크립트
 - 환경변수 기반 유연한 설정
 """
 
+import json
 import os
 import sys
-import json
-import requests
 from pathlib import Path
+
+import requests
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -25,20 +27,12 @@ except ImportError:
 def send_slack_message(message, webhook_url):
     """Slack 메시지 전송"""
     try:
-        response = requests.post(
-            webhook_url,
-            json={"text": message},
-            timeout=10
-        )
+        response = requests.post(webhook_url, json={"text": message}, timeout=10)
 
         if response.ok:
             return {"ok": True, "status_code": response.status_code}
         else:
-            return {
-                "ok": False,
-                "status_code": response.status_code,
-                "error": response.text[:200]
-            }
+            return {"ok": False, "status_code": response.status_code, "error": response.text[:200]}
 
     except requests.exceptions.Timeout:
         return {"ok": False, "error": "타임아웃"}
@@ -104,7 +98,7 @@ def main():
             "ok": True,
             "message_length": len(message),
             "notion_included": bool(notion_url),
-            "status_code": result.get("status_code")
+            "status_code": result.get("status_code"),
         }
 
         print(json.dumps(success_result, ensure_ascii=False))
@@ -120,7 +114,7 @@ def main():
         error_result = {
             "ok": False,
             "error": result.get("error"),
-            "status_code": result.get("status_code")
+            "status_code": result.get("status_code"),
         }
 
         print(json.dumps(error_result, ensure_ascii=False), file=sys.stderr)
@@ -129,6 +123,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

@@ -1,8 +1,10 @@
 # [EXPERIMENT] VELOS 모니터링 유틸리티 - 시스템 모니터링 모듈
 # [EXPERIMENT] monitor_utils.py
 from __future__ import annotations
+
+from typing import Iterable, Literal, Optional, Union
+
 import pandas as pd
-from typing import Iterable, Optional, Union, Literal
 
 ColumnKeys = Union[str, Iterable[str]]
 ConflictPolicy = Literal["keep_left", "keep_right", "suffix", "raise"]
@@ -154,16 +156,12 @@ def _safe_attach(
     if prefix:
         rdf = with_prefix(rdf, prefix, sep=sep)
 
-    attached = _align_or_merge(
-        left, rdf, on=on, left_on=left_on, right_on=right_on, how=how
-    )
+    attached = _align_or_merge(left, rdf, on=on, left_on=left_on, right_on=right_on, how=how)
 
     attached = _resolve_conflicts(
-        attached, conflict=conflict,
+        attached,
+        conflict=conflict,
         suffix=conflict_suffix,
-        keep="left" if conflict == "keep_left" else "right"
+        keep="left" if conflict == "keep_left" else "right",
     )
     return attached
-
-
-

@@ -2,13 +2,15 @@
 # [ACTIVE] 실행: streamlit run scripts/reportkey_dashboard.py --server.port=8501
 
 from __future__ import annotations
-import os
+
 import json
+import os
 from pathlib import Path
 
 # (선택) .env 읽기
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except Exception:
     pass
@@ -16,6 +18,7 @@ except Exception:
 # PDF 검색을 위한 PyPDF2
 try:
     from PyPDF2 import PdfReader
+
     PDF_AVAILABLE = True
 except ImportError:
     PDF_AVAILABLE = False
@@ -141,7 +144,9 @@ if st.button("검색 실행", use_container_width=True):
 
     st.subheader("📁 검색 결과")
     if not hits:
-        st.info("검색 결과가 없습니다. 경로가 맞는지 또는 REPORT_KEY가 포함되어 생성되었는지 확인하세요.")
+        st.info(
+            "검색 결과가 없습니다. 경로가 맞는지 또는 REPORT_KEY가 포함되어 생성되었는지 확인하세요."
+        )
         st.code("\n".join(str(p) for p in search_dirs), language="text")
         st.stop()
 
@@ -188,7 +193,9 @@ if st.button("검색 실행", use_container_width=True):
                             for i, page in enumerate(reader.pages[:3]):
                                 text = page.extract_text() or ""
                                 if text.strip():
-                                    st.code(f"--- 페이지 {i+1} ---\n{tail(text, 50)}", language="text")
+                                    st.code(
+                                        f"--- 페이지 {i+1} ---\n{tail(text, 50)}", language="text"
+                                    )
                         except Exception as e:
                             st.write(f"PDF 파일입니다. 읽기 오류: {e}")
                     else:

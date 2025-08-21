@@ -8,6 +8,7 @@ import uuid
 from datetime import UTC, datetime
 
 from modules.report_paths import ROOT
+
 GIWANOS = ROOT
 BUF_PATH = GIWANOS / "data" / "memory" / "memory_buffer.jsonl"
 META_PATH = GIWANOS / "data" / "memory" / "client_seq.json"
