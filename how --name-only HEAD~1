@@ -1,5 +1,0 @@
-[33me2635f87[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m chore: remove sensitive files from repo
-[33m13a6b835[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: apply cursor-connected changes
-[33m1a410022[m[33m ([m[1;33mtag: [m[1;33mv1.0-file-hygiene[m[33m)[m Add VELOS workspace rules with core deletion protection
-[33m004f21c0[m VELOS 시스템 업데이트: 가상환경 설정, Git 인코딩 개선, 자동화 스크립트 추가
-[33mb4e1ae5d[m feat: Update VS Code Python interpreter path to use .venv_link
