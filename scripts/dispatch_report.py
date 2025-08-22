@@ -16,7 +16,7 @@ def _load_dotenv():
         from dotenv import load_dotenv
     except Exception:
         return
-    root = Path(r"C:\giwanos")
+    root = Path("/home/user/webapp")
     for p in (root / "configs/.env", root / ".env"):
         if p.exists():
             load_dotenv(dotenv_path=p, override=False, encoding="utf-8")
@@ -33,7 +33,7 @@ except Exception:
     post_with_retry = None
     get_with_retry = None
 
-ROOT = Path(r"C:\giwanos")
+ROOT = Path("/home/user/webapp")
 AUTO = ROOT / "data" / "reports" / "auto"
 DISP = ROOT / "data" / "reports" / "_dispatch"
 DISP.mkdir(parents=True, exist_ok=True)
@@ -248,12 +248,52 @@ def send_pushbullet(title: str, body: str) -> dict:
 
 
 # ---------------- Entry ----------------
+def _generate_dynamic_title(pdf_path: Path, md_path: Path | None = None) -> str:
+    """파일명과 내용을 기반으로 동적 제목 생성"""
+    from datetime import datetime
+    
+    # 기본 제목
+    base_title = "VELOS 시스템 보고서"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    
+    filename = pdf_path.name.lower()
+    
+    # 파일명 패턴 기반 제목 결정
+    if "memory" in filename or "intelligence" in filename:
+        base_title = "🧠 VELOS 메모리 인텔리전스 보고서"
+    elif "weekly" in filename or "operations" in filename:
+        base_title = "📊 VELOS 주간 운영 요약 보고서"  
+    elif "health" in filename or "system" in filename:
+        base_title = "🏥 VELOS 시스템 헬스 보고서"
+    elif "performance" in filename or "bench" in filename:
+        base_title = "⚡ VELOS 성능 분석 보고서"
+    
+    # 마크다운 파일에서 실제 제목 추출 시도
+    if md_path and md_path.exists():
+        try:
+            md_content = md_path.read_text(encoding="utf-8")
+            lines = md_content.split('\n')
+            for line in lines[:10]:  # 처음 10줄에서 찾기
+                if line.startswith('# '):
+                    extracted_title = line[2:].strip()
+                    if extracted_title and len(extracted_title) < 100:
+                        return extracted_title
+        except Exception:
+            pass
+    
+    return f"{base_title} ({timestamp})"
+
+
 def dispatch_report(
-    pdf_path: str | Path, md_path: str | Path | None = None, title: str = "VELOS 한국어 보고서"
+    pdf_path: str | Path, md_path: str | Path | None = None, title: str | None = None
 ) -> dict:
     pdf = Path(pdf_path)
     md = Path(md_path) if md_path else None
     pdf.exists() or (_ for _ in ()).throw(FileNotFoundError(pdf))
+
+    # 제목이 제공되지 않았으면 동적 생성
+    if not title:
+        title = _generate_dynamic_title(pdf, md)
 
     text = f"{title}\n파일: {pdf.name}"
     results = {
