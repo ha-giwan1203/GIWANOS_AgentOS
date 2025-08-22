@@ -6,20 +6,21 @@
 
 # 시스템 기본 경로 설정
 # 경로 우선순위: ENV > configs/settings.yaml > 기본값
-root: "C:/giwanos"
+root: "C:\giwanos"
 venv_path: "C:/Users/User/venvs/velos"
-python_path: "C:/Users/User/venvs/velos/Scripts/python.exe"
+python_path: "python"
+powershell_path: "pwsh"  # PowerShell 7
 
 # 데이터베이스 설정
 database:
-  path: "C:/giwanos/data/memory/velos.db"
-  backup_path: "C:/giwanos/data/backups"
+  path: "C:\giwanos\data\memory\velos.db"
+  backup_path: "C:\giwanos\data\backups"
   max_backups: 10
 
 # 로그 설정
 logging:
   level: "INFO"
-  path: "C:/giwanos/data/logs"
+  path: "C:\giwanos\data\logs"
   max_size: "10MB"
   backup_count: 5
   # 로그 파일별 설정

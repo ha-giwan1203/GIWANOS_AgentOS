@@ -1,5 +1,5 @@
 # [ACTIVE] VELOS 시작 스크립트 - 시스템 초기화 및 실행
-#Requires -Version 5.1
+#Requires -Version 7.0
 # VELOS 운영 철학 선언문
 # "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
 
@@ -89,8 +89,15 @@ try {
   $err = $p.StandardError.ReadToEnd()
   $p.WaitForExit()
 
-  $out | Out-File -FilePath $Log -Encoding UTF8 -Append
-  if ($err) { "[ERR] " + $err | Out-File -FilePath $Log -Encoding UTF8 -Append }
+  # PowerShell 7의 향상된 JSON 로깅
+  $logEntry = @{
+      timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+      exitCode = $p.ExitCode
+      output = $out
+      error = $err
+  }
+  ($logEntry | ConvertTo-Json -Depth 3) | Out-File -FilePath $Log -Encoding UTF8 -Append
+  # 에러 로그는 위의 JSON 구조에 통합됨
   
   if ($p.ExitCode -eq 0) {
       if (-not $Background) {
