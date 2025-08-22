@@ -7,9 +7,7 @@ from typing import Dict
 
 
 def velos_root() -> Path:
-    # 환경변수 우선, 없으면 플랫폼별 기본값 사용
-    default_root = "/home/user/webapp" if os.name == "posix" else r"C:\giwanos"
-    return Path(os.getenv("VELOS_ROOT", default_root)).resolve()
+    return Path(os.getenv("VELOS_ROOT", r"C:\giwanos")).resolve()
 
 
 def paths() -> Dict[str, Path]:

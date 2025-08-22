@@ -29,15 +29,8 @@ def needs_reinject(text):
 
 
 def rebuild_context_pack():
-    import os
-    default_root = "/home/user/webapp" if os.name == "posix" else r"C:\giwanos"
-    root = os.getenv("VELOS_ROOT", default_root)
-    
-    script_path = os.path.join(root, "tools", "make_context_pack.py")
-    doc_path = os.path.join(root, "docs", "CONTEXT_PACK.md")
-    
-    subprocess.run(["python", script_path], check=False)
-    with open(doc_path, "r", encoding="utf-8") as f:
+    subprocess.run(["python", r"C:\giwanos\tools\make_context_pack.py"], check=False)
+    with open(r"C:\giwanos\docs\CONTEXT_PACK.md", "r", encoding="utf-8") as f:
         return f.read()
 
 
