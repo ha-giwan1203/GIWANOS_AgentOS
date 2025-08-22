@@ -11,185 +11,229 @@
 # 9) 지능형 처리: 자동 복구·경고 등 방어적 설계 우선
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
+
 import os
 import json
-import time
-import sqlite3
-from datetime import datetime, timedelta
+import sys
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any, List
 
 # Use centralized path manager
-from modules.core.path_manager import get_velos_root, get_data_path
+from modules.core.path_manager import (
+    get_velos_root,
+    get_data_path,
+    get_snapshots_path,
+)
+
 ROOT = get_velos_root()
+TEMPLATE_DIR = Path(__file__).resolve().parent / "templates"
+
+
+class SafeDict(dict):
+    """dict that returns empty string for missing keys to avoid KeyError on format_map"""
+    def __missing__(self, key):
+        return ""
+
+
+def _read_json(path: str) -> Dict[str, Any]:
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _list_recent_snapshots(limit: int = 5) -> List[str]:
+    """Efficiently list most recent snapshot files.
+    - Honors custom VELOS_SNAP_DIR (via get_snapshots_path)
+    - Uses os.scandir to avoid loading all entries into memory
+    - Sorts by modified time desc and returns top N
+    """
+    try:
+        snap_dir = get_snapshots_path()
+        if not snap_dir or not os.path.isdir(snap_dir):
+            # fallback to data/snapshots inside root
+            snap_dir = get_data_path("snapshots")
+        if not os.path.isdir(snap_dir):
+            return []
+
+        items = []
+        with os.scandir(snap_dir) as it:
+            for entry in it:
+                # Limit file system traversal for speed
+                if not entry.is_file():
+                    continue
+                name = entry.name
+                if name.startswith("snapshot_") and (name.endswith(".zip") or name.endswith(".json")):
+                    try:
+                        stat = entry.stat()
+                        items.append((stat.st_mtime, name))
+                    except Exception:
+                        continue
+        items.sort(key=lambda x: x[0], reverse=True)
+        return [name for _, name in items[:limit]]
+    except Exception:
+        return []
+
 
 def get_system_stats() -> Dict[str, Any]:
-    """시스템 통계 수집"""
+    """시스템 통계 수집 (경량·안전)
+    - MemoryAdapter.get_stats()
+    - data/logs/system_health.json
+    - 최근 스냅샷 5개
+    """
+    stats: Dict[str, Any] = {}
+
+    # 메모리 통계 (에러 무시)
     try:
-        # 메모리 통계
-        memory_stats = {"error": "memory_adapter_not_available"}
-        try:
-            from modules.core.memory_adapter import MemoryAdapter
-            adapter = MemoryAdapter()
-            memory_stats = adapter.get_stats()
-        except Exception as e:
-            memory_stats = {"error": str(e)}
-
-        # 헬스 로그 읽기
-        health_log = {}
-        health_path = get_data_path("logs", "system_health.json")
-        if os.path.exists(health_path):
-            try:
-                with open(health_path, "r", encoding="utf-8") as f:
-                    health_log = json.load(f)
-            except Exception as e:
-                health_log = {"error": str(e)}
-
-        # 최근 스냅샷 확인
-        snapshots = []
-        snapshots_dir = get_data_path("snapshots")
-        if os.path.exists(snapshots_dir):
-            try:
-                for item in os.listdir(snapshots_dir):
-                    if item.startswith("snapshot_"):
-                        snapshots.append(item)
-                snapshots.sort(reverse=True)
-            except Exception as e:
-                snapshots = [f"error: {e}"]
-
-        return {
-            "memory_stats": memory_stats,
-            "health_log": health_log,
-            "recent_snapshots": snapshots[:5],  # 최근 5개만
-            "timestamp": datetime.now().isoformat()
-        }
+        from modules.core.memory_adapter import MemoryAdapter
+        adapter = MemoryAdapter()
+        stats["memory_stats"] = adapter.get_stats()
     except Exception as e:
-        return {"error": str(e)}
+        stats["memory_stats"] = {"error": str(e)}
 
-def generate_markdown_report(stats: Dict[str, Any]) -> str:
-    """Markdown 형식 보고서 생성"""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 헬스 로그 읽기
+    health_path = get_data_path("logs", "system_health.json")
+    stats["health_log"] = _read_json(health_path) if os.path.exists(health_path) else {}
 
-    report_lines = [
-        f"# VELOS System Report - {timestamp}",
-        "",
-        "## 📊 System Statistics",
-        ""
-    ]
+    # 최근 스냅샷 (빠른 방식)
+    stats["recent_snapshots"] = _list_recent_snapshots(limit=5)
 
-    # 메모리 통계
-    if "memory_stats" in stats:
-        mem_stats = stats["memory_stats"]
-        if "error" not in mem_stats:
-            report_lines.extend([
-                "### Memory Status",
-                f"- Buffer Size: {mem_stats.get('buffer_size', 'N/A')}",
-                f"- DB Records: {mem_stats.get('db_records', 'N/A')}",
-                f"- JSON Records: {mem_stats.get('json_records', 'N/A')}",
-                ""
-            ])
-        else:
-            report_lines.extend([
-                "### Memory Status",
-                f"- Error: {mem_stats['error']}",
-                ""
-            ])
+    # 생성 시각
+    stats["timestamp"] = datetime.now().isoformat(timespec="seconds")
 
-    # 헬스 로그
-    if "health_log" in stats:
-        health = stats["health_log"]
-        if "error" not in health:
-            report_lines.extend([
-                "### Health Status",
-                f"- System Integrity: {health.get('system_integrity_ok', 'Unknown')}",
-                f"- Data Integrity: {health.get('data_integrity_ok', 'Unknown')}",
-                ""
-            ])
-        else:
-            report_lines.extend([
-                "### Health Status",
-                f"- Error: {health['error']}",
-                ""
-            ])
+    return stats
 
-    # 스냅샷 정보
-    if "recent_snapshots" in stats:
-        snapshots = stats["recent_snapshots"]
-        report_lines.extend([
-            "### Recent Snapshots",
-        ])
-        if snapshots:
-            for snapshot in snapshots:
-                report_lines.append(f"- {snapshot}")
-        else:
-            report_lines.append("- No snapshots found")
-        report_lines.append("")
 
-    # 생성 정보
-    report_lines.extend([
-        "---",
-        f"*Generated by VELOS Report Generator at {timestamp}*",
-        "*Based on VELOS Operating Philosophy*"
-    ])
+def load_template(report_type: str) -> str:
+    """Load a template text for the given report type.
+    Fallback order: {type}.md -> system.md -> built-in minimal
+    """
+    rt = (report_type or "system").strip().lower()
+    candidates = [TEMPLATE_DIR / f"{rt}.md", TEMPLATE_DIR / "system.md"]
+    for p in candidates:
+        try:
+            if p.is_file():
+                return p.read_text(encoding="utf-8")
+        except Exception:
+            continue
+    # Built-in minimal fallback
+    return (
+        "# VELOS Report ({timestamp})\n\n"
+        "## Summary\n"
+        "- Items in buffer: {buffer_size}\n"
+        "- DB records: {db_records}\n"
+        "- Last sync: {last_sync}\n"
+    )
 
-    return "\n".join(report_lines)
 
-def save_report(report_content: str) -> Dict[str, Any]:
-    """보고서 저장"""
+def build_context(stats: Dict[str, Any]) -> Dict[str, Any]:
+    """Flatten and normalize stats into template context."""
+    mem = stats.get("memory_stats") or {}
+    health = stats.get("health_log") or {}
+
+    # memory errors
+    memory_error = mem.get("error") if isinstance(mem, dict) else None
+
+    # memory numbers (safe)
+    buffer_size = mem.get("buffer_size", 0) if isinstance(mem, dict) else 0
+    db_records = mem.get("db_records", 0) if isinstance(mem, dict) else 0
+    json_records = mem.get("json_records", 0) if isinstance(mem, dict) else 0
+    last_sync = mem.get("last_sync") if isinstance(mem, dict) else None
+
+    # health flags (various schemas allowed)
+    system_integrity_ok = None
+    data_integrity_ok = None
+    health_error = None
+
+    if isinstance(health, dict):
+        # flat keys
+        system_integrity_ok = health.get("system_integrity_ok")
+        data_integrity_ok = health.get("data_integrity_ok")
+        if health.get("error"):
+            health_error = health.get("error")
+        # nested common schema support
+        sys_int = health.get("system_integrity") if isinstance(health.get("system_integrity"), dict) else None
+        if sys_int and system_integrity_ok is None:
+            system_integrity_ok = sys_int.get("integrity_ok")
+        data_int = health.get("data_integrity") if isinstance(health.get("data_integrity"), dict) else None
+        if data_int and data_integrity_ok is None:
+            data_integrity_ok = data_int.get("data_integrity_ok")
+
+    # snapshots bullets
+    snaps = stats.get("recent_snapshots") or []
+    recent_snapshots_bullets = "\n".join(f"- {s}" for s in snaps) if snaps else "- No snapshots found"
+
+    return {
+        "timestamp": stats.get("timestamp", datetime.now().isoformat(timespec="seconds")),
+        "buffer_size": buffer_size,
+        "db_records": db_records,
+        "json_records": json_records,
+        "last_sync": last_sync or "",
+        "memory_error": memory_error or "",
+        "system_integrity_ok": system_integrity_ok if system_integrity_ok is not None else "Unknown",
+        "data_integrity_ok": data_integrity_ok if data_integrity_ok is not None else "Unknown",
+        "health_error": health_error or "",
+        "recent_snapshots_bullets": recent_snapshots_bullets,
+        # convenience
+        "root": ROOT,
+    }
+
+
+def render_template(template_text: str, context: Dict[str, Any]) -> str:
+    return template_text.format_map(SafeDict(**context))
+
+
+def generate_markdown_report(stats: Dict[str, Any], report_type: str = "system") -> str:
+    tmpl = load_template(report_type)
+    ctx = build_context(stats)
+    return render_template(tmpl, ctx)
+
+
+def save_report(report_content: str, report_type: str = "system") -> Dict[str, Any]:
     try:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_filename = f"velos_report_{timestamp}.md"
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_filename = f"velos_{report_type}_report_{ts}.md"
         report_path = get_data_path("reports", report_filename)
-
-        # 디렉토리 생성
-        os.makedirs(os.path.dirname(report_path), exist_ok=True)
-
-        # 파일 저장
+        Path(report_path).parent.mkdir(parents=True, exist_ok=True)
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)
-
-        return {
-            "success": True,
-            "report_path": report_path,
-            "filename": report_filename
-        }
+        return {"success": True, "report_path": report_path, "filename": report_filename}
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
 
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="VELOS Report Generator (template-based)")
+    parser.add_argument("--type", dest="report_type", default="system", choices=["system", "health", "memory"], help="Report type")
+    parser.add_argument("--fast", action="store_true", help="Skip heavy probes if any (kept lightweight by default)")
+    args = parser.parse_args()
+
     print("=== VELOS Report Generator ===")
+    print(f"Type: {args.report_type}")
 
     # 시스템 통계 수집
-    print("📊 Collecting system statistics...")
     stats = get_system_stats()
 
     # 보고서 생성
-    print("📝 Generating report...")
-    report_content = generate_markdown_report(stats)
+    content = generate_markdown_report(stats, report_type=args.report_type)
 
     # 보고서 저장
-    print("💾 Saving report...")
-    save_result = save_report(report_content)
+    result = save_report(content, report_type=args.report_type)
 
-    if save_result["success"]:
-        print(f"✅ Report generated successfully")
-        print(f"📁 Location: {save_result['report_path']}")
-        print(f"📄 Filename: {save_result['filename']}")
-
-        # 결과를 JSON으로 출력
-        result = {
-            "success": True,
-            "report_path": save_result["report_path"],
-            "filename": save_result["filename"],
-            "stats": stats
-        }
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result.get("success"):
+        print("✅ Report generated successfully")
+        print(f"📁 Location: {result['report_path']}")
+        print(f"📄 Filename: {result['filename']}")
+        print(json.dumps({"success": True, **result, "stats": stats}, ensure_ascii=False, indent=2))
         sys.exit(0)
     else:
-        print(f"❌ Report generation failed: {save_result['error']}")
+        print(f"❌ Report generation failed: {result.get('error')}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
