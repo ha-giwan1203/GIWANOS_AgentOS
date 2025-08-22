@@ -9,8 +9,8 @@ VELOS Hotbuf Bootstrap Script
 import sys
 import os
 
-# ROOT 경로 설정
-ROOT = "C:/giwanos"
+# ROOT 경로 설정  
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

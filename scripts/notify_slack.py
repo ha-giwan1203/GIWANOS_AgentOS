@@ -49,7 +49,7 @@ def main():
     if not p:
         print("[SKIP] 최신 PDF 없음")
         return 0
-    text = f"VELOS 보고서 생성: {p.name}\\n경로: {p}"
+    text = f"VELOS 보고서 생성: {p.name}\n경로: {p}"
     body = json.dumps({"text": text}).encode("utf-8")
     req = Request(url, data=body, headers={"Content-Type": "application/json"})
     try:

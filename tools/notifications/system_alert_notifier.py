@@ -11,7 +11,7 @@ import argparse
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 

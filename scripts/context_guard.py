@@ -1,7 +1,7 @@
 # [ACTIVE] VELOS 운영 철학 선언문: 파일명 고정, 자가 검증 필수, 결과 기록, 경로/구조 불변, 실패 시 안전 복구와 알림.
 import os, sys, json, time
 
-ROOT   = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 # 임계값(분): 환경변수로 오버라이드 가능

@@ -1,6 +1,7 @@
 # [ACTIVE] VELOS 마크다운 PDF 변환 시스템 - 한국어 PDF 생성 스크립트
 from pathlib import Path
 import sys, glob, datetime
+import os
 
 # ReportLab 기본 설치되어 있다고 가정 (없으면: pip install reportlab)
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -9,17 +10,21 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-def pick_font():
-    # 1순위: 프로젝트 폰트, 2순위: 윈도우 시스템 폰트
+def find_korean_font() -> Path:
+    """한글 폰트 파일을 찾습니다."""
+    # 리눅스 호환 폰트 경로 candidates
+    root = Path(os.getenv("VELOS_ROOT", "/workspace"))
     candidates = [
-        Path(r"C:\giwanos\fonts\NanumGothic.ttf"),
-        Path(r"C:\giwanos\fonts\Nanum_Gothic\NanumGothic.ttf"),
-        Path(r"C:\Windows\Fonts\malgun.ttf"),  # Malgun Gothic
+        root / "fonts" / "NanumGothic.ttf",
+        root / "fonts" / "Nanum_Gothic" / "NanumGothic.ttf",
+        Path("/usr/share/fonts/truetype/nanum/NanumGothic.ttf"),  # Ubuntu/Debian
+        Path("/usr/share/fonts/TTF/NanumGothic.ttf"),  # Arch/CentOS
+        Path("/System/Library/Fonts/AppleGothic.ttf"),  # macOS fallback
     ]
     for p in candidates:
         if p.exists():
             return p
-    raise SystemExit("사용 가능한 한글 폰트 파일을 찾지 못했습니다. NanumGothic.ttf 또는 C:\\Windows\\Fonts\\malgun.ttf 필요.")
+    raise SystemExit("사용 가능한 한글 폰트 파일을 찾지 못했습니다. NanumGothic.ttf 설치 필요.")
 
 def find_latest_md(dir_path: Path) -> Path:
     files = sorted(dir_path.glob("velos_auto_report_*.md"))
@@ -67,7 +72,7 @@ def main():
     if not target_md.exists():
         raise SystemExit(f"파일이 존재하지 않습니다: {target_md}")
 
-    font_path = pick_font()
+    font_path = find_korean_font()
     pdfmetrics.registerFont(TTFont("KFont", str(font_path)))
 
     out_pdf = target_md.with_suffix(".pdf")

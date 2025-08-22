@@ -2,7 +2,7 @@
 import os, sys, json, time, sqlite3
 from pathlib import Path
 
-ROOT = "C:/giwanos"
+ROOT = "${VELOS_ROOT:-/workspace}"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 def jload(p):

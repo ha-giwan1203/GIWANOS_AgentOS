@@ -4,7 +4,7 @@ from __future__ import annotations
 import os, json, time, socket, psutil
 from pathlib import Path
 
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 OUT  = ROOT / "data" / "reports" / "loop_state_tracker.json"
 
 def heartbeat(status="ok", note=""):

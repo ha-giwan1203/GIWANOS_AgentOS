@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 
 # 상수 정의
 SCHEMA_VERSION = 1

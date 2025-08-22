@@ -18,16 +18,16 @@ def _root() -> Path:
 	root = os.getenv("VELOS_ROOT")
 	if root and Path(root).is_dir():
 		return Path(root)
-	sett = os.getenv("VELOS_SETTINGS") or "C:/giwanos/configs/settings.yaml"
+	sett = os.getenv("VELOS_SETTINGS") or "/workspace/configs/settings.yaml"
 	try:
 		if yaml is not None and Path(sett).exists():
-			y = yaml.safe_load(Path(sett).read_text(encoding="utf-8")) or {}
-			base = (y.get("paths") or {}).get("base_dir")
-			if base and Path(base).is_dir():
-				return Path(base)
+			with open(sett, 'r', encoding='utf-8') as f:
+				cfg = yaml.safe_load(f)
+				if cfg and cfg.get("base_dir"):
+					return Path(cfg["base_dir"])
 	except Exception:
 		pass
-	return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+	return Path("/workspace") if Path("/workspace").is_dir() else Path.cwd()
 
 
 ROOT = _root()

@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 # VELOS 루트 경로
-ROOT = Path("C:/giwanos")
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 
 # 추가: 상단 상수
 SCHEMA_VERSION = 1

@@ -6,7 +6,7 @@ import os, json, time
 from pathlib import Path
 from typing import Dict, Any
 
-ROOT = Path(r"C:/giwanos")
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 STATE_PATH = ROOT / "data" / "memory" / "runtime_state.json"
 
 

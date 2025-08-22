@@ -18,7 +18,7 @@ from typing import Dict, Any, List
 # - 거짓코드 절대 금지
 # - 모든 결과는 자가 검증 후 저장
 
-ROOT = r"C:\giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 SNAP_DIR = os.path.join(ROOT, "data", "snapshots")
 CATALOG = os.path.join(SNAP_DIR, "checksums.json")
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")

@@ -2,7 +2,8 @@
 import os, sys, json, time
 from typing import Dict, Any
 
-ROOT = "C:/giwanos"
+# ROOT 경로 설정
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

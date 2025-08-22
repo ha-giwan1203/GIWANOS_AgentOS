@@ -34,7 +34,7 @@ def backup_orphan_candidates():
     added_count = 0
     with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         for file_path in orphans:
-            full_path = Path("C:/giwanos") / file_path
+            full_path = Path(os.getenv("VELOS_ROOT", "/workspace")) / file_path
             if full_path.exists():
                 try:
                     zf.write(full_path, file_path)

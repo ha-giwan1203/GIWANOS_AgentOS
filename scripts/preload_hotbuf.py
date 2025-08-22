@@ -11,7 +11,7 @@ import os
 import json
 
 # ROOT 경로 설정
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

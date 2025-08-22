@@ -25,7 +25,7 @@ stats_before = adapter.get_stats()
 print("Before flush:", stats_before)
 
 # JSONL 파일 직접 확인
-jsonl_path = "C:/giwanos/data/memory/learning_memory.jsonl"
+jsonl_path = "${VELOS_ROOT:-/workspace}/data/memory/learning_memory.jsonl"
 print(f"\nJSONL file exists: {os.path.exists(jsonl_path)}")
 if os.path.exists(jsonl_path):
     with open(jsonl_path, "r", encoding="utf-8") as f:
@@ -45,7 +45,7 @@ try:
             print(f"Parsed object: {obj}")
             
             # DB에 직접 삽입 시도
-            db_path = "C:/giwanos/data/velos.db"
+            db_path = "${VELOS_ROOT:-/workspace}/data/velos.db"
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
             

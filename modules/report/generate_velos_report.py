@@ -19,7 +19,7 @@ import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

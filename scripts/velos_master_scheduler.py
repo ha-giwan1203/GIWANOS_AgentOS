@@ -5,9 +5,9 @@
 VELOS: Single Python Master Loop
 - Windows Task Scheduler는 5분마다 이 파일만 실행
 - 모든 잡(Daily/Weekly/Hourly)은 내부 디스패처가 판단해 실행
-- 설정:   C:\giwanos\data\jobs.json         (잡 정의)
-- 상태:   C:\giwanos\data\job_state.json    (마지막 실행 시각)
-- 로그:   C:\giwanos\data\logs\jobs.log
+- 설정:   /workspace/data/jobs.json         (잡 정의)
+- 상태:   /workspace/data/job_state.json    (마지막 실행 시각)
+- 로그:   /workspace/data/logs/jobs.log
 옵션:
   --list                 등록된 잡 목록 출력
   --force JOBNAME        특정 잡 강제 실행
@@ -247,24 +247,29 @@ def _run_job(job: Dict[str, Any], dry_run: bool = False) -> bool:
             
         # BridgeDispatch 전용 실행 방식
         if name == "BridgeDispatch":
+            env = os.environ.copy()
+            env["VELOS_ROOT"] = str(ROOT)
+            env["PYTHONPATH"] = f"{ROOT}:{env.get('PYTHONPATH', '')}"
             result = subprocess.run([
-                "pwsh", "-NoProfile", "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass",
-                "-Command", f"Set-Location '{ROOT}'; $env:PYTHONPATH='{ROOT}'; python .\\scripts\\velos_bridge.py"
-            ], capture_output=True, text=True, timeout=300)
+                "python3", os.path.join(ROOT, "scripts", "velos_bridge.py")
+            ], capture_output=True, text=True, timeout=300, cwd=str(ROOT), env=env)
 
         # 파일 확장자에 따른 실행 방법 결정
         elif script_path.endswith('.ps1'):
-            result = subprocess.run([
-                "pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", full_path
-            ], capture_output=True, text=True, timeout=300)
+            # PowerShell 스크립트는 건너뛰거나 Python 대안 실행
+            _log(f"SKIP PowerShell script: {script_path} (Linux 환경)", "WARN")
+            return True  # 에러로 처리하지 않고 건너뛰기
         elif script_path.endswith('.bat'):
-            result = subprocess.run([
-                full_path
-            ], capture_output=True, text=True, timeout=300)
+            # Batch 파일도 건너뛰기
+            _log(f"SKIP Batch script: {script_path} (Linux 환경)", "WARN")
+            return True
         else:
+            env = os.environ.copy()
+            env["VELOS_ROOT"] = str(ROOT)
+            env["PYTHONPATH"] = f"{ROOT}:{env.get('PYTHONPATH', '')}"
             result = subprocess.run([
-                sys.executable, full_path
-            ], capture_output=True, text=True, timeout=300)
+                "python3", full_path
+            ], capture_output=True, text=True, timeout=300, cwd=str(ROOT), env=env)
             
         if result.returncode == 0:
             _log(f"RUN {name} ok")

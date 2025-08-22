@@ -10,16 +10,17 @@ def _root() -> Path:
     root = os.getenv("VELOS_ROOT")
     if root and Path(root).is_dir():
         return Path(root)
-    sett = os.getenv("VELOS_SETTINGS") or "C:/giwanos/configs/settings.yaml"
+    sett = os.getenv("VELOS_SETTINGS") or "/workspace/configs/settings.yaml"
     try:
         import yaml  # type: ignore
-        y = yaml.safe_load(Path(sett).read_text(encoding="utf-8"))
-        base = (y or {}).get("paths", {}).get("base_dir")
-        if base and Path(base).is_dir():
-            return Path(base)
+        if Path(sett).exists():
+            with open(sett, 'r', encoding='utf-8') as f:
+                cfg = yaml.safe_load(f)
+                if cfg and cfg.get("base_dir"):
+                    return Path(cfg["base_dir"])
     except Exception:
         pass
-    return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+    return Path("/workspace") if Path("/workspace").is_dir() else Path.cwd()
 
 ROOT = _root()
 REPORTS = ROOT / "data" / "reports"
@@ -85,8 +86,9 @@ def match_manifest_keep(rel: str, manifest: List[Dict]) -> Optional[str]:
     return None
 
 # ===== 파일 스캔/정적 분석 =====
+# 정규식 패턴들 (리눅스 호환)
 py_import_re = re.compile(r'^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))', re.MULTILINE)
-path_hint_re = re.compile(r'["\'](C:\\\\[^"\']+|C:/[^"\']+|/mnt/data/[^"\']+)["\']')
+path_hint_re = re.compile(r'["\'](/workspace[^"\']*|/[^"\']+)["\']')
 
 def scan_files() -> List[Path]:
     out: List[Path] = []
@@ -137,7 +139,7 @@ def dynamic_hints() -> Dict[str, List[str]]:
             txt = lp.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
-        for full in re.findall(r"(C:\\giwanos\\[A-Za-z0-9_\-\\\.]+)", txt):
+        for full in re.findall(r"(/workspace/[A-Za-z0-9_\-/\.]+)", txt):
             try:
                 rel = str(Path(full).relative_to(ROOT))
                 hits.setdefault(str(lp.relative_to(ROOT)), []).append(rel)
@@ -154,7 +156,7 @@ def scheduled_task_paths() -> Set[str]:
             for line in txt.splitlines():
                 if "Task To Run" in line or "작업 실행" in line:
                     # 경로 추출
-                    m = re.findall(r'(C:\\[^"]+)', line)
+                    m = re.findall(r'(/[^"]+)', line)
                     for p in m:
                         try:
                             rel = str(Path(p).relative_to(ROOT))
@@ -167,9 +169,9 @@ def scheduled_task_paths() -> Set[str]:
         try:
             j = json.loads(tasks.read_text(encoding="utf-8"))
             blob = json.dumps(j, ensure_ascii=False)
-            for m in re.findall(r'(C:\\\\giwanos\\\\[A-Za-z0-9_\-\\\.]+)', blob):
+            for m in re.findall(r'(/workspace/[A-Za-z0-9_\-/\.]+)', blob):
                 try:
-                    rel = str(Path(m.replace("\\\\","\\")).relative_to(ROOT))
+                    rel = str(Path(m).relative_to(ROOT))
                     out.add(rel)
                 except Exception:
                     pass

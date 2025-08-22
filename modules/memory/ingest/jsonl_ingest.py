@@ -18,7 +18,7 @@ def _env(name: str, default: Optional[str] = None) -> str:
         # 설정 파일에서 로드 시도
         try:
             import yaml
-            config_path = Path("C:/giwanos/configs/settings.yaml")
+            config_path = Path(os.getenv("VELOS_ROOT", "/workspace")) / "configs" / "settings.yaml"
             if config_path.exists():
                 with open(config_path, 'r', encoding='utf-8') as f:
                     config = yaml.safe_load(f)
@@ -29,9 +29,9 @@ def _env(name: str, default: Optional[str] = None) -> str:
         if not v:
             # 기본값 설정
             if name == "VELOS_JSONL_DIR":
-                v = "C:/giwanos/data/memory"
+                v = os.path.join(os.getenv("VELOS_ROOT", "/workspace"), "data", "memory")
             elif name == "VELOS_DB":
-                v = "C:/giwanos/data/memory/velos.db"
+                v = os.path.join(os.getenv("VELOS_ROOT", "/workspace"), "data", "memory", "velos.db")
             else:
                 raise RuntimeError(f"Missing env: {name}")
     return v

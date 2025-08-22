@@ -18,7 +18,7 @@ import json
 import time
 from typing import List, Dict, Any
 
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -72,7 +72,7 @@ def extract_mandates_from_block(block: str) -> Dict[str, Any]:
     mandates = {
         "FILE_NAMES_IMMUTABLE": True,
         "NO_FAKE_CODE": True,
-        "ROOT_FIXED": "C:/giwanos",
+        "ROOT_FIXED": os.getenv("VELOS_ROOT", "/workspace"),
         "SELF_TEST_REQUIRED": True,
         "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
     }
@@ -86,7 +86,7 @@ def extract_mandates_from_block(block: str) -> Dict[str, Any]:
     if "자가 검증" in block:
         mandates["SELF_TEST_REQUIRED"] = True
     if "경로 고정" in block:
-        mandates["ROOT_FIXED"] = "C:/giwanos"
+        mandates["ROOT_FIXED"] = os.getenv("VELOS_ROOT", "/workspace")
     if "컨텍스트" in block and "포함" in block:
         mandates["PROMPT_ALWAYS_INCLUDE_CONTEXT"] = True
 
@@ -131,7 +131,7 @@ def rebuild_hotbuf() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": os.getenv("VELOS_ROOT", "/workspace"),
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },
@@ -186,7 +186,7 @@ def session_bootstrap() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": os.getenv("VELOS_ROOT", "/workspace"),
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },

@@ -78,7 +78,7 @@ def log(msg: str):
 
 def try_import(module_name):
     try:
-        return __import__(module_name.replace("/", ".").replace("\\", "."))
+        return __import__(module_name.replace("\\", ".").replace("/", "."))
     except Exception:
         return None
 

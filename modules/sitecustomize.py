@@ -16,7 +16,7 @@ os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
 # ---- optional .env loader (opt-in via VELOS_LOAD_ENV=1) ----
 if os.getenv("VELOS_LOAD_ENV") == "1":
-    for p in (Path("C:/giwanos/configs/.env"), Path("configs/.env"), Path(".env")):
+    for p in (Path("/workspace/configs/.env"), Path("configs/.env"), Path(".env")):
         try:
             if p.exists():
                 try:

@@ -19,7 +19,7 @@ import shutil
 from datetime import datetime
 from typing import Dict, Any
 
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 

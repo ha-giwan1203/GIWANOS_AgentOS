@@ -4,7 +4,11 @@ import os, sys, json
 from pathlib import Path
 from datetime import datetime, timezone
 
-ROOT = Path(r"C:/giwanos")
+# ROOT 경로를 환경변수 기반으로 설정
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))
+
 HEALTH_PATH = ROOT / "data" / "logs" / "system_health.json"
 
 

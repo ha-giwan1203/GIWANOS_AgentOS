@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path("${VELOS_ROOT:-/workspace}")
 if ROOT not in sys.path:
     sys.path.append(str(ROOT))
 

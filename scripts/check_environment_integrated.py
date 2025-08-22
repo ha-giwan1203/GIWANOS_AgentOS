@@ -58,7 +58,7 @@ def check_velos_environment():
     print("=" * 25)
 
     # 기본값 확인
-    root = os.environ.get("VELOS_ROOT", "C:\\giwanos")
+    root = os.environ.get("VELOS_ROOT", "/workspace")
     print(f"VELOS_ROOT exists: {os.path.exists(root)}")
     print(f"VELOS_ROOT is dir: {os.path.isdir(root)}")
 
@@ -208,7 +208,7 @@ def check_current_environment():
     print("=" * 35)
 
     # VELOS_ROOT 확인
-    velos_root = os.getenv("VELOS_ROOT", "C:\\giwanos")
+    velos_root = os.getenv("VELOS_ROOT", "/workspace")
     root_exists = os.path.exists(velos_root)
     print(f"VELOS_ROOT: {'✅ 설정됨' if root_exists else '❌ 없음'} ({velos_root})")
 

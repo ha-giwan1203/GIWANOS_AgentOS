@@ -18,7 +18,7 @@ import re
 from typing import Dict, Any, Optional
 
 # ROOT 경로 설정
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -69,7 +69,7 @@ def assert_core_policies(mandates: Dict[str, Any], root_path: str = ROOT) -> boo
         # 필수 정책 검증
         assert mandates.get("FILE_NAMES_IMMUTABLE", True), "file names must be immutable"
         assert mandates.get("NO_FAKE_CODE", True), "fake code not allowed"
-        assert mandates.get("ROOT_FIXED", "C:/giwanos") == root_path, "ROOT mismatch"
+        assert mandates.get("ROOT_FIXED", os.getenv("VELOS_ROOT", "/workspace")) == root_path, "ROOT mismatch"
 
         # 추가 정책 검증
         assert mandates.get("SELF_TEST_REQUIRED", True), "self-test required"

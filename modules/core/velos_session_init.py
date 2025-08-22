@@ -27,7 +27,7 @@ import sys
 from typing import Dict, Any
 
 # ROOT 경로 설정
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -51,7 +51,7 @@ def init_velos_session() -> Dict[str, Any]:
         _hot = session_bootstrap()  # {"context_block":..., "mandates":...}
 
         # 핵심 정책 검증
-        assert_core_policies(_hot["mandates"], "C:/giwanos")
+        assert_core_policies(_hot["mandates"], os.getenv("VELOS_ROOT", "/workspace"))
 
         return _hot
 
@@ -64,7 +64,7 @@ def init_velos_session() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": os.getenv("VELOS_ROOT", "/workspace"),
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },

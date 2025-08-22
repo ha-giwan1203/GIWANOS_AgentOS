@@ -48,7 +48,7 @@ def search_report_key(report_key: str):
     }
 
     # 검색 경로 설정
-    base_path = Path("C:/giwanos")
+    base_path = Path(os.getenv("VELOS_ROOT", "/workspace"))
 
     # 1. 로그 파일 검색
     log_patterns = [

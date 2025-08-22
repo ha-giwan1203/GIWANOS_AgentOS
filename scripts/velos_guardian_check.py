@@ -95,7 +95,7 @@ except Exception as e:
 
 # 10) PYTHONPATH 점검
 pp = os.getenv("PYTHONPATH","")
-ok_pp = ("C:\\giwanos" in pp) and ("modules" in pp)
+ok_pp = ("/workspace" in pp) and ("modules" in pp)
 add("pythonpath", ok_pp, pp, pp)
 
 # 출력 요약

@@ -359,7 +359,7 @@ def page_live():
     st.caption("자동 새로고침 동작 중…")
     st.experimental_rerun() if st.autorefresh(interval=refresh * 1000, key="live_ref") else None
 
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"

@@ -9,7 +9,8 @@ VELOS Integrity Check Script
 import json
 import os
 
-ROOT = "C:/giwanos"
+# ROOT 경로 설정
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 def main():

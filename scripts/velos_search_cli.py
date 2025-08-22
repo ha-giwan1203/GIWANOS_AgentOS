@@ -42,7 +42,7 @@ def search_report_key(report_key):
         "snapshots": []
     }
 
-    base_path = Path("C:/giwanos")
+    base_path = Path(os.getenv("VELOS_ROOT", "/workspace"))
 
     # 로그 파일 검색
     for log_file in glob.glob(str(base_path / "data/logs/*.json")):

@@ -18,7 +18,7 @@ import time
 from typing import Dict, Any
 
 # ROOT 경로 설정
-ROOT = "C:/giwanos"
+ROOT = os.getenv("VELOS_ROOT", "/workspace")
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -72,7 +72,7 @@ def session_bootstrap() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": os.getenv("VELOS_ROOT", "/workspace"),
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },

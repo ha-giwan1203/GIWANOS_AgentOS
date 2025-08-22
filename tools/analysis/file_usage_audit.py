@@ -19,16 +19,17 @@ def _root() -> Path:
     if root and Path(root).is_dir():
         return Path(root)
     # settings.yaml에서 base_dir 읽기(없어도 진행)
-    sett = os.getenv("VELOS_SETTINGS") or str(Path("C:/giwanos/configs/settings.yaml"))
+    sett = os.getenv("VELOS_SETTINGS") or str(Path("/workspace/configs/settings.yaml"))
     try:
         import yaml  # type: ignore
-        y = yaml.safe_load(Path(sett).read_text(encoding="utf-8"))
-        base = (y or {}).get("paths", {}).get("base_dir")
-        if base and Path(base).is_dir():
-            return Path(base)
+        if Path(sett).exists():
+            with open(sett, 'r', encoding='utf-8') as f:
+                cfg = yaml.safe_load(f)
+                if cfg and cfg.get("base_dir"):
+                    return Path(cfg["base_dir"])
     except Exception:
         pass
-    return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+    return Path("/workspace") if Path("/workspace").is_dir() else Path.cwd()
 
 ROOT = _root()
 
@@ -101,8 +102,9 @@ def now_iso() -> str:
 # ---------------------------
 # 정적 분석: import/참조 그래프
 # ---------------------------
+# 정규식 패턴들 (리눅스 호환)
 py_import_re = re.compile(r'^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))', re.MULTILINE)
-path_hint_re = re.compile(r'["\']([A-Za-z]:\\\\[^"\']+|\/mnt\/data\/[^"\']+|C:\/[^"\']+)["\']')
+path_hint_re = re.compile(r'["\']([A-Za-z]:[/\\][^"\']+|/workspace[^"\']*|/[^"\']+)["\']')
 
 def scan_files() -> List[Path]:
     targets: List[Path] = []
@@ -157,7 +159,7 @@ def dynamic_hints() -> Dict[str, List[str]]:
             txt = lp.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
-        for p in re.findall(r"(C:\\giwanos\\[A-Za-z0-9_\-\\\.]+)", txt):
+        for p in re.findall(r"(/workspace/[A-Za-z0-9_\-/\.]+)", txt):
             hits.setdefault(str(lp.relative_to(ROOT)), []).append(p)
     return hits
 

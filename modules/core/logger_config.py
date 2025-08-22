@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 
 # 로그 디렉토리 설정
-LOG_DIR = Path("C:/giwanos/data/logs")
+LOG_DIR = Path(os.getenv("VELOS_ROOT", "/workspace")) / "data" / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # 로그 파일 경로

@@ -7,6 +7,18 @@ import pandas as pd
 
 st.set_page_config(page_title="VELOS 대시보드", layout="wide")
 
+# ROOT 경로를 환경변수에서 가져오기
+import os
+from pathlib import Path
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
+DATA = ROOT / "data"
+REPORTS = DATA / "reports" / "auto"
+DISPATCH = DATA / "reports" / "_dispatch"
+LOGS = DATA / "logs"
+SESSION = DATA / "session"
+MEMORY = DATA / "memory"
+
+
 # ---------- 공통 스타일 ----------
 def _inject_base_css():
     st.markdown("""
@@ -358,14 +370,6 @@ def page_live():
     # 하단 바: 자동 새로고침
     st.caption("자동 새로고침 동작 중…")
     st.experimental_rerun() if st.autorefresh(interval=refresh * 1000, key="live_ref") else None
-
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
-DATA = ROOT / "data"
-REPORTS = DATA / "reports" / "auto"
-DISPATCH = DATA / "reports" / "_dispatch"
-LOGS = DATA / "logs"
-SESSION = DATA / "session"
-MEMORY = DATA / "memory"
 
 
 def resolve_report_key(key: str):

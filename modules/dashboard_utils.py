@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 import pandas as pd
 
-ROOT = Path(os.getenv("VELOS_ROOT", "C:/giwanos"))
+ROOT = Path(os.getenv("VELOS_ROOT", "/workspace"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"
