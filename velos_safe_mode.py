@@ -13,9 +13,9 @@ def emergency_shutdown():
     
     # 1. 모든 락 파일 제거
     lock_files = [
-        "/home/user/webapp/data/.velos.py.lock",
-        "/home/user/webapp/data/memory/memory.flush.lock",
-        "/home/user/webapp/data/logs/run.lock"
+        "C:\giwanos/data/.velos.py.lock",
+        "C:\giwanos/data/memory/memory.flush.lock",
+        "C:\giwanos/data/logs/run.lock"
     ]
     
     removed_locks = 0
@@ -32,13 +32,13 @@ def emergency_shutdown():
     
     # 2. 임시 파일 정리
     temp_patterns = [
-        "/home/user/webapp/data/**/*.tmp",
-        "/home/user/webapp/data/**/*.temp",
+        "C:\giwanos/data/**/*.tmp",
+        "C:\giwanos/data/**/*.temp",
     ]
     
     # 3. 메모리 백업 생성
     try:
-        memory_file = Path("/home/user/webapp/data/memory/learning_memory.json")
+        memory_file = Path("C:\giwanos/data/memory/learning_memory.json")
         if memory_file.exists():
             backup_file = memory_file.with_suffix(f".backup_emergency_{int(time.time())}.json")
             shutil.copy2(memory_file, backup_file)
@@ -48,7 +48,7 @@ def emergency_shutdown():
     
     # 4. 헬스 로그 업데이트
     try:
-        health_file = Path("/home/user/webapp/data/logs/system_health.json")
+        health_file = Path("C:\giwanos/data/logs/system_health.json")
         health = {}
         if health_file.exists():
             with open(health_file, 'r', encoding='utf-8') as f:
@@ -77,7 +77,7 @@ def safe_restart():
     # 2. 데이터 무결성 검사
     print("📊 데이터 무결성 검사 중...")
     try:
-        json_file = Path("/home/user/webapp/data/memory/learning_memory.json")
+        json_file = Path("C:\giwanos/data/memory/learning_memory.json")
         if json_file.exists():
             with open(json_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -92,9 +92,9 @@ def safe_restart():
     
     # 3. 필수 디렉토리 확인
     essential_dirs = [
-        "/home/user/webapp/data/logs",
-        "/home/user/webapp/data/memory",
-        "/home/user/webapp/data/reports"
+        "C:\giwanos/data/logs",
+        "C:\giwanos/data/memory",
+        "C:\giwanos/data/reports"
     ]
     
     for dir_path in essential_dirs:
@@ -104,7 +104,7 @@ def safe_restart():
     
     # 4. 시스템 상태 정상화
     try:
-        health_file = Path("/home/user/webapp/data/logs/system_health.json")
+        health_file = Path("C:\giwanos/data/logs/system_health.json")
         health = {}
         if health_file.exists():
             with open(health_file, 'r', encoding='utf-8') as f:
@@ -125,7 +125,7 @@ def safe_restart():
 
 def fix_learning_memory():
     """learning_memory.json 자동 수정"""
-    json_file = Path("/home/user/webapp/data/memory/learning_memory.json")
+    json_file = Path("C:\giwanos/data/memory/learning_memory.json")
     
     try:
         with open(json_file, 'r', encoding='utf-8') as f:
@@ -147,8 +147,8 @@ def show_status():
     
     # 락 파일 상태
     lock_files = [
-        "/home/user/webapp/data/.velos.py.lock",
-        "/home/user/webapp/data/memory/memory.flush.lock"
+        "C:\giwanos/data/.velos.py.lock",
+        "C:\giwanos/data/memory/memory.flush.lock"
     ]
     
     active_locks = 0
@@ -161,7 +161,7 @@ def show_status():
         print("✅ 활성 락 없음")
     
     # 메모리 파일 상태
-    json_file = Path("/home/user/webapp/data/memory/learning_memory.json")
+    json_file = Path("C:\giwanos/data/memory/learning_memory.json")
     if json_file.exists():
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
@@ -176,7 +176,7 @@ def show_status():
         print("❌ 메모리 파일: 없음")
     
     # 헬스 로그 상태
-    health_file = Path("/home/user/webapp/data/logs/system_health.json")
+    health_file = Path("C:\giwanos/data/logs/system_health.json")
     if health_file.exists():
         try:
             with open(health_file, 'r', encoding='utf-8') as f:

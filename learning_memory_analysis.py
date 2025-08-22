@@ -20,7 +20,7 @@ os.environ['TZ'] = 'Asia/Seoul'
 class LearningMemoryAnalyzer:
     """VELOS-GPT5 학습 메모리 종합 분석기"""
     
-    def __init__(self, webapp_root: str = "/home/user/webapp"):
+    def __init__(self, webapp_root: str = "C:\giwanos"):
         self.webapp_root = Path(webapp_root)
         self.data_path = self.webapp_root / "data"
         self.memory_path = self.data_path / "memory"

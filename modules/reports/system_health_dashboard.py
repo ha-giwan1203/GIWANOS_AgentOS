@@ -12,14 +12,14 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 
 # Use correct path for sandbox environment
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 
 class SystemHealthAnalyzer:
     """시스템 건강 상태 분석기"""
     
     def __init__(self):
         # Force correct path for sandbox environment
-        self.root = Path("/home/user/webapp")
+        self.root = Path("C:\giwanos")
         self.logs_dir = self.root / "data" / "logs"
         self.memory_dir = self.root / "data" / "memory"
         self.reports_dir = self.root / "data" / "reports"

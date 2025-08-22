@@ -15,17 +15,17 @@ class SystemCompletenessAnalyzer:
     """Analyzes system completeness and identifies improvement areas"""
 
     def __init__(self):
-        self.base_path = Path("/home/user/webapp")
+        self.base_path = Path("C:\giwanos")
         self.issues = defaultdict(list)
         self.recommendations = defaultdict(list)
 
     def analyze_remaining_path_references(self):
-        """Analyze remaining /home/user/webapp path references"""
+        """Analyze remaining C:\giwanos path references"""
         print("=== Remaining Path Reference Analysis ===")
 
         try:
             result = subprocess.run(
-                ["grep", "-r", "/home/user/webapp", "--include=*.py", "--include=*.json", "."],
+                ["grep", "-r", "C:\giwanos", "--include=*.py", "--include=*.json", "."],
                 cwd=str(self.base_path),
                 capture_output=True,
                 text=True,
@@ -58,7 +58,7 @@ class SystemCompletenessAnalyzer:
                         else:
                             categories["other"].append(line)
 
-                print(f"Total remaining /home/user/webapp references: {len(lines)}")
+                print(f"Total remaining C:\giwanos references: {len(lines)}")
                 for category, items in categories.items():
                     if items:
                         print(f"  {category}: {len(items)} references")
@@ -69,7 +69,7 @@ class SystemCompletenessAnalyzer:
 
                 return categories
             else:
-                print("✅ No remaining /home/user/webapp references found")
+                print("✅ No remaining C:\giwanos references found")
                 return {}
 
         except Exception as e:

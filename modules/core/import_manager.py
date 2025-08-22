@@ -17,7 +17,7 @@ class VelosImportManager:
     """Centralized import management for VELOS system"""
 
     def __init__(self):
-        self._base_path = Path(__file__).parent.parent.parent  # /home/user/webapp
+        self._base_path = Path(__file__).parent.parent.parent  # C:\giwanos
         self._import_cache = {}
         self._paths_added = set()
         self._initialize_standard_paths()

@@ -132,7 +132,7 @@ Cursor AI의 정확성 + Claude의 창의성 = 최적의 결과
 ### 1. 파일/디렉토리 작업 시
 ```bash
 # 항상 실제 확인 후 작업
-cd /home/user/webapp && pwd  # 경로 확실히 확인
+cd C:\giwanos && pwd  # 경로 확실히 확인
 find . -name "*.db" -type f   # 실제 파일 위치 검색
 ls -la /경로/                # 디렉토리 내용 실제 확인
 ```

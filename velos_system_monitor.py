@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 class VelosSystemMonitor:
     def __init__(self):
-        self.root_path = Path("/home/user/webapp")
+        self.root_path = Path("C:\giwanos")
         self.monitoring = False
         self.max_memory_mb = 512  # 512MB 메모리 제한
         self.max_cpu_percent = 50  # 50% CPU 사용률 제한

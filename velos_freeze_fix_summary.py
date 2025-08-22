@@ -89,14 +89,14 @@ def save_fix_report():
     summary = create_fix_summary()
     
     # JSON 보고서 저장
-    report_file = Path("/home/user/webapp/data/reports/velos_freeze_fix_report.json")
+    report_file = Path("C:\giwanos/data/reports/velos_freeze_fix_report.json")
     report_file.parent.mkdir(parents=True, exist_ok=True)
     
     with open(report_file, 'w', encoding='utf-8') as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
     
     # 마크다운 보고서도 생성
-    md_file = Path("/home/user/webapp/data/reports/velos_freeze_fix_report.md")
+    md_file = Path("C:\giwanos/data/reports/velos_freeze_fix_report.md")
     md_content = f"""# VELOS 시스템 멈춤 현상 해결 보고서
 
 **해결 일시**: {summary['fix_datetime']}

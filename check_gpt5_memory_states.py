@@ -11,7 +11,7 @@ from datetime import datetime
 def check_gpt5_memory_states():
     """GPT-5 모니터링 데이터베이스의 메모리 상태 확인"""
     
-    gpt5_db_path = Path("/home/user/webapp/data/gpt5_monitor/gpt5_monitor.db")
+    gpt5_db_path = Path("C:\giwanos/data/gpt5_monitor/gpt5_monitor.db")
     
     if not gpt5_db_path.exists():
         print(f"❌ GPT-5 모니터링 DB가 존재하지 않습니다: {gpt5_db_path}")
@@ -96,7 +96,7 @@ def check_gpt5_memory_states():
 def check_learning_memory_content():
     """learning_memory.json의 실제 학습 내용 확인"""
     
-    learning_json_path = Path("/home/user/webapp/data/memory/learning_memory.json")
+    learning_json_path = Path("C:\giwanos/data/memory/learning_memory.json")
     
     if not learning_json_path.exists():
         print(f"❌ 학습 메모리 JSON 파일이 존재하지 않습니다: {learning_json_path}")

@@ -9,7 +9,7 @@ from pathlib import Path
 def fix_learning_memory_json():
     """learning_memory.json 파일을 배열 형태로 수정"""
     
-    root_path = Path("/home/user/webapp")
+    root_path = Path("C:\giwanos")
     json_file = root_path / "data" / "memory" / "learning_memory.json"
     
     if not json_file.exists():

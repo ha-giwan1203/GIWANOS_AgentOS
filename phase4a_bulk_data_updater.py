@@ -30,7 +30,7 @@ class BulkDataPathUpdater:
         }
 
     def find_data_files_with_paths(self) -> Dict[str, List[str]]:
-        """Find data files containing /home/user/webapp references"""
+        """Find data files containing C:\giwanos references"""
         print("=== Scanning for data files with path references ===")
 
         file_categories = {
@@ -53,11 +53,11 @@ class BulkDataPathUpdater:
                     "-exec",
                     "grep",
                     "-l",
-                    "/home/user/webapp",
+                    "C:\giwanos",
                     "{}",
                     ";",
                 ],
-                cwd="/home/user/webapp",
+                cwd="C:\giwanos",
                 capture_output=True,
                 text=True,
             )
@@ -104,10 +104,10 @@ class BulkDataPathUpdater:
                 content = f.read()
 
             # Count different types of path references
-            patterns["windows_paths"] = len(re.findall(r"/home/user/webapp", content))
-            patterns["data_paths"] = len(re.findall(r"/home/user/webapp/data/", content))
-            patterns["config_paths"] = len(re.findall(r"/home/user/webapp/configs/", content))
-            patterns["log_paths"] = len(re.findall(r"/home/user/webapp/.*logs/", content))
+            patterns["windows_paths"] = len(re.findall(r"C:\giwanos", content))
+            patterns["data_paths"] = len(re.findall(r"C:\giwanos/data/", content))
+            patterns["config_paths"] = len(re.findall(r"C:\giwanos/configs/", content))
+            patterns["log_paths"] = len(re.findall(r"C:\giwanos/.*logs/", content))
 
         except Exception as e:
             self.errors.append(f"Pattern analysis error for {file_path}: {e}")
@@ -126,19 +126,19 @@ class BulkDataPathUpdater:
             replacements = [
                 # Database paths
                 (
-                    r'"/home/user/webapp/data/memory/velos\.db"',
-                    '"/home/user/webapp/data/memory/velos.db"',
+                    r'"C:\giwanos/data/memory/velos\.db"',
+                    '"C:\giwanos/data/memory/velos.db"',
                 ),
                 # General data paths
-                (r'"/home/user/webapp/data/([^"]+)"', r'"/home/user/webapp/data/\1"'),
+                (r'"C:\giwanos/data/([^"]+)"', r'"C:\giwanos/data/\1"'),
                 # Config paths
-                (r'"/home/user/webapp/configs/([^"]+)"', r'"/home/user/webapp/configs/\1"'),
+                (r'"C:\giwanos/configs/([^"]+)"', r'"C:\giwanos/configs/\1"'),
                 # Log paths
-                (r'"/home/user/webapp/([^"]*logs[^"]*)"', r'"/home/user/webapp/\1"'),
+                (r'"C:\giwanos/([^"]*logs[^"]*)"', r'"C:\giwanos/\1"'),
                 # General root paths
-                (r'"/home/user/webapp/([^"]+)"', r'"/home/user/webapp/\1"'),
+                (r'"C:\giwanos/([^"]+)"', r'"C:\giwanos/\1"'),
                 # Handle escaped paths in JSON
-                (r'"C:\\\\giwanos\\\\([^"]+)"', r'"/home/user/webapp/\1"'),
+                (r'"C:\\\\giwanos\\\\([^"]+)"', r'"C:\giwanos/\1"'),
             ]
 
             changes_made = False
@@ -241,7 +241,7 @@ class BulkDataPathUpdater:
             critical_files.extend(file_categories.get(category, []))
 
         if critical_files:
-            backup_dir = Path("/home/user/webapp/backups/phase4a_" + str(int(time.time())))
+            backup_dir = Path("C:\giwanos/backups/phase4a_" + str(int(time.time())))
 
             if not self.dry_run:
                 backup_dir.mkdir(parents=True, exist_ok=True)
@@ -345,9 +345,9 @@ class BulkDataPathUpdater:
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
 
-                # Check that /home/user/webapp references are reduced
-                old_refs = content.count("/home/user/webapp")
-                new_refs = content.count("/home/user/webapp")
+                # Check that C:\giwanos references are reduced
+                old_refs = content.count("C:\giwanos")
+                new_refs = content.count("C:\giwanos")
 
                 if new_refs > 0:
                     verification_passed += 1

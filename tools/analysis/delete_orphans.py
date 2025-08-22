@@ -44,7 +44,7 @@ def delete_orphan_candidates():
     error_count = 0
 
     for file_path in orphans:
-        full_path = Path("/home/user/webapp") / file_path
+        full_path = Path("C:\giwanos") / file_path
         if full_path.exists():
             try:
                 full_path.unlink()

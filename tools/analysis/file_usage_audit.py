@@ -21,7 +21,7 @@ def _root() -> Path:
     if root and Path(root).is_dir():
         return Path(root)
     # settings.yaml에서 base_dir 읽기(없어도 진행)
-    sett = os.getenv("VELOS_SETTINGS") or str(Path("/home/user/webapp/configs/settings.yaml"))
+    sett = os.getenv("VELOS_SETTINGS") or str(Path("C:\giwanos/configs/settings.yaml"))
     try:
         import yaml  # type: ignore
 
@@ -31,7 +31,7 @@ def _root() -> Path:
             return Path(base)
     except Exception:
         pass
-    return Path("/home/user/webapp") if Path("/home/user/webapp").is_dir() else Path.cwd()
+    return Path("C:\giwanos") if Path("C:\giwanos").is_dir() else Path.cwd()
 
 
 ROOT = _root()

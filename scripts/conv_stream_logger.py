@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(os.getenv("VELOS_ROOT", "/home/user/webapp"))
+ROOT = Path(os.getenv("VELOS_ROOT", "C:\giwanos"))
 OUT = ROOT / "data" / "session"
 OUT.mkdir(parents=True, exist_ok=True)
 cur = OUT / f"chat_{datetime.now().strftime('%Y%m%d')}.jsonl"

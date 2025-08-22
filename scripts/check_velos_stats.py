@@ -73,7 +73,7 @@ def _env(key, default=None):
         pass
 
     # 4. 기본값 반환
-    return default or "/home/user/webapp"
+    return default or "C:\giwanos"
 
 
 def check_basic_stats():
@@ -88,7 +88,7 @@ def check_basic_stats():
             else (
                 get_data_path("memory/velos.db")
                 if "get_data_path" in locals()
-                else "/home/user/webapp/data/memory/velos.db"
+                else "C:\giwanos/data/memory/velos.db"
             )
         ),
     )

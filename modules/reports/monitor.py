@@ -251,10 +251,10 @@ def normalize_record(raw: dict, src_path: str) -> dict:
 
 # 실시간 수집 대상 패턴 (필요시 경로 맞춰 조정)
 CHAT_GLOBS = [
-    r"/home/user/webapp\data\sessions\*.json",  # 세션 대화
-    r"/home/user/webapp\data\memory\*buffer*.jsonl",  # 실시간 버퍼
-    r"/home/user/webapp\data\memory\tasks_*.jsonl",  # 작업 히스토리
-    r"/home/user/webapp\data\logs\chat_*.jsonl",  # 선택: 채팅 로그가 따로 있을 때
+    r"C:\giwanos\data\sessions\*.json",  # 세션 대화
+    r"C:\giwanos\data\memory\*buffer*.jsonl",  # 실시간 버퍼
+    r"C:\giwanos\data\memory\tasks_*.jsonl",  # 작업 히스토리
+    r"C:\giwanos\data\logs\chat_*.jsonl",  # 선택: 채팅 로그가 따로 있을 때
 ]
 
 
@@ -419,7 +419,7 @@ def page_live():
     st.experimental_rerun() if st.autorefresh(interval=refresh * 1000, key="live_ref") else None
 
 
-ROOT = Path(os.getenv("VELOS_ROOT", "/home/user/webapp"))
+ROOT = Path(os.getenv("VELOS_ROOT", "C:\giwanos"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"

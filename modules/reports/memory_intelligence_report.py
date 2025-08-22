@@ -16,7 +16,7 @@ from collections import defaultdict, Counter
 import hashlib
 
 # Use correct path for sandbox environment
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 
 class MemoryIntelligenceAnalyzer:
     """메모리 인텔리전스 분석기"""

@@ -13,7 +13,7 @@ def check_data_integrity():
     issues = []
     
     # learning_memory.json 검사
-    json_file = Path("/home/user/webapp/data/memory/learning_memory.json")
+    json_file = Path("C:\giwanos/data/memory/learning_memory.json")
     if json_file.exists():
         try:
             with open(json_file, 'r', encoding='utf-8') as f:
@@ -34,8 +34,8 @@ def check_lock_files():
     print("🔒 락 파일 상태 검사 중...")
     
     lock_files = [
-        "/home/user/webapp/data/.velos.py.lock",
-        "/home/user/webapp/data/memory/memory.flush.lock"
+        "C:\giwanos/data/.velos.py.lock",
+        "C:\giwanos/data/memory/memory.flush.lock"
     ]
     
     cleaned = []
@@ -59,7 +59,7 @@ def check_autosave_runner():
     """autosave_runner 상태 확인"""
     print("🔄 autosave_runner 상태 확인 중...")
     
-    runner_script = Path("/home/user/webapp/scripts/autosave_runner.ps1")
+    runner_script = Path("C:\giwanos/scripts/autosave_runner.ps1")
     if runner_script.exists():
         print("✅ autosave_runner.ps1 스크립트 존재")
         return True
@@ -71,7 +71,7 @@ def update_system_health():
     """시스템 헬스 로그 업데이트"""
     print("📝 시스템 헬스 로그 업데이트 중...")
     
-    health_file = Path("/home/user/webapp/data/logs/system_health.json")
+    health_file = Path("C:\giwanos/data/logs/system_health.json")
     
     try:
         if health_file.exists():

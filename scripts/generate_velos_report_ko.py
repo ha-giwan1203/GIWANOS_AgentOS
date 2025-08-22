@@ -11,16 +11,16 @@ try:
 except ImportError:
     # Fallback functions for backward compatibility
     def get_velos_root():
-        return "/home/user/webapp"
+        return "C:\giwanos"
 
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
 
     def get_config_path(*parts):
-        return os.path.join("/home/user/webapp", "configs", *parts)
+        return os.path.join("C:\giwanos", "configs", *parts)
 
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
 """
@@ -51,7 +51,7 @@ def _maybe_load_env():
         Path(
             get_config_path(".env")
             if "get_config_path" in locals()
-            else "/home/user/webapp/configs/.env"
+            else "C:\giwanos/configs/.env"
         ),
         Path("configs/.env"),
         Path(".env"),
@@ -76,7 +76,7 @@ def _maybe_load_env():
 _maybe_load_env()
 
 # --------- 경로 ---------
-ROOT = Path(os.getenv("VELOS_ROOT") or r"/home/user/webapp").resolve()
+ROOT = Path(os.getenv("VELOS_ROOT") or r"C:\giwanos").resolve()
 AUTO = ROOT / "data" / "reports" / "auto"
 DISP = ROOT / "data" / "reports" / "_dispatch"
 LOGS = ROOT / "data" / "logs"

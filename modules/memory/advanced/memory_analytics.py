@@ -25,7 +25,7 @@ try:
     from modules.core.path_manager import get_db_path
 except ImportError:
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
 @dataclass

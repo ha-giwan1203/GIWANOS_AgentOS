@@ -13,7 +13,7 @@ class VelosProcessMonitor:
     """VELOS 프로세스 모니터링 및 자동 복구"""
     
     def __init__(self):
-        self.root_path = Path("/home/user/webapp")
+        self.root_path = Path("C:\giwanos")
         self.log_file = self.root_path / "data" / "logs" / "process_monitor.json"
         self.max_cpu_percent = 80.0  # CPU 사용률 임계값
         self.max_memory_mb = 1024    # 메모리 사용량 임계값 (MB)

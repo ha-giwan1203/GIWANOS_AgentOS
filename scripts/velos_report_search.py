@@ -49,7 +49,7 @@ def search_report_key(report_key: str):
     }
 
     # 검색 경로 설정
-    base_path = Path("/home/user/webapp")
+    base_path = Path("C:\giwanos")
 
     # 1. 로그 파일 검색
     log_patterns = ["data/logs/*.json", "data/logs/*.log", "data/logs/*.txt"]

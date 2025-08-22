@@ -10,16 +10,16 @@ try:
 except ImportError:
     # Fallback functions for backward compatibility
     def get_velos_root():
-        return "/home/user/webapp"
+        return "C:\giwanos"
 
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
 
     def get_config_path(*parts):
-        return os.path.join("/home/user/webapp", "configs", *parts)
+        return os.path.join("C:\giwanos", "configs", *parts)
 
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
 """
@@ -37,8 +37,8 @@ class VelosPathManager:
     """Centralized path management for VELOS system"""
 
     # Default paths for different platforms
-    DEFAULT_WINDOWS_ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
-    DEFAULT_LINUX_ROOT = "/home/user/webapp"
+    DEFAULT_WINDOWS_ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"
+    DEFAULT_LINUX_ROOT = "C:\giwanos"
 
     def __init__(self):
         self._root_path = None
@@ -111,9 +111,9 @@ class VelosPathManager:
 
         # Convert Windows paths to current platform
         if self.is_windows_style_path(path):
-            if path.startswith("/home/user/webapp"):
-                # Replace /home/user/webapp with current root
-                return path.replace("/home/user/webapp", self._root_path)
+            if path.startswith("C:\giwanos"):
+                # Replace C:\giwanos with current root
+                return path.replace("C:\giwanos", self._root_path)
 
         # Normalize separators
         return os.path.normpath(path)
@@ -196,13 +196,13 @@ if __name__ == "__main__":
             else (
                 get_data_path("memory/velos.db")
                 if "get_data_path" in locals()
-                else "/home/user/webapp/data/memory/velos.db"
+                else "C:\giwanos/data/memory/velos.db"
             )
         ),
         (
             get_config_path("settings.yaml")
             if "get_config_path" in locals()
-            else "/home/user/webapp/configs/settings.yaml"
+            else "C:\giwanos/configs/settings.yaml"
         ),
         "/some/absolute/path",
         "relative/path",

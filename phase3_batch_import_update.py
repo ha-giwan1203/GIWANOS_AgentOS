@@ -24,7 +24,7 @@ class ImportOptimizer:
         try:
             result = subprocess.run(
                 ["grep", "-rl", "sys.path", "--include=*.py", "."],
-                cwd="/home/user/webapp",
+                cwd="C:\giwanos",
                 capture_output=True,
                 text=True,
             )
@@ -176,7 +176,7 @@ except ImportError:
         try:
             result = subprocess.run(
                 ["find", directory, "-name", "*.py", "-exec", "grep", "-l", "sys.path", "{}", ";"],
-                cwd="/home/user/webapp",
+                cwd="C:\giwanos",
                 capture_output=True,
                 text=True,
             )

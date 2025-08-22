@@ -18,7 +18,7 @@ ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
 
 # Force correct ROOT path for sandbox environment
-REPORT_ROOT = ROOT  # Always use /home/user/webapp in sandbox
+REPORT_ROOT = ROOT  # Always use C:\giwanos in sandbox
 
 class EnhancedReportGenerator:
     """통합 보고서 생성기"""

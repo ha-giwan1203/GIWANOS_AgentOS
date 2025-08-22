@@ -19,7 +19,7 @@ def _root() -> Path:
     root = os.getenv("VELOS_ROOT")
     if root and Path(root).is_dir():
         return Path(root)
-    sett = os.getenv("VELOS_SETTINGS") or "/home/user/webapp/configs/settings.yaml"
+    sett = os.getenv("VELOS_SETTINGS") or "C:\giwanos/configs/settings.yaml"
     try:
         if yaml is not None and Path(sett).exists():
             y = yaml.safe_load(Path(sett).read_text(encoding="utf-8")) or {}
@@ -28,7 +28,7 @@ def _root() -> Path:
                 return Path(base)
     except Exception:
         pass
-    return Path("/home/user/webapp") if Path("/home/user/webapp").is_dir() else Path.cwd()
+    return Path("C:\giwanos") if Path("C:\giwanos").is_dir() else Path.cwd()
 
 
 ROOT = _root()

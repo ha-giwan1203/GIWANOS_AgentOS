@@ -21,16 +21,16 @@ try:
 except ImportError:
     # Fallback functions for backward compatibility
     def get_velos_root():
-        return "/home/user/webapp"
+        return "C:\giwanos"
 
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
 
     def get_config_path(*parts):
-        return os.path.join("/home/user/webapp", "configs", *parts)
+        return os.path.join("C:\giwanos", "configs", *parts)
 
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
 try:
@@ -57,7 +57,7 @@ if USE_PATH_MANAGER:
         "log": get_logs_path("system_health.json"),
     }
 else:
-    ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
+    ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"
     PATHS = {
         "jsonl": os.path.join(ROOT, "data", "memory", "learning_memory.jsonl"),
         "db": os.path.join(ROOT, "data", "memory", "velos.db"),
@@ -152,7 +152,7 @@ def create_memory_adapter(db_path: Optional[str] = None, **kw: Any) -> "MemoryAd
             else (
                 get_data_path("memory/velos.db")
                 if "get_data_path" in locals()
-                else "/home/user/webapp/data/memory/velos.db"
+                else "C:\giwanos/data/memory/velos.db"
             )
         ),
     )

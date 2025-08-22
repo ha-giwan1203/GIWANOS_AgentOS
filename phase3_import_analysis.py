@@ -29,7 +29,7 @@ class ImportAnalyzer:
         # Find files containing sys.path
         result = subprocess.run(
             ["grep", "-r", "sys.path", "--include=*.py", "."],
-            cwd="/home/user/webapp",
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
         )
@@ -78,7 +78,7 @@ class ImportAnalyzer:
 
         # Find Python files
         python_files = []
-        for root, dirs, files in os.walk("/home/user/webapp"):
+        for root, dirs, files in os.walk("C:\giwanos"):
             for file in files:
                 if file.endswith(".py"):
                     python_files.append(os.path.join(root, file))
@@ -126,7 +126,7 @@ class ImportAnalyzer:
         # Find files that manipulate sys.path for local imports
         result = subprocess.run(
             ["grep", "-rn", "sys.path.*parent", "--include=*.py", "."],
-            cwd="/home/user/webapp",
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
         )
@@ -149,7 +149,7 @@ class ImportAnalyzer:
         # Find files with complex path manipulations
         result = subprocess.run(
             ["grep", "-rn", "Path(__file__).parent", "--include=*.py", "."],
-            cwd="/home/user/webapp",
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
         )

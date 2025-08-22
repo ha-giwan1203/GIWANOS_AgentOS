@@ -13,7 +13,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from collections import defaultdict, Counter
 
 # Use correct path for sandbox environment  
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 
 class WeeklyOperationsAnalyzer:
     """주간 운영 분석기"""

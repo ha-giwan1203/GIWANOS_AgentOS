@@ -26,10 +26,10 @@ try:
 except ImportError:
     # Fallback implementations
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
     
     def get_data_path(*parts):
-        return "/home/user/webapp/data/" + "/".join(parts)
+        return "C:\giwanos/data/" + "/".join(parts)
 
 
 class MemoryDashboard:

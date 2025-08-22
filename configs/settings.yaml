@@ -2,24 +2,24 @@
 # "판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다."
 
 # VELOS 시스템 기본 설정
-# 환경 변수 우선순위: ENV > configs/settings.yaml > /home/user/webapp
+# 환경 변수 우선순위: ENV > configs/settings.yaml > C:\giwanos
 
 # 시스템 기본 경로 설정
 # 경로 우선순위: ENV > configs/settings.yaml > 기본값
-root: "/home/user/webapp"
+root: "C:\giwanos"
 venv_path: "C:/Users/User/venvs/velos"
-python_path: "/usr/bin/python3"
+python_path: "python"
 
 # 데이터베이스 설정
 database:
-  path: "/home/user/webapp/data/memory/velos.db"
-  backup_path: "/home/user/webapp/data/backups"
+  path: "C:\giwanos\data\memory\velos.db"
+  backup_path: "C:\giwanos\data\backups"
   max_backups: 10
 
 # 로그 설정
 logging:
   level: "INFO"
-  path: "/home/user/webapp/data/logs"
+  path: "C:\giwanos\data\logs"
   max_size: "10MB"
   backup_count: 5
   # 로그 파일별 설정

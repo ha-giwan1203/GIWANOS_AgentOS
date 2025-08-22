@@ -93,15 +93,15 @@ class TestVelosPathManager(unittest.TestCase):
         manager = VelosPathManager()
 
         # Test Windows path normalization
-        windows_path = "/home/user/webapp/data/memory/test.db"
+        windows_path = "C:\giwanos/data/memory/test.db"
         normalized = manager.normalize_path(windows_path)
 
-        # Should replace /home/user/webapp with current root
-        self.assertNotIn("/home/user/webapp", normalized)
+        # Should replace C:\giwanos with current root
+        self.assertNotIn("C:\giwanos", normalized)
         self.assertIn(manager.root, normalized)
 
-        # Test path with backslashes (only if it starts with /home/user/webapp pattern)
-        mixed_path = "/home/user/webapp/data/test"  # Use forward slash version
+        # Test path with backslashes (only if it starts with C:\giwanos pattern)
+        mixed_path = "C:\giwanos/data/test"  # Use forward slash version
         normalized_mixed = manager.normalize_path(mixed_path)
         self.assertIn(manager.root, normalized_mixed)
 
@@ -165,7 +165,7 @@ class TestPathManagerFunctions(unittest.TestCase):
     def test_path_normalization_function(self):
         """Test standalone path normalization function"""
         # Test that function handles various inputs
-        self.assertIsInstance(normalize_velos_path("/home/user/webapp/test"), str)
+        self.assertIsInstance(normalize_velos_path("C:\giwanos/test"), str)
         self.assertIsInstance(normalize_velos_path("/unix/path"), str)
         self.assertIsInstance(normalize_velos_path(""), str)
 

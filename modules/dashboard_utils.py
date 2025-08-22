@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(os.getenv("VELOS_ROOT", "/home/user/webapp"))
+ROOT = Path(os.getenv("VELOS_ROOT", "C:\giwanos"))
 DATA = ROOT / "data"
 REPORTS = DATA / "reports" / "auto"
 DISPATCH = DATA / "reports" / "_dispatch"

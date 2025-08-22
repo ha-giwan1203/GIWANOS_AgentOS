@@ -22,7 +22,7 @@ os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
 # ---- optional .env loader (opt-in via VELOS_LOAD_ENV=1) ----
 if os.getenv("VELOS_LOAD_ENV") == "1":
-    for p in (Path("/home/user/webapp/configs/.env"), Path("configs/.env"), Path(".env")):
+    for p in (Path("C:\giwanos/configs/.env"), Path("configs/.env"), Path(".env")):
         try:
             if p.exists():
                 try:
@@ -38,7 +38,7 @@ if os.getenv("VELOS_LOAD_ENV") == "1":
         except Exception:
             pass
 
-ROOT = Path(os.getenv("VELOS_ROOT", r"/home/user/webapp")).resolve()
+ROOT = Path(os.getenv("VELOS_ROOT", r"C:\giwanos")).resolve()
 DATA = ROOT / "data"
 LOGS = DATA / "logs"
 REPORTS = DATA / "reports" / "auto"

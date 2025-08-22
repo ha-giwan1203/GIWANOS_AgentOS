@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 
 def setup_demo_env():
     """데모용 환경 변수 설정"""

@@ -83,7 +83,7 @@ def get_root_path() -> str:
 
         return get_velos_root()
     except ImportError:
-        return get_setting("root", "/home/user/webapp")
+        return get_setting("root", "C:\giwanos")
 
 
 def get_db_path() -> str:

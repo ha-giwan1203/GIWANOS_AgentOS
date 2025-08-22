@@ -15,19 +15,19 @@ try:
 except ImportError:
     # Fallback functions for backward compatibility
     def get_velos_root():
-        return "/home/user/webapp"
+        return "C:\giwanos"
 
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
 
     def get_config_path(*parts):
-        return os.path.join("/home/user/webapp", "configs", *parts)
+        return os.path.join("C:\giwanos", "configs", *parts)
 
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
-ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 # 임계값(분): 환경변수로 오버라이드 가능

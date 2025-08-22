@@ -42,7 +42,7 @@ def search_report_key(report_key):
         "snapshots": [],
     }
 
-    base_path = Path("/home/user/webapp")
+    base_path = Path("C:\giwanos")
 
     # 로그 파일 검색
     for log_file in glob.glob(str(base_path / "data/logs/*.json")):

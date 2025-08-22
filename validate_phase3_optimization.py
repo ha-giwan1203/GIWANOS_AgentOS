@@ -67,7 +67,7 @@ def test_optimized_scripts():
     try:
         result = subprocess.run(
             [sys.executable, "scripts/check_velos_stats.py"],
-            cwd="/home/user/webapp",
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
             timeout=30,
@@ -122,7 +122,7 @@ def test_import_reduction():
         # Count remaining sys.path manipulations
         result = subprocess.run(
             ["grep", "-r", "sys.path", "--include=*.py", "."],
-            cwd="/home/user/webapp",
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
         )

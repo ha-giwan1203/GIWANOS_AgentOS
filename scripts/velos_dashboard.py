@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 # 환경변수 로드 함수
 def load_env_file():
     """환경 파일 로드"""
-    env_file = Path("/home/user/webapp/.env")
+    env_file = Path("C:\giwanos/.env")
     if env_file.exists():
         try:
             import os

@@ -52,7 +52,7 @@ def analyze_config_files():
             "-name",
             "*.toml",
         ],
-        cwd="/home/user/webapp",
+        cwd="C:\giwanos",
         capture_output=True,
         text=True,
     )
@@ -78,22 +78,22 @@ def analyze_config_files():
 
 
 def analyze_path_references():
-    """Analyze /home/user/webapp path references"""
+    """Analyze C:\giwanos path references"""
     print("\n=== Path Reference Analysis ===")
 
-    # Count files with /home/user/webapp references
+    # Count files with C:\giwanos references
     result = subprocess.run(
         [
             "grep",
             "-rl",
-            "/home/user/webapp",
+            "C:\giwanos",
             "--include=*.py",
             "--include=*.yaml",
             "--include=*.yml",
             "--include=*.json",
             ".",
         ],
-        cwd="/home/user/webapp",
+        cwd="C:\giwanos",
         capture_output=True,
         text=True,
     )
@@ -105,22 +105,22 @@ def analyze_path_references():
         [
             "grep",
             "-r",
-            "/home/user/webapp",
+            "C:\giwanos",
             "--include=*.py",
             "--include=*.yaml",
             "--include=*.yml",
             "--include=*.json",
             ".",
         ],
-        cwd="/home/user/webapp",
+        cwd="C:\giwanos",
         capture_output=True,
         text=True,
     )
 
     total_refs = len(result_lines.stdout.strip().split("\n")) if result_lines.stdout.strip() else 0
 
-    print(f"Files with /home/user/webapp references: {len(files_with_paths)}")
-    print(f"Total /home/user/webapp references: {total_refs}")
+    print(f"Files with C:\giwanos references: {len(files_with_paths)}")
+    print(f"Total C:\giwanos references: {total_refs}")
 
     # Categorize by file type and directory
     by_type = defaultdict(list)
@@ -161,8 +161,8 @@ def analyze_critical_modules():
     critical_files = []
     for path in critical_paths:
         result = subprocess.run(
-            ["find", path, "-name", "*.py", "-exec", "grep", "-l", "/home/user/webapp", "{}", ";"],
-            cwd="/home/user/webapp",
+            ["find", path, "-name", "*.py", "-exec", "grep", "-l", "C:\giwanos", "{}", ";"],
+            cwd="C:\giwanos",
             capture_output=True,
             text=True,
         )
@@ -195,10 +195,10 @@ def create_phase2_plan():
     }
 
     standardization_rules = {
-        "windows_path": "/home/user/webapp",
-        "linux_sandbox_path": "/home/user/webapp",
+        "windows_path": "C:\giwanos",
+        "linux_sandbox_path": "C:\giwanos",
         "environment_variable": "VELOS_ROOT_PATH",
-        "fallback_logic": "os.environ.get('VELOS_ROOT_PATH', '/home/user/webapp' if os.name == 'nt' else '/home/user/webapp')",
+        "fallback_logic": "os.environ.get('VELOS_ROOT_PATH', 'C:\giwanos' if os.name == 'nt' else 'C:\giwanos')",
     }
 
     print("Priority levels:")

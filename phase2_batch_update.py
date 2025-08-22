@@ -20,13 +20,13 @@ class VelosPathUpdater:
         self.errors = []
 
     def find_files_with_path_refs(self, directories: List[str]) -> List[str]:
-        """Find files containing /home/user/webapp references"""
+        """Find files containing C:\giwanos references"""
         files = []
         for directory in directories:
             try:
                 result = subprocess.run(
-                    ["grep", "-rl", "/home/user/webapp", "--include=*.py", directory],
-                    cwd="/home/user/webapp",
+                    ["grep", "-rl", "C:\giwanos", "--include=*.py", directory],
+                    cwd="C:\giwanos",
                     capture_output=True,
                     text=True,
                 )
@@ -39,34 +39,34 @@ class VelosPathUpdater:
         return list(set(files))  # Remove duplicates
 
     def update_hardcoded_paths(self, file_path: str) -> bool:
-        """Update hardcoded /home/user/webapp paths in a file"""
+        """Update hardcoded C:\giwanos paths in a file"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             original_content = content
 
-            # Pattern 1: Direct /home/user/webapp references
+            # Pattern 1: Direct C:\giwanos references
             patterns = [
                 # Database path patterns
                 (
-                    r'["\']/home/user/webapp/data/memory/velos\.db["\']',
-                    'get_db_path() if "get_db_path" in locals() else "/home/user/webapp/data/memory/velos.db"',
+                    r'["\']C:\giwanos/data/memory/velos\.db["\']',
+                    'get_db_path() if "get_db_path" in locals() else "C:\giwanos/data/memory/velos.db"',
                 ),
                 # General data paths
                 (
-                    r'["\']/home/user/webapp/data/([^"\']+)["\']',
-                    r'get_data_path("\1") if "get_data_path" in locals() else "/home/user/webapp/data/\1"',
+                    r'["\']C:\giwanos/data/([^"\']+)["\']',
+                    r'get_data_path("\1") if "get_data_path" in locals() else "C:\giwanos/data/\1"',
                 ),
                 # Config paths
                 (
-                    r'["\']/home/user/webapp/configs/([^"\']+)["\']',
-                    r'get_config_path("\1") if "get_config_path" in locals() else "/home/user/webapp/configs/\1"',
+                    r'["\']C:\giwanos/configs/([^"\']+)["\']',
+                    r'get_config_path("\1") if "get_config_path" in locals() else "C:\giwanos/configs/\1"',
                 ),
                 # Root path references
                 (
-                    r'ROOT\s*=\s*["\']/home/user/webapp["\']',
-                    'ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"',
+                    r'ROOT\s*=\s*["\']C:\giwanos["\']',
+                    'ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"',
                 ),
             ]
 
@@ -96,10 +96,10 @@ class VelosPathUpdater:
     from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "/home/user/webapp"
-    def get_data_path(*parts): return os.path.join("/home/user/webapp", "data", *parts)
-    def get_config_path(*parts): return os.path.join("/home/user/webapp", "configs", *parts)
-    def get_db_path(): return "/home/user/webapp/data/memory/velos.db"
+    def get_velos_root(): return "C:\giwanos"
+    def get_data_path(*parts): return os.path.join("C:\giwanos", "data", *parts)
+    def get_config_path(*parts): return os.path.join("C:\giwanos", "configs", *parts)
+    def get_db_path(): return "C:\giwanos/data/memory/velos.db"
 """
                         lines.insert(i, import_line)
                         lines.insert(i + 1, try_import)

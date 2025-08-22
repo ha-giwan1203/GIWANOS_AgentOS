@@ -13,7 +13,7 @@ import sys
 import signal
 
 # 경로 설정
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 LOGS_DIR = ROOT / "data" / "logs"
 MEMORY_DIR = ROOT / "data" / "memory"
 

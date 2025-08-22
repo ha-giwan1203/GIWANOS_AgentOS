@@ -32,20 +32,20 @@ try:
 except ImportError:
     # Fallback functions for backward compatibility
     def get_velos_root():
-        return "/home/user/webapp"
+        return "C:\giwanos"
 
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
 
     def get_config_path(*parts):
-        return os.path.join("/home/user/webapp", "configs", *parts)
+        return os.path.join("C:\giwanos", "configs", *parts)
 
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
 
 
 def _env(name: str, default: Optional[str] = None) -> str:
-    """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > /home/user/webapp 순서"""
+    """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > C:\giwanos 순서"""
     v = os.getenv(name, default)
     if not v:
         # 설정 파일에서 로드 시도
@@ -55,7 +55,7 @@ def _env(name: str, default: Optional[str] = None) -> str:
             config_path = os.path.join(
                 get_config_path("settings.yaml")
                 if "get_config_path" in locals()
-                else "/home/user/webapp/configs/settings.yaml"
+                else "C:\giwanos/configs/settings.yaml"
             )
             if config_path and os.path.exists(config_path):
                 with open(config_path, "r", encoding="utf-8") as f:

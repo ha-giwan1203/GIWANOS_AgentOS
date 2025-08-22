@@ -180,7 +180,7 @@ def main():
     
     if not env_ok:
         print("\n❌ 필수 환경 변수가 설정되지 않았습니다.")
-        print("📖 설정 가이드: /home/user/webapp/docs/SLACK_SETUP_GUIDE.md")
+        print("📖 설정 가이드: C:\giwanos/docs/SLACK_SETUP_GUIDE.md")
         return False
     
     # 2. API 연결 테스트

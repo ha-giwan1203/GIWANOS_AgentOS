@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("/home/user/webapp")
+ROOT = Path("C:\giwanos")
 
 # 상수 정의
 SCHEMA_VERSION = 1

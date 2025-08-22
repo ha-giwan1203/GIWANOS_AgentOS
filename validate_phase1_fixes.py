@@ -18,14 +18,14 @@ def test_environment_variables():
     print("=== Environment Variable Tests ===")
 
     # Check VELOS_DB_PATH setting
-    default_path = "/home/user/webapp/data/memory/velos.db"
+    default_path = "C:\giwanos/data/memory/velos.db"
     actual_path = os.environ.get("VELOS_DB_PATH", default_path)
 
     print(f"VELOS_DB_PATH: {actual_path}")
 
     # Convert to local path for sandbox environment
-    if actual_path.startswith("/home/user/webapp"):
-        local_path = actual_path.replace("/home/user/webapp", "/home/user/webapp")
+    if actual_path.startswith("C:\giwanos"):
+        local_path = actual_path.replace("C:\giwanos", "C:\giwanos")
         local_path = local_path.replace("\\", "/")
         print(f"Local path: {local_path}")
 
@@ -47,7 +47,7 @@ def test_memory_access():
         from modules.core.memory_adapter.adapter import create_memory_adapter
 
         # Set environment variable for local testing
-        os.environ["VELOS_DB_PATH"] = "/home/user/webapp/data/memory/velos.db"
+        os.environ["VELOS_DB_PATH"] = "C:\giwanos/data/memory/velos.db"
 
         adapter = create_memory_adapter()
         stats = adapter.get_stats()
@@ -73,7 +73,7 @@ def test_sqlite_store():
         from modules.memory.storage.sqlite_store import VelosMemoryStore
 
         # Set environment for testing
-        os.environ["VELOS_DB_PATH"] = "/home/user/webapp/data/memory/velos.db"
+        os.environ["VELOS_DB_PATH"] = "C:\giwanos/data/memory/velos.db"
 
         store = VelosMemoryStore()
         print(f"✅ sqlite_store: {store.db_path}")
@@ -93,7 +93,7 @@ def test_db_util():
         from modules.core.db_util import db_open
 
         # Set environment for testing
-        os.environ["VELOS_DB_PATH"] = "/home/user/webapp/data/memory/velos.db"
+        os.environ["VELOS_DB_PATH"] = "C:\giwanos/data/memory/velos.db"
 
         db_path = os.environ.get("VELOS_DB_PATH")
         print(f"✅ db_util path: {db_path}")
@@ -115,7 +115,7 @@ def test_config_files():
     print("\n=== Configuration File Tests ===")
 
     # Check settings.yaml
-    settings_path = "/home/user/webapp/configs/settings.yaml"
+    settings_path = "C:\giwanos/configs/settings.yaml"
     if os.path.exists(settings_path):
         with open(settings_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -134,7 +134,7 @@ def test_benchmark_regression():
 
     try:
         # Check if benchmark file exists and has correct sync check
-        benchmark_path = "/home/user/webapp/tests/perf/benchmark_regression.py"
+        benchmark_path = "C:\giwanos/tests/perf/benchmark_regression.py"
         if os.path.exists(benchmark_path):
             with open(benchmark_path, "r", encoding="utf-8") as f:
                 content = f.read()

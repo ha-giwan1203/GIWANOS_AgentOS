@@ -57,7 +57,7 @@ def _env(key: str, default: Optional[str] = None) -> str:
         pass
 
     # 3. 기본값 반환
-    return default or "/home/user/webapp"
+    return default or "C:\giwanos"
 
 
 def add_module_path(relative_path: str) -> None:
@@ -116,12 +116,12 @@ def check_file_exists(file_path: str, create_dir: bool = True) -> bool:
 
 def get_db_path() -> str:
     """VELOS DB 경로 반환"""
-    return _env("VELOS_DB_PATH", "/home/user/webapp/data/memory/velos.db")
+    return _env("VELOS_DB_PATH", "C:\giwanos/data/memory/velos.db")
 
 
 def get_jsonl_dir() -> str:
     """VELOS JSONL 디렉토리 경로 반환"""
-    return _env("VELOS_JSONL_DIR", "/home/user/webapp/data/memory")
+    return _env("VELOS_JSONL_DIR", "C:\giwanos/data/memory")
 
 
 if __name__ == "__main__":

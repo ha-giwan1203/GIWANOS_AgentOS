@@ -16,7 +16,7 @@
 ## 📊 학습 메모리 시스템 구성 요소
 
 ### 1. 🤖 실시간 GPT-5 메모리 모니터링 시스템
-**위치**: `/home/user/webapp/data/gpt5_monitor/gpt5_monitor.db`  
+**위치**: `C:\giwanos/data/gpt5_monitor/gpt5_monitor.db`  
 **파일 크기**: 49,152 bytes
 
 #### 핵심 테이블 구조:
@@ -31,7 +31,7 @@
 - **`report_transmissions`**: 1개 보고서 전송 기록
 
 ### 2. 📚 장기 학습 기록 저장소
-**위치**: `/home/user/webapp/data/memory/learning_memory.json`  
+**위치**: `C:\giwanos/data/memory/learning_memory.json`  
 **파일 크기**: 242,513 bytes  
 **총 학습 기록**: 950개
 
@@ -41,7 +41,7 @@
 - VELOS 시스템 아키텍처 학습 기록
 
 ### 3. 🗄️ VELOS 메모리 데이터베이스
-**위치**: `/home/user/webapp/data/memory/velos.db`  
+**위치**: `C:\giwanos/data/memory/velos.db`  
 **파일 크기**: 143,360 bytes  
 **총 레코드**: 2,878개
 

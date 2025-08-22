@@ -39,10 +39,10 @@ class ManualPathUpdater:
                     "--include=*.md",
                     "--include=*.yaml",
                     "--include=*.yml",
-                    "/home/user/webapp",
+                    "C:\giwanos",
                     ".",
                 ],
-                cwd="/home/user/webapp",
+                cwd="C:\giwanos",
                 capture_output=True,
                 text=True,
             )
@@ -86,8 +86,8 @@ class ManualPathUpdater:
 
             # Replace Windows paths
             patterns = [
-                (r"/home/user/webapp", "/home/user/webapp"),
-                (r"C:\\giwanos", "/home/user/webapp"),
+                (r"C:\giwanos", "C:\giwanos"),
+                (r"C:\\giwanos", "C:\giwanos"),
                 (r"C:/Users/User/venvs/velos/Scripts/python\.exe", "/usr/bin/python3"),
                 (r"C:\\Users\\User\\venvs\\velos\\Scripts\\python\.exe", "/usr/bin/python3"),
                 (r"/tmp", "/tmp"),
@@ -153,8 +153,8 @@ class ManualPathUpdater:
 
             # Replace Windows paths
             patterns = [
-                (r"/home/user/webapp", "/home/user/webapp"),
-                (r"C:\\giwanos", "/home/user/webapp"),
+                (r"C:\giwanos", "C:\giwanos"),
+                (r"C:\\giwanos", "C:\giwanos"),
                 (r"C:/Users/User/venvs/velos/Scripts/python\.exe", "/usr/bin/python3"),
                 (r"C:\\Users\\User\\venvs\\velos\\Scripts\\python\.exe", "/usr/bin/python3"),
                 (r"/tmp", "/tmp"),

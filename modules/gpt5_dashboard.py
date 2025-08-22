@@ -1006,7 +1006,7 @@ class GPT5Dashboard:
                 'recipient': random.choice(['admin@velos.ai', 'team@velos.ai', 'monitor@velos.ai']),
                 'method': random.choice(['이메일', '슬랙', '노션', '파일저장']),
                 'status': random.choice(['success', 'success', 'success', 'failed']),  # 75% 성공률
-                'file_path': f'/home/user/webapp/data/gpt5_monitor/reports/test_report_{i}.md',
+                'file_path': f'C:\giwanos/data/gpt5_monitor/reports/test_report_{i}.md',
                 'metadata': {'test': True, 'generated_by': 'dashboard_test'}
             }
             for i in range(random.randint(5, 20))
