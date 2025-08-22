@@ -16,9 +16,11 @@ class VelosPathManager:
 
     def __init__(self):
         # Priority: ENV > Legacy ENV > Platform default
+        # Accept VELOS_ROOT for backward/Windows env compatibility
         self._root_path = (
             os.environ.get("VELOS_ROOT_PATH")
             or os.environ.get("GIWANOS_ROOT")  # Legacy support
+            or os.environ.get("VELOS_ROOT")
             or (self.DEFAULT_WINDOWS_ROOT if os.name == "nt" else self.DEFAULT_LINUX_ROOT)
         )
 
@@ -71,6 +73,10 @@ class VelosPathManager:
     def to_posix_style(self, path: str) -> str:
         return path.replace("\\", "/") if path else path
 
+    def get_snapshots_path(self) -> str:
+        """Return snapshots directory honoring VELOS_SNAP_DIR if set."""
+        return os.environ.get("VELOS_SNAP_DIR") or self.get_data_path("snapshots")
+
     def get_environment_info(self) -> dict:
         return {
             "root_path": self._root_path,
@@ -78,8 +84,10 @@ class VelosPathManager:
             "is_windows": os.name == "nt",
             "environment_vars": {
                 "VELOS_ROOT_PATH": os.environ.get("VELOS_ROOT_PATH"),
+                "VELOS_ROOT": os.environ.get("VELOS_ROOT"),
                 "VELOS_DB_PATH": os.environ.get("VELOS_DB_PATH"),
                 "GIWANOS_ROOT": os.environ.get("GIWANOS_ROOT"),
+                "VELOS_SNAP_DIR": os.environ.get("VELOS_SNAP_DIR"),
             },
         }
 
@@ -115,3 +123,7 @@ def get_db_path(db_name: str = "velos.db") -> str:
 
 def normalize_velos_path(path: str) -> str:
     return _path_manager.normalize_path(path)
+
+
+def get_snapshots_path() -> str:
+    return _path_manager.get_snapshots_path()
