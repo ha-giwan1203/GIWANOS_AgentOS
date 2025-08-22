@@ -17,7 +17,8 @@ import sqlite3
 import sys
 
 # 경로 하드코딩 제거, report_paths 모듈 사용
-from modules.report_paths import ROOT, P`nsys.path.insert(0, str(ROOT))
+from modules.report_paths import ROOT, P
+sys.path.insert(0, str(ROOT))
 os.environ.setdefault("VELOS_DB_WRITE_FORBIDDEN", "1")
 import app.guards.db_write_guard  # noqa
 

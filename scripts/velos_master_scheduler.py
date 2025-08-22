@@ -256,11 +256,22 @@ def _run_job(job: Dict[str, Any], dry_run: bool = False) -> bool:
 
         # 파일 확장자에 따른 실행 방법 결정
         elif script_path.endswith('.ps1'):
-            # PowerShell 스크립트는 건너뛰거나 Python 대안 실행
-            _log(f"SKIP PowerShell script: {script_path} (Linux 환경)", "WARN")
-            return True  # 에러로 처리하지 않고 건너뛰기
+            # PowerShell이 설치되어 있는지 확인
+            try:
+                subprocess.run(["pwsh", "--version"], capture_output=True, check=True)
+                # PowerShell 사용 가능
+                env = os.environ.copy()
+                env["VELOS_ROOT"] = str(ROOT)
+                env["PYTHONPATH"] = f"{ROOT}:{env.get('PYTHONPATH', '')}"
+                result = subprocess.run([
+                    "pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", full_path
+                ], capture_output=True, text=True, timeout=300, cwd=str(ROOT), env=env)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                # PowerShell 없으면 건너뛰기
+                _log(f"SKIP PowerShell script: {script_path} (pwsh not found)", "WARN")
+                return True
         elif script_path.endswith('.bat'):
-            # Batch 파일도 건너뛰기
+            # Batch 파일은 여전히 건너뛰기
             _log(f"SKIP Batch script: {script_path} (Linux 환경)", "WARN")
             return True
         else:

@@ -1,4 +1,4 @@
-﻿# =========================================================
+# =========================================================
 # VELOS 운영 철학 선언문
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
@@ -12,22 +12,28 @@
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
 $ErrorActionPreference="Stop"
-$ROOT="C:\giwanos"
-$LOG ="$ROOT\data\logs\preflight_{0}.log" -f (Get-Date -Format yyyyMMdd)
+$ROOT = if ($env:VELOS_ROOT) { $env:VELOS_ROOT } else { "/workspace" }
+$LOG = "$ROOT/data/logs/preflight_{0}.log" -f (Get-Date -Format yyyyMMdd)
 function Log($m){ "[{0}] {1}" -f (Get-Date -Format "HH:mm:ss"),$m | Out-File -FilePath $LOG -Append -Encoding UTF8 }
 # python 존재 확인
-if (-not (Get-Command python -ErrorAction SilentlyContinue)) { Log "no python"; exit 1 }
+if (-not (Get-Command python3 -ErrorAction SilentlyContinue)) { 
+    if (-not (Get-Command python -ErrorAction SilentlyContinue)) { 
+        Log "no python"; exit 1 
+    }
+}
 # 빠른 문법 체크
-Get-ChildItem "$ROOT" -Recurse -Filter *.py | ?{ $_.FullName -notmatch '\\venv\\' } | %{
-  & python -m py_compile $_.FullName 2>$null
+Get-ChildItem "$ROOT" -Recurse -Filter *.py | ?{ $_.FullName -notmatch '/venv/' } | %{
+  & python3 -m py_compile $_.FullName 2>$null
   if ($LASTEXITCODE -ne 0){ Log "py_compile fail: $($_.FullName)"; exit 1 }
 }
 # 필수 임포트
-& python - << 'PY'
+$pythonCode = @"
 import importlib
 for m in ["modules.velos_common","modules.report_paths"]:
     importlib.import_module(m)
 print("OK")
-PY
+"@
+
+$pythonCode | python3
 if ($LASTEXITCODE -ne 0){ Log "import check failed"; exit 1 }
 Log "preflight pass"

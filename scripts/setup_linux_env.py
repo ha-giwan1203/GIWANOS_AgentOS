@@ -35,6 +35,14 @@ def setup_environment():
     os.environ["VELOS_ROOT"] = str(workspace)
     os.environ["PYTHONPATH"] = f"{workspace}:{os.environ.get('PYTHONPATH', '')}"
     
+    # PowerShell PATH 추가 (설치되어 있는 경우)
+    home_local_bin = Path.home() / ".local" / "bin"
+    if (home_local_bin / "pwsh").exists():
+        current_path = os.environ.get("PATH", "")
+        if str(home_local_bin) not in current_path:
+            os.environ["PATH"] = f"{home_local_bin}:{current_path}"
+            print(f"✅ PATH에 PowerShell 경로 추가: {home_local_bin}")
+    
     print(f"✅ VELOS_ROOT: {os.environ['VELOS_ROOT']}")
     print(f"✅ PYTHONPATH: {os.environ['PYTHONPATH']}")
     
@@ -70,10 +78,21 @@ def setup_environment():
     except Exception:
         print("⚠️  autosave_runner 상태 확인 불가")
     
+    # 5. PowerShell 테스트
+    try:
+        result = subprocess.run(["pwsh", "--version"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"✅ PowerShell v{result.stdout.strip().split()[-1]} 사용 가능")
+        else:
+            print("⚠️  PowerShell 실행 실패")
+    except FileNotFoundError:
+        print("⚠️  PowerShell 없음 - .ps1 스크립트는 건너뛰어집니다")
+    
     print("\n🎉 VELOS 리눅스 환경 설정 완료!")
-    print("\n📝 사용법:")
+    print("\n📝 사용법 (혼합 환경):")
     print("export VELOS_ROOT='/workspace'")
     print("export PYTHONPATH='/workspace:$PYTHONPATH'")
+    print("export PATH='$HOME/.local/bin:$PATH'")
     print("python3 scripts/velos_master_scheduler.py --list")
     
     return True
