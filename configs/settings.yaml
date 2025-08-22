@@ -9,6 +9,7 @@
 root: "C:\giwanos"
 venv_path: "C:/Users/User/venvs/velos"
 python_path: "python"
+powershell_path: "pwsh"  # PowerShell 7
 
 # 데이터베이스 설정
 database:

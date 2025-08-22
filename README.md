@@ -58,6 +58,36 @@ C:\giwanos\
 - **로그 분석**: 구조화된 로그 처리 및 분석
 - **메모리 인사이트**: 학습 데이터 기반 인사이트 생성
 
+## ⚡ 시스템 요구사항
+
+### PowerShell 7.x (필수)
+VELOS는 **PowerShell 7.x** (PowerShell Core)에 최적화되어 있습니다:
+
+```powershell
+# PowerShell 7 설치 확인
+$PSVersionTable.PSVersion
+
+# PowerShell 7이 없는 경우 설치
+winget install Microsoft.PowerShell
+```
+
+### PowerShell 7의 VELOS 최적화 기능
+- **크로스 플랫폼**: Windows, Linux, macOS 지원
+- **향상된 성능**: 더 빠른 시작 시간과 실행 속도  
+- **병렬 처리**: `ForEach-Object -Parallel`로 다중 작업 동시 실행
+- **개선된 JSON**: 더 정확한 JSON 직렬화/역직렬화
+- **UTF-8 기본**: 한글 로그 파일 처리 개선
+- **향상된 오류 처리**: 더 자세한 스택 트레이스
+
+### VELOS 전용 PowerShell 명령어
+```powershell
+# 병렬 작업 실행 (PowerShell 7 전용)
+.\scripts\Invoke-VelosParallel.ps1 -Tasks @("memory_tick", "health_check") -ThrottleLimit 2
+
+# JSON 로깅으로 VELOS 시작
+.\scripts\Start-Velos.ps1 -Verbose -KeepOutput
+```
+
 ## 🚀 빠른 시작
 
 ### 환경 설정
@@ -65,8 +95,8 @@ C:\giwanos\
 # 환경변수 설정
 $env:VELOS_DB_PATH = "C:\giwanos\data\velos.db"
 
-# VELOS 실행
-powershell -ExecutionPolicy Bypass -File scripts\run_velos_search.ps1
+# VELOS 실행 (PowerShell 7)
+pwsh -ExecutionPolicy Bypass -File scripts\run_velos_search.ps1
 ```
 
 ### 대시보드 실행
