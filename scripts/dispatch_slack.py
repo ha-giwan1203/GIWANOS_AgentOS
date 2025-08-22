@@ -18,7 +18,9 @@ except ImportError:
             from dotenv import load_dotenv
         except Exception:
             return
-        root = Path(r"C:\giwanos")
+        import os
+        default_root = "/home/user/webapp" if os.name == "posix" else r"C:\giwanos"
+        root = Path(os.getenv("VELOS_ROOT", default_root))
         for p in (root / "configs/.env", root / ".env"):
             if p.exists():
                 load_dotenv(dotenv_path=p, override=False, encoding="utf-8")
@@ -33,7 +35,9 @@ except Exception:
     requests = None
     post_with_retry = None
 
-ROOT = Path(r"C:\giwanos")
+import os
+default_root = "/home/user/webapp" if os.name == "posix" else r"C:\giwanos"
+ROOT = Path(os.getenv("VELOS_ROOT", default_root))
 AUTO = ROOT / "data" / "reports" / "auto"
 DISP = ROOT / "data" / "reports" / "_dispatch"
 DISP.mkdir(parents=True, exist_ok=True)
