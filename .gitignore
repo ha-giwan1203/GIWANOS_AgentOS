@@ -62,3 +62,24 @@ venv/
 secrets/
 private/
 config/private/
+
+# 대용량·산출물 디렉터리(리포 슬림화)
+artifacts/
+fonts/**
+!fonts/.keep
+
+data/
+!data/.keep
+!data/README.md
+
+# 특정 산출물 파일 패턴
+*.pdf
+*.zip
+*.db
+*.sqlite
+*.jsonl
+
+# Local debug artifacts (prevent PR noise)
+runs.json
+jobs.json
+pr_list.json

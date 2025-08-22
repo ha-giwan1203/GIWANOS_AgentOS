@@ -18,14 +18,17 @@ import datetime
 import sys
 from typing import Dict, Any, List
 
-ROOT = r"C:\giwanos"
-REPORT_DIR = os.path.join(ROOT, "data", "reports")
-HEALTH_LOG = os.path.join(ROOT, "data", "logs", "system_health.json")
+from modules.core.path_manager import get_data_path
+
+REPORT_DIR = get_data_path("reports")
+HEALTH_LOG = get_data_path("logs", "system_health.json")
+
 
 def get_latest_snapshot() -> str:
     """최신 스냅샷 파일명 반환"""
     try:
-        snap_dir = os.path.join(ROOT, "data", "snapshots")
+        from modules.core.path_manager import get_data_path
+        snap_dir = get_data_path("snapshots")
         if not os.path.exists(snap_dir):
             return "스냅샷 디렉토리 없음"
 
@@ -37,6 +40,7 @@ def get_latest_snapshot() -> str:
     except Exception as e:
         return f"스냅샷 조회 오류: {e}"
 
+
 def get_memory_stats() -> Dict[str, Any]:
     """메모리 통계 수집"""
     try:
@@ -45,6 +49,7 @@ def get_memory_stats() -> Dict[str, Any]:
         return adapter.get_stats()
     except Exception as e:
         return {"error": str(e)}
+
 
 def generate_report() -> Dict[str, Any]:
     """VELOS 시스템 보고서 생성"""
@@ -84,8 +89,8 @@ def generate_report() -> Dict[str, Any]:
         # 헬스 데이터 추가
         if "error" not in health_data:
             # 시스템 무결성 정보
-            system_integrity = health_data.get('system_integrity', {})
-            data_integrity = health_data.get('data_integrity', {})
+            system_integrity = health_data.get("system_integrity", {})
+            data_integrity = health_data.get("data_integrity", {})
 
             md_content.extend([
                 f"- autosave_runner_count: {system_integrity.get('autosave_runner_count', 'N/A')}",
@@ -95,11 +100,11 @@ def generate_report() -> Dict[str, Any]:
             ])
 
             # 경고 및 노트 추가
-            warnings = system_integrity.get('warnings', [])
+            warnings = system_integrity.get("warnings", [])
             if warnings:
                 md_content.append(f"- warnings: {', '.join(warnings)}")
 
-            notes = system_integrity.get('notes', [])
+            notes = system_integrity.get("notes", [])
             if notes:
                 md_content.append(f"- notes: {', '.join(notes)}")
         else:
@@ -128,7 +133,7 @@ def generate_report() -> Dict[str, Any]:
             "",
             "---",
             f"*생성 시각: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
-            "*VELOS 운영 철학 기반*"
+            "*VELOS 운영 철학 기반*",
         ])
 
         # 파일 저장
@@ -141,14 +146,15 @@ def generate_report() -> Dict[str, Any]:
             "filename": f"velos_report_{ts}.md",
             "health_data": health_data,
             "memory_stats": memory_stats,
-            "latest_snapshot": latest_snapshot
+            "latest_snapshot": latest_snapshot,
         }
 
     except Exception as e:
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def main():
     """메인 실행 함수"""
@@ -167,6 +173,7 @@ def main():
     else:
         print(f"❌ Report generation failed: {result['error']}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
