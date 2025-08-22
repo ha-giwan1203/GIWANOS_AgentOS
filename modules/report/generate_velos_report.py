@@ -12,16 +12,15 @@
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
 import os
-import sys
 import json
 import time
 import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
-ROOT = "C:/giwanos"
-if ROOT not in sys.path:
-    sys.path.append(ROOT)
+# Use centralized path manager
+from modules.core.path_manager import get_velos_root, get_data_path
+ROOT = get_velos_root()
 
 def get_system_stats() -> Dict[str, Any]:
     """시스템 통계 수집"""
@@ -37,7 +36,7 @@ def get_system_stats() -> Dict[str, Any]:
 
         # 헬스 로그 읽기
         health_log = {}
-        health_path = os.path.join(ROOT, "data", "logs", "system_health.json")
+        health_path = get_data_path("logs", "system_health.json")
         if os.path.exists(health_path):
             try:
                 with open(health_path, "r", encoding="utf-8") as f:
@@ -47,7 +46,7 @@ def get_system_stats() -> Dict[str, Any]:
 
         # 최근 스냅샷 확인
         snapshots = []
-        snapshots_dir = os.path.join(ROOT, "data", "snapshots")
+        snapshots_dir = get_data_path("snapshots")
         if os.path.exists(snapshots_dir):
             try:
                 for item in os.listdir(snapshots_dir):
@@ -139,7 +138,7 @@ def save_report(report_content: str) -> Dict[str, Any]:
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_filename = f"velos_report_{timestamp}.md"
-        report_path = os.path.join(ROOT, "data", "reports", report_filename)
+        report_path = get_data_path("reports", report_filename)
 
         # 디렉토리 생성
         os.makedirs(os.path.dirname(report_path), exist_ok=True)

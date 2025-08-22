@@ -1,0 +1,5 @@
+# Minimal dependencies for CI/report generation
+pytest>=7
+reportlab>=3
+PyYAML>=6
+# sqlite3 is in stdlib

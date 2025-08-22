@@ -4,6 +4,7 @@
 import os
 import json
 import time
+import re
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -127,6 +128,24 @@ def create_memory_adapter(db_path: Optional[str] = None, **kw: Any) -> "MemoryAd
 def _backoff_iter(max_tries: int = 5, base: float = 0.2) -> Any:
     for i in range(max_tries):
         yield base * (2 ** i)
+
+def _fts_sanitize_keyword(keyword: str) -> str:
+    """Build a safe FTS5 MATCH expression fragment for a single keyword or phrase.
+    - Removes FTS operators/specials by stripping non-word chars
+    - For single token: use prefix match (token*)
+    - For multi-word: use a quoted phrase ("w1 w2 ...")
+    Returns empty string if nothing usable remains.
+    """
+    try:
+        s = re.sub(r"[^\w\s]", " ", str(keyword))  # keep letters/digits/underscore and spaces
+        s = " ".join(s.split())  # collapse whitespace
+        if not s:
+            return ""
+        if " " in s:
+            return f'"{s}"'
+        return f"{s}*"
+    except Exception:
+        return str(keyword)
 
 class MemoryAdapter:
     def __init__(self, jsonl_path: Optional[str] = None, db_path: Optional[str] = None):
@@ -263,9 +282,9 @@ class MemoryAdapter:
                     rows = cur.execute("""
                       SELECT m.id, m.ts, m.role, m.insight, m.raw, m.tags
                       FROM memory_fts f JOIN memory m ON f.rowid = m.id
-                      WHERE f.text MATCH ?
+                      WHERE memory_fts MATCH ?
                       ORDER BY m.ts DESC
-                      LIMIT ?""", (keyword, limit)).fetchall()
+                      LIMIT ?""", ("insight:" + _fts_sanitize_keyword(keyword), limit)).fetchall()
                     
                     out = []
                     for row in rows:
