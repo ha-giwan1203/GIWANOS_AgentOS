@@ -1,10 +1,13 @@
 # [ACTIVE] VELOS 운영 철학 적용
 from __future__ import annotations
-import os, sys, json
-from pathlib import Path
-from datetime import datetime, timezone
 
-ROOT = Path(r"C:/giwanos")
+import json
+import os
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(r"C:\giwanos")
 HEALTH_PATH = ROOT / "data" / "logs" / "system_health.json"
 
 
@@ -57,9 +60,7 @@ def main():
                     file_data = pb.upload_file(f, p.name)
                 (dev or pb).push_file(**file_data, body=args.body, title=args.title)
             else:
-                (dev or pb).push_note(
-                    args.title, f"{args.body}\n[file missing: {args.file}]"
-                )
+                (dev or pb).push_note(args.title, f"{args.body}\n[file missing: {args.file}]")
         else:
             (dev or pb).push_note(args.title, args.body)
         print("[PUSHBULLET] ok")

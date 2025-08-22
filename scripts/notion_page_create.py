@@ -8,15 +8,17 @@ VELOS Notion Page 생성 스크립트
 - 환경변수 기반 유연한 설정
 """
 
+import json
 import os
 import sys
-import json
-import requests
 from pathlib import Path
+
+import requests
 
 # 환경변수 로딩
 try:
     from env_loader import load_env
+
     load_env()
 except ImportError:
     print("⚠️  env_loader 모듈을 찾을 수 없습니다", file=sys.stderr)
@@ -45,20 +47,16 @@ def md_to_blocks(md_text, max_length=20000):
         para = para.strip()
         if not para:
             # 빈 줄은 빈 paragraph 블록으로 생성
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {"rich_text": []}
-            })
+            blocks.append({"object": "block", "type": "paragraph", "paragraph": {"rich_text": []}})
         else:
             # 일반 텍스트는 paragraph 블록으로 생성
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": [{"type": "text", "text": {"content": para}}]
+            blocks.append(
+                {
+                    "object": "block",
+                    "type": "paragraph",
+                    "paragraph": {"rich_text": [{"type": "text", "text": {"content": para}}]},
                 }
-            })
+            )
 
     return blocks
 
@@ -69,11 +67,10 @@ def create_file_link_block(file_path, file_type="PDF"):
         "object": "block",
         "type": "paragraph",
         "paragraph": {
-            "rich_text": [{
-                "type": "text",
-                "text": {"content": f"📎 {file_type} 파일: {file_path}"}
-            }]
-        }
+            "rich_text": [
+                {"type": "text", "text": {"content": f"📎 {file_type} 파일: {file_path}"}}
+            ]
+        },
     }
 
 
@@ -117,21 +114,13 @@ def main():
     # 페이지 생성
     print("\n📄 페이지 생성 중...")
 
-    properties = {
-        "title": [{"type": "text", "text": {"content": title}}]
-    }
+    properties = {"title": [{"type": "text", "text": {"content": title}}]}
 
-    payload = {
-        "parent": parent,
-        "properties": {title_prop: properties["title"]}
-    }
+    payload = {"parent": parent, "properties": {title_prop: properties["title"]}}
 
     try:
         r = requests.post(
-            "https://api.notion.com/v1/pages",
-            headers=notion_headers(),
-            json=payload,
-            timeout=15
+            "https://api.notion.com/v1/pages", headers=notion_headers(), json=payload, timeout=15
         )
 
         if r.status_code not in (200, 201):
@@ -176,7 +165,7 @@ def main():
                 f"https://api.notion.com/v1/blocks/{page_id}/children",
                 headers=notion_headers(),
                 json={"children": blocks},
-                timeout=20
+                timeout=20,
             )
 
             if br.status_code not in (200, 201):
@@ -194,7 +183,7 @@ def main():
             "title": title,
             "url": f"https://notion.so/{page_id.replace('-', '')}",
             "blocks_count": len(blocks),
-            "parent_type": "page" if parent_page else "database"
+            "parent_type": "page" if parent_page else "database",
         }
 
         print(f"\n🎉 Notion Page 생성 완료!")
@@ -219,6 +208,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

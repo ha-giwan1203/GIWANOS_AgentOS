@@ -12,7 +12,8 @@ def run():
     cur = con.cursor()
     cur.execute("PRAGMA journal_mode=WAL;")
     cur.execute("PRAGMA synchronous=NORMAL;")
-    cur.execute("""
+    cur.execute(
+        """
     CREATE TABLE IF NOT EXISTS messages(
       conversation_id TEXT,
       message_id TEXT PRIMARY KEY,
@@ -25,7 +26,8 @@ def run():
       meta_json TEXT,
       idempotency_key TEXT UNIQUE
     );
-    """)
+    """
+    )
     # 멱등 보장 + 정렬 최적화
     cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS ux_dedupe ON messages(idempotency_key);")
     cur.execute(

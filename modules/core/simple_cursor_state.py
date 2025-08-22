@@ -2,11 +2,14 @@
 # - 파일명/경로 불변 · 거짓 코드 금지 · 자가 검증 필수 · 결과는 로그로 증빙
 
 from __future__ import annotations
-import os, json, time
-from pathlib import Path
-from typing import Dict, Any
 
-ROOT = Path(r"C:/giwanos")
+import json
+import os
+import time
+from pathlib import Path
+from typing import Any, Dict
+
+ROOT = Path(r"C:\giwanos")
 STATE_PATH = ROOT / "data" / "memory" / "runtime_state.json"
 
 
@@ -72,9 +75,7 @@ def set_cursor_in_use(flag: bool, source: str = "manual") -> None:
 def get_runtime_state() -> Dict[str, Any]:
     d = _read_json(STATE_PATH)
     d.setdefault("cursor_in_use", get_cursor_in_use())
-    d.setdefault(
-        "source", os.getenv("VELOS_SESSION_SOURCE") or d.get("source") or "unknown"
-    )
+    d.setdefault("source", os.getenv("VELOS_SESSION_SOURCE") or d.get("source") or "unknown")
     return d
 
 

@@ -5,29 +5,77 @@
 import os
 import sys
 import time
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
-# VELOS 모듈 경로 추가
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
-from velos_adapter import VelosEnhancedMemoryAdapter
+# Phase 3: Import manager integration for optimized imports
+try:
+    from modules.core.import_manager import add_velos_path, ensure_velos_imports, import_velos
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'cache'))
-from velos_cache_adapter import VelosCachedMemoryAdapter
+    _IMPORT_MANAGER_AVAILABLE = True
+except ImportError:
+    _IMPORT_MANAGER_AVAILABLE = False
 
-# 쿼리 라우터 모듈
-sys.path.append(os.path.dirname(__file__))
-from query_router import search_memory, search_memory_advanced, get_cache_stats, clear_query_cache
+    # Fallback for backward compatibility
+    def import_velos(module_name):
+        raise ImportError(f"Import manager not available for {module_name}")
 
-# SQLite 저장소 모듈
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
-from sqlite_store import connect_db
 
-# 역할별 검색 유틸리티
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'core', 'memory_adapter'))
-from search import search_by_role_dict, search_roles_unified, search_with_normalized_query
+# Phase 3: Optimized imports using import manager
+try:
+    from ...core.import_manager import import_velos
 
-# 명시적으로 utils 레벨 memory_adapter에서 import
-from modules.utils.memory_adapter import normalize_query
+    # Import storage modules
+    storage_module = import_velos("memory.storage.velos_adapter")
+    VelosEnhancedMemoryAdapter = getattr(storage_module, "VelosEnhancedMemoryAdapter")
+
+    # Import cache modules
+    cache_module = import_velos("memory.cache.velos_cache_adapter")
+    VelosCachedMemoryAdapter = getattr(cache_module, "VelosCachedMemoryAdapter")
+
+    # Import router modules
+    from .query_router import (
+        clear_query_cache,
+        get_cache_stats,
+        search_memory,
+        search_memory_advanced,
+    )
+
+    # Import SQLite storage
+    sqlite_module = import_velos("memory.storage.sqlite_store")
+    connect_db = getattr(sqlite_module, "connect_db")
+
+    # Import search utilities
+    search_module = import_velos("core.memory_adapter.search")
+    search_by_role_dict = getattr(search_module, "search_by_role_dict")
+    search_roles_unified = getattr(search_module, "search_roles_unified")
+    search_with_normalized_query = getattr(search_module, "search_with_normalized_query")
+
+    # Import utils
+    utils_module = import_velos("utils.memory_adapter")
+    normalize_query = getattr(utils_module, "normalize_query")
+
+except ImportError:
+    # Fallback to legacy sys.path approach
+    # Replaced with import manager - Phase 3 optimization)
+    # Replaced with import manager - Phase 3 optimization
+    from query_router import (
+        clear_query_cache,
+        get_cache_stats,
+        search_memory,
+        search_memory_advanced,
+    )
+
+    # Replaced with import manager - Phase 3 optimization)
+    from search import search_by_role_dict, search_roles_unified, search_with_normalized_query
+
+    # Replaced with import manager - Phase 3 optimization)
+    from sqlite_store import connect_db
+    from velos_adapter import VelosEnhancedMemoryAdapter
+
+    # Replaced with import manager - Phase 3 optimization)
+    from velos_cache_adapter import VelosCachedMemoryAdapter
+
+    from modules.utils.memory_adapter import normalize_query
 
 
 class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
@@ -39,7 +87,7 @@ class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
             "keyword_searches": 0,
             "deep_searches": 0,
             "cache_hits": 0,
-            "cache_misses": 0
+            "cache_misses": 0,
         }
 
     def smart_search(self, query: str, limit: int = 20) -> List[Dict[str, Any]]:
@@ -82,10 +130,13 @@ class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
 
         return results
 
-    def advanced_search(self, query: str,
-                       days: Optional[int] = None,
-                       limit: Optional[int] = None,
-                       use_cache: bool = True) -> List[Dict[str, Any]]:
+    def advanced_search(
+        self,
+        query: str,
+        days: Optional[int] = None,
+        limit: Optional[int] = None,
+        use_cache: bool = True,
+    ) -> List[Dict[str, Any]]:
         """고급 검색 - 추가 옵션 지원"""
         return search_memory_advanced(query, days, limit, use_cache)
 
@@ -110,7 +161,9 @@ class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
         """태그별 검색"""
         return self.smart_search(f"tag:{tag}", limit)
 
-    def search_roles_unified(self, roles: List[str], limit_per_role: int = 10) -> Dict[str, List[Dict[str, Any]]]:
+    def search_roles_unified(
+        self, roles: List[str], limit_per_role: int = 10
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """여러 역할을 한 번에 검색 - 통합된 쿼리"""
         try:
             con = connect_db()
@@ -141,7 +194,7 @@ class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
         return {
             "router": self.router_stats,
             "router_cache": router_cache_stats,
-            "adapter_cache": self.get_cache_stats()
+            "adapter_cache": self.get_cache_stats(),
         }
 
     def clear_all_caches(self) -> None:
@@ -159,9 +212,9 @@ class VelosRouterMemoryAdapter(VelosCachedMemoryAdapter):
             "router": router_stats,
             "total_records": base_stats.get("db_records", 0),
             "total_cache_hits": (
-                router_stats["router_cache"].get("hits", 0) +
-                router_stats["adapter_cache"].get("search", {}).get("hits", 0)
-            )
+                router_stats["router_cache"].get("hits", 0)
+                + router_stats["adapter_cache"].get("search", {}).get("hits", 0)
+            ),
         }
 
 
@@ -206,4 +259,3 @@ def test_router_adapter():
 if __name__ == "__main__":
     test_router_adapter()
     print("=== 모든 자가 검증 완료 ===")
-

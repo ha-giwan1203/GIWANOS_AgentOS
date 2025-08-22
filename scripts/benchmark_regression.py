@@ -3,13 +3,14 @@
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 
 from __future__ import annotations
-import os
-import re
-import sys
+
 import json
-import subprocess
-import time
+import os
 import pathlib
+import re
+import subprocess
+import sys
+import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DB = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
@@ -18,8 +19,8 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # 회귀 기준(느슨하게 시작해서 필요하면 조이세요)
 THRESHOLDS = {
-    "insert_2000_min_qps": 500,      # 초당 500행 미만이면 실패
-    "search_40_max_sec": 0.50,       # 40회 검색에 0.5초 초과면 실패
+    "insert_2000_min_qps": 500,  # 초당 500행 미만이면 실패
+    "search_40_max_sec": 0.50,  # 40회 검색에 0.5초 초과면 실패
 }
 
 
@@ -49,11 +50,7 @@ def main():
 
     m = re.search(r"\[sanity\]\s*mode=(\w+),\s*sync=(\d+),\s*busy=(\d+)", out)
     if m:
-        data["sanity"] = {
-            "mode": m.group(1),
-            "sync": int(m.group(2)),
-            "busy": int(m.group(3))
-        }
+        data["sanity"] = {"mode": m.group(1), "sync": int(m.group(2)), "busy": int(m.group(3))}
 
     def grab(name: str, pat: str, cast=float):
         mm = re.search(pat, out)

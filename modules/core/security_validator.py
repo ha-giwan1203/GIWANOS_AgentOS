@@ -38,22 +38,6 @@ class VelosSecurityValidator:
 
     def __init__(self):
         self.sql_pattern = re.compile("|".join(self.SQL_INJECTION_PATTERNS), re.IGNORECASE)
-    
-    def validate_search_query(self, query: str) -> bool:
-        """Validate search query for safety"""
-        if not query or not isinstance(query, str):
-            return False
-        
-        # Check length
-        if len(query) > self.MAX_TEXT_LENGTH:
-            return False
-        
-        # Check for SQL injection patterns
-        if self.sql_pattern.search(query):
-            return False
-        
-        # Allow most characters for search
-        return True
 
     def validate_filename(self, filename: str, max_length: Optional[int] = None) -> bool:
         """Validate filename for safety"""

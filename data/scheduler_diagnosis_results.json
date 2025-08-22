@@ -1,0 +1,223 @@
+{
+  "timestamp": "2025-08-21T23:22:06.393799",
+  "active_tasks": [],
+  "hidden_issues": [],
+  "recommendations": [
+    {
+      "priority": "STRATEGIC",
+      "issue": "스케줄러 작업 관리 체계화 필요",
+      "solution": "표준 VBScript 래퍼 + 통일된 XML 템플릿 적용",
+      "impact": "향후 모든 창 노출 문제 예방"
+    }
+  ],
+  "summary": {
+    "total_tasks_analyzed": 29,
+    "hidden_issues_count": 0,
+    "severity": "LOW"
+  },
+  "xml_analyses": [
+    {
+      "file": "/home/user/webapp/VELOS_Bridge_AutoStart_Fixed.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/VELOS_Bridge_AutoStart_Improved.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/VELOS_Bridge_AutoStart_HIDDEN_FIXED.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/VELOS_Bridge_AutoStart_VBS_HIDDEN.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/VELOS-MasterLoop.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/VELOS-MasterLoop_20250817.xml",
+      "error": "XML 파싱 오류: no element found: line 1, column 0",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/VELOS-MasterLoop_20250817_ok.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Bridge AutoStart.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Bridge Flush.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Context Guard.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS DB Backup.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Daily Error Summary.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Daily Report.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Ensure Risk Report.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Health MUX.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Housekeep.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Master Loop.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Quarantine Orphans.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Reflection Risk Tagger.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Session Merge.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Snapshot Catalog.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Snapshot Integrity.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS Weekly File Audit.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS-AutoGenerate-OnLogon.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS-Autofix-Once-At-Logon.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS-MasterLoop.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS-SystemHealth.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS_DailyReport_09.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    },
+    {
+      "file": "/home/user/webapp/backup/tasks_20250817_195409/VELOS_LogRotate.xml",
+      "error": "XML 파싱 오류: encoding specified in XML declaration is incorrect: line 1, column 30",
+      "issues": [
+        "파일 분석 실패"
+      ]
+    }
+  ]
+}

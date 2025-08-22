@@ -1,0 +1,25 @@
+{
+  "title": "📊 메모리 인텔리전스 생성 완료",
+  "message": "새로운 보고서가 생성되었습니다.\n\n📋 **보고서 정보**\n- 유형: 메모리 인텔리전스\n- 파일: velos_memory_report_20250821_154029.md\n- 크기: 749 문자\n- 생성시간: 20250821_154029\n\n📊 **주요 내용 미리보기**\n# 📊 VELOS 메모리 분석 - 대용량 데이터 활용 (2025-08-21 15:40)\n**분석 깊이**: DEEP\n\n## 💡 핵심 인사이트\n- 🎓 풍부한 학습 데이터: 총 3,898개 레코드 보유\n- ⚡ 학습 속도: 매우 빠름 (시간당 다수)\n- 📈 학습 효율성: 보통\n\n## 🗄️ 메모리 데이터베이스 분석\n- **총 레코드**: 2,878개\n- **테이블별 분포**:\n  - memory: 1,437개\n  - sqlite_sequence: 1개\n  - locks: 0개\n  - memory_fts: 1,437개\n  - memory_f...\n\n상세 내용은 첨부된 보고서 파일을 확인해주세요.",
+  "file_path": "/home/user/webapp/data/reports/enhanced/velos_memory_report_20250821_154029.md",
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "channel": "#general",
+      "upload_file": true
+    },
+    "notion": {
+      "enabled": true,
+      "parent_id": null
+    },
+    "email": {
+      "enabled": true,
+      "recipients": null,
+      "attach_file": true
+    },
+    "pushbullet": {
+      "enabled": true,
+      "attach_file": false
+    }
+  }
+}

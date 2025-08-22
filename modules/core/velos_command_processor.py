@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=C:\giwanos 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -19,13 +19,13 @@ VELOS 시스템에서 받은 명령을 처리하고 Cursor 연동을 통해 자�
 
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Union
-from datetime import datetime
 
 from modules.core.cursor_integration import CursorIntegration, CursorIntegrationError
 from modules.core.memory_adapter import MemoryAdapter
-from modules.core.velos_chat_memory import get_chat_memory, add_chat_message
+from modules.core.velos_chat_memory import add_chat_message, get_chat_memory
 
 
 class CommandProcessorError(Exception):
@@ -131,8 +131,7 @@ class VELOSCommandProcessor:
 
         # 파일 수정 명령
         elif any(
-            keyword in command
-            for keyword in ["파일 수정", "파일 편집", "modify file", "edit file"]
+            keyword in command for keyword in ["파일 수정", "파일 편집", "modify file", "edit file"]
         ):
             return self._parse_modify_file_command(command)
 
@@ -142,22 +141,16 @@ class VELOSCommandProcessor:
 
         # 워크스페이스 열기 명령
         elif any(
-            keyword in command
-            for keyword in ["워크스페이스 열기", "open workspace", "cursor 열기"]
+            keyword in command for keyword in ["워크스페이스 열기", "open workspace", "cursor 열기"]
         ):
             return {"type": "open_workspace"}
 
         # Cursor 상태 관리 명령
-        elif any(
-            keyword in command
-            for keyword in ["cursor 상태", "cursor state", "커서 상태"]
-        ):
+        elif any(keyword in command for keyword in ["cursor 상태", "cursor state", "커서 상태"]):
             return {"type": "cursor_state"}
 
         # 파일 정보 조회 명령
-        elif any(
-            keyword in command for keyword in ["파일 정보", "file info", "파일 목록"]
-        ):
+        elif any(keyword in command for keyword in ["파일 정보", "file info", "파일 목록"]):
             return self._parse_file_info_command(command)
 
         # 기본 명령 (도움말)
@@ -167,9 +160,7 @@ class VELOSCommandProcessor:
     def _parse_create_file_command(self, command: str) -> Dict:
         """파일 생성 명령 파싱"""
         # 파일 경로 추출
-        path_match = re.search(
-            r"([a-zA-Z0-9_\-\.\/\\]+\.(py|md|json|txt|yaml|yml))", command
-        )
+        path_match = re.search(r"([a-zA-Z0-9_\-\.\/\\]+\.(py|md|json|txt|yaml|yml))", command)
         file_path = path_match.group(1) if path_match else "new_file.py"
 
         # 파일 내용 추출 (따옴표 안의 내용 또는 마지막 부분)
@@ -184,8 +175,7 @@ class VELOSCommandProcessor:
                 file_name_index = -1
                 for i, part in enumerate(parts):
                     if "." in part and any(
-                        ext in part
-                        for ext in [".py", ".md", ".json", ".txt", ".yaml", ".yml"]
+                        ext in part for ext in [".py", ".md", ".json", ".txt", ".yaml", ".yml"]
                     ):
                         file_name_index = i
                         break
@@ -216,9 +206,7 @@ class VELOSCommandProcessor:
     def _parse_modify_file_command(self, command: str) -> Dict:
         """파일 수정 명령 파싱"""
         # 파일 경로 추출
-        path_match = re.search(
-            r"([a-zA-Z0-9_\-\.\/\\]+\.(py|md|json|txt|yaml|yml))", command
-        )
+        path_match = re.search(r"([a-zA-Z0-9_\-\.\/\\]+\.(py|md|json|txt|yaml|yml))", command)
         file_path = path_match.group(1) if path_match else ""
 
         # 라인 번호 추출
@@ -440,9 +428,7 @@ class VELOSCommandProcessor:
             )
 
             # 상태 정보 포맷팅
-            status = (
-                "사용 중" if state_info.get("cursor_in_use", False) else "사용 안함"
-            )
+            status = "사용 중" if state_info.get("cursor_in_use", False) else "사용 안함"
             source = state_info.get("source", "unknown")
             expired = "만료됨" if state_info.get("expired", False) else "유효함"
 

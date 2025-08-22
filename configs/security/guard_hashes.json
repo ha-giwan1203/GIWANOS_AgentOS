@@ -1,11 +1,11 @@
 {
   "files": [
     {
-      "path": "C:/giwanos/scripts/gpt_code_guard.ps1",
+      "path": "/home/user/webapp/scripts/gpt_code_guard.ps1",
       "sha256": "5c816f8fd2cdd630bed488e4e37f935926d50c8f92751d26a55e1bf8309f4b07"
     },
     {
-      "path": "C:/giwanos/scripts/materialize_gpt_output.py",
+      "path": "/home/user/webapp/scripts/materialize_gpt_output.py",
       "sha256": "3c3b049febd1e61626f44cb99e5e8bffc18c1cfbdbde3097cd48f0b87e9f3077"
     }
   ],

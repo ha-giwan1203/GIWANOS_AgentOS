@@ -1,9 +1,12 @@
 # [EXPERIMENT] VELOS FTS v2 재구성 시스템 - FTS v2 테이블 재구성 스크립트
-import sqlite3, os, sys
+import os
+import sqlite3
+import sys
 
 DB = os.environ.get("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
 FTS_NAME = "memory_fts_v2"  # 새 이름로 간다. 구 FTS와 충돌 방지.
 BASE = "memory"
+
 
 def main():
     print(f"[rebuild] DB={DB}, FTS={FTS_NAME}")
@@ -23,17 +26,25 @@ def main():
     cur.execute("BEGIN IMMEDIATE;")
     try:
         # drop triggers/views referencing memory_fts*
-        rows = cur.execute("""
+        rows = cur.execute(
+            """
           SELECT type, name FROM sqlite_master
           WHERE (lower(sql) LIKE '%memory_fts%' OR lower(sql) LIKE '%memory_fts_v2%')
             AND type IN ('trigger','view')
-        """).fetchall()
+        """
+        ).fetchall()
         for t, n in rows:
             cur.execute(f"DROP {t.upper()} IF EXISTS {n};")
 
         # drop old fts tables (both names) and possible shadows
-        for name in ("memory_fts","memory_fts_v2"):
-            for shadow in (name, f"{name}_data", f"{name}_idx", f"{name}_docsize", f"{name}_config"):
+        for name in ("memory_fts", "memory_fts_v2"):
+            for shadow in (
+                name,
+                f"{name}_data",
+                f"{name}_idx",
+                f"{name}_docsize",
+                f"{name}_config",
+            ):
                 cur.execute(f"DROP TABLE IF EXISTS {shadow};")
 
         cur.execute("COMMIT;")
@@ -54,7 +65,8 @@ def main():
     cur.executescript(ddl)
 
     # 3) 트리거를 새 FTS에 맞춰 재생성
-    cur.executescript(f"""
+    cur.executescript(
+        f"""
     CREATE TRIGGER trg_{BASE}_ai_v2 AFTER INSERT ON {BASE} BEGIN
       INSERT INTO {FTS_NAME}(rowid, text)
       VALUES (new.id, COALESCE(new.insight, new.raw, ''));
@@ -71,15 +83,18 @@ def main():
       INSERT INTO {FTS_NAME}(rowid, text)
       VALUES (new.id, COALESCE(new.insight, new.raw, ''));
     END;
-    """)
+    """
+    )
 
     # 4) 전체 재색인
-    cur.execute(f"""
+    cur.execute(
+        f"""
       INSERT INTO {FTS_NAME}(rowid, text)
       SELECT id, COALESCE(insight, raw, '')
       FROM {BASE}
       WHERE COALESCE(insight, raw, '') <> '';
-    """)
+    """
+    )
     cur.execute(f"INSERT INTO {FTS_NAME}({FTS_NAME}) VALUES ('optimize');")
 
     # 5) 검증
@@ -91,6 +106,7 @@ def main():
 
     con.close()
     print("[rebuild] OK")
+
 
 if __name__ == "__main__":
     try:

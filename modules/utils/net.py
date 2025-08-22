@@ -1,7 +1,8 @@
 # [ACTIVE] utils/net.py
-import requests
 import time
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
+import requests
 
 
 def post_with_retry(url: str, **kw) -> requests.Response:
@@ -32,7 +33,7 @@ def post_with_retry(url: str, **kw) -> requests.Response:
         except Exception as e:
             last = e
             if i < retries - 1:
-                sleep_time = backoff ** i
+                sleep_time = backoff**i
                 time.sleep(sleep_time)
 
     raise last
@@ -66,7 +67,7 @@ def get_with_retry(url: str, **kw) -> requests.Response:
         except Exception as e:
             last = e
             if i < retries - 1:
-                sleep_time = backoff ** i
+                sleep_time = backoff**i
                 time.sleep(sleep_time)
 
     raise last
@@ -87,7 +88,7 @@ def check_connectivity(urls: list = None) -> Dict[str, bool]:
             "https://www.google.com",
             "https://api.pushbullet.com",
             "https://api.notion.com",
-            "https://hooks.slack.com"
+            "https://hooks.slack.com",
         ]
 
     results = {}
@@ -115,7 +116,7 @@ def test_velos_services() -> Dict[str, Any]:
         "slack": {"status": "unknown", "detail": ""},
         "email": {"status": "unknown", "detail": ""},
         "pushbullet": {"status": "unknown", "detail": ""},
-        "notion": {"status": "unknown", "detail": ""}
+        "notion": {"status": "unknown", "detail": ""},
     }
 
     # Slack 테스트
@@ -123,14 +124,11 @@ def test_velos_services() -> Dict[str, Any]:
         webhook_url = os.getenv("SLACK_WEBHOOK_URL")
         if webhook_url:
             response = post_with_retry(
-                webhook_url,
-                json={"text": "VELOS 연결 테스트"},
-                timeout=10,
-                retries=2
+                webhook_url, json={"text": "VELOS 연결 테스트"}, timeout=10, retries=2
             )
             results["slack"] = {
                 "status": "success" if response.status_code == 200 else "failed",
-                "detail": f"status={response.status_code}"
+                "detail": f"status={response.status_code}",
             }
         else:
             results["slack"] = {"status": "no_config", "detail": "SLACK_WEBHOOK_URL not set"}
@@ -146,11 +144,11 @@ def test_velos_services() -> Dict[str, Any]:
                 headers={"Access-Token": token, "Content-Type": "application/json"},
                 json={"type": "note", "title": "VELOS Test", "body": "Connection test"},
                 timeout=10,
-                retries=2
+                retries=2,
             )
             results["pushbullet"] = {
                 "status": "success" if response.status_code < 300 else "failed",
-                "detail": f"status={response.status_code}"
+                "detail": f"status={response.status_code}",
             }
         else:
             results["pushbullet"] = {"status": "no_config", "detail": "PUSHBULLET_TOKEN not set"}
@@ -164,19 +162,19 @@ def test_velos_services() -> Dict[str, Any]:
         if token and db_id:
             response = get_with_retry(
                 f"https://api.notion.com/v1/databases/{db_id}",
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Notion-Version": "2022-06-28"
-                },
+                headers={"Authorization": f"Bearer {token}", "Notion-Version": "2022-06-28"},
                 timeout=10,
-                retries=2
+                retries=2,
             )
             results["notion"] = {
                 "status": "success" if response.status_code == 200 else "failed",
-                "detail": f"status={response.status_code}"
+                "detail": f"status={response.status_code}",
             }
         else:
-            results["notion"] = {"status": "no_config", "detail": "NOTION_TOKEN or NOTION_DATABASE_ID not set"}
+            results["notion"] = {
+                "status": "no_config",
+                "detail": "NOTION_TOKEN or NOTION_DATABASE_ID not set",
+            }
     except Exception as e:
         results["notion"] = {"status": "error", "detail": str(e)}
 
@@ -186,6 +184,7 @@ def test_velos_services() -> Dict[str, Any]:
         port = int(os.getenv("SMTP_PORT", "587"))
         if host:
             import smtplib
+
             with smtplib.SMTP(host, port, timeout=10) as s:
                 s.starttls()
                 results["email"] = {"status": "success", "detail": "SMTP connection OK"}
@@ -222,5 +221,3 @@ if __name__ == "__main__":
     for url, is_connected in connectivity.items():
         status = "✅" if is_connected else "❌"
         print(f"{status} {url}")
-
-

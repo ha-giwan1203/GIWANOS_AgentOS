@@ -1,11 +1,16 @@
 # [ACTIVE] VELOS 운영 철학: 파일명/경로 불변 · 거짓 코드 금지 · 자가 검증 · 로그 증빙
 from __future__ import annotations
-import os, sys, smtplib, mimetypes, json
+
+import json
+import mimetypes
+import os
+import smtplib
+import sys
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from pathlib import Path
-from datetime import datetime, timezone
 
-ROOT = Path(r"C:/giwanos")
+ROOT = Path(r"C:\giwanos")
 HEALTH_PATH = ROOT / "data" / "logs" / "system_health.json"
 
 
@@ -28,9 +33,7 @@ def write_health(ok: bool, reason: str = "", targets=None):
         pass
 
 
-def build_message(
-    subject: str, body: str, sender: str, recipients: list[str], attach: list[str]
-):
+def build_message(subject: str, body: str, sender: str, recipients: list[str], attach: list[str]):
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = sender
@@ -41,12 +44,8 @@ def build_message(
         if not p.exists():
             continue
         ctype, enc = mimetypes.guess_type(p.name)
-        maintype, subtype = (
-            ctype.split("/", 1) if ctype else ("application", "octet-stream")
-        )
-        msg.add_attachment(
-            p.read_bytes(), maintype=maintype, subtype=subtype, filename=p.name
-        )
+        maintype, subtype = ctype.split("/", 1) if ctype else ("application", "octet-stream")
+        msg.add_attachment(p.read_bytes(), maintype=maintype, subtype=subtype, filename=p.name)
     return msg
 
 
@@ -66,9 +65,7 @@ def main():
     pwd = os.getenv("SMTP_PASS")
     tls = os.getenv("SMTP_TLS", "1") == "1"
     sender = os.getenv("EMAIL_FROM")
-    rcpts_env = [
-        x.strip() for x in (os.getenv("EMAIL_TO") or "").split(",") if x.strip()
-    ]
+    rcpts_env = [x.strip() for x in (os.getenv("EMAIL_TO") or "").split(",") if x.strip()]
     recipients = args.to or rcpts_env
 
     if not (host and user and pwd and sender and recipients):

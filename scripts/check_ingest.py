@@ -1,19 +1,33 @@
 # [EXPERIMENT] scripts/check_ingest.py
-from modules.core.memory_adapter.adapter import MemoryAdapter
-import time
-import os
 import json
+import os
 import sqlite3
+import time
+
+from modules.core.memory_adapter.adapter import MemoryAdapter
 
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "C:\giwanos"
+
+    def get_data_path(*parts):
+        return os.path.join("C:\giwanos", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("C:\giwanos", "configs", *parts)
+
+    def get_db_path():
+        return "C:\giwanos/data/memory/velos.db"
+
 
 adapter = MemoryAdapter()
 
@@ -23,7 +37,7 @@ item = {
     "from": "test_user",
     "insight": f"unique ingest test at {unique_ts}",
     "tags": ["unique_test", "ingest_check"],
-    "ts": unique_ts
+    "ts": unique_ts,
 }
 adapter.append_jsonl(item)
 
@@ -35,7 +49,11 @@ stats_before = adapter.get_stats()
 print("Before flush:", stats_before)
 
 # JSONL 파일 직접 확인
-jsonl_path = get_data_path("memory/learning_memory.jsonl") if "get_data_path" in locals() else "C:/giwanos/data/memory/learning_memory.jsonl"
+jsonl_path = (
+    get_data_path("memory/learning_memory.jsonl")
+    if "get_data_path" in locals()
+    else "C:\giwanos/data/memory/learning_memory.jsonl"
+)
 print(f"\nJSONL file exists: {os.path.exists(jsonl_path)}")
 if os.path.exists(jsonl_path):
     with open(jsonl_path, "r", encoding="utf-8") as f:
@@ -53,17 +71,25 @@ try:
             print(f"First line: {first_line}")
             obj = json.loads(first_line)
             print(f"Parsed object: {obj}")
-            
+
             # DB에 직접 삽입 시도
-            db_path = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
+            db_path = (
+                get_db_path()
+                if "get_db_path" in locals()
+                else (
+                    get_data_path("memory/velos.db")
+                    if "get_data_path" in locals()
+                    else "C:\giwanos/data/memory/velos.db"
+                )
+            )
             conn = sqlite3.connect(db_path)
             cur = conn.cursor()
-            
+
             # 스키마 확인
             cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='memory'")
             if cur.fetchone():
                 print("Memory table exists")
-                
+
                 # 삽입 시도
                 cur.execute(
                     "INSERT INTO memory(ts, role, insight, raw, tags) VALUES (?, ?, ?, ?, ?)",
@@ -79,7 +105,7 @@ try:
                 print("Manual insert successful")
             else:
                 print("Memory table does not exist")
-            
+
             conn.close()
         else:
             print("No lines in JSONL file")

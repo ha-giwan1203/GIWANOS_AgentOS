@@ -1,25 +1,37 @@
 # VELOS 운영 철학 선언문: 판단은 기록으로 증명한다. 파일명 불변, 경로는 설정/환경으로 주입, 모든 저장은 자가 검증 후 확정한다.
 
 from __future__ import annotations
-import os, sys, re, json, time, subprocess, hashlib, fnmatch, platform
+
+import fnmatch
+import hashlib
+import json
+import os
+import platform
+import re
+import subprocess
+import sys
+import time
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Optional, Set, Tuple
+
 
 # ===== 경로/설정 로딩 =====
 def _root() -> Path:
     root = os.getenv("VELOS_ROOT")
     if root and Path(root).is_dir():
         return Path(root)
-    sett = os.getenv("VELOS_SETTINGS") or "C:/giwanos/configs/settings.yaml"
+    sett = os.getenv("VELOS_SETTINGS") or "C:\giwanos/configs/settings.yaml"
     try:
         import yaml  # type: ignore
+
         y = yaml.safe_load(Path(sett).read_text(encoding="utf-8"))
         base = (y or {}).get("paths", {}).get("base_dir")
         if base and Path(base).is_dir():
             return Path(base)
     except Exception:
         pass
-    return Path("C:/giwanos") if Path("C:/giwanos").is_dir() else Path.cwd()
+    return Path("C:\giwanos") if Path("C:\giwanos").is_dir() else Path.cwd()
+
 
 ROOT = _root()
 REPORTS = ROOT / "data" / "reports"
@@ -30,12 +42,43 @@ for p in (REPORTS, LOGS, MEMORY):
     p.mkdir(parents=True, exist_ok=True)
 
 # ===== 스캔 대상/확장자 =====
-SCAN_DIRS = [ROOT / d for d in ["scripts","modules","tools","interface","configs","docs","data","vector_cache","fonts"]]
-CODE_EXT = {".py",".ps1",".psm1",".cmd",".bat",".json",".yaml",".yml",".md",".txt",".css",".js",".ts",".ini",".toml"}
+SCAN_DIRS = [
+    ROOT / d
+    for d in [
+        "scripts",
+        "modules",
+        "tools",
+        "interface",
+        "configs",
+        "docs",
+        "data",
+        "vector_cache",
+        "fonts",
+    ]
+]
+CODE_EXT = {
+    ".py",
+    ".ps1",
+    ".psm1",
+    ".cmd",
+    ".bat",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".md",
+    ".txt",
+    ".css",
+    ".js",
+    ".ts",
+    ".ini",
+    ".toml",
+}
+
 
 # ===== 유틸 =====
 def now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
 
 def sh(cmd: List[str]) -> Tuple[int, str]:
     try:
@@ -46,24 +89,28 @@ def sh(cmd: List[str]) -> Tuple[int, str]:
     except Exception as e:
         return 1, str(e)
 
+
 def is_git_repo(path: Path) -> bool:
-    code, _ = sh(["git","-C",str(path),"rev-parse","--is-inside-work-tree"])
+    code, _ = sh(["git", "-C", str(path), "rev-parse", "--is-inside-work-tree"])
     return code == 0
+
 
 def git_last_commit(path: Path) -> Optional[str]:
     if not is_git_repo(ROOT):
         return None
-    code, out = sh(["git","-C",str(ROOT),"log","-1","--pretty=%ci","--",str(path)])
+    code, out = sh(["git", "-C", str(ROOT), "log", "-1", "--pretty=%ci", "--", str(path)])
     return out.strip() if code == 0 and out.strip() else None
 
-def file_hash(path: Path, limit: int = 2*1024*1024) -> str:
+
+def file_hash(path: Path, limit: int = 2 * 1024 * 1024) -> str:
     h = hashlib.sha256()
     try:
-        with open(path,"rb") as f:
+        with open(path, "rb") as f:
             h.update(f.read(limit))
         return h.hexdigest()
     except Exception:
         return ""
+
 
 # ===== Manifest 로딩 =====
 def load_manifest() -> List[Dict]:
@@ -72,21 +119,25 @@ def load_manifest() -> List[Dict]:
         return []
     try:
         import yaml  # type: ignore
+
         y = yaml.safe_load(mf.read_text(encoding="utf-8")) or {}
         return [f for f in (y.get("features") or []) if f.get("enabled")]
     except Exception:
         return []
 
+
 def match_manifest_keep(rel: str, manifest: List[Dict]) -> Optional[str]:
     for feat in manifest:
         for pat in feat.get("keep_patterns") or []:
-            if fnmatch.fnmatch(rel.replace("\\","/"), pat):
+            if fnmatch.fnmatch(rel.replace("\\", "/"), pat):
                 return feat.get("name") or "manifest"
     return None
 
+
 # ===== 파일 스캔/정적 분석 =====
-py_import_re = re.compile(r'^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))', re.MULTILINE)
+py_import_re = re.compile(r"^\s*(?:from\s+([\w\.\_]+)\s+import|import\s+([\w\.\_]+))", re.MULTILINE)
 path_hint_re = re.compile(r'["\'](C:\\\\[^"\']+|C:/[^"\']+|/mnt/data/[^"\']+)["\']')
+
 
 def scan_files() -> List[Path]:
     out: List[Path] = []
@@ -97,6 +148,7 @@ def scan_files() -> List[Path]:
             if p.is_file() and (p.suffix.lower() in CODE_EXT):
                 out.append(p)
     return out
+
 
 def analyze_static(files: List[Path]) -> Dict:
     imports: Dict[str, Set[str]] = {}
@@ -120,6 +172,7 @@ def analyze_static(files: List[Path]) -> Dict:
             refs.add(m.group(1))
         path_refs[str(p.relative_to(ROOT))] = refs
     return {"imports": imports, "path_refs": path_refs}
+
 
 # ===== 동적 흔적(로그/리포트/메모리) =====
 def dynamic_hints() -> Dict[str, List[str]]:
@@ -145,11 +198,12 @@ def dynamic_hints() -> Dict[str, List[str]]:
                 pass
     return hits
 
+
 # ===== 스케줄러/태스크/툴링 참조 추출 =====
 def scheduled_task_paths() -> Set[str]:
     out: Set[str] = set()
     if platform.system().lower().startswith("win"):
-        code, txt = sh(["schtasks","/query","/fo","LIST","/v"])
+        code, txt = sh(["schtasks", "/query", "/fo", "LIST", "/v"])
         if code == 0:
             for line in txt.splitlines():
                 if "Task To Run" in line or "작업 실행" in line:
@@ -167,15 +221,16 @@ def scheduled_task_paths() -> Set[str]:
         try:
             j = json.loads(tasks.read_text(encoding="utf-8"))
             blob = json.dumps(j, ensure_ascii=False)
-            for m in re.findall(r'(C:\\\\giwanos\\\\[A-Za-z0-9_\-\\\.]+)', blob):
+            for m in re.findall(r"(C:\\\\giwanos\\\\[A-Za-z0-9_\-\\\.]+)", blob):
                 try:
-                    rel = str(Path(m.replace("\\\\","\\")).relative_to(ROOT))
+                    rel = str(Path(m.replace("\\\\", "\\")).relative_to(ROOT))
                     out.add(rel)
                 except Exception:
                     pass
         except Exception:
             pass
     return out
+
 
 # ===== 분류/스코어 =====
 ENTRY_POINTS = {
@@ -185,10 +240,14 @@ ENTRY_POINTS = {
     "modules/report/generate_pdf_report.py",
 }
 
+
 def days_ago(ts: float) -> int:
     return int((time.time() - ts) / 86400)
 
-def classify(files: List[Path], static_info: Dict, dyn_hits: Dict[str, List[str]], manifest: List[Dict]) -> Dict:
+
+def classify(
+    files: List[Path], static_info: Dict, dyn_hits: Dict[str, List[str]], manifest: List[Dict]
+) -> Dict:
     imports = static_info["imports"]
     sched_refs = scheduled_task_paths()
 
@@ -221,23 +280,33 @@ def classify(files: List[Path], static_info: Dict, dyn_hits: Dict[str, List[str]
 
         # 보호 신호들: 크게 깎음
         if manifest_name:
-            risk -= 100; reasons.append(f"manifest_keep:{manifest_name}")
+            risk -= 100
+            reasons.append(f"manifest_keep:{manifest_name}")
         if in_entry:
-            risk -= 80; reasons.append("entry_point")
+            risk -= 80
+            reasons.append("entry_point")
         if in_sched:
-            risk -= 60; reasons.append("scheduled_task_ref")
+            risk -= 60
+            reasons.append("scheduled_task_ref")
         if in_import_map:
-            risk -= 40; reasons.append("statically_referenced")
+            risk -= 40
+            reasons.append("statically_referenced")
         if in_dyn_logs:
-            risk -= 30; reasons.append("runtime_log_reference")
+            risk -= 30
+            reasons.append("runtime_log_reference")
         if recent_git:
-            risk -= 20; reasons.append("recent_git_commit")
+            risk -= 20
+            reasons.append("recent_git_commit")
         if mday <= 180:
-            risk -= 10; reasons.append("recent_mtime<=180d")
+            risk -= 10
+            reasons.append("recent_mtime<=180d")
 
         # 위치 기반 가중치(코어 영역이면 더 보호)
-        if rel.startswith(("scripts/","modules/core/","interface/","tools/notifications/","modules/report/")):
-            risk -= 10; reasons.append("core_dir_bonus")
+        if rel.startswith(
+            ("scripts/", "modules/core/", "interface/", "tools/notifications/", "modules/report/")
+        ):
+            risk -= 10
+            reasons.append("core_dir_bonus")
 
         # 최소 보수 가드: 절대 음수 방어
         if risk < 0:
@@ -252,7 +321,19 @@ def classify(files: List[Path], static_info: Dict, dyn_hits: Dict[str, List[str]
             label = "REVIEW"
         else:
             # 고아 후보도 '1년 넘게 안 만짐' + '크기 작음(<=64KB)'일 때만 표시
-            label = "QUARANTINE_CANDIDATE" if (mday > 365 and size <= 65536 and not manifest_name and not in_sched and not in_entry and not in_import_map and not in_dyn_logs) else "REVIEW"
+            label = (
+                "QUARANTINE_CANDIDATE"
+                if (
+                    mday > 365
+                    and size <= 65536
+                    and not manifest_name
+                    and not in_sched
+                    and not in_entry
+                    and not in_import_map
+                    and not in_dyn_logs
+                )
+                else "REVIEW"
+            )
 
         rows[rel] = {
             "label": label,
@@ -265,19 +346,23 @@ def classify(files: List[Path], static_info: Dict, dyn_hits: Dict[str, List[str]
         }
     return rows
 
+
 # ===== 리포트 저장 =====
 def save_report(rows: Dict) -> Tuple[Path, Path]:
     REPORTS.mkdir(parents=True, exist_ok=True)
     out_json = REPORTS / "file_usage_risk_report.json"
-    out_md   = REPORTS / "file_usage_risk_report.md"
+    out_md = REPORTS / "file_usage_risk_report.md"
 
-    summary = {k: sum(1 for v in rows.values() if v["label"] == k) for k in ["KEEP_STRICT","KEEP","REVIEW","QUARANTINE_CANDIDATE"]}
+    summary = {
+        k: sum(1 for v in rows.values() if v["label"] == k)
+        for k in ["KEEP_STRICT", "KEEP", "REVIEW", "QUARANTINE_CANDIDATE"]
+    }
     js = {
         "generated_at": now_iso(),
         "root": str(ROOT),
         "summary": summary,
         "files": rows,
-        "deletion_guard": os.getenv("VELOS_DELETION_GUARD","paranoid")
+        "deletion_guard": os.getenv("VELOS_DELETION_GUARD", "paranoid"),
     }
     out_json.write_text(json.dumps(js, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -296,14 +381,15 @@ def save_report(rows: Dict) -> Tuple[Path, Path]:
         "## 고아 후보(Q)**주의: 즉시 삭제 금지**",
     ]
     # 고아 후보 정렬: 오래된 순
-    qs = [(k,v) for k,v in rows.items() if v["label"]=="QUARANTINE_CANDIDATE"]
+    qs = [(k, v) for k, v in rows.items() if v["label"] == "QUARANTINE_CANDIDATE"]
     qs.sort(key=lambda kv: kv[1]["mtime"])
-    for k,v in qs[:100]:
+    for k, v in qs[:100]:
         r = ",".join(v["reasons"])
         parts.append(f"- `{k}` | risk={v['risk']} | mtime={v['mtime']} | reasons={r}")
 
     out_md.write_text("\n".join(parts), encoding="utf-8")
     return out_json, out_md
+
 
 # ===== 메인 =====
 def main() -> int:
@@ -319,6 +405,7 @@ def main() -> int:
     print("[report]", j)
     print("[report]", m)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=C:\giwanos 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -12,23 +12,36 @@
 # 10) 거짓 코드 절대 불가: 실행 불가·미검증·허위 출력 일체 금지
 # =========================================================
 
+import json
 import os
 import sys
-import json
 import time
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "C:\giwanos"
 
-ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+    def get_data_path(*parts):
+        return os.path.join("C:\giwanos", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("C:\giwanos", "configs", *parts)
+
+    def get_db_path():
+        return "C:\giwanos/data/memory/velos.db"
+
+
+ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"
 if ROOT not in sys.path:
     sys.path.append(ROOT)
 
@@ -38,6 +51,7 @@ os.makedirs(os.path.dirname(HOTBUF), exist_ok=True)
 
 # 의존: memory_adapter / memory_reader (이미 이전 단계에서 넣음)
 from modules.core.memory_adapter import MemoryAdapter
+
 try:
     from modules.core.memory_reader import build_context_block
 except Exception:
@@ -47,17 +61,21 @@ except Exception:
         m.flush_jsonl_to_db()
         rows = m.recent(limit=limit)
         now = int(time.time())
-        cutoff = now - hours*3600
+        cutoff = now - hours * 3600
         rows = [r for r in rows if r.get("ts", 0) >= cutoff] or rows
         lines = ["<<VELOS_CONTEXT:BEGIN>>", f"window={hours}h; pulled={len(rows[:limit])}"]
         for r in rows[:limit]:
             tags = ",".join(r.get("tags") or [])
-            lines.append(f"[{r.get('ts',0)}] ({r.get('from','system')}) {r.get('insight','').strip()} | tags={tags}")
+            lines.append(
+                f"[{r.get('ts',0)}] ({r.get('from','system')}) {r.get('insight','').strip()} | tags={tags}"
+            )
         lines.append("<<VELOS_CONTEXT:END>>")
         return "\n".join(lines)
 
-REQUIRED_TAGS = ["명령","기억_유지","파일명_금지","운영_철학"]
+
+REQUIRED_TAGS = ["명령", "기억_유지", "파일명_금지", "운영_철학"]
 TTL_SEC = 2 * 3600  # 핫버퍼 유효시간 2시간
+
 
 def _read_json(p: str) -> Dict[str, Any]:
     """JSON 파일 안전 읽기"""
@@ -67,12 +85,14 @@ def _read_json(p: str) -> Dict[str, Any]:
     except Exception:
         return {}
 
+
 def _write_json(p: str, obj: Dict[str, Any]):
     """JSON 파일 안전 쓰기 (원자적 연산)"""
     tmp = p + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
     os.replace(tmp, p)
+
 
 def extract_mandates_from_block(block: str) -> Dict[str, Any]:
     """
@@ -82,7 +102,7 @@ def extract_mandates_from_block(block: str) -> Dict[str, Any]:
     mandates = {
         "FILE_NAMES_IMMUTABLE": True,
         "NO_FAKE_CODE": True,
-        "ROOT_FIXED": "C:/giwanos",
+        "ROOT_FIXED": "C:\giwanos",
         "SELF_TEST_REQUIRED": True,
         "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
     }
@@ -96,11 +116,12 @@ def extract_mandates_from_block(block: str) -> Dict[str, Any]:
     if "자가 검증" in block:
         mandates["SELF_TEST_REQUIRED"] = True
     if "경로 고정" in block:
-        mandates["ROOT_FIXED"] = "C:/giwanos"
+        mandates["ROOT_FIXED"] = "C:\giwanos"
     if "컨텍스트" in block and "포함" in block:
         mandates["PROMPT_ALWAYS_INCLUDE_CONTEXT"] = True
 
     return mandates
+
 
 def rebuild_hotbuf() -> Dict[str, Any]:
     """핫버퍼 재구성"""
@@ -117,7 +138,7 @@ def rebuild_hotbuf() -> Dict[str, Any]:
             "ttl_sec": TTL_SEC,
             "context_block": ctx,
             "mandates": mandates,
-            "rebuild_reason": "manual_rebuild"
+            "rebuild_reason": "manual_rebuild",
         }
 
         _write_json(HOTBUF, payload)
@@ -141,12 +162,13 @@ def rebuild_hotbuf() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": "C:\giwanos",
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def load_hotbuf() -> Dict[str, Any]:
     """핫버퍼 로드 (만료 시 자동 재구성)"""
@@ -163,6 +185,7 @@ def load_hotbuf() -> Dict[str, Any]:
     except Exception as e:
         # 로드 실패 시 재구성
         return rebuild_hotbuf()
+
 
 def session_bootstrap() -> Dict[str, Any]:
     """
@@ -196,26 +219,32 @@ def session_bootstrap() -> Dict[str, Any]:
             "mandates": {
                 "FILE_NAMES_IMMUTABLE": True,
                 "NO_FAKE_CODE": True,
-                "ROOT_FIXED": "C:/giwanos",
+                "ROOT_FIXED": "C:\giwanos",
                 "SELF_TEST_REQUIRED": True,
                 "PROMPT_ALWAYS_INCLUDE_CONTEXT": True,
             },
-            "error": str(e)
+            "error": str(e),
         }
+
 
 def get_mandates() -> Dict[str, Any]:
     """현재 강제 규칙 반환"""
     buf = load_hotbuf()
     return buf.get("mandates", {})
 
+
 def get_context_block() -> str:
     """현재 컨텍스트 블록 반환"""
     buf = load_hotbuf()
-    return buf.get("context_block", "<<VELOS_CONTEXT:BEGIN>>\n[ERROR] No context\n<<VELOS_CONTEXT:END>>")
+    return buf.get(
+        "context_block", "<<VELOS_CONTEXT:BEGIN>>\n[ERROR] No context\n<<VELOS_CONTEXT:END>>"
+    )
+
 
 def force_rebuild():
     """핫버퍼 강제 재구성"""
     return rebuild_hotbuf()
+
 
 def get_hotbuf_status() -> Dict[str, Any]:
     """핫버퍼 상태 정보 반환"""
@@ -224,12 +253,7 @@ def get_hotbuf_status() -> Dict[str, Any]:
         now = int(time.time())
 
         if not buf:
-            return {
-                "exists": False,
-                "age_sec": None,
-                "expired": True,
-                "ttl_sec": TTL_SEC
-            }
+            return {"exists": False, "age_sec": None, "expired": True, "ttl_sec": TTL_SEC}
 
         age_sec = now - int(buf.get("created_ts", 0))
         expired = age_sec > int(buf.get("ttl_sec", TTL_SEC))
@@ -241,11 +265,8 @@ def get_hotbuf_status() -> Dict[str, Any]:
             "ttl_sec": buf.get("ttl_sec", TTL_SEC),
             "created_ts": buf.get("created_ts"),
             "mandates_count": len(buf.get("mandates", {})),
-            "context_length": len(buf.get("context_block", ""))
+            "context_length": len(buf.get("context_block", "")),
         }
 
     except Exception as e:
-        return {
-            "exists": False,
-            "error": str(e)
-        }
+        return {"exists": False, "error": str(e)}

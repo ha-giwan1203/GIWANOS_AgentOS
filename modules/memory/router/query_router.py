@@ -1,21 +1,48 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
+
 import os
-import time
 import sqlite3
-from typing import List, Dict, Any, Optional
+import time
+from typing import Any, Dict, List, Optional
+
+# Phase 3: Import manager integration for optimized imports
+try:
+    from modules.core.import_manager import add_velos_path, ensure_velos_imports, import_velos
+
+    _IMPORT_MANAGER_AVAILABLE = True
+except ImportError:
+    _IMPORT_MANAGER_AVAILABLE = False
+
+    # Fallback for backward compatibility
+    def import_velos(module_name):
+        raise ImportError(f"Import manager not available for {module_name}")
+
 
 # VELOS 환경 변수 로딩
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "C:\giwanos"
+
+    def get_data_path(*parts):
+        return os.path.join("C:\giwanos", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("C:\giwanos", "configs", *parts)
+
+    def get_db_path():
+        return "C:\giwanos/data/memory/velos.db"
+
 
 def _env(name: str, default: Optional[str] = None) -> str:
     """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > C:\giwanos 순서"""
@@ -24,9 +51,14 @@ def _env(name: str, default: Optional[str] = None) -> str:
         # 설정 파일에서 로드 시도
         try:
             import yaml
-            config_path = os.path.join(get_config_path("settings.yaml") if "get_config_path" in locals() else "C:/giwanos/configs/settings.yaml")
+
+            config_path = os.path.join(
+                get_config_path("settings.yaml")
+                if "get_config_path" in locals()
+                else "C:\giwanos/configs/settings.yaml"
+            )
             if config_path and os.path.exists(config_path):
-                with open(config_path, 'r', encoding='utf-8') as f:
+                with open(config_path, "r", encoding="utf-8") as f:
                     config = yaml.safe_load(f)
                     v = config.get(name, default)
         except Exception:
@@ -44,13 +76,15 @@ def _env(name: str, default: Optional[str] = None) -> str:
                 raise RuntimeError(f"Missing env: {name}")
     return v
 
+
 # VELOS 모듈 경로 추가
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
-from sqlite_store import connect_db
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'cache'))
+# Replaced with import manager - Phase 3 optimization)
 from memory_cache import TTLCache
+
+# Replaced with import manager - Phase 3 optimization)
+from sqlite_store import connect_db
 
 # 환경 변수 로딩
 RECENT_DAYS = int(_env("VELOS_RECENT_DAYS", "3"))
@@ -76,7 +110,9 @@ def ensure_cache_fresh(con):
     v = con.execute("PRAGMA data_version;").fetchone()[0]
     if getattr(ensure_cache_fresh, "_v", None) not in (None, v):
         _qcache.clear()
-        print(f"캐시 무효화: DB 버전 변경 감지 ({getattr(ensure_cache_fresh, '_v', 'None')} -> {v})")
+        print(
+            f"캐시 무효화: DB 버전 변경 감지 ({getattr(ensure_cache_fresh, '_v', 'None')} -> {v})"
+        )
     ensure_cache_fresh._v = v
 
 
@@ -100,12 +136,15 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
         if _is_keyword(query):
             # 키워드 검색: 최근 N일 + LIKE 우선 (빠른 라이트 쿼리)
             since = _recent_since_epoch(RECENT_DAYS)
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT id, ts, role, insight, raw, tags
                 FROM memory
                 WHERE ts >= ? AND (insight LIKE ? OR raw LIKE ?)
                 ORDER BY ts DESC LIMIT ?
-            """, (since, f"%{query}%", f"%{query}%", FTS_LIMIT))
+            """,
+                (since, f"%{query}%", f"%{query}%", FTS_LIMIT),
+            )
 
             for r in cur.fetchall():
                 id_, ts, role, insight, raw, tags = r
@@ -113,14 +152,21 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                     tags = json.loads(tags) if tags else []
                 except:
                     tags = []
-                rows.append({
-                    "id": id_, "ts": ts, "from": role,
-                    "insight": insight, "raw": raw, "tags": tags
-                })
+                rows.append(
+                    {
+                        "id": id_,
+                        "ts": ts,
+                        "from": role,
+                        "insight": insight,
+                        "raw": raw,
+                        "tags": tags,
+                    }
+                )
 
             # 필요 시 FTS 보강 (개선된 패턴)
             if not rows:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
                     FROM memory_fts
                     JOIN memory_text t ON t.id = memory_fts.rowid
@@ -128,19 +174,28 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                     WHERE memory_fts MATCH ?
                     ORDER BY score
                     LIMIT ?
-                """, (query, FTS_LIMIT))
+                """,
+                    (query, FTS_LIMIT),
+                )
 
                 for r in cur.fetchall():
                     id_, ts, text_norm, score = r
                     # text_norm을 insight로 매핑 (호환성 유지)
-                    rows.append({
-                        "id": id_, "ts": ts, "from": "system",
-                        "insight": text_norm, "raw": "", "tags": [],
-                        "score": score
-                    })
+                    rows.append(
+                        {
+                            "id": id_,
+                            "ts": ts,
+                            "from": "system",
+                            "insight": text_norm,
+                            "raw": "",
+                            "tags": [],
+                            "score": score,
+                        }
+                    )
         else:
             # 깊은 쿼리: FTS 우선 (개선된 패턴)
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT m.id, m.ts, t.text_norm, bm25(memory_fts) AS score
                 FROM memory_fts
                 JOIN memory_text t ON t.id = memory_fts.rowid
@@ -148,16 +203,24 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
                 WHERE memory_fts MATCH ?
                 ORDER BY score
                 LIMIT ?
-            """, (query, FTS_LIMIT))
+            """,
+                (query, FTS_LIMIT),
+            )
 
             for r in cur.fetchall():
                 id_, ts, text_norm, score = r
                 # text_norm을 insight로 매핑 (호환성 유지)
-                rows.append({
-                    "id": id_, "ts": ts, "from": "system",
-                    "insight": text_norm, "raw": "", "tags": [],
-                    "score": score
-                })
+                rows.append(
+                    {
+                        "id": id_,
+                        "ts": ts,
+                        "from": "system",
+                        "insight": text_norm,
+                        "raw": "",
+                        "tags": [],
+                        "score": score,
+                    }
+                )
 
     except Exception as e:
         print(f"검색 오류: {e}")
@@ -171,10 +234,9 @@ def search_memory(query: str) -> List[Dict[str, Any]]:
     return rows
 
 
-def search_memory_advanced(query: str,
-                          days: Optional[int] = None,
-                          limit: Optional[int] = None,
-                          use_cache: bool = True) -> List[Dict[str, Any]]:
+def search_memory_advanced(
+    query: str, days: Optional[int] = None, limit: Optional[int] = None, use_cache: bool = True
+) -> List[Dict[str, Any]]:
     """고급 메모리 검색 - 추가 옵션 지원"""
     if days is None:
         days = RECENT_DAYS
@@ -200,12 +262,15 @@ def search_memory_advanced(query: str,
         since = _recent_since_epoch(days)
 
         # 하이브리드 검색: LIKE + FTS 조합
-        cur.execute("""
+        cur.execute(
+            """
             SELECT id, ts, role, insight, raw, tags
             FROM memory
             WHERE ts >= ? AND (insight LIKE ? OR raw LIKE ?)
             ORDER BY ts DESC LIMIT ?
-        """, (since, f"%{query}%", f"%{query}%", limit))
+        """,
+            (since, f"%{query}%", f"%{query}%", limit),
+        )
 
         for r in cur.fetchall():
             id_, ts, role, insight, raw, tags = r
@@ -213,10 +278,9 @@ def search_memory_advanced(query: str,
                 tags = json.loads(tags) if tags else []
             except:
                 tags = []
-            rows.append({
-                "id": id_, "ts": ts, "from": role,
-                "insight": insight, "raw": raw, "tags": tags
-            })
+            rows.append(
+                {"id": id_, "ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags}
+            )
 
         # 결과가 부족하면 FTS로 보강
         if len(rows) < limit:
@@ -226,13 +290,16 @@ def search_memory_advanced(query: str,
             if existing_ids:
                 id_filter = f"AND m.id NOT IN ({','.join(map(str, existing_ids))})"
 
-            cur.execute(f"""
+            cur.execute(
+                f"""
                 SELECT m.id, m.ts, m.role, m.insight, m.raw, m.tags
                 FROM memory_fts f
                 JOIN memory m ON m.id = f.rowid
                 WHERE memory_fts MATCH ? {id_filter}
                 ORDER BY bm25(memory_fts) ASC, m.ts DESC LIMIT ?
-            """, (query, remaining))
+            """,
+                (query, remaining),
+            )
 
             for r in cur.fetchall():
                 id_, ts, role, insight, raw, tags = r
@@ -240,10 +307,16 @@ def search_memory_advanced(query: str,
                     tags = json.loads(tags) if tags else []
                 except:
                     tags = []
-                rows.append({
-                    "id": id_, "ts": ts, "from": role,
-                    "insight": insight, "raw": raw, "tags": tags
-                })
+                rows.append(
+                    {
+                        "id": id_,
+                        "ts": ts,
+                        "from": role,
+                        "insight": insight,
+                        "raw": raw,
+                        "tags": tags,
+                    }
+                )
 
     except Exception as e:
         print(f"고급 검색 오류: {e}")
@@ -299,5 +372,6 @@ def test_query_router():
 
 if __name__ == "__main__":
     import json
+
     test_query_router()
     print("=== 모든 자가 검증 완료 ===")

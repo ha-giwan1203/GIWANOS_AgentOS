@@ -1,33 +1,48 @@
 # [ACTIVE] VELOS 메모리 어댑터 - 핵심 데이터 관리 모듈
 # [ACTIVE] VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
-import os
 import json
-import time
+import os
 import sqlite3
 import threading
+import time
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
 
 # VELOS 표준 데이터베이스 연결 및 경로 관리
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "C:\giwanos"
+
+    def get_data_path(*parts):
+        return os.path.join("C:\giwanos", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("C:\giwanos", "configs", *parts)
+
+    def get_db_path():
+        return "C:\giwanos/data/memory/velos.db"
+
 
 try:
     from ..db_util import db_open
+
     USE_DB_UTIL = True
 except ImportError:
     USE_DB_UTIL = False
 
 try:
-    from ..path_manager import get_velos_root, get_memory_path, get_data_path, get_logs_path
+    from ..path_manager import get_data_path, get_logs_path, get_memory_path, get_velos_root
+
     USE_PATH_MANAGER = True
 except ImportError:
     USE_PATH_MANAGER = False
@@ -37,17 +52,17 @@ if USE_PATH_MANAGER:
     ROOT = get_velos_root()
     PATHS = {
         "jsonl": get_memory_path("learning_memory.jsonl"),
-        "db":    get_memory_path("velos.db"),
-        "lock":  get_memory_path("memory.flush.lock"),
-        "log":   get_logs_path("system_health.json"),
+        "db": get_memory_path("velos.db"),
+        "lock": get_memory_path("memory.flush.lock"),
+        "log": get_logs_path("system_health.json"),
     }
 else:
-    ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+    ROOT = get_velos_root() if "get_velos_root" in locals() else "C:\giwanos"
     PATHS = {
         "jsonl": os.path.join(ROOT, "data", "memory", "learning_memory.jsonl"),
-        "db":    os.path.join(ROOT, "data", "memory", "velos.db"),
-        "lock":  os.path.join(ROOT, "data", "memory", "memory.flush.lock"),
-        "log":   os.path.join(ROOT, "data", "logs", "system_health.json"),
+        "db": os.path.join(ROOT, "data", "memory", "velos.db"),
+        "lock": os.path.join(ROOT, "data", "memory", "memory.flush.lock"),
+        "log": os.path.join(ROOT, "data", "logs", "system_health.json"),
     }
 
 os.makedirs(os.path.dirname(PATHS["jsonl"]), exist_ok=True)
@@ -56,6 +71,7 @@ os.makedirs(os.path.dirname(PATHS["log"]), exist_ok=True)
 
 _lock = threading.RLock()
 
+
 def _read_json(path: str) -> Dict[str, Any]:
     try:
         with open(path, "r", encoding="utf-8-sig") as f:
@@ -63,11 +79,13 @@ def _read_json(path: str) -> Dict[str, Any]:
     except Exception:
         return {}
 
+
 def _write_json(path: str, obj: Dict[str, Any]) -> None:
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
+
 
 @contextmanager
 def _file_lock(lock_path: str, timeout_sec: int = 10) -> Any:
@@ -88,10 +106,12 @@ def _file_lock(lock_path: str, timeout_sec: int = 10) -> Any:
             time.sleep(0.1)
     raise TimeoutError(f"Lock timeout: {lock_path}")
 
+
 def _ensure_compat_views(db_path: str) -> None:
     con = sqlite3.connect(db_path)
     cur = con.cursor()
-    cur.executescript("""
+    cur.executescript(
+        """
     CREATE VIEW IF NOT EXISTS memory_compat AS
     SELECT id, ts, role, insight AS text FROM memory;
 
@@ -100,12 +120,15 @@ def _ensure_compat_views(db_path: str) -> None:
 
     CREATE VIEW IF NOT EXISTS memory_text AS
     SELECT id, ts, role, '[]' AS tags, insight AS text_norm FROM memory;
-    """)
+    """
+    )
     con.commit()
     con.close()
 
+
 def _ensure_schema(conn: sqlite3.Connection) -> None:
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS memory (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             ts INTEGER NOT NULL,
@@ -114,19 +137,34 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
             raw TEXT,                   -- 원문(raw)
             tags TEXT                   -- JSON array string
         )
-    """)
+    """
+    )
     conn.execute("CREATE INDEX IF NOT EXISTS idx_memory_ts ON memory(ts DESC)")
     conn.commit()
 
+
 def create_memory_adapter(db_path: Optional[str] = None, **kw: Any) -> "MemoryAdapter":
-    db_path = db_path or os.getenv("VELOS_DB_PATH", get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
+    db_path = db_path or os.getenv(
+        "VELOS_DB_PATH",
+        (
+            get_db_path()
+            if "get_db_path" in locals()
+            else (
+                get_data_path("memory/velos.db")
+                if "get_data_path" in locals()
+                else "C:\giwanos/data/memory/velos.db"
+            )
+        ),
+    )
     if db_path:
         _ensure_compat_views(db_path)
     return MemoryAdapter(db_path=db_path, **kw)
 
+
 def _backoff_iter(max_tries: int = 5, base: float = 0.2) -> Any:
     for i in range(max_tries):
-        yield base * (2 ** i)
+        yield base * (2**i)
+
 
 class MemoryAdapter:
     def __init__(self, jsonl_path: Optional[str] = None, db_path: Optional[str] = None):
@@ -209,7 +247,13 @@ class MemoryAdapter:
             if moved > 0:
                 self._truncate_jsonl(prefix_count=moved)
 
-            self._health_update({"last_flush_count": moved, "last_flush_ok": True, "last_flush_ts": int(time.time())})
+            self._health_update(
+                {
+                    "last_flush_count": moved,
+                    "last_flush_ok": True,
+                    "last_flush_ts": int(time.time()),
+                }
+            )
             return moved
 
     def _truncate_jsonl(self, prefix_count: int) -> None:
@@ -230,7 +274,9 @@ class MemoryAdapter:
             conn = sqlite3.connect(self.db, timeout=5)
             _ensure_schema(conn)
             cur = conn.cursor()
-            for row in cur.execute("SELECT ts, role, insight, raw, tags FROM memory ORDER BY ts DESC LIMIT ?", (limit,)):
+            for row in cur.execute(
+                "SELECT ts, role, insight, raw, tags FROM memory ORDER BY ts DESC LIMIT ?", (limit,)
+            ):
                 ts, role, insight, raw, tags = row
                 try:
                     raw = json.loads(raw) if raw else ""
@@ -251,22 +297,28 @@ class MemoryAdapter:
                 conn = sqlite3.connect(self.db, timeout=5)
             _ensure_schema(conn)
             cur = conn.cursor()
-            
+
             # FTS 테이블 존재 확인
-            has_fts = cur.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='memory_fts'"
-            ).fetchone() is not None
-            
+            has_fts = (
+                cur.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='memory_fts'"
+                ).fetchone()
+                is not None
+            )
+
             if has_fts:
                 try:
                     # FTS 검색 시도
-                    rows = cur.execute("""
+                    rows = cur.execute(
+                        """
                       SELECT m.id, m.ts, m.role, m.insight, m.raw, m.tags
                       FROM memory_fts f JOIN memory m ON f.rowid = m.id
                       WHERE f.text MATCH ?
                       ORDER BY m.ts DESC
-                      LIMIT ?""", (keyword, limit)).fetchall()
-                    
+                      LIMIT ?""",
+                        (keyword, limit),
+                    ).fetchall()
+
                     out = []
                     for row in rows:
                         id_val, ts, role, insight, raw, tags = row
@@ -275,13 +327,15 @@ class MemoryAdapter:
                             tags = json.loads(tags) if tags else []
                         except Exception:
                             pass
-                        out.append({"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags})
-                    
+                        out.append(
+                            {"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags}
+                        )
+
                     conn.close()
                     return out
                 except sqlite3.Error:
                     pass  # FTS 실패 시 LIKE 검색으로 폴백
-            
+
             # LIKE 검색 (폴백)
             q = f"%{keyword}%"
             out = []
@@ -296,7 +350,7 @@ class MemoryAdapter:
                 except Exception:
                     pass
                 out.append({"ts": ts, "from": role, "insight": insight, "raw": raw, "tags": tags})
-            
+
             conn.close()
             return out
         except Exception:
@@ -329,17 +383,11 @@ class MemoryAdapter:
             # 역할별로 분류
             for row in rows:
                 id_val, ts, role, source, text = row
-                row_dict = {
-                    "id": id_val,
-                    "ts": ts,
-                    "role": role,
-                    "source": source,
-                    "text": text
-                }
+                row_dict = {"id": id_val, "ts": ts, "role": role, "source": source, "text": text}
 
-                if role == 'user':
+                if role == "user":
                     result["user"].append(row_dict)
-                elif role == 'system':
+                elif role == "system":
                     result["system"].append(row_dict)
 
             # 각 역할별로 limit 개수만큼만 반환
@@ -358,12 +406,7 @@ class MemoryAdapter:
 
     def get_stats(self) -> Dict[str, Any]:
         """메모리 통계 반환"""
-        stats = {
-            "buffer_size": 0,
-            "db_records": 0,
-            "json_records": 0,
-            "last_sync": None
-        }
+        stats = {"buffer_size": 0, "db_records": 0, "json_records": 0, "last_sync": None}
 
         # JSONL 버퍼 크기
         try:
@@ -404,6 +447,7 @@ class MemoryAdapter:
 
         return stats
 
+
 if __name__ == "__main__":
     # 자가 검증 테스트
     adapter = MemoryAdapter()
@@ -414,7 +458,7 @@ if __name__ == "__main__":
         "insight": "VELOS 운영 철학 테스트",
         "raw": "파일명 불변, 자가 검증, 자동 복구 원칙 테스트",
         "tags": ["test", "philosophy"],
-        "ts": int(time.time())
+        "ts": int(time.time()),
     }
 
     print("=== VELOS MemoryAdapter 자가 검증 테스트 ===")

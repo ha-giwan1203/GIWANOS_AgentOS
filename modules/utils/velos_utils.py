@@ -10,11 +10,11 @@ VELOS 공통 유틸리티
 성능 측정, 안전한 계산, 로깅 등의 공통 기능을 제공합니다.
 """
 
-import time
 import os
 import sys
+import time
 from pathlib import Path
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 # 공통 상수
 EPS = 1e-9  # 1ns
@@ -47,10 +47,9 @@ def _env(key: str, default: Optional[str] = None) -> str:
 
     # 2. configs/settings.yaml 확인
     try:
-        config_path = (Path(__file__).parent.parent.parent / 'configs' /
-                      'settings.yaml')
+        config_path = Path(__file__).parent.parent.parent / "configs" / "settings.yaml"
         if config_path.exists():
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
                 if config and key in config:
                     return str(config[key])
@@ -58,7 +57,7 @@ def _env(key: str, default: Optional[str] = None) -> str:
         pass
 
     # 3. 기본값 반환
-    return default or 'C:/giwanos'
+    return default or "C:\giwanos"
 
 
 def add_module_path(relative_path: str) -> None:
@@ -89,6 +88,7 @@ def log_with_timestamp(message: str, level: str = "INFO") -> None:
 
 def measure_time(func):
     """함수 실행 시간 측정 데코레이터"""
+
     def wrapper(*args, **kwargs):
         start_ns = now_ns()
         try:
@@ -100,6 +100,7 @@ def measure_time(func):
             elapsed = elapsed_s(start_ns)
             log_with_timestamp(f"{func.__name__} 실패 ({elapsed:.3f}s): {e}", "ERROR")
             raise
+
     return wrapper
 
 
@@ -115,12 +116,12 @@ def check_file_exists(file_path: str, create_dir: bool = True) -> bool:
 
 def get_db_path() -> str:
     """VELOS DB 경로 반환"""
-    return _env('VELOS_DB_PATH', 'C:/giwanos/data/memory/velos.db')
+    return _env("VELOS_DB_PATH", "C:\giwanos/data/memory/velos.db")
 
 
 def get_jsonl_dir() -> str:
     """VELOS JSONL 디렉토리 경로 반환"""
-    return _env('VELOS_JSONL_DIR', 'C:/giwanos/data/memory')
+    return _env("VELOS_JSONL_DIR", "C:\giwanos/data/memory")
 
 
 if __name__ == "__main__":
@@ -142,6 +143,3 @@ if __name__ == "__main__":
     print(f"JSONL 디렉토리: {get_jsonl_dir()}")
 
     print("✅ 자가 검증 완료")
-
-
-

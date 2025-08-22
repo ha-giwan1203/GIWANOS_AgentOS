@@ -65,4 +65,5 @@ foreach($wr in $watchRoots){
 }
 
 "[{0}] watch start" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Out-File -FilePath $LOG -Append -Encoding UTF8
-while($true){ Start-Sleep -Milliseconds 400 }
+# CPU 사용량 최적화: 400ms -> 2000ms (2초)로 증가
+while($true){ Start-Sleep -Milliseconds 2000 }

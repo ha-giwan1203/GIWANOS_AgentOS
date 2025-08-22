@@ -3,13 +3,26 @@
 
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "C:\giwanos"
+
+    def get_data_path(*parts):
+        return os.path.join("C:\giwanos", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("C:\giwanos", "configs", *parts)
+
+    def get_db_path():
+        return "C:\giwanos/data/memory/velos.db"
+
 
 """
 VELOS 메모리 역할별 검색 유틸리티
@@ -17,9 +30,9 @@ VELOS 메모리 역할별 검색 유틸리티
 기존의 'from:' 패턴 문제를 해결하고 역할별 검색을 위한 표준화된 함수들을 제공합니다.
 """
 
-import sqlite3
 import re
-from typing import List, Dict, Any, Optional, Tuple
+import sqlite3
+from typing import Any, Dict, List, Optional, Tuple
 
 
 def normalize_query(q: str) -> str:
@@ -36,10 +49,11 @@ def normalize_query(q: str) -> str:
         "from:system VELOS" -> "role:system VELOS"
         "from:user test" -> "role:user test"
     """
-    return (q
-            .replace("from:user", "role:user")
-            .replace("from:system", "role:system")
-            .replace("from:test", "role:test"))
+    return (
+        q.replace("from:user", "role:user")
+        .replace("from:system", "role:system")
+        .replace("from:test", "role:test")
+    )
 
 
 def search_by_role(cur: sqlite3.Cursor, role: str, limit: int = 10) -> List[Tuple[Any, ...]]:
@@ -81,19 +95,23 @@ def search_by_role_dict(cur: sqlite3.Cursor, role: str, limit: int = 10) -> List
 
     for row in rows:
         id_val, ts, role_val, source, text = row
-        results.append({
-            "id": id_val,
-            "ts": ts,
-            "role": role_val,
-            "source": source,
-            "text": text,
-            "from": role_val  # 호환성을 위한 별칭
-        })
+        results.append(
+            {
+                "id": id_val,
+                "ts": ts,
+                "role": role_val,
+                "source": source,
+                "text": text,
+                "from": role_val,  # 호환성을 위한 별칭
+            }
+        )
 
     return results
 
 
-def search_roles_unified(cur: sqlite3.Cursor, roles: List[str], limit_per_role: int = 10) -> Dict[str, List[Dict[str, Any]]]:
+def search_roles_unified(
+    cur: sqlite3.Cursor, roles: List[str], limit_per_role: int = 10
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     여러 역할을 한 번에 검색 - 통합된 쿼리
 
@@ -113,8 +131,9 @@ def search_roles_unified(cur: sqlite3.Cursor, roles: List[str], limit_per_role: 
     return result
 
 
-def search_by_role_advanced(cur: sqlite3.Cursor, role: str, days: Optional[int] = None,
-                          limit: int = 10) -> List[Dict[str, Any]]:
+def search_by_role_advanced(
+    cur: sqlite3.Cursor, role: str, days: Optional[int] = None, limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     고급 역할별 검색 - 시간 필터링 지원
 
@@ -129,6 +148,7 @@ def search_by_role_advanced(cur: sqlite3.Cursor, role: str, days: Optional[int] 
     """
     if days is not None:
         import time
+
         since = int(time.time() - days * 86400)
         sql = """
         SELECT id, ts, role, source, text
@@ -144,14 +164,16 @@ def search_by_role_advanced(cur: sqlite3.Cursor, role: str, days: Optional[int] 
     results = []
     for row in rows:
         id_val, ts, role_val, source, text = row
-        results.append({
-            "id": id_val,
-            "ts": ts,
-            "role": role_val,
-            "source": source,
-            "text": text,
-            "from": role_val
-        })
+        results.append(
+            {
+                "id": id_val,
+                "ts": ts,
+                "role": role_val,
+                "source": source,
+                "text": text,
+                "from": role_val,
+            }
+        )
 
     return results
 
@@ -182,7 +204,9 @@ def get_role_statistics(cur: sqlite3.Cursor) -> Dict[str, int]:
     return stats
 
 
-def search_by_role_with_keyword(cur: sqlite3.Cursor, role: str, keyword: str, limit: int = 10) -> List[Dict[str, Any]]:
+def search_by_role_with_keyword(
+    cur: sqlite3.Cursor, role: str, keyword: str, limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     역할별 + 키워드 검색
 
@@ -209,19 +233,23 @@ def search_by_role_with_keyword(cur: sqlite3.Cursor, role: str, keyword: str, li
     results = []
     for row in rows:
         id_val, ts, role_val, source, text = row
-        results.append({
-            "id": id_val,
-            "ts": ts,
-            "role": role_val,
-            "source": source,
-            "text": text,
-            "from": role_val
-        })
+        results.append(
+            {
+                "id": id_val,
+                "ts": ts,
+                "role": role_val,
+                "source": source,
+                "text": text,
+                "from": role_val,
+            }
+        )
 
     return results
 
 
-def search_with_normalized_query(cur: sqlite3.Cursor, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+def search_with_normalized_query(
+    cur: sqlite3.Cursor, query: str, limit: int = 10
+) -> List[Dict[str, Any]]:
     """
     정규화된 쿼리로 검색 - from: 패턴을 자동으로 role: 패턴으로 변환
 
@@ -237,13 +265,13 @@ def search_with_normalized_query(cur: sqlite3.Cursor, query: str, limit: int = 1
     normalized_query = normalize_query(query)
 
     # role: 패턴이 있는지 확인
-    role_match = re.search(r'role:(\w+)', normalized_query)
+    role_match = re.search(r"role:(\w+)", normalized_query)
 
     if role_match:
         # 역할별 검색
         role = role_match.group(1)
         # 나머지 키워드 추출
-        remaining_query = normalized_query.replace(f'role:{role}', '').strip()
+        remaining_query = normalized_query.replace(f"role:{role}", "").strip()
 
         if remaining_query:
             # 역할 + 키워드 검색
@@ -267,14 +295,16 @@ def search_with_normalized_query(cur: sqlite3.Cursor, query: str, limit: int = 1
         results = []
         for row in rows:
             id_val, ts, role_val, source, text = row
-            results.append({
-                "id": id_val,
-                "ts": ts,
-                "role": role_val,
-                "source": source,
-                "text": text,
-                "from": role_val
-            })
+            results.append(
+                {
+                    "id": id_val,
+                    "ts": ts,
+                    "role": role_val,
+                    "source": source,
+                    "text": text,
+                    "from": role_val,
+                }
+            )
 
         return results
 
@@ -282,17 +312,17 @@ def search_with_normalized_query(cur: sqlite3.Cursor, query: str, limit: int = 1
 # 호환성을 위한 별칭 함수들
 def get_user_messages(cur: sqlite3.Cursor, limit: int = 10) -> List[Dict[str, Any]]:
     """사용자 메시지 조회 (호환성)"""
-    return search_by_role_dict(cur, 'user', limit)
+    return search_by_role_dict(cur, "user", limit)
 
 
 def get_system_messages(cur: sqlite3.Cursor, limit: int = 10) -> List[Dict[str, Any]]:
     """시스템 메시지 조회 (호환성)"""
-    return search_by_role_dict(cur, 'system', limit)
+    return search_by_role_dict(cur, "system", limit)
 
 
 def get_test_messages(cur: sqlite3.Cursor, limit: int = 10) -> List[Dict[str, Any]]:
     """테스트 메시지 조회 (호환성)"""
-    return search_by_role_dict(cur, 'test', limit)
+    return search_by_role_dict(cur, "test", limit)
 
 
 if __name__ == "__main__":
@@ -300,7 +330,18 @@ if __name__ == "__main__":
     import os
 
     # VELOS DB 경로 설정
-    db_path = os.getenv('VELOS_DB_PATH', get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db")
+    db_path = os.getenv(
+        "VELOS_DB_PATH",
+        (
+            get_db_path()
+            if "get_db_path" in locals()
+            else (
+                get_data_path("memory/velos.db")
+                if "get_data_path" in locals()
+                else "C:\giwanos/data/memory/velos.db"
+            )
+        ),
+    )
 
     if not os.path.exists(db_path):
         print(f"❌ 데이터베이스 파일이 존재하지 않습니다: {db_path}")
@@ -318,7 +359,7 @@ if __name__ == "__main__":
 
         # 2. 기본 역할별 검색 테스트
         print("\n1. 기본 역할별 검색:")
-        for role in ['user', 'system', 'test']:
+        for role in ["user", "system", "test"]:
             results = search_by_role_dict(cur, role, limit=3)
             print(f"  {role} 역할: {len(results)}개")
             if results:
@@ -326,18 +367,18 @@ if __name__ == "__main__":
 
         # 3. 통합 검색 테스트
         print("\n2. 통합 검색:")
-        unified = search_roles_unified(cur, ['user', 'system'], limit_per_role=2)
+        unified = search_roles_unified(cur, ["user", "system"], limit_per_role=2)
         for role, results in unified.items():
             print(f"  {role}: {len(results)}개")
 
         # 4. 고급 검색 테스트
         print("\n3. 고급 검색 (최근 7일):")
-        recent_user = search_by_role_advanced(cur, 'user', days=7, limit=3)
+        recent_user = search_by_role_advanced(cur, "user", days=7, limit=3)
         print(f"  최근 사용자 메시지: {len(recent_user)}개")
 
         # 5. 키워드 검색 테스트
         print("\n4. 키워드 검색:")
-        velos_results = search_by_role_with_keyword(cur, 'system', 'VELOS', limit=3)
+        velos_results = search_by_role_with_keyword(cur, "system", "VELOS", limit=3)
         print(f"  시스템 VELOS 관련: {len(velos_results)}개")
 
         # 6. 정규화된 쿼리 검색 테스트
@@ -348,11 +389,7 @@ if __name__ == "__main__":
 
         # 7. 쿼리 정규화 테스트
         print("\n6. 쿼리 정규화 테스트:")
-        test_queries = [
-            "from:user test",
-            "from:system VELOS",
-            "from:test sample"
-        ]
+        test_queries = ["from:user test", "from:system VELOS", "from:test sample"]
         for q in test_queries:
             normalized = normalize_query(q)
             print(f"  '{q}' -> '{normalized}'")

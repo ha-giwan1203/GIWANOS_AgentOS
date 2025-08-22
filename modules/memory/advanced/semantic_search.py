@@ -26,10 +26,10 @@ try:
     from modules.core.security_validator import VelosSecurityValidator
 except ImportError:
     def get_db_path():
-        return "/home/user/webapp/data/memory/velos.db"
+        return "C:\giwanos/data/memory/velos.db"
     
     def get_data_path(*parts):
-        return os.path.join("/home/user/webapp", "data", *parts)
+        return os.path.join("C:\giwanos", "data", *parts)
     
     class VelosSecurityValidator:
         def validate_search_query(self, query: str) -> bool:

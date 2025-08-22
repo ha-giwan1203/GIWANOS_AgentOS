@@ -1,0 +1,12 @@
+{
+  "title": "📊 주간 운영 요약 생성 완료",
+  "message": "새로운 보고서가 생성되었습니다.\n\n📋 **보고서 정보**\n- 유형: 주간 운영 요약\n- 파일: velos_weekly_report_20250821_151123.md\n- 크기: 456 문자\n- 생성시간: 20250821_151123\n\n📊 **주요 내용 미리보기**\n# ✅ VELOS 주간 운영 보고서 - 안정적 운영 (08/14-08/21)\n**분석 기간**: 2025-08-14 ~ 2025-08-21\n\n## 🎯 종합 평가\n**종합 등급**: B\n**상세 점수**: 안정성 95점, 성능 60점, 성장 50점\n\n## 🧠 메모리 & 학습 현황\n- **총 메모리 레코드**: 0개\n- **주간 활동**: 0건\n\n## 🛡️ 시스템 안정성\n- **안정성 평가**: 매우 안정\n- **가동 시간**: unknown\n\n## ⚡ 성능 분석\n- **응답 효율성**: unknown\n- **리소스 활용도**: unk...\n\n상세 내용은 첨부된 보고서 파일을 확인해주세요.",
+  "file_path": "/home/user/webapp/C:\\giwanos/data/reports/enhanced/velos_weekly_report_20250821_151123.md",
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "channel": "#general",
+      "upload_file": false
+    }
+  }
+}

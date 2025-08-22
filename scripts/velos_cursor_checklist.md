@@ -53,7 +53,7 @@
 ### ⚠️ 주의사항
 
 1. **절대 경로 하드코딩 발견**
-   - 50개 이상의 파일에서 `C:\giwanos` 하드코딩 발견
+   - 50개 이상의 파일에서 `/home/user/webapp` 하드코딩 발견
    - 주요 파일들:
      - `interface/velos_dashboard.py`
      - `modules/velos_common.py`
@@ -68,7 +68,7 @@
 
 1. **절대 경로 하드코딩 제거**
    - 환경변수 `VELOS_ROOT` 사용으로 통일
-   - `os.environ.get('VELOS_ROOT', 'C:/giwanos')` 패턴 적용
+   - `os.environ.get('VELOS_ROOT', '/home/user/webapp')` 패턴 적용
 
 2. **로그 정리**
    - Streamlit 경고 메시지 필터링

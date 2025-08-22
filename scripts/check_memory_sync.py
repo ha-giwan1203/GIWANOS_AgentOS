@@ -7,14 +7,14 @@ VELOS Memory Sync Check Script
 메모리 동기화 상태를 확인하는 스크립트입니다.
 """
 
+import json
 import os
 import sys
-import json
 import time
 from pathlib import Path
 
 # ROOT 경로 설정
-ROOT = Path("C:/giwanos")
+ROOT = Path("C:\giwanos")
 if ROOT not in sys.path:
     sys.path.append(str(ROOT))
 

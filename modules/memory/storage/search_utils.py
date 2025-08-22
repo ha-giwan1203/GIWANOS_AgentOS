@@ -10,10 +10,10 @@ VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수�
 새로운 검색 패턴을 일관되게 적용하기 위한 유틸리티 함수들입니다.
 """
 
+import json
 import os
 import sqlite3
-from typing import List, Dict, Any, Optional, Tuple
-import json
+from typing import Any, Dict, List, Optional, Tuple
 
 # 환경변수에서 DB 경로 가져오기
 DB = os.getenv("VELOS_DB_PATH", r"C:\giwanos\data\velos.db")
@@ -81,14 +81,16 @@ def search_fts_with_metadata(term: str, limit: int = 20) -> List[Dict[str, Any]]
         except:
             tags = []
 
-        results.append({
-            "id": id_,
-            "ts": ts,
-            "role": role,
-            "text_norm": text_norm,
-            "tags": tags,
-            "score": score
-        })
+        results.append(
+            {
+                "id": id_,
+                "ts": ts,
+                "role": role,
+                "text_norm": text_norm,
+                "tags": tags,
+                "score": score,
+            }
+        )
 
     return results
 
@@ -135,6 +137,7 @@ def search_fts_recent(term: str, hours: int = 24, limit: int = 20) -> List[Tuple
         검색 결과 리스트
     """
     import time
+
     since_ts = int(time.time()) - (hours * 3600)
 
     con = sqlite3.connect(DB)
@@ -168,27 +171,36 @@ def get_search_stats(term: str) -> Dict[str, Any]:
     cur = con.cursor()
 
     # 전체 결과 수
-    total_count = cur.execute("""
+    total_count = cur.execute(
+        """
         SELECT COUNT(*) FROM memory_fts WHERE memory_fts MATCH ?
-    """, (term,)).fetchone()[0]
+    """,
+        (term,),
+    ).fetchone()[0]
 
     # 역할별 통계
     role_stats = {}
-    for role in ['user', 'system', 'test']:
-        count = cur.execute("""
+    for role in ["user", "system", "test"]:
+        count = cur.execute(
+            """
             SELECT COUNT(*) FROM memory_fts f
             JOIN memory m ON m.id = f.rowid
             WHERE memory_fts MATCH ? AND m.role = ?
-        """, (term, role)).fetchone()[0]
+        """,
+            (term, role),
+        ).fetchone()[0]
         role_stats[role] = count
 
     # 점수 통계
-    scores = cur.execute("""
+    scores = cur.execute(
+        """
         SELECT bm25(memory_fts) FROM memory_fts
         WHERE memory_fts MATCH ?
         ORDER BY bm25(memory_fts)
         LIMIT 10
-    """, (term,)).fetchall()
+    """,
+        (term,),
+    ).fetchall()
 
     score_stats = {}
     if scores:
@@ -196,7 +208,7 @@ def get_search_stats(term: str) -> Dict[str, Any]:
         score_stats = {
             "min": min(score_values),
             "max": max(score_values),
-            "avg": sum(score_values) / len(score_values)
+            "avg": sum(score_values) / len(score_values),
         }
 
     con.close()
@@ -205,7 +217,7 @@ def get_search_stats(term: str) -> Dict[str, Any]:
         "term": term,
         "total_count": total_count,
         "role_stats": role_stats,
-        "score_stats": score_stats
+        "score_stats": score_stats,
     }
 
 
@@ -261,10 +273,7 @@ if __name__ == "__main__":
     stats = get_search_stats("VELOS")
     print(f"총 결과: {stats['total_count']}개")
     print(f"역할별: {stats['role_stats']}")
-    if stats['score_stats']:
+    if stats["score_stats"]:
         print(f"점수: {stats['score_stats']}")
 
     print("\n✅ FTS 검색 유틸리티 테스트 완료")
-
-
-

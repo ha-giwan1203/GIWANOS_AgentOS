@@ -1,54 +1,18 @@
 # VELOS 운영 철학 선언문: 파일명은 절대 변경하지 않는다. 수정 시 자가 검증을 포함하고,
 # 실행 결과를 기록하며, 경로/구조는 불변으로 유지한다. 실패는 로깅하고 자동 복구를 시도한다.
 from __future__ import annotations
+
 import os
-import sys
-import json
-import time
+
+from modules.core.import_manager import ImportManager
+
+ImportManager.setup_imports()
+
 import hashlib
 from pathlib import Path
-from typing import Iterable, Dict, Any, Optional
+from typing import Any, Dict, Iterable
 
-
-# VELOS 환경 변수 로딩
-# Path manager imports (Phase 2 standardization)
-try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
-except ImportError:
-    # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
-
-def _env(name: str, default: Optional[str] = None) -> str:
-    """VELOS 환경 변수 로딩: ENV > configs/settings.yaml > C:\giwanos 순서"""
-    v = os.getenv(name, default)
-    if not v:
-        # 설정 파일에서 로드 시도
-        try:
-            import yaml
-            config_path = Path(get_config_path("settings.yaml") if "get_config_path" in locals() else "C:/giwanos/configs/settings.yaml")
-            if config_path.exists():
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config = yaml.safe_load(f)
-                    v = config.get(name, default)
-        except Exception:
-            pass
-
-        if not v:
-            # 기본값 설정
-            if name == "VELOS_JSONL_DIR":
-                v = get_data_path("memory") if "get_data_path" in locals() else "C:/giwanos/data/memory"
-            elif name == "VELOS_DB_PATH":
-                v = get_db_path() if "get_db_path" in locals() else get_data_path("memory/velos.db") if "get_data_path" in locals() else "C:/giwanos/data/memory/velos.db"
-            else:
-                raise RuntimeError(f"Missing env: {name}")
-    return v
-
-# 기존 VELOS 스키마와 호환되는 저장소 모듈 import
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'storage'))
-from sqlite_store import connect_db, init_schema, advisory_lock
+from sqlite_store import advisory_lock, connect_db, init_schema
 
 
 def sha1(s: str) -> str:
@@ -215,8 +179,8 @@ def test_ingest():
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    from modules.core.import_manager import ImportManager
+ImportManager.setup_imports())))
 
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
         test_ingest()

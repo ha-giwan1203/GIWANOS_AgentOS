@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=C:\giwanos 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -21,8 +21,8 @@ import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
 from threading import Lock
+from typing import Any, Dict, List, Optional
 
 from modules.core.memory_adapter import MemoryAdapter
 
@@ -42,9 +42,7 @@ class VELOSChatMemory:
         self.auto_save_interval = 10  # 10개 메시지마다 자동 저장
         self.max_buffer_size = 100
 
-    def add_message(
-        self, message: str, role: str = "user", metadata: Optional[Dict] = None
-    ) -> str:
+    def add_message(self, message: str, role: str = "user", metadata: Optional[Dict] = None) -> str:
         """
         새 메시지 추가
 
@@ -174,9 +172,7 @@ class VELOSChatMemory:
         # 현재 버퍼에서도 검색
         with self.buffer_lock:
             buffer_results = [
-                entry
-                for entry in self.chat_buffer
-                if keyword.lower() in entry["message"].lower()
+                entry for entry in self.chat_buffer if keyword.lower() in entry["message"].lower()
             ]
 
         # 결과 병합 및 정렬
@@ -236,9 +232,7 @@ class VELOSChatMemory:
             file_path = f"data/memory/conversation_export_{timestamp}.txt"
             with open(file_path, "w", encoding="utf-8") as f:
                 for entry in self.chat_buffer:
-                    f.write(
-                        f"[{entry['timestamp']}] {entry['role']}: {entry['message']}\n"
-                    )
+                    f.write(f"[{entry['timestamp']}] {entry['role']}: {entry['message']}\n")
         else:
             raise ValueError(f"지원하지 않는 형식: {format}")
 
@@ -262,9 +256,7 @@ def get_chat_memory() -> VELOSChatMemory:
     return _global_chat_memory
 
 
-def add_chat_message(
-    message: str, role: str = "user", metadata: Optional[Dict] = None
-) -> str:
+def add_chat_message(message: str, role: str = "user", metadata: Optional[Dict] = None) -> str:
     """
     채팅 메시지 추가 (편의 함수)
 

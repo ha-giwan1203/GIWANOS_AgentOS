@@ -3,31 +3,44 @@
 
 # Path manager imports (Phase 2 standardization)
 try:
-    from modules.core.path_manager import get_velos_root, get_data_path, get_config_path, get_db_path
+    from modules.core.path_manager import (
+        get_config_path,
+        get_data_path,
+        get_db_path,
+        get_velos_root,
+    )
 except ImportError:
     # Fallback functions for backward compatibility
-    def get_velos_root(): return "C:/giwanos"
-    def get_data_path(*parts): return os.path.join("C:/giwanos", "data", *parts)
-    def get_config_path(*parts): return os.path.join("C:/giwanos", "configs", *parts)
-    def get_db_path(): return "C:/giwanos/data/memory/velos.db"
+    def get_velos_root():
+        return "/home/user/webapp"
+
+    def get_data_path(*parts):
+        return os.path.join("/home/user/webapp", "data", *parts)
+
+    def get_config_path(*parts):
+        return os.path.join("/home/user/webapp", "configs", *parts)
+
+    def get_db_path():
+        return "/home/user/webapp/data/memory/velos.db"
+
 
 """
 VELOS Snapshot Integrity Module
 스냅샷 파일의 SHA256 무결성 해시를 계산하고 헬스 로그에 기록합니다.
 """
 
-import os
 import hashlib
 import json
+import os
 import time
-from typing import Dict, Any
+from typing import Any, Dict
 
 # VELOS 운영 철학 선언문
 # - 파일명 절대 변경 금지
 # - 거짓코드 절대 금지
 # - 모든 결과는 자가 검증 후 저장
 
-ROOT = get_velos_root() if "get_velos_root" in locals() else "C:/giwanos"
+ROOT = get_velos_root() if "get_velos_root" in locals() else "/home/user/webapp"
 HEALTH = os.path.join(ROOT, "data", "logs", "system_health.json")
 
 
@@ -86,7 +99,7 @@ def record_snapshot_integrity(snapshot_path: str) -> Dict[str, Any]:
             "snapshot": os.path.basename(snapshot_path),
             "sha256": digest,
             "file_size": os.path.getsize(snapshot_path),
-            "file_path": snapshot_path
+            "file_path": snapshot_path,
         }
 
         print(f"[VELOS] snapshot.sha256: {digest}")
@@ -102,7 +115,7 @@ def record_snapshot_integrity(snapshot_path: str) -> Dict[str, Any]:
         return {
             "error": str(e),
             "ts": int(time.time()),
-            "snapshot": os.path.basename(snapshot_path) if snapshot_path else "unknown"
+            "snapshot": os.path.basename(snapshot_path) if snapshot_path else "unknown",
         }
 
 
@@ -173,7 +186,7 @@ def verify_snapshot_integrity(snapshot_path: str, expected_sha256: str = None) -
             "expected_sha256": expected_sha256,
             "integrity_ok": is_valid,
             "file_size": os.path.getsize(snapshot_path),
-            "file_path": snapshot_path
+            "file_path": snapshot_path,
         }
 
         if is_valid:
@@ -191,7 +204,7 @@ def verify_snapshot_integrity(snapshot_path: str, expected_sha256: str = None) -
             "error": str(e),
             "ts": int(time.time()),
             "snapshot": os.path.basename(snapshot_path) if snapshot_path else "unknown",
-            "integrity_ok": False
+            "integrity_ok": False,
         }
 
 
@@ -217,7 +230,9 @@ def _get_expected_sha256(snapshot_path: str) -> str:
         if expected_file and expected_file == os.path.basename(snapshot_path):
             return data.get("snapshot_last_sha256", "")
         else:
-            raise ValueError(f"Snapshot file mismatch: expected {expected_file}, got {os.path.basename(snapshot_path)}")
+            raise ValueError(
+                f"Snapshot file mismatch: expected {expected_file}, got {os.path.basename(snapshot_path)}"
+            )
 
     except Exception as e:
         print(f"[VELOS] Failed to get expected SHA256: {e}")
@@ -244,7 +259,7 @@ def get_integrity_status() -> Dict[str, Any]:
             "snapshot_last_ts": data.get("snapshot_last_ts"),
             "snapshot_last_size": data.get("snapshot_last_size"),
             "snapshot_integrity_ok": data.get("snapshot_integrity_ok", False),
-            "snapshot_integrity_last_check": data.get("snapshot_integrity_last_check")
+            "snapshot_integrity_last_check": data.get("snapshot_integrity_last_check"),
         }
 
     except Exception as e:

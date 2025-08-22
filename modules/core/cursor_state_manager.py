@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=C:\giwanos 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -18,13 +18,13 @@ VELOS Cursor State Manager
 Cursor IDE의 사용 상태를 관리하고 TTL 기반 자동 만료를 처리합니다.
 """
 
-import os
 import json
+import os
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 # VELOS 루트 경로
-ROOT = Path("C:/giwanos")
+ROOT = Path("C:\giwanos")
 
 # 추가: 상단 상수
 SCHEMA_VERSION = 1
@@ -33,9 +33,7 @@ ENV_STATE_PATH = os.getenv("VELOS_RUNTIME_STATE_PATH")
 
 # 수정: STATE_PATH 결정
 STATE_PATH = (
-    Path(ENV_STATE_PATH)
-    if ENV_STATE_PATH
-    else ROOT / "data" / "memory" / "runtime_state.json"
+    Path(ENV_STATE_PATH) if ENV_STATE_PATH else ROOT / "data" / "memory" / "runtime_state.json"
 )
 
 
@@ -87,7 +85,7 @@ def _utc_now_iso() -> str:
 def _is_expired(last_iso: str | None) -> bool:
     if not last_iso:
         return True
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta, timezone
 
     try:
         ts = datetime.fromisoformat(last_iso.replace("Z", "+00:00"))
@@ -110,8 +108,7 @@ def get_cursor_in_use() -> bool:
             import psutil
 
             has_cursor = any(
-                "cursor" in (p.name() or "").lower()
-                for p in psutil.process_iter(["name"])
+                "cursor" in (p.name() or "").lower() for p in psutil.process_iter(["name"])
             )
         except Exception:
             has_cursor = False
@@ -152,8 +149,7 @@ def reconcile_env_file_state() -> dict:
             import psutil
 
             has_cursor = any(
-                "cursor" in (p.name() or "").lower()
-                for p in psutil.process_iter(["name"])
+                "cursor" in (p.name() or "").lower() for p in psutil.process_iter(["name"])
             )
         except Exception:
             has_cursor = False

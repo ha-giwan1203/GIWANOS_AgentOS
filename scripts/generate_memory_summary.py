@@ -3,7 +3,7 @@
 # 1) 파일명 고정: 시스템 파일명·경로·구조는 고정, 임의 변경 금지
 # 2) 자가 검증 필수: 수정/배포 전 자동·수동 테스트를 통과해야 함
 # 3) 실행 결과 직접 테스트: 코드 제공 시 실행 결과를 동봉/기록
-# 4) 저장 경로 고정: ROOT=C:/giwanos 기준, 우회/추측 경로 금지
+# 4) 저장 경로 고정: ROOT=C:\giwanos 기준, 우회/추측 경로 금지
 # 5) 실패 기록·회고: 실패 로그를 남기고 후속 커밋/문서에 반영
 # 6) 기억 반영: 작업/대화 맥락을 메모리에 저장하고 로딩에 사용
 # 7) 구조 기반 판단: 프로젝트 구조 기준으로만 판단 (추측 금지)
@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 from modules.report_paths import ROOT
+
 MEM = ROOT / r"data\memory"
 MEM.mkdir(parents=True, exist_ok=True)
 
@@ -115,12 +116,12 @@ def main():
         "summary": summary,
         "count": total,
         "sources": {
-            "learning_memory.json": (len(lm) if hasattr(lm, "__len__") else 0)
-            if lm is not None
-            else 0,
-            "dialog_memory.json": (len(dm) if hasattr(dm, "__len__") else 0)
-            if dm is not None
-            else 0,
+            "learning_memory.json": (
+                (len(lm) if hasattr(lm, "__len__") else 0) if lm is not None else 0
+            ),
+            "dialog_memory.json": (
+                (len(dm) if hasattr(dm, "__len__") else 0) if dm is not None else 0
+            ),
             "autosave_inbox.jsonl": len(inbox),
         },
         "timestamp": datetime.now().isoformat(timespec="seconds"),
