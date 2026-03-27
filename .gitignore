@@ -1,4 +1,4 @@
-# ==========================
+﻿# ==========================
 # 🔐 보안 민감정보 완전 차단
 # ==========================
 
@@ -65,12 +65,16 @@ config/private/
 
 # 대용량·산출물 디렉터리(리포 슬림화)
 artifacts/
-fonts/**
+!artifacts/.keep
+
+fonts/
 !fonts/.keep
 
 data/
 !data/.keep
-!data/README.md
+
+backup/
+archive/
 
 # 특정 산출물 파일 패턴
 *.pdf

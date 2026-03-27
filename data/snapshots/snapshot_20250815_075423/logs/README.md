@@ -1,5 +1,0 @@
-﻿## C:\giwanos\data\logs
-
-
-
-

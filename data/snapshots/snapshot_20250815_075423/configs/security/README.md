@@ -1,1 +1,0 @@
-﻿## C:\giwanos\configs\security
