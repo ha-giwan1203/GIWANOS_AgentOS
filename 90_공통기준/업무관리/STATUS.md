@@ -25,8 +25,8 @@
 | Notion 업무 현황 페이지 생성 | 2026-03-28 | STATUS / TASKS 페이지, 업무리스트 운영 부모 페이지 |
 | Slack 완료 보고 발송 | 2026-03-28 | `#새-워크스페이스-전체` 채널 |
 | Google Calendar 후속 작업 등록 | 2026-03-28 | 4건 (4/4 중요도 중·낮, 4/11 낮 2건) |
-| GitHub 운영 문서 push | 2026-03-28 | `ha-giwan1203/GIWANOS_AgentOS` 브랜치: `업무리스트` (64파일) |
-| GitHub PR 생성 | 2026-03-28 | ha-giwan1203/GIWANOS_AgentOS#8 |
+| GitHub 운영 문서 push | 2026-03-28 | `ha-giwan1203/GIWANOS_AgentOS` — PR #8, PR #9 순차 머지 완료. 현재 기준 브랜치: `main` |
+| GitHub PR #8 생성 및 머지 | 2026-03-28 | ha-giwan1203/GIWANOS_AgentOS#8 — MERGED |
 | 자동화 동기화 Phase 1 (파일 감지) | 2026-03-28 | `watch_changes.py` + `auto_watch_config.yaml` — watchdog 30분 debounce |
 | 자동화 동기화 Phase 2 (Git 커밋) | 2026-03-28 | `commit_docs.py` + `auto_commit_config.yaml` — allowlist 기반 자동 커밋 |
 | 자동화 동기화 Phase 3 (STATUS/TASKS 갱신) | 2026-03-28 | `update_status_tasks.py` + `status_rules.yaml` |
@@ -52,7 +52,6 @@
 | 보류 판정 유지 3건 후속 조치 | 중 | 데이터사전 동기화, 라인배치 스킬 패키지화, ENDPART 갱신 기준 확인 |
 | 파일 정리 2차 (99_임시수집 분류) | 낮 | 미분류 임시 파일 카테고리 배치 |
 | 각 도메인 STATUS.md 점검 | 낮 | 조립비정산, 라인배치 STATUS.md 마이그레이션 이후 경로 반영 여부 확인 |
-| GitHub PR 머지 | 낮 | ha-giwan1203/GIWANOS_AgentOS#8 — main 병합 여부 확인 |
 | Slack Bot Token 갱신 | 낮 | `.env` 토큰 `account_inactive` — api.slack.com 재발급 후 교체 |
 | 작업 스케줄러 등록 | 낮 | `register_watch_task.bat` CMD에서 직접 실행 (재시작 옵션 적용) |
 
