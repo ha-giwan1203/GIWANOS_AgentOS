@@ -34,7 +34,7 @@ TASKS.md 참조.
 |---------|------|------|
 | 중 | 보류 판정 유지 1건 후속 조치 | ENDPART 갱신 기준 확인 (라인배치 스킬 패키지화 완료) |
 | 낮 | 파일 정리 2차 (99_임시수집 분류) | |
-| 낮 | Slack Bot Token 갱신 | account_inactive 상태, 사용자 직접 재발급 필요 |
+| 낮 | ~~Slack Bot Token 갱신~~ | 완료 — 토큰 갱신, 멘션 추가, 폰 알림 정상화 |
 | 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
 | 낮 | 도메인 STATUS.md 점검 | 10_라인배치 마이그레이션 경로 반영 확인 |
 
@@ -55,7 +55,7 @@ TASKS.md 참조.
 - GitHub에 대용량 원본 엑셀 적재 금지
 - Notion을 AI 작업 기준 저장소로 사용하지 않는다
 - Drive 커넥트는 검색·참조 보조용. 편집 기준 아님
-- Slack Bot Token이 account_inactive 상태임 — 자동화 알림 발송 전 토큰 갱신 필요
+- Slack Bot Token 갱신 완료, 멘션(<@U096LU8KNN8>) 추가 완료 — 폰 알림 정상 동작 확인됨
 - 현재 브랜치: `main`. 신규 작업 시 새 브랜치 또는 main 직접 커밋 여부 확인 후 진행
 - step4 RSP 역추적 코드(row.iloc[2]/row.iloc[4])는 dead code — 수정 불필요, 파이프라인 결과 영향 없음 확인됨
 - Notion 표 내 .md/.py 파일명은 백틱으로 감싸야 자동링크 방지됨 (일반 텍스트 입력 시 재자동링크됨)
