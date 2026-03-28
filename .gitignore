@@ -1,13 +1,32 @@
+# ==========================
+# 보안 민감정보 완전 차단
+# ==========================
+
+# 환경 변수 / API 키 / 인증 토큰
+*.env
+*.env.*
+*.key
+*.pem
+*.crt
+*.cer
+*.pfx
+*.asc
+*.gpg
+*.keystore
+*.secrets
+*.credentials
+*secret*
+*token*
+*apikey*
+*api_key*
+*openai*
+
 # Claude Code 로컬 설정 (머신별 경로 하드코딩)
 .claude/
 
-# Windows 바로가기
-*.lnk
-
-# 패치 파일
-*.patch
-
+# ==========================
 # 대용량 원본 파일 제외
+# ==========================
 *.xlsx
 *.xls
 *.xlsm
@@ -29,14 +48,23 @@
 *.mp4
 *.avi
 *.mov
+*.lnk
+*.patch
+*.db
+*.sqlite
+*.jsonl
 
+# ==========================
 # Google Drive 캐시
+# ==========================
 .tmp.driveupload/
 .tmp.drivedownload/
 *.tmp
 *.driveupload
 
-# Python 캐시
+# ==========================
+# Python 캐시 / 빌드
+# ==========================
 __pycache__/
 *.pyc
 *.pyo
@@ -45,32 +73,66 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+.venv/
+venv/
+.envrc
 
-# 임시/백업 파일
+# ==========================
+# 임시 / 백업 파일
+# ==========================
 *.bak
+*.old
 *.swp
 *.swo
 *~
+*.DS_Store
+Thumbs.db
 구조_백업_*.txt
 전체목록_*.csv
 전수검색_결과_*.csv
-
-# 로그
 *.log
 robocopy_*.log
+runs.json
+jobs.json
+pr_list.json
 
-# 정산 자동화 출력물 (로컬 실행 전용)
+# ==========================
+# Node.js
+# ==========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================
+# IDE / Editor
+# ==========================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ==========================
+# 로컬 전용 폴더
+# ==========================
+99_임시수집/
+98_아카이브/
+artifacts/
+!artifacts/.keep
+data/
+!data/.keep
+backup/
+archive/
+secrets/
+private/
+config/private/
+
+# ==========================
+# 스크립트 출력물
+# ==========================
 05_생산실적/조립비정산/02_DB/
 05_생산실적/조립비정산/04_실적/
 05_생산실적/조립비정산/05_보고서/
 05_생산실적/조립비정산/03_정산자동화/run_logs/
-
-# 임시 파일 제외
-99_임시수집/
-
-# 아카이브 (로컬 전용)
-98_아카이브/
-
-# 스크립트 출력물
 03_품번관리/초물관리/_output/
 03_품번관리/초물관리/_backup/

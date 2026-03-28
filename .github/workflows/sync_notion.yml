@@ -1,0 +1,41 @@
+# .github/workflows/sync_notion.yml
+name: Sync Notion → GitHub Dashboard & Logs
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # UTC 00:00 → KST 09:00
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Load Notion data
+        run: python memory_loader.py
+
+      - name: Generate dashboard & diagnosis log
+        run: |
+          python memory_health_check_all.py
+
+      - name: Commit & push updated files
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Auto update dashboard & diagnosis log"
+          file_pattern: |
+            memory_dashboard.md
+            memory_diagnosis_log.md
+          branch: main

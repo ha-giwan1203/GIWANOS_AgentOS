@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>2025-08-22T00:00:00</Date>
+    <Author>VELOS System - Optimized</Author>
+    <URI>\VELOS Master Scheduler Hidden</URI>
+    <Description>VELOS AI 마스터 스케줄러 - 완전 숨김 모드 최적화 버전</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <!-- 부팅 후 5분 후 시작 -->
+    <BootTrigger>
+      <Enabled>true</Enabled>
+      <Delay>PT5M</Delay>
+    </BootTrigger>
+    <!-- 5분마다 반복 실행 -->
+    <TimeTrigger>
+      <StartBoundary>2025-08-22T00:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <Repetition>
+        <Interval>PT5M</Interval>
+        <StopAtDurationEnd>false</StopAtDurationEnd>
+      </Repetition>
+    </TimeTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <!-- SYSTEM 계정으로 실행하여 완전 숨김 -->
+      <UserId>S-1-5-18</UserId>
+      <LogonType>ServiceAccount</LogonType>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <!-- 완전 숨김 및 최적화 설정 -->
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <!-- 완전 숨김 모드 -->
+    <Hidden>true</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT10M</ExecutionTimeLimit>
+    <Priority>4</Priority>
+    <RestartOnFailure>
+      <Interval>PT1M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <!-- PowerShell 7.x 직접 실행으로 성능 최적화 -->
+      <Command>pwsh.exe</Command>
+      <Arguments>-NoProfile -NoLogo -NonInteractive -NoExit -WindowStyle Hidden -ExecutionPolicy Bypass -Command "
+        # VELOS 환경 설정
+        $env:PYTHONPATH='C:\giwanos'
+        $env:VELOS_ROOT='C:\giwanos'
+        Set-Location 'C:\giwanos'
+        
+        # 싱글톤 체크
+        $lockFile = 'C:\giwanos\data\.velos_master.lock'
+        if (Test-Path $lockFile) { 
+            $lockTime = (Get-Item $lockFile).LastWriteTime
+            if ((Get-Date) - $lockTime -lt [TimeSpan]::FromMinutes(10)) {
+                exit 0
+            }
+        }
+        New-Item -ItemType File -Path $lockFile -Force | Out-Null
+        
+        try {
+            # Python 가상환경 찾기
+            $venvPath = if (Test-Path '.venv_link') { Get-Content '.venv_link' } else { '.venv' }
+            $python = Join-Path $venvPath 'Scripts\python.exe'
+            if (-not (Test-Path $python)) { $python = 'python' }
+            
+            # VELOS 마스터 스케줄러 실행
+            $psi = New-Object System.Diagnostics.ProcessStartInfo
+            $psi.FileName = $python
+            $psi.Arguments = 'scripts\velos_master_scheduler.py --daemon'
+            $psi.WorkingDirectory = 'C:\giwanos'
+            $psi.UseShellExecute = $false
+            $psi.CreateNoWindow = $true
+            $psi.WindowStyle = 'Hidden'
+            $psi.RedirectStandardOutput = $true
+            $psi.RedirectStandardError = $true
+            
+            $process = [System.Diagnostics.Process]::Start($psi)
+            $process.WaitForExit()
+            
+            # 로그 기록
+            $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+            $logPath = 'C:\giwanos\data\logs\scheduler_hidden.log'
+            New-Item -ItemType Directory -Path (Split-Path $logPath) -Force -ErrorAction SilentlyContinue | Out-Null
+            &quot;[$timestamp] VELOS Master Scheduler executed (Exit: $($process.ExitCode))&quot; | Out-File -FilePath $logPath -Append -Encoding UTF8
+            
+        } finally {
+            Remove-Item $lockFile -Force -ErrorAction SilentlyContinue
+        }
+      "</Arguments>
+      <WorkingDirectory>C:\giwanos</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
