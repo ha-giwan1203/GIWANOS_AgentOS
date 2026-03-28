@@ -7,7 +7,7 @@ description: >
   API 사용 금지, 브라우저 직접 읽기만 사용.
 ---
 
-# 토론모드 (Debate Mode) v1.1
+# 토론모드 (Debate Mode) v1.2
 
 ## 개요
 Claude가 ChatGPT 브라우저 화면을 직접 읽고, 반박/질문을 생성하여 입력하는 반자동 토론 시스템.
