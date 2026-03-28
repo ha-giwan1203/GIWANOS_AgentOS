@@ -1,3 +1,12 @@
+# Claude Code 로컬 설정 (머신별 경로 하드코딩)
+.claude/
+
+# Windows 바로가기
+*.lnk
+
+# 패치 파일
+*.patch
+
 # 대용량 원본 파일 제외
 *.xlsx
 *.xls
