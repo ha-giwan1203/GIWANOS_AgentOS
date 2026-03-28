@@ -1,5 +1,5 @@
-﻿# ==========================
-# 🔐 보안 민감정보 완전 차단
+# ==========================
+# 보안 민감정보 완전 차단
 # ==========================
 
 # 환경 변수 / API 키 / 인증 토큰
@@ -21,69 +21,118 @@
 *api_key*
 *openai*
 
-# 개인/임시 설정 파일
-*.log
-*.tmp
-*.bak
-*.old
-*.swp
-*.swo
-*.DS_Store
-Thumbs.db
+# Claude Code 로컬 설정 (머신별 경로 하드코딩)
+.claude/
 
-# Python 캐시/빌드 산출물
+# ==========================
+# 대용량 원본 파일 제외
+# ==========================
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.csv
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.zip
+*.7z
+*.rar
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.mp4
+*.avi
+*.mov
+*.lnk
+*.patch
+*.db
+*.sqlite
+*.jsonl
+
+# ==========================
+# Google Drive 캐시
+# ==========================
+.tmp.driveupload/
+.tmp.drivedownload/
+*.tmp
+*.driveupload
+
+# ==========================
+# Python 캐시 / 빌드
+# ==========================
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.Python
 *.egg-info/
 dist/
 build/
+.venv/
+venv/
+.envrc
 
-# Node.js (혹시 있을 경우)
+# ==========================
+# 임시 / 백업 파일
+# ==========================
+*.bak
+*.old
+*.swp
+*.swo
+*~
+*.DS_Store
+Thumbs.db
+구조_백업_*.txt
+전체목록_*.csv
+전수검색_결과_*.csv
+*.log
+robocopy_*.log
+runs.json
+jobs.json
+pr_list.json
+
+# ==========================
+# Node.js
+# ==========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# 가상환경
-.venv/
-.venv_link/
-venv/
-.envrc
-
-# IDE/Editor 설정
+# ==========================
+# IDE / Editor
+# ==========================
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
 
-# 프로젝트 내부 보안 폴더
+# ==========================
+# 로컬 전용 폴더
+# ==========================
+99_임시수집/
+98_아카이브/
+artifacts/
+!artifacts/.keep
+data/
+!data/.keep
+backup/
+archive/
 secrets/
 private/
 config/private/
 
-# 대용량·산출물 디렉터리(리포 슬림화)
-artifacts/
-!artifacts/.keep
-
-fonts/
-!fonts/.keep
-
-data/
-!data/.keep
-
-backup/
-archive/
-
-# 특정 산출물 파일 패턴
-*.pdf
-*.zip
-*.db
-*.sqlite
-*.jsonl
-
-# Local debug artifacts (prevent PR noise)
-runs.json
-jobs.json
-pr_list.json
+# ==========================
+# 스크립트 출력물
+# ==========================
+05_생산실적/조립비정산/02_DB/
+05_생산실적/조립비정산/04_실적/
+05_생산실적/조립비정산/05_보고서/
+05_생산실적/조립비정산/03_정산자동화/run_logs/
+03_품번관리/초물관리/_output/
+03_품번관리/초물관리/_backup/

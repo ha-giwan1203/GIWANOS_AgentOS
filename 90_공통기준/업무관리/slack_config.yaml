@@ -1,0 +1,41 @@
+# Phase 4 — Slack 알림 설정
+
+slack:
+  # Bot Token은 환경변수 SLACK_BOT_TOKEN 에서 읽음
+  # 없으면 token_env_fallback_path 경로의 .env 파일에서 로드
+  token_env: "SLACK_BOT_TOKEN"
+  token_env_fallback_path: "C:/Users/User/Desktop/gpt파일api/.env"
+
+  # 알림 채널
+  channel_id: "C096LU8PH44"   # #새-워크스페이스-전체
+
+  # 알림 발송 조건
+  notify_on:
+    status_tasks_updated: true    # STATUS/TASKS 갱신 성공
+    status_tasks_failed: true     # STATUS/TASKS 갱신 실패
+    git_commit_success: true      # Git 커밋 성공
+    git_commit_failed: true       # Git 커밋 실패
+    critical_file_changed: true   # 핵심 파일 변경 포함 배치
+
+  # 핵심 파일 패턴 (이 파일이 배치에 포함되면 무조건 알림)
+  critical_patterns:
+    - "CLAUDE.md"
+    - "*.skill"
+    - "auto_watch_config.yaml"
+    - "auto_commit_config.yaml"
+    - "status_rules.yaml"
+
+  # 중복 알림 방지 (동일 batch_id 재발송 방지)
+  dedup_window_hours: 1
+
+  # 재시도
+  retry_count: 2
+  retry_delay_seconds: 3
+
+  # 메시지 prefix
+  bot_name: "업무리스트 AutoBot"
+
+# 로깅
+logging:
+  log_dir: "90_공통기준/업무관리"
+  error_prefix: "slack_errors_"
