@@ -1,0 +1,46 @@
+watch:
+  root: "C:/Users/User/Desktop/업무리스트"
+  debounce_minutes: 30
+
+  exclude_dirs:
+    - "98_아카이브"
+    - "99_임시수집"
+    - "__pycache__"
+    - ".git"
+    - ".claude"
+
+  exclude_patterns:
+    - "~$*"
+    - "*.tmp"
+    - "*.temp"
+    - "*.cache"
+    - "*.bak"
+    - "*.swp"
+    - "*.crdownload"
+    - "*.part"
+    - "*.tmp.driveupload"
+    - "*.driveupload"
+    - "Thumbs.db"
+    - "desktop.ini"
+
+  watch_extensions:
+    - ".md"
+    - ".txt"
+    - ".json"
+    - ".yaml"
+    - ".yml"
+    - ".py"
+    - ".ps1"
+    - ".bat"
+    - ".xlsx"
+    - ".xls"
+    - ".docx"
+    - ".pdf"
+
+logging:
+  log_dir: "90_공통기준/업무관리"
+  log_prefix: "작업로그_"
+  error_prefix: "watch_errors_"
+
+lock:
+  file: ".watch.lock"

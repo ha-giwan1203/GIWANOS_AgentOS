@@ -1,0 +1,82 @@
+repo:
+  path: "C:/Users/User/Desktop/업무리스트"
+  branch: "업무리스트"
+  push_on_commit: false
+  push_timeout_seconds: 60
+
+allowlist:
+  patterns:
+    - "CLAUDE.md"
+    - "README.md"
+    - "STATUS.md"
+    - "TASKS.md"
+    - "90_공통기준/**/*.md"
+    - "90_공통기준/**/*.py"
+    - "90_공통기준/**/*.yaml"
+    - "90_공통기준/**/*.yml"
+    - "90_공통기준/**/*.json"
+    - "90_공통기준/**/*.skill"
+    - "05_생산실적/조립비정산/03_정산자동화/*.py"
+    - "05_생산실적/조립비정산/03_정산자동화/**/*.py"
+    - "05_생산실적/조립비정산/03_정산자동화/*.md"
+    - "05_생산실적/조립비정산/CLAUDE.md"
+    - "05_생산실적/조립비정산/STATUS.md"
+    - "05_생산실적/_자동화/*.bat"
+    - "05_생산실적/_자동화/*.py"
+    - "10_라인배치/CLAUDE.md"
+    - "10_라인배치/STATUS.md"
+    - "03_품번관리/초물관리/_scripts/*.py"
+    - "03_품번관리/초물관리/CLAUDE.md"
+
+blocklist:
+  patterns:
+    - "98_아카이브/**"
+    - "99_임시수집/**"
+    - "*.xlsx"
+    - "*.xls"
+    - "*.xlsm"
+    - "*.docx"
+    - "*.doc"
+    - "*.pdf"
+    - "*.pptx"
+    - "*.csv"
+    - "작업로그_*.jsonl"
+    - "git_commit_log_*.jsonl"
+    - "*.log"
+    - "~$*"
+    - "*.tmp"
+    - "*.temp"
+    - "*.bak"
+    - "*.swp"
+    - "*.driveupload"
+    - ".watch.lock"
+    - ".commit_state.json"
+
+commit:
+  rules:
+    - match_names: ["STATUS.md", "TASKS.md"]
+      prefix: "docs(status)"
+      description: "STATUS/TASKS 자동 갱신"
+    - match_exts: [".yaml", ".yml", ".json"]
+      prefix: "chore(config)"
+      description: "설정 파일 자동 갱신"
+    - match_exts: [".py", ".ps1", ".bat"]
+      event_modified: "fix(script)"
+      event_created: "feat(script)"
+      description: "자동화 스크립트 반영"
+    - match_exts: [".skill"]
+      prefix: "feat(skill)"
+      description: "스킬 문서 갱신"
+    - match_exts: [".md"]
+      prefix: "docs(ops)"
+      description: "운영 문서 자동 갱신"
+  default_prefix: "chore(ops)"
+  default_description: "운영 파일 자동 갱신"
+  author_name: "AutoCommit"
+  author_email: "s250ppp@gmail.com"
+
+logging:
+  log_dir: "90_공통기준/업무관리"
+  commit_log_prefix: "git_commit_log_"
+  error_prefix: "git_commit_errors_"
+  state_file: ".commit_state.json"

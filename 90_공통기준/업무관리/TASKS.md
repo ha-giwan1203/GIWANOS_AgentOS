@@ -1,6 +1,6 @@
 # 업무리스트 작업 목록
 
-최종 업데이트: 2026-03-28 (커넥터 업로드 완료 반영)
+최종 업데이트: 2026-03-28 (자동화 동기화 파이프라인 Phase 1~4 완료)
 
 ---
 
@@ -24,6 +24,11 @@
 - `99_임시수집` 내 미분류 파일 카테고리 배치
 - 각 도메인 내 신규 수집 파일 정기 점검
 
+### [낮] Slack 봇 토큰 갱신
+- 현재 `.env` 파일의 `SLACK_BOT_TOKEN` — `account_inactive` 상태
+- https://api.slack.com/apps → Bot Token Scopes: `chat:write`, `chat:write.public` → 재설치
+- 새 토큰을 `C:/Users/User/Desktop/gpt파일api/.env` 파일에 교체
+
 ### [낮] 도메인 STATUS.md 점검
 - `05_생산실적\조립비정산\STATUS.md` — 마이그레이션 이후 경로 반영 확인
 - `10_라인배치\STATUS.md` — 현행 기준 반영 확인
@@ -46,3 +51,7 @@
 | Google Calendar 후속 작업 4건 등록 | 2026-03-28 |
 | GitHub 운영 문서 push (브랜치: 업무리스트) | 2026-03-28 |
 | GitHub PR 생성 (#8) | 2026-03-28 |
+| 자동화 동기화 Phase 1 (watch_changes.py) | 2026-03-28 |
+| 자동화 동기화 Phase 2 (commit_docs.py) | 2026-03-28 |
+| 자동화 동기화 Phase 3 (update_status_tasks.py) | 2026-03-28 |
+| 자동화 동기화 Phase 4 (slack_notify.py) | 2026-03-28 |

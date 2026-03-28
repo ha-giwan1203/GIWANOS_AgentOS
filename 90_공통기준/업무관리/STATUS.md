@@ -1,6 +1,6 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-28 (커넥터 업로드 완료 반영)
+최종 업데이트: 2026-03-28 (자동화 동기화 파이프라인 Phase 1~4 완료)
 
 ---
 
@@ -27,6 +27,10 @@
 | Google Calendar 후속 작업 등록 | 2026-03-28 | 4건 (4/4 중요도 중·낮, 4/11 낮 2건) |
 | GitHub 운영 문서 push | 2026-03-28 | `ha-giwan1203/GIWANOS_AgentOS` 브랜치: `업무리스트` (64파일) |
 | GitHub PR 생성 | 2026-03-28 | ha-giwan1203/GIWANOS_AgentOS#8 |
+| 자동화 동기화 Phase 1 (파일 감지) | 2026-03-28 | `watch_changes.py` + `auto_watch_config.yaml` — watchdog 30분 debounce |
+| 자동화 동기화 Phase 2 (Git 커밋) | 2026-03-28 | `commit_docs.py` + `auto_commit_config.yaml` — allowlist 기반 자동 커밋 |
+| 자동화 동기화 Phase 3 (STATUS/TASKS 갱신) | 2026-03-28 | `update_status_tasks.py` + `status_rules.yaml` |
+| 자동화 동기화 Phase 4 (Slack 알림) | 2026-03-28 | `slack_notify.py` + `slack_config.yaml` — 토큰 갱신 필요 |
 
 ---
 

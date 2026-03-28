@@ -1,0 +1,99 @@
+# STATUS.md / TASKS.md 자동 갱신 규칙
+
+# ── 운영 의미 있는 파일 패턴 ──────────────────────────────────────────────
+# label: STATUS.md에 기록할 변경 설명
+# add_task: TASKS.md에 [auto] 후속작업 추가 여부
+# task_text: add_task=true 일 때 추가할 작업 내용
+
+meaningful:
+  - pattern: "90_공통기준/스킬/**/*.skill"
+    label: "스킬 패키지 갱신"
+    add_task: false
+
+  - pattern: "90_공통기준/스킬/*.skill"
+    label: "스킬 패키지 갱신"
+    add_task: false
+
+  - pattern: "90_공통기준/스킬/**/*.md"
+    label: "스킬 문서 갱신"
+    add_task: false
+
+  - pattern: "90_공통기준/스킬/*.md"
+    label: "스킬 문서 갱신"
+    add_task: false
+
+  - pattern: "90_공통기준/업무관리/운영지침_*.md"
+    label: "운영 지침 문서 수정"
+    add_task: false
+
+  - pattern: "90_공통기준/업무관리/운영핵심파일_*.md"
+    label: "보호 파일 목록 수정"
+    add_task: false
+
+  - pattern: "05_생산실적/조립비정산/03_정산자동화/*.py"
+    label: "정산 파이프라인 스크립트 수정"
+    add_task: true
+    task_text: "정산 파이프라인 실행 테스트 확인"
+
+  - pattern: "05_생산실적/조립비정산/03_정산자동화/**/*.py"
+    label: "정산 파이프라인 스크립트 수정"
+    add_task: true
+    task_text: "정산 파이프라인 실행 테스트 확인"
+
+  - pattern: "05_생산실적/_자동화/*.bat"
+    label: "BI 자동화 배치 파일 수정"
+    add_task: true
+    task_text: "bi_copy.bat 실행 확인"
+
+  - pattern: "05_생산실적/_자동화/*.py"
+    label: "BI 자동화 스크립트 수정"
+    add_task: false
+
+  - pattern: "03_품번관리/초물관리/_scripts/*.py"
+    label: "초물관리 스크립트 수정"
+    add_task: false
+
+  - pattern: "CLAUDE.md"
+    label: "CLAUDE.md 운영 기준 수정"
+    add_task: false
+
+  - pattern: "README.md"
+    label: "README.md 수정"
+    add_task: false
+
+  - pattern: "10_라인배치/CLAUDE.md"
+    label: "라인배치 운영 기준 수정"
+    add_task: false
+
+  - pattern: "05_생산실적/조립비정산/CLAUDE.md"
+    label: "조립비정산 운영 기준 수정"
+    add_task: false
+
+# ── 제외 패턴 (STATUS/TASKS 갱신 대상에서 제외) ────────────────────────
+skip:
+  - "98_아카이브/**"
+  - "99_임시수집/**"
+  - "작업로그_*.jsonl"
+  - "git_commit_log_*.jsonl"
+  - "*.log"
+  - "~$*"
+  - "*.tmp"
+  - "*.bak"
+  - "*.driveupload"
+  # STATUS/TASKS 자체 변경은 무한루프 방지를 위해 제외
+  - "90_공통기준/업무관리/STATUS.md"
+  - "90_공통기준/업무관리/TASKS.md"
+  - ".commit_state.json"
+  - ".watch.lock"
+
+# ── STATUS.md 갱신 설정 ────────────────────────────────────────────────
+status:
+  section_header: "## 자동 감지 변경 이력"
+  max_entries: 30          # 보관할 최대 이력 건수
+  date_format: "%Y-%m-%d %H:%M"
+
+# ── TASKS.md 갱신 설정 ────────────────────────────────────────────────
+tasks:
+  pending_header: "## 대기 중 (우선순위 순)"
+  auto_tag: "[auto]"
+  dedup_window_hours: 24   # 동일 내용 중복 추가 방지 시간창
