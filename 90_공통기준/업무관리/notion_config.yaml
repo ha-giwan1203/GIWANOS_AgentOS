@@ -1,0 +1,35 @@
+# Phase 5 — Notion 자동 동기화 설정
+
+notion:
+  # Integration Token (환경변수 또는 .env 파일에서 로드)
+  token_env: "NOTION_TOKEN"
+  token_env_fallback_path: "C:/Users/User/Desktop/gpt설정api/.env"
+
+  # 동기화 대상 페이지
+  status_page_id: "331fee67-0be8-81f7-9f15-c3aaabfbd94a"   # 📊 STATUS — 전체 운영 현황
+  tasks_page_id:  "331fee67-0be8-818c-b2bc-cd8da0a40db8"   # ✅ TASKS — 작업 목록
+
+  # 중복 방지
+  dedup_window_hours: 1
+
+  # 재시도
+  retry_count: 2
+  retry_delay_seconds: 3
+
+  # 동기화 조건
+  sync_on:
+    status_tasks_updated: true    # Phase 3 갱신 성공 시
+    critical_file_changed: true   # 핵심 파일 변경 포함 배치
+
+  # 핵심 파일 패턴 (이 파일 포함 배치면 무조건 동기화)
+  critical_patterns:
+    - "CLAUDE.md"
+    - "*.skill"
+    - "auto_watch_config.yaml"
+    - "auto_commit_config.yaml"
+    - "status_rules.yaml"
+
+# 로깅
+logging:
+  log_dir: "90_공통기준/업무관리"
+  error_prefix: "notion_errors_"

@@ -362,9 +362,31 @@ def _try_phase4_notify(batch_id: str, ready: list, phase3_result: dict,
         error_logger.error(f"Phase 4 훅 예외: {e}")
 
 
+def _try_phase5_notion(batch_id: str, ready: list, phase3_result: dict,
+                       phase2_result: dict, dry_run: bool,
+                       error_logger: logging.Logger):
+    """Phase 5 Notion 동기화 훅. 미설치 시 조용히 건너뜀."""
+    try:
+        import notion_sync as _ns
+        notion_cfg = _ns.load_config()
+        _ns.sync_batch(
+            batch_id=batch_id,
+            events=ready,
+            phase3_result=phase3_result,
+            phase2_result=phase2_result,
+            cfg=notion_cfg,
+            dry_run=dry_run,
+            logger=error_logger,
+        )
+    except ImportError:
+        pass  # notion_sync 미설치 — Phase 1~4 단독 모드
+    except Exception as e:
+        error_logger.error(f"Phase 5 훅 예외: {e}")
+
+
 def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
                  error_logger: logging.Logger, stop_event: threading.Event):
-    """60초마다 debounce 완료 항목을 로그에 기록하고 Phase 3 → Phase 2 → Phase 4 순으로 훅 호출."""
+    """60초마다 debounce 완료 항목을 로그에 기록하고 Phase 3 → Phase 2 → Phase 4 → Phase 5 순으로 훅 호출."""
     import uuid as _uuid
     repo_root = cfg["watch"]["root"]
     while not stop_event.is_set():
@@ -382,6 +404,8 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
                 phase2_result = _try_phase2_commit(ready + extra, dry_run, error_logger)
                 _try_phase4_notify(batch_id, ready, phase3_result, phase2_result,
                                    dry_run, error_logger)
+                _try_phase5_notion(batch_id, ready, phase3_result, phase2_result,
+                                   dry_run, error_logger)
         except Exception as e:
             error_logger.error(f"flush_worker 예외: {e}")
 
@@ -398,6 +422,8 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
             }
             phase2_result = _try_phase2_commit(ready + extra, dry_run, error_logger)
             _try_phase4_notify(batch_id, ready, phase3_result, phase2_result,
+                               dry_run, error_logger)
+            _try_phase5_notion(batch_id, ready, phase3_result, phase2_result,
                                dry_run, error_logger)
     except Exception as e:
         error_logger.error(f"종료 시 최종 플러시 실패: {e}")
