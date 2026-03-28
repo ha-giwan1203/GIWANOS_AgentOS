@@ -35,6 +35,9 @@ slack:
   # 메시지 prefix
   bot_name: "업무리스트 AutoBot"
 
+  # 멘션 (폰 알림용) — Slack 사용자 ID
+  mention_user_id: "U096LU8KNN8"
+
 # 로깅
 logging:
   log_dir: "90_공통기준/업무관리"

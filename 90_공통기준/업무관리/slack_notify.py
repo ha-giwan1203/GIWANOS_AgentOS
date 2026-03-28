@@ -213,7 +213,9 @@ def build_message(
     summary = f"파일 {file_count}건 처리"
     body = "\n".join(lines)
 
-    return f"{header}\n{summary}\n{body}"
+    mention_id = notify_cfg.get("mention_user_id", "")
+    mention = f"<@{mention_id}> " if mention_id else ""
+    return f"{mention}{header}\n{summary}\n{body}"
 
 
 # ── 핵심: 알림 발송 ───────────────────────────────────────────────────────
@@ -249,13 +251,14 @@ def notify_batch(
         return True
 
     # 메시지 조립
+    notify_cfg_merged = {**notify_cfg, "mention_user_id": slack_cfg.get("mention_user_id", "")}
     msg = build_message(
         batch_id=batch_id,
         events=events,
         phase3_result=phase3_result or {},
         phase2_result=phase2_result or {},
         critical_patterns=critical_patterns,
-        notify_cfg=notify_cfg,
+        notify_cfg=notify_cfg_merged,
     )
 
     if msg is None:
@@ -299,10 +302,12 @@ def main():
         if not token:
             print("토큰 없음")
             return
+        mention_id = cfg["slack"].get("mention_user_id", "")
+        mention = f"<@{mention_id}> " if mention_id else ""
         ok = _slack_post(
             token,
             cfg["slack"]["channel_id"],
-            args.message,
+            f"{mention}{args.message}",
             cfg["slack"].get("retry_count", 2),
             cfg["slack"].get("retry_delay_seconds", 3),
             logger,
