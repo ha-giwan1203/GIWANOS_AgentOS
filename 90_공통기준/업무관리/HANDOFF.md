@@ -36,7 +36,6 @@
 | 낮 | Slack Bot Token 갱신 | account_inactive 상태, 사용자 직접 재발급 필요 |
 | 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
 | 낮 | 도메인 STATUS.md 점검 | 05_생산실적/조립비정산, 10_라인배치 마이그레이션 경로 반영 확인 |
-| 낮 | GitHub PR #8 머지 | ha-giwan1203/GIWANOS_AgentOS#8 |
 
 ---
 
