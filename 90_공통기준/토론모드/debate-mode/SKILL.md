@@ -54,8 +54,11 @@ continue 모드 진입 시 아래 값을 로그 JSON에서 읽어 복원한다.
 - `KeyboardEvent('keydown', Enter)` 전송
 
 ### Step 3. 응답 완료 감지 (2중 조건)
-1. `button[aria-label="스트리밍 중지"]` 소멸 확인
-2. `[data-message-author-role="assistant"]` 마지막 블록 텍스트 길이가 2회 연속 동일 → 완료 판정
+1. **완료 버튼 소멸 확인** (fallback 순서)
+   - `button[aria-label="스트리밍 중지"]` 소멸
+   - fallback: 전송 버튼(`button[data-testid="send-button"]`) 재활성화
+   - fallback2: `[aria-busy="true"]` 요소 소멸
+2. `[data-message-author-role="assistant"]` 마지막 블록 **텍스트 자체** 2회 연속 동일 → 완료 판정
 - 조건 1만 충족 시 5초 추가 대기 후 조건 2 재확인
 - 3회 실패 시 중단
 
@@ -65,7 +68,9 @@ continue 모드 진입 시 아래 값을 로그 JSON에서 읽어 복원한다.
 2. fallback: `read_page` DOM 트리에서 assistant 마지막 블록
 3. fallback2: `get_page_text` 전체 추출 후 마지막 "ChatGPT의 말:" 이후 구간
 
-last_reply_hash와 비교 — 동일하면 응답 미갱신으로 판단, 대기 후 재시도
+last_reply_hash 비교 — `normalize(full_text)` 전체 해시 기준 (앞 100자 → 전체로 변경)
+- 동일하면 응답 미갱신으로 판단, 대기 후 재시도
+- 턴별 원문(full_text) 로그 저장 필수 — 해시 충돌 시 원문으로 검증
 
 ### Step 5. 반박 생성
 - GPT 응답 핵심 주장 요약 (3줄)
@@ -109,3 +114,4 @@ last_reply_hash와 비교 — 동일하면 응답 미갱신으로 판단, 대기
 |------|------|------|
 | v1.0 | 2026-03-28 | 초안 작성 |
 | v1.1 | 2026-03-29 | Claude adversarial-review + GPT 검토 반영: 응답 완료 2중 감지, 파싱 우선순위 명시, continue 세션 상태 추가, review 모드 v2 예정 표시, 반박 거절 재생성 절차 추가 |
+| v1.2 | 2026-03-29 | GPT 2차 검토 반영: 완료 감지 fallback 3단계 추가(aria-label→send버튼→aria-busy), 텍스트 길이→텍스트 자체 동일 비교, last_reply_hash 앞100자→전체 해시, 턴별 원문 로그 저장 명시 |
