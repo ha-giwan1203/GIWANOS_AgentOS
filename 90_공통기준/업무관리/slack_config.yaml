@@ -4,7 +4,7 @@ slack:
   # Bot Token은 환경변수 SLACK_BOT_TOKEN 에서 읽음
   # 없으면 token_env_fallback_path 경로의 .env 파일에서 로드
   token_env: "SLACK_BOT_TOKEN"
-  token_env_fallback_path: "C:/Users/User/Desktop/gpt파일api/.env"
+  token_env_fallback_path: "C:/Users/User/Desktop/gpt설정api/.env"
 
   # 알림 채널
   channel_id: "C096LU8PH44"   # #새-워크스페이스-전체

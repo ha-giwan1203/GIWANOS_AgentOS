@@ -18,11 +18,6 @@
 - `99_임시수집` 내 미분류 파일 카테고리 배치
 - 각 도메인 내 신규 수집 파일 정기 점검
 
-### [낮] Slack Bot Token 갱신 (사용자 직접)
-- 현재 `.env` 파일의 `SLACK_BOT_TOKEN` — `account_inactive` 상태
-- https://api.slack.com/apps → 앱 선택 → OAuth & Permissions → Bot Token Scopes: `chat:write` → Reinstall
-- 새 토큰을 `C:/Users/User/Desktop/gpt파일api/.env`의 `SLACK_BOT_TOKEN=` 값에 교체
-- 갱신 후 `python slack_notify.py --message "토큰 갱신 테스트"` 실행
 
 ### [낮] 작업 스케줄러 등록 (사용자 직접 — 재시작 옵션 적용)
 - CMD 열고 실행: `C:\Users\User\Desktop\업무리스트\90_공통기준\업무관리\register_watch_task.bat`
@@ -68,3 +63,4 @@
 | 조립비정산 데이터사전 동기화 (데이터사전 v1.0 + pipeline_contract.md + CLAUDE.md) | 2026-03-28 |
 | line-batch-management.skill 패키지화 (v7→v9 기준 전환, SNAP-ON/LASER MARKING 갱신) | 2026-03-28 |
 | ENDPART라인배정 파일 용도 확인 — 임시 참고자료 확정 (갱신 기준 불필요) | 2026-03-28 |
+| Slack Bot Token 갱신 완료 — slack_notify.py 발송 성공, slack_config.yaml 경로 수정 | 2026-03-28 |
