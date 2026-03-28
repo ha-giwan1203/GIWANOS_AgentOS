@@ -1,0 +1,67 @@
+# 대용량 원본 파일 제외
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.csv
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.zip
+*.7z
+*.rar
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.mp4
+*.avi
+*.mov
+
+# Google Drive 캐시
+.tmp.driveupload/
+.tmp.drivedownload/
+*.tmp
+*.driveupload
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# 임시/백업 파일
+*.bak
+*.swp
+*.swo
+*~
+구조_백업_*.txt
+전체목록_*.csv
+전수검색_결과_*.csv
+
+# 로그
+*.log
+robocopy_*.log
+
+# 정산 자동화 출력물 (로컬 실행 전용)
+05_생산실적/조립비정산/02_DB/
+05_생산실적/조립비정산/04_실적/
+05_생산실적/조립비정산/05_보고서/
+05_생산실적/조립비정산/03_정산자동화/run_logs/
+
+# 임시 파일 제외
+99_임시수집/
+
+# 아카이브 (로컬 전용)
+98_아카이브/
+
+# 스크립트 출력물
+03_품번관리/초물관리/_output/
+03_품번관리/초물관리/_backup/
