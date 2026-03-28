@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-28 (Notion STATUS 표 구조 재구성 및 자동링크 정리 완료)
+최종 업데이트: 2026-03-28 (line-batch-management.skill 패키지화 완료 — v7→v9 기준 전환)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -8,8 +8,7 @@
 
 ## 1. 이번 작업 목적
 
-직전 세션 마감 작업: Notion STATUS 페이지 표 구조 복구 및 자동링크 잔재 정리.
-표 3개가 6열로 깨져 있었고 .md/.py 파일명이 자동링크로 변환된 상태였다.
+`line-batch-management.skill` 패키지화: v7.md(구버전)를 v9 운영 기준(CLAUDE.md)으로 갱신 후 .skill 파일 공식 생성.
 
 ---
 
@@ -17,13 +16,13 @@
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| 수정 (이전 세션) | `05_생산실적/조립비정산/06_스킬문서/참조_조립비정산_데이터사전_v1.0.md` | §4 기준정보 파일명 수정, 컬럼 구조(col 0~15) 업데이트, §5 Step5 items 19개 필드 추가, step4 RSP dead code 명시 |
-| 수정 (이전 세션) | `05_생산실적/조립비정산/03_정산자동화/pipeline_contract.md` | GERP col11 assy_part 추가, LineItem 스키마 4개 필드 추가, 기준 날짜 갱신 |
-| 수정 (이전 세션) | `05_생산실적/조립비정산/CLAUDE.md` | col12→col11 오기 수정, step4 RSP dead code 명시 |
-| 보완 (이전 세션) | `90_공통기준/업무관리/TASKS.md` | 데이터사전 동기화 완료 처리 |
-| 정리 (이번 세션) | Notion STATUS 페이지 | 표 3개 재생성(2열/3열/2열), 자동링크 5건 백틱 처리, 상단 동기화 문구 갱신 |
+| 신규 | `10_라인배치/라인배치_스킬문서_v9.md` | v7 기반, OUTER_RULES v9 적용 (SNAP-ON 추가, LASER MARKING 단축, JS 버전 v9) |
+| 신규 | `90_공통기준/스킬/line-batch-management.skill` | v9.md ZIP 패키지 (9,804 bytes) |
+| 이동 | `10_라인배치/라인배치_스킬문서_v7.md` | → `98_아카이브/라인배치_스킬문서_v7_archived_20260328.md` |
+| 수정 | `10_라인배치/STATUS.md` | 스킬 패키지 완료 기록 |
+| 수정 | `90_공통기준/업무관리/TASKS.md` | 스킬 패키지화 완료 이동, [중] 잔여 1건 |
 
-**GitHub 최종 커밋**: `31ccecba` (docs(마감): pipeline_contract 날짜 갱신 + TASKS 완료 항목 정리)
+**GitHub 최종 커밋**: 이번 세션 commit 예정
 
 ---
 
@@ -33,7 +32,7 @@ TASKS.md 참조.
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 중 | 보류 판정 유지 2건 후속 조치 | 라인배치 스킬 패키지화, ENDPART 갱신 기준 확인 |
+| 중 | 보류 판정 유지 1건 후속 조치 | ENDPART 갱신 기준 확인 (라인배치 스킬 패키지화 완료) |
 | 낮 | 파일 정리 2차 (99_임시수집 분류) | |
 | 낮 | Slack Bot Token 갱신 | account_inactive 상태, 사용자 직접 재발급 필요 |
 | 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
@@ -44,8 +43,9 @@ TASKS.md 참조.
 ## 4. 다음 AI가 바로 할 일
 
 1. STATUS.md와 TASKS.md 확인 후 [중] 우선순위 항목 착수
-2. 다음 우선순위: 라인배치 스킬 문서 패키지화 (TASKS.md [중] 항목 참조)
-3. 도메인별 재개 위치: 10_라인배치/STATUS.md, CLAUDE.md 참조
+2. 다음 우선순위: ENDPART 갱신 기준 확인 (TASKS.md [중] 항목)
+3. OUTER 라인 runOuterLine(295) 재개 — 10_라인배치/STATUS.md 참조
+4. 도메인별 재개 위치: 10_라인배치/STATUS.md, CLAUDE.md 참조
 
 ---
 

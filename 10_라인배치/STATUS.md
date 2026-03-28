@@ -15,3 +15,8 @@
 - 중지: window._haltAll=true; window._outerInstId=9999;
 - 상태 확인: window.outerStatus()
 - 세션 리셋 시 JS 함수 재주입 필요
+
+## 스킬 패키지 (2026-03-28)
+- v7→v9 기준 전환 완료 (SNAP-ON 추가, LASER MARKING 키워드 단축)
+- line-batch-management.skill 생성: 90_공통기준/스킬/
+- v7.md → 98_아카이브/라인배치_스킬문서_v7_archived_20260328.md
