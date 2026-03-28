@@ -22,4 +22,4 @@
 - v7.md → 98_아카이브/라인배치_스킬문서_v7_archived_20260328.md
 - ZIP 구조: line-batch-management/SKILL.md 확인
 - OUTER_RULES 6건 / 스모크 테스트 5건 ALL PASS
-- **다음 재개: runOuterLine(295)** — skill 재주입 후 실행 가능
+- **다음 재개: runOuterLine(295)** — ⏸ 잠정 보류 (2026-03-28)
