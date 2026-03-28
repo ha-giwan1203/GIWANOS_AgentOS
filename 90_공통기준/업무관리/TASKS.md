@@ -1,6 +1,6 @@
 # 업무리스트 작업 목록
 
-최종 업데이트: 2026-03-28 (자동화 동기화 파이프라인 Phase 1~4 완료)
+최종 업데이트: 2026-03-28 (상시 실행 등록, Slack 채널 테스트, 폴더 규칙 저장)
 
 ---
 
@@ -24,10 +24,16 @@
 - `99_임시수집` 내 미분류 파일 카테고리 배치
 - 각 도메인 내 신규 수집 파일 정기 점검
 
-### [낮] Slack 봇 토큰 갱신
+### [낮] Slack Bot Token 갱신 (사용자 직접)
 - 현재 `.env` 파일의 `SLACK_BOT_TOKEN` — `account_inactive` 상태
-- https://api.slack.com/apps → Bot Token Scopes: `chat:write`, `chat:write.public` → 재설치
-- 새 토큰을 `C:/Users/User/Desktop/gpt파일api/.env` 파일에 교체
+- https://api.slack.com/apps → 앱 선택 → OAuth & Permissions → Bot Token Scopes: `chat:write` → Reinstall
+- 새 토큰을 `C:/Users/User/Desktop/gpt파일api/.env`의 `SLACK_BOT_TOKEN=` 값에 교체
+- 갱신 후 `python slack_notify.py --message "토큰 갱신 테스트"` 실행
+
+### [낮] 작업 스케줄러 등록 (사용자 직접 — 재시작 옵션 적용)
+- CMD 열고 실행: `C:\Users\User\Desktop\업무리스트\90_공통기준\업무관리\register_watch_task.bat`
+- 현재는 Startup 폴더 방식으로 자동 시작되나, 재시작 옵션 없음
+- 스케줄러 등록 시 실패 후 1분 간격 3회 재시작 적용됨
 
 ### [낮] 도메인 STATUS.md 점검
 - `05_생산실적\조립비정산\STATUS.md` — 마이그레이션 이후 경로 반영 확인
@@ -55,3 +61,7 @@
 | 자동화 동기화 Phase 2 (commit_docs.py) | 2026-03-28 |
 | 자동화 동기화 Phase 3 (update_status_tasks.py) | 2026-03-28 |
 | 자동화 동기화 Phase 4 (slack_notify.py) | 2026-03-28 |
+| Slack 채널 연결 테스트 (MCP 경유) | 2026-03-28 |
+| watch_changes.py Startup 폴더 상시 실행 등록 | 2026-03-28 |
+| 작업 스케줄러 등록 파일 작성 (bat/xml) | 2026-03-28 |
+| 폴더 생성 규칙 메모리 저장 | 2026-03-28 |
