@@ -1,6 +1,6 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-28 (자동화 동기화 파이프라인 Phase 1~4 완료)
+최종 업데이트: 2026-03-28 (상시 실행 등록, Slack 채널 테스트 완료)
 
 ---
 
@@ -30,7 +30,11 @@
 | 자동화 동기화 Phase 1 (파일 감지) | 2026-03-28 | `watch_changes.py` + `auto_watch_config.yaml` — watchdog 30분 debounce |
 | 자동화 동기화 Phase 2 (Git 커밋) | 2026-03-28 | `commit_docs.py` + `auto_commit_config.yaml` — allowlist 기반 자동 커밋 |
 | 자동화 동기화 Phase 3 (STATUS/TASKS 갱신) | 2026-03-28 | `update_status_tasks.py` + `status_rules.yaml` |
-| 자동화 동기화 Phase 4 (Slack 알림) | 2026-03-28 | `slack_notify.py` + `slack_config.yaml` — 토큰 갱신 필요 |
+| 자동화 동기화 Phase 4 (Slack 알림) | 2026-03-28 | `slack_notify.py` + `slack_config.yaml` — MCP 경유 채널 발송 확인 |
+| watch_changes.py 상시 실행 등록 | 2026-03-28 | Startup 폴더 등록 완료 (`watch_changes_launcher.vbs`) |
+| 작업 스케줄러 등록 파일 작성 | 2026-03-28 | `register_watch_task.bat` / `watch_task.xml` — 사용자 직접 실행 필요 |
+| Slack 채널 연결 테스트 | 2026-03-28 | `#새-워크스페이스-전체` (C096LU8PH44) 발송 PASS |
+| 폴더 생성 규칙 메모리 저장 | 2026-03-28 | 루트 임의 폴더 생성 금지 규칙 — `memory/feedback_folder_creation_rules.md` |
 
 ---
 
@@ -42,6 +46,8 @@
 | 파일 정리 2차 (99_임시수집 분류) | 낮 | 미분류 임시 파일 카테고리 배치 |
 | 각 도메인 STATUS.md 점검 | 낮 | 조립비정산, 라인배치 STATUS.md 마이그레이션 이후 경로 반영 여부 확인 |
 | GitHub PR 머지 | 낮 | ha-giwan1203/GIWANOS_AgentOS#8 — main 병합 여부 확인 |
+| Slack Bot Token 갱신 | 낮 | `.env` 토큰 `account_inactive` — api.slack.com 재발급 후 교체 |
+| 작업 스케줄러 등록 | 낮 | `register_watch_task.bat` CMD에서 직접 실행 (재시작 옵션 적용) |
 
 ---
 
@@ -54,5 +60,8 @@
 | 조립비 기준정보 | `05_생산실적\조립비정산\01_기준정보\기준정보_라인별정리_최종_V1_20260316.xlsx` |
 | 스킬 패키지 위치 | `90_공통기준\스킬\` |
 | 운영 지침 문서 | `90_공통기준\업무관리\` |
+| 파일 감시 런처 | `90_공통기준\업무관리\watch_changes_launcher.vbs` |
+| 스케줄러 등록 배치 | `90_공통기준\업무관리\register_watch_task.bat` |
+| 스케줄러 XML | `90_공통기준\업무관리\watch_task.xml` |
 | 마이그레이션 증적 | `98_아카이브\마이그레이션_20260328\` |
 | 파일 정리 아카이브 | `98_아카이브\정리대기_20260328\` |
