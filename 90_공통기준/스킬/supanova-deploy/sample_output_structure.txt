@@ -1,0 +1,45 @@
+supanova-deploy 산출물 예시 구조
+=====================================
+
+supanova-deploy-output/
+  index.html                    # 최종 진입 파일. 상대경로 기준 동작.
+  assets/
+    css/
+      style.css                 # 메인 스타일시트
+      animation.css             # 스크롤 애니메이션 전용 CSS
+    js/
+      scroll.js                 # 프레임 시퀀스 스크롤 컨트롤러
+      main.js                   # 기타 인터랙션
+    img/
+      logo.png                  # 정적 이미지 자산
+      bg.webp                   # 배경 이미지 (영상 외)
+  frames/
+    0001.webp                   # WebP 프레임 시퀀스 시작
+    0002.webp
+    0003.webp
+    ...
+    0120.webp                   # 영상 길이에 따라 수량 다름 (보통 60~150장)
+  README_deploy.txt             # 배포 메타 정보
+
+=====================================
+README_deploy.txt 예시
+=====================================
+
+Template source: supanova 템플릿 #12 (다크모드 랜딩)
+Gemini model used: Gemini Pro
+Video ratio: 16:9
+Frame format: WebP
+Frame count: 120
+Entry file: index.html
+Deploy method: Netlify Drop (검수용 임시)
+Deploy URL: https://jolly-unicorn-abc123.netlify.app
+Known issues: 모바일 스크롤 속도 미최적화
+
+=====================================
+주의사항
+=====================================
+
+- frames/ 폴더 누락 시 배포 후 애니메이션 완전 깨짐
+- ZIP 파일을 Netlify Drop에 바로 올리면 안 됨 (output 폴더 기준)
+- index.html 내 절대경로 참조 시 배포 후 404 발생
+- Netlify Drop URL은 임시 — 운영 목적이면 Git 연동 필요

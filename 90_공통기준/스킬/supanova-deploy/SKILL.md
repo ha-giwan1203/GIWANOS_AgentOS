@@ -1,3 +1,13 @@
+---
+name: supanova-deploy
+description: >
+  Pinterest 레퍼런스 이미지 → Gemini Pro 16:9 영상 생성 → Claude Code WebP 프레임 변환 +
+  스크롤 애니메이션 → 템플릿 HTML 결합 → 정적 산출물 검증 → Netlify Drop 배포까지
+  재현 가능한 절차로 수행하는 영상 기반 랜딩 페이지 배포 스킬.
+  '수파노바 배포', '랜딩 영상 넣어줘', '스크롤 애니메이션 랜딩', 'Gemini 영상으로 웹페이지',
+  'WebP 프레임 변환', '템플릿 HTML + 영상 결합', 'Netlify Drop까지 묶어줘' 요청에서 발동한다.
+---
+
 # supanova-deploy
 
 ## 시작 전 입력 자산 확인
