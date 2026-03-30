@@ -72,5 +72,13 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-30 23:22 | modified | debate-mode.skill | 스킬 패키지 갱신 |
+| 2026-03-30 22:21 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-30 22:01 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-30 21:53 | moved    | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-30 20:47 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-30 20:47 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-30 19:49 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-30 19:45 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-30 19:37 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-30 18:30 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |

@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-03-30 (step7 Slack PNG 발송 성공 — files:write 스코프 추가 완료)
+최종 업데이트: 2026-03-31 (전체 폴더 정리 — 토론모드 중복 폴더 정리, debate-mode v2.4 동기화, _cache gitignore 추가, Plan-First 템플릿 2종 추가)
 
 ---
 
@@ -87,3 +87,5 @@
 | 조립비 정산 step7 시각화 PoC — HTML 대시보드 + PNG 생성 (GPT PASS) | 2026-03-30 |
 | watch_changes.py Phase 6 훅 — .skill 자동 설치 (skill_install.py) | 2026-03-30 |
 | step7 Slack PNG 발송 — files:write 스코프 추가, Slack files v2 API 3단계 완성 | 2026-03-30 |
+| Plan-First 워크플로우 도입 — CLAUDE.md 3개 규칙 + debate-mode.skill v2.4 + research/plan 템플릿 2종 | 2026-03-30 |
+| 전체 폴더 정리 — 토론모드 중복 폴더 제거, debate-mode 언패킹 v2.4 동기화, _cache gitignore 추가 | 2026-03-31 |

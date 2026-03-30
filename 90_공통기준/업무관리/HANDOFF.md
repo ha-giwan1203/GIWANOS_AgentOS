@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-03-30 (상태 원본 단일화 + 업무 원본 2계층 규칙 + 스킬 설치 + Notion 동기화 완료)
+최종 업데이트: 2026-03-31 (전체 폴더 정리 + Plan-First 워크플로우 도입 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 작업 목적
 
-상태 원본 단일화 규칙 확립 + 업무 원본 2계층 규칙 추가 + 스킬 버전 갱신/미설치 스킬 설치 + Notion 동기화 + GPT PASS 루틴 완료.
+전체 폴더 정리 + Plan-First 워크플로우 도입 (YouTube 영상 기반 GPT+Claude 공동작업 결과).
 
 ---
 
@@ -19,15 +19,14 @@
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| 신설 | `CLAUDE.md` | 상태 원본 단일화 규칙 섹션 + 업무 원본 계층 규칙 섹션 + 세션 시작 판단 규칙 섹션 추가. commit 597df4f2, 870bfb8b, 18fb0fed |
-| 재정의 | `TASKS.md` | 상태 유일 원본 선언 헤더 + 현업 원본과 역할 구분 주석 추가 |
-| 재정의 | `STATUS.md` | 완료 이력 테이블 삭제 → 운영 요약/재개 위치/주의사항/경로 전용으로 재구성. 상태성 표현 제거 |
-| 재정의 | `HANDOFF.md` | 상태 선언 제거, 세션 메모 전용 + TASK 참조 방식 가이드 명시 |
-| 설치 | 스킬 3종 | `chomul-module-partno`, `supanova-deploy`, `line-batch-outer-main` 미설치 스킬 AppData에 추출 |
-| 갱신 | `debate-mode` | v1.2 → v2.2 (contenteditable DIV 입력, 완료 감지 개선) |
-| 동기화 | Notion STATUS | commit 18fb0fed 기준 반영. 스케줄러 ✅ 완료, 신규 완료 항목 6건 추가. GPT PASS |
-| 동기화 | Notion TASKS | 대기 중 정리 (낮 우선순위 2건만 유지), 완료 이력 신규 행 추가. GPT PASS |
-| 확립 | 운영 루틴 | Claude→push→GPT PASS→Notion 동기화 루틴 정착 |
+| 추가 | `CLAUDE.md` | Plan-First 워크플로우 3개 규칙 (research.md 강제화, plan.md 승인 게이트, 인라인 주석 루프). commits eb23caf9, 4373ce93 |
+| 신설 | `debate-mode.skill` | v2.3→v2.4 Step 5-0 GPT 제안 검증 단계 추가 (신규/중복/충돌 판정, 승인 대기 없이 자동 진행). commits 55215ad4, e22aa4c2 |
+| 신설 | `90_공통기준/프롬프트/research_template.md` | ERP/MES 연동 제약·컬럼 구조·외부 연동 필드 포함. commits 8a5b1af9, cad543b6 |
+| 신설 | `90_공통기준/프롬프트/plan_template.md` | 승인 게이트·인라인 주석 루프·재개 위치 포함. commit 8a5b1af9 |
+| 정리 | `90_공통기준/업무관리/토론모드/` | 중복 폴더 → 98_아카이브/정리대기_20260331/ 이동 후 삭제 |
+| 정리 | `90_공통기준/스킬/debate-mode/` | v2.0 구버전 언패킹 폴더 → 아카이브 후 삭제 |
+| 동기화 | `90_공통기준/토론모드/debate-mode/SKILL.md` | v2.0 → v2.4 교체 |
+| 추가 | `.gitignore` | `03_정산자동화/_cache/` 스크립트 출력물 제외 규칙 추가 |
 
 ---
 
@@ -47,6 +46,7 @@
 1. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
 2. 루트 CLAUDE.md 하네스 원칙 승격 — 파일럿 2회 후 검토 (현재 1회 완료)
 3. 도메인 STATUS.md 점검 — 조립비정산, 라인배치
+4. 새 작업 시 research.md → plan.md 승인 → 구현 순서 준수 (Plan-First 워크플로우)
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
