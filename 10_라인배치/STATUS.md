@@ -1,4 +1,4 @@
-# 라인배치 진행 현황 (2026-03-22)
+# 라인배치 진행 현황 (2026-03-31 최신화)
 
 ## OUTER 라인 배치
 - 스킬: line-batch-management v9
@@ -6,7 +6,7 @@
 - 진행: idx 119~294 완료 (176건)
 - 다음 재개: runOuterLine(295)
 - ERP URL: http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do
-- 탭 ID: 1382924186
+- 탭 ID: 세션별 재확인 필요 (기존 1382924186은 구 세션값, 재접속 시 JS 함수 재주입 필수)
 
 ## 동기화 금지 구간
 매시 x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53
