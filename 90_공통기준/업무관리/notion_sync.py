@@ -148,12 +148,23 @@ def _append_blocks(page_id: str, blocks: list, token: str,
 
 
 def _get_page_blocks(page_id: str, token: str) -> list:
-    """페이지 최상위 블록 목록 조회."""
+    """페이지 최상위 블록 목록 조회 (pagination 지원)."""
     pid = page_id.replace("-", "")
-    result = _notion_request("GET", f"/blocks/{pid}/children?page_size=100", token, logger=None)
-    if result:
-        return result.get("results", [])
-    return []
+    all_blocks = []
+    cursor = None
+    while True:
+        endpoint = f"/blocks/{pid}/children?page_size=100"
+        if cursor:
+            endpoint += f"&start_cursor={cursor}"
+        result = _notion_request("GET", endpoint, token, logger=None)
+        if not result:
+            break
+        all_blocks.extend(result.get("results", []))
+        if result.get("has_more"):
+            cursor = result.get("next_cursor")
+        else:
+            break
+    return all_blocks
 
 
 def _find_heading_block_id(blocks: list, heading_text: str) -> str | None:
@@ -187,10 +198,14 @@ def _bullet_block(text: str) -> dict:
 
 
 def _heading3_block(text: str) -> dict:
+    # is_toggleable=True 필수 — False면 heading block에 children append 불가 (Notion API 제한)
     return {
         "object": "block",
         "type": "heading_3",
-        "heading_3": {"rich_text": [{"type": "text", "text": {"content": text}}]}
+        "heading_3": {
+            "rich_text": [{"type": "text", "text": {"content": text}}],
+            "is_toggleable": True,
+        }
     }
 
 
@@ -337,8 +352,10 @@ def sync_batch(batch_id: str, events: list,
     if not should_sync:
         return True
 
-    # 중복 방지
-    if _is_dup(batch_id, dedup_hours):
+    # 중복 방지 — STATUS/TASKS 페이지별 독립 추적 (부분 성공 재실행 시 중복 append 방지)
+    status_done = _is_dup(batch_id + "_s", dedup_hours)
+    tasks_done  = _is_dup(batch_id + "_t", dedup_hours)
+    if status_done and tasks_done:
         return True
 
     if dry_run:
@@ -351,14 +368,21 @@ def sync_batch(batch_id: str, events: list,
         logger.error("Notion 토큰 없음 — NOTION_TOKEN 환경변수 또는 .env 파일 확인")
         return False
 
-    retry  = notion_cfg.get("retry_count", 2)
-    ok1 = sync_status_page(batch_id, events, phase3_result or {}, phase2_result or {},
-                           token, cfg, logger)
-    ok2 = sync_tasks_page(batch_id, events, phase3_result or {},
-                          token, cfg, logger)
+    ok1 = False if not status_done else True
+    ok2 = False if not tasks_done else True
 
-    if ok1 and ok2:
-        _mark_done(batch_id, dedup_hours)
+    if not status_done:
+        ok1 = sync_status_page(batch_id, events, phase3_result or {}, phase2_result or {},
+                               token, cfg, logger)
+        if ok1:
+            _mark_done(batch_id + "_s", dedup_hours)
+
+    if not tasks_done:
+        ok2 = sync_tasks_page(batch_id, events, phase3_result or {},
+                              token, cfg, logger)
+        if ok2:
+            _mark_done(batch_id + "_t", dedup_hours)
+
     return ok1 and ok2
 
 

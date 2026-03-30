@@ -93,7 +93,7 @@ def get_error_log_path(root: str, log_dir: str, prefix: str) -> Path:
 def setup_error_logger(error_log_path: Path) -> logging.Logger:
     error_log_path.parent.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger("watch_errors")
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.INFO)
     handler = logging.FileHandler(error_log_path, encoding="utf-8")
     handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
     logger.addHandler(handler)
@@ -237,7 +237,8 @@ class WorkspaceEventHandler(FileSystemEventHandler):
 
 # ── 로그 라이터 ───────────────────────────────────────────────────────────
 
-def write_log_entries(entries: list, cfg: dict, dry_run: bool, error_logger: logging.Logger):
+def write_log_entries(entries: list, cfg: dict, dry_run: bool, error_logger: logging.Logger,
+                      batch_id: str = None):
     if not entries:
         return
 
@@ -246,7 +247,8 @@ def write_log_entries(entries: list, cfg: dict, dry_run: bool, error_logger: log
     log_prefix = cfg["logging"]["log_prefix"]
     log_path = get_log_path(root, log_dir, log_prefix)
 
-    batch_id = str(uuid.uuid4())[:8]
+    if batch_id is None:
+        batch_id = str(uuid.uuid4())[:8]
 
     records = []
     for abs_path, entry in entries:
@@ -395,7 +397,7 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
             ready = debouncer.flush_ready()
             if ready:
                 batch_id = str(_uuid.uuid4())[:8]
-                write_log_entries(ready, cfg, dry_run, error_logger)
+                write_log_entries(ready, cfg, dry_run, error_logger, batch_id=batch_id)
                 extra = _try_phase3_update(ready, repo_root, dry_run, error_logger)
                 phase3_result = {
                     "ok": len(extra) > 0,
@@ -414,7 +416,7 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
         ready = debouncer.flush_ready(now=time.time() + 999999)
         if ready:
             batch_id = str(_uuid.uuid4())[:8]
-            write_log_entries(ready, cfg, dry_run, error_logger)
+            write_log_entries(ready, cfg, dry_run, error_logger, batch_id=batch_id)
             extra = _try_phase3_update(ready, repo_root, dry_run, error_logger)
             phase3_result = {
                 "ok": len(extra) > 0,
@@ -450,6 +452,7 @@ def main():
         cfg["logging"]["error_prefix"],
     )
     error_logger = setup_error_logger(error_log_path)
+    error_logger.info(f"watch_changes.py 시작 | PID={os.getpid()} | root={root}")
 
     # Lock 획득 (dry-run은 lock 생략)
     lock = LockFile(lock_path)
