@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-30 (Step 6 FAIL 분리 구현 완료 + debate-mode v2.0)
+최종 업데이트: 2026-03-30 (Step6/7 완료 + debate-mode v2.0 패키징 완료)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -33,6 +33,8 @@
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
 | 완료 | ~~step7 WARNING 별도 섹션 표시~~ | commit 34b04828, GPT PASS |
+| 완료 | ~~샘플 XLSX 실검증~~ | step6+step7 실행 정상, 03_검증결과 시트 확인 |
+| 완료 | ~~debate-mode.skill 재빌드~~ | commit 65a534e4, v2.0 패키징, GPT PASS |
 | 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | 파일럿 검증 2회 이상 후 검토 (1회 완료) |
 | 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
 | 낮 | 도메인 STATUS.md 점검 | 10_라인배치 마이그레이션 경로 반영 확인 |
@@ -41,9 +43,8 @@
 
 ## 4. 다음 AI가 바로 할 일
 
-1. **샘플 XLSX 실검증** — step6+step7 파이프라인 실행 후 03_검증결과 시트 색상/행 배치 육안 확인 (GPT 권고)
-2. **debate-mode.skill 재빌드** — SKILL.md v2.0 반영 패키징 필요
-3. OUTER 라인 runOuterLine(295) 재개 — 10_라인배치/CLAUDE.md 참조
+1. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
+2. 루트 CLAUDE.md 하네스 원칙 승격 — 파일럿 검증 2회 이상 후 검토 (현재 1회 완료)
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
