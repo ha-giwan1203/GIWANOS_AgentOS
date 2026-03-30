@@ -102,4 +102,4 @@
 - 정산DB 반영 (정산결과 → 조립비_관리DB 업데이트)
 - 미매핑 품번 54건 검토
 - ~~Step 6 FAIL 분리 설계~~ → **완료** (commit aed19a12, GPT PASS)
-- step7_보고서.py WARNING 별도 섹션 표시 추가 (다음 작업)
+- ~~step7 WARNING 별도 섹션 추가~~ → **완료** (commit 34b04828, GPT PASS)
