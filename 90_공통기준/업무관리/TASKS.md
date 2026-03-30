@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-03-31 (루트 CLAUDE.md 하네스 검증 원칙 승격 — 공통 4원칙 추가, GPT 공동작업)
+최종 업데이트: 2026-03-31 (Phase 1-1 Hooks 하이브리드 도입 — 6건 hook + 스크립트 배치, GPT 조건부 승인)
 
 ---
 
@@ -89,3 +89,5 @@
 | 전체 폴더 정리 — 토론모드 중복 폴더 제거, debate-mode 언패킹 v2.4 동기화, _cache gitignore 추가 | 2026-03-31 |
 | 하네스 파일럿 2회차 — skill-creator harness 모드 3가지 한계 해결 (평가기준참조/KnownException/피드백루프), Evaluator PASS 95점 | 2026-03-31 |
 | 루트 CLAUDE.md 하네스 검증 원칙 승격 — 공통 4원칙(사용시점/3인체제/KnownException/피드백루프) GPT 공동작업 | 2026-03-31 |
+| 루트 CLAUDE.md 공동작업 운영 원칙 5항목 추가 + 공동작업 표 금지 반영 | 2026-03-31 |
+| Phase 1-1 Hooks 하이브리드 도입 — SessionStart/PreToolUse/Notification/ConfigChange/InstructionsLoaded/SessionEnd 6건, GPT 조건부 승인 | 2026-03-31 |
