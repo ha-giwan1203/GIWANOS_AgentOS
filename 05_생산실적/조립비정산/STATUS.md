@@ -92,7 +92,8 @@
 | 판정 차이 이유 | RSP 미매칭 4건은 STATUS.md 등록 Known Exception — 비즈니스 규칙상 GERP 원본금액 사용이 맞음. Evaluator는 감점 처리 |
 | 의의 | 하네스 Evaluator 도입 첫 실검증. Generator 내부 FAIL을 Evaluator가 Known Exception 반영해 PASS로 재판정 — 오판정 방지 효과 확인 |
 
-> 다음 2회차 전 검토 사항: Step 6 FAIL 항목을 "치명 오류"와 "Known Exception 경고"로 분리할지 설계 필요
+> Step 6 FAIL 2레벨 분리 완료 (2026-03-30, commit aed19a12): CRITICAL/WARNING 분리, KNOWN_EXCEPTIONS 레지스트리, overall 3단계(FAIL/WARNING/PASS). GPT 로직 PASS 판정.
+> 다음: step7_보고서.py에 WARNING 항목 별도 섹션 추가
 
 ## 남은 작업
 - ANAAS04/WAMAS01 단가 차이 실무 확인 (기준정보 47원 vs GERP 23원)
@@ -100,4 +101,5 @@
 - SD9A01/SP3M3 구ERP 주간수량 차이 원인 확인
 - 정산DB 반영 (정산결과 → 조립비_관리DB 업데이트)
 - 미매핑 품번 54건 검토
-- Step 6 FAIL 분리 설계 (치명 오류 vs Known Exception 경고) — 2회차 전 적용
+- ~~Step 6 FAIL 분리 설계~~ → **완료** (commit aed19a12, GPT PASS)
+- step7_보고서.py WARNING 별도 섹션 표시 추가 (다음 작업)
