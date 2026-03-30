@@ -4,7 +4,7 @@
 - 스킬: line-batch-management v9
 - 작업 대상: OUTER 라인, 674행
 - 진행: idx 119~294 완료 (176건)
-- 다음 재개: runOuterLine(295)
+- 다음 재개: ~~runOuterLine(295)~~ → **사용자 취소 (2026-03-31)**
 - ERP URL: http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do
 - 탭 ID: 세션별 재확인 필요 (기존 1382924186은 구 세션값, 재접속 시 JS 함수 재주입 필수)
 
@@ -22,4 +22,4 @@
 - v7.md → 98_아카이브/라인배치_스킬문서_v7_archived_20260328.md
 - ZIP 구조: line-batch-management/SKILL.md 확인
 - OUTER_RULES 6건 / 스모크 테스트 5건 ALL PASS
-- **다음 재개: runOuterLine(295)** — ⏸ 잠정 보류 (2026-03-28)
+- ~~다음 재개: runOuterLine(295)~~ — **사용자 취소 (2026-03-31)**
