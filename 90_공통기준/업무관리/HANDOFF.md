@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-30 (MCP 2종 추가 설치 — context7, sequential-thinking)
+최종 업데이트: 2026-03-30 (youtube-analysis 스킬 제작 완료)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -8,7 +8,7 @@
 
 ## 1. 이번 작업 목적
 
-MCP 2종 추가 설치 및 문서화: context7(최신 공식 문서 참조), sequential-thinking(단계별 사고 강제).
+YouTube URL → 자막 자동 추출 + 분석 스킬 제작. 매번 수동 복붙 없이 URL 하나로 영상 분석 가능.
 
 ---
 
@@ -16,11 +16,15 @@ MCP 2종 추가 설치 및 문서화: context7(최신 공식 문서 참조), seq
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| MCP 설치 | `~/.claude.json` (프로젝트) | context7, sequential-thinking 추가 (`claude mcp add`) |
-| 신규 | `90_공통기준/MCP/mcp_설치현황.md` | 전체 MCP 목록, 설정 파일 위치, 실무 프롬프트 |
-| 수정 | `90_공통기준/업무관리/STATUS.md` | MCP 설치 완료 항목 추가 |
-| 수정 | `90_공통기준/업무관리/TASKS.md` | MCP 설치 완료 이동 |
-| 수정 | `90_공통기준/업무관리/HANDOFF.md` | 본 문서 갱신 |
+| MCP 설치 | `~/.claude.json` (프로젝트) | context7, sequential-thinking 추가 |
+| 신규 | `90_공통기준/MCP/mcp_설치현황.md` | 전체 MCP 목록 문서화 |
+| 신규 | `90_공통기준/스킬/youtube-analysis/youtube_transcript.py` | 자막 추출 스크립트 |
+| 신규 | `90_공통기준/스킬/youtube-analysis/SKILL.md` | 스킬 정의 |
+| 신규 | `90_공통기준/스킬/youtube-analysis.skill` | ZIP 패키지 |
+| 신규 | `90_공통기준/프롬프트/YouTube_영상분석.md` | 프롬프트 템플릿 |
+| 수정 | `CLAUDE.md` (루트) | 스킬 기준표 youtube-analysis 추가 |
+| 수정 | `90_공통기준/업무관리/STATUS.md` | 완료 항목 추가 |
+| 수정 | `90_공통기준/업무관리/TASKS.md` | 완료 이동 |
 
 ---
 

@@ -1,6 +1,6 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-30 (MCP 2종 추가 설치 — context7, sequential-thinking)
+최종 업데이트: 2026-03-30 (youtube-analysis 스킬 제작 — URL → 자막 자동 추출 + 분석)
 
 ---
 
@@ -45,6 +45,9 @@
 | MCP context7 설치 | 2026-03-30 | `@upstash/context7-mcp` — 최신 공식 문서 실시간 참조 |
 | MCP sequential-thinking 설치 | 2026-03-30 | `@modelcontextprotocol/server-sequential-thinking` — 단계별 사고 강제 |
 | mcp_설치현황.md 신규 생성 | 2026-03-30 | `90_공통기준/MCP/mcp_설치현황.md` — 전체 MCP 목록 문서화 |
+| youtube-analysis 스킬 제작 | 2026-03-30 | `youtube_transcript.py` + `SKILL.md` + `.skill` 패키지 — URL → 자막 자동 추출 |
+| YouTube_영상분석.md 프롬프트 신규 | 2026-03-30 | `90_공통기준/프롬프트/YouTube_영상분석.md` |
+| CLAUDE.md 스킬 기준표 갱신 | 2026-03-30 | youtube-analysis 항목 추가 |
 
 ---
 

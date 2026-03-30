@@ -1,6 +1,6 @@
 # 업무리스트 작업 목록
 
-최종 업데이트: 2026-03-30 (MCP 2종 추가 설치 — context7, sequential-thinking)
+최종 업데이트: 2026-03-30 (youtube-analysis 스킬 제작 완료)
 
 ---
 
@@ -63,6 +63,8 @@
 | MCP context7 설치 (`@upstash/context7-mcp`) | 2026-03-30 |
 | MCP sequential-thinking 설치 (`@modelcontextprotocol/server-sequential-thinking`) | 2026-03-30 |
 | mcp_설치현황.md 신규 생성 (전체 MCP 목록·프롬프트 문서화) | 2026-03-30 |
+| youtube-analysis 스킬 제작 (URL → 자막 자동 추출 + 분석) | 2026-03-30 |
+| YouTube_영상분석.md 프롬프트 신규 생성 | 2026-03-30 |
 | Slack Bot Token 갱신 완료 — slack_notify.py 발송 성공, slack_config.yaml 경로 수정 | 2026-03-28 |
 | Slack 멘션 추가 — build_message + --message 경로 두 곳 mention_user_id 적용, 폰 알림 정상화 | 2026-03-28 |
 | 파일 정리 2차 확인 — 99_임시수집 비어있음, 추가 작업 없음 | 2026-03-28 |
