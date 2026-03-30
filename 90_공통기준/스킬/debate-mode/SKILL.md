@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v1.8
+version: v1.9
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -8,7 +8,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v1.8
+# 토론모드 (debate-mode) 스킬 v1.9
 
 ## 개요
 
@@ -170,6 +170,13 @@ Claude 작업 완료
 3. 로그 파일 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
 4. 첫 메시지 전송 후 URL이 `/c/` 형태로 바뀌면 즉시 `chat_url`을 로그 JSON에 저장
 
+### Step 1.5. 입력 전 미확인 응답 점검 (필수)
+
+메시지 전송 전 반드시 실행:
+1. `[data-message-author-role="assistant"]` 마지막 블록 텍스트 확인
+2. `last_reply_hash`와 비교 → 새 응답이 있으면 먼저 읽고 반영
+3. 새 응답이 없으면 예정대로 전송 진행
+
 ### Step 2. 초기 메시지 전송
 1. 핵심 로직 `1. 텍스트 입력 방식` 사용
 2. 스트리밍 완료 감지 (핵심 로직 `2.`)
@@ -178,8 +185,9 @@ Claude 작업 완료
 ### Step 3. 반박 생성 및 자동 전송
 1. GPT 응답 핵심 주장 3줄 요약
 2. 반박 포인트 2~3개 도출 (근거 + 대안 구조)
-3. **승인 없이** 바로 Step 2 방식으로 전송
-4. 완료 감지 → 읽기 → 반복
+3. **Step 1.5 점검 실행** (미확인 응답 없는지 재확인)
+4. **승인 없이** 바로 Step 2 방식으로 전송
+5. 완료 감지 → 읽기 → 반복
 
 ### Step 4. 종료 및 마무리
 - 설정 턴 수 도달 / "합의" 감지 / 동일 주장 2회 반복 시 종료
@@ -225,3 +233,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v1.6 | 2026-03-30 | 완료 감지 로직 전면 교체 — JS 폴링(CDP 타임아웃) 제거, get_page_text 10초 간격 5회 텍스트 비교 방식으로 대체. send-button 셀렉터 의존 제거 |
 | v1.7 | 2026-03-30 | 입력 방식 교체: innerHTML 폐기 → native value setter + InputEvent (React 상태 정상 동기화). contenteditable div 분기 추가. 전송 버튼 확인 로직 개선 (값 반영 1차, aria-disabled 포함 버튼 활성화 2차) |
 | v1.8 | 2026-03-30 | 출력 형식 규칙 추가: Claude/GPT 모두 표형식 출력 금지. 문단형/번호 목록형만 허용 |
+| v1.9 | 2026-03-30 | Step 1.5 신설: 입력 전 미확인 GPT 응답 점검 필수화. Step 3에 재확인 단계 추가 |
