@@ -1,6 +1,6 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-28 (PR #9 main 머지 완료 — 커넥터 운영구조 재정의 전체 반영)
+최종 업데이트: 2026-03-30 (MCP 2종 추가 설치 — context7, sequential-thinking)
 
 ---
 
@@ -42,6 +42,9 @@
 | HANDOFF.md 신규 생성 | 2026-03-28 | `90_공통기준/업무관리/HANDOFF.md` — AI 인수인계 문서 체계 신설 |
 | GitHub PR #9 생성 및 main 머지 | 2026-03-28 | 커넥터 재정의 전체 반영. merge SHA: `a00702cd`. 업무리스트 브랜치 삭제 완료 |
 | 현재 브랜치 | 2026-03-28 | `main` (origin/main과 동기화, clean) |
+| MCP context7 설치 | 2026-03-30 | `@upstash/context7-mcp` — 최신 공식 문서 실시간 참조 |
+| MCP sequential-thinking 설치 | 2026-03-30 | `@modelcontextprotocol/server-sequential-thinking` — 단계별 사고 강제 |
+| mcp_설치현황.md 신규 생성 | 2026-03-30 | `90_공통기준/MCP/mcp_설치현황.md` — 전체 MCP 목록 문서화 |
 
 ---
 
