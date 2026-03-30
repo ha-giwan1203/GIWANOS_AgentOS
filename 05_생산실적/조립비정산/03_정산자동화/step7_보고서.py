@@ -879,7 +879,7 @@ if s6 is not None:
     if notable:
         row += 1
         ws5.merge_cells(f'A{row}:E{row}')
-        ws5.cell(row, 1, '▶ 주의 항목 (WARNING / FAIL)')
+        ws5.cell(row, 1, '▶ 주의 항목 — WARNING / CRITICAL FAIL')
         ws5.cell(row, 1).font = Font(name='맑은 고딕', bold=True, size=9, color='C62828')
         ws5.cell(row, 1).fill = PatternFill('solid', fgColor='FFEBEE')
         row += 1
