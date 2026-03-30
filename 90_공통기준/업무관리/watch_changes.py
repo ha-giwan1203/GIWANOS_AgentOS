@@ -386,9 +386,22 @@ def _try_phase5_notion(batch_id: str, ready: list, phase3_result: dict,
         error_logger.error(f"Phase 5 훅 예외: {e}")
 
 
+def _try_phase6_skill_install(ready: list, repo_root: str, dry_run: bool,
+                               error_logger: logging.Logger) -> dict:
+    """Phase 6 스킬 자동 설치 훅. .skill 파일 변경 시 Claude skills 디렉토리에 자동 압축 해제."""
+    try:
+        import skill_install as _si
+        return _si.process_events(ready, repo_root, dry_run, error_logger)
+    except ImportError:
+        pass  # skill_install 미설치 — 건너뜀
+    except Exception as e:
+        error_logger.error(f"Phase 6 훅 예외: {e}")
+    return {}
+
+
 def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
                  error_logger: logging.Logger, stop_event: threading.Event):
-    """60초마다 debounce 완료 항목을 로그에 기록하고 Phase 3 → Phase 2 → Phase 4 → Phase 5 순으로 훅 호출."""
+    """60초마다 debounce 완료 항목을 로그에 기록하고 Phase 3 → Phase 2 → Phase 4 → Phase 5 → Phase 6 순으로 훅 호출."""
     import uuid as _uuid
     repo_root = cfg["watch"]["root"]
     while not stop_event.is_set():
@@ -408,6 +421,7 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
                                    dry_run, error_logger)
                 _try_phase5_notion(batch_id, ready, phase3_result, phase2_result,
                                    dry_run, error_logger)
+                _try_phase6_skill_install(ready, repo_root, dry_run, error_logger)
         except Exception as e:
             error_logger.error(f"flush_worker 예외: {e}")
 
@@ -427,6 +441,7 @@ def flush_worker(debouncer: Debouncer, cfg: dict, dry_run: bool,
                                dry_run, error_logger)
             _try_phase5_notion(batch_id, ready, phase3_result, phase2_result,
                                dry_run, error_logger)
+            _try_phase6_skill_install(ready, repo_root, dry_run, error_logger)
     except Exception as e:
         error_logger.error(f"종료 시 최종 플러시 실패: {e}")
 

@@ -36,6 +36,7 @@ watch:
     - ".xls"
     - ".docx"
     - ".pdf"
+    - ".skill"
 
 logging:
   log_dir: "90_공통기준/업무관리"

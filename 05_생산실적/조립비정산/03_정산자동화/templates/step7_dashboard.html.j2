@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ meta.base_month }} 조립비 정산 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic', sans-serif; background: #f4f6f9; color: #1a1a2e; }
+
+  /* ── 헤더 ── */
+  .header {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 { font-size: 20px; font-weight: 700; }
+  .header .sub { font-size: 13px; color: #aaa; margin-top: 4px; }
+  .badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .badge-PASS        { background: #22c55e; color: #fff; }
+  .badge-WARNING     { background: #f59e0b; color: #fff; }
+  .badge-CRITICAL_FAIL { background: #ef4444; color: #fff; }
+  .badge-NA          { background: #6b7280; color: #fff; }
+
+  /* ── 본문 레이아웃 ── */
+  .body { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+
+  /* ── 요약 카드 ── */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .card .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .card .value { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+  .card .value.positive { color: #ef4444; }
+  .card .value.negative { color: #2563eb; }
+  .card .sub-value { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+  /* ── 2컬럼 레이아웃 ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  /* ── 공통 박스 ── */
+  .box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .box h2 { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px;
+             padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+
+  /* ── 라인별 상세표 ── */
+  .full-box { background: #fff; border-radius: 10px; padding: 20px;
+              box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 24px; }
+  .full-box h2 { font-size: 14px; font-weight: 700; margin-bottom: 16px;
+                 padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #f8fafc; padding: 10px 12px; text-align: right;
+             border-bottom: 1px solid #e5e7eb; color: #555; font-weight: 600; }
+  thead th:first-child { text-align: left; }
+  tbody td { padding: 9px 12px; text-align: right; border-bottom: 1px solid #f0f0f0; }
+  tbody td:first-child { text-align: left; font-weight: 500; }
+  tbody tr:hover { background: #f9fafb; }
+  .rank-badge { display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+                background: #e5e7eb; font-size: 11px; font-weight: 700;
+                text-align: center; line-height: 22px; margin-right: 6px; }
+  .rank-1 { background: #ffd700; color: #333; }
+  .rank-2 { background: #c0c0c0; color: #333; }
+  .rank-3 { background: #cd7f32; color: #fff; }
+  .diff-pos { color: #ef4444; font-weight: 600; }
+  .diff-neg { color: #2563eb; font-weight: 600; }
+  .diff-zero { color: #888; }
+
+  /* ── 이상치 ── */
+  .anomaly-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid #f59e0b;
+    background: #fffbeb;
+    font-size: 13px;
+  }
+  .anomaly-item.CRITICAL_FAIL { border-color: #ef4444; background: #fef2f2; }
+  .anomaly-item .a-title { font-weight: 700; margin-bottom: 4px; }
+  .anomaly-item .a-detail { color: #666; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+  .no-anomaly { color: #22c55e; font-weight: 600; font-size: 14px; text-align: center; padding: 20px 0; }
+
+  /* ── 인사이트 ── */
+  .insights { display: flex; flex-direction: column; gap: 10px; }
+  .insight-item {
+    padding: 12px 16px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .insight-num { font-weight: 700; color: #4f46e5; min-width: 20px; }
+
+  /* ── 푸터 ── */
+  .footer { text-align: center; color: #bbb; font-size: 11px; padding: 16px 0 24px; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div>
+    <div class="h1">{{ meta.base_month }} 월간 조립비 정산 대시보드</div>
+    <div class="sub">{{ meta.company_name }} &nbsp;|&nbsp; 생성: {{ meta.generated_at }}</div>
+  </div>
+  <div>
+    <span class="badge badge-{{ summary.validation_result }}">{{ summary.validation_result }}</span>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- 요약 카드 -->
+  <div class="cards">
+    <div class="card">
+      <div class="label">총 조립비 (GERP)</div>
+      <div class="value">{{ "{:,}".format(summary.total_cost) }}원</div>
+      <div class="sub-value">{{ meta.base_month }} 기준</div>
+    </div>
+    <div class="card">
+      <div class="label">구ERP 합계</div>
+      <div class="value">{{ "{:,}".format(summary.erp_total_cost) }}원</div>
+      <div class="sub-value">비교용</div>
+    </div>
+    <div class="card">
+      <div class="label">차이 (GERP − 구ERP)</div>
+      <div class="value {% if summary.diff_total > 0 %}positive{% elif summary.diff_total < 0 %}negative{% endif %}">
+        {% if summary.diff_total > 0 %}+{% endif %}{{ "{:,}".format(summary.diff_total) }}원
+      </div>
+      <div class="sub-value">{{ "%.1f"|format(summary.diff_total / summary.total_cost * 100) if summary.total_cost }}%</div>
+    </div>
+    <div class="card">
+      <div class="label">라인 수 / 이상치</div>
+      <div class="value">{{ summary.line_count }}개
+        {% if summary.anomaly_count > 0 %}
+        <span style="font-size:14px;color:#f59e0b;"> / {{ summary.anomaly_count }}건</span>
+        {% else %}
+        <span style="font-size:14px;color:#22c55e;"> / 0건</span>
+        {% endif %}
+      </div>
+      <div class="sub-value">라인 / 이상치</div>
+    </div>
+  </div>
+
+  <!-- 차트 + 이상치 (2컬럼) -->
+  <div class="two-col">
+    <!-- 가로막대차트 -->
+    <div class="box">
+      <h2>라인별 조립비 (GERP 기준, 원)</h2>
+      <canvas id="barChart" height="280"></canvas>
+    </div>
+    <!-- 이상치/검증 -->
+    <div class="box">
+      <h2>이상치 / 검증 결과</h2>
+      {% if anomalies %}
+        {% for a in anomalies %}
+        <div class="anomaly-item {{ a.status }}">
+          <div class="a-title">[{{ a.status }}] {{ a.name }}</div>
+          <div class="a-detail">{{ a.detail }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-anomaly">이상치 없음 — PASS</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 라인별 상세표 -->
+  <div class="full-box">
+    <h2>라인별 상세 (금액 내림차순)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left">순위&nbsp;&nbsp;라인명</th>
+          <th>GERP 금액 (원)</th>
+          <th>구ERP 금액 (원)</th>
+          <th>차이 (원)</th>
+          <th>비중 (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in line_costs %}
+        <tr>
+          <td>
+            <span class="rank-badge {% if r.rank <= 3 %}rank-{{ r.rank }}{% endif %}">{{ r.rank }}</span>
+            {{ r.line_name }}
+          </td>
+          <td>{{ "{:,}".format(r.current_cost) }}</td>
+          <td>{{ "{:,}".format(r.erp_cost) }}</td>
+          <td class="{% if r.diff_amount > 0 %}diff-pos{% elif r.diff_amount < 0 %}diff-neg{% else %}diff-zero{% endif %}">
+            {% if r.diff_amount > 0 %}+{% endif %}{{ "{:,}".format(r.diff_amount) }}
+          </td>
+          <td>{{ r.share_rate }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 인사이트 -->
+  <div class="full-box">
+    <h2>3줄 인사이트</h2>
+    <div class="insights">
+      {% for insight in insights %}
+      <div class="insight-item">
+        <span class="insight-num">{{ loop.index }}</span>
+        <span>{{ insight }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div><!-- /body -->
+
+<div class="footer">
+  {{ meta.company_name }} &nbsp;|&nbsp; {{ meta.base_month }} &nbsp;|&nbsp;
+  Pipeline: {{ meta.source_pipeline }} {{ meta.source_version }} &nbsp;|&nbsp;
+  {{ meta.generated_at }}
+</div>
+
+<script>
+const chartData = {{ chart_data | tojson }};
+
+const ctx = document.getElementById('barChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: chartData.labels,
+    datasets: [{
+      label: 'GERP 금액',
+      data: chartData.gerp_values,
+      backgroundColor: 'rgba(79, 70, 229, 0.75)',
+      borderRadius: 4,
+    }, {
+      label: '구ERP 금액',
+      data: chartData.erp_values,
+      backgroundColor: 'rgba(156, 163, 175, 0.6)',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.dataset.label + ': ' + ctx.raw.toLocaleString() + '원'
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          callback: v => (v / 1e6).toFixed(0) + 'M',
+          font: { size: 10 }
+        }
+      },
+      y: { ticks: { font: { size: 11 } } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>

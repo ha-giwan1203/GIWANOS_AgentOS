@@ -21,6 +21,28 @@
 
 ## 대기 중 (우선순위 순)
 
+### [중] 조립비 정산 step7 시각화 자동화 도입
+- 목적: 조립비 정산 파이프라인의 step7 보고서 단계에 Visualization 스킬을 연결해 HTML 대시보드 + PNG 보고 이미지를 자동 생성
+- 기준 원본: `05_생산실적/조립비정산/`
+- 적용 범위: 월간 조립비 정산 결과 요약, 라인별 금액 비교, 전월 대비 증감, 이상치/누락 표시, 3줄 인사이트
+- 출력 목표: HTML 1장 (`월간_조립비_대시보드.html`) + PNG 1장 + Slack 보고용 이미지
+- 구현 원칙: 계산/검증은 기존 정산 파이프라인(step1~6) 유지, Visualization은 step7 출력 전용
+- 선행 조건: step7 요약 데이터 구조 확정, 라인명/금액/전월비교/이상치 판정 기준 고정, 시범 1회 생성 후 GPT PASS
+- 완료 기준: 월 1회 실행 가능한 HTML + PNG 자동 생성, Slack 또는 보고서 삽입 재사용 가능
+- 참조: Visualization 스킬 (커리어해커 알렉스 영상 분석 기반, 2026-03-30)
+
+**진행 현황 (2026-03-30)**
+- [완료] step7_시각화입력생성.py 작성 + 실데이터 검증
+  - 출력: `_cache/step7_visualization_input.json`
+  - 검증: total_cost=179,180,199원 / 10라인 / anomaly=1건(SP3M3 Known WARNING) / 합계 일치
+- [완료] step7_대시보드.py + templates/step7_dashboard.html.j2 작성 + 실행 검증
+  - HTML + PNG 생성 확인 (Playwright headless shell)
+  - 구성: Jinja2 템플릿 / Chart.js CDN / Playwright PNG
+  - 출력: `_cache/월간_조립비_대시보드.html` + `_cache/월간_조립비_대시보드.png`
+- [완료] watch_changes.py Phase 6 훅 추가 (skill_install.py) + .skill 확장자 감시 등록
+- [대기] GPT PASS 확인 후 TASKS.md DONE 전환
+- [다음] Slack 보고 이미지 연결 (3차)
+
 ### [낮] 루트 CLAUDE.md 하네스 원칙 승격 (보류)
 - 조건: 파일럿 검증 2회 이상 완료 후 검토
 - 현재 1회 완료
