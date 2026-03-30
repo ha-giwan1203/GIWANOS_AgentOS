@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-03-31 (전체 폴더 정리 + Plan-First 워크플로우 도입 완료)
+최종 업데이트: 2026-03-31 (하네스 파일럿 2회차 완료 — skill-creator harness 모드 개선, Evaluator PASS 95점)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 작업 목적
 
-전체 폴더 정리 + Plan-First 워크플로우 도입 (YouTube 영상 기반 GPT+Claude 공동작업 결과).
+하네스 파일럿 2회차 — skill-creator harness 모드 3가지 한계 해결 (Plan-First 첫 실전 적용).
 
 ---
 
@@ -19,14 +19,11 @@
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| 추가 | `CLAUDE.md` | Plan-First 워크플로우 3개 규칙 (research.md 강제화, plan.md 승인 게이트, 인라인 주석 루프). commits eb23caf9, 4373ce93 |
-| 신설 | `debate-mode.skill` | v2.3→v2.4 Step 5-0 GPT 제안 검증 단계 추가 (신규/중복/충돌 판정, 승인 대기 없이 자동 진행). commits 55215ad4, e22aa4c2 |
-| 신설 | `90_공통기준/프롬프트/research_template.md` | ERP/MES 연동 제약·컬럼 구조·외부 연동 필드 포함. commits 8a5b1af9, cad543b6 |
-| 신설 | `90_공통기준/프롬프트/plan_template.md` | 승인 게이트·인라인 주석 루프·재개 위치 포함. commit 8a5b1af9 |
-| 정리 | `90_공통기준/업무관리/토론모드/` | 중복 폴더 → 98_아카이브/정리대기_20260331/ 이동 후 삭제 |
-| 정리 | `90_공통기준/스킬/debate-mode/` | v2.0 구버전 언패킹 폴더 → 아카이브 후 삭제 |
-| 동기화 | `90_공통기준/토론모드/debate-mode/SKILL.md` | v2.0 → v2.4 교체 |
-| 추가 | `.gitignore` | `03_정산자동화/_cache/` 스크립트 출력물 제외 규칙 추가 |
+| 수정 | `skill-creator-merged.skill` | harness 모드 Known Exception 처리 규칙 추가, 피드백 루프 4단계 절차표 교체. commit c7dd616f |
+| 신설 | `90_공통기준/업무관리/research_하네스2회차.md` | 1회차 결과 현황·구조 파악·변경 영향 범위. SHA: a8c9a892 |
+| 신설 | `90_공통기준/업무관리/plan_하네스2회차.md` | Step 1-3 구현 계획, GPT PASS 승인완료. SHA: 54272678 |
+| 완료 | `plan_하네스2회차.md` | Step 1-3 체크박스 완료, Evaluator PASS 95점 기록 |
+| 갱신 | `TASKS.md` | 하네스 2회차 완료 항목 추가, 루트 CLAUDE.md 승격 조건 충족 표시 |
 
 ---
 
@@ -36,15 +33,15 @@
 
 | 우선순위 | TASKS 참조 항목 | 비고 |
 |---------|---------------|------|
-| 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | 파일럿 검증 2회 이상 후 검토 (1회 완료) |
+| 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | **파일럿 2회 완료 조건 충족** (1회차 94점, 2회차 95점) |
 | 낮 | 도메인 STATUS.md 점검 | 조립비정산, 라인배치 STATUS.md 경로 반영 확인 |
 
 ---
 
 ## 4. 다음 AI가 바로 할 일
 
-1. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
-2. 루트 CLAUDE.md 하네스 원칙 승격 — 파일럿 2회 후 검토 (현재 1회 완료)
+1. **루트 CLAUDE.md 하네스 원칙 승격** — 파일럿 2회 완료 조건 충족, 승격 내용 확정 후 적용
+2. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
 3. 도메인 STATUS.md 점검 — 조립비정산, 라인배치
 4. 새 작업 시 research.md → plan.md 승인 → 구현 순서 준수 (Plan-First 워크플로우)
 
