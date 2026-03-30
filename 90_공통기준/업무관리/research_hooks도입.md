@@ -86,7 +86,7 @@
 2. **PostToolUse(Write/Edit)**: 파일 수정 후 자동 git add + 변경 로그 기록
 3. **Notification**: Slack 알림 자동 발송 (기존 slack_notify.py 연동)
 4. **SessionEnd**: 세션 종료 시 HANDOFF.md 갱신 리마인드
-5. **FileChanged**: .skill 파일 변경 시 자동 설치 (기존 Phase 6 대체)
+5. **ConfigChange**: 스킬 설정 변경 감지 로그 (GPT 수정: FileChanged → ConfigChange, 오발동 방지)
 6. **PreToolUse(Bash)**: 위험 명령 차단 (rm -rf 등)
 
 ### Hooks로 이동 불가 (watcher 유지)

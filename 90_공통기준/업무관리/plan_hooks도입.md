@@ -79,15 +79,15 @@
 
 ## 진행 상태
 
-- [ ] research.md 완성 — GO
-- [ ] plan.md GPT 승인
-- [ ] 구현
-- [ ] 검증
-- [ ] 완료
+- [x] research.md 완성 — GO
+- [x] plan.md GPT 조건부 승인
+- [x] 구현 (settings.local.json + 스크립트 6건, PreToolUse 제거)
+- [ ] 검증 (다음 세션 /hooks 증빙)
+- [x] 운영상 완료 (Git 반영 커밋 e3d1cb06, ea7baece)
 
 ---
 
 ## 재개 위치
 
-- 현재 단계: plan.md GPT 검토 대기
-- 다음: GPT PASS 후 Step 1부터 순차 구현
+- 현재 단계: **운영상 완료**, 검증 증적만 다음 세션에서 남기면 최종 PASS
+- 다음: Phase 4 (도메인 STATUS.md 점검 + 정산 파이프라인 확인)
