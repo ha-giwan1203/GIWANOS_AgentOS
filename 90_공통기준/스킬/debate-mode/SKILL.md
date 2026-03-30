@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v1.5
+version: v1.6
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -75,18 +75,21 @@ const poll = setInterval(() => {
 
 > **v1.4 변경**: HTML escape 추가 (< > & 문자 입력 오류 방지), setTimeout → polling으로 전환 (버튼 활성화 타이밍 대응)
 
-### 2. 완료 감지 (2중 조건)
+### 2. 완료 감지 (get_page_text 텍스트 비교 방식)
 
-```javascript
-// 조건 1: 스트리밍 중지 버튼 소멸
-// polling: button[aria-label="스트리밍 중지"] 가 false 될 때까지 대기
+> JS 폴링(setInterval)은 CDP 45초 타임아웃으로 사용 불가. send-button/스트리밍 버튼 셀렉터는 GPT UI 버전에 따라 없을 수 있음.
+> **유일하게 신뢰 가능한 방법: get_page_text 2회 비교**
 
-// 조건 2: 텍스트 안정성 (소멸 후 3초 대기 후 재확인)
-const text1 = getLastAssistantText();
-await sleep(3000);
-const text2 = getLastAssistantText();
-if (text1 === text2) → 완료 확정
 ```
+Step 1. 전송 직후 get_page_text → text_before 저장
+Step 2. 10초 대기 (Bash sleep 또는 다음 tool call 자연 지연)
+Step 3. get_page_text → text_after
+Step 4. text_before == text_after → 아직 미응답 → 10초 더 대기 후 재시도
+         text_before != text_after AND 마지막 발화자가 assistant → 완료 판정
+Step 5. 최대 5회(50초) 반복. 초과 시 사용자에게 "GPT 응답 대기 중" 보고
+```
+
+완료 판정 기준: `[data-message-author-role="assistant"]` 마지막 블록이 내 전송 메시지 이후에 추가됨
 
 ### 3. 응답 읽기 우선순위
 
@@ -175,8 +178,8 @@ Claude 작업 완료
 
 | 상황 | 대응 |
 |------|------|
-| send-button 미감지 | polling 300ms×10회 재시도. 3초 내 미활성 시 타임아웃 경고 |
-| 스트리밍 완료 미감지 | 10초씩 3회 polling. 실패 시 텍스트 안정성만으로 판단 |
+| send-button 미감지 | get_page_text 텍스트 비교 방식으로 대체 (send-button은 GPT UI 버전에 따라 없을 수 있음) |
+| 스트리밍 완료 미감지 | get_page_text 10초 간격 최대 5회 비교. 텍스트 변화 없으면 사용자에게 보고 |
 | 응답 텍스트 미추출 | fallback 순서대로 (read_page → get_page_text) |
 | 로그인 만료 | 사용자에게 재로그인 요청 후 대기 |
 
@@ -205,3 +208,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v1.4 | 2026-03-30 | HTML escape 추가, setTimeout → send-button polling (300ms×10회), chat_url 재사용 로직 명시 |
 | v1.4.1 | 2026-03-30 | 오류 대응 표 polling 문구 통일, 완료 감지 대기 5초→3초 통일 |
 | v1.5 | 2026-03-30 | GPT Evaluator 루틴 추가 — PASS/FAIL 키워드 자동 감지 + 판정에 따른 자동 분기. "바로 적용할까요?" 재확인 버그 수정 |
+| v1.6 | 2026-03-30 | 완료 감지 로직 전면 교체 — JS 폴링(CDP 타임아웃) 제거, get_page_text 10초 간격 5회 텍스트 비교 방식으로 대체. send-button 셀렉터 의존 제거 |
