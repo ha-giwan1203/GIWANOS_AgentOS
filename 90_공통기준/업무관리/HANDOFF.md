@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-30 (debate-mode v1.4.1 + GPT 협업 루틴 확립)
+최종 업데이트: 2026-03-30 (하네스 1회차 실검증 PASS + debate-mode v1.4.1 + GPT 협업 루틴 확립)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -31,9 +31,9 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 중 | 하네스 파일럿 검증 | 조립비정산 다음 실행 시 Evaluator 기준표 실제 적용 확인 |
-| 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | 파일럿 검증 2회 이상 후 검토 |
-| 낮 | skill-creator 스킬에 3단계 절차 연결 | 경로 확인됨 (`skill-creator-merged.skill`) — 다음 턴 |
+| 중 | Step 6 FAIL 분리 설계 | 치명 오류 vs Known Exception 경고 2레벨 분리. `step6_검증.py` 수정. 설계 후 GPT 검토 필요 |
+| 중 | skill-creator 3단계 절차 연결 | `skill-creator-merged.skill` 구조 파악 → 절차 설계 → 삽입 |
+| 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | 파일럿 검증 2회 이상 후 검토 (1회 완료) |
 | 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
 | 낮 | 도메인 STATUS.md 점검 | 10_라인배치 마이그레이션 경로 반영 확인 |
 
@@ -41,9 +41,11 @@
 
 ## 4. 다음 AI가 바로 할 일
 
-1. 조립비정산 파이프라인 실행 시 `05_생산실적/조립비정산/CLAUDE.md` Evaluator 기준표 적용
-2. skill-creator-merged.skill 파일 열어 Planner→Generator→Evaluator 절차 연결 검토
+1. **Step 6 분리 설계** — `step6_검증.py` 열어 FAIL 항목을 치명/Known Exception 경고로 분리. GPT에 설계안 공유 후 적용
+2. **skill-creator-merged.skill 구조 파악** — 파일 열어 현재 절차 확인 후 Planner→Generator→Evaluator 3단계 연결 설계
 3. OUTER 라인 runOuterLine(295) 재개 — 10_라인배치/STATUS.md 참조
+
+**GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
 ---
 
