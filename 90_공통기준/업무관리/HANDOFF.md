@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-30 (Step6/7 완료 + debate-mode v2.0 패키징 완료)
+최종 업데이트: 2026-03-30 (Notion 대시보드 재구조화 + Phase 5 안정화 + 문서 정합성 수정)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -8,8 +8,7 @@
 
 ## 1. 이번 작업 목적
 
-하네스 엔지니어링(Planner→Generator→Evaluator 3인 체제) 파일럿 도입.
-조립비정산 도메인부터 Evaluator 기준표 적용. 루트 CLAUDE.md 반영은 검증 후 승격.
+Phase 5(notion_sync.py) 안정화 + Notion 업무리스트 운영 대시보드 재구조화 + TASKS/STATUS/HANDOFF 문서 정합성 수정.
 
 ---
 
@@ -17,13 +16,13 @@
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| 수정 | `05_생산실적/조립비정산/CLAUDE.md` | 하네스 Evaluator 기준표 섹션 추가 |
-| 신규 | `90_공통기준/업무관리/하네스_운영가이드.md` | 3인 체제 / 컨텍스트 리셋 / 판정 규칙 (DRAFT) |
-| 신규 | `90_공통기준/업무관리/하네스_스킬평가기준표.md` | 스킬 Rubric / 판정 기준 (DRAFT) |
-| 수정 | `90_공통기준/스킬/skill-creator-merged.skill` | `harness` 모드 추가 — Planner→Generator→Evaluator 3단계 + 평가기준표 연결 + 피드백 루프 |
-| 수정 | `90_공통기준/스킬/debate-mode/SKILL.md` | **v2.0** — 입력방식(native setter+InputEvent), 표형식 금지, Step1.5 미확인응답 점검, push 완료 후 GPT 보고 순서 강제 |
-| 수정 | `05_생산실적/조립비정산/03_정산자동화/step6_검증.py` | **FAIL 2레벨 분리** — KNOWN_EXCEPTIONS 레지스트리, `chk()` severity 파라미터, SP3M3 RSP 미매칭 → WARNING, overall 3단계(FAIL/WARNING/PASS) |
-| 완료 | Notion 자동화 | STATUS/TASKS 페이지에 GPT 자동 분류 시스템 통합 연결 완료, notion_sync.py 동작 확인 |
+| 수정 | `90_공통기준/업무관리/notion_sync.py` | heading-as-container 폐기 → 페이지 직접 append. pagination, per-page dedup 추가. commit fa8a04fa, 562dffab |
+| 수정 | `90_공통기준/업무관리/watch_changes_launcher.vbs` | 한글 경로 인코딩 문제 제거 — WScript.ScriptFullName 기반 상대경로 |
+| 완료 | 작업 스케줄러 등록 | `업무리스트_WatchChanges` 로그온 트리거 등록. Python 직접 실행(VBS 우회). PID 정상 확인 |
+| 완료 | Slack Bot Token 갱신 | .env 교체 완료, Phase 4 정상 동작 |
+| 재구조화 | Notion 📁 업무리스트 운영 | GPT 제안 구조 반영: 운영요약/파이프라인상태/미완료작업/완료이력/바로가기 |
+| 수정 | `90_공통기준/업무관리/TASKS.md` | Step6 FAIL분리 [완료] 처리, 스케줄러 [완료] 처리 |
+| 수정 | `90_공통기준/업무관리/STATUS.md` | 미완료 목록 정리 (스케줄러/Step6 제거) |
 | 확립 | 운영 루틴 | Claude→push→GPT Evaluator 검증→PASS 확정 루틴 정착 |
 
 ---
@@ -32,19 +31,17 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 완료 | ~~step7 WARNING 별도 섹션 표시~~ | commit 34b04828, GPT PASS |
-| 완료 | ~~샘플 XLSX 실검증~~ | step6+step7 실행 정상, 03_검증결과 시트 확인 |
-| 완료 | ~~debate-mode.skill 재빌드~~ | commit 65a534e4, v2.0 패키징, GPT PASS |
+| 중 | 상태 원본 단일화 설계 | TASKS/STATUS/HANDOFF/Notion이 같은 상태를 각자 보유 → 정합성 문제 반복 원인. 다음 세션 검토 |
 | 낮 | 루트 CLAUDE.md 하네스 원칙 승격 | 파일럿 검증 2회 이상 후 검토 (1회 완료) |
-| 낮 | 작업 스케줄러 등록 | register_watch_task.bat CMD 직접 실행 필요 |
-| 낮 | 도메인 STATUS.md 점검 | 10_라인배치 마이그레이션 경로 반영 확인 |
+| 낮 | 도메인 STATUS.md 점검 | 조립비정산, 라인배치 STATUS.md 경로 반영 확인 |
 
 ---
 
 ## 4. 다음 AI가 바로 할 일
 
-1. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
-2. 루트 CLAUDE.md 하네스 원칙 승격 — 파일럿 검증 2회 이상 후 검토 (현재 1회 완료)
+1. **상태 원본 단일화 설계** — TASKS/STATUS/HANDOFF/Notion이 같은 항목을 각자 보유하는 구조가 정합성 문제의 근본 원인. GPT와 설계 방향 상의 후 구현
+2. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
+3. 루트 CLAUDE.md 하네스 원칙 승격 — 파일럿 2회 후 검토 (현재 1회 완료)
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
