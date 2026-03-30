@@ -1,6 +1,6 @@
 # 업무리스트 작업 목록
 
-최종 업데이트: 2026-03-30 (하네스 엔지니어링 파일럿 도입)
+최종 업데이트: 2026-03-30 (skill-creator harness 모드 추가 + Notion 자동화 완료)
 
 ---
 
@@ -25,9 +25,11 @@
 - 대상 파일: `05_생산실적/조립비정산/03_정산자동화/step6_검증.py`
 - 설계 후 GPT 검토 → 적용
 
-### [낮] skill-creator 3단계 절차 연결
-- `90_공통기준/스킬/skill-creator-merged.skill` 파일 열어 Planner→Generator→Evaluator 절차 추가
-- `하네스_스킬평가기준표.md` 참조 기준으로 연결
+### [완료] skill-creator 3단계 절차 연결 — 2026-03-30
+- `skill-creator-merged.skill` SKILL.md에 `harness` 모드 추가 (모드 테이블 + 규칙 + 3단계 섹션)
+- Stage 1 Planner / Stage 2 Generator / Stage 3 Evaluator 절차 명문화
+- 평가 기준표: `하네스_스킬평가기준표.md` 연결, PASS/CONDITIONAL/FAIL/BLOCKED 판정 포함
+- 컨텍스트 분리 원칙 및 피드백 루프 (최대 3회) 포함
 
 ### [낮] 루트 CLAUDE.md 하네스 원칙 승격 (보류)
 - 조건: 파일럿 검증 2회 이상 완료 후 검토
