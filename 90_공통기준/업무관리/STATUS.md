@@ -50,6 +50,9 @@
 | CLAUDE.md 스킬 기준표 갱신 | 2026-03-30 | youtube-analysis 항목 추가 |
 | 하네스 엔지니어링 파일럿 도입 | 2026-03-30 | GPT/Claude 토론 합의 — 조립비정산 Evaluator 기준표 + 운영가이드 + 스킬평가기준표 (DRAFT) |
 | debate-mode v1.3 개선 | 2026-03-30 | 전송 로직(`<p>` 태그 + setTimeout + send-button), 승인 절차 제거, 지정 채팅방 명확화 |
+| debate-mode v1.4 개선 | 2026-03-30 | HTML escape + send-button polling(300ms×10) + chat_url 재사용. GPT PASS(8fd031c6) |
+| debate-mode v1.4.1 패치 | 2026-03-30 | 문서 표현 통일 (오류대응 표 + 완료감지 대기). GPT PASS(58f27fde) |
+| GPT 협업 루틴 정착 | 2026-03-30 | Claude(Planner+Generator)→push→GPT(Evaluator) 검증→PASS 확정 루틴 확립 |
 
 ---
 

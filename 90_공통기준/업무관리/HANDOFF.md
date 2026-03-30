@@ -1,6 +1,6 @@
 # HANDOFF — AI 인수인계 문서
 
-최종 업데이트: 2026-03-30 (debate-mode v1.3 개선 + 하네스 파일럿)
+최종 업데이트: 2026-03-30 (debate-mode v1.4.1 + GPT 협업 루틴 확립)
 이 문서는 AI 세션 시작 시 가장 먼저 읽는다.
 읽기 순서: HANDOFF.md → STATUS.md → TASKS.md → CLAUDE.md → 도메인 CLAUDE.md
 
@@ -21,8 +21,9 @@
 | 신규 | `90_공통기준/업무관리/하네스_운영가이드.md` | 3인 체제 / 컨텍스트 리셋 / 판정 규칙 (DRAFT) |
 | 신규 | `90_공통기준/업무관리/하네스_스킬평가기준표.md` | 스킬 Rubric / 판정 기준 (DRAFT) |
 | 확인 | `90_공통기준/스킬/skill-creator-merged.skill` | 경로 확인 완료 — 개별 수정은 다음 턴 |
-| 수정 | `90_공통기준/스킬/debate-mode/SKILL.md` | v1.3 — 전송 로직 개선, 승인 절차 제거, 지정 채팅방 명확화 |
-| 수정 | `90_공통기준/스킬/debate-mode.skill` | v1.3 패키지 재빌드 |
+| 수정 | `90_공통기준/스킬/debate-mode/SKILL.md` | v1.4.1 — HTML escape, polling, chat_url 재사용, 문서 통일 |
+| 수정 | `90_공통기준/스킬/debate-mode.skill` | v1.4.1 패키지 재빌드 |
+| 확립 | 운영 루틴 | Claude→push→GPT Evaluator 검증→PASS 확정 루틴 정착 |
 
 ---
 
