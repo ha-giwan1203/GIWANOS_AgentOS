@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v1.9
+version: v2.0
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -8,7 +8,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v1.9
+# 토론모드 (debate-mode) 스킬 v2.0
 
 ## 개요
 
@@ -128,6 +128,8 @@ document.querySelectorAll('[data-message-author-role="assistant"]')
 
 ```
 Claude 작업 완료
+  → git commit
+  → git push origin main  ← 반드시 push 완료 확인 후 다음 단계
   → GPT 지정 채팅방에 완료 보고 전송 (SHA + 변경 내용 + 질문)
   → GPT 응답 대기 (완료 감지 로직 사용)
   → GPT 응답에서 판정 추출
@@ -151,9 +153,9 @@ Claude 작업 완료
 
 | GPT 판정 | Claude 행동 |
 |----------|------------|
-| PASS (즉시 적용 포함) | 사용자 확인 없이 바로 구현 → GitHub push → GPT에 최종 완료 보고 |
-| 조건부 PASS | GPT가 제시한 수정 항목만 반영 → push → GPT 재판정 요청 |
-| PASS + 보류 항목 혼재 | PASS 항목만 적용 → 보류 항목은 TASKS.md에 기록 → push → GPT 최종 보고 |
+| PASS (즉시 적용 포함) | 사용자 확인 없이 바로 구현 → commit → **push 완료 확인** → GPT에 최종 완료 보고 |
+| 조건부 PASS | GPT가 제시한 수정 항목만 반영 → commit → **push 완료 확인** → GPT 재판정 요청 |
+| PASS + 보류 항목 혼재 | PASS 항목만 적용 → 보류 항목은 TASKS.md에 기록 → commit → **push 완료 확인** → GPT 최종 보고 |
 | HOLD (단독) | 작업 중단 → 사용자에게 보류 사유 보고 후 대기 |
 | FAIL / 재검토 | 수정 내용 파악 → 수정 후 재보고 (최대 2회) → 동일 FAIL 2회 시 사용자에게 보고 후 중단 |
 
@@ -234,3 +236,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v1.7 | 2026-03-30 | 입력 방식 교체: innerHTML 폐기 → native value setter + InputEvent (React 상태 정상 동기화). contenteditable div 분기 추가. 전송 버튼 확인 로직 개선 (값 반영 1차, aria-disabled 포함 버튼 활성화 2차) |
 | v1.8 | 2026-03-30 | 출력 형식 규칙 추가: Claude/GPT 모두 표형식 출력 금지. 문단형/번호 목록형만 허용 |
 | v1.9 | 2026-03-30 | Step 1.5 신설: 입력 전 미확인 GPT 응답 점검 필수화. Step 3에 재확인 단계 추가 |
+| v2.0 | 2026-03-30 | GPT 보고 순서 강제: commit → push 완료 확인 → GPT 전송. push 전 GPT 보고 금지 |
