@@ -1,6 +1,6 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-30 (youtube-analysis 스킬 제작 — URL → 자막 자동 추출 + 분석)
+최종 업데이트: 2026-03-30 (업무_마스터리스트.xlsx 수식 오류 수정 + 드롭다운 확장 + 조건부서식)
 
 ---
 
@@ -53,6 +53,7 @@
 | debate-mode v1.4 개선 | 2026-03-30 | HTML escape + send-button polling(300ms×10) + chat_url 재사용. GPT PASS(8fd031c6) |
 | debate-mode v1.4.1 패치 | 2026-03-30 | 문서 표현 통일 (오류대응 표 + 완료감지 대기). GPT PASS(58f27fde) |
 | GPT 협업 루틴 정착 | 2026-03-30 | Claude(Planner+Generator)→push→GPT(Evaluator) 검증→PASS 확정 루틴 확립 |
+| 업무_마스터리스트.xlsx 수식 수정 | 2026-03-30 | E5/G5/I5 I열→G열 수정, 드롭다운 F/G열 1000행 확장, 조건부서식 완료일 불일치 경고 2개 추가. GPT PASS |
 
 ---
 
