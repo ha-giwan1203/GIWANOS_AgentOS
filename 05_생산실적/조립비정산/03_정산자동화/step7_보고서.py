@@ -36,6 +36,17 @@ lines    = s5['lines']
 summary  = s5['summary']
 unmapped = s5.get('unmatched_gerp', [])
 
+# step6 검증 결과 로드 (없으면 None)
+_step6_path = os.path.join(CACHE_DIR, 'step6_validation.json')
+s6 = None
+if os.path.exists(_step6_path):
+    with open(_step6_path, encoding='utf-8') as f:
+        s6 = json.load(f)
+    print(f"[검증] step6 결과 로드: overall={s6.get('overall')} "
+          f"(CRITICAL_FAIL={s6.get('critical_fail',0)}, WARNING={s6.get('warning',0)})")
+else:
+    print("[검증] step6_validation.json 없음 — 03_검증결과 시트 생략")
+
 # ── 스타일 정의 ───────────────────────────────────────────────
 HDR_FILL  = PatternFill('solid', fgColor='1B2A4A')
 HDR_FONT  = Font(name='맑은 고딕', bold=True, color='FFFFFF', size=9)
@@ -804,9 +815,102 @@ for i, pn in enumerate(unmapped, 1):
 auto_w(ws4)
 print(f"  미매핑 품번: {len(unmapped)}건")
 
+# ══════════════════════════════════════════════════════════════
+# 시트: 03_검증결과  (step6_validation.json 기반)
+# ══════════════════════════════════════════════════════════════
+if s6 is not None:
+    print("[5/5] 03_검증결과 시트...")
+    ws5 = wb.create_sheet('03_검증결과')
+
+    overall  = s6.get('overall', 'N/A')
+    crit_n   = s6.get('critical_fail', 0)
+    warn_n   = s6.get('warning', 0)
+    ts       = s6.get('timestamp', '')[:16].replace('T', ' ')
+
+    # 제목
+    ws5.merge_cells('A1:E1')
+    ws5['A1'] = f'{MONTH}월 정산 검증 결과 (Step 6)'
+    ws5['A1'].font = Font(name='맑은 고딕', bold=True, size=11)
+    ws5.row_dimensions[1].height = 22
+
+    # 종합 판정 행
+    overall_fill = (
+        PatternFill('solid', fgColor='FCE4EC') if overall == 'FAIL' else
+        PatternFill('solid', fgColor='FFF2CC') if overall == 'WARNING' else
+        PatternFill('solid', fgColor='E8F5E9')
+    )
+    ws5.merge_cells('A2:E2')
+    ws5['A2'] = (f"최종 판정: {overall}  |  CRITICAL FAIL: {crit_n}건  |  "
+                 f"WARNING: {warn_n}건  |  실행시각: {ts}")
+    ws5['A2'].font = Font(name='맑은 고딕', bold=True, size=10)
+    ws5['A2'].fill = overall_fill
+    ws5['A2'].alignment = L
+    ws5.row_dimensions[2].height = 18
+
+    # 헤더 (row 4)
+    for c, h in enumerate(['No', '항목명', '상태', '심각도', '상세'], 1):
+        ws5.cell(4, c, h)
+    hdr(ws5, 4, 5)
+
+    # ── WARNING / FAIL 항목만 표시 (INFO/PASS 제외)
+    WARN_STATUS = {'FAIL', 'WARNING'}
+    checks = s6.get('checks', [])
+    notable = [c for c in checks if c.get('status') in WARN_STATUS]
+    all_checks = checks  # 전체도 함께 표시
+
+    row = 5
+    for ck in all_checks:
+        st  = ck.get('status', '')
+        sev = ck.get('severity', '')
+        fill = None
+        if st == 'FAIL':
+            fill = NEG_FILL
+        elif st == 'WARNING':
+            fill = WARN_FILL
+
+        dc(ws5, row, 1, ck.get('no'), align=C)
+        dc(ws5, row, 2, ck.get('name'), fill=fill)
+        dc(ws5, row, 3, st, fill=fill, align=C)
+        dc(ws5, row, 4, sev, fill=fill, align=C)
+        dc(ws5, row, 5, ck.get('detail', ''), fill=fill)
+        row += 1
+
+    # ── WARNING 전용 섹션 (별도 블록)
+    if notable:
+        row += 1
+        ws5.merge_cells(f'A{row}:E{row}')
+        ws5.cell(row, 1, '▶ 주의 항목 (WARNING / FAIL)')
+        ws5.cell(row, 1).font = Font(name='맑은 고딕', bold=True, size=9, color='C62828')
+        ws5.cell(row, 1).fill = PatternFill('solid', fgColor='FFEBEE')
+        row += 1
+
+        for c, h in enumerate(['No', '항목명', '상태', '심각도', '상세'], 1):
+            ws5.cell(row, c, h)
+        hdr(ws5, row, 5)
+        row += 1
+
+        for ck in notable:
+            st  = ck.get('status', '')
+            fill = WARN_FILL if st == 'WARNING' else NEG_FILL
+            dc(ws5, row, 1, ck.get('no'), align=C)
+            dc(ws5, row, 2, ck.get('name'), fill=fill)
+            dc(ws5, row, 3, st, fill=fill, align=C)
+            dc(ws5, row, 4, ck.get('severity', ''), fill=fill, align=C)
+            dc(ws5, row, 5, ck.get('detail', ''), fill=fill)
+            row += 1
+
+    # 열 너비
+    ws5.column_dimensions['A'].width = 6
+    ws5.column_dimensions['B'].width = 38
+    ws5.column_dimensions['C'].width = 12
+    ws5.column_dimensions['D'].width = 12
+    ws5.column_dimensions['E'].width = 55
+    print(f"  검증항목: {len(checks)}건 (WARNING/FAIL: {len(notable)}건)")
+
 # ── 저장 ──────────────────────────────────────────────────────
 wb.save(OUTPUT_FILE)
 print(f"\n{'='*60}")
 print(f"저장 완료: {OUTPUT_FILE}")
-print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석 | 02_미매핑품번")
+extra = ' | 03_검증결과' if s6 is not None else ''
+print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석 | 02_미매핑품번{extra}")
 print("Step 7 완료 — 최종 보고서 생성")
