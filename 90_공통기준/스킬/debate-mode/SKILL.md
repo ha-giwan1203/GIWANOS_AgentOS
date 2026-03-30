@@ -8,7 +8,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v1.4
+# 토론모드 (debate-mode) 스킬 v1.6
 
 ## 개요
 
