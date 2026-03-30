@@ -22,7 +22,7 @@
 
 | 도메인 | 재개 위치 | 참조 |
 |--------|---------|------|
-| 라인배치 OUTER | `runOuterLine(295)` — idx119~294 완료(176건) | `10_라인배치/CLAUDE.md` |
+| 라인배치 OUTER | `runOuterLine(295)` — 마지막 처리 범위 idx119~294 | `10_라인배치/CLAUDE.md` |
 | 조립비정산 | 파이프라인 정상 운영 중 | `05_생산실적/조립비정산/CLAUDE.md` |
 
 ---
@@ -72,4 +72,5 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-30 19:37 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-30 18:30 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |

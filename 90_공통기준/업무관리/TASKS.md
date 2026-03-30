@@ -17,38 +17,9 @@
 
 ## 대기 중 (우선순위 순)
 
-### [완료] 상태 원본 단일화 설계 — 2026-03-30
-- GPT+Claude 설계 합의: TASKS.md = 유일 상태 원본
-- STATUS.md: 운영 요약/재개 위치 전용, 상태 선언 제거
-- HANDOFF.md: 세션 메모 전용, TASK 참조 방식으로 전환
-- Notion: Git→Notion 단방향, 사람용 대시보드
-- CLAUDE.md 상태 원본 단일화 규칙 섹션 신설, AI 인수인계 읽기 순서 변경(TASKS 1순위)
-
-
-
-### [완료] 하네스 파일럿 1회차 검증 — 2026-03-30
-- Generator FAIL / Evaluator PASS 94점 — Known Exception 오판정 방지 효과 확인
-- 결과 조립비정산 STATUS.md에 기록 완료
-
-### [완료] Step 6 FAIL 2레벨 분리 — 2026-03-30 이전
-- KNOWN_EXCEPTIONS 레지스트리, `chk()` severity 파라미터 적용
-- overall 3단계 (FAIL/WARNING/PASS) 분리 완료
-- HANDOFF.md에 기록됨
-
-### [완료] skill-creator 3단계 절차 연결 — 2026-03-30
-- `skill-creator-merged.skill` SKILL.md에 `harness` 모드 추가 (모드 테이블 + 규칙 + 3단계 섹션)
-- Stage 1 Planner / Stage 2 Generator / Stage 3 Evaluator 절차 명문화
-- 평가 기준표: `하네스_스킬평가기준표.md` 연결, PASS/CONDITIONAL/FAIL/BLOCKED 판정 포함
-- 컨텍스트 분리 원칙 및 피드백 루프 (최대 3회) 포함
-
 ### [낮] 루트 CLAUDE.md 하네스 원칙 승격 (보류)
 - 조건: 파일럿 검증 2회 이상 완료 후 검토
-- 현재: 루트 수정 금지
-
-### [완료] 작업 스케줄러 등록 — 2026-03-30
-- `업무리스트_WatchChanges` 태스크 로그온 트리거 등록 완료
-- watch_changes.py Python 직접 실행 방식 (VBS 우회)
-- PID 15588 정상 실행 확인
+- 현재 1회 완료
 
 ### [낮] 도메인 STATUS.md 점검
 - `05_생산실적\조립비정산\STATUS.md` — 마이그레이션 이후 경로 반영 확인
@@ -98,3 +69,8 @@
 | Slack Bot Token 갱신 완료 — slack_notify.py 발송 성공, slack_config.yaml 경로 수정 | 2026-03-28 |
 | Slack 멘션 추가 — build_message + --message 경로 두 곳 mention_user_id 적용, 폰 알림 정상화 | 2026-03-28 |
 | 파일 정리 2차 확인 — 99_임시수집 비어있음, 추가 작업 없음 | 2026-03-28 |
+| 작업 스케줄러 등록 (업무리스트_WatchChanges 로그온 트리거) | 2026-03-30 |
+| Step 6 FAIL 2레벨 분리 (KNOWN_EXCEPTIONS/severity/overall 3단계) | 2026-03-30 |
+| skill-creator 3단계 절차 연결 (harness 모드, Planner/Generator/Evaluator) | 2026-03-30 |
+| 하네스 파일럿 1회차 검증 (Generator FAIL / Evaluator PASS 94점) | 2026-03-30 |
+| 상태 원본 단일화 설계 — TASKS 단일 원본, STATUS/HANDOFF 역할 재정의 | 2026-03-30 |
