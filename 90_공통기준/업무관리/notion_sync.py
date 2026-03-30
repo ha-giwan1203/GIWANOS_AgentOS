@@ -252,27 +252,13 @@ def sync_status_page(batch_id: str, events: list, phase3_result: dict,
 
     summary = f"[{ts}] 배치 {batch_id[:8]} | 파일 {len(events)}건"
 
-    # '자동 감지 변경 이력' 섹션 존재 확인
-    blocks = _get_page_blocks(page_id, token)
-    section_id = _find_heading_block_id(blocks, "자동 감지 변경 이력")
-
-    if section_id is None:
-        # 섹션 없음 → 페이지 하단에 섹션 + 첫 항목 추가
-        new_blocks = [
-            _divider_block(),
-            _heading3_block("🔄 자동 감지 변경 이력"),
-            _text_block(summary),
-        ] + [_bullet_block(l) for l in lines]
-        return _append_blocks(page_id, new_blocks, token, logger)
-    else:
-        # 섹션 있음 → 섹션 하위에 append
-        new_blocks = [_text_block(summary)] + [_bullet_block(l) for l in lines]
-        sid = section_id.replace("-", "")
-        result = _notion_request(
-            "PATCH", f"/blocks/{sid}/children",
-            token, {"children": new_blocks}, logger=logger
-        )
-        return result is not None
+    # 항상 페이지 하단에 직접 append (heading-as-container 방식 폐기)
+    # heading block은 is_toggleable=True 없으면 children append 불가 (Notion API 400)
+    new_blocks = [
+        _divider_block(),
+        _text_block(summary),
+    ] + [_bullet_block(l) for l in lines]
+    return _append_blocks(page_id, new_blocks, token, logger)
 
 
 # ── TASKS 페이지 동기화 ───────────────────────────────────────────────────
@@ -303,26 +289,13 @@ def sync_tasks_page(batch_id: str, events: list, phase3_result: dict,
     if not auto_items:
         return True
 
-    # '자동 생성 태스크' 섹션 확인
-    blocks    = _get_page_blocks(page_id, token)
-    section_id = _find_heading_block_id(blocks, "자동 생성 태스크")
-
-    summary     = f"[{ts}] 배치 {batch_id[:8]} — {len(auto_items)}건 자동 추가"
-    new_blocks  = [_text_block(summary)] + [_bullet_block(i) for i in auto_items[:10]]
-
-    if section_id is None:
-        new_blocks = [
-            _divider_block(),
-            _heading3_block("🤖 자동 생성 태스크"),
-        ] + new_blocks
-        return _append_blocks(page_id, new_blocks, token, logger)
-    else:
-        sid = section_id.replace("-", "")
-        result = _notion_request(
-            "PATCH", f"/blocks/{sid}/children",
-            token, {"children": new_blocks}, logger=logger
-        )
-        return result is not None
+    # 항상 페이지 하단에 직접 append (heading-as-container 방식 폐기)
+    summary    = f"[{ts}] 배치 {batch_id[:8]} — {len(auto_items)}건 자동 추가"
+    new_blocks = [
+        _divider_block(),
+        _text_block(summary),
+    ] + [_bullet_block(i) for i in auto_items[:10]]
+    return _append_blocks(page_id, new_blocks, token, logger)
 
 
 # ── 핵심: 배치 동기화 ─────────────────────────────────────────────────────
