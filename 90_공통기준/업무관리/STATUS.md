@@ -1,68 +1,41 @@
 # 업무리스트 전체 운영 현황
 
-최종 업데이트: 2026-03-30 (작업 스케줄러 등록 완료 + Notion 대시보드 재구조화)
+> **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
+> 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
+
+최종 업데이트: 2026-03-30 (상태 원본 단일화 규칙 적용)
 
 ---
 
 ## 현재 운영 상태
 
-### 완료 항목
-
-| 항목 | 완료일 | 비고 |
-|------|--------|------|
-| 폴더 마이그레이션 (13개 최상위 구조) | 2026-03-28 | Phase 0~7 완료 |
-| 90_공통기준 하위 통합 (스킬/프롬프트/MCP/업무관리) | 2026-03-28 | |
-| 05_생산실적 하위 정리 (BI실적/_자동화/조립비정산) | 2026-03-28 | |
-| 10_라인배치 독립 카테고리 유지 | 2026-03-28 | |
-| 98_아카이브 / 99_임시수집 역할 분리 | 2026-03-28 | |
-| 마이그레이션 증적 파일 아카이브 | 2026-03-28 | `98_아카이브/마이그레이션_20260328/` |
-| 파일 정리 1차 (정리대기 이동 94건) | 2026-03-28 | `98_아카이브/정리대기_20260328/` |
-| 보호 파일 10건 운영 목록 고정 | 2026-03-28 | `90_공통기준/업무관리/운영핵심파일_보호목록_v1.0.md` |
-| 보류 파일 5건 최종 판정 | 2026-03-28 | `90_공통기준/업무관리/보류파일_최종판정_20260328.md` |
-| 커넥터 운영 지침 확정 | 2026-03-28 | `90_공통기준/업무관리/운영지침_커넥터관리_v1.0.md` |
-| CLAUDE.md 전면 개정 | 2026-03-28 | 13개 구조 기준 + 커넥터 역할 분리 반영 |
-| __pycache__ 삭제 | 2026-03-28 | `정리대기_20260328/__pycache__/` 4건 삭제 완료 |
-| Notion 업무 현황 페이지 생성 | 2026-03-28 | STATUS / TASKS 페이지, 업무리스트 운영 부모 페이지 |
-| Slack 완료 보고 발송 | 2026-03-28 | `#새-워크스페이스-전체` 채널 |
-| Google Calendar 후속 작업 등록 | 2026-03-28 | 4건 (4/4 중요도 중·낮, 4/11 낮 2건) |
-| GitHub 운영 문서 push | 2026-03-28 | `ha-giwan1203/GIWANOS_AgentOS` — PR #8, PR #9 순차 머지 완료. 현재 기준 브랜치: `main` |
-| GitHub PR #8 생성 및 머지 | 2026-03-28 | ha-giwan1203/GIWANOS_AgentOS#8 — MERGED |
-| 자동화 동기화 Phase 1 (파일 감지) | 2026-03-28 | `watch_changes.py` + `auto_watch_config.yaml` — watchdog 30분 debounce |
-| 자동화 동기화 Phase 2 (Git 커밋) | 2026-03-28 | `commit_docs.py` + `auto_commit_config.yaml` — allowlist 기반 자동 커밋 |
-| 자동화 동기화 Phase 3 (STATUS/TASKS 갱신) | 2026-03-28 | `update_status_tasks.py` + `status_rules.yaml` |
-| 자동화 동기화 Phase 4 (Slack 알림) | 2026-03-28 | `slack_notify.py` + `slack_config.yaml` — MCP 경유 채널 발송 확인 |
-| watch_changes.py 상시 실행 등록 | 2026-03-28 | Startup 폴더 등록 완료 (`watch_changes_launcher.vbs`) |
-| 작업 스케줄러 등록 파일 작성 | 2026-03-28 | `register_watch_task.bat` / `watch_task.xml` — 사용자 직접 실행 필요 |
-| Slack 채널 연결 테스트 | 2026-03-28 | `#새-워크스페이스-전체` (C096LU8PH44) 발송 PASS |
-| 폴더 생성 규칙 메모리 저장 | 2026-03-28 | 루트 임의 폴더 생성 금지 규칙 — `memory/feedback_folder_creation_rules.md` |
-| 커넥터 운영구조 재정의 | 2026-03-28 | Drive = 업무리스트 동기화 경로 명시. GitHub = AI 업무공유 기준 저장소 재정의. Notion = 사람용 현황판 분리 |
-| CLAUDE.md (루트) 2차 개정 | 2026-03-28 | 파일명 규칙·환경설정 섹션 삭제. AI 인수인계 원칙·알림 원칙 추가 |
-| 운영지침_커넥터관리_v1.0.md v1.1 갱신 | 2026-03-28 | GitHub AI 업무공유 역할 추가. Notion 역할 분리. AI 인수인계 원칙 섹션 추가 |
-| README.md 신규 생성 | 2026-03-28 | 루트 진입점. AI 세션 시작 가이드 + 핵심 파일 위치 표 |
-| HANDOFF.md 신규 생성 | 2026-03-28 | `90_공통기준/업무관리/HANDOFF.md` — AI 인수인계 문서 체계 신설 |
-| GitHub PR #9 생성 및 main 머지 | 2026-03-28 | 커넥터 재정의 전체 반영. merge SHA: `a00702cd`. 업무리스트 브랜치 삭제 완료 |
-| 현재 브랜치 | 2026-03-28 | `main` (origin/main과 동기화, clean) |
-| MCP context7 설치 | 2026-03-30 | `@upstash/context7-mcp` — 최신 공식 문서 실시간 참조 |
-| MCP sequential-thinking 설치 | 2026-03-30 | `@modelcontextprotocol/server-sequential-thinking` — 단계별 사고 강제 |
-| mcp_설치현황.md 신규 생성 | 2026-03-30 | `90_공통기준/MCP/mcp_설치현황.md` — 전체 MCP 목록 문서화 |
-| youtube-analysis 스킬 제작 | 2026-03-30 | `youtube_transcript.py` + `SKILL.md` + `.skill` 패키지 — URL → 자막 자동 추출 |
-| YouTube_영상분석.md 프롬프트 신규 | 2026-03-30 | `90_공통기준/프롬프트/YouTube_영상분석.md` |
-| CLAUDE.md 스킬 기준표 갱신 | 2026-03-30 | youtube-analysis 항목 추가 |
-| 하네스 엔지니어링 파일럿 도입 | 2026-03-30 | GPT/Claude 토론 합의 — 조립비정산 Evaluator 기준표 + 운영가이드 + 스킬평가기준표 (DRAFT) |
-| debate-mode v1.3 개선 | 2026-03-30 | 전송 로직(`<p>` 태그 + setTimeout + send-button), 승인 절차 제거, 지정 채팅방 명확화 |
-| debate-mode v1.4 개선 | 2026-03-30 | HTML escape + send-button polling(300ms×10) + chat_url 재사용. GPT PASS(8fd031c6) |
-| debate-mode v1.4.1 패치 | 2026-03-30 | 문서 표현 통일 (오류대응 표 + 완료감지 대기). GPT PASS(58f27fde) |
-| GPT 협업 루틴 정착 | 2026-03-30 | Claude(Planner+Generator)→push→GPT(Evaluator) 검증→PASS 확정 루틴 확립 |
-| 업무_마스터리스트.xlsx 수식 수정 | 2026-03-30 | E5/G5/I5 I열→G열 수정, 드롭다운 F/G열 1000행 확장, 조건부서식 완료일 불일치 경고 2개 추가. GPT PASS |
+| 항목 | 내용 |
+|------|------|
+| 현재 브랜치 | `main` (origin/main 동기화) |
+| 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
+| 미완료 작업 수 | TASKS.md 참조 |
+| 자동화 파이프라인 | Phase 1~5 운영 중 |
 
 ---
 
-### 후속 작업 (미완료)
+## 현재 재개 위치
 
-| 항목 | 우선순위 | 비고 |
-|------|---------|------|
-| 루트 CLAUDE.md 하네스 원칙 승격 | 낮 | 파일럿 검증 2회 이상 후 검토 (현재 1회 완료) |
-| 각 도메인 STATUS.md 점검 | 낮 | 조립비정산, 라인배치 STATUS.md 경로 반영 여부 확인 |
+| 도메인 | 재개 위치 | 참조 |
+|--------|---------|------|
+| 라인배치 OUTER | `runOuterLine(295)` — idx119~294 완료(176건) | `10_라인배치/CLAUDE.md` |
+| 조립비정산 | 파이프라인 정상 운영 중 | `05_생산실적/조립비정산/CLAUDE.md` |
+
+---
+
+## 자동화 파이프라인 상태
+
+| Phase | 스크립트 | 상태 |
+|-------|---------|------|
+| Phase 1 | `watch_changes.py` | 운영 중 (작업 스케줄러 등록) |
+| Phase 2 | `commit_docs.py` | 운영 중 |
+| Phase 3 | `update_status_tasks.py` | 운영 중 |
+| Phase 4 | `slack_notify.py` | 운영 중 (Token 갱신 완료) |
+| Phase 5 | `notion_sync.py` | 운영 중 (per-page dedup 적용) |
 
 ---
 
@@ -77,9 +50,24 @@
 | 운영 지침 문서 | `90_공통기준\업무관리\` |
 | 파일 감시 런처 | `90_공통기준\업무관리\watch_changes_launcher.vbs` |
 | 스케줄러 등록 배치 | `90_공통기준\업무관리\register_watch_task.bat` |
-| 스케줄러 XML | `90_공통기준\업무관리\watch_task.xml` |
 | 마이그레이션 증적 | `98_아카이브\마이그레이션_20260328\` |
-| 파일 정리 아카이브 | `98_아카이브\정리대기_20260328\` |
+
+---
+
+## 운영 주의사항
+
+- 동기화 금지 구간: 매시 x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53
+- GitHub에 대용량 원본 엑셀 적재 금지
+- 업무리스트 폴더 루트 임의 폴더 생성 금지
+- Notion을 AI 작업 기준 저장소로 사용 금지
+- 상태 판정은 TASKS.md 기준. STATUS/HANDOFF/Notion이 충돌하면 TASKS.md가 우선
+
+---
+
+## 완료 이력 참조
+
+완료된 작업 전체 목록은 `TASKS.md`의 "## 완료됨" 섹션 참조.
+Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
