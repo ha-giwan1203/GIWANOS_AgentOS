@@ -48,6 +48,7 @@
 | youtube-analysis 스킬 제작 | 2026-03-30 | `youtube_transcript.py` + `SKILL.md` + `.skill` 패키지 — URL → 자막 자동 추출 |
 | YouTube_영상분석.md 프롬프트 신규 | 2026-03-30 | `90_공통기준/프롬프트/YouTube_영상분석.md` |
 | CLAUDE.md 스킬 기준표 갱신 | 2026-03-30 | youtube-analysis 항목 추가 |
+| 하네스 엔지니어링 파일럿 도입 | 2026-03-30 | GPT/Claude 토론 합의 — 조립비정산 Evaluator 기준표 + 운영가이드 + 스킬평가기준표 (DRAFT) |
 
 ---
 
@@ -55,10 +56,10 @@
 
 | 항목 | 우선순위 | 비고 |
 |------|---------|------|
-| 보류 판정 유지 3건 후속 조치 | 중 | 데이터사전 동기화, 라인배치 스킬 패키지화, ENDPART 갱신 기준 확인 |
-| 파일 정리 2차 (99_임시수집 분류) | 낮 | 미분류 임시 파일 카테고리 배치 |
-| 각 도메인 STATUS.md 점검 | 낮 | 조립비정산, 라인배치 STATUS.md 마이그레이션 이후 경로 반영 여부 확인 |
-| Slack Bot Token 갱신 | 낮 | `.env` 토큰 `account_inactive` — api.slack.com 재발급 후 교체 |
+| 하네스 파일럿 검증 | 중 | 조립비정산 다음 실행 시 Evaluator 기준표 실제 적용 확인 |
+| 루트 CLAUDE.md 하네스 원칙 승격 | 낮 | 파일럿 검증 2회 이상 후 검토 |
+| skill-creator 3단계 절차 연결 | 낮 | `skill-creator-merged.skill` 경로 확인됨 — 다음 턴 |
+| 각 도메인 STATUS.md 점검 | 낮 | 조립비정산, 라인배치 STATUS.md 경로 반영 여부 확인 |
 | 작업 스케줄러 등록 | 낮 | `register_watch_task.bat` CMD에서 직접 실행 (재시작 옵션 적용) |
 
 ---

@@ -1,6 +1,6 @@
 # 업무리스트 작업 목록
 
-최종 업데이트: 2026-03-30 (youtube-analysis 스킬 제작 완료)
+최종 업데이트: 2026-03-30 (하네스 엔지니어링 파일럿 도입)
 
 ---
 
@@ -15,6 +15,18 @@
 없음
 
 
+
+### [중] 하네스 파일럿 검증
+- 조립비정산 파이프라인 다음 실행 시 `05_생산실적/조립비정산/CLAUDE.md` Evaluator 기준표 실제 적용
+- PASS/CONDITIONAL/FAIL 판정 결과 STATUS.md에 기록
+
+### [낮] skill-creator 3단계 절차 연결
+- `90_공통기준/스킬/skill-creator-merged.skill` 파일 열어 Planner→Generator→Evaluator 절차 추가
+- `하네스_스킬평가기준표.md` 참조 기준으로 연결
+
+### [낮] 루트 CLAUDE.md 하네스 원칙 승격 (보류)
+- 조건: 파일럿 검증 2회 이상 완료 후 검토
+- 현재: 루트 수정 금지
 
 ### [낮] 작업 스케줄러 등록 (사용자 직접 — 재시작 옵션 적용)
 - CMD 열고 실행: `C:\Users\User\Desktop\업무리스트\90_공통기준\업무관리\register_watch_task.bat`
@@ -65,6 +77,7 @@
 | mcp_설치현황.md 신규 생성 (전체 MCP 목록·프롬프트 문서화) | 2026-03-30 |
 | youtube-analysis 스킬 제작 (URL → 자막 자동 추출 + 분석) | 2026-03-30 |
 | YouTube_영상분석.md 프롬프트 신규 생성 | 2026-03-30 |
+| 하네스 엔지니어링 파일럿 도입 (조립비정산 Evaluator + 운영가이드 + 스킬평가기준표) | 2026-03-30 |
 | Slack Bot Token 갱신 완료 — slack_notify.py 발송 성공, slack_config.yaml 경로 수정 | 2026-03-28 |
 | Slack 멘션 추가 — build_message + --message 경로 두 곳 mention_user_id 적용, 폰 알림 정상화 | 2026-03-28 |
 | 파일 정리 2차 확인 — 99_임시수집 비어있음, 추가 작업 없음 | 2026-03-28 |
