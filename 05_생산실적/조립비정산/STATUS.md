@@ -82,9 +82,22 @@
 |------|------|--------|
 | 2026-03-28 | 데이터사전 v1.0 동기화 완료 — 기준정보 파일명 수정, §5 Step5 items 필드 19개 추가, pipeline_contract.md GERP col11 + LineItem 4필드 추가, CLAUDE.md col 오기 수정 (col12→col11), step4 RSP dead code 사실 명시 | 484f81d7 |
 
+## 하네스 Evaluator 1회차 검증 결과 (2026-03-30)
+
+| 항목 | 결과 |
+|------|------|
+| 실행일 | 2026-03-30, 소요 54.9초 |
+| Generator Step 6 판정 | FAIL (SP3M3 야간 RSP 미매칭 170원 불일치) |
+| Evaluator 외부 판정 | **PASS 94점** |
+| 판정 차이 이유 | RSP 미매칭 4건은 STATUS.md 등록 Known Exception — 비즈니스 규칙상 GERP 원본금액 사용이 맞음. Evaluator는 감점 처리 |
+| 의의 | 하네스 Evaluator 도입 첫 실검증. Generator 내부 FAIL을 Evaluator가 Known Exception 반영해 PASS로 재판정 — 오판정 방지 효과 확인 |
+
+> 다음 2회차 전 검토 사항: Step 6 FAIL 항목을 "치명 오류"와 "Known Exception 경고"로 분리할지 설계 필요
+
 ## 남은 작업
 - ANAAS04/WAMAS01 단가 차이 실무 확인 (기준정보 47원 vs GERP 23원)
 - SP3M3 미매칭 RSP 4건 → 모듈품번 파일 갱신 후 재실행 (RSP3SC0291~0294)
 - SD9A01/SP3M3 구ERP 주간수량 차이 원인 확인
 - 정산DB 반영 (정산결과 → 조립비_관리DB 업데이트)
 - 미매핑 품번 54건 검토
+- Step 6 FAIL 분리 설계 (치명 오류 vs Known Exception 경고) — 2회차 전 적용

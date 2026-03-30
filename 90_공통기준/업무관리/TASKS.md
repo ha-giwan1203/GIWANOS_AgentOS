@@ -16,9 +16,14 @@
 
 
 
-### [중] 하네스 파일럿 검증
-- 조립비정산 파이프라인 다음 실행 시 `05_생산실적/조립비정산/CLAUDE.md` Evaluator 기준표 실제 적용
-- PASS/CONDITIONAL/FAIL 판정 결과 STATUS.md에 기록
+### [완료] 하네스 파일럿 1회차 검증 — 2026-03-30
+- Generator FAIL / Evaluator PASS 94점 — Known Exception 오판정 방지 효과 확인
+- 결과 조립비정산 STATUS.md에 기록 완료
+
+### [중] Step 6 FAIL 분리 설계 (2회차 전 적용)
+- "치명 오류"와 "Known Exception 경고" 두 레벨로 분리
+- 대상 파일: `05_생산실적/조립비정산/03_정산자동화/step6_검증.py`
+- 설계 후 GPT 검토 → 적용
 
 ### [낮] skill-creator 3단계 절차 연결
 - `90_공통기준/스킬/skill-creator-merged.skill` 파일 열어 Planner→Generator→Evaluator 절차 추가
