@@ -1,141 +1,111 @@
 ---
 name: debate-mode
+version: v1.3
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
-  "토론 시작", "GPT랑 싸워봐", "GPT한테 물어보고 반박해", "AI끼리 토론" 등을 언급하면 반드시 이 스킬을 사용할 것.
-  API 없이 브라우저 자동화만으로 동작하며, Claude가 비판자·검증자 역할을 맡고 GPT가 제안자 역할을 한다.
-  GPT-Claude 4라운드 공동 설계 토론으로 합의된 핵심 로직(완료 감지 2중 신호 + read_page assistant 블록 추출)을 사용한다.
+  "토론 시작", "GPT랑 싸워봐", "GPT한테 물어보고 반박해", "AI끼리 토론", "gpt한테 물어봐", "gpt한테 알려줘" 등을 언급하면 반드시 이 스킬을 사용할 것.
+  API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬
+# 토론모드 (debate-mode) 스킬 v1.3
 
 ## 개요
 
-Claude가 브라우저에서 ChatGPT 화면을 직접 읽고, 이전 답변을 바탕으로 반박/질문을 생성하여 반자동 AI 대 AI 토론을 이어가는 Cowork 스킬.
+Claude가 브라우저에서 ChatGPT 화면을 직접 읽고, 반박/질문을 생성하여 자동으로 전송하는 반자동 AI 대 AI 토론 스킬.
 
-**GPT와 Claude의 4라운드 설계 토론을 통해 합의된 핵심 로직 기반.**
-
-- API 사용 금지
-- Notion 등 외부 저장소 불필요
-- 브라우저 화면 텍스트 직접 읽기 방식
+- API 사용 금지 — 브라우저 자동화만
+- **승인 없이 자동 진행** — 반박문 작성 후 즉시 전송, 사용자 승인 대기 없음
+- 지정 프로젝트방 전용 운영
 - 로컬 로그 파일 저장
-- 목적: 완전 무인 자동화가 아닌 실전형 반자동 코워크
 
 ---
 
 ## 트리거 조건
 
-사용자가 다음을 언급하면 이 스킬을 사용:
 - "토론모드", "AI 토론", "GPT랑 토론", "debate-mode"
-- "ChatGPT에게 반박해", "GPT 의견 들어봐"
-- "토론 시작", "GPT랑 싸워봐"
+- "GPT 의견 들어봐", "GPT한테 물어봐", "GPT한테 알려줘"
+- "ChatGPT에게 반박해", "토론 시작"
 
 ---
 
-## 합의된 핵심 로직 (GPT-Claude 공동 설계)
+## 지정 채팅방 (필수)
 
-### 1. 완료 감지 (2중 신호)
-```
-신호 1: read_page → 전송버튼 enabled 상태 확인
-신호 2: get_page_text 2회 비교 (2초 간격, 동일하면 완료)
-제외:   aria-busy (ChatGPT 실제 노출 여부 불확실 → 제거)
+**새 ChatGPT 대화를 임의로 개설하지 않는다.**
+
+- 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c/`
+- 방 이름: `CLAUDE COWORK 업무 자동화 지침만들기`
+- 기존 대화가 없으면 해당 프로젝트 내에서만 새 대화 개설
+
+---
+
+## 핵심 로직
+
+### 1. 텍스트 입력 방식 (v1.3 개선)
+
+```javascript
+// 줄바꿈이 포함된 메시지 입력
+const textarea = document.querySelector('#prompt-textarea');
+const lines = message.split('\n');
+textarea.innerHTML = lines.map(l => `<p>${l === '' ? '<br>' : l}</p>`).join('');
+textarea.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+// 전송 — 500ms 후 send-button 클릭
+setTimeout(() => {
+  document.querySelector('button[data-testid="send-button"]')?.click();
+}, 500);
 ```
 
-### 2. 최신 답변 식별
-```
-read_page → role=assistant 블록 필터 → 마지막 visible 항목 추출
+> **주의**: `innerHTML` 직접 설정 시 `send-button`이 즉시 감지 안 될 수 있음 → 반드시 `setTimeout 500ms` 후 클릭
+
+### 2. 완료 감지 (2중 조건)
+
+```javascript
+// 조건 1: 스트리밍 중지 버튼 소멸
+// polling: button[aria-label="스트리밍 중지"] 가 false 될 때까지 대기
+
+// 조건 2: 텍스트 안정성 (소멸 후 5초 대기 후 재확인)
+const text1 = getLastAssistantText();
+await sleep(3000);
+const text2 = getLastAssistantText();
+if (text1 === text2) → 완료 확정
 ```
 
-### 3. 읽기 방식 우선순위
-```
-1순위: read_page (접근성 트리, DOM 변경에 강인)
-2순위: get_page_text (노이즈 있으나 완료 비교용으로 활용)
-3순위: CSS 선택자 (최후 수단, DOM 변경 취약)
+### 3. 응답 읽기 우선순위
+
+```javascript
+// 1순위: .markdown innerText
+document.querySelectorAll('[data-message-author-role="assistant"]')
+  [last].querySelector('.markdown').innerText
+
+// 2순위: read_page accessibility tree assistant 마지막 블록
+// 3순위: get_page_text 전체에서 마지막 "ChatGPT의 말:" 이후
 ```
 
 ---
 
 ## 실행 절차
 
-### Step 1. 초기화
-1. ChatGPT 탭 확인 (`tabs_context_mcp`)
-2. ChatGPT 새 채팅 열기 (`navigate https://chatgpt.com/new`)
-3. 로그 파일 초기화 (`logs/debate_YYYYMMDD_HHMMSS.md`)
-4. 토론 주제 및 라운드 수 확인 (기본: 4라운드)
+### Step 1. 탭 준비
+1. `tabs_context_mcp` — 현재 탭 확인
+2. 지정 프로젝트방 이동 또는 기존 대화 URL로 직접 이동
+3. 로그 파일 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
 
-### Step 2. 역할 설정
-- **Claude**: 반대측 / 비판자 / 검증자
-- **GPT**: 찬성측 / 제안자 / 설계자
-- **심판**: Claude가 마지막에 요약 및 합의안 정리
+### Step 2. 초기 메시지 전송
+1. 핵심 로직 `1. 텍스트 입력 방식` 사용
+2. 스트리밍 완료 감지 (핵심 로직 `2.`)
+3. GPT 응답 읽기 (핵심 로직 `3.`)
 
-### Step 3. 토론 루프 (최대 6라운드)
-```
-[라운드 N]
-1. 현재 주제/질문을 ChatGPT 입력창에 입력 (computer → type → Return)
-2. 완료 감지 대기:
-   - read_page에서 전송버튼 enabled 확인
-   - get_page_text 스냅샷 A 저장
-   - 2초 대기
-   - get_page_text 스냅샷 B 저장
-   - A == B → 완료 확정
-3. 최신 답변 추출:
-   - read_page → assistant role 마지막 블록 텍스트
-4. 답변 로그 저장 (logs/ 폴더)
-5. 반박/질문 생성:
-   - GPT 답변 핵심 3가지 추출
-   - 논리적 허점 / 현실 제약 / 미합의 쟁점 지적
-   - 300자 이내로 압축
-6. 다음 라운드 입력으로 전환
-```
+### Step 3. 반박 생성 및 자동 전송
+1. GPT 응답 핵심 주장 3줄 요약
+2. 반박 포인트 2~3개 도출 (근거 + 대안 구조)
+3. **승인 없이** 바로 Step 2 방식으로 전송
+4. 완료 감지 → 읽기 → 반복
 
-### Step 4. 종료 조건
-- 최대 라운드 도달
-- "합의" 키워드 GPT 답변에서 감지
-- 동일 주장 2회 이상 반복 감지
-- 오류 3회 연속
-
-### Step 5. 마무리
-1. Claude가 전체 토론 요약 작성
-2. 합의안 / 미합의 쟁점 분리
-3. 즉시 실행안 3가지 도출
-4. 로그 파일 최종 저장
-
----
-
-## 토론 규칙
-
-| 항목 | 기준 |
-|------|------|
-| 최대 라운드 | 6턴 |
-| 답변 길이 | 200~400자 |
-| 새 논점 | 매 턴 최소 1개 이상 |
-| 반복 주장 | 2회 이상 시 종료 트리거 |
-| 오류 재시도 | 최대 3회 |
-| 마지막 출력 | 합의안 + 즉시 실행안 |
-
----
-
-## 로그 구조
-
-```
-logs/
-├── debate_YYYYMMDD_HHMMSS.md
-├── debate_YYYYMMDD_HHMMSS.json
-└── errors/
-```
-
-### 로그 항목 (턴별)
-```
-- Debate ID
-- Round
-- Speaker (Claude / GPT)
-- Prompt
-- Response
-- Key Points (핵심 3가지)
-- Timestamp
-- Status
-```
+### Step 4. 종료 및 마무리
+- 설정 턴 수 도달 / "합의" 감지 / 동일 주장 2회 반복 시 종료
+- 합의안 + 미합의 쟁점 + 즉시 실행안 3개 도출
+- 로그 저장 (`.md` + `.json`)
 
 ---
 
@@ -143,16 +113,30 @@ logs/
 
 | 상황 | 대응 |
 |------|------|
-| 전송버튼 미감지 | computer → screenshot → 수동 위치 재확인 |
-| 완료 신호 불일치 | 5초 추가 대기 후 재확인 |
-| 답변 블록 미감지 | get_page_text 전체 텍스트 fallback |
-| 3회 연속 실패 | 토론 중단, 현재까지 로그 저장 후 보고 |
+| send-button 미감지 | 500ms 추가 대기 후 재시도. 최대 3회 |
+| 스트리밍 완료 미감지 | 10초씩 3회 polling. 실패 시 텍스트 안정성만으로 판단 |
+| 응답 텍스트 미추출 | fallback 순서대로 (read_page → get_page_text) |
+| 로그인 만료 | 사용자에게 재로그인 요청 후 대기 |
 
 ---
 
-## 금지 사항
+## 로그 구조
 
-- API 직접 호출 금지
-- 동일 주장 3회 이상 반복 금지
-- 6라운드 상한 초과 금지
-- 억지 합의 금지 (합의 안 되면 미합의로 명시)
+```
+90_공통기준/토론모드/logs/
+├── debate_YYYYMMDD_HHMMSS.md
+└── debate_YYYYMMDD_HHMMSS.json
+```
+
+JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`
+
+---
+
+## 변경 이력
+
+| 버전 | 날짜 | 내용 |
+|------|------|------|
+| v1.0 | 2026-03-28 | 초안 |
+| v1.1 | 2026-03-29 | 완료 감지 2중 조건, fallback 우선순위 |
+| v1.2 | 2026-03-29 | hash 전체 비교, 원문 로그 저장 |
+| v1.3 | 2026-03-30 | 전송 로직 개선 (`<p>` 태그 + setTimeout 500ms + data-testid="send-button"), 승인 절차 제거, 지정 채팅방 명확화 |

@@ -49,6 +49,7 @@
 | YouTube_영상분석.md 프롬프트 신규 | 2026-03-30 | `90_공통기준/프롬프트/YouTube_영상분석.md` |
 | CLAUDE.md 스킬 기준표 갱신 | 2026-03-30 | youtube-analysis 항목 추가 |
 | 하네스 엔지니어링 파일럿 도입 | 2026-03-30 | GPT/Claude 토론 합의 — 조립비정산 Evaluator 기준표 + 운영가이드 + 스킬평가기준표 (DRAFT) |
+| debate-mode v1.3 개선 | 2026-03-30 | 전송 로직(`<p>` 태그 + setTimeout + send-button), 승인 절차 제거, 지정 채팅방 명확화 |
 
 ---
 
