@@ -20,10 +20,10 @@
 - Generator FAIL / Evaluator PASS 94점 — Known Exception 오판정 방지 효과 확인
 - 결과 조립비정산 STATUS.md에 기록 완료
 
-### [중] Step 6 FAIL 분리 설계 (2회차 전 적용)
-- "치명 오류"와 "Known Exception 경고" 두 레벨로 분리
-- 대상 파일: `05_생산실적/조립비정산/03_정산자동화/step6_검증.py`
-- 설계 후 GPT 검토 → 적용
+### [완료] Step 6 FAIL 2레벨 분리 — 2026-03-30 이전
+- KNOWN_EXCEPTIONS 레지스트리, `chk()` severity 파라미터 적용
+- overall 3단계 (FAIL/WARNING/PASS) 분리 완료
+- HANDOFF.md에 기록됨
 
 ### [완료] skill-creator 3단계 절차 연결 — 2026-03-30
 - `skill-creator-merged.skill` SKILL.md에 `harness` 모드 추가 (모드 테이블 + 규칙 + 3단계 섹션)
