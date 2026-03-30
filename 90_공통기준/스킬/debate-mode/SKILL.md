@@ -81,7 +81,7 @@ const poll = setInterval(() => {
 // 조건 1: 스트리밍 중지 버튼 소멸
 // polling: button[aria-label="스트리밍 중지"] 가 false 될 때까지 대기
 
-// 조건 2: 텍스트 안정성 (소멸 후 5초 대기 후 재확인)
+// 조건 2: 텍스트 안정성 (소멸 후 3초 대기 후 재확인)
 const text1 = getLastAssistantText();
 await sleep(3000);
 const text2 = getLastAssistantText();
@@ -132,7 +132,7 @@ document.querySelectorAll('[data-message-author-role="assistant"]')
 
 | 상황 | 대응 |
 |------|------|
-| send-button 미감지 | 500ms 추가 대기 후 재시도. 최대 3회 |
+| send-button 미감지 | polling 300ms×10회 재시도. 3초 내 미활성 시 타임아웃 경고 |
 | 스트리밍 완료 미감지 | 10초씩 3회 polling. 실패 시 텍스트 안정성만으로 판단 |
 | 응답 텍스트 미추출 | fallback 순서대로 (read_page → get_page_text) |
 | 로그인 만료 | 사용자에게 재로그인 요청 후 대기 |
@@ -160,3 +160,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v1.2 | 2026-03-29 | hash 전체 비교, 원문 로그 저장 |
 | v1.3 | 2026-03-30 | 전송 로직 개선 (`<p>` 태그 + setTimeout 500ms + data-testid="send-button"), 승인 절차 제거, 지정 채팅방 명확화 |
 | v1.4 | 2026-03-30 | HTML escape 추가, setTimeout → send-button polling (300ms×10회), chat_url 재사용 로직 명시 |
+| v1.4.1 | 2026-03-30 | 오류 대응 표 polling 문구 통일, 완료 감지 대기 5초→3초 통일 |
