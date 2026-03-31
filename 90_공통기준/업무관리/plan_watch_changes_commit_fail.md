@@ -20,10 +20,10 @@ GPT 승인: 확인됨 (공동작업방 응답 기준)
 
 - [x] Step 1: research_watch_changes_commit_fail.md 작성 완료
 - [x] Step 2: GPT 방향 확정 (branch: main, push_on_commit: true)
-- [ ] Step 3: auto_commit_config.yaml 2줄 수정
-- [ ] Step 4: git add / commit / push (수동)
-- [ ] Step 5: watch_changes.py 재시작 또는 다음 debounce 사이클 대기
-- [ ] Step 6: 다음 Slack AutoBot 알림에서 [Git 커밋 실패] 없음 확인
+- [x] Step 3: auto_commit_config.yaml 2줄 수정 (branch, push_on_commit)
+- [x] Step 4: git add / commit / push — 커밋 f0a62cba (2026-03-31)
+- [ ] Step 5: watch_changes.py 다음 debounce 사이클 대기 (30분 idle 후 자동)
+- [ ] Step 6: 다음 Slack AutoBot 알림에서 [Git 커밋 실패] 없음 확인 (운영 검증)
 
 ---
 
