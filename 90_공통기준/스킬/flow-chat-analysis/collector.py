@@ -160,26 +160,35 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             for i in range(max_scroll):
                 current = chat_page.evaluate("""() => {
                     const msgs = [];
-                    const els = document.querySelectorAll(
-                        '[class*="chat-message"], [class*="msg-item"], [class*="chat-item"], ' +
-                        '[class*="message-wrap"], [class*="chat-wrap"], [class*="chat-content"]'
-                    );
-                    for (const el of els) {
-                        const text = el.innerText || '';
-                        if (text.trim() && text.length > 3) {
-                            msgs.push({ cls: el.className.substring(0, 100), text: text.substring(0, 2000) });
+                    // chat-left clearfix = 개별 메시지 블록
+                    const blocks = document.querySelectorAll('.chat-left.clearfix');
+                    for (const block of blocks) {
+                        // chat-txt = 메시지 본문 (깨끗한 텍스트)
+                        const txtEl = block.querySelector('.chat-txt');
+                        const text = txtEl ? txtEl.innerText.trim() : '';
+                        if (!text || text.length < 3) continue;
+
+                        // 작성자명 (chat-name 또는 이전 요소)
+                        const nameEl = block.querySelector('.chat-name') || block.previousElementSibling?.querySelector?.('.chat-name');
+                        const author = nameEl ? nameEl.innerText.trim() : '';
+
+                        // 시간 (chat-btns 안)
+                        const timeEl = block.querySelector('.chat-btns');
+                        let time = '';
+                        if (timeEl) {
+                            const timeMatch = timeEl.innerText.match(/(오전|오후)\s*(\d{1,2}):(\d{2})/);
+                            if (timeMatch) time = timeMatch[0];
                         }
+
+                        msgs.push({ cls: 'chat-left', text, author, time });
                     }
-                    if (msgs.length === 0) {
-                        document.querySelectorAll('div[class]').forEach(el => {
-                            const c = el.className || '';
-                            if (c.includes('chat') || c.includes('msg') || c.includes('message')) {
-                                const t = el.innerText || '';
-                                if (t.trim() && t.length > 5 && t.length < 5000)
-                                    msgs.push({ cls: c.substring(0, 100), text: t.substring(0, 2000) });
-                            }
-                        });
+
+                    // 날짜 구분선도 수집 (월별 분류용)
+                    const dates = document.querySelectorAll('.chat-date');
+                    for (const d of dates) {
+                        msgs.push({ cls: 'chat-date', text: d.innerText.trim(), author: '', time: '' });
                     }
+
                     return msgs;
                 }""")
 
