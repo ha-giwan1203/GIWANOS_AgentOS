@@ -72,33 +72,33 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
-| 2026-03-31 23:04 | modified | README.md | README.md 수정 |
-| 2026-03-31 20:49 | created  | report_2026-03.md | 스킬 문서 갱신 |
-| 2026-03-31 19:20 | modified | plan.md | 스킬 문서 갱신 |
-| 2026-03-31 19:20 | modified | research.md | 스킬 문서 갱신 |
-| 2026-03-31 19:20 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-31 17:43 | modified | plan.md | 스킬 문서 갱신 |
-| 2026-03-31 17:43 | modified | research.md | 스킬 문서 갱신 |
-| 2026-03-31 17:43 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-31 16:35 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:35 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:32 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | 운영핵심파일_보호목록_v1.0.md | 보호 파일 목록 수정 |
-| 2026-03-31 16:28 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
-| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
-| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | RUNBOOK.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | eval_cases.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | prompt_template.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | deploy_checklist.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
-| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-31 16:28 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-31 16:28 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
-| 2026-03-31 16:28 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
-| 2026-03-31 16:28 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 23:25 | modified | RUNBOOK.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | prompt_template.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | eval_cases.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | deploy_checklist.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | report_2026-03.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | production-report.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | procurement-delivery.skill | 스킬 패키지 갱신 |
+| 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 23:25 | modified | process-improvement.skill | 스킬 패키지 갱신 |
