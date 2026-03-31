@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-03-31 (루트 CLAUDE.md 하네스 검증 원칙 승격 — GPT 공동작업 완료)
+최종 업데이트: 2026-03-31 (auto_commit_config 수정 + Hooks 실전 패턴 + 멀티에이전트 A2 research — GPT 공동작업)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 작업 목적
 
-하네스 파일럿 2회차 완료 + 루트 CLAUDE.md 하네스 원칙 승격 (GPT 공동작업).
+자동화 체인 복구 + Hooks 실전 패턴 적용 + 외부 리소스 분석 (GPT 공동작업).
 
 ---
 
@@ -41,9 +41,12 @@
 
 ## 4. 다음 AI가 바로 할 일
 
-1. ~~OUTER 라인 runOuterLine(295) 재개~~ — **취소됨** (커밋 833a675b)
-2. ~~도메인 STATUS.md 점검~~ — 완료됨 (2026-03-31)
-3. 새 작업 시 research.md → plan.md 승인 → 구현 순서 준수 (Plan-First 워크플로우)
+1. ~~auto_commit_config 수정~~ — 완료 (f0a62cba, GPT PASS)
+2. ~~Hooks 실전 패턴 적용~~ — 완료 (0db38bcb, GPT PASS)
+3. ~~A2 멀티에이전트 research~~ — 완료 (0e0bf1d2, subagents 적합 판정)
+4. A2 plan 진행 중 — subagent 파일럿 2종 (doc-check, task-status-sync)
+5. auto-commit 운영 검증 — 다음 Slack AutoBot 알림에서 [Git 커밋 실패] 없음 확인
+6. 리소스 리스트 B등급 의제 대기
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
