@@ -105,7 +105,7 @@ if (btn && !btn.disabled) btn.click();
   0~20초:   sleep 5  (일반 응답 빠르게 캐치)
   20~60초:  sleep 10 (중간 구간)
   60초~:    sleep 15 (확장추론 대응)
-timeout:    최대 180초
+timeout:    최대 300초 (확장추론 5분 대응)
 ```
 > CDP 45초 timeout 때문에 javascript_tool 안에서 setInterval/Promise 기반 polling 불가.
 > 반드시 `javascript_tool` + `sleep N` 분리 호출로 루프를 구성한다.
