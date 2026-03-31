@@ -98,3 +98,4 @@
 | Hooks 실전 패턴 적용 — PreToolUse 보호 2계층, PostToolUse 로그, Notification 스팸방지 (GPT 승인) | 2026-03-31 |
 | A2 멀티에이전트 research — subagents 적합/agent teams 보류 판정 (GPT 승인) | 2026-03-31 |
 | A2 subagent 파일럿 — doc-check FAIL 3건 + task-status-sync FAIL 4건 즉시 수정 (정합성 복구) | 2026-03-31 |
+| B1 아키텍처 정리 — AGENTS_GUIDE.md 신설 (6계층 맵 + 구성요소 목록 + 세션 체크리스트) | 2026-03-31 |
