@@ -189,8 +189,8 @@ JSON 로그: 턴별 타임스탬프, 입력/출력, 토큰 추정, 오류 여부
 ### 오류 대응
 | 상황 | 대응 |
 |------|------|
-| ChatGPT 응답 미완료 | 15~30초 대기 후 stop-button 확인, 3회 실패 시 중단 |
-| 텍스트 추출 실패 | read_page → find 순서로 fallback |
+| ChatGPT 응답 미완료 | stop-button 3초 polling, 최대 120초 timeout. 초과 시 사용자에게 보고 |
+| 텍스트 추출 실패 | javascript_tool → get_page_text → read_page 순서로 fallback |
 | 로그인 만료 | 사용자에게 재로그인 요청 |
 | 네트워크 오류 | 로그 기록 후 중단 |
 
