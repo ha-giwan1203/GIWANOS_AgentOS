@@ -100,10 +100,13 @@ if (btn && !btn.disabled) btn.click();
 ```
 방식:    stop-button 유무 확인 (polling)
 완료:    document.querySelector('[data-testid="stop-button"]') === null
-간격:    3초
-timeout: 최대 120초 (GPT 확장추론 대응)
+실행:    javascript_tool로 확인 → Bash sleep 5 → 반복
+사이클:  ~6초 (javascript_tool 1초 + sleep 5초)
+timeout: 최대 120초 (약 20사이클)
 ```
-> MutationObserver는 javascript_tool 매 호출 새 컨텍스트라 상태 유지 불가. 오탐 실제 발생 전까지 도입하지 않는다.
+> CDP 45초 timeout 때문에 javascript_tool 안에서 setInterval/Promise 기반 polling 불가.
+> 반드시 `javascript_tool` + `sleep 5` 분리 호출로 루프를 구성한다.
+> **sleep 60 같은 긴 대기 금지** — 완료 후 최대 6초 내 감지가 목표.
 
 #### 최신 응답 읽기
 ```javascript
