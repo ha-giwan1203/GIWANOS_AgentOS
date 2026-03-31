@@ -158,37 +158,50 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             no_change = 0
 
             for i in range(max_scroll):
-                current = chat_page.evaluate("""() => {
+                current = chat_page.evaluate(r"""() => {
                     const msgs = [];
-                    // chat-left clearfix = 개별 메시지 블록
                     const blocks = document.querySelectorAll('.chat-left.clearfix');
                     for (const block of blocks) {
-                        // chat-txt = 메시지 본문 (깨끗한 텍스트)
-                        const txtEl = block.querySelector('.chat-txt');
+                        const txtEl = block.querySelector('.chat-txt:not(.d-none)');
                         const text = txtEl ? txtEl.innerText.trim() : '';
                         if (!text || text.length < 3) continue;
+                        if (text.includes('원문/번역보기') || text.startsWith('0%')) continue;
 
-                        // 작성자명 (chat-name 또는 이전 요소)
-                        const nameEl = block.querySelector('.chat-name') || block.previousElementSibling?.querySelector?.('.chat-name');
-                        const author = nameEl ? nameEl.innerText.trim() : '';
+                        // 작성자: 이전 형제 .user-sub-wr 안의 .user-title
+                        let author = '';
+                        const prev = block.previousElementSibling;
+                        if (prev && prev.classList.contains('user-sub-wr')) {
+                            const titleEl = prev.querySelector('.user-title');
+                            if (titleEl) author = titleEl.innerText.trim();
+                        }
+                        // 같은 작성자 연속 메시지면 이전 블록에서 찾기
+                        if (!author) {
+                            let el = block.previousElementSibling;
+                            while (el) {
+                                if (el.classList.contains('user-sub-wr')) {
+                                    const t = el.querySelector('.user-title');
+                                    if (t) { author = t.innerText.trim(); break; }
+                                }
+                                el = el.previousElementSibling;
+                            }
+                        }
 
-                        // 시간 (chat-btns 안)
-                        const timeEl = block.querySelector('.chat-btns');
+                        // 시간: .chat-btns 안
                         let time = '';
-                        if (timeEl) {
-                            const timeMatch = timeEl.innerText.match(/(오전|오후)\s*(\d{1,2}):(\d{2})/);
-                            if (timeMatch) time = timeMatch[0];
+                        const btns = block.querySelector('.chat-btns');
+                        if (btns) {
+                            const m = btns.innerText.match(/([오전오후]+)\s*(\d{1,2}):(\d{2})/);
+                            if (m) time = m[0];
                         }
 
                         msgs.push({ cls: 'chat-left', text, author, time });
                     }
 
-                    // 날짜 구분선도 수집 (월별 분류용)
+                    // 날짜 구분선
                     const dates = document.querySelectorAll('.chat-date');
                     for (const d of dates) {
                         msgs.push({ cls: 'chat-date', text: d.innerText.trim(), author: '', time: '' });
                     }
-
                     return msgs;
                 }""")
 
@@ -262,37 +275,25 @@ def _save_results(room_srno, messages, network_debug, network_items):
 
 
 def _normalize_to_csv(messages, room_srno, csv_path):
-    datetime_pat = re.compile(r'(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2})')
-    time_pat = re.compile(r'(오전|오후)\s*(\d{1,2}):(\d{2})')
-    author_pat = re.compile(r'^([가-힣a-zA-Z_]+(?:_[가-힣a-zA-Z]+)?)\s*$', re.MULTILINE)
-
+    current_date = ""
     rows = []
     for msg in messages:
         text = msg.get("text", "")
-        lines = text.strip().split('\n')
+        author = msg.get("author", "").strip()
+        time_str = msg.get("time", "").strip()
+        cls = msg.get("cls", "")
 
-        dt = datetime_pat.search(text)
-        tm = time_pat.search(text)
-        date_str = dt.group(1) if dt else ""
-        time_str = ""
-        if dt:
-            time_str = dt.group(2)
-        elif tm:
-            h = int(tm.group(2))
-            m = tm.group(3)
-            if tm.group(1) == "오후" and h != 12: h += 12
-            elif tm.group(1) == "오전" and h == 12: h = 0
-            time_str = f"{h:02d}:{m}"
+        # 날짜 구분선이면 현재 날짜 업데이트
+        if cls == "chat-date":
+            current_date = text
+            continue
 
-        author = ""
-        for line in lines[:3]:
-            am = author_pat.match(line.strip())
-            if am:
-                author = am.group(1)
-                break
+        # 메시지가 아닌 건 제외
+        if not text or len(text) < 3:
+            continue
 
         rows.append({
-            "date": date_str, "time": time_str, "author": author,
+            "date": current_date, "time": time_str, "author": author,
             "text": text.strip()[:2000], "room_srno": room_srno, "source": "dom",
         })
 
