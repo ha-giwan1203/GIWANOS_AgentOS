@@ -96,7 +96,7 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
                 except Exception:
                     pass
 
-        # 이미 열린 채팅 탭 찾기 또는 팝업 열기
+        # 채팅 탭 찾기 — 없으면 자동 로그인 + 채팅방 열기
         chat_page = None
         flow_page = None
         for pg in pages:
@@ -107,38 +107,64 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             if 'flow.team' in pg.url:
                 flow_page = pg
 
-        if not chat_page and flow_page:
-            print(f"[COLLECT] 채팅방 {room_srno} 팝업 열기...")
-            try:
-                with flow_page.expect_popup(timeout=15000) as popup_info:
-                    flow_page.evaluate("""() => {
-                        const btn = document.querySelector('.js-project-chat.participant-button');
-                        if (btn) btn.click();
-                    }""")
-                chat_page = popup_info.value
-                print(f"[COLLECT] 채팅 팝업 열림: {chat_page.url}")
-            except Exception as e:
-                print(f"[ERROR] 팝업 열기 실패: {e}")
-                print("[TIP] 디버깅 Chrome에서 채팅방을 직접 열어주세요.")
-                browser.close()
-                return messages
+        if not chat_page:
+            print("[COLLECT] 채팅방 자동 열기 시도...")
+            page = flow_page or context.new_page()
+
+            # Step 1: 로그인 처리
+            if 'main.act' not in page.url:
+                print("[COLLECT] 로그인 페이지 이동...")
+                page.goto(f"{FLOW_URL}/signin.act?postlink=main")
+                page.wait_for_load_state("domcontentloaded")
+                page.wait_for_timeout(3000)
+
+                if 'main' not in page.url:
+                    kakao = page.locator("text=Kakao 계정으로 로그인")
+                    if kakao.count() > 0:
+                        print("[COLLECT] 카카오 로그인 클릭...")
+                        kakao.click()
+                        page.wait_for_timeout(5000)
+                        print(f"[COLLECT] 로그인 완료: {page.url}")
+                    else:
+                        print("[ERROR] 카카오 로그인 버튼 없음. 수동 로그인 필요.")
+                        browser.close()
+                        return messages
+
+            # Step 2: main.act 이동
+            if 'main.act' not in page.url:
+                page.goto(f"{FLOW_URL}/main.act")
+                page.wait_for_load_state("networkidle")
+                page.wait_for_timeout(2000)
+
+            # Step 3: 채팅 말풍선 → SP3S03 선택
+            print("[COLLECT] 채팅 목록 열기...")
+            page.evaluate('document.querySelector(".btn-chatting")?.click()')
+            page.wait_for_timeout(2000)
+
+            print("[COLLECT] SP3S03 채팅방 선택...")
+            page.evaluate("""() => {
+                const items = document.querySelectorAll('.mini-mode-area-list-type-1');
+                for (const el of items) {
+                    const name = el.querySelector('.mini-mode-text-main-1, strong');
+                    if (name && name.innerText.includes('SP3S03')) {
+                        el.click();
+                        return;
+                    }
+                }
+            }""")
+            page.wait_for_timeout(3000)
+
+            # messenger.act 탭 확인
+            for pg in context.pages:
+                if 'messenger.act' in pg.url:
+                    chat_page = pg
+                    print(f"[COLLECT] 채팅방 자동 열림: {chat_page.url}")
+                    break
 
         if not chat_page:
-            print("[ERROR] 채팅 탭 없음. 디버깅 Chrome에서 채팅방을 열어주세요.")
+            print("[ERROR] 채팅방을 열 수 없습니다.")
             browser.close()
             return messages
-
-        # room_srno 검증 — DOM에서 채팅방 ID 확인
-        actual_room = chat_page.evaluate("""() => {
-            return document.body?.getAttribute('data-focus-room-srno') || '';
-        }""")
-        if actual_room and actual_room != room_srno:
-            print(f"[ERROR] 열린 채팅방({actual_room})이 요청한 방({room_srno})과 다릅니다.")
-            print("[TIP] SP3S03 운영 채팅방을 열어주세요.")
-            browser.close()
-            return messages
-        if actual_room:
-            print(f"[COLLECT] 채팅방 ID 확인: {actual_room}")
 
         try:
             chat_page.on("response", handle_response)
