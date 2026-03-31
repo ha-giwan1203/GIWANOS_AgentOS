@@ -75,6 +75,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-01 07:34 | modified | debate-mode.skill | 스킬 패키지 갱신 |
 | 2026-04-01 07:24 | modified | _apply_all_v3.py | 초물관리 스크립트 수정 |
 | 2026-04-01 07:24 | modified | _patch_v4.py | 초물관리 스크립트 수정 |
 | 2026-04-01 07:24 | modified | SKILL.md | 스킬 문서 갱신 |
@@ -104,4 +105,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-01 07:24 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
 | 2026-04-01 07:24 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-01 07:24 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-01 07:24 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
