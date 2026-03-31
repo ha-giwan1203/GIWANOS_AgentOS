@@ -1,7 +1,7 @@
 repo:
   path: "C:/Users/User/Desktop/업무리스트"
-  branch: "업무리스트"
-  push_on_commit: false
+  branch: "main"
+  push_on_commit: true
   push_timeout_seconds: 60
 
 allowlist:
