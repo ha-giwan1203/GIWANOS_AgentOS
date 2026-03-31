@@ -72,6 +72,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-01 01:44 | modified | debate-mode.skill | 스킬 패키지 갱신 |
 | 2026-03-31 23:25 | modified | RUNBOOK.md | 스킬 문서 갱신 |
 | 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 23:25 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
@@ -101,4 +102,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 23:25 | modified | procurement-delivery.skill | 스킬 패키지 갱신 |
 | 2026-03-31 23:25 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 23:25 | modified | process-improvement.skill | 스킬 패키지 갱신 |
