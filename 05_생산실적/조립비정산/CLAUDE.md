@@ -148,5 +148,19 @@ SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, IS
 - 재작업 시 이전 대화 전체를 다시 먹이지 않고, Evaluator 피드백만 전달한다
 - 최대 3회 재작업 허용. 동일 실패 2회 반복 시 BLOCKED 전환
 
+## 빈번 조회 데이터
+
+| 항목 | 값 | 비고 |
+|------|-----|------|
+| 업체코드 | 0109 | 대원테크 |
+| 라인 수 | 10개 | SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03 |
+| 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx` | 단가 권위값 |
+| 파이프라인 진입점 | `03_정산자동화/run_settlement_pipeline.py` | step1~7 순차 실행 |
+| 대시보드 출력 | `_cache/월간_조립비_대시보드.png` | step7 시각화 |
+| Slack 보고 | `03_정산자동화/step7_slack_보고.py` | PNG 첨부 (files:write scope 필요) |
+| SP3M3 야간 고정단가 | 170원 | |
+| SD9A01 단가기준판정 | <=500 야간가산, >500 기본 | SD9A01만 적용 |
+| 야간수당 | 기준단가 × 30% 추가 가산 | 전체 100% + 야간 30% |
+
 ## 진행 현황
 참조 오류 수치, 마감 월, 산출 파일명 등은 STATUS.md 참조

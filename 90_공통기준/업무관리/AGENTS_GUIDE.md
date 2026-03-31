@@ -99,6 +99,16 @@ Claude-GPT 공동작업 + 운영 원칙.
 | xlsx/docx/pdf/pptx | 파일 형식별 처리 |
 | youtube-analysis | YouTube 영상 분석 |
 
+### 스킬 메타데이터 표준 (향후 업데이트 시 적용)
+
+모든 SKILL.md frontmatter에 아래 필드 포함:
+- `name`: 스킬 이름
+- `description`: 1줄 설명 (트리거 조건 포함)
+- `version`: 버전 (예: v9)
+- `trigger`: 사용자가 어떤 말을 했을 때 활성화되는지
+- `author`: 작성자
+- `last_updated`: 최종 수정일
+
 ---
 
 ## 6. 감시 계층
@@ -116,10 +126,49 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 ---
 
+## 실행 순서 플로우
+
+```
+[세션 시작]
+  ├→ TASKS.md → STATUS.md → HANDOFF.md 읽기
+  ├→ /doc-check subagent 실행 (필수)
+  ├→ /task-status-sync subagent 실행 (필수)
+  ├→ FAIL 있으면 즉시 수정
+  └→ 작업 착수
+
+[작업 실행]
+  ├→ Plan-First: research.md → plan.md 승인 → 구현
+  ├→ hooks 자동 검증 (PreToolUse 보호, PostToolUse 로그)
+  └→ git commit 시 정합성 리마인드 (hook)
+
+[작업 완료]
+  ├→ TASKS.md 완료 항목 추가
+  ├→ HANDOFF.md 세션 변경사항 기록
+  ├→ Git 커밋/push
+  ├→ GPT 공동작업방 결과 공유 (보고 아닌 공유)
+  └→ Slack 알림 (필요 시)
+
+[세션 종료]
+  └→ HANDOFF.md 다음 AI 할 일 정리
+```
+
+## 장애 대응 절차
+
+| 장애 | 증상 | 대응 |
+|------|------|------|
+| watch_changes.py 사망 | Slack AutoBot 알림 없음, .watch.lock에 죽은 PID | 헬스체크 스케줄러가 5분 내 자동 재시작. 수동: lock 삭제 후 VBS 런처 실행 |
+| auto-commit 실패 | Slack에 [Git 커밋 실패] 알림 | watch_errors_*.log 확인 → 브랜치/allowlist/경로 문제 진단 |
+| STATUS/TASKS 충돌 | doc-check FAIL | 즉시 수정. TASKS.md가 원본 (판정 우선순위) |
+| hooks 미동작 | hook_log.txt에 기록 없음 | settings.local.json hooks 섹션 확인 → 스크립트 실행 권한 확인 |
+| GPT 응답 없음 | ChatGPT 채팅방 로딩 실패 | 브라우저 새로고침 → 프로젝트방 첫 번째 대화 재진입 |
+| Slack 발송 실패 | slack_errors_*.log에 에러 | Bot Token 만료 확인 → token_env_fallback_path .env 파일 확인 |
+
 ## 세션 시작 체크리스트
 
 1. TASKS.md 읽기 (상태 원본)
 2. STATUS.md 읽기 (재개 위치)
 3. HANDOFF.md 읽기 (세션 메모)
-4. `/doc-check` 실행 (정합성 사전 확인 권장)
-5. 현업 질문이면 `업무_마스터리스트.xlsx` 먼저
+4. `/doc-check` 실행 (정합성 검사 — **필수**)
+5. `/task-status-sync` 실행 (상태 충돌 탐지 — **필수**)
+6. FAIL 있으면 즉시 수정
+7. 현업 질문이면 `업무_마스터리스트.xlsx` 먼저

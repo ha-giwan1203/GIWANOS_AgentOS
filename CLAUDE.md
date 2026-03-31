@@ -155,6 +155,11 @@ AI가 수행하는 문서 정리, 자동화, 구조 개편, 검토, 인수인계
 
 읽기 순서: `TASKS.md` → `STATUS.md` → `HANDOFF.md` → `CLAUDE.md`
 
+읽기 후 **필수 점검** (생략 금지):
+1. `/doc-check` — 문서 정합성 검사 (subagent 실행)
+2. `/task-status-sync` — 상태 충돌 탐지 (subagent 실행)
+3. FAIL 발견 시 즉시 수정 후 작업 착수
+
 ### 해석 원칙
 - 현업 업무 질문인데 Git 문서만 보고 답하지 않는다.
 - AI 작업 질문인데 엑셀만 보고 상태를 판정하지 않는다.
