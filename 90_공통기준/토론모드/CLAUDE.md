@@ -124,6 +124,19 @@ msgs[msgs.length - 1].innerText;
 2. 텍스트가 너무 길거나 잘리면 get_page_text로 전체 페이지 텍스트 추출 후 파싱
 3. 파싱 실패 시 read_page로 DOM 구조에서 마지막 메시지 요소 탐색
 
+### 입력 전 미확인 응답 점검 (필수)
+
+> 메시지 전송 전 반드시 실행. 확인 없이 바로 입력하는 것은 금지.
+
+```javascript
+const msgs = document.querySelectorAll('article[data-message-author-role="assistant"]');
+const lastText = msgs[msgs.length - 1]?.innerText?.slice(0, 100) || '';
+```
+
+1. 마지막 assistant 블록 텍스트를 먼저 읽는다
+2. 이전에 읽은 내용과 다르면 → 새 응답이 있는 것 → 먼저 읽고 반영
+3. 같으면 → 변동 없음 → 예정대로 전송 진행
+
 ### GPT 응답 비판적 분석 (필수 — 반박 생성 전)
 
 > **이 단계를 건너뛰면 GPT 프레임에 종속된다. 세션이 바뀌어도 반드시 실행.**
