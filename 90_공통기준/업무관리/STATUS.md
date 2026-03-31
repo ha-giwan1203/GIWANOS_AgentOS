@@ -72,6 +72,9 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-31 17:43 | modified | plan.md | 스킬 문서 갱신 |
+| 2026-03-31 17:43 | modified | research.md | 스킬 문서 갱신 |
+| 2026-03-31 17:43 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 16:35 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 16:35 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 16:32 | moved    | SKILL.md | 스킬 문서 갱신 |
@@ -99,6 +102,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-03-31 16:28 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
 | 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 16:28 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 16:28 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
-| 2026-03-31 16:28 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
