@@ -9,12 +9,9 @@ REM Chrome 디버깅 모드 실행 (이미 열려있으면 스킵)
 tasklist /FI "IMAGENAME eq chrome.exe" 2>NUL | find /I "chrome.exe" >NUL
 if %ERRORLEVEL% NEQ 0 (
     echo [1/3] Chrome 실행 중...
-    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="%USERPROFILE%\.flow-chrome-debug" "https://flow.team/main.act?detail"
-    echo Chrome이 열렸습니다.
-    echo.
-    echo [필수] Flow.team에 로그인하고 SP3S03 채팅방을 열어주세요.
-    echo 준비되면 아무 키나 누르세요...
-    pause >nul
+    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="%USERPROFILE%\.flow-chrome-debug" "https://flow.team/main.act"
+    echo Chrome 실행 완료. 5초 대기...
+    timeout /t 5 /nobreak >nul
 ) else (
     echo [1/3] Chrome 이미 실행 중. 스킵.
 )
