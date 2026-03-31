@@ -71,8 +71,8 @@ def _make_dedupe_key(text: str) -> str:
     return hashlib.md5(normalized.encode('utf-8')).hexdigest()
 
 
-def collect_messages(room_srno: str, max_scroll: int = 200):
-    """채팅 메시지 수집 — headless 모드"""
+def collect_messages(room_srno: str, max_scroll: int = 200, headed: bool = False):
+    """채팅 메시지 수집"""
 
     if not PROFILE_DIR.exists():
         print("[ERROR] 로그인 프로필 없음. login.bat 또는 'python collector.py --login' 먼저 실행")
@@ -85,10 +85,9 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
     network_items = []    # 실제 메시지 후보
 
     with sync_playwright() as p:
-        # headless로 수집 (GUI 없이)
         browser = p.chromium.launch_persistent_context(
             user_data_dir=str(PROFILE_DIR),
-            headless=True,
+            headless=not headed,
             viewport={"width": 1400, "height": 900},
         )
         page = browser.pages[0] if browser.pages else browser.new_page()
@@ -345,7 +344,7 @@ def main():
     if args.login:
         login_mode()
     else:
-        collect_messages(args.room, args.max_scroll)
+        collect_messages(args.room, args.max_scroll, args.headed)
 
 
 if __name__ == "__main__":
