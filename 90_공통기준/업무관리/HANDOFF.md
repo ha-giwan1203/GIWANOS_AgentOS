@@ -19,12 +19,13 @@
 
 | 구분 | 대상 | 핵심 변경 |
 |------|------|----------|
-| 수정 | `skill-creator-merged.skill` | harness 모드 Known Exception 처리 규칙 추가, 피드백 루프 4단계 절차표 교체. commit c7dd616f |
-| 신설 | `90_공통기준/업무관리/research_하네스2회차.md` | 1회차 결과 현황·구조 파악·변경 영향 범위. SHA: a8c9a892 |
-| 신설 | `90_공통기준/업무관리/plan_하네스2회차.md` | Step 1-3 구현 계획, GPT PASS 승인완료. SHA: 54272678 |
-| 완료 | `plan_하네스2회차.md` | Step 1-3 체크박스 완료, Evaluator PASS 95점 기록 |
-| 갱신 | `TASKS.md` | 하네스 2회차 완료 항목 추가, 루트 CLAUDE.md 승격 완료 표시 |
-| 승격 | `CLAUDE.md` | `## 하네스 검증 원칙` 섹션 신설 — 공통 4원칙(사용시점/3인체제/KnownException/피드백루프) |
+| 수정 | `auto_commit_config.yaml` | branch: "업무리스트"→"main", push_on_commit: false→true (f0a62cba) |
+| 신설 | `protect_files.sh` | PreToolUse 보호 파일 deny/log 2계층 (로컬) |
+| 갱신 | `notify_slack.sh` | 60초 dedup 스팸 방지 (로컬) |
+| 신설 | `AGENTS_GUIDE.md` | 6계층 아키텍처 맵 + 구성요소 목록 + 세션 체크리스트 (487f1a8d) |
+| 신설 | research 4건 | watch_changes_commit_fail, hooks_실전패턴, 멀티에이전트_A2, 아키텍처_B1 |
+| 신설 | plan 4건 | 위 research 대응 plan 문서 |
+| 수정 | STATUS.md/HANDOFF.md | doc-check FAIL 3건 + task-status-sync FAIL 4건 수정 |
 
 ---
 
@@ -44,9 +45,10 @@
 1. ~~auto_commit_config 수정~~ — 완료 (f0a62cba, GPT PASS)
 2. ~~Hooks 실전 패턴 적용~~ — 완료 (0db38bcb, GPT PASS)
 3. ~~A2 멀티에이전트 research~~ — 완료 (0e0bf1d2, subagents 적합 판정)
-4. ~~A2 plan 진행 중~~ — subagent 파일럿 2종 테스트 완료 (doc-check FAIL 3건 즉시 수정, task-status-sync FAIL 4건 즉시 수정)
-5. [대기] auto-commit 운영 검증 — TASKS.md `[auto] 정산 파이프라인 실행 테스트 확인` 참조
-6. [대기] 리소스 리스트 B등급 의제 — TASKS.md에 등록 시 진행
+4. ~~A2 subagent 파일럿~~ — 완료 (GPT PASS)
+5. ~~B1 아키텍처 정리~~ — 완료 (AGENTS_GUIDE.md, GPT PASS)
+6. [대기] auto-commit 운영 검증 — 다음 Slack AutoBot 알림 확인
+7. [다음 세션] B2 Claude Skills 생태계 — GPT 권고 다음 의제
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
