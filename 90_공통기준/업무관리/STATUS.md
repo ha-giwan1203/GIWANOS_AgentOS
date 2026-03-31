@@ -72,33 +72,33 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
-| 2026-03-31 15:31 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 15:31 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 15:28 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-31 15:25 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-31 14:30 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-31 14:05 | created  | quality-assurance.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:05 | created  | equipment-utilization.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:05 | created  | partno-management.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:04 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-31 14:04 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:04 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:04 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:02 | created  | procurement-delivery.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:02 | created  | process-improvement.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:02 | created  | line-stoppage.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:02 | created  | hr-attendance.skill | 스킬 패키지 갱신 |
-| 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 13:58 | created  | quality-defect-report.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:57 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 13:53 | created  | cost-rate-management.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:52 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 13:51 | created  | production-report.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:50 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 13:46 | created  | sp3-production-plan.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:46 | moved    | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-31 13:44 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
-| 2026-03-31 13:35 | modified | build_master.py | BI 자동화 스크립트 수정 |
+| 2026-03-31 16:28 | modified | 운영핵심파일_보호목록_v1.0.md | 보호 파일 목록 수정 |
+| 2026-03-31 16:28 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
+| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | RUNBOOK.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | eval_cases.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | prompt_template.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | deploy_checklist.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-03-31 16:28 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | mes-production-upload.skill | 스킬 패키지 갱신 |
+| 2026-03-31 16:28 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
+| 2026-03-31 16:28 | modified | production-report.skill | 스킬 패키지 갱신 |
