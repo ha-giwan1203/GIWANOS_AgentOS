@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-03-31 (커버리지 19%→33%, 스킬 패키징 3종 완료 — GPT 공동작업)
+최종 업데이트: 2026-04-01 (Claude 효율화 리서치 9루프 — GPT 공동작업)
 
 ---
 
@@ -116,6 +116,15 @@
 | watch_changes 헬스체크 — check_watch_alive.bat + 5분 주기 스케줄러 등록 (GPT PASS) | 2026-03-31 |
 | auto_watch_config xlsx/docx/pdf 감시 소음 제거 (GPT PASS) | 2026-03-31 |
 | auto-commit dry-run 검증 성공 — branch 수정 후 7배치 정상 (최종 PASS: 실제 커밋 1회 대기) | 2026-03-31 |
+| debate-mode v2.5~v2.9 — 입력(execCommand)/완료감지(stop-button)/응답읽기 전면 개편 + 하네스 비판적 분석 + 사용자 중간 확인 금지 + GPT 재공유 루프 + 적응형 polling 5/10/15초 | 2026-04-01 |
+| hooks 신규 3개 — Stop(stop_guard.sh v2 금지문구+채택/버림), SessionStart(등록), UserPromptSubmit(prompt_inject.sh 체크리스트 주입) | 2026-04-01 |
+| hooks 강화 — post_validate.sh v2 CLAUDE.md 내부 모순 자동 감지 + stop_guard BLOCK 로깅 | 2026-04-01 |
+| CLAUDE.md 슬림화 — 루트 322→230줄, 토론모드 223→167줄. skill_guide.md 분리 | 2026-04-01 |
+| Context Engineering — 세션 토큰 운영 규칙 + subagent 3개(evidence-reader/debate-analyzer/artifact-validator) | 2026-04-01 |
+| 운영 검증 체계 — analyze_hook_log.sh KPI + smoke_test.sh 10/10 PASS + 경고 임계치 | 2026-04-01 |
+| settings allow 정리 172→46개 + OAuth 토큰 제거 + 요약본 문서화 | 2026-04-01 |
+| 커넥터 운영지침 v1.3 — 자동화 연결 권한 경계 표준화 (읽기/쓰기/전송 3단계 + 주체별 정리) | 2026-04-01 |
+| daily-doc-check scheduled task 생성 (평일 09시 TASKS/STATUS/HANDOFF 정합성 체크) | 2026-04-01 |
 | 영상/리소스 발굴 안건 10건 처리 완료 — hooks/subagent/문서 구현 7건 + 확인 2건 + 안내 1건 | 2026-03-31 |
 | 업무리스트 전체 커버리지 맵 작성 — 27건 전수 맵핑, 우선순위 확정 | 2026-03-31 |
 | sp3-production-plan.skill 패키징 — 생산계획 v3.0 문서 3건 통합 (#11) | 2026-03-31 |

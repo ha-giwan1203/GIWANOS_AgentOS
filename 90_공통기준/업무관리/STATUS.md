@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-03-31 (auto_commit_config 수정, Hooks 실전 패턴 적용, 멀티에이전트 research)
+최종 업데이트: 2026-04-01 (Claude 효율화 리서치 9루프 — hooks/subagent/CLAUDE.md슬림화/settings정리/KPI)
 
 ---
 
@@ -61,6 +61,9 @@
 - 업무리스트 폴더 루트 임의 폴더 생성 금지
 - Notion을 AI 작업 기준 저장소로 사용 금지
 - 상태 판정은 TASKS.md 기준. STATUS/HANDOFF/Notion이 충돌하면 TASKS.md가 우선
+- settings.local.json 토큰 하드코딩 금지 (2026-04-01 OAuth 토큰 제거)
+- hooks 수정 후 반드시 smoke_test.sh 실행 (10케이스)
+- 토론모드 금지 문구는 stop_guard.sh가 deterministic 차단
 
 ---
 
