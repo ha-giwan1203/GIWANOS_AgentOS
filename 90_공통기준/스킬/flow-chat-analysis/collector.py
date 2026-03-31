@@ -87,8 +87,9 @@ def login_mode():
 def collect_messages(room_srno: str, max_scroll: int = 200):
     """채팅 메시지 수집"""
 
-    if not AUTH_STATE_FILE.exists():
-        print("[ERROR] 로그인 세션이 없습니다. 먼저 'python collector.py --login' 실행")
+    profile_dir = SCRIPT_DIR / "playwright_profile"
+    if not profile_dir.exists():
+        print("[ERROR] 로그인 프로필이 없습니다. 먼저 'python collector.py --login' 실행")
         sys.exit(1)
 
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -140,17 +141,15 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
         # 채팅 팝업 열기 시도
         print(f"[COLLECT] 채팅방 {room_srno} 팝업 열기...")
 
-        # 채팅 버튼 클릭으로 팝업 열기
-        popup_promise = page.wait_for_event("popup", timeout=10000)
-
-        # JS로 채팅 버튼 클릭
-        page.evaluate("""() => {
-            const btn = document.querySelector('.js-project-chat.participant-button');
-            if (btn) btn.click();
-        }""")
-
         try:
-            popup = popup_promise
+            # expect_popup 컨텍스트 매니저로 안전하게 팝업 대기
+            with page.expect_popup(timeout=10000) as popup_info:
+                # JS로 채팅 버튼 클릭
+                page.evaluate("""() => {
+                    const btn = document.querySelector('.js-project-chat.participant-button');
+                    if (btn) btn.click();
+                }""")
+            popup = popup_info.value
             print(f"[COLLECT] 채팅 팝업 열림: {popup.url}")
             popup.on("response", handle_response)
             popup.wait_for_load_state("networkidle")
