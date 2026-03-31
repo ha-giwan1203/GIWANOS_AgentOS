@@ -1,0 +1,5 @@
+auth_state.json
+output/
+playwright_profile/
+*.pyc
+__pycache__/
