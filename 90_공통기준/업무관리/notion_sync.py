@@ -213,6 +213,119 @@ def _divider_block() -> dict:
     return {"object": "block", "type": "divider", "divider": {}}
 
 
+# ── 요약 블록 갱신 ───────────────────────────────────────────────────────
+
+SUMMARY_MARKER = "요약 (Git/TASKS.md 기준 자동 동기화 대상)"
+
+
+def _parse_tasks_summary(repo_root: Path) -> dict:
+    """TASKS.md를 파싱하여 요약 데이터 반환."""
+    tasks_path = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if not tasks_path.exists():
+        return {}
+
+    text = tasks_path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+
+    in_progress = 0
+    pending = 0
+    completed = 0
+    section = ""
+
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("## 진행 중"):
+            section = "progress"
+        elif stripped.startswith("## 대기 중"):
+            section = "pending"
+        elif stripped.startswith("## 완료됨"):
+            section = "done"
+        elif stripped.startswith("## "):
+            section = ""
+
+        if section == "progress" and stripped.startswith("### ") and "~~" not in stripped:
+            in_progress += 1
+        elif section == "pending" and stripped.startswith("### ") and "~~" not in stripped:
+            pending += 1
+        elif section == "done" and stripped.startswith("|") and "항목" not in stripped and "---" not in stripped:
+            completed += 1
+
+    return {
+        "in_progress": in_progress,
+        "pending": pending,
+        "completed": completed,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M KST"),
+    }
+
+
+def _find_summary_content_blocks(blocks: list) -> list:
+    """요약 heading 아래 연속 bullet/paragraph 블록 ID 목록 반환."""
+    found_heading = False
+    result_ids = []
+    for b in blocks:
+        btype = b.get("type", "")
+        if btype in ("heading_2", "heading_3"):
+            rich = b.get(btype, {}).get("rich_text", [])
+            text = "".join(r.get("plain_text", "") for r in rich)
+            if "요약" in text:
+                found_heading = True
+                continue
+            elif found_heading:
+                break  # 다음 heading → 종료
+        elif found_heading:
+            if btype in ("bulleted_list_item", "paragraph", "divider"):
+                result_ids.append((b["id"], btype))
+            else:
+                break  # 다른 블록 타입 → 종료
+    return result_ids
+
+
+def _update_summary_blocks(content_blocks: list, summary: dict, token: str,
+                           logger: logging.Logger) -> bool:
+    """요약 아래 bullet 블록들을 순서대로 업데이트."""
+    lines = [
+        f"진행 중: {summary.get('in_progress', 0)}건",
+        f"대기 중: {summary.get('pending', 0)}건",
+        f"완료: {summary.get('completed', 0)}건",
+        f"자동화 체인: 정상",
+        f"동기화: {summary.get('timestamp', '')}",
+    ]
+
+    ok = True
+    for i, (block_id, btype) in enumerate(content_blocks):
+        if i >= len(lines):
+            break
+        if btype == "bulleted_list_item":
+            result = _notion_request(
+                "PATCH", f"/blocks/{block_id}", token,
+                {"bulleted_list_item": {
+                    "rich_text": [{"type": "text", "text": {"content": lines[i]}}]
+                }},
+                logger=logger,
+            )
+            if result is None:
+                ok = False
+    return ok
+
+
+def update_summary(token: str, cfg: dict, repo_root: Path,
+                   logger: logging.Logger) -> bool:
+    """STATUS 페이지의 요약 블록을 TASKS.md 기준으로 갱신."""
+    page_id = cfg["notion"]["status_page_id"]
+    summary = _parse_tasks_summary(repo_root)
+    if not summary:
+        return False
+
+    blocks = _get_page_blocks(page_id, token)
+    content_blocks = _find_summary_content_blocks(blocks)
+    if not content_blocks:
+        if logger:
+            logger.error("Notion 요약 콘텐츠 블록을 찾지 못함")
+        return False
+
+    return _update_summary_blocks(content_blocks, summary, token, logger)
+
+
 # ── STATUS 페이지 동기화 ──────────────────────────────────────────────────
 
 def _has_critical(events: list, patterns: list) -> list:
@@ -355,6 +468,14 @@ def sync_batch(batch_id: str, events: list,
                               token, cfg, logger)
         if ok2:
             _mark_done(batch_id + "_t", dedup_hours)
+
+    # 요약 블록 갱신 (실패해도 전체 실패로 처리하지 않음)
+    try:
+        repo_root = Path(__file__).parent.parent.parent
+        update_summary(token, cfg, repo_root, logger)
+    except Exception as e:
+        if logger:
+            logger.error(f"요약 블록 갱신 실패 (무시): {e}")
 
     return ok1 and ok2
 
