@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-03-31 (auto_commit_config branch/push 오기입 수정 — 자동화 체인 복구, GPT PASS)
+최종 업데이트: 2026-03-31 (멀티에이전트 파일럿 완료 — subagent 2종 테스트 + 정합성 FAIL 즉시 수정)
 
 ---
 
@@ -96,3 +96,5 @@
 | 프로젝트 커맨드 3종 작성 — doc-check/task-status-sync/review-claude-md (.claude/commands/ + Git 미러링) | 2026-03-31 |
 | auto_commit_config.yaml 오기입 수정 — branch: "업무리스트"→"main", push_on_commit: false→true (자동화 체인 복구) | 2026-03-31 |
 | Hooks 실전 패턴 적용 — PreToolUse 보호 2계층, PostToolUse 로그, Notification 스팸방지 (GPT 승인) | 2026-03-31 |
+| A2 멀티에이전트 research — subagents 적합/agent teams 보류 판정 (GPT 승인) | 2026-03-31 |
+| A2 subagent 파일럿 — doc-check FAIL 3건 + task-status-sync FAIL 4건 즉시 수정 (정합성 복구) | 2026-03-31 |

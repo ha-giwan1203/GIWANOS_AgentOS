@@ -35,7 +35,7 @@
 | 우선순위 | TASKS 참조 항목 | 비고 |
 |---------|---------------|------|
 | ~~낮~~ | ~~루트 CLAUDE.md 하네스 원칙 승격~~ | **완료** — 공통 4원칙 승격됨 |
-| 낮 | 도메인 STATUS.md 점검 | 조립비정산, 라인배치 STATUS.md 경로 반영 확인 |
+| ~~낮~~ | ~~도메인 STATUS.md 점검~~ | **완료** (2026-03-31) |
 
 ---
 
@@ -44,9 +44,9 @@
 1. ~~auto_commit_config 수정~~ — 완료 (f0a62cba, GPT PASS)
 2. ~~Hooks 실전 패턴 적용~~ — 완료 (0db38bcb, GPT PASS)
 3. ~~A2 멀티에이전트 research~~ — 완료 (0e0bf1d2, subagents 적합 판정)
-4. A2 plan 진행 중 — subagent 파일럿 2종 (doc-check, task-status-sync)
-5. auto-commit 운영 검증 — 다음 Slack AutoBot 알림에서 [Git 커밋 실패] 없음 확인
-6. 리소스 리스트 B등급 의제 대기
+4. ~~A2 plan 진행 중~~ — subagent 파일럿 2종 테스트 완료 (doc-check FAIL 3건 즉시 수정, task-status-sync FAIL 4건 즉시 수정)
+5. [대기] auto-commit 운영 검증 — TASKS.md `[auto] 정산 파이프라인 실행 테스트 확인` 참조
+6. [대기] 리소스 리스트 B등급 의제 — TASKS.md에 등록 시 진행
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
