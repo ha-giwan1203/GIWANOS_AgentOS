@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-03-31 (auto_commit_config 수정 + Hooks 실전 패턴 + 멀티에이전트 A2 research — GPT 공동작업)
+최종 업데이트: 2026-03-31 (자동화 체인 완전 복구 + 리소스 리스트 A/B 전체 + 독립 판단 규칙 — GPT 공동작업)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -47,8 +47,9 @@
 3. ~~A2 멀티에이전트 research~~ — 완료 (0e0bf1d2, subagents 적합 판정)
 4. ~~A2 subagent 파일럿~~ — 완료 (GPT PASS)
 5. ~~B1 아키텍처 정리~~ — 완료 (AGENTS_GUIDE.md, GPT PASS)
-6. [대기] auto-commit 운영 검증 — 다음 Slack AutoBot 알림 확인
-7. [다음 세션] B2 Claude Skills 생태계 — GPT 권고 다음 의제
+6. [대기] auto-commit 실제 커밋 1회 확인 — 세션 종료 후 debounce fire 시 자동 검증
+7. [대기] Slack files:write scope 추가 — 사용자 조작 필요 (step7_slack_보고.py PNG 첨부)
+8. [향후] B3 확대 후보 — 생산계획표 자동화, BI 실적 집계, 임률단가 테이블
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 
