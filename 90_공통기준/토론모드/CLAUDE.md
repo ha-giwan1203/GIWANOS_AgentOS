@@ -96,17 +96,21 @@ if (btn && !btn.disabled) btn.click();
 ```
 > 클릭 전 disabled 상태 확인 필수.
 
-#### 응답 완료 감지
+#### 응답 완료 감지 (적응형 polling)
 ```
 방식:    stop-button 유무 확인 (polling)
 완료:    document.querySelector('[data-testid="stop-button"]') === null
-실행:    javascript_tool로 확인 → Bash sleep 5 → 반복
-사이클:  ~6초 (javascript_tool 1초 + sleep 5초)
-timeout: 최대 120초 (약 20사이클)
+
+적응형 간격 (3단):
+  0~20초:   sleep 5  (일반 응답 빠르게 캐치)
+  20~60초:  sleep 10 (중간 구간)
+  60초~:    sleep 15 (확장추론 대응)
+timeout:    최대 180초
 ```
 > CDP 45초 timeout 때문에 javascript_tool 안에서 setInterval/Promise 기반 polling 불가.
-> 반드시 `javascript_tool` + `sleep 5` 분리 호출로 루프를 구성한다.
-> **sleep 60 같은 긴 대기 금지** — 완료 후 최대 6초 내 감지가 목표.
+> 반드시 `javascript_tool` + `sleep N` 분리 호출로 루프를 구성한다.
+> **sleep 60 같은 긴 고정 대기 금지.**
+> 확장추론 표시 selector는 불안정하므로 core 로직에 의존하지 않는다.
 
 #### 최신 응답 읽기
 ```javascript
