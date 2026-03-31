@@ -72,6 +72,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-31 23:04 | modified | README.md | README.md 수정 |
 | 2026-03-31 20:49 | created  | report_2026-03.md | 스킬 문서 갱신 |
 | 2026-03-31 19:20 | modified | plan.md | 스킬 문서 갱신 |
 | 2026-03-31 19:20 | modified | research.md | 스킬 문서 갱신 |
@@ -101,4 +102,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-03-31 16:28 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
 | 2026-03-31 16:28 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
 | 2026-03-31 16:28 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-31 16:28 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
