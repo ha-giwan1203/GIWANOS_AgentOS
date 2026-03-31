@@ -114,19 +114,18 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             # 목표 페이지 직접 진입 → 로그인 안 됐으면 signin으로 리다이렉트됨
             page.goto(f"{FLOW_URL}/main.act")
             page.wait_for_load_state("domcontentloaded")
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(1000)
 
             if 'signin' in page.url or 'index' in page.url:
                 print("[COLLECT] 로그인 필요 — 카카오 버튼 대기...")
                 try:
                     page.wait_for_selector("text=Kakao 계정으로 로그인", timeout=15000)
                     page.locator("text=Kakao 계정으로 로그인").click()
-                    page.wait_for_timeout(5000)
+                    page.wait_for_url("**/main**", timeout=10000)
                     print(f"[COLLECT] 로그인 완료: {page.url}")
                     if 'main.act' not in page.url:
                         page.goto(f"{FLOW_URL}/main.act")
                         page.wait_for_load_state("networkidle")
-                        page.wait_for_timeout(2000)
                 except Exception:
                     print("[ERROR] 카카오 버튼 대기 실패. 수동 로그인 필요.")
                     browser.close()
@@ -135,7 +134,7 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             # 채팅 말풍선 → SP3S03 선택
             print("[COLLECT] SP3S03 채팅방 열기...")
             page.evaluate('document.querySelector(".btn-chatting")?.click()')
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(1500)
 
             page.evaluate("""() => {
                 const items = document.querySelectorAll('.mini-mode-area-list-type-1');
@@ -147,7 +146,7 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
                     }
                 }
             }""")
-            page.wait_for_timeout(3000)
+            page.wait_for_timeout(2000)
 
             for pg in context.pages:
                 if 'messenger.act' in pg.url:
