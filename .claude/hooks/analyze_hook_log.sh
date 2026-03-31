@@ -41,3 +41,28 @@ echo ""
 # === 4. 가장 많이 수정된 파일 Top 5 ===
 echo "--- 가장 많이 수정된 파일 Top 5 ---"
 grep 'PostToolUse\|protect_files' "$LOG" | grep -oE '[^ ]+\.(md|sh|json|py|xlsx)' | sort | uniq -c | sort -rn | head -5
+echo ""
+
+# === 5. 일자별 활동 추이 ===
+echo "--- 일자별 활동 ---"
+grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' "$LOG" | sort | uniq -c | sort -rn | head -7
+echo ""
+
+# === 6. 경고 임계치 체크 ===
+echo "--- 경고 임계치 ---"
+BLOCKS=$(grep -c 'stop_guard BLOCK' "$LOG" 2>/dev/null | tail -1 || echo 0)
+FAILS=$(grep -c '\[FAIL\]' "$LOG" 2>/dev/null | tail -1 || echo 0)
+WARNS=$(grep -c '\[WARN\]' "$LOG" 2>/dev/null | tail -1 || echo 0)
+
+if [ "$BLOCKS" -gt 5 ]; then
+  echo "[ALERT] Stop Guard BLOCK ${BLOCKS}회 — 금지 문구 반복 발생. 패턴 점검 필요"
+fi
+if [ "$FAILS" -gt 3 ]; then
+  echo "[ALERT] 정합성 FAIL ${FAILS}회 — CLAUDE.md 내부 모순 반복. 수정 필요"
+fi
+if [ "$WARNS" -gt 10 ]; then
+  echo "[ALERT] WARN ${WARNS}회 — 참조 파일 미존재 다수. 링크 점검 필요"
+fi
+if [ "$BLOCKS" -le 5 ] && [ "$FAILS" -le 3 ] && [ "$WARNS" -le 10 ]; then
+  echo "모든 임계치 정상."
+fi
