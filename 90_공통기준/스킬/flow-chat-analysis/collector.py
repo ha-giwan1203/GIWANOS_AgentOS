@@ -102,13 +102,12 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
         for pg in pages:
             if 'messenger.act' in pg.url:
                 chat_page = pg
-                print(f"[COLLECT] 채팅 탭 발견 (이미 열림): {pg.url}")
+                print(f"[COLLECT] 채팅 탭 발견: {pg.url}")
                 break
             if 'flow.team' in pg.url:
                 flow_page = pg
 
         if not chat_page and flow_page:
-            # 채팅 탭이 없으면 팝업 열기 시도
             print(f"[COLLECT] 채팅방 {room_srno} 팝업 열기...")
             try:
                 with flow_page.expect_popup(timeout=15000) as popup_info:
@@ -125,9 +124,21 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
                 return messages
 
         if not chat_page:
-            print("[ERROR] 채팅 탭을 찾을 수 없습니다. 디버깅 Chrome에서 채팅방을 열어주세요.")
+            print("[ERROR] 채팅 탭 없음. 디버깅 Chrome에서 채팅방을 열어주세요.")
             browser.close()
             return messages
+
+        # room_srno 검증 — DOM에서 채팅방 ID 확인
+        actual_room = chat_page.evaluate("""() => {
+            return document.body?.getAttribute('data-focus-room-srno') || '';
+        }""")
+        if actual_room and actual_room != room_srno:
+            print(f"[ERROR] 열린 채팅방({actual_room})이 요청한 방({room_srno})과 다릅니다.")
+            print("[TIP] SP3S03 운영 채팅방을 열어주세요.")
+            browser.close()
+            return messages
+        if actual_room:
+            print(f"[COLLECT] 채팅방 ID 확인: {actual_room}")
 
         try:
             chat_page.on("response", handle_response)
