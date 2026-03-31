@@ -72,6 +72,15 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-31 09:26 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-31 09:26 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-31 08:46 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
+| 2026-03-31 08:46 | modified | 운영핵심파일_보호목록_v1.0.md | 보호 파일 목록 수정 |
+| 2026-03-31 08:46 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-31 07:40 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
+| 2026-03-31 07:21 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-31 07:12 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-03-31 07:12 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 07:01 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 04:56 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 04:54 | modified | debate-mode.skill | 스킬 패키지 갱신 |
