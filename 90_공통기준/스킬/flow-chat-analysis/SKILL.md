@@ -187,5 +187,8 @@ Flow.team SP3S03 프로젝트 채팅방의 원문 메시지를 입력받아, 품
 
 ## 현재 상태
 
-- v1: 수동 입력 기반 분류·보고 스킬 (완성)
-- v2 예정: 수집기 연동 (공식 API 또는 내부 API 캡처)
+- v1: 완성 (CDP 수집기 + 분류·보고 스킬)
+  - collector.py: Chrome CDP 연결 → 자동 로그인 → 채팅방 열기 → DOM 수집
+  - 실행: run.bat (원클릭) 또는 login.bat → collect.bat
+  - 1차 보고서: report_2026-03.md 생성 완료
+- v2 예정: 운영 안정화 (DOM 변경 대응, 다른 채팅방 확장)

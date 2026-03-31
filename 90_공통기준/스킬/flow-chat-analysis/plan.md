@@ -190,13 +190,15 @@ plan.md 기준으로 구현 시작해. Step 5부터. 인라인 주석의 [변경
 |------|------|------|
 | research.md 완성 | DONE | GPT PASS |
 | plan.md 승인 | DONE | GPT 경미수정 후 PASS |
-| 구현 (SKILL.md) | DONE | GPT 경미수정 후 PASS |
-| 검증 | 미착수 | Step 6 — 예시 입력 필요 |
+| 구현 (SKILL.md) | DONE | GPT PASS |
+| 수집기 (collector.py) | DONE | CDP + 자동 로그인 + DOM 정밀 파싱 |
+| 검증 (1차 보고서) | DONE | report_2026-03.md 생성 완료 |
+| 완료 | DONE | v1 전체 완성 |
 
 ---
 
 ## 재개 위치
 
-- 현재 단계: Step 5 완료, Step 6 수동 검증 대기
-- 막힌 지점: 예시 채팅 원문 필요 (사용자 제공 대기)
-- 다음 실행 항목: 예시 입력으로 스킬 실행 → 분류 정확도 검증
+- 현재 단계: v1 완성
+- 막힌 지점: 없음
+- 다음 실행 항목: v2 수집기 안정화 (운영 중 발견되는 이슈 대응)

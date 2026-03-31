@@ -237,6 +237,7 @@ AI가 수행하는 문서 정리, 자동화, 구조 개편, 검토, 인수인계
 | zdm-daily-inspection | ZDM 일상점검 자동 입력 | 점검 기준 문의 |
 | xlsx/docx/pdf/pptx | 해당 파일 형식 작업 | 단순 내용 질문 |
 | youtube-analysis | YouTube URL → 자막 자동 추출 + 분석 | 자막 없는 영상, 단순 URL 확인 |
+| flow-chat-analysis | Flow 채팅 품질·설비 이슈 월별 분류/보고 | 일반 채팅 질문, ERP 데이터 기반 보고 (quality-defect-report 사용) |
 
 ## 하네스 검증 원칙
 
