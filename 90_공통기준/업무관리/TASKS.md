@@ -101,3 +101,5 @@
 | B1 아키텍처 정리 — AGENTS_GUIDE.md 신설 (6계층 맵 + 구성요소 목록 + 세션 체크리스트) | 2026-03-31 |
 | B2 스킬 생태계 research — 커뮤니티 벤치마킹, 도입 불필요 판정 (GPT PASS) | 2026-03-31 |
 | B3 제조업 AI research — 확대 후보 3건 + Gap 분석, research 종료 (GPT PASS) | 2026-03-31 |
+| CLAUDE.md 공동작업 원칙 강화 — Claude 독립 판단 의무 + 5단계 검증 절차 추가 | 2026-03-31 |
+| watch_changes 헬스체크 — check_watch_alive.bat + 5분 주기 스케줄러 등록 (GPT PASS) | 2026-03-31 |
