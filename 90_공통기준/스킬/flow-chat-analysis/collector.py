@@ -111,26 +111,24 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
             print("[COLLECT] 채팅방 자동 열기...")
             page = flow_page or context.new_page()
 
-            # 목표 페이지 직접 진입
+            # 목표 페이지 직접 진입 → 로그인 안 됐으면 signin으로 리다이렉트됨
             page.goto(f"{FLOW_URL}/main.act")
             page.wait_for_load_state("domcontentloaded")
-            page.wait_for_timeout(3000)
+            page.wait_for_timeout(2000)
 
-            # 로그인 안 됐으면 signin으로 리다이렉트됨 → 그때만 카카오 클릭
             if 'signin' in page.url or 'index' in page.url:
-                print("[COLLECT] 로그인 필요 — 카카오 로그인 시도...")
-                kakao = page.locator("text=Kakao 계정으로 로그인")
-                if kakao.count() > 0:
-                    kakao.click()
+                print("[COLLECT] 로그인 필요 — 카카오 버튼 대기...")
+                try:
+                    page.wait_for_selector("text=Kakao 계정으로 로그인", timeout=15000)
+                    page.locator("text=Kakao 계정으로 로그인").click()
                     page.wait_for_timeout(5000)
                     print(f"[COLLECT] 로그인 완료: {page.url}")
-                    # 로그인 후 main.act 재진입
                     if 'main.act' not in page.url:
                         page.goto(f"{FLOW_URL}/main.act")
                         page.wait_for_load_state("networkidle")
                         page.wait_for_timeout(2000)
-                else:
-                    print("[ERROR] 카카오 버튼 없음. 수동 로그인 필요.")
+                except Exception:
+                    print("[ERROR] 카카오 버튼 대기 실패. 수동 로그인 필요.")
                     browser.close()
                     return messages
 
