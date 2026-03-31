@@ -1,23 +1,21 @@
 """
-Flow.team SP3S03 채팅방 메시지 수집기 (Playwright 기반)
+Flow.team SP3S03 채팅방 메시지 수집기 (CDP 연결 방식)
 
 사용법:
-  1. 최초 1회 (로컬 Windows에서 실행):
-     login.bat 더블클릭 또는 python collector.py --login
-     → 전용 브라우저 열림 → Flow.team 로그인 → Enter
-     → 전용 프로필에 세션 저장됨
+  1. login.bat 실행 → Chrome이 디버깅 모드로 열림
+  2. Flow.team에 카카오 계정으로 로그인
+  3. collect.bat 실행 또는 python collector.py
+     → 로그인된 Chrome에 CDP로 연결 → 채팅 메시지 수집
 
-  2. 수집 (headless 가능):
-     collect.bat 더블클릭 또는 python collector.py
-     → 저장된 프로필로 headless 접속 → 채팅 메시지 수집
-
-  3. 특정 채팅방:
-     python collector.py --room 2938379
+원리:
+  - Playwright가 새 브라우저를 띄우지 않음
+  - 이미 로그인된 Chrome에 connect_over_cdp()로 붙음
+  - 카카오 봇 감지 우회 (로그인 자동화 안 함)
 
 출력:
   - output/messages_raw.json: 수집된 원시 메시지
   - output/messages.csv: 정규화된 CSV (분류 스킬 입력용)
-  - output/network_debug.json: 네트워크 응답 디버그 정보
+  - output/network_debug.json: 네트워크 응답 디버그
 """
 
 import argparse
@@ -35,62 +33,43 @@ except ImportError:
     print("playwright 미설치. 설치: pip install playwright && python -m playwright install chromium")
     sys.exit(1)
 
-# 설정
 SCRIPT_DIR = Path(__file__).parent
 OUTPUT_DIR = SCRIPT_DIR / "output"
-# 영문 경로 (한글 경로 spawn 에러 방지)
-PROFILE_DIR = Path.home() / ".flow-collector-profile"
+CDP_URL = "http://127.0.0.1:9222"
 FLOW_URL = "https://flow.team"
-DEFAULT_ROOM_SRNO = "2938379"  # SP3S03 운영
-
-
-def login_mode():
-    """최초 로그인 — 사용자가 전용 브라우저에서 직접 로그인"""
-    print("[LOGIN] 전용 브라우저를 엽니다. Flow.team에 로그인해주세요.")
-    print("[LOGIN] 로그인 완료 후 이 터미널에서 Enter를 누르세요.")
-
-    with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(
-            user_data_dir=str(PROFILE_DIR),
-            headless=False,
-            viewport={"width": 1400, "height": 900},
-        )
-        page = browser.pages[0] if browser.pages else browser.new_page()
-        page.goto(f"{FLOW_URL}/l/dashboard")
-
-        input("[LOGIN] 로그인 완료 후 Enter...")
-        browser.close()
-
-    print(f"[LOGIN] 프로필 저장 완료: {PROFILE_DIR}")
-    print("[LOGIN] 이제 'python collector.py' 또는 collect.bat으로 수집 가능")
+DEFAULT_ROOM_SRNO = "2938379"
 
 
 def _make_dedupe_key(text: str) -> str:
-    """메시지 텍스트 기반 중복 제거 키 생성 (좌표 무시)"""
     normalized = re.sub(r'\s+', ' ', text.strip())[:200]
     return hashlib.md5(normalized.encode('utf-8')).hexdigest()
 
 
-def collect_messages(room_srno: str, max_scroll: int = 200, headed: bool = False):
-    """채팅 메시지 수집"""
-
-    if not PROFILE_DIR.exists():
-        print("[ERROR] 로그인 프로필 없음. login.bat 또는 'python collector.py --login' 먼저 실행")
-        sys.exit(1)
+def collect_messages(room_srno: str, max_scroll: int = 200):
+    """CDP로 기존 Chrome에 연결하여 채팅 메시지 수집"""
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     seen_keys = set()
     messages = []
-    network_debug = []    # URL/status/keys 디버그
-    network_items = []    # 실제 메시지 후보
+    network_debug = []
+    network_items = []
 
     with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(
-            user_data_dir=str(PROFILE_DIR),
-            headless=not headed,
-            viewport={"width": 1400, "height": 900},
-        )
-        page = browser.pages[0] if browser.pages else browser.new_page()
+        # CDP로 기존 Chrome에 연결
+        print(f"[COLLECT] Chrome CDP 연결 시도: {CDP_URL}")
+        try:
+            browser = p.chromium.connect_over_cdp(CDP_URL)
+        except Exception as e:
+            print(f"[ERROR] Chrome 연결 실패: {e}")
+            print("[ERROR] login.bat으로 Chrome을 디버깅 모드로 먼저 실행하세요.")
+            sys.exit(1)
+
+        print(f"[COLLECT] Chrome 연결 성공. 컨텍스트 {len(browser.contexts)}개")
+
+        # 기존 컨텍스트 사용
+        context = browser.contexts[0] if browser.contexts else browser.new_context()
+        pages = context.pages
+        print(f"[COLLECT] 열린 탭 {len(pages)}개")
 
         # 네트워크 응답 가로채기
         def handle_response(response):
@@ -104,13 +83,12 @@ def collect_messages(room_srno: str, max_scroll: int = 200, headed: bool = False
                             "status": response.status,
                             "keys": list(body.keys())[:15],
                         })
-                        # 메시지 배열 탐색
                         for key in body:
                             val = body[key]
                             if isinstance(val, list) and len(val) > 0:
                                 first = val[0]
                                 if isinstance(first, dict) and any(
-                                    k in first for k in ["MSG_CONTS", "CONTS", "msg", "content", "text",
+                                    k in first for k in ["MSG_CONTS", "CONTS", "content", "text",
                                                           "CHAT_CONTS", "SENDER_NM", "SEND_DTTM"]
                                 ):
                                     for item in val:
@@ -118,115 +96,115 @@ def collect_messages(room_srno: str, max_scroll: int = 200, headed: bool = False
                 except Exception:
                     pass
 
-        page.on("response", handle_response)
+        # 이미 열린 채팅 탭 찾기 또는 팝업 열기
+        chat_page = None
+        flow_page = None
+        for pg in pages:
+            if 'messenger.act' in pg.url:
+                chat_page = pg
+                print(f"[COLLECT] 채팅 탭 발견 (이미 열림): {pg.url}")
+                break
+            if 'flow.team' in pg.url:
+                flow_page = pg
 
-        # SP3S03 프로젝트 페이지로 직접 이동 (room 지정)
-        print(f"[COLLECT] Flow.team SP3S03 프로젝트 접속 중...")
-        page.goto(f"{FLOW_URL}/main.act?detail")
-        page.wait_for_load_state("networkidle")
+        if not chat_page and flow_page:
+            # 채팅 탭이 없으면 팝업 열기 시도
+            print(f"[COLLECT] 채팅방 {room_srno} 팝업 열기...")
+            try:
+                with flow_page.expect_popup(timeout=15000) as popup_info:
+                    flow_page.evaluate("""() => {
+                        const btn = document.querySelector('.js-project-chat.participant-button');
+                        if (btn) btn.click();
+                    }""")
+                chat_page = popup_info.value
+                print(f"[COLLECT] 채팅 팝업 열림: {chat_page.url}")
+            except Exception as e:
+                print(f"[ERROR] 팝업 열기 실패: {e}")
+                print("[TIP] 디버깅 Chrome에서 채팅방을 직접 열어주세요.")
+                browser.close()
+                return messages
 
-        # 채팅 팝업 열기
-        print(f"[COLLECT] 채팅방 {room_srno} 팝업 열기...")
+        if not chat_page:
+            print("[ERROR] 채팅 탭을 찾을 수 없습니다. 디버깅 Chrome에서 채팅방을 열어주세요.")
+            browser.close()
+            return messages
+
         try:
-            with page.expect_popup(timeout=15000) as popup_info:
-                # data-focus-room-srno에서 roomSrno 확인 후 채팅 버튼 클릭
-                page.evaluate("""() => {
-                    const btn = document.querySelector('.js-project-chat.participant-button');
-                    if (btn) btn.click();
-                }""")
-            popup = popup_info.value
-            print(f"[COLLECT] 채팅 팝업 열림: {popup.url}")
+            chat_page.on("response", handle_response)
+            chat_page.wait_for_timeout(1000)
 
-            # 팝업 URL에서 room 확인
-            if room_srno not in popup.url and room_srno not in page.url:
-                print(f"[WARN] 팝업 URL에 room {room_srno} 미포함. 열린 방이 맞는지 확인 필요")
-
-            popup.on("response", handle_response)
-            popup.wait_for_load_state("networkidle")
-            popup.wait_for_timeout(2000)
-
-            # 스크롤 컨테이너 찾기
-            print(f"[COLLECT] 스크롤 컨테이너 탐색...")
-            scroll_selector = popup.evaluate("""() => {
-                // 채팅 스크롤 컨테이너 후보 탐색
+            # 스크롤 컨테이너 탐색
+            scroll_info = chat_page.evaluate("""() => {
                 const candidates = document.querySelectorAll('[class*="scroll"], [class*="chat-list"], [class*="msg-list"], [class*="chat-body"]');
                 for (const el of candidates) {
                     if (el.scrollHeight > el.clientHeight && el.clientHeight > 100) {
-                        return { found: true, class: el.className.substring(0, 80), scrollHeight: el.scrollHeight };
+                        return { found: true, cls: el.className.substring(0, 80), height: el.scrollHeight };
                     }
                 }
-                // fallback: 가장 큰 스크롤 영역
-                let best = null;
-                let bestHeight = 0;
+                let best = null, bestH = 0;
                 document.querySelectorAll('div').forEach(el => {
-                    if (el.scrollHeight > el.clientHeight && el.clientHeight > 200 && el.scrollHeight > bestHeight) {
-                        best = el;
-                        bestHeight = el.scrollHeight;
+                    if (el.scrollHeight > el.clientHeight && el.clientHeight > 200 && el.scrollHeight > bestH) {
+                        best = el; bestH = el.scrollHeight;
                     }
                 });
-                if (best) return { found: true, class: best.className.substring(0, 80), scrollHeight: best.scrollHeight };
+                if (best) return { found: true, cls: best.className.substring(0, 80), height: best.scrollHeight };
                 return { found: false };
             }""")
-            print(f"[COLLECT] 스크롤 컨테이너: {scroll_selector}")
+            print(f"[COLLECT] 스크롤 컨테이너: {scroll_info}")
 
             # 메시지 수집 루프
             print(f"[COLLECT] 메시지 수집 시작 (최대 {max_scroll}회 스크롤)...")
             prev_count = 0
-            no_change_count = 0
+            no_change = 0
 
             for i in range(max_scroll):
-                current_messages = popup.evaluate("""() => {
+                current = chat_page.evaluate("""() => {
                     const msgs = [];
-                    const msgElements = document.querySelectorAll(
+                    const els = document.querySelectorAll(
                         '[class*="chat-message"], [class*="msg-item"], [class*="chat-item"], ' +
                         '[class*="message-wrap"], [class*="chat-wrap"], [class*="chat-content"]'
                     );
-                    for (const el of msgElements) {
+                    for (const el of els) {
                         const text = el.innerText || '';
                         if (text.trim() && text.length > 3) {
-                            msgs.push({
-                                html_class: el.className.substring(0, 100),
-                                text: text.substring(0, 2000)
-                            });
+                            msgs.push({ cls: el.className.substring(0, 100), text: text.substring(0, 2000) });
                         }
                     }
                     if (msgs.length === 0) {
                         document.querySelectorAll('div[class]').forEach(el => {
-                            const cls = el.className || '';
-                            if (cls.includes('chat') || cls.includes('msg') || cls.includes('message')) {
-                                const text = el.innerText || '';
-                                if (text.trim() && text.length > 5 && text.length < 5000) {
-                                    msgs.push({ html_class: cls.substring(0, 100), text: text.substring(0, 2000) });
-                                }
+                            const c = el.className || '';
+                            if (c.includes('chat') || c.includes('msg') || c.includes('message')) {
+                                const t = el.innerText || '';
+                                if (t.trim() && t.length > 5 && t.length < 5000)
+                                    msgs.push({ cls: c.substring(0, 100), text: t.substring(0, 2000) });
                             }
                         });
                     }
                     return msgs;
                 }""")
 
-                # 중복 제거 (텍스트 기반 hash)
-                for msg in current_messages:
+                for msg in current:
                     key = _make_dedupe_key(msg.get("text", ""))
                     if key not in seen_keys:
                         seen_keys.add(key)
                         messages.append(msg)
 
-                current_count = len(messages)
-                if current_count == prev_count:
-                    no_change_count += 1
-                    if no_change_count >= 5:
-                        print(f"[COLLECT] 더 이상 새 메시지 없음. 총 {current_count}건")
+                cnt = len(messages)
+                if cnt == prev_count:
+                    no_change += 1
+                    if no_change >= 5:
+                        print(f"[COLLECT] 더 이상 새 메시지 없음. 총 {cnt}건")
                         break
                 else:
-                    no_change_count = 0
+                    no_change = 0
                     if i % 10 == 0:
-                        print(f"[COLLECT] 스크롤 {i}/{max_scroll}, 메시지 {current_count}건")
-                prev_count = current_count
+                        print(f"[COLLECT] 스크롤 {i}/{max_scroll}, 메시지 {cnt}건")
+                prev_count = cnt
 
                 # 내부 스크롤 컨테이너 위로 스크롤
-                popup.evaluate("""() => {
-                    const containers = document.querySelectorAll('[class*="scroll"], [class*="chat-list"], [class*="msg-list"], [class*="chat-body"]');
-                    for (const el of containers) {
+                chat_page.evaluate("""() => {
+                    const els = document.querySelectorAll('[class*="scroll"], [class*="chat-list"], [class*="msg-list"], [class*="chat-body"]');
+                    for (const el of els) {
                         if (el.scrollHeight > el.clientHeight && el.clientHeight > 100) {
                             el.scrollTop = 0;
                             return;
@@ -234,26 +212,24 @@ def collect_messages(room_srno: str, max_scroll: int = 200, headed: bool = False
                     }
                     window.scrollTo(0, 0);
                 }""")
-                popup.wait_for_timeout(800)
+                chat_page.wait_for_timeout(800)
 
-            popup.close()
+            print(f"[COLLECT] 수집 완료.")
 
         except Exception as e:
-            print(f"[WARN] 팝업 열기 실패: {e}")
-            print("[WARN] login.bat으로 로그인 상태 확인 후 재시도")
+            print(f"[ERROR] 팝업 열기/수집 실패: {e}")
+            print("[TIP] Flow.team SP3S03 프로젝트 페이지가 열려있는지 확인하세요.")
 
+        # CDP 연결 해제 (Chrome은 종료 안 됨)
         browser.close()
 
-    # 결과 저장
     _save_results(room_srno, messages, network_debug, network_items)
     return messages
 
 
 def _save_results(room_srno, messages, network_debug, network_items):
-    """수집 결과 저장"""
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    # 원시 데이터
     raw_path = OUTPUT_DIR / "messages_raw.json"
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump({
@@ -265,86 +241,68 @@ def _save_results(room_srno, messages, network_debug, network_items):
             "total_network": len(network_items),
         }, f, ensure_ascii=False, indent=2)
 
-    # 네트워크 디버그
     debug_path = OUTPUT_DIR / "network_debug.json"
     with open(debug_path, "w", encoding="utf-8") as f:
         json.dump(network_debug, f, ensure_ascii=False, indent=2)
 
-    # CSV 정규화
     csv_path = OUTPUT_DIR / "messages.csv"
     _normalize_to_csv(messages, room_srno, csv_path)
 
     print(f"[DONE] 원시: {raw_path} (DOM {len(messages)}건, Net {len(network_items)}건)")
-    print(f"[DONE] 디버그: {debug_path}")
     print(f"[DONE] CSV: {csv_path}")
 
 
 def _normalize_to_csv(messages, room_srno, csv_path):
-    """DOM 메시지를 정규화 CSV로 변환 (author 포함)"""
-    datetime_pattern = re.compile(r'(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2})')
-    time_pattern = re.compile(r'(오전|오후)\s*(\d{1,2}):(\d{2})')
-    # 작성자 패턴: "이름_소속" 또는 "이름" (줄 시작)
-    author_pattern = re.compile(r'^([가-힣a-zA-Z_]+(?:_[가-힣a-zA-Z]+)?)\s*$', re.MULTILINE)
+    datetime_pat = re.compile(r'(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2})')
+    time_pat = re.compile(r'(오전|오후)\s*(\d{1,2}):(\d{2})')
+    author_pat = re.compile(r'^([가-힣a-zA-Z_]+(?:_[가-힣a-zA-Z]+)?)\s*$', re.MULTILINE)
 
     rows = []
     for msg in messages:
         text = msg.get("text", "")
         lines = text.strip().split('\n')
 
-        # 날짜 추출
-        dt_match = datetime_pattern.search(text)
-        time_match = time_pattern.search(text)
-        date_str = dt_match.group(1) if dt_match else ""
+        dt = datetime_pat.search(text)
+        tm = time_pat.search(text)
+        date_str = dt.group(1) if dt else ""
         time_str = ""
-        if dt_match:
-            time_str = dt_match.group(2)
-        elif time_match:
-            hour = int(time_match.group(2))
-            minute = time_match.group(3)
-            if time_match.group(1) == "오후" and hour != 12:
-                hour += 12
-            elif time_match.group(1) == "오전" and hour == 12:
-                hour = 0
-            time_str = f"{hour:02d}:{minute}"
+        if dt:
+            time_str = dt.group(2)
+        elif tm:
+            h = int(tm.group(2))
+            m = tm.group(3)
+            if tm.group(1) == "오후" and h != 12: h += 12
+            elif tm.group(1) == "오전" and h == 12: h = 0
+            time_str = f"{h:02d}:{m}"
 
-        # 작성자 추출 (첫 줄 또는 두번째 줄에서)
         author = ""
         for line in lines[:3]:
-            am = author_pattern.match(line.strip())
+            am = author_pat.match(line.strip())
             if am:
                 author = am.group(1)
                 break
 
         rows.append({
-            "date": date_str,
-            "time": time_str,
-            "author": author,
-            "text": text.strip()[:2000],
-            "room_srno": room_srno,
-            "source": "dom",
+            "date": date_str, "time": time_str, "author": author,
+            "text": text.strip()[:2000], "room_srno": room_srno, "source": "dom",
         })
 
-    fieldnames = ["date", "time", "author", "text", "room_srno", "source"]
+    fields = ["date", "time", "author", "text", "room_srno", "source"]
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    print(f"[DONE] CSV 저장: {csv_path} ({len(rows)}건)")
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        w.writerows(rows)
+    print(f"[DONE] CSV: {csv_path} ({len(rows)}건)")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Flow.team 채팅 메시지 수집기")
-    parser.add_argument("--login", action="store_true", help="최초 로그인 모드 (GUI)")
-    parser.add_argument("--room", default=DEFAULT_ROOM_SRNO, help="채팅방 ID (기본: SP3S03)")
+    parser = argparse.ArgumentParser(description="Flow.team 채팅 수집기 (CDP)")
+    parser.add_argument("--room", default=DEFAULT_ROOM_SRNO, help="채팅방 ID")
     parser.add_argument("--max-scroll", type=int, default=200, help="최대 스크롤 횟수")
-    parser.add_argument("--headed", action="store_true", help="수집 시 GUI 브라우저 사용")
+    parser.add_argument("--cdp-url", default=CDP_URL, help="Chrome CDP URL")
     args = parser.parse_args()
 
-    if args.login:
-        login_mode()
-    else:
-        collect_messages(args.room, args.max_scroll, args.headed)
+    collect_messages(args.room, args.max_scroll)
 
 
 if __name__ == "__main__":
