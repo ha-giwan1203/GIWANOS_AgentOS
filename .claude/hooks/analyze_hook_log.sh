@@ -28,8 +28,9 @@ echo ""
 
 # === 2. Stop Guard 차단 (별도 로그가 없으면 transcript 기반) ===
 echo "--- Stop Guard ---"
-echo "Stop Guard는 transcript에서 exit 2로 차단하므로 hook_log.txt에 기록 안 됨."
-echo "실전 차단 횟수는 다음 세션에서 transcript 분석으로 확인 필요."
+echo "BLOCK (forbidden_phrase): $(grep -c 'stop_guard BLOCK.*forbidden_phrase' "$LOG")"
+echo "BLOCK (missing_bucket):   $(grep -c 'stop_guard BLOCK.*missing_bucket' "$LOG")"
+echo "총 BLOCK:                 $(grep -c 'stop_guard BLOCK' "$LOG")"
 echo ""
 
 # === 3. 최근 24시간 활동 ===
