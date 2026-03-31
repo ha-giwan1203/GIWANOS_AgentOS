@@ -32,11 +32,8 @@ watch:
     - ".py"
     - ".ps1"
     - ".bat"
-    - ".xlsx"
-    - ".xls"
-    - ".docx"
-    - ".pdf"
     - ".skill"
+    # .xlsx/.xls/.docx/.pdf 제거 — blocklist+status_rules 모두 미대응, 감지만 하고 처리 안 됨
 
 logging:
   log_dir: "90_공통기준/업무관리"
