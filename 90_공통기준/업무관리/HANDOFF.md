@@ -41,9 +41,9 @@
 
 ## 4. 다음 AI가 바로 할 일
 
-1. **OUTER 라인 runOuterLine(295) 재개** — 10_라인배치/CLAUDE.md 참조
-3. 도메인 STATUS.md 점검 — 조립비정산, 라인배치
-4. 새 작업 시 research.md → plan.md 승인 → 구현 순서 준수 (Plan-First 워크플로우)
+1. ~~OUTER 라인 runOuterLine(295) 재개~~ — **취소됨** (커밋 833a675b)
+2. ~~도메인 STATUS.md 점검~~ — 완료됨 (2026-03-31)
+3. 새 작업 시 research.md → plan.md 승인 → 구현 순서 준수 (Plan-First 워크플로우)
 
 **GPT 협업 루틴**: 작업 완료 → push → GPT 지정 채팅방 보고 → PASS 확인
 

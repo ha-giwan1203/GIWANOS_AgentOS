@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-03-31 (Phase 1-1 Hooks 하이브리드 도입 — 6건 hook + 스크립트 배치, GPT 조건부 승인)
+최종 업데이트: 2026-03-31 (커뮤니티 패턴 3종 프로젝트 커맨드 작성 + Git 미러링, 우회모드 점검 완료)
 
 ---
 
@@ -93,3 +93,4 @@
 | 루트 CLAUDE.md 공동작업 운영 원칙 5항목 추가 + 공동작업 표 금지 반영 | 2026-03-31 |
 | Phase 1-1 Hooks 하이브리드 도입 — SessionStart/PreToolUse/Notification/ConfigChange/InstructionsLoaded/SessionEnd 6건, GPT 조건부 승인 | 2026-03-31 |
 | 도메인 STATUS.md 점검 완료 — 조립비정산 정합성 OK, 라인배치 OUTER 재개 취소 반영 | 2026-03-31 |
+| 프로젝트 커맨드 3종 작성 — doc-check/task-status-sync/review-claude-md (.claude/commands/ + Git 미러링) | 2026-03-31 |
