@@ -72,6 +72,10 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-31 14:02 | created  | procurement-delivery.skill | 스킬 패키지 갱신 |
+| 2026-03-31 14:02 | created  | process-improvement.skill | 스킬 패키지 갱신 |
+| 2026-03-31 14:02 | created  | line-stoppage.skill | 스킬 패키지 갱신 |
+| 2026-03-31 14:02 | created  | hr-attendance.skill | 스킬 패키지 갱신 |
 | 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
 | 2026-03-31 14:00 | moved    | SKILL.md | 스킬 문서 갱신 |
@@ -98,7 +102,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-03-31 13:32 | modified | line-mapping-validator.skill | 스킬 패키지 갱신 |
 | 2026-03-31 13:32 | modified | line-batch-outer-main.skill | 스킬 패키지 갱신 |
 | 2026-03-31 13:32 | modified | line-batch-management.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:32 | modified | line-batch-mainsub.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:32 | modified | debate-mode.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:32 | modified | chomul-module-partno.skill | 스킬 패키지 갱신 |
-| 2026-03-31 13:32 | modified | assembly-cost-settlement.skill | 스킬 패키지 갱신 |
