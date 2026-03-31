@@ -42,5 +42,21 @@ GPT 승인: 확인됨 (3가지 조건 포함)
 - [x] Step 3: protect_files.sh 신규 작성 (deny/log 2계층)
 - [x] Step 4: notify_slack.sh 스팸 방지 업데이트 (60초 dedup)
 - [x] Step 5: settings.local.json hooks 섹션 추가 (PreToolUse 2, PostToolUse 1, Notification 1)
-- [ ] Step 6: 동작 확인 (hooks 로그)
+- [x] Step 6: 동작 확인 완료 (2026-03-31)
 - [ ] Step 7: Git 커밋/push + GPT 보고
+
+## Step 6 검증 결과 (hook_log.txt 요약)
+
+```
+PreToolUse(protect_files.sh) 트리거 5건:
+  - plan_hooks_실전패턴.md (11:24:45)
+  - TASKS.md (11:26:03)
+  - protect_files.sh (11:27:20)
+  - feedback_no_idle_report.md (11:32:29)
+  - MEMORY.md (11:32:42)
+
+PostToolUse 트리거 5건: 각 Write/Edit 직후 정상 실행
+Notification: 테스트 기회 미발생 (permission/idle 상황 없음 — 정상)
+```
+
+판정: PreToolUse + PostToolUse 정상 동작 확인. 최소셋 운영 가능.
