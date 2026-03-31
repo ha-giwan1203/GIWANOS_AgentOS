@@ -41,6 +41,11 @@ if echo "$FILE_PATH" | grep -qi "CLAUDE.md"; then
 
   ISSUES=""
 
+  # timeout/polling 불일치 검사
+  if [ "$POLL_OLD" -gt 0 ]; then
+    ISSUES="${ISSUES}[FAIL] 구버전 polling 간격 참조 남아있음 (10초 대기/15~30초/60초)\n"
+  fi
+
   if [ "$HAS_FIND_BAN" -gt 0 ] && [ "$HAS_FIND_USE" -gt 0 ]; then
     ISSUES="${ISSUES}[FAIL] find() 금지 규칙과 find 사용 참조가 동시에 존재\n"
   fi
