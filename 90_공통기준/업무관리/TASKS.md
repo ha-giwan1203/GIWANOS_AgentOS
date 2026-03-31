@@ -95,3 +95,4 @@
 | 도메인 STATUS.md 점검 완료 — 조립비정산 정합성 OK, 라인배치 OUTER 재개 취소 반영 | 2026-03-31 |
 | 프로젝트 커맨드 3종 작성 — doc-check/task-status-sync/review-claude-md (.claude/commands/ + Git 미러링) | 2026-03-31 |
 | auto_commit_config.yaml 오기입 수정 — branch: "업무리스트"→"main", push_on_commit: false→true (자동화 체인 복구) | 2026-03-31 |
+| Hooks 실전 패턴 적용 — PreToolUse 보호 2계층, PostToolUse 로그, Notification 스팸방지 (GPT 승인) | 2026-03-31 |
