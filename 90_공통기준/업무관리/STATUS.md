@@ -72,6 +72,19 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-03-31 13:32 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | mes-production-upload.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | line-mapping-validator.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | line-batch-outer-main.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | line-batch-management.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | line-batch-mainsub.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | debate-mode.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | chomul-module-partno.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | assembly-cost-settlement.skill | 스킬 패키지 갱신 |
+| 2026-03-31 13:32 | modified | adversarial-review.skill | 스킬 패키지 갱신 |
 | 2026-03-31 09:26 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 09:26 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-31 08:46 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
@@ -89,11 +102,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-03-31 04:50 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-03-30 23:22 | modified | debate-mode.skill | 스킬 패키지 갱신 |
 | 2026-03-30 22:21 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-30 22:01 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-30 21:53 | moved    | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
-| 2026-03-30 20:47 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-30 20:47 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-30 19:49 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-30 19:45 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-03-30 19:37 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-03-30 18:30 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
