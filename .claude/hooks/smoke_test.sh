@@ -83,6 +83,53 @@ check $? "session_start.sh 존재 + 실행 가능"
 
 echo ""
 
+# === 5. Pre Write Guard (pre_write_guard.sh) ===
+echo "--- 5. Pre Write Guard (pre_write_guard.sh) ---"
+
+test -x "$HOOKS_DIR/pre_write_guard.sh"
+check $? "pre_write_guard.sh 존재 + 실행 가능"
+
+grep -q 'EXEMPT_SUFFIXES' "$HOOKS_DIR/pre_write_guard.sh"
+check $? "EXEMPT 파일 목록 정의됨"
+
+grep -q 'parse_plan' "$HOOKS_DIR/pre_write_guard.sh"
+check $? "plan.md 파싱 로직 존재"
+
+echo ""
+
+# === 6. Post Write Dirty (post_write_dirty.sh) ===
+echo "--- 6. Post Write Dirty (post_write_dirty.sh) ---"
+
+test -x "$HOOKS_DIR/post_write_dirty.sh"
+check $? "post_write_dirty.sh 존재 + 실행 가능"
+
+grep -q 'dirty.flag' "$HOOKS_DIR/post_write_dirty.sh"
+check $? "dirty.flag 생성 로직 존재"
+
+echo ""
+
+# === 7. Pre Finish Guard (pre_finish_guard.sh) ===
+echo "--- 7. Pre Finish Guard (pre_finish_guard.sh) ---"
+
+test -x "$HOOKS_DIR/pre_finish_guard.sh"
+check $? "pre_finish_guard.sh 존재 + 실행 가능"
+
+grep -q 'verify.json' "$HOOKS_DIR/pre_finish_guard.sh"
+check $? "verify.json 검사 로직 존재"
+
+echo ""
+
+# === 8. GPT Followup Guard (gpt_followup_guard.sh) ===
+echo "--- 8. GPT Followup Guard (gpt_followup_guard.sh) ---"
+
+test -x "$HOOKS_DIR/gpt_followup_guard.sh"
+check $? "gpt_followup_guard.sh 존재 + 실행 가능"
+
+grep -q 'pending.flag\|pending_flag' "$HOOKS_DIR/gpt_followup_guard.sh"
+check $? "pending.flag 상태기계 로직 존재"
+
+echo ""
+
 # === 결과 ===
 echo "=== 결과: $PASS/$TOTAL PASS, $FAIL FAIL ==="
 if [ "$FAIL" -gt 0 ]; then
