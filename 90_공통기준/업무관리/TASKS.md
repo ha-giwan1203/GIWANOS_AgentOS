@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-01 KST — 운영 안정화 업그레이드 GPT 검증 PASS, 완료 처리
+최종 업데이트: 2026-04-01 KST — 영상분석 스킬 자동 모드 설계 (GPT 공동작업 합의 완료)
 
 ---
 
@@ -48,6 +48,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| youtube-analysis 스킬 자동 모드 설계 — 8단계 워크플로우 + A/B/C 3단 게이트 + 교차검증 의무화 + 분석관점 9개 (GPT 공동작업 합의) | 2026-04-01 |
 | 운영 안정화 업그레이드 — 훅 6개 + rules 5개 + agent 1개 + command 1개 + CLAUDE.md 경량화 + 토론모드 셀렉터 수정 (GPT 검증 PASS: 4e4a6264) | 2026-04-01 |
 | 1단계 구조적 가드레일 구현 — hooks 3개(pre_write_guard/post_write_dirty/pre_finish_guard) + settings merge + verify_xlsm.py 2단계 구조 (GPT 구조 PASS) | 2026-04-01 |
 | GPT 후속작업 강제 가드 — gpt_followup_guard.sh (PostToolUse+Stop 겸용, pending.flag 상태기계) GPT 합의 | 2026-04-01 |
