@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-01 KST — 영상분석 스킬 자동 모드 설계 (GPT 공동작업 합의 완료)
+최종 업데이트: 2026-04-01 14:38 KST — 영상분석 자동 모드 1차 실행 완료 (A2 구현 + B1 plan 작성)
 
 ---
 
@@ -20,6 +20,12 @@
 ---
 
 ## 대기 중 (우선순위 순)
+
+### [대기] subagent 확장 plan — **대기: 사용자 승인**
+- 출처: 영상분석 자동 모드 1차 실행 (GPT 합의)
+- plan 경로: `90_공통기준/업무관리/_플랜/plan_subagent_expansion.md`
+- 내용: settlement-validator subagent 신규 + code-reviewer memory 추가 + skills preloading
+- 승인 후 구현 진행
 
 
 
@@ -48,6 +54,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| 영상분석 자동 모드 1차 실행 — 3영상 분석 + 교차검증 + GPT 토론 합의 → A2 SubagentStart/SubagentStop hooks 구현 + B1 subagent 확장 plan 작성 | 2026-04-01 |
 | youtube-analysis 스킬 자동 모드 설계 — 8단계 워크플로우 + A/B/C 3단 게이트 + 교차검증 의무화 + 분석관점 9개 (GPT 공동작업 합의) | 2026-04-01 |
 | 운영 안정화 업그레이드 — 훅 6개 + rules 5개 + agent 1개 + command 1개 + CLAUDE.md 경량화 + 토론모드 셀렉터 수정 (GPT 검증 PASS: 4e4a6264) | 2026-04-01 |
 | 1단계 구조적 가드레일 구현 — hooks 3개(pre_write_guard/post_write_dirty/pre_finish_guard) + settings merge + verify_xlsm.py 2단계 구조 (GPT 구조 PASS) | 2026-04-01 |

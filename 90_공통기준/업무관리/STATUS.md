@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-01 — youtube-analysis 스킬 자동 모드 설계 확정 (GPT 공동작업 합의, 커밋 7105ef8f)
+최종 업데이트: 2026-04-01 — youtube-analysis 자동 모드 1차 실행 완료 (3영상 분석 + GPT 토론 합의 + A2 구현)
 
 ---
 
@@ -24,6 +24,7 @@
 |--------|---------|------|
 | ~~라인배치 OUTER~~ | ~~runOuterLine(295)~~ — **사용자 취소** (2026-03-31) | `10_라인배치/STATUS.md` 참조 |
 | 조립비정산 | 파이프라인 정상 운영 중 | `05_생산실적/조립비정산/CLAUDE.md` |
+| subagent 확장 | plan 승인 대기 (settlement-validator + code-reviewer memory) | `_플랜/plan_subagent_expansion.md` |
 
 ---
 
