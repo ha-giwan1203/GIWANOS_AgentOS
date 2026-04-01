@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-01 (Claude 효율화 리서치 9루프 — GPT 공동작업)
+최종 업데이트: 2026-04-01 03:30 KST (bi_copy 전면 정리 + 개선 안건 4순위 실행 — GPT 공동작업)
 
 ---
 
@@ -115,6 +115,9 @@
 | Context Engineering — 세션 토큰 운영 규칙 + subagent 3개(evidence-reader/debate-analyzer/artifact-validator) | 2026-04-01 |
 | 운영 검증 체계 — analyze_hook_log.sh KPI + smoke_test.sh 10/10 PASS + 경고 임계치 | 2026-04-01 |
 | bi_copy.bat 스케줄러 삭제 → SKILL.md 0단계 통합 (업로드 시 자동 갱신) | 2026-04-01 |
+| bi_copy 잔존 참조 전면 정리 — status_rules/SKILL/STATUS/보호목록 갱신 + bat 3파일 아카이브 | 2026-04-01 |
+| BI 경로 원본 단일화 — production-result-upload 0단계를 단일 원본으로 지정 | 2026-04-01 |
+| 상태 메타데이터 갱신 — TASKS.md 최종 업데이트 현행화 | 2026-04-01 |
 | settings allow 정리 172→46개 + OAuth 토큰 제거 + 요약본 문서화 | 2026-04-01 |
 | 커넥터 운영지침 v1.3 — 자동화 연결 권한 경계 표준화 (읽기/쓰기/전송 3단계 + 주체별 정리) | 2026-04-01 |
 | daily-doc-check scheduled task 생성 (평일 09시 TASKS/STATUS/HANDOFF 정합성 체크) | 2026-04-01 |
