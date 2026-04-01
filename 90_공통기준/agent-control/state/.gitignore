@@ -1,0 +1,5 @@
+# 런타임 상태 파일 — 세션/머신 종속, Git 추적 금지
+current_task
+dirty.flag
+gpt_followup_pending.flag
+*.flag
