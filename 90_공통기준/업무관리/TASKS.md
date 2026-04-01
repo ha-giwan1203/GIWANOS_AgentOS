@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-01 18:00 KST (GetModelGroup 동적 조회 개선 — GPT 공동작업 코드 PASS + 실반영 완료)
+최종 업데이트: 2026-04-01 11:05 KST (1단계 구조적 가드레일 구현 완료 — GPT 구조 PASS / 운영 조건부 PASS)
 
 ---
 
@@ -22,6 +22,11 @@
 ## 대기 중 (우선순위 순)
 
 
+
+### [대기] verify_xlsm.py COM 실검증 — **대기: 다음 xlsm 작업 시 실행**
+- 출처: 1단계 구조적 가드레일 GPT 공동작업
+- verify_xlsm.py 구조는 완료. COM 실검증 산출물(verify.json PASS)은 xlsm 작업 재개 시 확인
+- hooks 3개 + settings merge 구현 완료 (GPT 구조 PASS)
 
 ### [auto] 정산 파이프라인 실행 테스트 확인 — **차단: 4월 데이터 대기**
 - 출처: `step7_대시보드.py` 변경 감지
@@ -43,6 +48,8 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| 1단계 구조적 가드레일 구현 — hooks 3개(pre_write_guard/post_write_dirty/pre_finish_guard) + settings merge + verify_xlsm.py 2단계 구조 (GPT 구조 PASS) | 2026-04-01 |
+| GPT 후속작업 강제 가드 — gpt_followup_guard.sh (PostToolUse+Stop 겸용, pending.flag 상태기계) GPT 합의 | 2026-04-01 |
 | 폴더 마이그레이션 Phase 0~7 | 2026-03-28 |
 | 파일 정리 1차 (94건 아카이브) | 2026-03-28 |
 | 커넥터 운영 지침 v1.0 확정 | 2026-03-28 |
@@ -125,6 +132,7 @@
 | settings allow 정리 172→46개 + OAuth 토큰 제거 + 요약본 문서화 | 2026-04-01 |
 | 커넥터 운영지침 v1.3 — 자동화 연결 권한 경계 표준화 (읽기/쓰기/전송 3단계 + 주체별 정리) | 2026-04-01 |
 | daily-doc-check scheduled task 생성 (평일 09시 TASKS/STATUS/HANDOFF 정합성 체크) | 2026-04-01 |
+| PLAN_OUTPUT 동적 조회 시트 추가 — Table 기반 37컬럼, MATCH+INDEX 수식, GPT 실물 검증 PASS (v2.xlsm) | 2026-04-02 |
 | GetModelGroup 동적 조회 개선 — 하드코딩 40개 차종 제거, B열 동적 수집 + StrComp 정확비교, GPT 코드 PASS + COM 자동 주입 (v2.xlsm) | 2026-04-01 |
 | 영상/리소스 발굴 안건 10건 처리 완료 — hooks/subagent/문서 구현 7건 + 확인 2건 + 안내 1건 | 2026-03-31 |
 | 업무리스트 전체 커버리지 맵 작성 — 27건 전수 맵핑, 우선순위 확정 | 2026-03-31 |

@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-01 18:00 KST (GetModelGroup 동적 조회 개선 — GPT 코드 PASS + 실반영 완료)
+최종 업데이트: 2026-04-01 11:25 KST (구조적 가드레일 1단계 + GPT 후속작업 가드 — GPT 양건 PASS)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 작업 목적
 
-생산계획 VBA GetModelGroup 하드코딩 40개 차종 제거 → 기준 정보 시트 동적 수집 개선 (GPT 공동작업).
+PLAN_OUTPUT 시트 작업에서 드러난 구조적 문제(검증 부재, plan 없는 구현, 자기검증)를 해결하기 위한 구조적 가드레일 1단계 설계·구현.
 
 ---
 
@@ -19,29 +19,28 @@
 
 | 대상 | 핵심 변경 |
 |------|----------|
-| `04_생산계획/SP3M3_생산지시서_메크로자동화_v2.xlsm` | modPlanResultFixed VBA 모듈 교체 (COM 자동 주입) |
-| `04_생산계획/vba_patch.py` | VBA 소스 패치 스크립트 (oletools 추출→수정→출력) |
-| `04_생산계획/vba_inject.py` | COM 자동 주입 스크립트 |
-| `04_생산계획/modPlanResultFixed_modified.bas` | 수정된 VBA 모듈 소스 (3,282 lines) |
-| `04_생산계획/modPlanResultFixed_patch.bas` | 패치 참조 코드 |
-| `90_공통기준/업무관리/TASKS.md` | 완료 항목 추가 |
+| `.claude/hooks/pre_write_guard.sh` | plan.md 기반 쓰기 허가 게이트 (신규) |
+| `.claude/hooks/post_write_dirty.sh` | 파일 변경 시 dirty.flag 생성 (신규) |
+| `.claude/hooks/pre_finish_guard.sh` | verify.json PASS 없으면 완료 차단 (신규) |
+| `.claude/hooks/gpt_followup_guard.sh` | GPT 후속작업 강제: pending.flag 상태기계 (신규) |
+| `.claude/settings.local.json` | 기존 14개 hook 유지 + 4개 append merge (총 19개) |
+| `90_공통기준/agent-control/verifiers/verify_xlsm.py` | 2단계 검증: openpyxl 구조 + COM 값 (신규) |
+| `90_공통기준/agent-control/state/` | current_task, dirty.flag 저장 디렉토리 (신규) |
+| `90_공통기준/업무관리/TASKS.md` | 완료 항목 + verify 대기 항목 추가 |
 
-### VBA 변경 상세
-- Mod1: 모듈 레벨 변수 `mModelKeys()`, `mModelKeysCount` 추가
-- Mod2: `BuildItem` 내 `GetModelGroup(txtAll)` → `GetModelGroup(item("CarType"))` 변경
-- Mod3: `BuildInfoMap` 시작 시 `mModelKeysCount = 0` + `BuildModelKeys wsInfo` 호출 추가
-- Mod4: `BuildModelKeys` 신규 — B열 차종에서 모델 코드 동적 수집 (Dictionary + 길이 내림차순 정렬)
-- Mod5: `ExtractLeadingAlphaNum` 신규 — 선두 영숫자 토큰 추출 + UCase 정규화
-- Mod6: `GetModelGroup` 교체 — `ExtractLeadingAlphaNum` + `StrComp` 정확 비교 (InStr 부분일치 제거)
+### 버그 수정 2건
+- `>>?` 패턴 → `(?<!\d)\s*>>?\s` (2>&1 오탐 방지, pre_write_guard + post_write_dirty)
+- task_dir 미존재 시 None 반환 (게이트 비활성)
 
 ---
 
 ## 3. GPT 공동작업 상태
 
 - GPT 대화방: `생산계획표 자동화 분석` (프로젝트방)
-- GPT 코드 검토: PASS (2차 수정 후 — Len(code)>=2→>0, InStr→StrComp)
-- GPT 실반영 정합: PASS (oletools 재추출 7/7 검증)
-- GPT 프로젝트 완료 PASS: TASKS.md + Git 커밋 확인 후 확정 예정
+- GPT 1단계 설계: PASS (hooks 구조 + verify 2단계 합의)
+- GPT 구현 판정: 구조 PASS / 운영 조건부 PASS
+- GPT 후속작업 가드 판정: PASS
+- 조건: verify_xlsm.py COM 실검증은 다음 xlsm 작업 시 확인
 
 ---
 
@@ -49,14 +48,15 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 중 | Git 커밋 + GPT에 완료 증적 공유 | TASKS 반영 완료, 커밋 후 GPT 최종 PASS |
-| 낮 | AccessVBOM 레지스트리 원복 | 보안 설정 복원 (선택) |
-| 낮 | CLAUDE.md subagent 목록 갱신 | 문서 업데이트만 |
+| 중 | verify_xlsm.py COM 실검증 | 다음 xlsm 작업 시 자동 실행, verify.json PASS 산출 |
+| 낮 | smoke_test.sh에 신규 hooks 테스트 추가 | 현재 기존 4묶음만 테스트 |
+| 낮 | Git 커밋 | agent-control/ 신규 파일 커밋 |
 
 ---
 
 ## 5. 이번 세션 발견사항
 
-- Notion 부모 페이지("업무리스트 운영")가 notion_config.yaml 동기화 대상에 없어서 3/30 이후 갱신 안 됨
-- 사용자 체감으로는 "Notion 동기화 안 됨"이 반복되는 구조적 원인
-- 해결 방향: 부모 페이지를 링크 허브로 단순화하고 요약은 STATUS 자식 페이지 단일화 (GPT 검토 중)
+- bash_looks_mutating의 `>>?` 패턴이 `2>&1`까지 매칭하여 모든 Bash 차단 — regex 수정 필요
+- current_task에 경로만 적고 디렉토리 미생성 시 hooks 에러 — exists() 체크 추가
+- GPT 응답 감지 누락 2회 — polling 루프를 보고 후 중단하는 패턴이 반복됨
+- .claude/ 전체가 .gitignore — hooks/settings는 로컬 전용, agent-control만 Git 추적
