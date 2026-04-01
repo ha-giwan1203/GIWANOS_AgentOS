@@ -231,6 +231,8 @@ def _parse_tasks_summary(repo_root: Path) -> dict:
     pending = 0
     completed = 0
     section = ""
+    progress_names = []
+    pending_names = []
 
     for line in lines:
         stripped = line.strip()
@@ -245,8 +247,16 @@ def _parse_tasks_summary(repo_root: Path) -> dict:
 
         if section == "progress" and stripped.startswith("### ") and "~~" not in stripped:
             in_progress += 1
+            name = stripped.lstrip("# ").strip()
+            progress_names.append(name)
         elif section == "pending" and stripped.startswith("### ") and "~~" not in stripped:
             pending += 1
+            name = stripped.lstrip("# ").strip()
+            # 차단 사유 추출 — "**차단:" 패턴
+            block_reason = ""
+            if "차단:" in name or "차단：" in name:
+                block_reason = name.split("차단")[-1].strip(":： —*").strip()
+            pending_names.append((name, block_reason))
         elif section == "done" and stripped.startswith("|") and "항목" not in stripped and "---" not in stripped:
             completed += 1
 
@@ -254,6 +264,8 @@ def _parse_tasks_summary(repo_root: Path) -> dict:
         "in_progress": in_progress,
         "pending": pending,
         "completed": completed,
+        "progress_names": progress_names,
+        "pending_names": pending_names,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M KST"),
     }
 
@@ -280,50 +292,141 @@ def _find_summary_content_blocks(blocks: list) -> list:
     return result_ids
 
 
-def _update_summary_blocks(content_blocks: list, summary: dict, token: str,
-                           logger: logging.Logger) -> bool:
-    """요약 아래 bullet 블록들을 순서대로 업데이트."""
-    lines = [
-        f"진행 중: {summary.get('in_progress', 0)}건",
-        f"대기 중: {summary.get('pending', 0)}건",
+def _build_summary_lines(summary: dict) -> list:
+    """요약 데이터로 bullet 텍스트 목록 생성."""
+    # 진행 중 상세
+    prog_count = summary.get("in_progress", 0)
+    prog_names = summary.get("progress_names", [])
+    if prog_count > 0 and prog_names:
+        progress_text = f"진행 중: {prog_count}건 ({', '.join(prog_names[:3])})"
+    else:
+        progress_text = f"진행 중: {prog_count}건"
+
+    # 대기 중 상세
+    pend_count = summary.get("pending", 0)
+    pend_names = summary.get("pending_names", [])
+    if pend_count > 0 and pend_names:
+        details = []
+        for name, reason in pend_names[:3]:
+            # 짧은 이름 추출 (### 제거, [auto] 등 태그 정리)
+            short = name.replace("[auto]", "").strip().split("—")[0].strip()
+            if reason:
+                details.append(f"{short} — {reason}")
+            else:
+                details.append(short)
+        pending_text = f"대기 중: {pend_count}건 ({', '.join(details)})"
+    else:
+        pending_text = f"대기 중: {pend_count}건"
+
+    return [
+        progress_text,
+        pending_text,
         f"완료: {summary.get('completed', 0)}건",
-        f"자동화 체인: 정상",
+        "자동화 체인: 정상 (watch_changes + auto-commit + Slack + Notion)",
         f"동기화: {summary.get('timestamp', '')}",
     ]
 
+
+def _update_summary_blocks(content_blocks: list, summary: dict, token: str,
+                           logger: logging.Logger) -> tuple:
+    """요약 아래 bullet 블록들을 순서대로 업데이트. (before, after) 스냅샷 반환."""
+    lines = _build_summary_lines(summary)
+
+    before_snapshot = []
+    after_snapshot = []
     ok = True
+    updated_count = 0
+
     for i, (block_id, btype) in enumerate(content_blocks):
         if i >= len(lines):
             break
-        if btype == "bulleted_list_item":
-            result = _notion_request(
-                "PATCH", f"/blocks/{block_id}", token,
-                {"bulleted_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": lines[i]}}]
-                }},
-                logger=logger,
+        if btype != "bulleted_list_item":
+            continue
+
+        # before 스냅샷: 현재 블록 내용 읽기
+        current = _notion_request("GET", f"/blocks/{block_id}", token, logger=logger)
+        if current:
+            rich = current.get("bulleted_list_item", {}).get("rich_text", [])
+            old_text = "".join(r.get("plain_text", "") for r in rich)
+            before_snapshot.append(old_text)
+        else:
+            before_snapshot.append("(읽기 실패)")
+
+        # 업데이트
+        result = _notion_request(
+            "PATCH", f"/blocks/{block_id}", token,
+            {"bulleted_list_item": {
+                "rich_text": [{"type": "text", "text": {"content": lines[i]}}]
+            }},
+            logger=logger,
+        )
+        if result is None:
+            ok = False
+            after_snapshot.append("(갱신 실패)")
+            if logger:
+                logger.error(f"요약 블록 갱신 실패: block_id={block_id}, line={lines[i]}")
+        else:
+            after_snapshot.append(lines[i])
+            updated_count += 1
+
+    # 부분 갱신 감지 — 즉시 중단 조건
+    if 0 < updated_count < len(lines) and updated_count < len(content_blocks):
+        if logger:
+            logger.error(
+                f"요약 블록 부분 갱신 감지: {updated_count}/{min(len(lines), len(content_blocks))}건만 성공"
             )
-            if result is None:
-                ok = False
-    return ok
+        ok = False
+
+    return ok, before_snapshot, after_snapshot
 
 
 def update_summary(token: str, cfg: dict, repo_root: Path,
                    logger: logging.Logger) -> bool:
-    """STATUS 페이지의 요약 블록을 TASKS.md 기준으로 갱신."""
+    """STATUS 페이지의 요약 블록을 TASKS.md 기준으로 갱신.
+
+    즉시 중단 조건 3가지:
+    1. 페이지 못 찾음 (blocks 빈 목록)
+    2. 요약 블록 매칭 실패 (content_blocks 없음)
+    3. 부분 갱신 (_update_summary_blocks에서 감지)
+    """
     page_id = cfg["notion"]["status_page_id"]
     summary = _parse_tasks_summary(repo_root)
     if not summary:
+        if logger:
+            logger.error("TASKS.md 파싱 실패 — 파일 없거나 빈 결과")
         return False
 
     blocks = _get_page_blocks(page_id, token)
+    if not blocks:
+        if logger:
+            logger.error(f"Notion 페이지 블록 조회 실패: page_id={page_id}")
+        return False
+
     content_blocks = _find_summary_content_blocks(blocks)
     if not content_blocks:
         if logger:
-            logger.error("Notion 요약 콘텐츠 블록을 찾지 못함")
+            logger.error("Notion 요약 콘텐츠 블록을 찾지 못함 — '요약' 헤딩 아래 bullet 없음")
         return False
 
-    return _update_summary_blocks(content_blocks, summary, token, logger)
+    ok, before, after = _update_summary_blocks(content_blocks, summary, token, logger)
+
+    # 검증 로그: before/after 스냅샷 비교
+    if logger and before and after:
+        verify_logger = logging.getLogger("notion_sync_verify")
+        if not verify_logger.handlers:
+            verify_logger.setLevel(logging.INFO)
+            log_dir = Path(__file__).parent
+            vlog = log_dir / f"notion_sync_verify_{datetime.now().strftime('%Y%m%d')}.log"
+            h = logging.FileHandler(vlog, encoding="utf-8")
+            h.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+            verify_logger.addHandler(h)
+        verify_logger.info(f"=== 요약 갱신 검증 ===")
+        for i, (b, a) in enumerate(zip(before, after)):
+            changed = "변경" if b != a else "동일"
+            verify_logger.info(f"  [{i}] {changed}: '{b}' → '{a}'")
+        verify_logger.info(f"  결과: {'PASS' if ok else 'FAIL'}")
+
+    return ok
 
 
 # ── STATUS 페이지 동기화 ──────────────────────────────────────────────────
