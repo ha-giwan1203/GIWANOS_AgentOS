@@ -147,6 +147,72 @@ def _append_blocks(page_id: str, blocks: list, token: str,
     return result is not None
 
 
+def _delete_block(block_id: str, token: str, logger: logging.Logger) -> bool:
+    """블록 삭제 (archived=true)."""
+    result = _notion_request("DELETE", f"/blocks/{block_id}", token, logger=logger)
+    return result is not None
+
+
+# ── 이력 보존 정책 ──────────────────────────────────────────────────────
+
+MAX_HISTORY_ENTRIES = 20  # 이력 항목(divider 기준) 최대 보존 수
+
+
+def _trim_history_blocks(page_id: str, token: str, logger: logging.Logger,
+                         max_entries: int = MAX_HISTORY_ENTRIES) -> int:
+    """페이지 하단 이력 블록을 최근 N개만 유지. 초과분 삭제. 삭제 건수 반환."""
+    blocks = _get_page_blocks(page_id, token)
+    if not blocks:
+        return 0
+
+    # '자동 감지 변경 이력' 또는 '자동 생성 태스크' 헤딩 이후 블록 수집
+    history_start = -1
+    for i, b in enumerate(blocks):
+        btype = b.get("type", "")
+        if btype in ("heading_2", "heading_3"):
+            rich = b.get(btype, {}).get("rich_text", [])
+            text = "".join(r.get("plain_text", "") for r in rich)
+            if "이력" in text or "태스크" in text:
+                history_start = i + 1
+                break
+
+    if history_start < 0:
+        return 0
+
+    # divider 블록을 entry 구분자로 사용 — divider 수 = entry 수
+    history_blocks = blocks[history_start:]
+    entries = []  # [(start_idx, [block_ids])]
+    current_entry_blocks = []
+
+    for b in history_blocks:
+        if b.get("type") == "divider":
+            if current_entry_blocks:
+                entries.append(current_entry_blocks)
+            current_entry_blocks = [b["id"]]
+        else:
+            current_entry_blocks.append(b["id"])
+
+    if current_entry_blocks:
+        entries.append(current_entry_blocks)
+
+    if len(entries) <= max_entries:
+        return 0
+
+    # 오래된 것부터 삭제 (entries[0]이 가장 오래됨)
+    to_delete = entries[:len(entries) - max_entries]
+    deleted = 0
+    for entry_block_ids in to_delete:
+        for bid in entry_block_ids:
+            if _delete_block(bid, token, logger):
+                deleted += 1
+
+    if logger and deleted > 0:
+        logger.error(
+            f"이력 보존 정책: {len(entries)}개 중 {len(to_delete)}개 항목({deleted}블록) 삭제 → {max_entries}개 유지"
+        )
+    return deleted
+
+
 def _get_page_blocks(page_id: str, token: str) -> list:
     """페이지 최상위 블록 목록 조회 (pagination 지원)."""
     pid = page_id.replace("-", "")
@@ -572,15 +638,26 @@ def sync_batch(batch_id: str, events: list,
         if ok2:
             _mark_done(batch_id + "_t", dedup_hours)
 
-    # 요약 블록 갱신 (실패해도 전체 실패로 처리하지 않음)
+    # 요약 블록 갱신 — 실패 시 배치 결과에 반영 (조용한 실패 방지)
+    ok3 = True
     try:
         repo_root = Path(__file__).parent.parent.parent
-        update_summary(token, cfg, repo_root, logger)
+        ok3 = update_summary(token, cfg, repo_root, logger)
+    except Exception as e:
+        ok3 = False
+        if logger:
+            logger.error(f"요약 블록 갱신 예외: {e}")
+
+    # 이력 보존 정책 — 오래된 이력 자동 삭제
+    max_entries = notion_cfg.get("max_history_entries", MAX_HISTORY_ENTRIES)
+    try:
+        status_pid = notion_cfg["status_page_id"]
+        _trim_history_blocks(status_pid, token, logger, max_entries)
     except Exception as e:
         if logger:
-            logger.error(f"요약 블록 갱신 실패 (무시): {e}")
+            logger.error(f"이력 정리 실패 (무시): {e}")
 
-    return ok1 and ok2
+    return ok1 and ok2 and ok3
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────

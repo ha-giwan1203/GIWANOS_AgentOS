@@ -21,6 +21,9 @@ notion:
     status_tasks_updated: true    # Phase 3 갱신 성공 시
     critical_file_changed: true   # 핵심 파일 변경 포함 배치
 
+  # 이력 보존 정책 (오래된 이력 자동 삭제)
+  max_history_entries: 20
+
   # 핵심 파일 패턴 (이 파일 포함 배치면 무조건 동기화)
   critical_patterns:
     - "CLAUDE.md"
