@@ -23,20 +23,92 @@ BI 엑셀 파일에서 데이터를 읽어 MES API로 직접 POST하므로,
 - **최대 처리 범위**: 한 달치 (31일)
 
 ## 실행 전 확인사항
-- Chrome 브라우저가 Claude in Chrome과 연결되어 있어야 함
-- MES System에 이미 로그인되어 있어야 함
-- BI 파일이 최신 상태여야 함 (해당 날짜 데이터 포함)
+- CDP 브라우저(`--remote-debugging-port=9222`, 프로필 `.flow-chrome-debug`)가 실행 중이거나 자동 실행 가능해야 함
+- MES System에 이미 로그인되어 있어야 함 (프로필에 세션 유지)
+- Z드라이브(`Z:\★ 라인별 생산실적\`)에 접근 가능해야 함
+
+## CDP 브라우저 실행/종료
+
+**실행:**
+```python
+subprocess.Popen([
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    "--remote-debugging-port=9222",
+    r"--user-data-dir=C:\Users\User\.flow-chrome-debug",
+    "http://mes-dev.samsong.com:19200/layout/layout.do",
+    "--no-first-run", "--no-default-browser-check"
+])
+```
+
+**종료 (필수 — 아래 방식만 사용):**
+```python
+cdp = browser.contexts[0].pages[0].context.new_cdp_session(browser.contexts[0].pages[0])
+cdp.send("Browser.close")
+```
+
+**금지:** `taskkill //F //IM chrome.exe` 사용 금지 — 기존 브라우저까지 종료되고 복구 팝업 발생
+
+## BI 파일 자동 갱신 (0단계 — 업로드 전 필수)
+
+BI 파일은 별도 스케줄러 없이 **업로드 실행 시 자동으로 최신본을 가져온다.**
+
+| 항목 | 값 |
+|------|-----|
+| 원본 | `Z:\★ 라인별 생산실적\대원테크_라인별 생산실적_BI.xlsx` |
+| 로컬 | `C:\Users\User\Desktop\업무리스트\05_생산실적\BI실적\대원테크_라인별 생산실적_BI.xlsx` |
+
+```python
+import os, shutil
+
+SRC = r"Z:\★ 라인별 생산실적\대원테크_라인별 생산실적_BI.xlsx"
+DST = r"C:\Users\User\Desktop\업무리스트\05_생산실적\BI실적\대원테크_라인별 생산실적_BI.xlsx"
+
+if not os.path.exists(SRC):
+    print("ERROR: Z드라이브 원본 접근 불가 — 네트워크 확인 필요")
+    # 로컬 파일이 있으면 경고 후 로컬로 진행, 없으면 중단
+else:
+    src_mtime = os.path.getmtime(SRC)
+    dst_mtime = os.path.getmtime(DST) if os.path.exists(DST) else 0
+    if src_mtime > dst_mtime:
+        shutil.copy2(SRC, DST)
+        print(f"BI 파일 갱신 완료 (원본: {src_mtime}, 기존: {dst_mtime})")
+    else:
+        print("BI 파일 이미 최신")
+```
+
+- Z드라이브 접근 불가 시 → 로컬 파일로 진행하되 **"원본 미갱신 상태"** 경고 표시
+- 원본이 더 새로우면 복사 후 진행
+- 이미 최신이면 스킵
 
 ## 네트워크 제약사항
-- VM에서 MES 서버 직접 접근 불가 (프록시 allowlist 차단)
-- 반드시 **Chrome 브라우저의 javascript_tool**을 통해 API 호출
-- Python requests, curl 등 VM 직접 호출은 403 에러 발생
+- CDP 브라우저의 MES 세션을 활용하여 iframe jQuery로 API 호출
+- Playwright `connect_over_cdp('http://localhost:9222')` → `page.evaluate()` 방식
+- Python requests, curl 등 직접 호출도 가능하나, iframe jQuery 방식이 검증됨
 
 ## 안전 원칙
 - **기존 데이터 절대 수정/삭제 안 함** — 신규 날짜만 INSERT
 - 업로드 전 반드시 MES 기존 데이터 조회하여 **중복 확인**
 - 중복 발견 시 사용자 확인 없이 진행하지 않음
 - 한 번에 최대 한 달치(31일)까지만 처리
+
+## ★ 데이터 품질 검증 (업로드 전 필수)
+
+BI 추출 후 반드시 아래 검증을 통과해야 업로드 진행:
+
+1. **생산량(COL15) None/0 검사**: 전체 행 중 생산량이 None 또는 0인 행이 있으면
+   → "BI 데이터 미완성 (생산량 없음)" 안내 후 **업로드 중단**
+   → 사용자가 명시적으로 "빈 데이터라도 올려" 요청한 경우에만 진행
+2. **핵심값 존재 확인**: 업체명(COL1), 라인(COL5), 날짜(COL8), 생산량(COL15) 중 하나라도 비면 해당 행 제외
+3. **건수 비교만으로 검증 PASS 판정 금지**: 업로드 후 MES 조회 시 건수뿐 아니라 **생산량 합계**를 BI 원본과 대조
+
+검증 코드 예시:
+```python
+# BI 추출 후 품질 검사
+empty_qty = [r for r in items if r.get('COL15') in (None, '', '0', 'None')]
+if empty_qty:
+    print(f"⚠ 생산량 없는 행: {len(empty_qty)}/{len(items)}건 — 업로드 중단")
+    # 사용자 확인 없이 진행하지 않음
+```
 
 ---
 
