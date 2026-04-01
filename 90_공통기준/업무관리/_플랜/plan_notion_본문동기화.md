@@ -70,4 +70,4 @@ Notion이 상태 원본처럼 보이게 만들면 안 된다.
 | _update_summary_blocks 스냅샷 | ✅ 완료 | 7059dc6e |
 | update_summary 즉시 중단 3조건 | ✅ 완료 | 7059dc6e |
 | 검증 로그 파일 생성 | ✅ 완료 | 7059dc6e |
-| 부모 페이지 구조 결정 | ⏳ GPT 검토 중 | - |
+| 부모 페이지 링크 허브 단순화 | ✅ 완료 (GPT 합의 2번 확정) | Notion MCP 직접 반영 |
