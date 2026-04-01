@@ -20,7 +20,7 @@
 ```yaml
 ---
 name: settlement-validator
-description: 조립비 정산 파이프라인 검증 전용. 정산 결과 파일 대조, 합계 검증, 불일치 추적. 정산 관련 작업 후 자동 위임.
+description: 조립비 정산 파이프라인(Step 1~7) 검증 전용. 05_생산실적/조립비정산/ 하위 결과 파일 대조, 합계 검증, 불일치 추적. run_settlement_pipeline.py 실행 완료 후 또는 /settlement-validate 호출 시 위임.
 model: haiku
 tools:
   - Read
@@ -43,6 +43,14 @@ skills:
 - Read/Grep/Glob: 파일 읽기 + 검색
 - Bash: python 스크립트 실행(검증용), git diff
 - Edit/Write 제외: 검증 전용, 수정 금지
+
+### 위임 조건 (과발동 방지)
+- 트리거 1: run_settlement_pipeline.py 실행 완료 후 (메인 agent가 명시적 위임)
+- 트리거 2: 사용자 명시 호출 `/settlement-validate`
+- 금지: "정산" 키워드 매칭 기반 자동 트리거 (오탐 위험)
+- 금지: 파일 열람만으로 트리거 (파이프라인 실행 없는 조회는 대상 아님)
+- 중복 방지: 같은 파이프라인 실행에서 1회만 위임 (완료 마커 또는 최종 산출물 기준)
+- description에 경로(05_생산실적/조립비정산/)와 트리거 조건 명시 → context 기반 위임 정확도 확보
 
 ### skills preloading
 - `assembly-cost-settlement` 스킬 주입 → 정산 도메인 지식 자동 로드
@@ -71,13 +79,32 @@ skills:
    - 200줄 제한 (공식 문서 기본값과 동일)
    - system prompt에 "MEMORY.md 200줄 이내 유지" 명시
 
+### 테스트 케이스 (행동 증거 기반 판정)
+
+| Case | 설정 | 성공 조건 | 실패 조건 |
+|------|------|----------|----------|
+| A | `memory: project` + `tools: [Read, Grep, Glob, Bash]` (Write/Edit 미포함) | memory 파일 생성됨 + 재세션 재사용 확인 | memory 파일 미생성 or subagent 동작 불가 |
+| B | `disallowedTools: [Write, Edit]` + `memory: project` | memory 쓰기 차단됨 + subagent 정상 동작 유지 | Write/Edit 차단 안 됨 (disallowedTools 무력화) |
+| C | `memory: project` + Write/Edit 허용 + PreToolUse hook guard | memory 파일 생성/재사용 + memory 경로 밖 Write/Edit 시도 시 hook이 차단 | hook 우회 or prompt 무시로 임의 파일 수정 |
+
+판정 흐름:
+1. Case A 테스트 → memory 쓰기 성공이면 A 채택 (최선: 도구 제한만으로 해결)
+2. Case A 실패 → Case B 테스트 → 쓰기 차단 + 정상 동작이면 B 채택 (memory 포기, read-only 유지)
+3. Case B에서 disallowedTools 무력화 확인 → Case C 테스트
+4. Case C: PreToolUse hook로 `.claude/agent-memory/code-reviewer/` 밖 경로 Write/Edit 차단 (deterministic guard)
+
+> Case C의 hook guard는 prompt-only 제한보다 안전. 이 프로젝트에서 이미 protect_files.sh, pre_write_guard.sh 패턴 운영 중이므로 동일 구조 활용.
+
+### .gitignore 결정
+- .claude/ 전체 .gitignore 현행 유지 (agent-memory 포함)
+- 1인 개발 + AI 체제, 팀 공유 불필요
+- 머신 교체 시 memory 유실 → code-reviewer memory는 프로젝트 구조 캐시 수준이라 자동 재학습 가능
+
 ### 실행 순서
-1. disallowedTools + memory 병용 테스트 (로컬)
-2. 테스트 결과에 따라:
-   - 병용 가능 → memory: project + disallowedTools: Write, Edit 적용
-   - 병용 불가 → memory용 Write/Edit만 허용하되 system prompt에서 "memory 디렉토리 외 Write/Edit 금지" 명시
-3. .gitignore 예외 여부 결정
-4. frontmatter + system prompt 수정
+1. Case A 테스트 (로컬)
+2. 결과에 따라 Case B or C 테스트
+3. 테스트 결과 기반 frontmatter + system prompt 수정
+4. Case C 채택 시 PreToolUse hook guard 추가 (code-reviewer 전용 경로 제한)
 5. GPT 검증 요청
 
 ---
