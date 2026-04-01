@@ -2,7 +2,7 @@
 
 > 출처: 영상분석 자동 모드 (2026-04-01)
 > GPT 합의: A1→B 하향 + B1 범위 조정 (settlement-validator 우선, skills preloading 포함)
-> 상태: **사용자 승인 대기**
+> 상태: **구현 완료** (2026-04-02 사용자 승인 → 즉시 구현)
 
 ---
 
@@ -100,12 +100,20 @@ skills:
 - 1인 개발 + AI 체제, 팀 공유 불필요
 - 머신 교체 시 memory 유실 → code-reviewer memory는 프로젝트 구조 캐시 수준이라 자동 재학습 가능
 
-### 실행 순서
-1. Case A 테스트 (로컬)
-2. 결과에 따라 Case B or C 테스트
-3. 테스트 결과 기반 frontmatter + system prompt 수정
-4. Case C 채택 시 PreToolUse hook guard 추가 (code-reviewer 전용 경로 제한)
-5. GPT 검증 요청
+### 테스트 결과 (2026-04-02 실행)
+
+**Case A 실행**: memory: project + tools: [Read, Grep, Glob, Bash]
+- 결과: Write/Edit 자동 활성화 **안 됨**. subagent에 Write/Edit 도구 미노출.
+- memory 저장 불가. subagent 정상 동작은 유지.
+- 판정: **memory 쓰기 불가 → memory 포기, read-only 현행 유지**
+
+Case B/C 테스트 불필요 — Case A 결과로 결론:
+- memory: project를 넣어도 tools 목록에 Write/Edit 없으면 자동 활성화 안 함
+- code-reviewer는 현행 그대로 유지 (memory 없이 read-only)
+
+### 최종 결정
+- code-reviewer: 변경 없음 (memory 미적용, read-only 유지)
+- settlement-validator: 신규 생성 완료 (.claude/agents/settlement-validator.md)
 
 ---
 
@@ -122,8 +130,8 @@ settlement-validator 구현 완료 후 검토.
 
 ## 체크리스트
 
-- [ ] settlement-validator.md 작성 + system prompt 완성
-- [ ] assembly-cost-settlement 스킬 preloading 테스트
-- [ ] code-reviewer disallowedTools + memory 병용 테스트
-- [ ] 테스트 결과 기반 code-reviewer memory 적용 방안 확정
-- [ ] GPT 검증 요청 (실물 기준)
+- [x] settlement-validator.md 작성 + system prompt 완성 (2026-04-02)
+- [ ] assembly-cost-settlement 스킬 preloading 테스트 (정산 데이터 입수 후)
+- [x] code-reviewer memory 테스트: Case A 실행 → Write/Edit 미활성화 → memory 포기 결정 (2026-04-02)
+- [x] 테스트 결과 기반 code-reviewer memory 적용 방안 확정: 현행 유지 (2026-04-02)
+- [ ] GPT 검증 요청 (실물 기준) — 진행 중
