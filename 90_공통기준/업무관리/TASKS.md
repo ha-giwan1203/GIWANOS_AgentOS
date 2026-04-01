@@ -20,14 +20,6 @@
 ---
 
 ## 대기 중 (우선순위 순)
-### [auto] bi_copy.bat 실행 확인 (2026-03-31)
-- 출처: `bi_scheduler.bat` 변경 감지
-- 자동 생성 항목 — 확인 후 처리 또는 삭제
-
-
-### [auto] bi_copy.bat 실행 확인 (2026-03-31)
-- 출처: `bi_copy.bat` 변경 감지
-- 자동 생성 항목 — 확인 후 처리 또는 삭제
 
 
 
@@ -122,6 +114,7 @@
 | CLAUDE.md 슬림화 — 루트 322→230줄, 토론모드 223→167줄. skill_guide.md 분리 | 2026-04-01 |
 | Context Engineering — 세션 토큰 운영 규칙 + subagent 3개(evidence-reader/debate-analyzer/artifact-validator) | 2026-04-01 |
 | 운영 검증 체계 — analyze_hook_log.sh KPI + smoke_test.sh 10/10 PASS + 경고 임계치 | 2026-04-01 |
+| bi_copy.bat 스케줄러 삭제 → SKILL.md 0단계 통합 (업로드 시 자동 갱신) | 2026-04-01 |
 | settings allow 정리 172→46개 + OAuth 토큰 제거 + 요약본 문서화 | 2026-04-01 |
 | 커넥터 운영지침 v1.3 — 자동화 연결 권한 경계 표준화 (읽기/쓰기/전송 3단계 + 주체별 정리) | 2026-04-01 |
 | daily-doc-check scheduled task 생성 (평일 09시 TASKS/STATUS/HANDOFF 정합성 체크) | 2026-04-01 |
