@@ -40,10 +40,11 @@ meaningful:
     add_task: true
     task_text: "정산 파이프라인 실행 테스트 확인"
 
-  - pattern: "05_생산실적/_자동화/*.bat"
-    label: "BI 자동화 배치 파일 수정"
-    add_task: true
-    task_text: "bi_copy.bat 실행 확인"
+  # bi_copy.bat 스케줄러 폐지 (2026-04-01) — SKILL.md 0단계 통합 완료
+  # - pattern: "05_생산실적/_자동화/*.bat"
+  #   label: "BI 자동화 배치 파일 수정"
+  #   add_task: true
+  #   task_text: "bi_copy.bat 실행 확인"
 
   - pattern: "05_생산실적/_자동화/*.py"
     label: "BI 자동화 스크립트 수정"

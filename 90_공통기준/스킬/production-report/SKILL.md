@@ -32,16 +32,14 @@ PYTHONUTF8=1 python build_master.py
 `05_생산실적/생산관리_마스터리스트.xlsx`
 
 ## 선행 작업
-- BI 실적 파일 최신본 확인 (bi_copy.bat으로 자동 복사 또는 수동 갱신)
+- BI 실적 파일 최신본 확인 (production-result-upload SKILL.md 0단계에서 자동 갱신)
 - 임률단가 파일 최신본 확인
 
 ## 관련 스크립트
 
 | 스크립트 | 역할 |
 |---------|------|
-| bi_copy.bat | BI 파일 자동 복사 |
-| bi_scheduler.bat | BI 복사 스케줄러 |
-| bi_config.txt | 소스/대상 경로 설정 |
+| *(폐지됨)* | BI 파일 갱신은 production-result-upload SKILL.md 0단계에서 처리 |
 
 ## 금지사항
 - build_master.py 출력 파일을 직접 수정하지 않는다 (재실행 시 덮어씀)
