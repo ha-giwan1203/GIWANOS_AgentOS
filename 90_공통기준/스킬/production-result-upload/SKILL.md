@@ -83,7 +83,7 @@ else:
 ## 네트워크 제약사항
 - CDP 브라우저의 MES 세션을 활용하여 iframe jQuery로 API 호출
 - Playwright `connect_over_cdp('http://localhost:9222')` → `page.evaluate()` 방식
-- Python requests, curl 등 직접 호출도 가능하나, iframe jQuery 방식이 검증됨
+- **운영 표준: iframe 내부 jQuery $.ajax 사용** (fetch/requests 직접 호출은 500 에러 발생 — 실증 확인됨)
 
 ## 안전 원칙
 - **기존 데이터 절대 수정/삭제 안 함** — 신규 날짜만 INSERT
