@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-02 01:30 KST — 기능 활용 갭 분석 GPT 합의 완료
+최종 업데이트: 2026-04-02 02:00 KST — domain_guard 화이트리스트 전환 GPT PASS
 
 ---
 
@@ -52,6 +52,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| domain_guard 화이트리스트 전환 — 도메인 문서 미로드 시 전체 도구 차단 (d2b7d6ea, GPT PASS) + 토론모드 공유 규칙 추가 | 2026-04-02 |
 | 기능 활용 갭 분석 — 커스텀 명령 우선순위·커넥터 내장·Context7 제한·병렬 반자동·IDE 보류 합의 + .claude/rules/feature-utilization.md 생성 (GPT PASS) | 2026-04-02 |
 | 영상분석(Context Rot+GSD) → Fast/Full Lane 판정 규칙 신규 — GPT 토론 합의 + .claude/rules/fast-full-lane.md 생성 (커밋 15b06459, GPT 실물 검증 PASS) | 2026-04-02 |
 | subagent 확장 구현 — settlement-validator 생성 + code-reviewer memory 테스트(Case A: 미활성화 확인) → 현행 유지 결정 (GPT 검증 진행 중) | 2026-04-02 |
