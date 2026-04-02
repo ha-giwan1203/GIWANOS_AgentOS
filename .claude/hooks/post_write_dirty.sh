@@ -59,8 +59,8 @@ PATTERNS = [
     r'(^|\s)perl\s+.*\s-i(\s|$)',
     r'(^|\s)python(3)?\s+.*\b(xlsxwriter|xlwings|oletools|olefile|win32com)\b',
     r'(^|\s)python(3)?\s+.*\bopenpyxl\b.*\bsave\b',  # openpyxl은 save 포함 시만 dirty
-    # 리다이렉트: /dev/ /tmp/ /var/tmp/ /proc/ $TMPDIR $TMP $TEMP $TMP_INPUT 계열은 허용
-    r'>>?\s+(?!\/dev\/|\/tmp\/|\/var\/tmp\/|\/proc\/|\$TMPDIR|\$TMP_INPUT|\$TMP\b|\$TEMP\b)',
+    # 리다이렉트: /dev/ /tmp/ /var/tmp/ /proc/ + $TMPDIR/$TMP/$TEMP (따옴표/중괄호 포함) 허용
+    r'>>?\s+(?!"?\$(?:TMPDIR|TMP_INPUT|TMP|TEMP)\b|"?\$\{(?:TMPDIR|TMP_INPUT|TMP|TEMP)\}|\/dev\/|\/tmp\/|\/var\/tmp\/|\/proc\/)',
 ]
 
 def bash_looks_mutating(command: str):
