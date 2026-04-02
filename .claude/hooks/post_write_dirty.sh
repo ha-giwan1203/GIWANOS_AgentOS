@@ -60,6 +60,7 @@ PATTERNS = [
     r'(^|\s)python(3)?\s+.*\b(xlsxwriter|xlwings|oletools|olefile|win32com)\b',
     r'(^|\s)python(3)?\s+.*\bopenpyxl\b.*\bsave\b',  # openpyxl은 save 포함 시만 dirty
     # 리다이렉트: /dev/ /tmp/ /var/tmp/ /proc/ + $TMPDIR/$TMP/$TEMP (따옴표/중괄호 포함) 허용
+    # ※ \s+ 유지 (공백없는 리다이렉트 >./out.txt 는 false negative 허용 — 실무 미사용)
     r'>>?\s+(?!"?\$(?:TMPDIR|TMP_INPUT|TMP|TEMP)\b|"?\$\{(?:TMPDIR|TMP_INPUT|TMP|TEMP)\}|\/dev\/|\/tmp\/|\/var\/tmp\/|\/proc\/)',
 ]
 
