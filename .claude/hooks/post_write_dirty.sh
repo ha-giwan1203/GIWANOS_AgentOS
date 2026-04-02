@@ -53,18 +53,26 @@ def is_exempt(rel_path: str) -> bool:
         return True
     return False
 
-def bash_looks_mutating(command: str) -> bool:
-    patterns = [
-        r'(^|\s)(cp|mv|rm|touch|mkdir|rmdir|install|ln)\b',
-        r'(^|\s)sed\s+.*\s-i(\s|$)',
-        r'(^|\s)perl\s+.*\s-i(\s|$)',
-        r'(^|\s)python(3)?\s+.*\b(xlsxwriter|xlwings|oletools|olefile|win32com)\b',
-        r'(^|\s)python(3)?\s+.*\bopenpyxl\b.*\bsave\b',  # openpyxl은 save 포함 시만 dirty
-        r'(?<!\d)\s*>>?\s',  # 파일 리다이렉트만 (2>&1 제외)
-    ]
-    return any(re.search(p, command) for p in patterns)
+PATTERNS = [
+    r'(^|\s)(cp|mv|rm|touch|mkdir|rmdir|install|ln)\b',
+    r'(^|\s)sed\s+.*\s-i(\s|$)',
+    r'(^|\s)perl\s+.*\s-i(\s|$)',
+    r'(^|\s)python(3)?\s+.*\b(xlsxwriter|xlwings|oletools|olefile|win32com)\b',
+    r'(^|\s)python(3)?\s+.*\bopenpyxl\b.*\bsave\b',  # openpyxl은 save 포함 시만 dirty
+    # 리다이렉트: /dev/ /tmp/ /var/tmp/ /proc/ $TMPDIR $TMP $TEMP $TMP_INPUT 계열은 허용
+    r'>>?\s+(?!\/dev\/|\/tmp\/|\/var\/tmp\/|\/proc\/|\$TMPDIR|\$TMP_INPUT|\$TMP\b|\$TEMP\b)',
+]
+
+def bash_looks_mutating(command: str):
+    """첫 번째 매칭 패턴 인덱스와 매칭 텍스트 반환. 없으면 (None, None)."""
+    for i, p in enumerate(PATTERNS):
+        m = re.search(p, command)
+        if m:
+            return i, m.group(0)[:100]
+    return None, None
 
 mark_dirty = False
+matched_info = {}
 
 if tool_name in {"Edit", "Write"}:
     file_path = tool_input.get("file_path", "")
@@ -72,16 +80,28 @@ if tool_name in {"Edit", "Write"}:
         rel_path = normalize_rel(file_path)
         if not is_exempt(rel_path):
             mark_dirty = True
+            matched_info = {"pattern_idx": "Edit/Write", "matched_text": rel_path[:100], "command": ""}
 
 elif tool_name == "Bash":
     command = tool_input.get("command", "") or ""
-    if bash_looks_mutating(command):
+    pat_idx, matched_text = bash_looks_mutating(command)
+    if pat_idx is not None:
         mark_dirty = True
+        matched_info = {"pattern_idx": pat_idx, "matched_text": matched_text, "command": command[:200]}
 
 if mark_dirty:
     import time
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
-    dirty_flag.write_text(f"{ts}\n", encoding="utf-8")
+    tool_use_id = payload.get("tool_use_id", "")
+    lines = [
+        ts,
+        f"tool_name={tool_name}",
+        f"tool_use_id={tool_use_id}",
+        f"matched_pattern={matched_info.get('pattern_idx', '')}",
+        f"matched_text={matched_info.get('matched_text', '')}",
+        f"command_head={matched_info.get('command', '')}",
+    ]
+    dirty_flag.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 rm -f "$TMP_INPUT"
