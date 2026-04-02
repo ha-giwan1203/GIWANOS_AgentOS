@@ -58,7 +58,8 @@ def bash_looks_mutating(command: str) -> bool:
         r'(^|\s)(cp|mv|rm|touch|mkdir|rmdir|install|ln)\b',
         r'(^|\s)sed\s+.*\s-i(\s|$)',
         r'(^|\s)perl\s+.*\s-i(\s|$)',
-        r'(^|\s)python(3)?\s+.*\b(openpyxl|xlsxwriter|xlwings|oletools|olefile|win32com)\b',
+        r'(^|\s)python(3)?\s+.*\b(xlsxwriter|xlwings|oletools|olefile|win32com)\b',
+        r'(^|\s)python(3)?\s+.*\bopenpyxl\b.*\bsave\b',  # openpyxl은 save 포함 시만 dirty
         r'(?<!\d)\s*>>?\s',  # 파일 리다이렉트만 (2>&1 제외)
     ]
     return any(re.search(p, command) for p in patterns)
