@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-02 — post_write_dirty.sh 리다이렉트 패턴 개선 + GPT PASS (41ddb99e)
+최종 업데이트: 2026-04-02 — post_write_dirty.sh 리다이렉트 패턴 개선 + GPT PASS (41ddb99e) / 토론모드 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---

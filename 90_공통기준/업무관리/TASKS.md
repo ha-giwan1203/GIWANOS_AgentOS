@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-02 — post_write_dirty.sh 리다이렉트 패턴 개선 + matched_pattern 로깅 (GPT PASS 41ddb99e)
+최종 업데이트: 2026-04-02 — post_write_dirty.sh 리다이렉트 패턴 개선 + matched_pattern 로깅 (GPT PASS 41ddb99e) / 토론모드 완료
 
 ---
 
