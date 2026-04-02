@@ -61,7 +61,47 @@ def is_exempt(rel_path):
         return True
     return False
 
-cleanup_candidates = [f for f in untracked if not is_exempt(f)]
+# TASKS/HANDOFF 언급 파일 예외: 상태 문서에 경로가 명시된 파일은 의도적 산출물
+def get_mentioned_files():
+    mentioned = set()
+    for doc_name in ['TASKS.md', 'HANDOFF.md']:
+        doc_path = root / '90_공통기준' / '업무관리' / doc_name
+        if doc_path.exists():
+            try:
+                content = doc_path.read_text(encoding='utf-8')
+                for u in untracked:
+                    # 파일명이 문서에 언급되어 있으면 예외
+                    fname = Path(u).name
+                    if fname in content:
+                        mentioned.add(u)
+            except Exception:
+                pass
+    return mentioned
+
+# 도메인 산출물 예외: 도메인 폴더 내 신규 파일은 작업 산출물로 간주
+DOMAIN_PREFIXES = [
+    '05_생산실적/',
+    '10_라인배치/',
+    '04_생산계획/',
+    '90_공통기준/스킬/',
+    '90_공통기준/토론모드/',
+    '_플랜/',
+]
+
+def is_domain_output(rel_path):
+    for dp in DOMAIN_PREFIXES:
+        if rel_path.startswith(dp):
+            # 도메인 폴더 내 .py/.md/.xlsx/.json은 산출물로 간주
+            ext = Path(rel_path).suffix.lower()
+            if ext in ('.py', '.md', '.xlsx', '.json', '.yaml', '.yml', '.sh', '.bat'):
+                return True
+    return False
+
+mentioned_files = get_mentioned_files()
+cleanup_candidates = [
+    f for f in untracked
+    if not is_exempt(f) and f not in mentioned_files and not is_domain_output(f)
+]
 
 if not cleanup_candidates:
     sys.exit(0)
