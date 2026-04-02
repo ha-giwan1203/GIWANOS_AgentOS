@@ -4,15 +4,15 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-02 02:10 KST — domain_guard 화이트리스트 전환 + 기능 활용 합의 + 토론모드 v3
+최종 업데이트: 2026-04-02 — 작업 후 파일정리 자동화 토론 진행 중
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-영상분석(Context Rot+GSD) 기반 운영 개선 토론 → 규칙 합의 → 구현 적용.
-도메인 진입 프로토콜 결함 진단 → domain_guard 화이트리스트 전환.
+작업 후 파일/폴더 정리 자동화 구조 설계 (GPT 토론).
+untracked 불필요 파일 정리 (vba_inject_*.py 삭제).
 
 ---
 
@@ -24,7 +24,10 @@
 | `.claude/rules/feature-utilization.md` | 기능 활용 규칙 신규 — 커스텀 명령·커넥터·Context7·병렬·IDE | 3bee0253, df697071 |
 | `.claude/hooks/domain_guard.sh` | v2 화이트리스트 전환 — loaded 전 Read(대상 CLAUDE.md)만 허용 | d2b7d6ea |
 | `.claude/hooks/prompt_inject.sh` | 디버그 로깅 추가 (발동 확인 + 결과 길이) | d2b7d6ea |
+| `.claude/hooks/completion_gate.sh` | v2 — Stop 시 TASKS/HANDOFF 갱신 강제 + STATUS 경고 | 08c44050, e995d0b8 |
+| `.claude/hooks/post_write_dirty.sh` | dirty marker에 타임스탬프 기록 추가 | 08c44050 |
 | `90_공통기준/토론모드/CLAUDE.md` | v3 최적화 3건 + GPT 실물 공유 순서 규칙 추가 | f8d49306, 28cac937 |
+| `90_공통기준/스킬/debate-mode.skill` | v2.9 → v3.0 패키징 | eb15f30b |
 | `.claude/settings.local.json` | defaultMode: bypassPermissions 추가 (로컬 전용) | — |
 
 ### 토론모드 v3 최적화 내역
@@ -49,6 +52,7 @@
 - GPT Fast/Full Lane 규칙 판정: **검증 PASS** (커밋 15b06459)
 - GPT 기능 활용 갭 분석 판정: **PASS** (커밋 3bee0253 → df697071 수정)
 - GPT domain_guard 화이트리스트 판정: **PASS** (커밋 d2b7d6ea)
+- GPT completion_gate v2 판정: **PASS** (커밋 08c44050 → e995d0b8)
 
 ---
 

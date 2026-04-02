@@ -1,0 +1,264 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *:*)",
+      "Bash(python*:*)",
+      "Bash(PYTHONUTF8=1 python*:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python*:*)",
+      "Bash(pip install:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(echo:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(sleep:*)",
+      "Bash(bash:*)",
+      "Bash(cmd /c:*)",
+      "Bash(gh pr:*)",
+      "Bash(TZ=Asia/Seoul date *:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(schtasks:*)",
+      "Bash(tar:*)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(gzip:*)",
+      "Bash(claude config:*)",
+      "Read",
+      "WebSearch",
+      "WebFetch",
+      "mcp__00b6c2d7-87e0-41f1-a983-74975edcd79b__gcal_create_event",
+      "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page",
+      "Bash(python3 -c \":*)",
+      "Bash(rm -f /c/tmp/.claude_domain_debate_active /c/tmp/.claude_domain_debate_loaded)",
+      "Bash(python3 -c \"import os; [os.remove\\(f''/tmp/.claude_domain_debate{s}''\\) for s in \\(''_active'',''_loaded''\\) if os.path.exists\\(f''/tmp/.claude_domain_debate{s}''\\)]\")"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block_dangerous.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/protect_files.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/domain_guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre_write_guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post_validate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/auto_compile.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/domain_read_tracker.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post_write_dirty.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome|Bash|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/gpt_followup_guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/bash_audit_log.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/notify_slack.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/stop_guard.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre_finish_guard.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/gpt_followup_guard.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/completion_gate.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/cleanup_audit.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session_start.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session_preflight.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/pre_compact.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post_tool_failure.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/prompt_inject.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subagent_audit_log.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/subagent_audit_log.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
