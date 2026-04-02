@@ -50,7 +50,10 @@ if missing:
     msg = f'[COMPLETION GATE] 작업 파일 변경 후 상태 문서 미갱신: {\", \".join(missing)}{status_warn} — 갱신 후 다시 종료하세요.'
     print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
 else:
-    # 모두 갱신됨 — dirty marker 삭제 + 통과
+    # TASKS/HANDOFF 갱신됨 — STATUS만 경고 (차단 아님)
+    if status_warn:
+        print(json.dumps({'message': f'[COMPLETION GATE] TASKS/HANDOFF 갱신 확인.{status_warn}'}, ensure_ascii=False))
+    # dirty marker 삭제 + 통과
     try:
         dirty_flag.unlink()
     except:
