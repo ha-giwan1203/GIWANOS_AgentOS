@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-02 — 작업 후 파일정리 자동화 토론 진행 중
+최종 업데이트: 2026-04-02 — youtube-analysis 도메인 가드 등록 + 하네스 영상 분석
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -20,6 +20,7 @@ untracked 불필요 파일 정리 (vba_inject_*.py 삭제).
 
 | 대상 | 핵심 변경 | 커밋 |
 |------|----------|------|
+| `.claude/hooks/cleanup_audit.sh` | Stop hook 신규 — untracked 파일 감지·정리 강제 + 예외(TASKS/HANDOFF 언급+도메인 산출물) | 49e69f19→8d933918 |
 | `.claude/rules/fast-full-lane.md` | Fast/Full Lane 판정 규칙 신규 (GPT 합의) | 15b06459 |
 | `.claude/rules/feature-utilization.md` | 기능 활용 규칙 신규 — 커스텀 명령·커넥터·Context7·병렬·IDE | 3bee0253, df697071 |
 | `.claude/hooks/domain_guard.sh` | v2 화이트리스트 전환 — loaded 전 Read(대상 CLAUDE.md)만 허용 | d2b7d6ea |
@@ -52,6 +53,7 @@ untracked 불필요 파일 정리 (vba_inject_*.py 삭제).
 - GPT Fast/Full Lane 규칙 판정: **검증 PASS** (커밋 15b06459)
 - GPT 기능 활용 갭 분석 판정: **PASS** (커밋 3bee0253 → df697071 수정)
 - GPT domain_guard 화이트리스트 판정: **PASS** (커밋 d2b7d6ea)
+- GPT cleanup_audit.sh 판정: **PASS** (커밋 49e69f19 → 8d933918)
 - GPT completion_gate v2 판정: **PASS** (커밋 08c44050 → e995d0b8)
 
 ---

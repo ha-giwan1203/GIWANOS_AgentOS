@@ -123,6 +123,15 @@ if name == 'zdm_inspection':
         '→ 실행 전 SKILL.md의 API 스펙·금지사항 필수 확인.'
     ])
 
+if name == 'youtube_analysis':
+    ctx_lines.extend([
+        '',
+        '→ youtube-analysis 스킬 수동/자동 모드 SKILL.md 참조.',
+        '→ 자막 추출: youtube_transcript.py 스크립트 사용 필수.',
+        '→ 분석 관점 9개 + A/B/C 판정 + 교차검증 절차를 따를 것.',
+        '→ URL 포함 시 수동 모드, URL 없이 "영상분석"만 입력 시 자동 모드.'
+    ])
+
 output = {'additionalContext': '\\n'.join(ctx_lines)}
 print(json.dumps(output, ensure_ascii=False))
 " "$CONFIG" "$PROMPT" 2>>"$LOG_DIR/prompt_inject_debug.log")

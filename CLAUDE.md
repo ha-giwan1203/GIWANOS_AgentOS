@@ -58,6 +58,7 @@
 | 라인배치 / OUTER / ERP 라인배정 | `10_라인배치/CLAUDE.md` |
 | MES 업로드 / 실적 업로드 / 실적 올려 | `90_공통기준/스킬/production-result-upload/SKILL.md` |
 | 일상점검 / ZDM / 점검 입력 | `90_공통기준/스킬/zdm-daily-inspection/SKILL.md` |
+| 영상분석 / 유튜브 / youtu.be / youtube.com | `90_공통기준/스킬/youtube-analysis/SKILL.md` |
 
 ## 작업 종료 시 상태 갱신
 1. `TASKS.md` — 완료 이동, 신규 항목 추가
