@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-02 — hooks 층 표준화 완료 + smoke_test 36/36 GPT PASS
+최종 업데이트: 2026-04-02 — post_write_dirty.sh 리다이렉트 패턴 개선 + matched_pattern 로깅 (GPT PASS 41ddb99e)
 
 ---
 
@@ -52,6 +52,12 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| ZDM 일상점검 — SP3M3 19개 점검표 75건 OK 입력 (2026-04-02, day=2) | 2026-04-02 |
+| MES 생산실적 업로드 — 4/1 15건 업로드 완료, 43,249ea 검증 PASS (3/25~3/31 기존 등록 확인) | 2026-04-02 |
+| MES SKILL.md 자동 로그인·iframe 동적 탐지 반영 — pyautogui 절차 + iframe-0 실증 + 재패키징 (5f990f5f) | 2026-04-02 |
+| MES 전체 흐름 테스트 PASS — CDP재시작→자동로그인→MES진입→iframe탐지→데이터조회 6단계 완전 검증 | 2026-04-02 |
+| completion_gate 반복 차단 수정 — openpyxl 읽기 전용 오탐 제거 (save 포함 시만 dirty 판정, 8b7ef521) | 2026-04-02 |
+| post_write_dirty.sh 리다이렉트 패턴 경로인식형 전환 + matched_pattern 로깅 — 허용목록 제외형, dirty.flag 6줄, 따옴표/중괄호 변수 허용, GPT PASS (41ddb99e) | 2026-04-02 |
 | hooks 층 표준화 — 24개 훅 8분류(감지/차단/정리/알림/감사/세션/미연결/유틸), README.md 문서화 (GPT 합의) | 2026-04-02 |
 | smoke_test 신규 3훅 커버리지 — completion_gate+cleanup_audit+domain_guard 17건 추가, 36/36 PASS (f6d1ff92, GPT PASS) | 2026-04-02 |
 | youtube-analysis 도메인 가드 등록 — config.yaml+prompt_inject+CLAUDE.md (d1250a99) | 2026-04-02 |
