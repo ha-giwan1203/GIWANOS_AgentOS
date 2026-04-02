@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-02 — smoke_test 36/36 PASS (신규 3훅 커버리지 추가)
+최종 업데이트: 2026-04-02 — hooks 층 표준화 완료 + smoke_test 36/36 GPT PASS
 
 ---
 
@@ -52,6 +52,10 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| hooks 층 표준화 — 24개 훅 8분류(감지/차단/정리/알림/감사/세션/미연결/유틸), README.md 문서화 (GPT 합의) | 2026-04-02 |
+| smoke_test 신규 3훅 커버리지 — completion_gate+cleanup_audit+domain_guard 17건 추가, 36/36 PASS (f6d1ff92, GPT PASS) | 2026-04-02 |
+| youtube-analysis 도메인 가드 등록 — config.yaml+prompt_inject+CLAUDE.md (d1250a99) | 2026-04-02 |
+| 하네스 영상 분석 — 실베개발자 4축 프레임워크, 갭 분석(가비지 컬렉션 부분갭), Claude+GPT 취합 | 2026-04-02 |
 | cleanup_audit.sh Stop hook — untracked 파일 감지·정리 강제, 예외(TASKS/HANDOFF 언급+도메인 산출물) (49e69f19→8d933918, GPT PASS) | 2026-04-02 |
 | completion_gate v2 — 작업 완료 시 TASKS/HANDOFF 갱신 자동 강제, STATUS 경고 (08c44050→e995d0b8, GPT PASS) | 2026-04-02 |
 | domain_guard 화이트리스트 전환 — 도메인 문서 미로드 시 전체 도구 차단 (d2b7d6ea, GPT PASS) + 토론모드 공유 규칙 추가 | 2026-04-02 |
