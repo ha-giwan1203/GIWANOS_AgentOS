@@ -130,6 +130,72 @@ check $? "pending.flag 상태기계 로직 존재"
 
 echo ""
 
+# === 9. Completion Gate (completion_gate.sh) ===
+echo "--- 9. Completion Gate (completion_gate.sh) ---"
+
+test -x "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate.sh 존재 + 실행 가능"
+
+grep -q 'dirty.flag' "$HOOKS_DIR/completion_gate.sh"
+check $? "dirty.flag 타임스탬프 비교 로직 존재"
+
+grep -q 'TASKS.md' "$HOOKS_DIR/completion_gate.sh"
+check $? "TASKS.md 갱신 검사 로직 존재"
+
+grep -q 'HANDOFF.md' "$HOOKS_DIR/completion_gate.sh"
+check $? "HANDOFF.md 갱신 검사 로직 존재"
+
+grep -q 'STATUS.md' "$HOOKS_DIR/completion_gate.sh"
+check $? "STATUS.md 경고 로직 존재"
+
+echo ""
+
+# === 10. Cleanup Audit (cleanup_audit.sh) ===
+echo "--- 10. Cleanup Audit (cleanup_audit.sh) ---"
+
+test -x "$HOOKS_DIR/cleanup_audit.sh"
+check $? "cleanup_audit.sh 존재 + 실행 가능"
+
+grep -q 'git status --porcelain' "$HOOKS_DIR/cleanup_audit.sh"
+check $? "git status untracked 파일 감지 로직 존재"
+
+grep -q '98_아카이브' "$HOOKS_DIR/cleanup_audit.sh"
+check $? "98_아카이브 이동 권고 메시지 존재"
+
+grep -q 'EXEMPT_PREFIXES\|is_exempt' "$HOOKS_DIR/cleanup_audit.sh"
+check $? "예외 규칙 (EXEMPT) 정의됨"
+
+grep -q 'get_mentioned_files\|mentioned_files' "$HOOKS_DIR/cleanup_audit.sh"
+check $? "TASKS/HANDOFF 언급 파일 예외 로직 존재"
+
+grep -q 'is_domain_output\|DOMAIN_PREFIXES' "$HOOKS_DIR/cleanup_audit.sh"
+check $? "도메인 산출물 예외 로직 존재"
+
+echo ""
+
+# === 11. Domain Guard (domain_guard.sh) ===
+echo "--- 11. Domain Guard (domain_guard.sh) ---"
+
+test -x "$HOOKS_DIR/domain_guard.sh"
+check $? "domain_guard.sh 존재 + 실행 가능"
+
+grep -q 'domain_guard_config.yaml' "$HOOKS_DIR/domain_guard.sh"
+check $? "config.yaml 참조 로직 존재"
+
+grep -q '_active' "$HOOKS_DIR/domain_guard.sh"
+check $? "도메인 활성 플래그 검사 로직 존재"
+
+grep -q '_loaded' "$HOOKS_DIR/domain_guard.sh"
+check $? "도메인 로드 플래그 검사 로직 존재"
+
+test -f "$HOOKS_DIR/domain_guard_config.yaml"
+check $? "domain_guard_config.yaml 존재"
+
+grep -q 'youtube_analysis' "$HOOKS_DIR/domain_guard_config.yaml"
+check $? "config.yaml에 youtube_analysis 도메인 등록됨"
+
+echo ""
+
 # === 결과 ===
 echo "=== 결과: $PASS/$TOTAL PASS, $FAIL FAIL ==="
 if [ "$FAIL" -gt 0 ]; then
