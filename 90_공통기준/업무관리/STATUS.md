@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-02 — 영상분석 토론 → Fast/Full Lane 규칙 확정 (15b06459)
+최종 업데이트: 2026-04-02 — 기능 활용 갭 분석 GPT PASS + feature-utilization.md 생성
 
 ---
 
@@ -26,6 +26,7 @@
 | 조립비정산 | 파이프라인 정상 운영 중 | `05_생산실적/조립비정산/CLAUDE.md` |
 | subagent 확장 | 구현 완료 (GPT PASS 7bae2a78) | `_플랜/plan_subagent_expansion.md` |
 | Fast/Full Lane | 규칙 확정 (GPT PASS 15b06459), 체크리스트 순차 작성 예정 | `.claude/rules/fast-full-lane.md` |
+| 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 제작 대기 | `.claude/rules/feature-utilization.md` |
 
 ---
 
