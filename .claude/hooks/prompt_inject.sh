@@ -12,6 +12,11 @@ except:
     pass
 " 2>/dev/null)
 
+# 실검증 로그: UserPromptSubmit 발동 확인
+LOG_DIR="$(cd "$(dirname "$0")" && pwd)/../logs"
+mkdir -p "$LOG_DIR" 2>/dev/null
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] prompt_inject fired | prompt_len=${#PROMPT} | prompt_head=$(echo "$PROMPT" | head -c 80)" >> "$LOG_DIR/prompt_inject_audit.log"
+
 if [ -z "$PROMPT" ]; then
   exit 0
 fi
@@ -120,7 +125,9 @@ if name == 'zdm_inspection':
 
 output = {'additionalContext': '\\n'.join(ctx_lines)}
 print(json.dumps(output, ensure_ascii=False))
-" "$CONFIG" "$PROMPT" 2>/dev/null)
+" "$CONFIG" "$PROMPT" 2>>"$LOG_DIR/prompt_inject_debug.log")
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] config=$CONFIG | result_len=${#RESULT} | result=$(echo "$RESULT" | head -c 200)" >> "$LOG_DIR/prompt_inject_audit.log"
 
 if [ -n "$RESULT" ]; then
   echo "$RESULT"
