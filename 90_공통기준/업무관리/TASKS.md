@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-02 00:35 KST — subagent 확장 구현 완료 (settlement-validator 생성 + code-reviewer memory 테스트 → 현행 유지)
+최종 업데이트: 2026-04-02 00:55 KST — 영상분석(Context Rot+GSD) → Fast/Full Lane 규칙 GPT 합의+구현 완료
 
 ---
 
@@ -52,6 +52,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| 영상분석(Context Rot+GSD) → Fast/Full Lane 판정 규칙 신규 — GPT 토론 합의 + .claude/rules/fast-full-lane.md 생성 (커밋 15b06459, GPT 실물 검증 PASS) | 2026-04-02 |
 | subagent 확장 구현 — settlement-validator 생성 + code-reviewer memory 테스트(Case A: 미활성화 확인) → 현행 유지 결정 (GPT 검증 진행 중) | 2026-04-02 |
 | 영상분석 자동 모드 1차 실행 — 3영상 분석 + 교차검증 + GPT 토론 합의 → A2 SubagentStart/SubagentStop hooks 구현 + B1 subagent 확장 plan 작성 | 2026-04-01 |
 | youtube-analysis 스킬 자동 모드 설계 — 8단계 워크플로우 + A/B/C 3단 게이트 + 교차검증 의무화 + 분석관점 9개 (GPT 공동작업 합의) | 2026-04-01 |
