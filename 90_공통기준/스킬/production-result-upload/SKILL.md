@@ -24,8 +24,45 @@ BI 엑셀 파일에서 데이터를 읽어 MES API로 직접 POST하므로,
 
 ## 실행 전 확인사항
 - CDP 브라우저(`--remote-debugging-port=9222`, 프로필 `.flow-chrome-debug`)가 실행 중이거나 자동 실행 가능해야 함
-- MES System에 이미 로그인되어 있어야 함 (프로필에 세션 유지)
+- MES 세션 만료 시 자동 로그인 절차(아래 참조) 수행
 - Z드라이브(`Z:\★ 라인별 생산실적\`)에 접근 가능해야 함
+
+## MES 자동 로그인 (세션 만료 시)
+
+OAuth 페이지(`auth-dev.samsong.com:18100/login`)로 리다이렉트되면 아래 절차 실행.
+
+```python
+from playwright.sync_api import sync_playwright
+import pyautogui, time
+
+with sync_playwright() as p:
+    browser = p.chromium.connect_over_cdp('http://localhost:9222')
+    page = browser.contexts[0].pages[0]
+    page.bring_to_front()
+    time.sleep(0.5)
+
+    # 브라우저 뷰포트 오프셋 계산
+    info = page.evaluate("() => ({screenX: window.screenX, screenY: window.screenY, chromeH: window.outerHeight - window.innerHeight})")
+    box = page.locator('input[name="userId"]').bounding_box()
+
+    # 화면 좌표 = 뷰포트 원점 + 필드 중심
+    screen_x = int(info['screenX'] + box['x'] + box['width'] / 2)
+    screen_y = int(info['screenY'] + info['chromeH'] + box['y'] + box['height'] / 2)
+    # 실증값 (1920x1080 전체화면): screen_x=984, screen_y=613
+
+    pyautogui.click(screen_x, screen_y)
+    time.sleep(1.5)
+    pyautogui.press('down')   # 저장된 자격증명 선택 (0109)
+    time.sleep(0.5)
+    pyautogui.press('return')
+    time.sleep(1.5)
+
+    page.locator('button[type=submit]').first.click()
+    time.sleep(4)
+    # 로그인 성공 확인: page.url에 'auth-dev' 없어야 함 또는 '로그아웃' 버튼 존재
+```
+
+**전제조건:** `pip install pyautogui` 설치 필요
 
 ## CDP 브라우저 실행/종료
 
@@ -128,24 +165,39 @@ if empty_qty:
 
 ## 실행 절차
 
-### 0단계: MES 탭 확인 + iframe 사전 로드 (필수)
+### 0단계: MES 접속 + iframe 사전 로드 (필수)
 
 API 호출 전 반드시 iframe을 먼저 로드해야 한다. iframe이 없으면 jQuery 참조 에러 발생.
 
 ```
-1. tabs_context_mcp(createIfEmpty=true) — 실패 시 한 번 더 재시도
-2. MES 탭 확인 (mes-dev.samsong.com 포함 탭 검색)
-3. 없으면 새 탭 → http://mes-dev.samsong.com:19200/layout/layout.do 이동
-4. iframe 사전 로드 (JS 실행):
+1. CDP 연결: playwright connect_over_cdp('http://localhost:9222')
+2. 현재 URL 확인
+   - auth-dev 로그인 페이지 → 자동 로그인 절차 먼저 수행
+   - mes-dev 페이지 → 바로 진행
+3. MES 레이아웃으로 이동: http://mes-dev.samsong.com:19200/layout/layout.do
+4. iframe 동적 탐지 후 생산실적 페이지 로드:
 ```
 
-```javascript
-document.querySelector('iframe[name="iframe-1"]').src = '/prdtstatus/viewPrdtRsltByLine.do';
+```python
+# iframe 이름은 환경에 따라 iframe-0 또는 iframe-1 — 동적으로 탐지
+iframe_name = page.evaluate("""() => {
+    const iframes = document.querySelectorAll('iframe[name]');
+    return iframes.length > 0 ? iframes[0].name : null;
+}""")
+page.evaluate(f"document.querySelector('iframe[name=\"{iframe_name}\"]').src = '/prdtstatus/viewPrdtRsltByLine.do'")
 ```
 
-5. 2초 대기 후 iframe.contentWindow.$ 존재 확인
-6. Tab no longer exists 에러 시 → 1번부터 재시도
+```python
+# jQuery 존재 확인 (3초 대기 후)
+import time; time.sleep(3)
+has_jq = page.evaluate(f"""() => {{
+    const f = document.querySelector('iframe[name="{iframe_name}"]');
+    return !!(f && f.contentWindow && f.contentWindow.$);
+}}""")
+# has_jq == True 확인 후 업로드 진행
+```
 
+**실증값 (2026-04-02):** iframe 이름 = `iframe-0`
 **이 단계를 건너뛰면 SaveExcelData.do 호출 시 iframe null 에러 발생.**
 
 ### 1단계: 사용자 의도 파악
@@ -432,7 +484,7 @@ URL: /prdtstatus/selectPrdtRsltByLine.do
 | 상황 | 대응 |
 |------|------|
 | Chrome 연결 안 됨 | "Claude in Chrome 확장 프로그램을 연결해주세요" 안내 |
-| MES 로그인 안 됨 | 직접 로그인 요청 후 재실행 |
+| MES 로그인 안 됨 | 자동 로그인 절차 실행 (pyautogui 화면좌표 클릭 → 자동완성 선택) |
 | 403 에러 | 로그인 세션 만료 → 브라우저에서 MES 새로고침 후 재실행 |
 | 500 에러 (SaveExcelData) | Content-Type 확인, iframe jQuery 사용 여부 확인 |
 | BI 파일에 해당 날짜 없음 | "BI 파일에 {날짜} 데이터가 없습니다" 안내 |
