@@ -4,7 +4,7 @@
 반복 절차는 `.claude/commands/` 슬래시 명령으로 캡슐화한다.
 제작 우선순위: `/sp3-verify` → `/mes-check` → `/release-proof` → `/debate-run`
 
-## 커넥터 (Notion·Slack·Calendar) 활용
+## 커넥터 (Notion·Slack·Gmail·Calendar) 활용
 커넥터는 독립 호출이 아니라 슬래시 명령 내부에 포함한다.
 예: `/sp3-verify` 안에서 Notion 상태 갱신, Slack 결과 알림을 한 번에 처리.
 
