@@ -19,7 +19,7 @@ domains:
       - ["하네스", "분석"]
     claude_path: "90_공통기준/토론모드/CLAUDE.md"
     entry_path: "90_공통기준/토론모드/ENTRY.md"
-    flag_prefix: "/tmp/.claude_domain_debate"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_debate"
     phases:
       - name: "entry_read"
         description: "ENTRY.md 읽기만 허용"
@@ -39,7 +39,7 @@ domains:
   settlement:
     keywords: ["정산", "조립비", "settlement", "대시보드"]
     claude_path: "05_생산실적/조립비정산/CLAUDE.md"
-    flag_prefix: "/tmp/.claude_domain_settlement"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_settlement"
     blocked_tools: ["Bash"]
     blocked_patterns:
       - "run_settlement_pipeline"
@@ -50,27 +50,27 @@ domains:
   linebatch:
     keywords: ["라인배치", "OUTER", "품번배치", "라인배정", "partLineBatch"]
     claude_path: "10_라인배치/CLAUDE.md"
-    flag_prefix: "/tmp/.claude_domain_linebatch"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_linebatch"
     blocked_tools: ["mcp__Claude_in_Chrome"]
     blocked_patterns: []
 
   mes_upload:
     keywords: ["MES 업로드", "실적 업로드", "생산실적 업로드", "BI 업로드", "실적 올려", "MES 실적"]
     claude_path: "90_공통기준/스킬/production-result-upload/SKILL.md"
-    flag_prefix: "/tmp/.claude_domain_mes_upload"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_mes_upload"
     blocked_tools: ["mcp__Claude_in_Chrome"]
     blocked_patterns: []
 
   zdm_inspection:
     keywords: ["일상점검", "ZDM", "ZDM 점검", "점검 입력", "일상점검 등록"]
     claude_path: "90_공통기준/스킬/zdm-daily-inspection/SKILL.md"
-    flag_prefix: "/tmp/.claude_domain_zdm"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_zdm"
     blocked_tools: ["mcp__Claude_in_Chrome"]
     blocked_patterns: []
 
   youtube_analysis:
     keywords: ["영상분석", "영상 분석", "유튜브 분석", "영상 요약", "youtu.be", "youtube.com/watch"]
     claude_path: "90_공통기준/스킬/youtube-analysis/SKILL.md"
-    flag_prefix: "/tmp/.claude_domain_youtube"
+    flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_youtube"
     blocked_tools: []
     blocked_patterns: []

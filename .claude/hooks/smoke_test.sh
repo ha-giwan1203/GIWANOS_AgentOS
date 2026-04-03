@@ -8,6 +8,22 @@ TOTAL=0
 LOG="$HOME/Desktop/업무리스트/.claude/hooks/hook_log.txt"
 HOOKS_DIR="$HOME/Desktop/업무리스트/.claude/hooks"
 
+# I/O 테스트에서 생성하는 도메인 flag를 종료 시 반드시 정리
+cleanup_domain_flags() {
+  PYTHONIOENCODING=utf-8 python3 -c "
+import yaml, sys, os
+with open(sys.argv[1],'r',encoding='utf-8') as f:
+    cfg = yaml.safe_load(f)
+for d in cfg.get('domains',{}).values():
+    p = d.get('flag_prefix','')
+    if p:
+        for s in ('_active','_phase','_loaded'):
+            try: os.remove(p+s)
+            except: pass
+" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null
+}
+trap cleanup_domain_flags EXIT
+
 check() {
   TOTAL=$((TOTAL+1))
   if [ "$1" = "0" ]; then
@@ -182,10 +198,10 @@ check $? "domain_guard.sh 존재 + 실행 가능"
 grep -q 'domain_guard_config.yaml' "$HOOKS_DIR/domain_guard.sh"
 check $? "config.yaml 참조 로직 존재"
 
-grep -q '_active' "$HOOKS_DIR/domain_guard.sh"
+grep -rq '_active' "$HOOKS_DIR/domain_guard.sh" "$HOOKS_DIR/domain_guard_logic.py" 2>/dev/null
 check $? "도메인 활성 플래그 검사 로직 존재"
 
-grep -q '_loaded' "$HOOKS_DIR/domain_guard.sh"
+grep -rq '_loaded' "$HOOKS_DIR/domain_guard.sh" "$HOOKS_DIR/domain_guard_logic.py" 2>/dev/null
 check $? "도메인 로드 플래그 검사 로직 존재"
 
 test -f "$HOOKS_DIR/domain_guard_config.yaml"
@@ -193,6 +209,59 @@ check $? "domain_guard_config.yaml 존재"
 
 grep -q 'youtube_analysis' "$HOOKS_DIR/domain_guard_config.yaml"
 check $? "config.yaml에 youtube_analysis 도메인 등록됨"
+
+echo ""
+
+# === 12. 입출력 검증 (I/O Tests) — cp949 회귀 방지 ===
+echo "--- 12. 입출력 검증 (I/O Tests) ---"
+
+# 12-1. prompt_inject: 한글 키워드 감지 (cp949 회귀 방지)
+IO_RESULT=$(echo '{"prompt":"토론모드 진행해줘"}' | PYTHONIOENCODING=utf-8 bash "$HOOKS_DIR/prompt_inject.sh" 2>/dev/null)
+echo "$IO_RESULT" | grep -q 'additionalContext'
+check $? "prompt_inject 한글 키워드 '토론모드' 감지 → additionalContext 반환"
+
+# 12-2. prompt_inject: Active Laws 5줄 포함
+echo "$IO_RESULT" | grep -q 'Active Laws'
+check $? "prompt_inject Active Laws 문구 포함"
+
+# 12-3. domain_guard: 비활성 도메인 → 통과 (출력 없음)
+# 12-1에서 prompt_inject가 도메인 active flag를 생성하므로 전체 정리
+# glob 대신 YAML에서 모든 flag_prefix를 추출해서 명시적 삭제
+PYTHONIOENCODING=utf-8 python3 -c "
+import yaml, sys, os
+with open(sys.argv[1],'r',encoding='utf-8') as f:
+    cfg = yaml.safe_load(f)
+for d in cfg.get('domains',{}).values():
+    p = d.get('flag_prefix','')
+    if p:
+        for s in ('_active','_phase','_loaded'):
+            try: os.remove(p+s)
+            except: pass
+" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null
+DG_RESULT=$(echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | bash "$HOOKS_DIR/domain_guard.sh" 2>/dev/null)
+test -z "$DG_RESULT"
+check $? "domain_guard 비활성 도메인 → 빈 출력 (통과)"
+
+# 12-4. domain_guard: phase guard 차단 테스트 (활성 도메인 시뮬레이션)
+DEBATE_PREFIX=$(PYTHONIOENCODING=utf-8 python3 -c "
+import yaml, sys
+with open(sys.argv[1],'r',encoding='utf-8') as f:
+    cfg = yaml.safe_load(f)
+print(cfg['domains']['debate']['flag_prefix'])
+" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null)
+if [ -n "$DEBATE_PREFIX" ]; then
+  # 임시 활성 플래그 생성 (phase 파일 없음 = entry_read 상태)
+  echo "debate" > "${DEBATE_PREFIX}_active"
+  rm -f "${DEBATE_PREFIX}_phase" "${DEBATE_PREFIX}_loaded" 2>/dev/null
+  PG_RESULT=$(echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | bash "$HOOKS_DIR/domain_guard.sh" 2>/dev/null)
+  echo "$PG_RESULT" | grep -q 'block'
+  check $? "domain_guard phase:entry_read → Bash 차단 (block)"
+  # 정리
+  rm -f "${DEBATE_PREFIX}_active" "${DEBATE_PREFIX}_phase" "${DEBATE_PREFIX}_loaded" 2>/dev/null
+else
+  TOTAL=$((TOTAL+1)); FAIL=$((FAIL+1))
+  echo "  [FAIL] domain_guard phase guard — debate flag_prefix 추출 실패"
+fi
 
 echo ""
 
