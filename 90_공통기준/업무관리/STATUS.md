@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-03 — hooks 하네스 최종 PASS (760d6bd2) + jq 완전 제거 (GPT 전검 합의)
+최종 업데이트: 2026-04-03 — hooks 체계 정비 + jq 완전 제거 (상세: TASKS.md 참조)
 
 ---
 
@@ -41,6 +41,7 @@
 | Phase 3 | `update_status_tasks.py` | 운영 중 |
 | Phase 4 | `slack_notify.py` | 운영 중 (Token 갱신 완료) |
 | Phase 5 | `notion_sync.py` | 운영 중 (per-page dedup 적용) |
+| Phase 6 | `skill_install.py` | 운영 중 (.skill 변경 시 자동 압축 해제) |
 
 ---
 
