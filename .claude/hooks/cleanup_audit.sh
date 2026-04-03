@@ -4,6 +4,8 @@
 # - completion_gate와 분리 (기능별 독립)
 # - 자동 삭제 금지, 98_아카이브/정리대기_YYYYMMDD/ 이동 권고
 # - 예외: .claude/, .gitignore 대상, TASKS/HANDOFF 언급 파일
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+hook_log "Stop" "cleanup_audit 발화" 2>/dev/null
 
 RESULT=$(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 -c "
 import os, sys, json, subprocess

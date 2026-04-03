@@ -2,6 +2,8 @@
 # Stop hook — 금지 문구 차단 + 토론모드 필수 형식 검사
 # Claude 응답 완료 직전에 실행. 위반 시 exit 2로 stop 차단.
 # v2: 마지막 assistant 블록 기준 판정 (GPT 합의 2026-04-01)
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+hook_log "Stop" "stop_guard 발화" 2>/dev/null
 
 HOOK_LOG="$HOME/Desktop/업무리스트/.claude/hooks/hook_log.txt"
 TRANSCRIPT="$CLAUDE_TRANSCRIPT_PATH"
