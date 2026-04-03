@@ -15,19 +15,21 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 # Python으로 YAML 파싱 + 활성 도메인 확인 + phase-based 차단 판정
-RESULT=$(python3 -c "
+# v3.1: stdin 파이프 방식 (bash 변수 경유 제거 — cp949 인코딩 깨짐 방지)
+RESULT=$(echo "$INPUT" | PYTHONIOENCODING=utf-8 python3 -c "
 import yaml, re, sys, json, os
 
 config_path = sys.argv[1]
-hook_input = sys.argv[2]
+
+# stdin에서 직접 JSON 읽기 (bash 변수 경유 없음)
+try:
+    raw = sys.stdin.buffer.read()
+    data = json.loads(raw.decode('utf-8'))
+except:
+    sys.exit(0)
 
 with open(config_path, 'r', encoding='utf-8') as f:
     cfg = yaml.safe_load(f)
-
-try:
-    data = json.loads(hook_input)
-except:
-    sys.exit(0)
 
 tool_name = data.get('tool_name', '')
 tool_input = data.get('tool_input', {})
@@ -140,7 +142,7 @@ for name, d in domains.items():
 
 # 활성 도메인 없음 — 통과
 sys.exit(0)
-" "$CONFIG" "$INPUT" 2>/dev/null)
+" "$CONFIG" 2>/dev/null)
 
 if [ -n "$RESULT" ]; then
   echo "$RESULT"

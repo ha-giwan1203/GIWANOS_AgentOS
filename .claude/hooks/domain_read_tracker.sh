@@ -13,19 +13,21 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 # Python으로 YAML 파싱 + 읽은 파일 경로 매칭 + phase 전환
-python3 -c "
+# v2.1: stdin 파이프 방식 (cp949 인코딩 깨짐 방지)
+echo "$INPUT" | PYTHONIOENCODING=utf-8 python3 -c "
 import yaml, sys, json, os
 
 config_path = sys.argv[1]
-hook_input = sys.argv[2]
+
+# stdin에서 직접 JSON 읽기
+try:
+    raw = sys.stdin.buffer.read()
+    data = json.loads(raw.decode('utf-8'))
+except:
+    sys.exit(0)
 
 with open(config_path, 'r', encoding='utf-8') as f:
     cfg = yaml.safe_load(f)
-
-try:
-    data = json.loads(hook_input)
-except:
-    sys.exit(0)
 
 tool_input = data.get('tool_input', {})
 file_path = tool_input.get('file_path', '')
@@ -71,6 +73,6 @@ for name, d in domains.items():
         if claude_path and claude_path.replace('\\\\', '/') in file_path_normalized:
             open(loaded_flag, 'w').close()
             break
-" "$CONFIG" "$INPUT" 2>/dev/null
+" "$CONFIG" 2>/dev/null
 
 exit 0
