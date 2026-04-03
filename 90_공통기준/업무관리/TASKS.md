@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-04 — 규칙 완화+등급제 구현 (GPT PASS 5e034ad3)
+최종 업데이트: 2026-04-04 — hooks cp949 인코딩 버그 수정 (211ab177)
 
 ---
 
@@ -53,6 +53,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| hooks cp949 인코딩 버그 수정 — prompt_inject/domain_guard/domain_read_tracker 3개 hook sys.argv→stdin 파이프 전환, 한글 키워드 감지 복구 (211ab177) | 2026-04-04 |
 | 규칙 완화+등급제 — ENTRY.md=Primary(NEVER만), CLAUDE.md=Reference(등급태그), additionalContext 7줄→5줄 축소 (GPT 합의 2턴) | 2026-04-04 |
 | domain_guard phase guard — 토론모드 3단 시퀀스(entry_read→doc_read→full) + 키워드 2단 조합 11패턴 + ENTRY.md 신규 (GPT 합의 2턴, PASS 65c34115) | 2026-04-04 |
 | PPT 실무 투입 최종 PASS — 실데이터 2종 생성(NCR 사진포함+월간 13라인) + PowerPoint 육안 검수 5/5 + 엣지 7/7 + 재현성 2/2 + 입력계약 검증 (308a588d) | 2026-04-04 |

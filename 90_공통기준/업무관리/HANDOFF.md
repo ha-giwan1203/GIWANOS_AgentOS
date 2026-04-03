@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — 규칙 완화+등급제 구현 (GPT PASS 5e034ad3)
+최종 업데이트: 2026-04-04 — hooks cp949 인코딩 버그 수정 (211ab177)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -19,12 +19,12 @@
 
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
+| prompt_inject.sh | v2: sys.argv→stdin 파이프 (cp949 인코딩 버그 수정) | 완료 (211ab177) |
+| domain_guard.sh | v3.1: 동일 인코딩 수정 | 완료 (211ab177) |
+| domain_read_tracker.sh | v2.1: 동일 인코딩 수정 | 완료 (211ab177) |
 | 토론모드 ENTRY.md | Primary 문서로 재작성 — NEVER 등급만, 25줄 | 완료 |
 | 토론모드 CLAUDE.md | Reference 격하 + [NEVER]/[SHOULD]/[MAY] 등급 태그 | 완료 |
-| prompt_inject.sh | additionalContext 7줄→5줄 축소 (Active Laws만) | 완료 |
-| domain_guard.sh | v3: phase-based sequence guard | 완료 (PASS 65c34115) |
 | domain_guard_config.yaml | keyword_combos 11패턴 + phases 3단 | 완료 |
-| domain_read_tracker.sh | v2: phase 전환 | 완료 |
 
 ---
 
