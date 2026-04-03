@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-03 — hooks 체계 정비 + jq 완전 제거 (상세: TASKS.md 참조)
+최종 업데이트: 2026-04-03 — PPT 자동 생성 스킬 MVP 2종 PoC 완료 (상세: TASKS.md 참조)
 
 ---
 
@@ -29,6 +29,7 @@
 | Fast/Full Lane | 규칙 확정 (GPT PASS 15b06459), 체크리스트 순차 작성 예정 | `.claude/rules/fast-full-lane.md` |
 | 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 보류 (자연어 대체) | `.claude/rules/feature-utilization.md` |
 | domain_guard | 화이트리스트 전환 완료 (GPT PASS d2b7d6ea) | `.claude/hooks/domain_guard.sh` |
+| PPT 자동 생성 | MVP 2종 PoC 완료 (GPT 조건부 PASS b22ef085) | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 
 ---
 
