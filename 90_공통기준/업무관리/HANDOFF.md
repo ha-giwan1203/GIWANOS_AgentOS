@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — hooks cp949 인코딩 버그 수정 (211ab177)
+최종 업데이트: 2026-04-04 — 양방향 하네스 합의 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -32,6 +32,6 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 중 | 루트 CLAUDE.md + rules 동일 원칙 적용 | NEVER/SHOULD/MAY 분류 + 규칙량 감사 |
-| 중 | 다른 도메인 phase guard 확장 | 토론모드 실증 후 settlement/linebatch 등 |
+| ~~중~~ | ~~루트 CLAUDE.md + rules 등급 태그~~ | GPT 합의: 현행 유지, 추가 작업 불필요 (원칙형 문서에 태그는 노이즈) |
+| ~~중~~ | ~~다른 도메인 phase guard 확장~~ | GPT 합의: 현행 유지, 문서 1개 도메인에 순서 강제 불필요 (재논의 조건: ENTRY.md 신규 생성 시) |
 | 낮 | PPT 확장 검증 | Graphviz 다이어그램, visualize 자동 분기 |
