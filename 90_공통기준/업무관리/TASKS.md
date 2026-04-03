@@ -9,18 +9,20 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-03 — PPT 자동 생성 스킬 GPT 토론 1차 합의 완료
+최종 업데이트: 2026-04-03 — PPT 자동 생성 스킬 MVP 2종 PoC 완료 (b22ef085)
 
 ---
 
 ## 진행 중
 
-### [진행] PPT 자동 생성 스킬 구축 — **1차 GPT 토론 합의 완료, 재사용 검증 대기**
+### [진행] PPT 자동 생성 스킬 구축 — **MVP 2종 PoC 완료, GPT 최종 판정 대기**
 - 출처: 사용자 요청 (2026-04-03) — YouTube AI PPT 생성 영상 기반 스킬화 제안
-- GPT 토론 합의: C(템플릿)+D(python-pptx+AI) 혼합, 기존 오픈소스 재사용 우선
-- 기준 원형: Anthropic 공식 skills/pptx (1순위) + tfriedel/claude-office-skills (보조)
-- MVP: 품질 대책서 + 월간 생산실적 2종
-- 다음: 공식 skills/pptx SKILL.md 실사용성 검증 → 재사용/자체구축 판정
+- GPT 토론 합의: C(템플릿)+D(python-pptx+AI) 혼합, Anthropic QA 차용
+- 엔진: python-pptx 1.0.2 + matplotlib 3.10.8
+- MVP 1 (품질 대책서): cfb88dde — 카드형 보고서 QA PASS
+- MVP 2 (월간 생산실적): b22ef085 — 표+차트+KPI 카드 QA PASS
+- SKILL.md: 90_공통기준/스킬/pptx-generator/SKILL.md (3층 아키텍처 + QA 3축)
+- 다음: GPT 최종 판정 → 실무 투입 준비
 
 ---
 
