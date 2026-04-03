@@ -1,8 +1,8 @@
 """
-NCR (Non-Conformity Report) PPT 생성기 — PoC v1
+NCR (Non-Conformity Report) PPT 생성기 — v2
 GPT 합의 기반: python-pptx + Beautify 규칙 엔진
 
-입력: NCR 데이터 dict
+입력: NCR 데이터 dict (photo_path 옵션)
 출력: 2슬라이드 NCR 보고서 PPTX
 
 사용법:
@@ -13,6 +13,7 @@ GPT 합의 기반: python-pptx + Beautify 규칙 엔진
 import json
 import sys
 import os
+from pathlib import Path
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
@@ -172,8 +173,67 @@ def add_bullet_box(slide, left, top, width, height, items):
         p.space_after = Pt(2)
 
 
+REQUIRED_KEYS = ["title", "site", "date"]  # supplier는 선택 (미입력 시 "미입력" 표시)
+
+
+def _validate_input(data):
+    """필수 키 검증. 누락 시 ValueError."""
+    missing = [k for k in REQUIRED_KEYS if not data.get(k)]
+    if missing:
+        raise ValueError(f"NCR 필수 입력 누락: {', '.join(missing)}")
+
+
+def _safe_str(value, default="미입력"):
+    """None/빈값 → 기본 텍스트"""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return default
+    return str(value)
+
+
+def _safe_list(value):
+    """None/비리스트 → 빈 리스트, 각 항목 문자열 변환"""
+    if not value or not isinstance(value, list):
+        return []
+    return [str(item) for item in value]
+
+
+def _add_photo_or_placeholder(slide, left, top, width, height, photo_path):
+    """사진 삽입 (비율 유지) 또는 빈 박스 + 안내 텍스트"""
+    if photo_path and Path(photo_path).is_file():
+        from PIL import Image
+        img = Image.open(photo_path)
+        img_w, img_h = img.size
+        img.close()
+
+        # 비율 유지하며 영역 내 최대 크기 계산
+        scale = min(width / img_w, height / img_h)
+        final_w = int(img_w * scale)
+        final_h = int(img_h * scale)
+        # 중앙 정렬
+        x_offset = left + (width - final_w) // 2
+        y_offset = top + (height - final_h) // 2
+
+        slide.shapes.add_picture(photo_path, x_offset, y_offset, final_w, final_h)
+    else:
+        # 빈 박스 + "사진 미첨부" 텍스트
+        box = slide.shapes.add_shape(1, left, top, width, height)
+        box.fill.solid()
+        box.fill.fore_color.rgb = RGBColor(0xF5, 0xF5, 0xF5)
+        box.line.color.rgb = RGBColor(0xCC, 0xCC, 0xCC)
+        box.line.width = Pt(1)
+
+        txbox = slide.shapes.add_textbox(
+            left + width // 4, top + height // 2 - Inches(0.15),
+            width // 2, Inches(0.3)
+        )
+        tf = txbox.text_frame
+        _set_run(tf.paragraphs[0], "사진 미첨부", Pt(14),
+                 RGBColor(0x99, 0x99, 0x99), align=PP_ALIGN.CENTER)
+
+
 def generate_ncr(data, output_path="ncr_output.pptx"):
     """NCR 보고서 PPTX 생성"""
+    _validate_input(data)
     prs = Presentation()
     prs.slide_width = SLIDE_W
     prs.slide_height = SLIDE_H
@@ -189,12 +249,11 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
     bg.fill.fore_color.rgb = COLORS["bg_light"]
     bg.line.fill.background()
 
-    add_header(slide1, "NCR | Non-Conformity Report", data.get("header_subtitle", "부적합 보고서"), "1 / 2")
+    add_header(slide1, "NCR | Non-Conformity Report", _safe_str(data.get("header_subtitle"), "부적합 보고서"), "1 / 2")
 
     y = HEADER_H + Inches(0.12)
     col1_x = MARGIN
-    col2_x = MARGIN + Inches(6.2)
-    card_w = Inches(5.9)
+    col1_w = Inches(5.9)
     card_h = Inches(0.32)
 
     # 섹션: 기본 정보
@@ -203,29 +262,41 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
 
     # 좌측 카드들
     cards_left = [
-        ("Title", data.get("title", "")),
-        ("Supplier & Team", data.get("supplier", "")),
-        ("Occurrence Site", data.get("site", "")),
-        ("Date", data.get("date", "")),
-        ("Part No", data.get("part_no", "")),
-        ("Part Name", data.get("part_name", "")),
+        ("Title", _safe_str(data.get("title"))),
+        ("Supplier & Team", _safe_str(data.get("supplier"))),
+        ("Occurrence Site", _safe_str(data.get("site"))),
+        ("Date", _safe_str(data.get("date"))),
+        ("Part No", _safe_str(data.get("part_no"))),
+        ("Part Name", _safe_str(data.get("part_name"))),
     ]
 
     for label, value in cards_left:
-        add_card(slide1, col1_x, y, card_w, card_h, label, value)
+        add_card(slide1, col1_x, y, col1_w, card_h, label, value)
         y += card_h + CARD_GAP
 
-    # 우측: 부적합 수량 + NG 표시
-    ng_y = HEADER_H + Inches(0.5)
-    add_card(slide1, col2_x, ng_y, card_w, card_h, "부적합 수량", data.get("ng_qty", ""))
+    # 우측: 현상 사진 영역 (원본 좌표 기준: L=5.85" T=1.0")
+    photo_x = MARGIN + Inches(6.2)
+    photo_section_y = HEADER_H + Inches(0.12)
+    photo_section_w = Inches(6.1)
+    add_section_title(slide1, photo_x, photo_section_y, photo_section_w, "현상 사진")
+    photo_y = photo_section_y + Inches(0.38)
+    photo_h = Inches(3.2)
+    _add_photo_or_placeholder(
+        slide1, photo_x, photo_y, photo_section_w, photo_h,
+        data.get("photo_path")
+    )
+
+    # 우측 하단: 부적합 수량 + NG 표시
+    ng_y = photo_y + photo_h + Inches(0.15)
+    add_card(slide1, photo_x, ng_y, photo_section_w, card_h, "부적합 수량", _safe_str(data.get("ng_qty")))
     ng_y += card_h + CARD_GAP
 
     # NG 강조 표시
-    ng_box = slide1.shapes.add_shape(1, col2_x, ng_y, Inches(1.2), Inches(0.4))
+    ng_box = slide1.shapes.add_shape(1, photo_x, ng_y, Inches(1.2), Inches(0.4))
     ng_box.fill.solid()
     ng_box.fill.fore_color.rgb = COLORS["fail_red"]
     ng_box.line.fill.background()
-    ng_txbox = slide1.shapes.add_textbox(col2_x + Inches(0.08), ng_y + Inches(0.03), Inches(1.04), Inches(0.34))
+    ng_txbox = slide1.shapes.add_textbox(photo_x + Inches(0.08), ng_y + Inches(0.03), Inches(1.04), Inches(0.34))
     ng_tf = ng_txbox.text_frame
     _set_run(ng_tf.paragraphs[0], "NG", Pt(24), COLORS["text_white"], bold=True, align=PP_ALIGN.CENTER)
 
@@ -233,18 +304,18 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
     desc_y = y + Inches(0.08)
     add_section_title(slide1, col1_x, desc_y, Inches(12.3), "부적합 내용")
     desc_y += Inches(0.35)
-    add_bullet_box(
-        slide1, col1_x, desc_y, Inches(12.3), Inches(0.7),
-        data.get("description", [])
-    )
+    desc_items = _safe_list(data.get("description"))
+    if not desc_items:
+        desc_items = ["(내용 없음)"]
+    add_bullet_box(slide1, col1_x, desc_y, Inches(12.3), Inches(0.7), desc_items)
 
     # 특기사항
     note_y = desc_y + Inches(0.78)
     add_section_title(slide1, col1_x, note_y, Inches(6.0), "특기사항")
     note_y += Inches(0.35)
-    add_card(slide1, col1_x, note_y, Inches(6.0), card_h, "특기사항", data.get("note", ""))
+    add_card(slide1, col1_x, note_y, Inches(6.0), card_h, "특기사항", _safe_str(data.get("note")))
     note_y += card_h + CARD_GAP
-    add_card(slide1, col1_x, note_y, Inches(6.0), card_h, "대책요구일", data.get("action_due", ""))
+    add_card(slide1, col1_x, note_y, Inches(6.0), card_h, "대책요구일", _safe_str(data.get("action_due")))
 
     # ── Slide 2: 원인 · 대책 ──
     slide2 = prs.slides.add_slide(blank_layout)
@@ -269,10 +340,8 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
     _set_run(tf_lbl.paragraphs[0], "① 직접 원인", FONT_LABEL, COLORS["primary"], bold=True)
     y2 += Inches(0.24)
 
-    add_bullet_box(
-        slide2, MARGIN, y2, full_w, Inches(0.5),
-        data.get("direct_cause", [])
-    )
+    dc = _safe_list(data.get("direct_cause")) or ["(원인 미입력)"]
+    add_bullet_box(slide2, MARGIN, y2, full_w, Inches(0.5), dc)
     y2 += Inches(0.55)
 
     # 관리 원인
@@ -281,37 +350,31 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
     _set_run(tf_lbl2.paragraphs[0], "② 관리 원인", FONT_LABEL, COLORS["primary"], bold=True)
     y2 += Inches(0.24)
 
-    add_bullet_box(
-        slide2, MARGIN, y2, full_w, Inches(0.5),
-        data.get("mgmt_cause", [])
-    )
+    mc = _safe_list(data.get("mgmt_cause")) or ["(원인 미입력)"]
+    add_bullet_box(slide2, MARGIN, y2, full_w, Inches(0.5), mc)
     y2 += Inches(0.58)
 
     # 즉시 조치
     add_section_title(slide2, MARGIN, y2, full_w, "즉시 조치")
     y2 += Inches(0.35)
-    add_bullet_box(
-        slide2, MARGIN, y2, full_w, Inches(0.65),
-        data.get("immediate_action", [])
-    )
+    ia = _safe_list(data.get("immediate_action")) or ["(조치 미입력)"]
+    add_bullet_box(slide2, MARGIN, y2, full_w, Inches(0.65), ia)
     y2 += Inches(0.72)
 
     # 재발 방지 대책
     add_section_title(slide2, MARGIN, y2, full_w, "재발 방지 대책")
     y2 += Inches(0.35)
-    add_bullet_box(
-        slide2, MARGIN, y2, full_w, Inches(0.65),
-        data.get("prevention", [])
-    )
+    pv = _safe_list(data.get("prevention")) or ["(대책 미입력)"]
+    add_bullet_box(slide2, MARGIN, y2, full_w, Inches(0.65), pv)
     y2 += Inches(0.72)
 
     # 실행 관리
     add_section_title(slide2, MARGIN, y2, full_w, "실행 관리")
     y2 += Inches(0.35)
     exec_cards = [
-        ("담당", data.get("responsible", "")),
-        ("완료예정", data.get("due_date", "")),
-        ("비고", data.get("remark", "")),
+        ("담당", _safe_str(data.get("responsible"))),
+        ("완료예정", _safe_str(data.get("due_date"))),
+        ("비고", _safe_str(data.get("remark"))),
     ]
     for label, value in exec_cards:
         add_card(slide2, MARGIN, y2, Inches(4.0), card_h, label, value)
@@ -324,6 +387,7 @@ def generate_ncr(data, output_path="ncr_output.pptx"):
 # ── 샘플 데이터 (각인텅 대책서 재현) ──
 SAMPLE_DATA = {
     "header_subtitle": "각인텅 무단 폐기 · 보고",
+    "photo_path": None,  # 사진 경로 (없으면 "사진 미첨부" 표시)
     "title": "각인텅 (Engraving Tong)",
     "supplier": "대원테크 / 팀",
     "site": "SD9A01 라인",

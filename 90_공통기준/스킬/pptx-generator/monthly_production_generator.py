@@ -211,8 +211,27 @@ def create_achievement_chart(data, output_path):
     return output_path
 
 
+REQUIRED_KEYS = ["month", "lines"]
+
+
+def _validate_input(data):
+    """필수 키 검증."""
+    missing = [k for k in REQUIRED_KEYS if not data.get(k)]
+    if missing:
+        raise ValueError(f"월간 생산실적 필수 입력 누락: {', '.join(missing)}")
+    lines = data["lines"]
+    if not isinstance(lines, list) or len(lines) == 0:
+        raise ValueError("lines는 1개 이상의 라인 데이터가 필요합니다")
+    for i, line in enumerate(lines):
+        if not line.get("name"):
+            raise ValueError(f"lines[{i}]: name 누락")
+        if "actual" not in line:
+            raise ValueError(f"lines[{i}] ({line['name']}): actual 누락")
+
+
 def generate_monthly_report(data, output_path="monthly_production_output.pptx"):
     """월간 생산실적 보고서 PPTX 생성"""
+    _validate_input(data)
     prs = Presentation()
     prs.slide_width = SLIDE_W
     prs.slide_height = SLIDE_H
