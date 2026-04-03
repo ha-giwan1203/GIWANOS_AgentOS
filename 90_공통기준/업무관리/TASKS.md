@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-04 — domain_guard phase guard 구현 (GPT 합의 2턴)
+최종 업데이트: 2026-04-04 — 규칙 완화+등급제 구현 (GPT 합의 2턴)
 
 ---
 
@@ -53,7 +53,8 @@
 
 | 항목 | 완료일 |
 |------|--------|
-| domain_guard phase guard — 토론모드 3단 시퀀스(entry_read→doc_read→full) + 키워드 2단 조합 11패턴 + ENTRY.md 신규 (GPT 합의 2턴) | 2026-04-04 |
+| 규칙 완화+등급제 — ENTRY.md=Primary(NEVER만), CLAUDE.md=Reference(등급태그), additionalContext 7줄→5줄 축소 (GPT 합의 2턴) | 2026-04-04 |
+| domain_guard phase guard — 토론모드 3단 시퀀스(entry_read→doc_read→full) + 키워드 2단 조합 11패턴 + ENTRY.md 신규 (GPT 합의 2턴, PASS 65c34115) | 2026-04-04 |
 | PPT 실무 투입 최종 PASS — 실데이터 2종 생성(NCR 사진포함+월간 13라인) + PowerPoint 육안 검수 5/5 + 엣지 7/7 + 재현성 2/2 + 입력계약 검증 (308a588d) | 2026-04-04 |
 | PPT 자동 생성 스킬 MVP 2종 PoC — ncr_generator.py + monthly_production_generator.py, 검증 PASS — MVP 2종 엔진 적합성 실물 확인 (GPT PASS, cfb88dde/b22ef085/f1da0084) | 2026-04-04 |
 | 병렬 실행 규칙 신규 — 읽기/검증 병렬, 쓰기/반영 직렬, GPT 대기 병행 (GenSpark 토론 합의, GPT PASS 463dc674) | 2026-04-03 |

@@ -1,19 +1,23 @@
-# 토론모드 프로젝트
+# 토론모드 프로젝트 (Reference 문서)
+
+> **이 파일은 Reference다. Primary는 ENTRY.md.**
+> ENTRY.md의 NEVER 규칙이 최우선. 이 문서는 상세 배경·selector·fallback 참조용.
+> 등급: [NEVER] 위반=버그 / [SHOULD] 최선 노력 / [MAY] 선택
 
 ## 목적
 Claude가 브라우저에서 ChatGPT 웹 화면을 직접 읽고, 이전 답변을 바탕으로 다음 반박/질문을 생성하여 반자동 토론을 이어가는 코워크 구조.
 
 ## 핵심 조건
-- API 사용 금지 — 브라우저 화면 텍스트 직접 읽기만 사용
-- 사용자는 ChatGPT에 로그인 상태 유지
-- 완전 무인 자동화가 아닌 반자동 코워크 (사용자가 주제/방향 결정, Claude가 실행)
-- 로그는 로컬 파일로 저장
+- [NEVER] API 사용 금지 — 브라우저 화면 텍스트 직접 읽기만 사용
+- [SHOULD] 사용자는 ChatGPT에 로그인 상태 유지
+- [SHOULD] 완전 무인 자동화가 아닌 반자동 코워크 (사용자가 주제/방향 결정, Claude가 실행)
+- [MAY] 로그는 로컬 파일로 저장
 
 ## 사용자 개입 금지 + 실행 루프 (hooks 강제)
 
 > stop_guard.sh가 금지 문구를 차단한다. prompt_inject.sh가 체크리스트를 주입한다.
 
-사용자에게 중간 승인 요청 금지. 예외: 입력값 부족 / 비가역 실행 / 명시적 "검토만" 지시.
+[NEVER] 사용자에게 중간 승인 요청 금지. 예외: 입력값 부족 / 비가역 실행 / 명시적 "검토만" 지시.
 
 실행 루프: 방향 지시 → GPT 토론 → 합의 → 즉시 실행 → GPT 공유 → 추가수정 시 재공유 루프 → 루프 완료 후 사용자 보고 1회.
 
@@ -112,8 +116,8 @@ setTimeout(() => {
 ```
 textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true}) dispatch
 ```
-금지: DataTransfer/synthetic paste 기반 입력 (isTrusted=false → 앱이 무시)
-금지: find() → form_input 방식 (느림, React 이벤트 미트리거)
+[NEVER] 금지: DataTransfer/synthetic paste 기반 입력 (isTrusted=false → 앱이 무시)
+[NEVER] 금지: find() → form_input 방식 (느림, React 이벤트 미트리거)
 
 #### 응답 완료 감지 (적응형 polling)
 ```
@@ -229,9 +233,9 @@ JSON 로그: 턴별 타임스탬프, 입력/출력, 토큰 추정, 오류 여부
 | 네트워크 오류 | 로그 기록 후 중단 |
 
 ### 금지사항
-- ChatGPT API 호출
-- 자동 로그인 시도
-- find() → form_input 방식으로 입력 (javascript_tool 직접 입력 사용)
-- DataTransfer/synthetic paste 기반 입력
-- 이전 턴 로그 덮어쓰기
-- 프로젝트방 외 일반 대화창에 새 대화 개설
+- [NEVER] ChatGPT API 호출
+- [NEVER] 자동 로그인 시도
+- [NEVER] find() → form_input 방식으로 입력 (javascript_tool 직접 입력 사용)
+- [NEVER] DataTransfer/synthetic paste 기반 입력
+- [SHOULD] 이전 턴 로그 덮어쓰기
+- [NEVER] 프로젝트방 외 일반 대화창에 새 대화 개설

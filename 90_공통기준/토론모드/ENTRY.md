@@ -1,22 +1,30 @@
-# 토론모드 진입 핵심 규칙 (ENTRY.md)
+# 토론모드 Active Laws (ENTRY.md)
 
-> domain_guard가 강제하는 최소 읽기 대상. 이 파일 읽기 → CLAUDE.md 읽기 → 실행.
+> 이 파일이 Primary. CLAUDE.md는 Reference(상세 배경용).
+> 위반 = 버그. hooks가 강제한다.
 
-## 필수 순서
-1. 기존 ChatGPT 탭 확인 (tabs_context_mcp) → 있으면 switch, 없으면 프로젝트 URL navigate
-2. main 영역에서 JS로 대화 URL 추출 → navigate (클릭 금지)
-3. 입력: `#prompt-textarea` + `execCommand('insertText')` (클립보드/DataTransfer 금지)
-4. 전송: `[data-testid="send-button"]` JS 클릭 (ref 클릭 금지)
-5. 응답 대기: stop-button polling 적응형 (5/10/15초)
-6. 입력 전 미확인 응답 점검 필수
+## NEVER (위반 시 hooks 차단)
 
-## 필수 분석
-- GPT 응답 → 주장 분해 → 라벨링(실증/일반론/환경미스매치/과잉) → 채택/보류/버림
-- 반박문 첫 문단에 `채택:` `보류:` `버림:` 포함
+1. 클립보드 붙여넣기 입력 금지 — `execCommand('insertText')` only
+2. ref 클릭 전송 금지 — `[data-testid="send-button"]` JS 클릭 only
+3. find()/form_input 입력 금지
+4. 프로젝트방 외 새 대화 개설 금지
+5. 입력 전 미확인 응답 점검 생략 금지
 
-## 금지
-- 프로젝트방 외 새 대화 개설
-- find() → form_input 입력
-- 클립보드 붙여넣기 입력
-- ref 클릭으로 전송
-- 중간 승인 요청 (비가역 제외)
+## NEVER (분석)
+
+6. 하네스 분석 없이 반박 전송 금지 — 채택/보류/버림 필수
+7. 반박문에 `채택:` `보류:` `버림:` 누락 금지
+
+## 필수 순서 (SHOULD → NEVER 승격 대상)
+
+1. 기존 탭 확인 → 있으면 switch
+2. main 영역 JS로 대화 URL 추출 → navigate
+3. `#prompt-textarea` + `execCommand('insertText')`
+4. `[data-testid="send-button"]` JS 클릭
+5. stop-button polling 적응형 (5/10/15초)
+6. 입력 전 미확인 응답 점검
+
+## 상세 참조
+
+selector 목록, fallback 체인, 오류 대응, 로그 형식 → `CLAUDE.md` 참조
