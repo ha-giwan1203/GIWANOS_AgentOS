@@ -7,8 +7,8 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 LOG_FILE="$PROJECT_DIR/.claude/tool-failure.log"
 INPUT=$(cat)
 
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // "unknown"' 2>/dev/null)
-ERROR_MSG=$(echo "$INPUT" | jq -r '.error // "no error message"' 2>/dev/null | head -c 200)
+TOOL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_name','unknown'))" 2>/dev/null)
+ERROR_MSG=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('error','no error message')[:200])" 2>/dev/null)
 TIMESTAMP=$(date '+%Y-%m-%dT%H:%M:%S')
 
 # 로그 기록

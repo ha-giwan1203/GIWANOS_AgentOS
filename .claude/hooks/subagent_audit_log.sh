@@ -7,9 +7,9 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
 LOG_FILE="$PROJECT_DIR/.claude/subagent-audit.log"
 INPUT=$(cat)
 
-EVENT=$(echo "$INPUT" | jq -r '.hook_event_name // "unknown"' 2>/dev/null)
-AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // "unknown"' 2>/dev/null)
-AGENT_ID=$(echo "$INPUT" | jq -r '.agent_id // "unknown"' 2>/dev/null)
+EVENT=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('hook_event_name','unknown'))" 2>/dev/null)
+AGENT_TYPE=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('agent_type','unknown'))" 2>/dev/null)
+AGENT_ID=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('agent_id','unknown'))" 2>/dev/null)
 TIMESTAMP=$(date '+%Y-%m-%dT%H:%M:%S')
 
 # 로그 기록

@@ -4,7 +4,7 @@
 # 합의: GPT+Claude 2026-04-01 — 문법 검사는 동기, 알림/로깅만 async
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // ""' 2>/dev/null)
+FILE_PATH=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') or d.get('tool_input',{}).get('path',''))" 2>/dev/null)
 
 # .py 파일만 대상
 if [[ "$FILE_PATH" == *.py ]]; then

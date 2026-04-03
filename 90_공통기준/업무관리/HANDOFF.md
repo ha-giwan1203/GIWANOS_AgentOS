@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-03 — hooks 하네스 최종 PASS (GPT 확정, c30c791b, A그룹 6/6 실발화)
+최종 업데이트: 2026-04-03 — 전체 기능 전검 + jq 완전 제거 (GPT 합의)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
