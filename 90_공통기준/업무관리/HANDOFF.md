@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-03 — 전체 기능 실동작 점검 완료 (hooks/파이프라인/스킬/토론모드 전항목 PASS, watch 프로세스 미실행 INFO)
+최종 업데이트: 2026-04-03 — 전체 기능 실동작 점검 GPT 최종 PASS (a68c16d3), watch 프로세스 재시작 별도 관리
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -31,6 +31,8 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| ~~높~~ | ~~Stop/SessionStart 실발화 로그 GPT 제출~~ | **완료** — GPT 최종 PASS 확정 |
+| ~~높~~ | ~~전체 기능 실동작 점검 GPT 제출~~ | **완료** — GPT 최종 PASS (a68c16d3) |
+| 중 | watch_changes.py 재시작 + stale lock 정리 | PID 4920 사망, 프로세스 재시작 필요 |
 | 중 | verify_xlsm.py COM 실검증 | 다음 xlsm 작업 시 자동 실행 |
+| 낮 | domain_read_tracker.sh 백슬래시 처리 조사 | Windows \\ vs \ 잠재 버그, 현재 동작 영향 없음 |
 | 낮 | B그룹 8개 hook에 hook_common 로깅 추가 | 우선순위 낮음, 필요 시 진행 |
