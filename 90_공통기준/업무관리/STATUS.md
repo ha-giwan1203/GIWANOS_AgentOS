@@ -102,6 +102,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-03 22:51 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | RUNBOOK.md | 스킬 문서 갱신 |
@@ -131,4 +132,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-03 22:37 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
 | 2026-04-03 22:37 | modified | README.md | README.md 수정 |
 | 2026-04-03 22:37 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-03 22:37 | modified | README.md | README.md 수정 |
