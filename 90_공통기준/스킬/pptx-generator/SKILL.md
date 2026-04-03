@@ -46,8 +46,9 @@ C. 렌더링층 — python-pptx + Matplotlib + Beautify 규칙 엔진
 | 수치 비교 (2개 이상 항목) | 막대/선 차트 | matplotlib → 이미지 삽입 |
 | 비율/구성 | 원형 차트 | matplotlib → 이미지 삽입 |
 | 원인-대책 쌍 | 2단 표 | python-pptx 네이티브 표 |
-| 프로세스/절차 | 순서도 | python-pptx 도형 조합 |
-| 타임라인 | 화살표 연결 | python-pptx 도형 조합 |
+| 프로세스/절차 | 순서도 | Graphviz → PNG → 이미지 삽입 |
+| 타임라인 | 화살표 연결 | Graphviz → PNG → 이미지 삽입 |
+| 조직/계층 | 조직도/트리 | Graphviz → PNG → 이미지 삽입 |
 | KPI/핵심 수치 | 큰 숫자 카드 | python-pptx 텍스트 박스 |
 | 사진/증빙 | 이미지 배치 | python-pptx add_picture |
 
@@ -248,8 +249,23 @@ def qa_structure(pptx_path):
 선택:
 | 패키지 | 용도 |
 |--------|------|
-| Graphviz | 순서도/다이어그램 (필요 시 설치) |
-| LibreOffice | PDF 변환 시각검사 (필요 시 설치) |
+| graphviz (Python) | 0.21 | Graphviz API |
+| Graphviz (바이너리) | 14.1.4 | dot 렌더링 엔진 |
+| LibreOffice | - | PDF 변환 시각검사 (필요 시 설치) |
+
+### 다이어그램 모듈 (diagram_renderer.py)
+
+Graphviz 기반 다이어그램 → PNG → PPTX 삽입 유틸리티.
+
+| 함수 | 용도 | 입력 |
+|------|------|------|
+| `render_flowchart()` | 순서도 (분기 포함) | nodes + edges |
+| `render_process()` | 프로세스 흐름도 (단순 순차) | steps 리스트 |
+| `render_org_chart()` | 조직도/계층도 | 트리 구조 dict |
+| `insert_diagram()` | PPTX 슬라이드에 비율 유지 삽입 | slide + png_path |
+| `auto_select_visual()` | 데이터 설명 → 시각 타입 자동 추천 | 문자열 |
+
+노드 유형 자동 판정: 라벨에 "?"·"판정"·"검사" → diamond, "시작"·"입고" → oval(녹색), "종료"·"반품" → oval(적색)
 
 ---
 
