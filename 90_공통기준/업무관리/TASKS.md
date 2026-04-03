@@ -9,20 +9,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-03 — PPT 자동 생성 스킬 MVP 2종 PoC 완료 (f1da0084)
+최종 업데이트: 2026-04-04 — /share-result 커맨드 신규 (977bac01)
 
 ---
 
 ## 진행 중
 
-### [진행] PPT 자동 생성 스킬 구축 — **MVP 2종 PoC 완료, GPT 최종 판정 대기**
-- 출처: 사용자 요청 (2026-04-03) — YouTube AI PPT 생성 영상 기반 스킬화 제안
-- GPT 토론 합의: C(템플릿)+D(python-pptx+AI) 혼합, Anthropic QA 차용
-- 엔진: python-pptx 1.0.2 + matplotlib 3.10.8
-- MVP 1 (품질 대책서): cfb88dde — 카드형 보고서 QA PASS
-- MVP 2 (월간 생산실적): b22ef085 — 표+차트+KPI 카드 QA PASS
-- SKILL.md: 90_공통기준/스킬/pptx-generator/SKILL.md (3층 아키텍처 + QA 3축)
-- 다음: GPT 최종 판정 → 실무 투입 준비
+### [대기] PPT 자동 생성 스킬 — **실무 투입 준비 (실데이터 생성 + PowerPoint 시각 확인)**
+- 출처: GPT PASS 판정 (2026-04-04) — MVP 2종 PoC 구현 완료 범위
+- 다음: 실제 데이터로 생성 테스트 → PowerPoint 열어 시각 최종 확인
+- 확장: 사진 삽입, Graphviz 다이어그램, visualize 자동 분기
 
 ---
 
@@ -59,6 +55,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| PPT 자동 생성 스킬 MVP 2종 PoC — ncr_generator.py + monthly_production_generator.py, 검증 PASS — MVP 2종 엔진 적합성 실물 확인 (GPT PASS, cfb88dde/b22ef085/f1da0084) | 2026-04-04 |
 | 병렬 실행 규칙 신규 — 읽기/검증 병렬, 쓰기/반영 직렬, GPT 대기 병행 (GenSpark 토론 합의, GPT PASS 463dc674) | 2026-04-03 |
 | 전체 기능 실동작 점검 — smoke 36/36, hooks 14종 실발화, 파이프라인 6/6 py_compile, 스킬 24pkg, 토론모드 9/9 셀렉터 (GPT 최종 PASS a68c16d3) | 2026-04-03 |
 | 전체 기능 전검 — jq 완전 제거 3파일 + STATUS.md 정합 수정 (GPT PASS c0549cfb), 보류 3건 현행 유지 합의 | 2026-04-03 |
