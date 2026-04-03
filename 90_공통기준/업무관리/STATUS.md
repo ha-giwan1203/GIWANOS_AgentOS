@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — /share-result 6-7단계 보강 GPT PASS (2b7c7a7f, 상세: TASKS.md 참조)
+최종 업데이트: 2026-04-04 — PPT 실무 투입 최종 검증 PASS (실데이터+육안검수 5/5, 상세: TASKS.md 참조)
 
 ---
 
@@ -29,7 +29,7 @@
 | Fast/Full Lane | 규칙 확정 (GPT PASS 15b06459), 체크리스트 순차 작성 예정 | `.claude/rules/fast-full-lane.md` |
 | 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 보류 (자연어 대체) | `.claude/rules/feature-utilization.md` |
 | domain_guard | 화이트리스트 전환 완료 (GPT PASS d2b7d6ea) | `.claude/hooks/domain_guard.sh` |
-| PPT 자동 생성 | MVP 2종 PoC GPT PASS — 실무 투입 준비 대기 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
+| PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 
 ---
 
