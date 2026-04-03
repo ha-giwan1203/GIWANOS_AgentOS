@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — /share-result 커맨드 신규 (977bac01, 상세: TASKS.md 참조)
+최종 업데이트: 2026-04-04 — /share-result 6-7단계 보강 GPT PASS (2b7c7a7f, 상세: TASKS.md 참조)
 
 ---
 
@@ -103,6 +103,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-04 04:54 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
 | 2026-04-04 04:41 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 04:35 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-03 23:37 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
@@ -131,5 +132,4 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-03 22:37 | modified | research.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | plan.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | report_2026-03.md | 스킬 문서 갱신 |
-| 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
