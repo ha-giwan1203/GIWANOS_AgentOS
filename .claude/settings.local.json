@@ -38,7 +38,11 @@
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page",
       "Bash(python3 -c \":*)",
       "Bash(rm -f /c/tmp/.claude_domain_debate_active /c/tmp/.claude_domain_debate_loaded)",
-      "Bash(python3 -c \"import os; [os.remove\\(f''/tmp/.claude_domain_debate{s}''\\) for s in \\(''_active'',''_loaded''\\) if os.path.exists\\(f''/tmp/.claude_domain_debate{s}''\\)]\")"
+      "Bash(python3 -c \"import os; [os.remove\\(f''/tmp/.claude_domain_debate{s}''\\) for s in \\(''_active'',''_loaded''\\) if os.path.exists\\(f''/tmp/.claude_domain_debate{s}''\\)]\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(1 echo:*)"
     ],
     "defaultMode": "bypassPermissions"
   },
@@ -63,7 +67,7 @@
         ]
       },
       {
-        "matcher": "mcp__Claude_in_Chrome",
+        "matcher": "Bash|mcp__Claude_in_Chrome",
         "hooks": [
           {
             "type": "command",

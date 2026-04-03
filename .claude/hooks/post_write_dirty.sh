@@ -3,6 +3,8 @@
 # 구현 파일 변경 감지 시 dirty.flag를 생성하여 검증 필요 상태를 표시
 # GPT 합의 2026-04-01: 1단계 구조적 가드레일
 set -euo pipefail
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+hook_log "PostToolUse" "post_write_dirty 발화" 2>/dev/null || true
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 TMP_INPUT="$(mktemp)"

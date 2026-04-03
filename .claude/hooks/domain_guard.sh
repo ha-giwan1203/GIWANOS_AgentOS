@@ -3,7 +3,9 @@
 # 정책: domain_guard_config.yaml (단일 기준)
 # v2: 도메인 활성 + loaded 미완 시 Read(대상 CLAUDE.md)만 허용, 나머지 전부 차단
 
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
+hook_log "PreToolUse" "domain_guard 발화"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG="$SCRIPT_DIR/domain_guard_config.yaml"

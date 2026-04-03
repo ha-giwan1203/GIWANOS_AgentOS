@@ -3,6 +3,8 @@
 # dirty marker 존재 시 TASKS.md/HANDOFF.md가 dirty 이후 수정됐는지 확인
 # 미갱신이면 Stop 차단 → Claude가 자동 갱신 후 재시도
 # GPT+Claude 합의 2026-04-02
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+hook_log "Stop" "completion_gate 발화"
 
 # Python 내부에서 경로 구성 (한국어 경로 bash→python 인코딩 문제 방지)
 RESULT=$(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 -c "

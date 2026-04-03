@@ -2,7 +2,9 @@
 # UserPromptSubmit hook — 도메인 키워드 감지 시 CLAUDE.md 경로 + 체크리스트 자동 주입
 # 정책: domain_guard_config.yaml (단일 기준)
 
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
+hook_log "UserPromptSubmit" "prompt_inject 발화"
 PROMPT=$(echo "$INPUT" | python3 -c "
 import sys, json
 try:
