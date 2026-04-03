@@ -49,6 +49,14 @@ for name, d in domains.items():
     if pattern and re.search(pattern, prompt, re.IGNORECASE):
         matched = (name, d)
         break
+    # 2단 조합 패턴: 키워드 2개가 모두 프롬프트에 포함되면 매치
+    combos = d.get('keyword_combos', [])
+    for combo in combos:
+        if all(re.search(re.escape(w), prompt, re.IGNORECASE) for w in combo):
+            matched = (name, d)
+            break
+    if matched:
+        break
 
 if not matched:
     sys.exit(0)
@@ -79,12 +87,26 @@ if flag_prefix:
         os.remove(flag_prefix + '_loaded')
     except FileNotFoundError:
         pass
+    # phase 초기화 (phase-based 도메인용)
+    phase_flag = flag_prefix + '_phase'
+    try:
+        os.remove(phase_flag)
+    except FileNotFoundError:
+        pass
 
 # 도메인별 additionalContext 구성
-ctx_lines = [
-    f'[Hook 자동 주입] 도메인 로드 필수: {claude_path}',
-    '→ 이 문서에 명시된 규칙·selector·입력방식을 읽기 전 임의 실행 금지.'
-]
+entry_path = d.get('entry_path', '')
+if entry_path:
+    ctx_lines = [
+        f'[Hook 자동 주입] 도메인 진입 순서: ①{entry_path} → ②{claude_path}',
+        '→ ENTRY.md를 먼저 읽고, CLAUDE.md를 읽어야 도구가 해제됩니다.',
+        '→ 순서를 지키지 않으면 domain_guard가 모든 도구를 차단합니다.'
+    ]
+else:
+    ctx_lines = [
+        f'[Hook 자동 주입] 도메인 로드 필수: {claude_path}',
+        '→ 이 문서에 명시된 규칙·selector·입력방식을 읽기 전 임의 실행 금지.'
+    ]
 
 # 토론모드 전용 하네스 체크리스트
 if name == 'debate':

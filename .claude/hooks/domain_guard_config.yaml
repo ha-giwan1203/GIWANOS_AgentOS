@@ -5,8 +5,34 @@
 domains:
   debate:
     keywords: ["토론모드", "debate", "공동작업", "GPT토론", "토론"]
+    keyword_combos:
+      - ["GPT", "물어"]
+      - ["GPT", "질문"]
+      - ["GPT", "공유"]
+      - ["GPT", "전달"]
+      - ["GPT", "보내"]
+      - ["결과", "공유"]
+      - ["판정", "요청"]
+      - ["재공유"]
+      - ["GPT", "확인"]
+      - ["GPT", "검증"]
+      - ["하네스", "분석"]
     claude_path: "90_공통기준/토론모드/CLAUDE.md"
+    entry_path: "90_공통기준/토론모드/ENTRY.md"
     flag_prefix: "/tmp/.claude_domain_debate"
+    phases:
+      - name: "entry_read"
+        description: "ENTRY.md 읽기만 허용"
+        allow_tools: ["Read"]
+        allow_paths: ["ENTRY.md"]
+      - name: "doc_read"
+        description: "CLAUDE.md 읽기 + 탭 확인만 허용"
+        allow_tools: ["Read", "mcp__Claude_in_Chrome__tabs_context_mcp"]
+        allow_paths: []
+      - name: "full"
+        description: "전체 도구 허용"
+        allow_tools: ["*"]
+        allow_paths: []
     blocked_tools: ["mcp__Claude_in_Chrome"]
     blocked_patterns: []
 
