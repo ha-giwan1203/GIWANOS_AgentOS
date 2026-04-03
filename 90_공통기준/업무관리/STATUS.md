@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — domain_guard phase guard 구현 (GPT 합의 2턴, 상세: TASKS.md 참조)
+최종 업데이트: 2026-04-04 — domain_guard phase guard 구현 (GPT PASS 65c34115, 상세: TASKS.md 참조)
 
 ---
 
@@ -103,6 +103,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-04 05:55 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 05:44 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 05:35 | modified | build_master.py | BI 자동화 스크립트 수정 |
 | 2026-04-04 05:35 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
@@ -127,7 +128,6 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-03 22:37 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | deploy_checklist.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | prompt_template.md | 스킬 문서 갱신 |
-| 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-03 22:37 | modified | SKILL.md | 스킬 문서 갱신 |
