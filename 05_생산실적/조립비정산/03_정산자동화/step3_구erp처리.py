@@ -31,8 +31,9 @@ if not os.path.exists(OLDERP_FILE):
     sys.exit(1)
 
 # ── 로딩 ──────────────────────────────────────────────────────
-print(f"\n[1/3] 구ERP 파일 로딩 (Sheet1)...")
-df_raw = pd.read_excel(OLDERP_FILE, sheet_name='Sheet1', header=None)
+_sheet = getattr(sys.modules[__name__], 'OLDERP_SHEET', 'Sheet1')
+print(f"\n[1/3] 구ERP 파일 로딩 ({_sheet})...")
+df_raw = pd.read_excel(OLDERP_FILE, sheet_name=_sheet, header=None)
 data = df_raw.iloc[2:].reset_index(drop=True)
 
 c = OLDERP_COL

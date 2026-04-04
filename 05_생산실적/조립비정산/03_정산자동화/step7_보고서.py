@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Step 7 — 보고서 생성
-00_정산집계 + 라인별 시트 10개 + 01_차이분석 + 02_미매핑 → 최종 xlsx
+00_정산집계 + 라인별 시트 10개 + 01_차이분석 → 최종 xlsx
 
 실행: python step7_보고서.py
 입력: _cache/step5_settlement.json
@@ -34,7 +34,7 @@ with open(CACHE_STEP5, encoding='utf-8') as f:
 
 lines    = s5['lines']
 summary  = s5['summary']
-unmapped = s5.get('unmatched_gerp', [])
+unmapped = []  # 미매핑 품번은 GERP 단가 fallback 적용됨 → 별도 시트 불필요
 
 # step6 검증 결과 로드 (없으면 None)
 _step6_path = os.path.join(CACHE_DIR, 'step6_validation.json')
@@ -796,26 +796,6 @@ ws3.freeze_panes = 'A4'
 print(f"  차이항목: {diff_count}건")
 
 # ══════════════════════════════════════════════════════════════
-# 시트: 02_미매핑품번
-# ══════════════════════════════════════════════════════════════
-print("[4/4] 02_미매핑품번 시트...")
-ws4 = wb.create_sheet('02_미매핑품번')
-ws4['A1'] = f'{MONTH}월 GERP 미매핑 품번 (기준정보 없음)'
-ws4['A1'].font = Font(name='맑은 고딕', bold=True, size=10)
-
-for c, h in enumerate(['No', '품번', '비고'], 1):
-    ws4.cell(3, c, h)
-hdr(ws4, 3, 3)
-
-for i, pn in enumerate(unmapped, 1):
-    dc(ws4, 3 + i, 1, i)
-    dc(ws4, 3 + i, 2, pn, fill=WARN_FILL)
-    dc(ws4, 3 + i, 3, '기준정보 등록 필요')
-
-auto_w(ws4)
-print(f"  미매핑 품번: {len(unmapped)}건")
-
-# ══════════════════════════════════════════════════════════════
 # 시트: 03_검증결과  (step6_validation.json 기반)
 # ══════════════════════════════════════════════════════════════
 if s6 is not None:
@@ -912,5 +892,5 @@ wb.save(OUTPUT_FILE)
 print(f"\n{'='*60}")
 print(f"저장 완료: {OUTPUT_FILE}")
 extra = ' | 03_검증결과' if s6 is not None else ''
-print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석 | 02_미매핑품번{extra}")
+print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석{extra}")
 print("Step 7 완료 — 최종 보고서 생성")

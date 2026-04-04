@@ -110,11 +110,12 @@ print("\n[구ERP 파일 구조]")
 if os.path.exists(OLDERP_FILE):
     try:
         xf = pd.ExcelFile(OLDERP_FILE)
-        check("구ERP Sheet1 존재", 'Sheet1' in xf.sheet_names,
+        _sheet = getattr(sys.modules[__name__], 'OLDERP_SHEET', 'Sheet1')
+        check(f"구ERP '{_sheet}' 시트 존재", _sheet in xf.sheet_names,
               f"시트목록={xf.sheet_names[:5]}")
 
-        if 'Sheet1' in xf.sheet_names:
-            df = pd.read_excel(xf, sheet_name='Sheet1', header=None)
+        if _sheet in xf.sheet_names:
+            df = pd.read_excel(xf, sheet_name=_sheet, header=None)
             data_rows = len(df) - 2
             check("구ERP 데이터행 1건 이상", data_rows > 0, f"{data_rows:,}행")
             check("구ERP 컬럼수 최소 13개", df.shape[1] >= 13, f"실제 {df.shape[1]}열")

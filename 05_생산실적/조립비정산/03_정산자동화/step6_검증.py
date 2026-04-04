@@ -187,11 +187,7 @@ else:
     chk(5, f"SP3M3 야간 고정단가 {SP3M3_NIGHT_PRICE}원 적용",
         'PASS', "전체 정상")
 
-# ── 항목 6: 미매핑 품번 ──────────────────────────────────────
-unmatched = s5.get('unmatched_gerp', [])
-chk(6, "GERP 미매핑 품번 현황",
-    'INFO' if unmatched else 'PASS',
-    f"{len(unmatched)}건 미매핑: {unmatched[:10]}" if unmatched else "미매핑 없음")
+# ── 항목 6: (삭제됨 — 미매핑 품번은 GERP 단가 fallback 적용) ──
 
 # ── 항목 7: 라인별 차이 요약 (INFO) ──────────────────────────
 diff_lines = [r for r in summary if r['diff_amt'] != 0]

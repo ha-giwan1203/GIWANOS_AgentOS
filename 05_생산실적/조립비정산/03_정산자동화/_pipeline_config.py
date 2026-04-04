@@ -14,13 +14,14 @@ import os
 # 기본 경로 (월별로만 OUTPUT_FILE 변경)
 # ============================================================
 BASE_DIR     = r'C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산'
-CACHE_DIR    = os.path.join(os.path.dirname(__file__), '_cache')
+CACHE_DIR    = os.path.join(BASE_DIR, '04월', '_cache')
 
 MASTER_FILE  = os.path.join(BASE_DIR, '01_기준정보', '기준정보_라인별정리_최종_V1_20260316.xlsx')
-GERP_FILE    = os.path.join(BASE_DIR, '04_실적데이터', 'GERP_실적현황_20260311.xlsx')
-OLDERP_FILE  = os.path.join(BASE_DIR, '04_실적데이터', '구ERP_실적현황_20260311.xlsx')
-OUTPUT_FILE  = os.path.join(BASE_DIR, '정산결과_03월.xlsx')   # ← 월 바꿀 때 수정
+GERP_FILE    = os.path.join(BASE_DIR, '04월', '실적데이터', 'G-ERP 3월실적.xlsx')
+OLDERP_FILE  = os.path.join(BASE_DIR, '04월', '실적데이터', '구ERP 3월 실적.xlsx')
+OUTPUT_FILE  = os.path.join(BASE_DIR, '04월', '정산결과_03월.xlsx')   # ← 월 바꿀 때 수정
 
+OLDERP_SHEET = '3월 실적'   # 구ERP 데이터 시트명 (파일마다 다를 수 있음)
 MONTH        = '03'
 VENDOR_CODE  = '0109'
 SP3M3_NIGHT_PRICE = 170   # SP3M3 야간 고정단가(원)
@@ -53,6 +54,9 @@ OLD_ERP_LINE_MAP = {
     'TD9':    'SD9A01',
     'D9N6':   'SD9A01',
     'SP3S03': 'SP3M3',
+    'SP2M02': 'SP3M3',
+    'SP3M02': 'SP3M3',
+    'SP3M03': 'SP3M3',
 }
 
 # ============================================================
@@ -74,11 +78,11 @@ GERP_COL = {
 # 구ERP 컬럼 인덱스 (0-based, header=None, data from row 2)
 # ============================================================
 OLDERP_COL = {
-    'vendor':    2,
+    'vendor':    2,   # "0109[대원테크]" 형태
     'part_no':   4,
-    'qty':       5,
-    'line_code': 7,
-    'lot_no':    10,  # 끝자리 B=야간, 나머지=주간
+    'qty':       10,  # 04월 신규 파일: col5→품명, col10→수량
+    'line_code': 6,   # 04월 신규 파일: col6→라인코드(TD9,SP2M02 등), col7→차종
+    'lot_no':    9,   # 04월 신규 파일: col9→LOTNO(260302A 등)
     'unit_cost': 11,
     'amount':    12,
 }

@@ -246,6 +246,47 @@ for lc in LINE_ORDER:
                 # 합계 가산 안 함 — GERP 원본 night_amt_pivot에 이미 포함
                 print(f"    RSP미매칭 {rsp_pn}: {rsp_qty}개, GERP원본 {ngt_amt:,}원 (합계 미가산)")
 
+    # 미매핑 품번: 기준정보 단가 없음 → GERP 원본금액 fallback 적용
+    unmatched_set = set(step4.get('unmatched_gerp', []))
+    lc_day_items = gp_d  # day_pivot[lc]
+    for pn in list(lc_day_items.keys()):
+        if pn not in unmatched_set:
+            continue
+        um_day_qty = lc_day_items[pn]
+        um_day_amt = round(gp_d_amt.get(pn, 0))
+        um_ngt_qty = gp_n.get(pn, 0) if has_night else 0
+        um_ngt_amt = round(gp_n_amt.get(pn, 0)) if has_night else 0
+        um_price = round(um_day_amt / um_day_qty) if um_day_qty else 0
+        um_total = um_day_amt + um_ngt_amt
+
+        row = {
+            'part_no':          pn,
+            'assy_part':        gerp_assy_lookup.get(f"{lc}|{pn}|{um_price}", ''),
+            'price':            um_price,
+            'usage':            1,
+            'price_type':       '미매핑_GERP단가',
+            'vtype':            '',
+            'gerp_day_qty':     um_day_qty,
+            'gerp_day_amt':     um_day_amt,
+            'gerp_ngt_qty':     um_ngt_qty,
+            'gerp_ngt_amt':     um_ngt_amt,
+            'gerp_total_amt':   um_total,
+            'gerp_orig_day_amt': um_day_amt,
+            'gerp_orig_ngt_amt': um_ngt_amt,
+            'erp_day_qty':      0,
+            'erp_day_amt':      0,
+            'erp_ngt_qty':      0,
+            'erp_ngt_amt':      0,
+            'erp_tot_qty':      0,
+            'price_judgment':   None,
+        }
+        detail.append(row)
+        total_gerp_day_qty += um_day_qty
+        total_gerp_day_amt += um_day_amt
+        total_gerp_ngt_qty += um_ngt_qty
+        total_gerp_ngt_amt += um_ngt_amt
+        print(f"    미매핑 {pn}: {um_day_qty}개, GERP단가={um_price}, 금액={um_total:,}원")
+
     gerp_total = total_gerp_day_amt + total_gerp_ngt_amt
     erp_total  = total_erp_day_amt  + total_erp_ngt_amt
     diff       = gerp_total - erp_total
@@ -292,7 +333,7 @@ result = {
     "grand_gerp_amt": grand_gerp,
     "grand_erp_amt":  grand_erp,
     "grand_diff_amt": grand_diff,
-    "unmatched_gerp": step4['unmatched_gerp'],
+    "unmatched_gerp": [],  # GERP 단가 fallback 적용 완료
 }
 
 with open(CACHE_STEP5, 'w', encoding='utf-8') as f:
