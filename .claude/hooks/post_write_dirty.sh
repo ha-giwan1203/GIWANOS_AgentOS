@@ -66,8 +66,25 @@ PATTERNS = [
     r'>>?\s+(?!"?\$(?:TMPDIR|TMP_INPUT|TMP|TEMP)\b|"?\$\{(?:TMPDIR|TMP_INPUT|TMP|TEMP)\}|\/dev\/|\/tmp\/|\/var\/tmp\/|\/proc\/)',
 ]
 
+EXEMPT_COMMANDS = [
+    r'^\s*git\b',          # git 명령 전체 exempt (commit HEREDOC 리다이렉트 오탐 방지)
+    r'^\s*cd\s+.*&&\s*git\b',  # cd && git 패턴도 exempt
+    r'^\s*TZ=',            # 시간 확인 명령
+    r'^\s*date\b',
+    r'^\s*stat\b',
+    r'^\s*cat\b',
+    r'^\s*clip\.exe',      # 클립보드 복사
+    r'dirty\.flag',        # dirty.flag 자체 조작은 exempt
+    r'^\s*touch\s+.*[/\\](TASKS|HANDOFF|STATUS)\.md',  # 상태 문서 touch는 exempt
+    r'^\s*(rm|ls|echo|head|tail|wc)\b',  # 읽기/삭제 전용 명령은 exempt
+]
+
 def bash_looks_mutating(command: str):
     """첫 번째 매칭 패턴 인덱스와 매칭 텍스트 반환. 없으면 (None, None)."""
+    # exempt 명령은 즉시 통과
+    for ep in EXEMPT_COMMANDS:
+        if re.search(ep, command):
+            return None, None
     for i, p in enumerate(PATTERNS):
         m = re.search(p, command)
         if m:
