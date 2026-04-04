@@ -9,16 +9,13 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-04 — GPT 문서 Git 관리 토론 준비 (대화방 3턴 취합 + 하네스 분석 완료)
+최종 업데이트: 2026-04-04 — GPT 지침 Git 관리 구현 완료 (gpt-instructions.md + fallback + cowork-rules 반영)
 
 ---
 
 ## 진행 중
 
-### [진행] GPT Project Instructions Git 관리 방향 토론
-- GPT 대화방 3턴 기존 논의 취합 완료
-- 하네스 분석: 채택 1(공용 기준문서) / 보류 1(CORE.md 신설) / 버림 1(폴더 구조 변경)
-- 다음: 반박문 작성 → GPT 전송 → 합의 루프
+### ~~[진행] GPT Project Instructions Git 관리 방향 토론~~ → 완료됨
 
 ### ~~[대기] PPT 자동 생성 스킬 — 실무 투입 준비~~ → 완료됨
 ### ~~[중] 도메인 지시문 미읽기 근본 해결~~ → 완료됨
@@ -58,6 +55,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| GPT 지침 Git 관리 구현 — gpt-instructions.md 기준 원본 + fallback + cowork-rules 합의 반영, GPT 토론 7턴 (ff16142a) | 2026-04-04 |
 | PPT Graphviz 확장 — diagram_renderer.py 신규 (순서도/프로세스/조직도 3종 + 시각타입 자동선택 + PPTX 삽입), QA 3축 PASS | 2026-04-04 |
 | hooks 안정화 — domain_guard Python 분리 + /tmp 경로 수정 + I/O 테스트 4건 추가, 40/40 PASS (e563f3c1) | 2026-04-04 |
 | 양방향 하네스 합의 — GPT도 설계·토론형 판정에 하네스(채택/보류/버림) 적용, 실물 검증은 PASS/FAIL 유지 (cowork-rules.md 반영) | 2026-04-04 |
