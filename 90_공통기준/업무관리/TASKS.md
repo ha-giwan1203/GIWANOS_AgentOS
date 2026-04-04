@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-04 — completion_gate.sh 버그 수정 (GPT 부분반영 피드백 반영)
+최종 업데이트: 2026-04-04 — completion_gate.sh 버그 수정 GPT PASS (19400bed)
 
 ---
 
@@ -55,7 +55,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
-| 8단계 자동 루틴 강제 — /finish 커맨드 + finish_state.json + completion_gate 연동, GPT 토론 3턴 합의 + 부분반영 수정 | 2026-04-04 |
+| 8단계 자동 루틴 강제 — /finish 커맨드 + finish_state.json + completion_gate 연동, GPT 토론 3턴 합의 + 부분반영→PASS (19400bed) | 2026-04-04 |
 | post_write_dirty.sh EXEMPT_COMMANDS — git HEREDOC 오탐 제거 (GPT PASS 880cb437) | 2026-04-04 |
 | GPT 지침 Git 관리 구현 — gpt-instructions.md 기준 원본 + fallback + cowork-rules 합의 반영, GPT 토론 7턴 (ff16142a) | 2026-04-04 |
 | PPT Graphviz 확장 — diagram_renderer.py 신규 (순서도/프로세스/조직도 3종 + 시각타입 자동선택 + PPTX 삽입), QA 3축 PASS | 2026-04-04 |

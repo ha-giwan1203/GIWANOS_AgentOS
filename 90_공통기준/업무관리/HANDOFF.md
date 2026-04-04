@@ -31,6 +31,6 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 즉시 | completion_gate.sh 수정 커밋 GPT 검증 | 부분반영 → 수정 완료, 재검증 필요 |
+| 완료 | completion_gate.sh 수정 GPT PASS (19400bed) | 8단계 루틴 강제 구조 완성 |
 | 대기 | settlement 스킬 preloading 테스트 | 4월 정산 데이터 입수 후 |
 | 사용자 | ChatGPT Project Instructions fallback 붙여넣기 | `gpt-project-fallback.md` 사용자 직접 반영 |
