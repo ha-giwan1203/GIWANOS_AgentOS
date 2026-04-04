@@ -65,6 +65,10 @@
 - timeout/로그인만료/네트워크오류 → `terminal_state: "exception"`, `exception_reason` 기록
 - 예외 시에도 사용자 보고는 수행
 
+## 공유 범위
+- **모든 커밋은 예외 없이 GPT에 공유한다** — 상태 문서 갱신(6단계) 후 추가 커밋이 발생하면 해당 커밋도 GPT에 공유한 뒤 사용자 보고한다
+- 커밋 종류(docs, fix, feat 등)에 따라 공유를 임의 생략하지 않는다
+
 ## Stop guard 연동
 - completion_gate.sh가 finish_state.json의 terminal_state를 확인
 - `terminal_state != "done" && != "exception"`이면 종료 차단
