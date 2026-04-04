@@ -97,7 +97,7 @@ GPT 단독 요청 시:
 - 상태 원본은 `TASKS.md`다.
 - `STATUS.md`는 운영 요약·재개 위치 전용이다.
 - `HANDOFF.md`는 세션 메모 전용이다.
-- 판정 우선순위는 `TASKS.md > STATUS.md > HANDOFF.md > Notion`이다.
+- 판정 우선순위는 `TASKS.md > STATUS.md > HANDOFF.md > CLAUDE.md > Notion`이다.
 
 ## 프로젝트 작업 원칙
 - 기준 파일과 마스터 파일을 우선 존중한다.
