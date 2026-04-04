@@ -413,10 +413,11 @@ for lc in LINE_ORDER:
     # ── 컬럼 정의 ──
     if has_night:
         if lc == 'SD9A01':
-            grp_hdrs = [('기본정보', 6), ('GERP 정산', 5), ('구ERP 비교', 4), ('결과', 3)]
+            grp_hdrs = [('기본정보', 6), ('GERP 정산', 5), ('구ERP 비교', 4), ('지원분', 3), ('결과', 3)]
             col_hdrs = ['No', '품번', '조립\n품번', 'Usage', '기준\n단가', 'GERP\n단가',
                         '주간\n수량', '주간\n금액', '야간\n수량', '야간\n금액', '합계',
                         '구ERP\n주간수량', '구ERP\n주간금액', '구ERP\n야간수량', '구ERP\n야간금액',
+                        '지원\n업체', '지원\n라인', '지원\n수량',
                         '수량차', '금액차', '유형']
         else:  # SP3M3
             grp_hdrs = [('기본정보', 6), ('GERP 정산', 4), ('구ERP 비교', 4), ('결과', 3)]
@@ -532,11 +533,22 @@ for lc in LINE_ORDER:
         assy = item.get('assy_part', '')
         if has_night:
             if lc == 'SD9A01':
+                # 지원분 정보
+                sup_list = item.get('support', [])
+                if sup_list:
+                    sup_vendor = ', '.join(s['vendor'] for s in sup_list)
+                    sup_line   = ', '.join(s['line_code'] for s in sup_list)
+                    sup_qty    = sum(s['day_qty'] + s['night_qty'] for s in sup_list)
+                else:
+                    sup_vendor = '-'
+                    sup_line   = '-'
+                    sup_qty    = '-'
                 vals = [i, item['part_no'], assy, item.get('usage', 1), item['price'], gerp_p,
                         item['gerp_day_qty'], item['gerp_day_amt'],
                         item['gerp_ngt_qty'], item['gerp_ngt_amt'], item['gerp_total_amt'],
                         item['erp_day_qty'], item['erp_day_amt'],
                         item['erp_ngt_qty'], item['erp_ngt_amt'],
+                        sup_vendor, sup_line, sup_qty,
                         qty_diff, amt_diff, dtype]
             else:  # SP3M3
                 vals = [i, item['part_no'], assy, item.get('usage', 1), item['price'], gerp_p,
