@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-04 — GPT Project Instructions Git 관리 구현 완료 (GPT PASS: 4bcd7877)
+최종 업데이트: 2026-04-04 — 8단계 자동 루틴 강제 구현 + completion_gate 버그 수정
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-GPT Project Instructions Git 기반 관리 구현 — GPT 부분반영 피드백 반복 수정 후 최종 PASS 획득
+8단계 자동 루틴(/finish) 강제 구현 — GPT 토론 합의 + completion_gate.sh finish_state.json 연동 + 버그 수정
 
 ---
 
@@ -19,11 +19,11 @@ GPT Project Instructions Git 기반 관리 구현 — GPT 부분반영 피드백
 
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
-| `gpt-instructions.md` | GPT Project Instructions 전문 Git 기준 원본 생성 + 판정 우선순위 CLAUDE.md 복구 | 완료 (4bcd7877) |
-| `gpt-project-fallback.md` | ChatGPT UI 붙여넣기용 최소 fallback 문서 생성 | 완료 (72b4bc58) |
-| `cowork-rules.md` | GPT 지침 Git 기반 관리 합의 섹션 추가 | 완료 (42b278d0) |
-| `TASKS.md` | GPT Instructions Git 관리 토론 → 완료 처리 | 완료 (c915d21d) |
-| GPT 검증 | 부분반영 → 부분반영 → PASS (3라운드) | GPT PASS 확정 |
+| `.claude/commands/finish.md` | /finish 8단계 자동 루틴 커맨드 신규 | 완료 |
+| `.claude/commands/share-result.md` | 8단계 확장 + finish_state.json 연동 섹션 추가 | 완료 |
+| `.claude/hooks/completion_gate.sh` | finish_state.json 체크 추가 (dirty.flag와 독립) + 중복 블록 제거 | 완료 |
+| `.claude/hooks/post_write_dirty.sh` | EXEMPT_COMMANDS 추가 (git HEREDOC 오탐 방지) | 완료 (880cb437, GPT PASS) |
+| `feedback_chatgpt_input_method.md` | ENTRY.md 규칙 정합 (execCommand + JS send-button) | 완료 |
 
 ---
 
@@ -31,6 +31,6 @@ GPT Project Instructions Git 기반 관리 구현 — GPT 부분반영 피드백
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
+| 즉시 | completion_gate.sh 수정 커밋 GPT 검증 | 부분반영 → 수정 완료, 재검증 필요 |
 | 대기 | settlement 스킬 preloading 테스트 | 4월 정산 데이터 입수 후 |
-| 사용자 | ChatGPT Project Instructions fallback 붙여넣기 | `gpt-project-fallback.md` 1안 또는 2안 선택 후 사용자가 직접 반영 |
-| 사용자 | GitHub App 연결 검토 | 연결 시 GPT가 자동으로 Git 기준 원본 참조 가능 |
+| 사용자 | ChatGPT Project Instructions fallback 붙여넣기 | `gpt-project-fallback.md` 사용자 직접 반영 |

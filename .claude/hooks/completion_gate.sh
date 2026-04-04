@@ -16,10 +16,31 @@ from pathlib import Path
 project_dir = os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd())
 root = Path(project_dir)
 
-dirty_flag = root / '90_공통기준' / 'agent-control' / 'state' / 'dirty.flag'
+state_dir = root / '90_공통기준' / 'agent-control' / 'state'
+dirty_flag = state_dir / 'dirty.flag'
 tasks = root / '90_공통기준' / '업무관리' / 'TASKS.md'
 handoff = root / '90_공통기준' / '업무관리' / 'HANDOFF.md'
 status = root / '90_공통기준' / '업무관리' / 'STATUS.md'
+
+# === finish_state.json 체크 (dirty.flag와 독립) ===
+finish_state_path = state_dir / 'finish_state.json'
+if finish_state_path.exists():
+    try:
+        fs = json.loads(finish_state_path.read_text(encoding='utf-8'))
+        ts = fs.get('terminal_state', '')
+        if ts not in ('done', 'exception', ''):
+            pending_steps = []
+            if not fs.get('committed_pushed'): pending_steps.append('커밋+푸시')
+            if not fs.get('gpt_shared'): pending_steps.append('GPT 공유')
+            if not fs.get('gpt_judgment'): pending_steps.append('GPT 판정 확인')
+            if not fs.get('user_reported'): pending_steps.append('사용자 보고')
+            if not fs.get('followup_checked'): pending_steps.append('후속 확인')
+            if pending_steps:
+                msg = f'[COMPLETION GATE] finish 루틴 미완료: {", ".join(pending_steps)} — /finish 8단계를 완료하세요.'
+                print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
+                sys.exit(0)
+    except:
+        pass
 
 if not dirty_flag.exists():
     sys.exit(0)
@@ -61,24 +82,6 @@ else:
     except:
         pass
 
-    # finish_state.json 체크 (GPT 합의 2026-04-04)
-    finish_state_path = state_dir / 'finish_state.json'
-    if finish_state_path.exists():
-        try:
-            fs = json.loads(finish_state_path.read_text(encoding='utf-8'))
-            ts = fs.get('terminal_state', '')
-            if ts not in ('done', 'exception', ''):
-                pending_steps = []
-                if not fs.get('committed_pushed'): pending_steps.append('커밋+푸시')
-                if not fs.get('gpt_shared'): pending_steps.append('GPT 공유')
-                if not fs.get('gpt_judgment'): pending_steps.append('GPT 판정 확인')
-                if not fs.get('user_reported'): pending_steps.append('사용자 보고')
-                if not fs.get('followup_checked'): pending_steps.append('후속 확인')
-                if pending_steps:
-                    msg = f'[COMPLETION GATE] finish 루틴 미완료: {", ".join(pending_steps)} — /finish 8단계를 완료하세요.'
-                    print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
-        except:
-            pass
 " 2>/dev/null)
 
 if [ -n "$RESULT" ]; then
