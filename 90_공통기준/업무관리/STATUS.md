@@ -104,33 +104,33 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
-| 2026-04-04 11:51 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step7_시각화입력생성.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | README.md | README.md 수정 |
-| 2026-04-04 11:51 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:51 | modified | step5_정산계산.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:50 | modified | step2_GERP처리.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:26 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 11:25 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 11:00 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 10:33 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 10:26 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 09:49 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 09:42 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
-| 2026-04-04 09:42 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
-| 2026-04-04 09:42 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
-| 2026-04-04 09:42 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | prompt_template.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-04 09:42 | modified | RUNBOOK.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | build_master.py | BI 자동화 스크립트 수정 |
+| 2026-04-04 12:05 | modified | _apply_all_v3.py | 초물관리 스크립트 수정 |
+| 2026-04-04 12:05 | modified | _patch_v4.py | 초물관리 스크립트 수정 |
+| 2026-04-04 12:05 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | prompt_template.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | deploy_checklist.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | RUNBOOK.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | eval_cases.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | 스킬_SP3생산계획_운영절차_v3.0.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | plan.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | report_2026-03.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | research.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-04 12:05 | modified | 운영지침_커넥터관리_v1.0.md | 운영 지침 문서 수정 |
+| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
