@@ -59,8 +59,29 @@ GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 - 상태 문서 갱신 완료 여부
 - 이후 멈추지 말고 다음 의제 발굴 또는 세션 종료 진행
 
+### 8단계: GPT 후속 의견 1회 재확인 (루프 방지)
+- GPT 마지막 응답에 추가 수정 요구가 있는지 1회만 확인
+- FAIL/구조충돌 → 수정 루프 재진입
+- 개선 제안 → 다음 의제로만 기록, 종료
+- 후속 없음 → 종료
+- **재확인은 1회만. 2회 이상 반복 금지.**
+
+## finish_state.json 연동 (GPT 합의 2026-04-04)
+
+`/finish` 명령에서 호출될 때 `90_공통기준/agent-control/state/finish_state.json`에 단계별 상태를 기록한다.
+
+각 단계 완료 시 해당 필드를 true로 갱신:
+- 4단계 완료 → `committed_pushed: true`
+- 5단계 완료 → `gpt_shared: true`
+- 6단계 완료 → `gpt_judgment: "{판정값}"`
+- 7단계 완료 → `user_reported: true`
+- 8단계 완료 → `followup_checked: true`, `terminal_state: "done"`
+
+예외 발생 시 → `terminal_state: "exception"`, `exception_reason: "{사유}"`
+
 ## 주의사항
 - 커밋 없이 결과만 공유 금지 — 반드시 SHA 포함
-- 토론모드 CLAUDE.md 규정을 먼저 읽고 진행
+- 토론모드 ENTRY.md 규칙 준수 (execCommand + JS send-button)
 - 입력 전 미확인 응답 점검 필수
 - **GPT 판정 수신 후 사용자 보고만 하고 멈추는 것 금지** — 상태 갱신까지 연속 실행
+- **Stop guard가 finish_state.json의 terminal_state를 확인** — done/exception 아니면 종료 차단

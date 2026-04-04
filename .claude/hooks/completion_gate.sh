@@ -55,11 +55,30 @@ else:
     # TASKS/HANDOFF 갱신됨 — STATUS만 경고 (차단 아님)
     if status_warn:
         print(json.dumps({'message': f'[COMPLETION GATE] TASKS/HANDOFF 갱신 확인.{status_warn}'}, ensure_ascii=False))
-    # dirty marker 삭제 + 통과
+    # dirty marker 삭제
     try:
         dirty_flag.unlink()
     except:
         pass
+
+    # finish_state.json 체크 (GPT 합의 2026-04-04)
+    finish_state_path = state_dir / 'finish_state.json'
+    if finish_state_path.exists():
+        try:
+            fs = json.loads(finish_state_path.read_text(encoding='utf-8'))
+            ts = fs.get('terminal_state', '')
+            if ts not in ('done', 'exception', ''):
+                pending_steps = []
+                if not fs.get('committed_pushed'): pending_steps.append('커밋+푸시')
+                if not fs.get('gpt_shared'): pending_steps.append('GPT 공유')
+                if not fs.get('gpt_judgment'): pending_steps.append('GPT 판정 확인')
+                if not fs.get('user_reported'): pending_steps.append('사용자 보고')
+                if not fs.get('followup_checked'): pending_steps.append('후속 확인')
+                if pending_steps:
+                    msg = f'[COMPLETION GATE] finish 루틴 미완료: {", ".join(pending_steps)} — /finish 8단계를 완료하세요.'
+                    print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
+        except:
+            pass
 " 2>/dev/null)
 
 if [ -n "$RESULT" ]; then
