@@ -340,6 +340,47 @@ grand_erp  = sum(r['erp_amt']  for r in summary_rows)
 grand_diff = grand_gerp - grand_erp
 print(f"\n  합계: GERP {grand_gerp:>12,}  구ERP {grand_erp:>12,}  차이 {grand_diff:>+12,}")
 
+# ── 오류 리스트 (라인별 차이 품번 유형 분류) ─────────────────
+error_list = []
+for lc in LINE_ORDER:
+    ld = lines_result.get(lc, {})
+    for r in ld.get('items', []):
+        g_amt = r['gerp_total_amt']
+        e_amt = r['erp_day_amt'] + r['erp_ngt_amt']
+        if g_amt == e_amt:
+            continue
+        g_qty = r['gerp_day_qty'] + r['gerp_ngt_qty']
+        e_qty = r['erp_day_qty'] + r['erp_ngt_qty']
+        # 유형 판정
+        if e_amt == 0 and g_amt > 0:
+            etype = '구실적누락'
+        elif g_amt == 0 and e_amt > 0:
+            etype = 'GERP누락'
+        elif r['price'] == 0:
+            etype = '기준누락'
+        elif g_qty != e_qty:
+            etype = '수량차이'
+        else:
+            etype = '정산차이'
+        error_list.append({
+            'line': lc, 'part_no': r['part_no'], 'type': etype,
+            'price_type': r['price_type'],
+            'gerp_qty': g_qty, 'erp_qty': e_qty,
+            'gerp_amt': g_amt, 'erp_amt': e_amt,
+            'diff_amt': g_amt - e_amt,
+        })
+
+# 요약 출력
+from collections import Counter
+type_cnt = Counter(e['type'] for e in error_list)
+type_amt = {}
+for e in error_list:
+    type_amt[e['type']] = type_amt.get(e['type'], 0) + e['diff_amt']
+print(f"\n오류 리스트: {len(error_list)}건")
+for t in ['구실적누락', 'GERP누락', '수량차이', '정산차이', '기준누락']:
+    if t in type_cnt:
+        print(f"  {t}: {type_cnt[t]}건, {type_amt[t]:+,}원")
+
 # ── JSON 저장 ─────────────────────────────────────────────────
 result = {
     "step": 5,
@@ -351,6 +392,7 @@ result = {
     "grand_erp_amt":  grand_erp,
     "grand_diff_amt": grand_diff,
     "unmatched_gerp": [],  # GERP 단가 fallback 적용 완료
+    "error_list": error_list,
 }
 
 with open(CACHE_STEP5, 'w', encoding='utf-8') as f:

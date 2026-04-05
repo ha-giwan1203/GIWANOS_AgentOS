@@ -44,6 +44,7 @@ STEP_SCRIPTS = {
     5: 'step5_정산계산.py',
     6: 'step6_검증.py',
     7: 'step7_보고서.py',
+    8: 'step8_오류리스트.py',
 }
 
 # Step별 출력 캐시 파일 (--use-cache 판단용)
@@ -244,8 +245,8 @@ def main():
     args = parse_args()
 
     # start-from 범위 검사
-    if not (1 <= args.start_from <= 7):
-        print(f"[ERROR] --start-from 값은 1~7이어야 합니다. (입력: {args.start_from})")
+    if not (1 <= args.start_from <= 8):
+        print(f"[ERROR] --start-from 값은 1~8이어야 합니다. (입력: {args.start_from})")
         sys.exit(1)
 
     # 월 패치 객체 (--month 미지정이면 None)

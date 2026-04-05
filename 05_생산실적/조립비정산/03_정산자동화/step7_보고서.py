@@ -899,10 +899,74 @@ if s6 is not None:
     ws5.column_dimensions['E'].width = 55
     print(f"  검증항목: {len(checks)}건 (WARNING/FAIL: {len(notable)}건)")
 
+# ══════════════════════════════════════════════════════════════
+# 시트: 04_오류리스트  (step5 error_list 기반 — 라인별 차이 유형 분류)
+# ══════════════════════════════════════════════════════════════
+err_list = s5.get('error_list', [])
+if err_list:
+    print("[6/6] 04_오류리스트 시트...")
+    ws6 = wb.create_sheet('04_오류리스트')
+
+    ws6.merge_cells('A1:H1')
+    ws6['A1'] = f'{MONTH}월 GERP vs 구ERP 차이 오류 리스트'
+    ws6['A1'].font = Font(name='맑은 고딕', bold=True, size=11, color='1B2A4A')
+
+    # 유형별 요약 (row 2)
+    from collections import Counter
+    tcnt = Counter(e['type'] for e in err_list)
+    tamt = {}
+    for e in err_list:
+        tamt[e['type']] = tamt.get(e['type'], 0) + e['diff_amt']
+    summary_parts = []
+    for t in ['구실적누락', 'GERP누락', '수량차이', '정산차이', '기준누락']:
+        if t in tcnt:
+            summary_parts.append(f"{t}: {tcnt[t]}건({tamt[t]:+,})")
+    ws6.merge_cells('A2:H2')
+    ws6['A2'] = '  |  '.join(summary_parts)
+    ws6['A2'].font = Font(name='맑은 고딕', size=9, color='666666')
+
+    # 헤더 (row 3)
+    err_hdrs = ['No', '라인', '품번', '유형', '단가유형', 'GERP수량', '구ERP수량', 'GERP금액', '구ERP금액', '차이금액']
+    for c, h in enumerate(err_hdrs, 1):
+        ws6.cell(3, c, h)
+    hdr(ws6, 3, len(err_hdrs))
+
+    # 데이터
+    row = 4
+    for i, e in enumerate(sorted(err_list, key=lambda x: (x['line'], -abs(x['diff_amt']))), 1):
+        fill = NEG_FILL if e['diff_amt'] < 0 else (POS_FILL if e['diff_amt'] > 0 else None)
+        vals = [i, e['line'], e['part_no'], e['type'], e['price_type'],
+                e['gerp_qty'], e['erp_qty'], e['gerp_amt'], e['erp_amt'], e['diff_amt']]
+        for c, v in enumerate(vals, 1):
+            fmt = NUM_FMT if isinstance(v, (int, float)) and c >= 6 else None
+            f = fill if c == 10 else None
+            al = C if c in (1, 2, 4, 5) else R
+            dc(ws6, row, c, v, fmt=fmt, fill=f, align=al)
+        row += 1
+
+    # 합계행
+    for c in range(1, len(err_hdrs) + 1):
+        ws6.cell(row, c).fill = GRAY_FILL
+        ws6.cell(row, c).font = BOLD_FONT
+        ws6.cell(row, c).border = BDR
+    dc(ws6, row, 1, '합계', bold=True, fill=GRAY_FILL, align=C)
+    dc(ws6, row, 8, sum(e['gerp_amt'] for e in err_list), bold=True, fmt=NUM_FMT, fill=GRAY_FILL)
+    dc(ws6, row, 9, sum(e['erp_amt'] for e in err_list), bold=True, fmt=NUM_FMT, fill=GRAY_FILL)
+    total_diff = sum(e['diff_amt'] for e in err_list)
+    df = NEG_FILL if total_diff < 0 else POS_FILL
+    dc(ws6, row, 10, total_diff, bold=True, fmt=NUM_FMT, fill=df)
+
+    # 열 너비
+    for ci, w in {1:5, 2:10, 3:20, 4:10, 5:12, 6:10, 7:10, 8:14, 9:14, 10:14}.items():
+        ws6.column_dimensions[get_column_letter(ci)].width = w
+    ws6.freeze_panes = 'A4'
+    print(f"  오류항목: {len(err_list)}건")
+
 # ── 저장 ──────────────────────────────────────────────────────
 wb.save(OUTPUT_FILE)
 print(f"\n{'='*60}")
 print(f"저장 완료: {OUTPUT_FILE}")
 extra = ' | 03_검증결과' if s6 is not None else ''
-print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석{extra}")
+extra2 = ' | 04_오류리스트' if err_list else ''
+print(f"시트 구성: 00_정산집계 | {' | '.join(LINE_ORDER)} | 01_차이분석{extra}{extra2}")
 print("Step 7 완료 — 최종 보고서 생성")

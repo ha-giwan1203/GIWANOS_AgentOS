@@ -113,7 +113,42 @@
 SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03
 
 ## 관련 스킬
-- assembly-cost-settlement: 정산 자동화
+- assembly-cost-settlement: 정산 자동화 (`/settlement MM`으로 실행)
+
+## 월별 정산 실행 절차
+
+### 원스텝 실행
+```
+/settlement 03      # 3월 정산 (환경세팅 → step1~8 → 검증보고)
+/settlement 03 --from 5  # step5부터 재실행
+```
+
+### 수동 실행 (단계별)
+```bash
+# 1. 환경 세팅
+python setup_month.py 03         # 폴더 생성 + 파일 복사 + config 수정
+python setup_month.py 03 --dry-run  # 사전 확인
+
+# 2. 파이프라인 실행 (step 1~8)
+python run_settlement_pipeline.py
+python run_settlement_pipeline.py --start-from 5 --use-cache  # 재시작
+
+# 3. 산출물 확인
+#   {월별폴더}/정산결과_MM월.xlsx   — 정산 보고서 (13개 시트)
+#   {월별폴더}/오류리스트_MM월.xlsx — DB 양식 오류 리스트
+```
+
+### 파이프라인 8단계
+| Step | 스크립트 | 출력 |
+|------|---------|------|
+| 1 | step1_파일검증.py | step1_validation.json |
+| 2 | step2_GERP처리.py | step2_gerp.json |
+| 3 | step3_구erp처리.py | step3_olderp.json |
+| 4 | step4_기준정보매칭.py | step4_matched.json |
+| 5 | step5_정산계산.py | step5_settlement.json |
+| 6 | step6_검증.py | step6_validation.json |
+| 7 | step7_보고서.py | 정산결과_MM월.xlsx |
+| 8 | step8_오류리스트.py | 오류리스트_MM월.xlsx |
 
 ## 하네스 Evaluator 판정 기준표 (파일럿 — 2026-03-30 도입)
 
@@ -155,7 +190,8 @@ SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, IS
 | 업체코드 | 0109 | 대원테크 |
 | 라인 수 | 10개 | SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03 |
 | 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx` | 단가 권위값 |
-| 파이프라인 진입점 | `03_정산자동화/run_settlement_pipeline.py` | step1~7 순차 실행 |
+| 파이프라인 진입점 | `03_정산자동화/run_settlement_pipeline.py` | step1~8 순차 실행 |
+| 환경 세팅 | `03_정산자동화/setup_month.py` | 월 전환 자동화 |
 | 대시보드 출력 | `_cache/월간_조립비_대시보드.png` | step7 시각화 |
 | Slack 보고 | `03_정산자동화/step7_slack_보고.py` | PNG 첨부 (files:write scope 필요) |
 | SP3M3 야간 고정단가 | 170원 | |
