@@ -91,6 +91,16 @@ for lc in LINE_ORDER:
             'sup_text': sup_text,
         })
 
+# 정상예외 판정: 이관 완료 품번 (X9000/X9500)
+NORMAL_EXCEPTION_PATTERNS = ['X9000', 'X9500']
+
+def is_normal_exception(part_no):
+    """이관 완료 품번 등 정상예외 여부 판정"""
+    for pat in NORMAL_EXCEPTION_PATTERNS:
+        if pat in str(part_no):
+            return True
+    return False
+
 type_order = {'GERP누락':0, '구실적누락':1, '기준누락':2, '수량차이':3, '정산차이':4}
 errors.sort(key=lambda x: (LINE_ORDER.index(x['line']),
                            type_order.get(x['err_type'], 9),
@@ -148,7 +158,7 @@ ws.title = '오류리스트'
 month_int = int(MONTH)
 
 # Row 1: 타이틀
-ws.merge_cells('A1:T1')
+ws.merge_cells('A1:U1')
 ws['A1'] = f'{month_int}월 조립비 정산 오류 리스트'
 ws['A1'].font = Font(name='맑은 고딕', bold=True, size=12, color='1B2A4A')
 ws['A1'].alignment = LA
@@ -158,7 +168,7 @@ summary = []
 for t in ['구실적누락', 'GERP누락', '수량차이', '정산차이', '기준누락']:
     if t in tcnt:
         summary.append(f"{t} {tcnt[t]}건({tamt[t]:+,}원)")
-ws.merge_cells('A2:T2')
+ws.merge_cells('A2:U2')
 ws['A2'] = f"총 {len(errors)}건  |  " + '  |  '.join(summary)
 ws['A2'].font = Font(name='맑은 고딕', size=9, color='555555')
 
@@ -167,7 +177,7 @@ groups = [
     ('기본정보', 8, DB_FILL, DB_FONT),
     ('GERP', 4, G_FILL, G_FONT),
     ('구ERP', 4, E_FILL, E_FONT),
-    ('결과', 4, RES_FILL, RES_FONT),
+    ('결과', 5, RES_FILL, RES_FONT),
 ]
 col = 1
 for name, span, fill, font in groups:
@@ -191,6 +201,7 @@ headers = [
     ('야간수량', 10, E_FILL, E_FONT), ('야간금액', 13, E_FILL, E_FONT),
     ('차이금액', 13, RES_FILL, RES_FONT), ('오류유형', 10, RES_FILL, RES_FONT),
     ('지원업체', 12, RES_FILL, RES_FONT), ('비고', 15, RES_FILL, RES_FONT),
+    ('예외태그', 10, RES_FILL, RES_FONT),
 ]
 for ci, (name, width, fill, font) in enumerate(headers, 1):
     c = ws.cell(4, ci, name)
@@ -208,6 +219,8 @@ for e in errors:
     elif e['err_type'] == '기준누락':
         note = '기준단가 없음'
 
+    exc_tag = '정상예외' if is_normal_exception(e['part_no']) else ''
+
     vals = [
         (e['part_no'], LA, None), (VENDOR_CODE, CA, None),
         (e['line'], CA, None), (e['assy_part'], LA, None),
@@ -219,6 +232,7 @@ for e in errors:
         (e['erp_ngt_qty'], RA, NUM), (e['erp_ngt_amt'], RA, NUM),
         (e['diff'], RA, NUM), (e['err_type'], CA, None),
         (e['sup_text'], LA, None), (note, LA, None),
+        (exc_tag, CA, None),
     ]
     for ci, (v, align, fmt) in enumerate(vals, 1):
         c = ws.cell(row, ci, v)
@@ -230,6 +244,10 @@ for e in errors:
     if tf:
         ws.cell(row, 18).fill = tf
 
+    if exc_tag:
+        EXC_FILL = PatternFill('solid', fgColor='D9EAD3')
+        ws.cell(row, 21).fill = EXC_FILL
+
     if e['diff'] < 0:
         ws.cell(row, 17).fill = NEG_FILL
         ws.cell(row, 17).font = Font(name='맑은 고딕', size=9, color='CC0000')
@@ -239,7 +257,8 @@ for e in errors:
     row += 1
 
 # ── 합계행 ──
-for ci in range(1, 21):
+exc_count = sum(1 for e in errors if is_normal_exception(e['part_no']))
+for ci in range(1, 22):
     c = ws.cell(row, ci)
     c.fill = SUM_FILL; c.border = BDR; c.font = BOLD
 ws.cell(row, 1, '합계').alignment = CA
@@ -263,6 +282,9 @@ c.fill = NEG_FILL if total_diff < 0 else POS_FILL; c.border = BDR
 
 ws.cell(row, 18, f"{len(errors)}건").font = BOLD
 ws.cell(row, 18).alignment = CA; ws.cell(row, 18).fill = SUM_FILL; ws.cell(row, 18).border = BDR
+if exc_count > 0:
+    ws.cell(row, 21, f"정상예외 {exc_count}건").font = BOLD
+    ws.cell(row, 21).alignment = CA
 
 # ── 유형별 요약 시트 ──
 ws2 = wb.create_sheet('유형별요약')
