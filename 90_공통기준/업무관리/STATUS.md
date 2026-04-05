@@ -104,33 +104,33 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 11:08 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-05 11:08 | modified | zdm-daily-inspection-v4.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | production-report.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | procurement-delivery.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | process-improvement.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | partno-management.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | mes-production-upload.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | line-stoppage.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | line-mapping-validator.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | line-batch-outer-main.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | line-batch-management.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | line-batch-mainsub.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | hr-attendance.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | equipment-utilization.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | debate-mode.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | cost-rate-management.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | chomul-module-partno.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | assembly-cost-settlement.skill | 스킬 패키지 갱신 |
+| 2026-04-05 11:08 | modified | adversarial-review.skill | 스킬 패키지 갱신 |
 | 2026-04-05 11:00 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 10:59 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 10:51 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 10:51 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 10:51 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step7_시각화입력생성.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step2_GERP처리.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:51 | modified | README.md | README.md 수정 |
-| 2026-04-05 10:49 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:49 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:29 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 10:27 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-05 00:11 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 00:11 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 00:11 | modified | step5_정산계산.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 00:10 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-05 00:10 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 20:17 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 20:17 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 20:16 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 18:33 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 18:29 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 14:53 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 14:53 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 14:52 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
