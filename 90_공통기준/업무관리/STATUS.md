@@ -104,6 +104,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 11:00 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 10:59 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 10:51 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 10:51 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
@@ -132,5 +133,4 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-04 18:29 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 14:53 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-04 14:53 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 14:52 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 14:52 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
