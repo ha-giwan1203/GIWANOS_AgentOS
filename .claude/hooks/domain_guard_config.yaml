@@ -54,7 +54,7 @@ domains:
         description: "전체 도구 허용"
         allow_tools: ["*"]
         allow_paths: []
-    blocked_tools: ["Bash"]
+    blocked_tools: ["Bash", "mcp__Claude_in_Chrome"]
     blocked_patterns:
       - "run_settlement_pipeline"
       - "step[0-9]_"
