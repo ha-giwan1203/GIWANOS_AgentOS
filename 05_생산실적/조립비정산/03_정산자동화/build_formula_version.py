@@ -207,11 +207,13 @@ for line in LINES:
         ws.cell(out_r, 11).number_format = num_fmt
         ws.cell(out_r, 11).border = thin_border
 
-        # L: GERP 야간금액
-        if line == 'SD9A01':
-            ws.cell(out_r, 12).value = f'=G{out_r}*0.3*J{out_r}'
-        else:
-            ws.cell(out_r, 12).value = f'=G{out_r}*J{out_r}'
+        # L: GERP 야간금액 — GERP 추가행의 조립금액(col Q)을 직접 합산
+        #    야간은 GERP 원본금액이 권위값이므로 기준단가로 재계산하지 않음
+        ws.cell(out_r, 12).value = (
+            f'=SUMIFS(GERP_입력!$Q:$Q,'
+            f'GERP_입력!$C:$C,"{line}",'
+            f'GERP_입력!$G:$G,A{out_r},'
+            f'GERP_입력!$N:$N,"추가")')
         ws.cell(out_r, 12).number_format = num_fmt
         ws.cell(out_r, 12).border = thin_border
 
