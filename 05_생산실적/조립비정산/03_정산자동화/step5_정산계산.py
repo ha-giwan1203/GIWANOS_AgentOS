@@ -253,15 +253,18 @@ for lc in LINE_ORDER:
                     'gerp_orig_ngt_amt': ngt_amt,
                     'erp_day_qty':      0,
                     'erp_day_amt':      0,
-                    'erp_ngt_qty':      0,
-                    'erp_ngt_amt':      0,
-                    'erp_tot_qty':      0,
+                    'erp_ngt_qty':      rsp_qty,
+                    'erp_ngt_amt':      ngt_amt,
+                    'erp_tot_qty':      rsp_qty,
                     'price_judgment':   None,
                 }
                 detail.append(row)
                 # GERP 원본금액 기준 전환 — RSP미매칭도 합계에 포함
                 total_gerp_ngt_qty += rsp_qty
                 total_gerp_ngt_amt += ngt_amt
+                # 구ERP 야간도 GERP 동일 적용 (SP3M3 구ERP 야간 = GERP 야간)
+                total_erp_ngt_qty += rsp_qty
+                total_erp_ngt_amt += ngt_amt
                 print(f"    RSP미매칭 {rsp_pn}: {rsp_qty}개, GERP원본 {ngt_amt:,}원 (합계 가산)")
 
     # 미매핑 품번: 기준정보 단가 없음 → GERP 원본금액 fallback 적용
