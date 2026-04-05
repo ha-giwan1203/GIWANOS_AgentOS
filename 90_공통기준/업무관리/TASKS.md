@@ -24,9 +24,10 @@
 
 ## 대기 중 (우선순위 순)
 
-### [대기] settlement 스킬 preloading 테스트 — **대기: 4월 정산 데이터**
-- 출처: subagent 확장 plan 구현 (2026-04-02)
-- settlement-validator.md 생성 완료, skills preloading 실테스트는 정산 데이터 입수 후
+### ~~[대기] settlement 스킬 preloading 테스트~~ → 완료됨 (3월 정산 04월 폴더 실행)
+
+### [대기] 4월 실적 정산 — **대기: 4월 GERP/구ERP 데이터**
+- 4월 정산 데이터 입수 후 `/settlement 04` 실행
 
 
 
@@ -35,10 +36,7 @@
 - verify_xlsm.py 구조는 완료. COM 실검증 산출물(verify.json PASS)은 xlsm 작업 재개 시 확인
 - hooks 3개 + settings merge 구현 완료 (GPT 구조 PASS)
 
-### [auto] 정산 파이프라인 실행 테스트 확인 — **차단: 4월 데이터 대기**
-- 출처: `step7_대시보드.py` 변경 감지
-- 자동 생성 항목 — 4월 GERP/구ERP 실적 데이터 입수 후 자동 확인 예정
-- 현 시점 강제 실행 불필요 (3월 데이터 기준 파이프라인 정상 동작 확인됨)
+### ~~[auto] 정산 파이프라인 실행 테스트 확인~~ → 완료됨 (04월 폴더 step1~8 정상 실행)
 
 
 
@@ -55,6 +53,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| 3월 정산 04월 폴더 재실행 + 스킬화 — setup_month.py + step8 오류리스트 + `/settlement` 슬래시 명령 + SKILL.md, 데이터 검증 PASS (10라인 0원 차이) | 2026-04-05 |
 | 8단계 자동 루틴 강제 — /finish 커맨드 + finish_state.json + completion_gate 연동, GPT 토론 3턴 합의 + 부분반영→PASS (19400bed) | 2026-04-04 |
 | post_write_dirty.sh EXEMPT_COMMANDS — git HEREDOC 오탐 제거 (GPT PASS 880cb437) | 2026-04-04 |
 | GPT 지침 Git 관리 구현 — gpt-instructions.md 기준 원본 + fallback + cowork-rules 합의 반영, GPT 토론 7턴 (ff16142a) | 2026-04-04 |
