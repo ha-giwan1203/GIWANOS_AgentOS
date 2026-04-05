@@ -104,6 +104,8 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 12:24 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
+| 2026-04-05 12:24 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 12:23 | modified | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 12:23 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-05 11:59 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
@@ -132,5 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-05 11:08 | modified | procurement-delivery.skill | 스킬 패키지 갱신 |
 | 2026-04-05 11:08 | modified | process-improvement.skill | 스킬 패키지 갱신 |
 | 2026-04-05 11:08 | modified | partno-management.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | mes-production-upload.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | line-stoppage.skill | 스킬 패키지 갱신 |
