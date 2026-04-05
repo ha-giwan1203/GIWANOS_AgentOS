@@ -104,6 +104,10 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 20:55 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 20:55 | modified | step2_GERP처리.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 20:55 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 20:55 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 20:47 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 20:24 | modified | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 20:24 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
@@ -130,7 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-05 16:46 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 16:46 | modified | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 16:46 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 16:46 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 16:46 | modified | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 16:46 | modified | step7_시각화입력생성.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 16:46 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
