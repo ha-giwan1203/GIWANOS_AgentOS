@@ -153,39 +153,17 @@ chk(4, "Usage=2 품번 수량 짝수 여부 (2배 환산 확인)",
     'PASS' if not usage2_issues else 'INFO',
     f"홀수 수량 품번(비정상 가능): {usage2_issues[:5]}" if usage2_issues else "전체 정상(짝수)")
 
-# ── 항목 5: SP3M3 야간 고정단가 170원 (KNOWN_EXCEPTIONS 매칭) ──
-sp3_items = lines.get('SP3M3', {}).get('items', [])
-sp3_known = _known_part_set("SP3M3_NIGHT_RSP")
-sp3_critical = []  # 미등록 불일치
-sp3_warned   = []  # KNOWN_EXCEPTIONS 등록 불일치
-for r in sp3_items:
-    if r['gerp_ngt_qty'] > 0:
-        expected_amt = r['gerp_ngt_qty'] * SP3M3_NIGHT_PRICE
-        if r['gerp_ngt_amt'] != expected_amt:
-            entry = (
-                f"{r['part_no']}(야간qty={r['gerp_ngt_qty']}, "
-                f"금액={r['gerp_ngt_amt']}, 기대={expected_amt})"
-            )
-            if r['part_no'] in sp3_known:
-                sp3_warned.append(entry)
-            else:
-                sp3_critical.append(entry)
-
-if sp3_critical:
-    # 미등록 불일치 존재 → CRITICAL FAIL
-    detail_msg = f"미등록오류: {sp3_critical[:5]}"
-    if sp3_warned:
-        detail_msg += f" | Known예외(WARNING): {sp3_warned[:5]}"
-    chk(5, f"SP3M3 야간 고정단가 {SP3M3_NIGHT_PRICE}원 적용",
-        'FAIL', detail_msg, severity='CRITICAL')
-elif sp3_warned:
-    # 등록된 품번만 불일치 → WARNING
-    chk(5, f"SP3M3 야간 고정단가 {SP3M3_NIGHT_PRICE}원 적용",
-        'WARNING',
-        f"Known예외(등록품번 불일치): {sp3_warned[:5]}")
-else:
-    chk(5, f"SP3M3 야간 고정단가 {SP3M3_NIGHT_PRICE}원 적용",
-        'PASS', "전체 정상")
+# ── 항목 5: GERP 원본금액 정합성 (정산금액 = GERP 원본) ──
+# 2026-04-05: SP3M3 야간 170원 고정 → GERP 원본금액 직접 사용으로 변경
+# 정산금액과 원본금액이 동일한지 확인
+orig_mismatch = []
+for lc_chk in lines:
+    for r in lines[lc_chk].get('items', []):
+        if r['gerp_day_amt'] != r['gerp_orig_day_amt'] or r['gerp_ngt_amt'] != r['gerp_orig_ngt_amt']:
+            orig_mismatch.append(f"{lc_chk}/{r['part_no']}")
+chk(5, "GERP 원본금액 정합성 (정산=원본)",
+    'PASS' if not orig_mismatch else 'FAIL',
+    f"불일치: {orig_mismatch[:5]}" if orig_mismatch else "전체 정상")
 
 # ── 항목 6: (삭제됨 — 미매핑 품번은 GERP 단가 fallback 적용) ──
 

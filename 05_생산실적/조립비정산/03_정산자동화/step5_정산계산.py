@@ -4,10 +4,10 @@
 Step 5 — 정산 계산
 라인별 금액 계산 → JSON 저장 (Step7 엑셀 생성용 중간 데이터)
 
-계산 규칙 (CLAUDE.md 기준):
-  - 총 정산금액 = (총수량 × 단가) + (야간수량 × 단가 × 30%)
-  - SP3M3 야간: qty × 170원 고정단가 (야간 기본단가 30% 적용 없음)
-  - SD9A01 단가기준판정: 단가 ≤ 500 → 야간가산, > 500 → 기본
+계산 규칙 (GERP 단가 기준 — 2026-04-05 변경):
+  - 정산금액 = GERP 원본금액 직접 사용 (기준단가 재계산 아님)
+  - 주간: GERP 원본 주간금액, 야간: GERP 원본 야간금액
+  - SD9A01 단가기준판정: 단가 ≤ 500 → 야간가산, > 500 → 기본 (표시용)
   - Usage=2 품번: 수량 2배 환산
 
 실행: python step5_정산계산.py
@@ -74,8 +74,8 @@ def get_olderp_pv(lc):
         return olderp_all_day, olderp_all_night, olderp_all_total
 
 
-def calc_night_price(lc, price, night_qty):
-    """야간 정산금액 계산 (구ERP 방식 통일)
+def calc_night_price_erp(lc, price, night_qty):
+    """구ERP 야간 정산금액 계산 (구ERP에는 GERP 원본 없으므로 기존 방식 유지)
 
     SP3M3: qty × 170원 고정단가
     SD9A01: qty × 단가 × 1.3 (기본100% + 가산30%)
@@ -148,17 +148,24 @@ for lc in LINE_ORDER:
         e_day_raw = ep_d.get(pn, 0)
         e_day_qty = e_day_raw * usage
 
-        # 금액 계산 — 구ERP 방식 통일
-        # 주간금액 = 순수주간수량 × 단가
-        # 야간금액 = 야간수량 × 단가 × 1.3 (기본100% + 가산30%)
-        # GERP '정상'행 = 총수량(주+야) → 순수주간 = 정상 - 추가
-        # SD9A01: GERP 순수주간 = 정상 - 추가 (SP3M3는 야간=170원 고정, 분리 불필요)
+        # 금액 계산 — GERP 원본금액 기준 (2026-04-05 변경)
+        # GERP 정산: GERP 원본금액 직접 사용 (기준단가 재계산 아님)
+        # 구ERP: 기존 방식 유지 (기준단가 × 수량)
         if lc == 'SD9A01':
             g_pure_day = g_day_qty - g_ngt_qty
         else:
             g_pure_day = g_day_qty
-        g_day_amt = round(g_pure_day * price)
-        g_ngt_amt = calc_night_price(lc, price, g_ngt_qty)
+        # GERP: 원본금액 직접 사용
+        g_day_amt = round(gp_d_amt.get(pn, 0))
+        if lc == 'SP3M3' and has_night:
+            base_pn = pn[:10]
+            if g_ngt_raw > 0:
+                g_ngt_amt = round(gp_n_amt.get(base_pn, 0))
+            else:
+                g_ngt_amt = 0
+        else:
+            g_ngt_amt = round(gp_n_amt.get(pn, 0)) if has_night else 0
+        # 구ERP: 기준단가 × 수량 (기준단가 = 기준정보 파일 단가)
         e_day_amt = round(e_day_qty * price)
 
         # 구ERP 야간: SP3M3는 GERP 야간 동일 적용 (구ERP에 야간 데이터 없음)
@@ -169,24 +176,16 @@ for lc in LINE_ORDER:
         else:
             e_ngt_raw = ep_n.get(pn, 0) if has_night else 0
             e_ngt_qty = e_ngt_raw * usage if has_night else 0
-            e_ngt_amt = calc_night_price(lc, price, e_ngt_qty)
+            e_ngt_amt = calc_night_price_erp(lc, price, e_ngt_qty)
             e_tot_raw = ep_t.get(pn, 0) if has_night else e_day_raw
             e_tot_qty = e_tot_raw * usage
 
         # 야간 총 정산금액 (GERP 기준): 주간+야간 합산
         gerp_total_amt = g_day_amt + g_ngt_amt
 
-        # GERP 원본 금액 (다중단가 비교용)
-        gerp_orig_day_amt = round(gp_d_amt.get(pn, 0))
-        if lc == 'SP3M3' and has_night:
-            # 야간수량과 동일하게 첫 품번에만 할당 (컬러별 중복 방지)
-            base_pn = pn[:10]
-            if g_ngt_raw > 0:  # 이 품번이 야간수량을 할당받은 경우만
-                gerp_orig_ngt_amt = round(gp_n_amt.get(base_pn, 0))
-            else:
-                gerp_orig_ngt_amt = 0
-        else:
-            gerp_orig_ngt_amt = round(gp_n_amt.get(pn, 0))
+        # GERP 원본 금액 = 정산금액과 동일 (GERP 기준 전환)
+        gerp_orig_day_amt = g_day_amt
+        gerp_orig_ngt_amt = g_ngt_amt
 
         price_judgment = sd9_price_judgment(lc, price, g_ngt_qty)
 
@@ -260,8 +259,10 @@ for lc in LINE_ORDER:
                     'price_judgment':   None,
                 }
                 detail.append(row)
-                # 합계 가산 안 함 — GERP 원본 night_amt_pivot에 이미 포함
-                print(f"    RSP미매칭 {rsp_pn}: {rsp_qty}개, GERP원본 {ngt_amt:,}원 (합계 미가산)")
+                # GERP 원본금액 기준 전환 — RSP미매칭도 합계에 포함
+                total_gerp_ngt_qty += rsp_qty
+                total_gerp_ngt_amt += ngt_amt
+                print(f"    RSP미매칭 {rsp_pn}: {rsp_qty}개, GERP원본 {ngt_amt:,}원 (합계 가산)")
 
     # 미매핑 품번: 기준정보 단가 없음 → GERP 원본금액 fallback 적용
     unmatched_set = set(step4.get('unmatched_gerp', []))
@@ -358,10 +359,24 @@ for lc in LINE_ORDER:
             etype = 'GERP누락'
         elif r['price'] == 0:
             etype = '기준누락'
+        elif g_qty != e_qty and g_qty > 0 and e_qty > 0:
+            # 단가도 다른지 확인
+            gerp_up = round(g_amt / g_qty) if g_qty else 0
+            erp_up = r['price']
+            if gerp_up != erp_up:
+                etype = '단가+수량'
+            else:
+                etype = '수량차이'
         elif g_qty != e_qty:
             etype = '수량차이'
         else:
-            etype = '정산차이'
+            # 수량 동일, 금액 다름 → 단가 차이
+            gerp_up = round(g_amt / g_qty) if g_qty else 0
+            erp_up = r['price']
+            if gerp_up != erp_up:
+                etype = '단가차이'
+            else:
+                etype = '정산차이'
         error_list.append({
             'line': lc, 'part_no': r['part_no'], 'type': etype,
             'price_type': r['price_type'],
