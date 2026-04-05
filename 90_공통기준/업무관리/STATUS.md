@@ -104,6 +104,8 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 22:01 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 22:01 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 22:00 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 22:00 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 21:58 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
@@ -132,5 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-05 21:44 | modified | equipment-utilization.skill | 스킬 패키지 갱신 |
 | 2026-04-05 21:44 | modified | debate-mode.skill | 스킬 패키지 갱신 |
 | 2026-04-05 21:44 | modified | cost-rate-management.skill | 스킬 패키지 갱신 |
-| 2026-04-05 21:44 | modified | chomul-module-partno.skill | 스킬 패키지 갱신 |
-| 2026-04-05 21:44 | modified | assembly-cost-settlement.skill | 스킬 패키지 갱신 |
