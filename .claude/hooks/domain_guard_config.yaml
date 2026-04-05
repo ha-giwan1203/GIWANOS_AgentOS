@@ -39,7 +39,21 @@ domains:
   settlement:
     keywords: ["정산", "조립비", "settlement", "대시보드"]
     claude_path: "05_생산실적/조립비정산/CLAUDE.md"
+    entry_path: "05_생산실적/조립비정산/ENTRY.md"
     flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_settlement"
+    phases:
+      - name: "entry_read"
+        description: "ENTRY.md 읽기만 허용"
+        allow_tools: ["Read"]
+        allow_paths: ["ENTRY.md"]
+      - name: "doc_read"
+        description: "CLAUDE.md 읽기만 허용"
+        allow_tools: ["Read"]
+        allow_paths: []
+      - name: "full"
+        description: "전체 도구 허용"
+        allow_tools: ["*"]
+        allow_paths: []
     blocked_tools: ["Bash"]
     blocked_patterns:
       - "run_settlement_pipeline"

@@ -83,13 +83,23 @@ if flag_prefix:
                 except FileNotFoundError:
                     pass
 
+    # 같은 도메인이 이미 활성이면 _loaded/_phase 유지 (세션 내 재초기화 방지)
+    already_active = False
+    try:
+        with open(flag_prefix + '_active', 'r') as f:
+            already_active = (f.read().strip() == name)
+    except FileNotFoundError:
+        pass
+
     with open(flag_prefix + '_active', 'w') as f:
         f.write(name)
-    for suffix in ('_loaded', '_phase'):
-        try:
-            os.remove(flag_prefix + suffix)
-        except FileNotFoundError:
-            pass
+
+    if not already_active:
+        for suffix in ('_loaded', '_phase'):
+            try:
+                os.remove(flag_prefix + suffix)
+            except FileNotFoundError:
+                pass
 
 # additionalContext 구성
 entry_path = d.get('entry_path', '')
@@ -118,7 +128,12 @@ domain_laws = {
     ],
     'settlement': [
         '',
-        '→ 정산 파이프라인 규칙·단가 기준·검증 절차가 이 문서에 명시됨.'
+        '정산 Preflight Laws (NEVER):',
+        '1. 이번 월 권위값 확인 — 3월=GERP원본, 4월+=기준정보',
+        '2. 동일품번 다중단가 정상 — 대표단가 1개로 덮기 금지',
+        '3. 매칭키 = (라인, 품번, 조립품번) 3중키 — (라인,품번)만 사용 금지',
+        '4. 기준정보 수정 전 백업 확인 + 적용 범위 명시',
+        '5. 구조(시트/컬럼/다중행) 보존 우선 — 값만 수정'
     ],
     'linebatch': [
         '',
