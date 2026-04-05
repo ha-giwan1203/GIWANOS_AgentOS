@@ -104,6 +104,17 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 12:43 | modified | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-05 12:43 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | step5_정산계산.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | setup_month.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 12:43 | modified | build_master.py | BI 자동화 스크립트 수정 |
+| 2026-04-05 12:43 | modified | _apply_all_v3.py | 초물관리 스크립트 수정 |
+| 2026-04-05 12:43 | modified | _patch_v4.py | 초물관리 스크립트 수정 |
 | 2026-04-05 12:36 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 12:24 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-05 12:24 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
@@ -123,14 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-05 11:14 | moved    | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-05 11:11 | moved    | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 11:10 | moved    | setup_month.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-05 11:08 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-05 11:08 | modified | zdm-daily-inspection-v4.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | production-report.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | procurement-delivery.skill | 스킬 패키지 갱신 |
-| 2026-04-05 11:08 | modified | process-improvement.skill | 스킬 패키지 갱신 |
