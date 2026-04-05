@@ -104,6 +104,17 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-05 10:51 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step7_시각화입력생성.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step2_GERP처리.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-05 10:51 | modified | README.md | README.md 수정 |
 | 2026-04-05 10:49 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 10:49 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-05 10:29 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
@@ -123,14 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-04 14:52 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 14:52 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-04 14:52 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 14:52 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 14:52 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 12:55 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 12:55 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-04 12:30 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 12:05 | modified | build_master.py | BI 자동화 스크립트 수정 |
-| 2026-04-04 12:05 | modified | _apply_all_v3.py | 초물관리 스크립트 수정 |
-| 2026-04-04 12:05 | modified | _patch_v4.py | 초물관리 스크립트 수정 |
-| 2026-04-04 12:05 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-04 12:05 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-04 12:05 | modified | prompt_template.md | 스킬 문서 갱신 |
