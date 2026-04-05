@@ -96,6 +96,27 @@ for gerp_lc in ['SD9A01', 'SP3M3']:
 
 print(f"  전체업체 주간품번 {len(all_day_pv):,}개  야간품번 {len(all_night_pv):,}개")
 
+# 대원테크 0109 전체 (라인코드 무시) — SD9A01 집계용
+dw_day_pv   = erp_dw[erp_dw['shift_type'] == '주간'].groupby('part_no')['qty'].sum().astype(int).to_dict()
+dw_night_pv = erp_dw[erp_dw['shift_type'] == '야간'].groupby('part_no')['qty'].sum().astype(int).to_dict()
+dw_total_pv = erp_dw.groupby('part_no')['qty'].sum().astype(int).to_dict()
+print(f"  대원테크(라인무시) 주간품번 {len(dw_day_pv):,}개  야간품번 {len(dw_night_pv):,}개")
+
+# 지원분 (0109 외 업체) — 품번별 업체코드+라인코드+수량
+erp_support = all_data[~all_data['vendor'].str.contains(VENDOR_CODE, na=False)].copy()
+support_detail = {}  # {품번: [{vendor, line_code, day_qty, night_qty}]}
+for pn, grp in erp_support.groupby('part_no'):
+    entries = []
+    for (vendor, lc), sub in grp.groupby(['vendor', 'line_code']):
+        dq = int(sub[sub['shift_type'] == '주간']['qty'].sum())
+        nq = int(sub[sub['shift_type'] == '야간']['qty'].sum())
+        if dq > 0 or nq > 0:
+            entries.append({'vendor': vendor, 'line_code': lc, 'day_qty': dq, 'night_qty': nq})
+    if entries:
+        support_detail[pn] = entries
+sup_qty = sum(e['day_qty'] + e['night_qty'] for elist in support_detail.values() for e in elist)
+print(f"  지원분(0109외) 품번 {len(support_detail):,}개  수량 {sup_qty:,}개")
+
 # ── JSON 저장 ─────────────────────────────────────────────────
 result = {
     "step": 3,
@@ -106,10 +127,16 @@ result = {
     "line_day_pivot":   line_day_pv,
     "line_night_pivot": line_night_pv,
     "line_total_pivot": line_total_pv,   # 주간+야간 합산 총수량 (SD9A01/SP3M3 비교 기준)
+    # 대원테크 0109 전체 — 라인코드 무시 (SD9A01 집계용)
+    "dw_day_pivot":    dw_day_pv,
+    "dw_night_pivot":  dw_night_pv,
+    "dw_total_pivot":  dw_total_pv,
     # 전 업체 합산 (SUB 라인 매칭용)
     "all_day_pivot":   all_day_pv,
     "all_night_pivot": all_night_pv,
     "all_total_pivot": all_total_pv,
+    # 지원분 (0109 외 업체) — 품번별 업체+라인코드+수량
+    "support_detail":  support_detail,
 }
 
 with open(CACHE_STEP3, 'w', encoding='utf-8') as f:
