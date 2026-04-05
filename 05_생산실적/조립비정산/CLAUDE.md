@@ -120,7 +120,7 @@ SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, IS
 ### 원스텝 실행
 ```
 /settlement 03      # 3월 정산 (환경세팅 → step1~8 → 검증보고)
-/settlement 03 --from 5  # step5부터 재실행
+/settlement 03 --start-from 5  # step5부터 재실행
 ```
 
 ### 수동 실행 (단계별)

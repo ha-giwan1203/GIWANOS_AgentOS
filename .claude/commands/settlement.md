@@ -6,11 +6,11 @@
 ```
 /settlement 03        # 3월 정산 실행
 /settlement 04        # 4월 정산 실행
-/settlement 03 --from 5  # 3월 정산, step5부터 재실행
+/settlement 03 --start-from 5  # 3월 정산, step5부터 재실행
 ```
 
 ## 인수
-- `$ARGUMENTS` — 첫 번째: 정산 대상 월 (01~12), 두 번째(선택): --from N (재시작 step)
+- `$ARGUMENTS` — 첫 번째: 정산 대상 월 (01~12), 두 번째(선택): --start-from N (재시작 step)
 
 ## 실행 순서
 

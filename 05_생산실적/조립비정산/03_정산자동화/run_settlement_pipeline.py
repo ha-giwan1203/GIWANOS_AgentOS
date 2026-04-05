@@ -56,6 +56,7 @@ STEP_OUTPUTS = {
     5: os.path.join(SCRIPT_DIR, '_cache', 'step5_settlement.json'),
     6: os.path.join(SCRIPT_DIR, '_cache', 'step6_validation.json'),
     7: None,  # Step 7 출력은 OUTPUT_FILE (설정값 읽기 필요)
+    8: None,  # Step 8 출력은 오류리스트_MM월.xlsx (OUTPUT_FILE과 동일 폴더)
 }
 
 # Step 완료 후 권장 도메인 에이전트 (1·3·5는 해당 없음)
