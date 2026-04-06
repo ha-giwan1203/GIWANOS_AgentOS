@@ -1,0 +1,26 @@
+#!/bin/bash
+# Stop 전용 — GPT pending flag 존재 시 종료 차단
+# gpt_followup_guard.sh에서 분리 (v2, 2026-04-06 GPT 합의)
+# python3 없이 순수 bash로 경량화
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+hook_log "Stop" "gpt_followup_stop 발화" 2>/dev/null || true
+
+INPUT=$(cat)
+STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
+PENDING="$STATE_DIR/gpt_followup_pending.flag"
+
+# pending flag 없으면 통과
+if [ ! -f "$PENDING" ]; then
+  exit 0
+fi
+
+# 예외 보고 패턴 확인 (timeout, 로그인 만료, 검토만 등)
+LAST_MSG=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('last_assistant_message',''))" 2>/dev/null)
+
+if echo "$LAST_MSG" | grep -qiE '(timeout|타임아웃|로그인 만료|재로그인|네트워크 오류|검토만|읽기만|예외 종료)'; then
+  rm -f "$PENDING" 2>/dev/null
+  exit 0
+fi
+
+# pending flag 존재 + 예외 아님 → 차단
+echo '{"decision":"block","reason":"GPT 응답을 읽은 뒤 후속 작업 없이 종료할 수 없습니다. 반박/재전송 또는 합의된 실행을 먼저 진행하세요."}'

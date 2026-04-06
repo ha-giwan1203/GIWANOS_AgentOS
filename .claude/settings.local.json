@@ -93,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/gpt_followup_guard.sh"
+            "command": "bash .claude/hooks/gpt_followup_post.sh"
           }
         ]
       }
@@ -122,7 +122,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/gpt_followup_guard.sh"
+            "command": "bash .claude/hooks/gpt_followup_stop.sh"
           }
         ]
       },

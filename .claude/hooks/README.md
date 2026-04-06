@@ -19,7 +19,7 @@
 |---|---|---|
 | `auto_compile.sh` | Write\|Edit | 파일 수정 후 자동 컴파일/변환 |
 | `write_marker.sh` | Write\|Edit | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
-| `gpt_followup_guard.sh` | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 읽기 후 pending flag 관리 |
+| `gpt_followup_post.sh` | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 
 ### 알림층 (Notification)
 
@@ -32,7 +32,7 @@
 | 훅 | matcher | 역할 |
 |---|---|---|
 | `stop_guard.sh` | (전체) | 금지 문구 포함 시 Stop 차단 |
-| `gpt_followup_guard.sh` | (전체) | GPT pending flag 존재 시 Stop 차단 |
+| `gpt_followup_stop.sh` | (전체) | GPT pending flag 존재 시 Stop 차단 |
 | `completion_gate.sh` | (전체) | TASKS/HANDOFF 미갱신 시 Stop 차단 |
 
 ## 보조 스크립트 (settings 미등록)
