@@ -104,6 +104,17 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | SKILL.md | 스킬 문서 갱신 |
+| 2026-04-06 11:45 | created  | production-result-upload.skill | 스킬 패키지 갱신 |
+| 2026-04-06 11:45 | created  | flow-chat-analysis.skill | 스킬 패키지 갱신 |
+| 2026-04-06 11:45 | created  | cdp-wrapper.skill | 스킬 패키지 갱신 |
+| 2026-04-06 11:45 | created  | pptx-generator.skill | 스킬 패키지 갱신 |
+| 2026-04-06 11:45 | created  | night-scan-compare.skill | 스킬 패키지 갱신 |
 | 2026-04-06 11:42 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-06 10:55 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
 | 2026-04-06 10:55 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
@@ -122,15 +133,4 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-06 10:55 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
 | 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | sp3-production-plan.skill | 스킬 패키지 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | skill-creator-merged.skill | 스킬 패키지 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | quality-defect-report.skill | 스킬 패키지 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
-| 2026-04-06 10:55 | modified | research.md | 스킬 문서 갱신 |
 | 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
