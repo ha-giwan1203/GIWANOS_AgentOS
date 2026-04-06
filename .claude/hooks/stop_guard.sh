@@ -5,7 +5,7 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 hook_log "Stop" "stop_guard 발화" 2>/dev/null
 
-HOOK_LOG="$HOME/Desktop/업무리스트/.claude/hooks/hook_log.txt"
+# HOOK_LOG는 hook_common.sh의 hook_log() 함수로 통일 (hook_log.jsonl)
 TRANSCRIPT="$CLAUDE_TRANSCRIPT_PATH"
 
 if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
@@ -55,7 +55,8 @@ FORBIDDEN_PATTERNS=(
 
 for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
   if echo "$LAST_TEXT" | grep -q "$pattern"; then
-    echo "[Hook] stop_guard BLOCK: $(date '+%Y-%m-%d %H:%M:%S') | forbidden_phrase | $pattern" >> "$HOOK_LOG"
+    hook_log "Stop/stop_guard" "BLOCK: forbidden_phrase | $pattern" 2>/dev/null
+    hook_incident "hook_block" "stop_guard" "" "금지 문구: $pattern" 2>/dev/null || true
     echo '{"decision":"block","reason":"[Stop Guard] 금지 문구 감지: '"$pattern"'. 사용자에게 중간 승인을 요청하지 마라. 합의 후 바로 실행하고 결과만 보고해라."}'
     exit 2
   fi
@@ -71,7 +72,8 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
   fi
 
   if [ "$HAS_DISCARD" -eq 0 ]; then
-    echo "[Hook] stop_guard BLOCK: $(date '+%Y-%m-%d %H:%M:%S') | missing_bucket | 보류+버림 0건" >> "$HOOK_LOG"
+    hook_log "Stop/stop_guard" "BLOCK: missing_bucket | 보류+버림 0건" 2>/dev/null
+    hook_incident "hook_block" "stop_guard" "" "토론모드 보류+버림 0건" 2>/dev/null || true
     echo '{"decision":"block","reason":"[Stop Guard] 토론모드에서 보류/버림이 0건. GPT 프레임을 그대로 수용한 것으로 판단. 주장 분해 → 라벨링 → 채택/보류/버림을 다시 수행하라."}'
     exit 2
   fi
