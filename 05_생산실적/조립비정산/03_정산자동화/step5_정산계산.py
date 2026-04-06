@@ -148,8 +148,14 @@ for lc in LINE_ORDER:
         g_day_qty = g_day_raw * usage
         g_ngt_qty = g_ngt_raw * usage if has_night else 0
 
-        # 구ERP 수량 (Usage 환산) — 다중단가 각 행별 개별 계산
-        e_day_raw = ep_d.get(pn, 0)
+        # 구ERP 수량 (Usage 환산)
+        # SD9A01: LOT B 주야 분리 (야간수당 계산 필요)
+        # 그 외 (SP3M3 포함): 총수량 = 주간수량 (야간=0)
+        e_total_raw = ep_t.get(pn, 0)
+        if lc == 'SD9A01':
+            e_day_raw = ep_d.get(pn, 0)
+        else:
+            e_day_raw = e_total_raw
         e_day_qty = e_day_raw * usage
 
         # 금액 계산 — GERP 원본금액 기준 (2026-04-05 변경)
@@ -174,12 +180,8 @@ for lc in LINE_ORDER:
         # 구ERP: 기준단가 × 수량 (기준단가 = 기준정보 파일 단가)
         e_day_amt = round(e_day_qty * price)
 
-        # 구ERP 야간: SP3M3는 GERP 야간 동일 적용 (구ERP에 야간 데이터 없음)
-        if lc == 'SP3M3' and has_night:
-            e_ngt_qty = g_ngt_qty
-            e_ngt_amt = g_ngt_amt
-            e_tot_qty = e_day_qty + e_ngt_qty
-        else:
+        # 구ERP 야간
+        if lc == 'SD9A01' and has_night:
             e_ngt_raw = ep_n.get(pn, 0) if has_night else 0
             e_ngt_qty = e_ngt_raw * usage if has_night else 0
             e_ngt_amt = calc_night_price_erp(lc, price, e_ngt_qty)

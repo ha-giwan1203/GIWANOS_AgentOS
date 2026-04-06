@@ -18,7 +18,7 @@ thin_border = Border(
     left=Side(style='thin'), right=Side(style='thin'),
     top=Side(style='thin'), bottom=Side(style='thin')
 )
-num_fmt = '#,##0'
+num_fmt = '#,##0;-#,##0;"-"'
 
 # 1. Load sources
 print("1. 기준정보 로딩...")
@@ -36,7 +36,7 @@ print("3. 구ERP 실적 로딩...")
 olderp_wb = openpyxl.load_workbook(
     os.path.join(BASE, '04월', '실적데이터', '구ERP 3월 실적.xlsx'),
     data_only=True)
-olderp_ws = olderp_wb['3월 전체입고량']
+olderp_ws = olderp_wb['3월 실적']
 
 # 2. New workbook
 wb = openpyxl.Workbook()
@@ -63,7 +63,8 @@ guide_lines = [
     '  구ERP 수량 = SUMIFS(입고수량, 품번=해당품번)',
     '',
     '제한사항:',
-    '  - 구ERP 전체입고량에는 주야 구분 없음 -> 구ERP 야간=0 고정',
+    '  - 구ERP 야간: LOT 끝자리 B = 야간, 그 외 = 주간',
+    '  - SP3M3 구ERP: 서브라인 LOT B 무의미 → 총수량-GERP야간=주간, 야간=GERP야간',
     '  - SP3M3 RSP 모듈품번 역변환은 수식으로 불가 -> Python 파이프라인 필요',
     '  - Usage=2 품번 수량 2배 환산은 미적용 (필요시 수동 확인)',
 ]
@@ -92,31 +93,48 @@ for r in range(1, gerp_ws.max_row + 1):
 
 print(f"   GERP 데이터: {gerp_row_count}행")
 
-# ===== 구ERP_입력 sheet =====
-print("5. 구ERP_입력 시트 생성...")
+# ===== 구ERP_입력 sheet (품번별 주야 집계) =====
+print("5. 구ERP_입력 시트 생성 (품번별 집계)...")
 ws_olderp = wb.create_sheet('구ERP_입력')
 
-olderp_headers = ['업체', '차종', '기종', '품번', '수량']
+# Python에서 0109 업체 품번별 주간/야간 수량 집계
+from collections import defaultdict
+olderp_day = defaultdict(int)   # LOT 끝자리 ≠ B
+olderp_night = defaultdict(int) # LOT 끝자리 = B
+
+olderp_raw_count = 0
+for r in range(3, olderp_ws.max_row + 1):
+    pn = olderp_ws.cell(r, 5).value
+    vendor = olderp_ws.cell(r, 3).value
+    if not pn or not vendor or not str(vendor).startswith('0109'):
+        continue
+    olderp_raw_count += 1
+    lot = str(olderp_ws.cell(r, 10).value or '')
+    qty = olderp_ws.cell(r, 11).value or 0
+    if lot.strip().endswith('B'):
+        olderp_night[pn] += qty
+    else:
+        olderp_day[pn] += qty
+
+# 품번 합집합
+all_pns = sorted(set(olderp_day) | set(olderp_night), key=str)
+
+olderp_headers = ['품번', '주간수량', '야간수량', '합계']
 for c, h in enumerate(olderp_headers, 1):
     cell = ws_olderp.cell(1, c, h)
     cell.font = header_font
     cell.fill = olderp_fill
     cell.border = thin_border
 
-olderp_row_count = 0
-for r in range(4, olderp_ws.max_row + 1):
-    pn = olderp_ws.cell(r, 4).value
-    if not pn:
-        continue
-    olderp_row_count += 1
-    out_r = olderp_row_count + 1
-    for c in range(1, 6):
-        v = olderp_ws.cell(r, c).value
-        cell = ws_olderp.cell(out_r, c, v)
-        if isinstance(v, (int, float)):
-            cell.number_format = num_fmt
+for i, pn in enumerate(all_pns):
+    out_r = i + 2
+    ws_olderp.cell(out_r, 1, pn)
+    ws_olderp.cell(out_r, 2, olderp_day.get(pn, 0)).number_format = num_fmt
+    ws_olderp.cell(out_r, 3, olderp_night.get(pn, 0)).number_format = num_fmt
+    ws_olderp.cell(out_r, 4).value = f'=B{out_r}+C{out_r}'
+    ws_olderp.cell(out_r, 4).number_format = num_fmt
 
-print(f"   구ERP 데이터: {olderp_row_count}행")
+print(f"   구ERP 원본: {olderp_raw_count}행 → 집계: {len(all_pns)}품번")
 
 # ===== 10 Line sheets =====
 LINES = ['SD9A01', 'ANAAS04', 'DRAAS11', 'SP3M3', 'HASMS02', 'HCAMS02',
@@ -217,15 +235,29 @@ for line in LINES:
         ws.cell(out_r, 12).number_format = num_fmt
         ws.cell(out_r, 12).border = thin_border
 
-        # M: 구ERP 주간수량
-        ws.cell(out_r, 13).value = (
-            f'=IFERROR(SUMIFS('
-            f"구ERP_입력!$E:$E,구ERP_입력!$D:$D,A{out_r}),0)")
+        # M: 구ERP 주간수량 — 집계 테이블에서 SUMIFS
+        # SP3M3: 구ERP 총수량(합계) - GERP 야간수량 (서브라인 LOT B 무의미)
+        if line == 'SP3M3':
+            ws.cell(out_r, 13).value = (
+                f'=IFERROR(SUMIFS('
+                f"구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)"
+                f'-J{out_r}')
+        else:
+            ws.cell(out_r, 13).value = (
+                f'=IFERROR(SUMIFS('
+                f"구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)")
         ws.cell(out_r, 13).number_format = num_fmt
         ws.cell(out_r, 13).border = thin_border
 
-        # N: 구ERP 야간수량 (전체입고량에 주야 없음)
-        ws.cell(out_r, 14, 0).number_format = num_fmt
+        # N: 구ERP 야간수량 — 집계 테이블에서 SUMIFS
+        # SP3M3: GERP 야간 동일 적용 (서브라인 야간 구분 불가)
+        if line == 'SP3M3':
+            ws.cell(out_r, 14).value = f'=J{out_r}'
+        else:
+            ws.cell(out_r, 14).value = (
+                f'=IFERROR(SUMIFS('
+                f"구ERP_입력!$C:$C,구ERP_입력!$A:$A,A{out_r}),0)")
+        ws.cell(out_r, 14).number_format = num_fmt
         ws.cell(out_r, 14).border = thin_border
 
         # O: 구ERP 주간금액
@@ -262,6 +294,19 @@ for line in LINES:
         ws.cell(sum_r, c).font = Font(bold=True)
         ws.cell(sum_r, c).fill = summary_fill
         ws.cell(sum_r, c).border = thin_border
+
+    # SP3M3: 야간은 RSP 모듈품번이라 행별 매칭 불가 → 합계행에서 직접 SUMIFS
+    if line == 'SP3M3':
+        # J: 야간수량 합계 = GERP_입력에서 SP3M3 + 추가 행 전체
+        ws.cell(sum_r, 10).value = (
+            '=SUMIFS(GERP_입력!$I:$I,'
+            'GERP_입력!$C:$C,"SP3M3",'
+            'GERP_입력!$N:$N,"추가")')
+        # L: 야간금액 합계 = GERP_입력 조립금액에서 SP3M3 + 추가
+        ws.cell(sum_r, 12).value = (
+            '=SUMIFS(GERP_입력!$Q:$Q,'
+            'GERP_입력!$C:$C,"SP3M3",'
+            'GERP_입력!$N:$N,"추가")')
 
     line_summaries[line] = sum_r
 
