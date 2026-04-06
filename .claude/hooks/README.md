@@ -3,7 +3,7 @@
 > 2026-04-06 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (8개 스크립트, settings.local.json 등록)
+## 활성 Hook (10개 스크립트, settings.local.json 등록)
 
 ### 차단층 (PreToolUse)
 
@@ -46,5 +46,5 @@
 
 | 파일 | 역할 |
 |---|---|
-| `hook_log.txt` | hook 실행 이력 (500KB 로테이션) |
+| `hook_log.jsonl` | hook 실행 이력 JSONL (500KB 로테이션) |
 | `_archive/` | 비활성화된 hook 20개 보관 |

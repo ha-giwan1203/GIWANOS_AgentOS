@@ -4,12 +4,11 @@
 # ask: TASKS.md/HANDOFF.md/STATUS.md → 사용자 확인 요청
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-ti = d.get('tool_input', {})
-print(ti.get('file_path', ti.get('file', '')))
-" 2>/dev/null)
+# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
+FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+if [ -z "$FILE_PATH" ]; then
+  FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
 
 # Layer 1: 즉시 차단 (deny)
 if echo "$FILE_PATH" | grep -qiE '\.(xlsx|xls|xlsm|csv|docx|pdf)$'; then

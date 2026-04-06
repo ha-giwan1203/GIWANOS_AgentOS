@@ -4,47 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 에이전트 운영 체계 개선 9건 완료 (38c935a1, GPT 전항목 PASS)
+최종 업데이트: 2026-04-07 — 문서-구현 정합성 3건 수정 (GPT 부분정합→정합)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-GPT 토론방 "에이전트 운영 방식" 검토 → 하네스 판정 → 3건 개선안 구현
+GPT "클로드 코드 문제 분석" 방 지적 6건 → Claude 실물 검증 → 합의 → 즉시 수정 3건 구현
 
 ---
 
 ## 2. 실제 변경 사항
 
-### Step 1: 문서 충돌 제거 (커밋 b0d1432e, GPT PASS)
+### 문서-구현 정합성 복구 (GPT 토론 합의, smoke_test 32/32 PASS)
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
-| 90_공통기준/업무관리/CLAUDE.md | 42줄→5줄 (라인배치 stale 상태 제거) | 도메인별 분리 원칙 확립 |
-| 05_생산실적/조립비정산/CLAUDE.md | 타입테이블 2중 → 1개 통일 (GERP누락) | 규격 정합 |
-| step7_보고서.py | G실적누락→GERP누락 (2곳) | step5/step8과 용어 통일 |
-
-### Step 2: 구조 경량화 (로컬 전용, GPT 임시검토 정합)
-| 대상 | 핵심 변경 | 결과 |
-|------|----------|------|
-| completion_gate.sh | v2→v3 (pre_finish_guard 흡수) | Stop 5→4개 |
-| settings.local.json | permissions 78→40개 축소 | 중복 패턴 제거 |
-| hook_common.sh | 500KB 로그 로테이션 추가 | 무한 누적 방지 |
-| protect_files.sh | echo→hook_log() 전환 | 로테이션 우회 해소 |
-
-### Step 3: 안정 운영 개선 (GPT 토론 합의)
-| 대상 | 핵심 변경 | 결과 |
-|------|----------|------|
-| completion_gate.sh | v4→v5 python3→순수bash 전환 | #34457 Windows hooks 멈춤 대응 |
-| CLAUDE.md | 운영 안정성 섹션 추가 (2줄) | settings 변경 후 재시작 + 장시간 세션 방지 |
-
-### Step 4: 자체진단 정리 (커밋 c5016378, -1603줄)
-| 대상 | 핵심 변경 | 결과 |
-|------|----------|------|
-| hooks 20개 + rules 2개 | 삭제 파일 git 반영 | unstaged deletion 해소 |
-| .claudeignore | 신규 생성 | _archive 규칙 세션 로딩 차단 |
-| .gitignore | .watch.lock + dedup 추가 | git dirty 상태 해소 |
-| 메모리 | 톤 3→1 통합, 리서치 107→20줄 | 28항목으로 정리 |
+| block_dangerous.sh | DANGER_CMDS에 `cp` 추가 + python3→bash 전환 | HANDOFF 기재 내용과 실물 일치 |
+| gpt_followup_post.sh | python3→bash 전환 (주석 "순수 bash" 실현) | #34457 멈춤 위험 감소 |
+| gpt_followup_stop.sh | python3→bash 전환 (주석 "순수 bash" 실현) | #34457 멈춤 위험 감소 |
+| protect_files.sh | python3→bash 전환 | 추가 경량화 |
+| README.md | hook 개수 8→10개 정정 + hook_log.txt→jsonl 정정 | 문서 정합 |
+| STATUS.md | hook 개수 9→10개, completion_gate v4→v5 정정 | 문서 정합 |
 
 ---
 
@@ -53,8 +34,8 @@ GPT 토론방 "에이전트 운영 방식" 검토 → 하네스 판정 → 3건 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
 | ~~완료~~ | 에이전트 운영 체계 개선 3건 | hook_log JSON 전환 + incident_ledger + candidate 브랜치 규칙 |
-| **1순위** | protect_files Bash 삭제 차단 + allow 축소 | rm/mv/cp/sed -i + 보호경로 조합 차단, powershell:*/bash*:* 축소 |
-| 2순위 | Hook README/settings 동기화 | 현재 8개 기준으로 README 갱신, 미연결 11개 폐기 명시 |
+| ~~완료~~ | 문서-구현 정합성 복구 3건 | cp추가 + python3→bash + hook개수 동기화 |
+| **1순위** | 잔여 python3→bash 전환 | send_gate, stop_guard, write_marker, notify_slack (auto_compile은 py_compile 필요로 유지) |
 | ~~3순위~~ | gpt_followup_guard 물리 분리 완료 | gpt_followup_post.sh + gpt_followup_stop.sh, 기존 아카이브 |
 | 4순위 | 토론모드 코어/참조 분리 | 253줄→50줄 코어 + REFERENCE.md |
 | 5순위 | completion_gate 역할 문서화 | CLAUDE.md에 "사람/GPT 판정, 자동 게이트 아님" 명시 |

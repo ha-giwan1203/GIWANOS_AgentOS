@@ -1,12 +1,13 @@
 #!/bin/bash
 # PostToolUse 전용 — GPT 읽기/전송/후속작업 감지 → pending flag 관리
 # gpt_followup_guard.sh에서 분리 (v2, 2026-04-06 GPT 합의)
-# python3 없이 순수 bash로 경량화
+# v3: python3→bash 전환 (#34457 Windows hooks 멈춤 대응)
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 
 INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
-TOOL_INPUT=$(echo "$INPUT" | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin).get('tool_input',{})))" 2>/dev/null)
+# bash-only JSON 파싱 (python3 의존 제거)
+TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+TOOL_INPUT=$(echo "$INPUT" | sed -n 's/.*"tool_input"[[:space:]]*:[[:space:]]*\({.*}\).*/\1/p' | head -1)
 
 STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
 mkdir -p "$STATE_DIR" 2>/dev/null
