@@ -182,11 +182,21 @@ for lc in LINE_ORDER:
 
         # 구ERP 야간
         if lc == 'SD9A01' and has_night:
-            e_ngt_raw = ep_n.get(pn, 0) if has_night else 0
-            e_ngt_qty = e_ngt_raw * usage if has_night else 0
+            # SD9A01: LOT B 기반 주야 분리
+            e_ngt_raw = ep_n.get(pn, 0)
+            e_ngt_qty = e_ngt_raw * usage
             e_ngt_amt = calc_night_price_erp(lc, price, e_ngt_qty)
-            e_tot_raw = ep_t.get(pn, 0) if has_night else e_day_raw
+            e_tot_raw = ep_t.get(pn, 0)
             e_tot_qty = e_tot_raw * usage
+        elif lc == 'SP3M3' and has_night:
+            # SP3M3: 구ERP 야간 = GERP 야간 동일 적용 (구ERP 서브라인 야간 구분 불가)
+            e_ngt_qty = g_ngt_qty
+            e_ngt_amt = g_ngt_amt
+            e_tot_qty = e_day_qty + e_ngt_qty
+        else:
+            e_ngt_qty = 0
+            e_ngt_amt = 0
+            e_tot_qty = e_day_qty
 
         # 야간 총 정산금액 (GERP 기준): 주간+야간 합산
         gerp_total_amt = g_day_amt + g_ngt_amt
@@ -215,6 +225,7 @@ for lc in LINE_ORDER:
             'usage':            usage,
             'price_type':       r['price_type'],
             'vtype':            r['vtype'],
+            'is_first_gerp':    is_first_gerp,
             'gerp_day_qty':     g_pure_day,
             'gerp_day_amt':     g_day_amt,
             'gerp_ngt_qty':     g_ngt_qty,
@@ -295,13 +306,27 @@ for lc in LINE_ORDER:
         um_price = round(um_day_amt / um_day_qty) if um_day_qty else 0
         um_total = um_day_amt + um_ngt_amt
 
+        # 구ERP 수량 조회 (미매핑이라도 구ERP에 데이터 있으면 가져옴)
+        um_e_total_raw = ep_t.get(pn, 0)
+        if lc == 'SD9A01':
+            um_e_day_raw = ep_d.get(pn, 0)
+            um_e_ngt_raw = ep_n.get(pn, 0) if has_night else 0
+        else:
+            um_e_day_raw = um_e_total_raw
+            um_e_ngt_raw = 0
+        um_e_day_qty = um_e_day_raw  # usage=1
+        um_e_ngt_qty = um_e_ngt_raw
+        um_e_day_amt = round(um_e_day_qty * um_price)
+        um_e_ngt_amt = calc_night_price_erp(lc, um_price, um_e_ngt_qty)
+
         row = {
             'part_no':          pn,
             'assy_part':        gerp_assy_lookup.get(f"{lc}|{pn}|{um_price}", ''),
             'price':            um_price,
             'usage':            1,
-            'price_type':       '정단가',
+            'price_type':       '기준누락',
             'vtype':            '',
+            'is_first_gerp':    True,
             'gerp_day_qty':     um_day_qty,
             'gerp_day_amt':     um_day_amt,
             'gerp_ngt_qty':     um_ngt_qty,
@@ -309,11 +334,11 @@ for lc in LINE_ORDER:
             'gerp_total_amt':   um_total,
             'gerp_orig_day_amt': um_day_amt,
             'gerp_orig_ngt_amt': um_ngt_amt,
-            'erp_day_qty':      0,
-            'erp_day_amt':      0,
-            'erp_ngt_qty':      0,
-            'erp_ngt_amt':      0,
-            'erp_tot_qty':      0,
+            'erp_day_qty':      um_e_day_qty,
+            'erp_day_amt':      um_e_day_amt,
+            'erp_ngt_qty':      um_e_ngt_qty,
+            'erp_ngt_amt':      um_e_ngt_amt,
+            'erp_tot_qty':      um_e_total_raw,
             'price_judgment':   None,
         }
         detail.append(row)
@@ -321,7 +346,11 @@ for lc in LINE_ORDER:
         total_gerp_day_amt += um_day_amt
         total_gerp_ngt_qty += um_ngt_qty
         total_gerp_ngt_amt += um_ngt_amt
-        print(f"    미매핑 {pn}: 주간={um_day_qty}개/{um_day_amt:,}원 야간={um_ngt_qty}개/{um_ngt_amt:,}원")
+        total_erp_day_qty  += um_e_day_qty
+        total_erp_day_amt  += um_e_day_amt
+        total_erp_ngt_qty  += um_e_ngt_qty
+        total_erp_ngt_amt  += um_e_ngt_amt
+        print(f"    미매핑 {pn}: GERP={um_day_qty}개/{um_day_amt:,}원 구ERP={um_e_day_qty}개/{um_e_day_amt:,}원")
 
     gerp_total = total_gerp_day_amt + total_gerp_ngt_amt
     erp_total  = total_erp_day_amt  + total_erp_ngt_amt
@@ -364,6 +393,9 @@ error_list = []
 for lc in LINE_ORDER:
     ld = lines_result.get(lc, {})
     for r in ld.get('items', []):
+        # 다중단가 2번째+ 행: GERP금액이 의도적 0 (중복방지) → 비교 대상 아님
+        if not r.get('is_first_gerp', True):
+            continue
         g_amt = r['gerp_total_amt']
         e_amt = r['erp_day_amt'] + r['erp_ngt_amt']
         if g_amt == e_amt:
@@ -371,7 +403,9 @@ for lc in LINE_ORDER:
         g_qty = r['gerp_day_qty'] + r['gerp_ngt_qty']
         e_qty = r['erp_day_qty'] + r['erp_ngt_qty']
         # 유형 판정
-        if e_amt == 0 and g_amt > 0:
+        if r.get('price_type') == '기준누락':
+            etype = '기준누락'
+        elif e_amt == 0 and g_amt > 0:
             etype = '구실적누락'
         elif g_amt == 0 and e_amt > 0:
             etype = 'GERP누락'
@@ -410,7 +444,7 @@ type_amt = {}
 for e in error_list:
     type_amt[e['type']] = type_amt.get(e['type'], 0) + e['diff_amt']
 print(f"\n오류 리스트: {len(error_list)}건")
-for t in ['구실적누락', 'GERP누락', '수량차이', '정산차이', '기준누락']:
+for t in ['기준누락', '구실적누락', 'GERP누락', '수량차이', '단가+수량', '단가차이', '정산차이']:
     if t in type_cnt:
         print(f"  {t}: {type_cnt[t]}건, {type_amt[t]:+,}원")
 
