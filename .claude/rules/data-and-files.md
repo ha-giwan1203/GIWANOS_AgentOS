@@ -17,6 +17,7 @@ description: 데이터 처리, 파일 정리, 삭제 금지 대상 규칙
 - Full Lane 해당 작업(시트/컬럼/경로/참조체계/스크립트 로직 변경)은 `candidate/{YYYYMMDD}-{주제}` 브랜치에서 작업
 - candidate → main 머지는 GPT 리뷰 또는 사용자 확인 후 수행
 - Fast Lane(국소 수정, 구조 불변)은 기존대로 main 직행
+- 자동 강제 없음 — 사용자가 Full Lane 선언 시 Claude가 candidate 브랜치 생성 → 작업 → PR 생성까지 수행
 
 ## 삭제 금지 대상
 `CLAUDE.md` / `README.md` / `STATUS.md` / `RUNBOOK.md` / `AGENTS_GUIDE.md` /
