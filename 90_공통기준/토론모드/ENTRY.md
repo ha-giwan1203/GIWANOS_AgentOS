@@ -9,7 +9,7 @@
 2. ref 클릭 전송 금지 — `[data-testid="send-button"]` JS 클릭 only
 3. find()/form_input 입력 금지
 4. 프로젝트방 외 새 대화 개설 금지
-5. 입력 전 미확인 응답 점검 생략 금지
+5. SEND GATE: 전송 직전 assistant 최신 텍스트 재읽기 → 변경 시 재계산 필수 — 생략 금지
 
 ## NEVER (분석)
 
@@ -20,10 +20,13 @@
 
 1. 기존 탭 확인 → 있으면 switch
 2. main 영역 JS로 대화 URL 추출 → navigate
-3. `#prompt-textarea` + `execCommand('insertText')`
-4. `[data-testid="send-button"]` JS 클릭
-5. stop-button polling 적응형 (5/10/15초)
-6. 입력 전 미확인 응답 점검
+3. **[SEND GATE] 전송 직전 미확인 응답 점검** (NEVER 5 강제)
+   - 마지막 assistant 블록 텍스트 100자 읽기
+   - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
+   - 같으면 → 예정대로 전송 진행
+4. `#prompt-textarea` + `execCommand('insertText')`
+5. `[data-testid="send-button"]` JS 클릭
+6. stop-button polling 적응형 (5/10/15초)
 
 ## 상세 참조
 

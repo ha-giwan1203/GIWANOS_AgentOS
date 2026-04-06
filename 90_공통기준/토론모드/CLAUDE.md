@@ -153,18 +153,24 @@ msgs[msgs.length - 1].innerText;
 2. 텍스트가 너무 길거나 잘리면 get_page_text로 전체 페이지 텍스트 추출 후 파싱
 3. 파싱 실패 시 read_page로 DOM 구조에서 마지막 메시지 요소 탐색
 
-### [NEVER] 입력 전 미확인 응답 점검
+### [NEVER] SEND GATE — 전송 직전 미확인 응답 점검
 
-> 메시지 전송 전 반드시 실행. [NEVER] 확인 없이 바로 입력하는 것은 금지.
+> **이 게이트를 통과하지 않으면 전송 금지.** 메시지 입력(execCommand) 전에 반드시 실행.
+> 2026-04-06 GPT 합의: 체크리스트만으로 부족, send 직전 하드 게이트로 승격.
 
 ```javascript
-const msgs = document.querySelectorAll('article[data-message-author-role="assistant"]');
+// SEND GATE: 반드시 전송 직전에 실행
+const msgs = document.querySelectorAll('[data-message-author-role="assistant"]');
 const lastText = msgs[msgs.length - 1]?.innerText?.slice(0, 100) || '';
+const stopBtn = document.querySelector('[data-testid="stop-button"]');
+JSON.stringify({lastSnippet: lastText, isGenerating: !!stopBtn});
 ```
 
-1. 마지막 assistant 블록 텍스트를 먼저 읽는다
-2. 이전에 읽은 내용과 다르면 → 새 응답이 있는 것 → 먼저 읽고 반영
-3. 같으면 → 변동 없음 → 예정대로 전송 진행
+1. 마지막 assistant 블록 텍스트 100자를 읽는다
+2. GPT가 아직 생성 중(stop-button 존재)이면 → 대기
+3. 이전에 읽은 내용과 다르면 → **새 응답 전체 읽기 → 하네스 재계산 → 반박문 재작성** 후 전송
+4. 같으면 → 변동 없음 → 예정대로 전송 진행
+5. [NEVER] 이 절차를 건너뛰고 바로 execCommand 호출하는 것은 금지
 
 ### [NEVER] GPT 응답 비판적 분석 — 하네스 방식
 
