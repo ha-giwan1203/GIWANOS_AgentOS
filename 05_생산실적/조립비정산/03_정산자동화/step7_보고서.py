@@ -512,7 +512,7 @@ for lc in LINE_ORDER:
         is_multi_price = (item['part_no'] in multi_price_pns)
 
         if gerp_missing:
-            dtype = 'G실적누락'
+            dtype = 'GERP누락'
         elif ref_missing:
             dtype = '기준누락'
         elif erp_missing:
@@ -734,7 +734,7 @@ for lc in LINE_ORDER:
         is_multi       = (item['part_no'] in multi_price_pns_d)
 
         if gerp_missing:
-            dtype = 'G실적누락'
+            dtype = 'GERP누락'
         elif ref_missing:
             dtype = '기준누락'
         elif erp_missing:
