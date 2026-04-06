@@ -104,6 +104,21 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-06 15:14 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step7_시각화입력생성.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step7_대시보드.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step7_slack_보고.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | setup_month.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step2_GERP처리.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | README.md | README.md 수정 |
+| 2026-04-06 15:14 | modified | step4_기준정보매칭.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | step1_파일검증.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:14 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 15:13 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-06 15:09 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-06 15:04 | modified | build_formula_version.py | 정산 파이프라인 스크립트 수정 |
@@ -119,18 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-06 13:01 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 13:01 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 12:42 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-06 12:13 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 12:13 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 12:13 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 12:13 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 12:13 | modified | build_master.py | BI 자동화 스크립트 수정 |
-| 2026-04-06 12:13 | modified | _apply_all_v3.py | 초물관리 스크립트 수정 |
-| 2026-04-06 12:13 | modified | _patch_v4.py | 초물관리 스크립트 수정 |
-| 2026-04-06 12:13 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-06 12:13 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-06 12:13 | modified | README.md | README.md 수정 |
-| 2026-04-06 12:13 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 12:13 | modified | RUNBOOK.md | 스킬 문서 갱신 |
-| 2026-04-06 12:13 | modified | supanova-deploy.skill | 스킬 패키지 갱신 |
-| 2026-04-06 12:13 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 12:13 | modified | deploy_checklist.md | 스킬 문서 갱신 |
