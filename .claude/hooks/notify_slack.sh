@@ -2,7 +2,9 @@
 # Notification hook — Slack 알림 연동 (스팸 방지 포함)
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
-MSG=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('message','알림'))" 2>/dev/null || echo "알림")
+# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
+MSG=$(echo "$INPUT" | sed -n 's/.*"message"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+MSG="${MSG:-알림}"
 
 # 스팸 방지: 동일 메시지 60초 내 중복 전송 차단
 DEDUP_FILE="$HOME/Desktop/업무리스트/.claude/hooks/.notify_dedup"

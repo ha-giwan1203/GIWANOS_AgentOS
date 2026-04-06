@@ -21,22 +21,9 @@ if [ -z "$LAST_ASSISTANT" ]; then
   exit 0
 fi
 
-# content 배열에서 text type 블록의 text 필드만 추출
-LAST_TEXT=$(echo "$LAST_ASSISTANT" | python3 -c "
-import sys, json
-try:
-    obj = json.loads(sys.stdin.readline())
-    msg = obj.get('message', {})
-    content = msg.get('content', []) if isinstance(msg, dict) else []
-    texts = []
-    if isinstance(content, list):
-        for block in content:
-            if isinstance(block, dict) and block.get('type') == 'text':
-                texts.append(block.get('text', ''))
-    print('\\n'.join(texts))
-except:
-    pass
-" 2>/dev/null)
+# bash-only: content 배열에서 "text" 필드 추출 (python3 의존 제거, #34457 대응)
+# 금지 문구 검사 대상은 한국어 문장이므로 JSON 키와 충돌하지 않음 — raw line grep 안전
+LAST_TEXT=$(echo "$LAST_ASSISTANT" | sed 's/\\n/\n/g' | sed -n 's/.*"text"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '\n' ' ')
 
 if [ -z "$LAST_TEXT" ]; then
   exit 0

@@ -19,13 +19,16 @@
 - 1~5순위 구현 완료, GPT 전항목 PASS (78c46b72, b0888223)
 - 6순위 bypassPermissions 전환: 1주 로깅 후 결정 (보류)
 
-### ~~[진행] 문서-구현 정합성 복구 3건~~ → 완료됨 (2026-04-07)
+### ~~[진행] 문서-구현 정합성 복구 + python3 전면 제거~~ → 완료됨 (2026-04-07)
 - GPT "클로드 코드 문제 분석" 방 지적 → Claude 실물 검증 → 합의
-- ① block_dangerous.sh DANGER_CMDS에 cp 추가 + python3→bash 전환
-- ② gpt_followup_post/stop.sh python3→bash 전환 (주석-코드 불일치 해소)
+- ① block_dangerous.sh DANGER_CMDS cp 추가 + python3→bash
+- ② gpt_followup_post/stop.sh python3→bash (주석-코드 불일치 해소)
 - ③ README.md(8→10개) + STATUS.md(9→10개) hook 개수 동기화
-- 추가: protect_files.sh python3→bash 전환
-- smoke_test 32/32 ALL PASS
+- ④ send_gate/stop_guard/write_marker/notify_slack python3→bash 전환
+- ⑤ protect_files.sh python3→bash 전환
+- ⑥ final_check.sh 자체검증 4건 추가 (python3잔존/hook개수/HANDOFF교차/cp확인)
+- 결과: 운영 훅 python3 의존 0건 (auto_compile py_compile만 유지)
+- smoke_test 32/32 + final_check ALL PASS
 
 ### ~~[진행] GPT Project Instructions Git 관리 방향 토론~~ → 완료됨
 ### ~~[진행] 8단계 자동 루틴 강제 — /finish + completion_gate 연동~~ → 완료됨

@@ -1,18 +1,14 @@
 #!/bin/bash
 # PostToolUse(Edit|Write) — 파일 변경 추적 마커
 # completion_gate가 이 마커로 TASKS/HANDOFF 갱신 필요 여부 판단
-# v4: python3 JSON 파싱으로 안정화 (grep -oP PCRE 불안정 해소)
+# v5: python3→bash 전환 (#34457 Windows hooks 멈춤 대응)
 INPUT=$(cat)
 
-# tool_input에서 file_path 추출 (python3 — 안정적 JSON 파싱)
-FILE_PATH=$(echo "$INPUT" | python3 -c "
-import sys, json
-try:
-    d = json.load(sys.stdin)
-    ti = d.get('tool_input', {})
-    print(ti.get('file_path', ti.get('file', '')))
-except: print('')
-" 2>/dev/null)
+# bash-only JSON 파싱 (python3 의존 제거)
+FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+if [ -z "$FILE_PATH" ]; then
+  FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
 
 STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
 MARKER="$STATE_DIR/write_marker.flag"

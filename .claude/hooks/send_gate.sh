@@ -6,15 +6,8 @@
 
 INPUT=$(cat)
 
-# tool_name 추출
-TOOL_NAME=$(echo "$INPUT" | python3 -c "
-import sys, json
-try:
-    data = json.loads(sys.stdin.read())
-    print(data.get('tool_name', ''))
-except:
-    print('')
-" 2>/dev/null)
+# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
+TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 
 # javascript_tool이 아니면 통과
 if [[ "$TOOL_NAME" != *"javascript_tool"* ]]; then
@@ -22,18 +15,10 @@ if [[ "$TOOL_NAME" != *"javascript_tool"* ]]; then
 fi
 
 # text 파라미터에 execCommand + insertText 패턴 확인
-HAS_INSERT=$(echo "$INPUT" | python3 -c "
-import sys, json
-try:
-    data = json.loads(sys.stdin.read())
-    text = json.loads(data.get('tool_input', '{}')).get('text', '')
-    if 'execCommand' in text and 'insertText' in text:
-        print('YES')
-    else:
-        print('NO')
-except:
-    print('NO')
-" 2>/dev/null)
+HAS_INSERT="NO"
+if echo "$INPUT" | grep -q 'execCommand' && echo "$INPUT" | grep -q 'insertText'; then
+  HAS_INSERT="YES"
+fi
 
 # insertText가 아니면 통과 (일반 JS 실행은 차단하지 않음)
 if [[ "$HAS_INSERT" != "YES" ]]; then
@@ -63,16 +48,10 @@ if [ ! -f "$GATE_FILE" ]; then
   exit 0
 fi
 
-# 120초 이내 갱신 확인
-GATE_AGE=$(python3 -c "
-import os, time
-try:
-    mtime = os.path.getmtime('$GATE_FILE')
-    age = time.time() - mtime
-    print(int(age))
-except:
-    print(9999)
-" 2>/dev/null)
+# 120초 이내 갱신 확인 (bash-only, python3 의존 제거)
+GATE_MTIME=$(stat --format=%Y "$GATE_FILE" 2>/dev/null || stat -f %m "$GATE_FILE" 2>/dev/null || echo 0)
+NOW_EPOCH=$(date +%s 2>/dev/null || echo 9999)
+GATE_AGE=$((NOW_EPOCH - GATE_MTIME))
 
 if [[ "$GATE_AGE" -gt 120 ]]; then
   echo '{"decision":"block","reason":"SEND GATE 만료('"$GATE_AGE"'초 경과): 전송 전 미확인 응답 점검을 다시 실행하세요. 120초 이내 점검만 유효합니다."}'
