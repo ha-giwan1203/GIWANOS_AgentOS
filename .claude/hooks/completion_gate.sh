@@ -32,6 +32,7 @@ for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF"; do
 done
 
 if [ -n "$MISSING" ]; then
+  hook_incident "gate_reject" "completion_gate" "$MISSING" "파일 변경 후 ${MISSING} 미갱신" 2>/dev/null || true
   echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] 파일 변경 후 ${MISSING} 미갱신 — 갱신 후 종료하세요.\"}"
 else
   rm -f "$MARKER" 2>/dev/null
