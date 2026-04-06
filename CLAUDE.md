@@ -34,6 +34,8 @@
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
 - 장시간 세션 방치 금지 — 도메인/의제 전환 시 세션 재시작 권장
+- 공통 모듈(hook_common 등) 수정 시 `grep -r` 호출부 전수 확인 선행
+- 파일 변경 후 TASKS/HANDOFF 갱신을 커밋 직전에 함께 수행 (completion_gate 반복 방지)
 
 ## 금지
 - 원본 xlsx/docx/pdf 직접 수정

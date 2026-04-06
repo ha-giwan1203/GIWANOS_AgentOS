@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 에이전트 운영 체계 개선 3건 + smoke_test v2 (GPT PASS)
+최종 업데이트: 2026-04-07 — 에이전트 운영 체계 개선 + 개선안건 3건 GPT 합의 구현
 
 ---
 
@@ -43,10 +43,13 @@
 - GPT 3라운드 공동작업 완료, 커밋 fb81d7a5
 
 ### ~~[진행] 에이전트 운영 체계 개선~~ → 완료됨 (2026-04-07)
-- GPT 토론 합의 → Claude 하네스 판정 → 3건 구현 완료
+- GPT 토론 합의 → Claude 하네스 판정 → 구현 + 자체검증 + 개선안건 마무리
 - ① hook_common.sh JSON 로그 전환 (hook_log.jsonl)
-- ② incident_ledger.jsonl 도입 (auto_compile, completion_gate 연동)
+- ② incident_ledger.jsonl 도입 (auto_compile, completion_gate, stop_guard 연동)
 - ③ candidate 브랜치 규칙 문서화 (data-and-files.md)
+- ④ smoke_test 퇴행 방지 검사 추가 (hook_log.txt 직접 참조 0건)
+- ⑤ 토론모드 공유 규칙 강화 (SHA + git show --stat)
+- ⑥ CLAUDE.md 운영 규칙 2건 추가 (grep 전수확인, 상태문서 동시갱신)
 
 ### [대기] 4월 실적 정산 — **대기: 4월 GERP/구ERP 데이터**
 - 4월 정산 데이터 입수 후 `/settlement 04` 실행

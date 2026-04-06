@@ -167,8 +167,17 @@ sed -i '$ d' "$LEDGER" 2>/dev/null
 
 echo ""
 
-# === 13. 구 훅 부재 확인 (아카이브 완료) ===
-echo "--- 13. 구 훅 부재 확인 ---"
+# === 13. 퇴행 방지: 구 로그 직접 참조 0건 ===
+echo "--- 13. 퇴행 방지 (hook_log.txt 직접 참조) ---"
+# smoke_test.sh 자신(INFO 표시용)은 제외
+STALE_REFS=$(grep -l 'hook_log\.txt' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | wc -l)
+test "$STALE_REFS" -eq 0
+check $? "운영 훅에서 hook_log.txt 직접 참조 0건 (JSONL 통일)"
+
+echo ""
+
+# === 14. 구 훅 부재 확인 (아카이브 완료) ===
+echo "--- 14. 구 훅 부재 확인 ---"
 ! test -f "$HOOKS_DIR/pre_finish_guard.sh"
 check $? "pre_finish_guard.sh 미존재 (completion_gate에 흡수됨)"
 
