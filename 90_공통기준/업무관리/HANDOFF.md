@@ -39,6 +39,7 @@ Claude Code 환경 복잡도 개선 — hooks 28개·규칙 1,356줄·permission
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
 | 관찰 | completion_gate v3 과차단 가능성 | 중간 진행보고 시 Gate2가 막을 수 있음 (GPT 지적) |
+| 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 (GPT 합의) |
 | 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 `/settlement 04` |
 | 대기 | SP3M3 미매칭 RSP 4건 | RSP3SC0291~0294 모듈품번 갱신 |
 
@@ -48,3 +49,5 @@ Claude Code 환경 복잡도 개선 — hooks 28개·규칙 1,356줄·permission
 - .claude/ 파일은 .gitignore 대상이라 GPT가 실물 확인 불가 → 로컬 실물 텍스트 직접 공유로 해결
 - gpt_followup_guard Stop 제거 시 pending flag 차단 기능 소실 (GPT가 식별, 복원 완료)
 - protect_files.sh가 hook_log() 대신 직접 echo 사용 시 로테이션 우회 (GPT가 식별, 수정 완료)
+- 미사용 hook 3개(pre_finish_guard, skill_config_change, instructions_loaded) → _archive 이동 (GPT 채택)
+- GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 — .gitignore 대상이므로 Git PASS 불가는 정상

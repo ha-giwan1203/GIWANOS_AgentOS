@@ -64,7 +64,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
-| Claude Code 환경 경량화 GPT 토론 — Step1 문서충돌 3건(업무관리CLAUDE.md 5줄화, 정산 타입테이블 통일, G실적누락→GERP누락) b0d1432e GPT PASS + Step2 구조경량화 4건(completion_gate v3 통합, permissions 78→40, Stop 5→4, 로그로테이션) GPT 임시검토 정합 | 2026-04-06 |
+| Claude Code 환경 경량화 GPT 토론 — Step1 문서충돌 3건 GPT PASS (b0d1432e) + Step2 구조경량화 (permissions 78→39, Stop 5→4, completion_gate v3, 로그로테이션) GPT 임시검토 정합 + 잔여 정리 3건(미사용 hook 아카이브) 완료 | 2026-04-06 |
 | CLAUDE.md+rules/ 경량화 — 143→71줄(CLAUDE.md), rules/ 145→64줄, 전체 135줄. GPT PASS (de416123+8a4fbd11) | 2026-04-06 |
 | step5 매핑 버그 4건 수정 — 에러 388→190건, 차이 +25.6M→+7.2M. GPT 공동작업 완료 (fb81d7a5) | 2026-04-06 |
 | SEND GATE 구현 — send_gate.sh PreToolUse hook + 토론모드 ENTRY/CLAUDE.md 반영 (54908fab) | 2026-04-06 |
