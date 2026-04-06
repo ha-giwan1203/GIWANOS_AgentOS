@@ -24,6 +24,7 @@
 | THINK GATE | 전역 4칸 사고 흔적 강제 | GPT PASS (fc438e3d) |
 | CLAUDE.md + rules/ | 143→71줄, rules/ 145→64줄 (총 135줄) | GPT PASS (de416123+8a4fbd11) |
 | 스킬 패키징 | .skill 5건 생성, SKILL.md 6건 추출, 중복 2건 삭제 | 불일치 0건 (e25a9c38) |
+| GPT 프로젝트 라우팅 | domain_guard_config + prompt_inject에 자동 URL 주입 | 3개 도메인 매핑 (c08a0fde) |
 
 ---
 
