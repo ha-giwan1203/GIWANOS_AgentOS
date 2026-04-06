@@ -19,7 +19,7 @@
 ### ~~[진행] 8단계 자동 루틴 강제 — /finish + completion_gate 연동~~ → 완료됨
 ### ~~[대기] PPT 자동 생성 스킬 — 실무 투입 준비~~ → 완료됨
 ### ~~[중] 도메인 지시문 미읽기 근본 해결~~ → 완료됨
-### ~~[진행] Claude Code 환경 경량화 GPT 토론~~ → 완료됨 (2026-04-06)
+### ~~[진행] Claude Code 환경 근본 경량화 GPT 토론~~ → 완료됨 (2026-04-06)
 
 ---
 
@@ -64,7 +64,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
-| Claude Code 환경 경량화 GPT 토론 — Step1 문서충돌 3건 GPT PASS (b0d1432e) + Step2 구조경량화 (permissions 78→39, Stop 5→4, completion_gate v3, 로그로테이션) GPT 임시검토 정합 + 잔여 정리 3건(미사용 hook 아카이브) 완료 | 2026-04-06 |
+| Claude Code 근본 경량화 GPT 토론 — hooks 23→9, rules 6→2, CLAUDE.md 71→38줄, permissions 78→37, completion_gate v4 단순화. 20개 hook + 4개 rules 아카이브 | 2026-04-06 |
 | CLAUDE.md+rules/ 경량화 — 143→71줄(CLAUDE.md), rules/ 145→64줄, 전체 135줄. GPT PASS (de416123+8a4fbd11) | 2026-04-06 |
 | step5 매핑 버그 4건 수정 — 에러 388→190건, 차이 +25.6M→+7.2M. GPT 공동작업 완료 (fb81d7a5) | 2026-04-06 |
 | SEND GATE 구현 — send_gate.sh PreToolUse hook + 토론모드 ENTRY/CLAUDE.md 반영 (54908fab) | 2026-04-06 |

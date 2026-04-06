@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-06 — Claude Code 환경 경량화 GPT 토론 세션
+최종 업데이트: 2026-04-06 — Claude Code 근본 경량화 GPT 토론 (hooks 23→9, rules 6→2, CLAUDE.md 38줄)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
