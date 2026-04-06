@@ -9,11 +9,19 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-06 — write_marker v3 (상태문서 수정 시 marker 삭제 방식, GPT 토론 합의)
+최종 업데이트: 2026-04-06 — Claude Code 문제점 6건 개선 1~5순위 구현 완료
 
 ---
 
 ## 진행 중
+
+### [진행] Claude Code 문제점 6건 개선 — GPT 토론 합의 (2026-04-06)
+- ~~1순위: protect_files Bash 삭제 차단 + allow 축소~~ → 완료
+- ~~2순위: Hook README/settings 동기화~~ → 완료
+- ~~3순위: gpt_followup_guard 후속작업 인정 범위 확대~~ → 완료
+- ~~4순위: 토론모드 253줄→56줄 코어 + REFERENCE.md 분리~~ → 완료
+- ~~5순위: completion_gate 역할 문서화~~ → 완료
+- 6순위: bypassPermissions→default 전환 준비 (1주 로깅 후 — 보류)
 
 ### ~~[진행] GPT Project Instructions Git 관리 방향 토론~~ → 완료됨
 ### ~~[진행] 8단계 자동 루틴 강제 — /finish + completion_gate 연동~~ → 완료됨

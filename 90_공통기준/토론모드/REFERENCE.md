@@ -1,0 +1,132 @@
+# 토론모드 상세 참조 (REFERENCE)
+
+> CLAUDE.md에서 분리된 상세 배경·fallback·실험 규칙.
+> 코어 규칙은 ENTRY.md(Primary) + CLAUDE.md(코어) 참조.
+
+## 채팅방 입장 상세
+
+### 탭 재사용 (신규 탭 중복 방지)
+새 Claude 세션 시작 시 브라우저 탭을 먼저 확인한다.
+
+```
+1. tabs_context_mcp → 현재 열린 탭 목록 확인
+2. chatgpt.com/g/g-p-69bca... URL 포함 탭 있으면 → switch (새 탭 열지 않음)
+3. 없으면 → navigate로 프로젝트 URL 진입 후 아래 '대화 URL 추출' 절차 실행
+```
+
+### 대화 URL 추출 (클릭 대신 JS 직접 추출 — 2026-04-01 실증)
+
+프로젝트 페이지에서 대화 목록 클릭은 React 이벤트 미트리거로 실패할 수 있다.
+**클릭 시도 금지. 반드시 JS로 URL을 추출한 뒤 navigate()로 진입한다.**
+
+```javascript
+const main = document.querySelector('main');
+const links = main ? main.querySelectorAll('a[href*="/c/"]') : [];
+const url = links.length > 0 ? links[0].href : null;
+url;  // → navigate()에 전달
+```
+
+> **주의 (2026-04-01 실증)**: `nav a[href*="/c/"]`는 사이드바 일반 대화 목록이다.
+> 프로젝트 전용 대화는 `main` 영역 안에만 있고, URL에 `/g/g-p-.../c/...` 패턴을 포함한다.
+
+```
+실행 순서:
+1. navigate → 프로젝트 URL (채팅 목록 페이지)
+2. javascript_tool → 위 스크립트로 첫 번째 대화 URL 추출
+3. navigate → 추출된 URL로 대화방 진입
+```
+
+## 입력+전송 상세
+
+### 통합 JS (1회 호출)
+```javascript
+const el = document.querySelector('#prompt-textarea');
+el.focus();
+document.execCommand('insertText', false, text);
+setTimeout(() => {
+  const btn = document.querySelector('[data-testid="send-button"]');
+  if (btn && !btn.disabled) btn.click();
+}, 100);
+```
+
+### fallback (execCommand 실패 시)
+```
+textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true}) dispatch
+```
+
+## 응답 완료 감지 상세
+
+```
+방식:    stop-button 유무 확인 (polling)
+완료:    document.querySelector('[data-testid="stop-button"]') === null
+
+적응형 간격 (3단):
+  0~20초:   sleep 5  (일반 응답 빠르게 캐치)
+  20~60초:  sleep 10 (중간 구간)
+  60초~:    sleep 15 (확장추론 대응)
+timeout:    최대 300초 (확장추론 5분 대응)
+```
+> CDP 45초 timeout 때문에 javascript_tool 안에서 setInterval/Promise 기반 polling 불가.
+> 반드시 `javascript_tool` + `sleep N` 분리 호출로 루프를 구성한다.
+
+## 최신 응답 읽기 상세
+
+```javascript
+const msgs = document.querySelectorAll('[data-message-author-role="assistant"]');
+const last = msgs[msgs.length - 1];
+last ? last.innerText : 'NO_MSG';
+```
+
+### fallback 순서
+1. javascript_tool로 마지막 assistant 노드 직접 추출
+2. 텍스트가 너무 길거나 잘리면 get_page_text로 전체 페이지 텍스트 추출 후 파싱
+3. 파싱 실패 시 read_page로 DOM 구조에서 마지막 메시지 요소 탐색
+
+## SEND GATE 상세
+
+```javascript
+const msgs = document.querySelectorAll('[data-message-author-role="assistant"]');
+const lastText = msgs[msgs.length - 1]?.innerText?.slice(0, 100) || '';
+const stopBtn = document.querySelector('[data-testid="stop-button"]');
+JSON.stringify({lastSnippet: lastText, isGenerating: !!stopBtn});
+```
+
+1. 마지막 assistant 블록 텍스트 100자를 읽는다
+2. GPT가 아직 생성 중(stop-button 존재)이면 → 대기
+3. 이전에 읽은 내용과 다르면 → 새 응답 전체 읽기 → 하네스 재계산 → 반박문 재작성 후 전송
+4. 같으면 → 변동 없음 → 예정대로 전송 진행
+5. gate 파일 갱신: `echo "$(date +%s)" > .claude/state/send_gate_passed`
+6. gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 차단
+
+## GPT 대기 중 병행 작업
+
+> GPT 응답 대기(30~60초) 동안 background Agent로 독립 작업을 병행할 수 있다.
+> Agent 도구는 독립 컨텍스트에서 실행되므로 세션 충돌 없음 (GPT 합의 2026-04-02).
+> 단, 동일 대상 파일·로그·출력물 동시 수정은 금지.
+
+## 하네스 분석 상세
+
+라벨: 실증됨 / 일반론 / 환경 미스매치 / 과잉설계
+판정: 채택(실증만) / 보류(일반론) / 버림(미스매치+과잉)
+환경 게이트: 채택 후보는 (1)우리 환경 유지 (2)세션 지속성 불필요 (3)실증과 미충돌 통과 필수
+
+### 사용자 보고 축약
+- 매턴 표 대신 1줄 요약: `채택 N건 / 보류 N건 / 버림 N건 — [핵심 판정 이유 1줄]`
+- 상세 분해·라벨링은 반박문(GPT에 전송하는 텍스트) 안에만 포함
+
+## 로그 저장 구조
+
+```
+logs/
+├── debate_YYYYMMDD_HHMMSS.md
+└── debate_YYYYMMDD_HHMMSS.json
+```
+
+## 오류 대응
+
+| 상황 | 대응 |
+|------|------|
+| ChatGPT 응답 미완료 | 적응형 polling(5/10/15초), 최대 300초 timeout. 초과 시 사용자에게 보고 |
+| 텍스트 추출 실패 | javascript_tool → get_page_text → read_page 순서로 fallback |
+| 로그인 만료 | 사용자에게 재로그인 요청 |
+| 네트워크 오류 | 로그 기록 후 중단 |

@@ -109,7 +109,10 @@ def is_gpt_send_action(tool_name: str, tool_input: dict) -> bool:
     return False
 
 def is_real_followup_work(tool_name: str, tool_input: dict) -> bool:
-    if tool_name in {"Bash", "Edit", "Write"}:
+    if tool_name in {"Bash", "Edit", "Write", "MultiEdit"}:
+        return True
+    # Notion, Calendar 등 MCP 액션도 후속 작업으로 인정
+    if any(k in tool_name.lower() for k in ("notion", "gcal", "gmail", "slack")):
         return True
     return False
 

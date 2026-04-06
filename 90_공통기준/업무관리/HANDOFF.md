@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-06 — write_marker v3 (5aa3fc91 → GPT 부분반영 → v3 수정)
+최종 업데이트: 2026-04-06 — Claude Code 문제점 6건 개선 1~5순위 구현 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-Claude Code 자체진단 — 경량화 이후 잔여 문제 식별 및 정리
+Claude Code 문제점 전수 분석 → GPT 토론 합의 → 1~5순위 구현 완료
 
 ---
 
@@ -52,7 +52,12 @@ Claude Code 자체진단 — 경량화 이후 잔여 문제 식별 및 정리
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 보류 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
+| **1순위** | protect_files Bash 삭제 차단 + allow 축소 | rm/mv/cp/sed -i + 보호경로 조합 차단, powershell:*/bash*:* 축소 |
+| 2순위 | Hook README/settings 동기화 | 현재 8개 기준으로 README 갱신, 미연결 11개 폐기 명시 |
+| 3순위 | gpt_followup_guard 역할 분리 | PostToolUse=flag set, Stop=flag check 경량화 |
+| 4순위 | 토론모드 코어/참조 분리 | 253줄→50줄 코어 + REFERENCE.md |
+| 5순위 | completion_gate 역할 문서화 | CLAUDE.md에 "사람/GPT 판정, 자동 게이트 아님" 명시 |
+| 6순위 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
 | 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 |
 | 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 `/settlement 04` |
 | 대기 | SP3M3 미매칭 RSP 4건 | RSP3SC0291~0294 모듈품번 갱신 |

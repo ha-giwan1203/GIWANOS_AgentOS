@@ -21,10 +21,12 @@
 - 현업 업무: `업무_마스터리스트.xlsx` 우선. AI 작업: TASKS.md 우선
 - Git이 기준 원본. Notion은 보조. 중복 유지 금지
 
-## 완료 판정
+## 완료 판정 (사람/GPT 판정 기준 — 자동 게이트 아님)
 
 기준 문서 확인 + 반영 위치 확인 + Git 실물 존재 + TASKS.md 비충돌 → PASS
 미충족 시: 정합 / 부분반영 / 미반영 / 보류 / 기준 미확인 / 임시검토
+
+> completion_gate는 TASKS/HANDOFF 갱신 여부만 검사하는 최소 게이트다. 위 4개 기준 전체를 자동 검증하지 않는다.
 
 ## 종료 시 갱신
 1. TASKS.md → 2. 도메인 STATUS.md → 3. HANDOFF.md → 4. Notion (필요 시)
