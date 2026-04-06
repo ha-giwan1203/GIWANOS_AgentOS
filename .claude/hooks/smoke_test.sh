@@ -1,28 +1,12 @@
 #!/bin/bash
-# Hooks Smoke Test — hooks 수정 후 반드시 실행
-# 4묶음 10개 테스트 케이스
+# Hooks Smoke Test v2 — 현행 훅 실물 기준 (2026-04-07)
+# 운영 훅 11개 + hook_common + incident_ledger 검증
 
 PASS=0
 FAIL=0
 TOTAL=0
-LOG="$HOME/Desktop/업무리스트/.claude/hooks/hook_log.txt"
 HOOKS_DIR="$HOME/Desktop/업무리스트/.claude/hooks"
-
-# I/O 테스트에서 생성하는 도메인 flag를 종료 시 반드시 정리
-cleanup_domain_flags() {
-  PYTHONIOENCODING=utf-8 python3 -c "
-import yaml, sys, os
-with open(sys.argv[1],'r',encoding='utf-8') as f:
-    cfg = yaml.safe_load(f)
-for d in cfg.get('domains',{}).values():
-    p = d.get('flag_prefix','')
-    if p:
-        for s in ('_active','_phase','_loaded'):
-            try: os.remove(p+s)
-            except: pass
-" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null
-}
-trap cleanup_domain_flags EXIT
+PROJECT_DIR="$HOME/Desktop/업무리스트"
 
 check() {
   TOTAL=$((TOTAL+1))
@@ -35,125 +19,115 @@ check() {
   fi
 }
 
-echo "=== Hooks Smoke Test ==="
+echo "=== Hooks Smoke Test v2 ==="
 echo ""
 
-# === 1. Stop Guard ===
-echo "--- 1. Stop Guard (stop_guard.sh) ---"
+# === 1. hook_common.sh ===
+echo "--- 1. hook_common.sh (공통 로깅) ---"
+test -f "$HOOKS_DIR/hook_common.sh"
+check $? "hook_common.sh 존재"
 
-# 1-1. 스크립트 존재 + 실행 가능
+grep -q 'hook_log()' "$HOOKS_DIR/hook_common.sh"
+check $? "hook_log() 함수 정의됨"
+
+grep -q 'hook_incident()' "$HOOKS_DIR/hook_common.sh"
+check $? "hook_incident() 함수 정의됨"
+
+grep -q 'hook_log.jsonl' "$HOOKS_DIR/hook_common.sh"
+check $? "로그 파일명 hook_log.jsonl (JSON 형식)"
+
+grep -q '_rotate_file()' "$HOOKS_DIR/hook_common.sh"
+check $? "로테이션 함수 _rotate_file() 정의됨"
+
+echo ""
+
+# === 2. block_dangerous.sh (PreToolUse/Bash) ===
+echo "--- 2. block_dangerous.sh ---"
+test -x "$HOOKS_DIR/block_dangerous.sh"
+check $? "block_dangerous.sh 존재 + 실행 가능"
+
+grep -q 'hook_common.sh' "$HOOKS_DIR/block_dangerous.sh"
+check $? "hook_common.sh source 연결"
+
+grep -q 'rm -rf' "$HOOKS_DIR/block_dangerous.sh"
+check $? "파괴 명령 차단 패턴 존재"
+
+echo ""
+
+# === 3. protect_files.sh (PreToolUse/Write|Edit) ===
+echo "--- 3. protect_files.sh ---"
+test -x "$HOOKS_DIR/protect_files.sh"
+check $? "protect_files.sh 존재 + 실행 가능"
+
+grep -q 'deny\|ask' "$HOOKS_DIR/protect_files.sh"
+check $? "2계층 판정 (deny/ask) 로직 존재"
+
+echo ""
+
+# === 4. send_gate.sh (PreToolUse/javascript_tool) ===
+echo "--- 4. send_gate.sh ---"
+test -x "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate.sh 존재 + 실행 가능"
+
+grep -q 'execCommand.*insertText\|insertText' "$HOOKS_DIR/send_gate.sh"
+check $? "execCommand/insertText 전송 감지 패턴 존재"
+
+echo ""
+
+# === 5. auto_compile.sh (PostToolUse/Write|Edit) ===
+echo "--- 5. auto_compile.sh ---"
+test -x "$HOOKS_DIR/auto_compile.sh"
+check $? "auto_compile.sh 존재 + 실행 가능"
+
+grep -q 'py_compile' "$HOOKS_DIR/auto_compile.sh"
+check $? "py_compile 문법 검증 로직 존재"
+
+grep -q 'hook_incident' "$HOOKS_DIR/auto_compile.sh"
+check $? "compile_fail → incident_ledger 연동"
+
+echo ""
+
+# === 6. write_marker.sh (PostToolUse/Write|Edit) ===
+echo "--- 6. write_marker.sh ---"
+test -x "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker.sh 존재 + 실행 가능"
+
+grep -q 'write_marker.flag' "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker.flag 생성 로직 존재"
+
+echo ""
+
+# === 7. gpt_followup_post.sh (PostToolUse) ===
+echo "--- 7. gpt_followup_post.sh ---"
+test -x "$HOOKS_DIR/gpt_followup_post.sh"
+check $? "gpt_followup_post.sh 존재 + 실행 가능"
+
+echo ""
+
+# === 8. stop_guard.sh (Stop) ===
+echo "--- 8. stop_guard.sh ---"
 test -x "$HOOKS_DIR/stop_guard.sh"
 check $? "stop_guard.sh 존재 + 실행 가능"
 
-# 1-2. 금지 문구 패턴 7개 정의 확인
-COUNT=$(grep -c 'FORBIDDEN_PATTERNS' "$HOOKS_DIR/stop_guard.sh" 2>/dev/null)
-test "$COUNT" -gt 0
-check $? "금지 문구 패턴 배열 정의됨"
-
-# 1-3. BLOCK 로깅 코드 존재
-grep -q 'stop_guard BLOCK' "$HOOKS_DIR/stop_guard.sh"
-check $? "BLOCK 시 hook_log.txt 로깅 코드 존재"
-
-# 1-4. python3 파싱 코드 존재 (마지막 assistant 블록 추출)
-grep -q 'python3' "$HOOKS_DIR/stop_guard.sh"
-check $? "python3 transcript 파싱 코드 존재"
+grep -q 'FORBIDDEN_PATTERNS\|forbidden' "$HOOKS_DIR/stop_guard.sh"
+check $? "금지 문구 패턴 정의됨"
 
 echo ""
 
-# === 2. UserPromptSubmit (prompt_inject.sh) ===
-echo "--- 2. UserPromptSubmit (prompt_inject.sh) ---"
-
-# 2-1. 스크립트 존재 + 실행 가능
-test -x "$HOOKS_DIR/prompt_inject.sh"
-check $? "prompt_inject.sh 존재 + 실행 가능"
-
-# 2-2. 토론모드 키워드 감지 패턴 존재
-grep -q '토론모드\|debate-mode\|공동작업' "$HOOKS_DIR/prompt_inject.sh"
-check $? "토론모드/공동작업 키워드 감지 패턴 존재"
+# === 9. gpt_followup_stop.sh (Stop) ===
+echo "--- 9. gpt_followup_stop.sh ---"
+test -x "$HOOKS_DIR/gpt_followup_stop.sh"
+check $? "gpt_followup_stop.sh 존재 + 실행 가능"
 
 echo ""
 
-# === 3. PostToolUse (post_validate.sh) ===
-echo "--- 3. PostToolUse (post_validate.sh) ---"
-
-# 3-1. 스크립트 존재 + 실행 가능
-test -x "$HOOKS_DIR/post_validate.sh"
-check $? "post_validate.sh 존재 + 실행 가능"
-
-# 3-2. find() 충돌 감지 코드 존재
-grep -q 'HAS_FIND_BAN\|HAS_FIND_USE' "$HOOKS_DIR/post_validate.sh"
-check $? "find() 금지/사용 충돌 감지 코드 존재"
-
-# 3-3. polling 불일치 감지 코드 존재
-grep -q 'POLL_OLD' "$HOOKS_DIR/post_validate.sh"
-check $? "구버전 polling 참조 감지 코드 존재"
-
-echo ""
-
-# === 4. SessionStart (session_start.sh) ===
-echo "--- 4. SessionStart (session_start.sh) ---"
-
-# 4-1. 스크립트 존재 + 실행 가능
-test -x "$HOOKS_DIR/session_start.sh"
-check $? "session_start.sh 존재 + 실행 가능"
-
-echo ""
-
-# === 5. Pre Write Guard (pre_write_guard.sh) ===
-echo "--- 5. Pre Write Guard (pre_write_guard.sh) ---"
-
-test -x "$HOOKS_DIR/pre_write_guard.sh"
-check $? "pre_write_guard.sh 존재 + 실행 가능"
-
-grep -q 'EXEMPT_SUFFIXES' "$HOOKS_DIR/pre_write_guard.sh"
-check $? "EXEMPT 파일 목록 정의됨"
-
-grep -q 'parse_plan' "$HOOKS_DIR/pre_write_guard.sh"
-check $? "plan.md 파싱 로직 존재"
-
-echo ""
-
-# === 6. Post Write Dirty (post_write_dirty.sh) ===
-echo "--- 6. Post Write Dirty (post_write_dirty.sh) ---"
-
-test -x "$HOOKS_DIR/post_write_dirty.sh"
-check $? "post_write_dirty.sh 존재 + 실행 가능"
-
-grep -q 'dirty.flag' "$HOOKS_DIR/post_write_dirty.sh"
-check $? "dirty.flag 생성 로직 존재"
-
-echo ""
-
-# === 7. Pre Finish Guard (pre_finish_guard.sh) ===
-echo "--- 7. Pre Finish Guard (pre_finish_guard.sh) ---"
-
-test -x "$HOOKS_DIR/pre_finish_guard.sh"
-check $? "pre_finish_guard.sh 존재 + 실행 가능"
-
-grep -q 'verify.json' "$HOOKS_DIR/pre_finish_guard.sh"
-check $? "verify.json 검사 로직 존재"
-
-echo ""
-
-# === 8. GPT Followup Guard (gpt_followup_guard.sh) ===
-echo "--- 8. GPT Followup Guard (gpt_followup_guard.sh) ---"
-
-test -x "$HOOKS_DIR/gpt_followup_guard.sh"
-check $? "gpt_followup_guard.sh 존재 + 실행 가능"
-
-grep -q 'pending.flag\|pending_flag' "$HOOKS_DIR/gpt_followup_guard.sh"
-check $? "pending.flag 상태기계 로직 존재"
-
-echo ""
-
-# === 9. Completion Gate (completion_gate.sh) ===
-echo "--- 9. Completion Gate (completion_gate.sh) ---"
-
+# === 10. completion_gate.sh (Stop) ===
+echo "--- 10. completion_gate.sh ---"
 test -x "$HOOKS_DIR/completion_gate.sh"
 check $? "completion_gate.sh 존재 + 실행 가능"
 
-grep -q 'dirty.flag' "$HOOKS_DIR/completion_gate.sh"
-check $? "dirty.flag 타임스탬프 비교 로직 존재"
+grep -q 'write_marker.flag' "$HOOKS_DIR/completion_gate.sh"
+check $? "write_marker.flag 타임스탬프 비교 로직 존재"
 
 grep -q 'TASKS.md' "$HOOKS_DIR/completion_gate.sh"
 check $? "TASKS.md 갱신 검사 로직 존재"
@@ -161,107 +135,47 @@ check $? "TASKS.md 갱신 검사 로직 존재"
 grep -q 'HANDOFF.md' "$HOOKS_DIR/completion_gate.sh"
 check $? "HANDOFF.md 갱신 검사 로직 존재"
 
-grep -q 'STATUS.md' "$HOOKS_DIR/completion_gate.sh"
-check $? "STATUS.md 경고 로직 존재"
+grep -q 'hook_incident' "$HOOKS_DIR/completion_gate.sh"
+check $? "gate_reject → incident_ledger 연동"
 
 echo ""
 
-# === 10. Cleanup Audit (cleanup_audit.sh) ===
-echo "--- 10. Cleanup Audit (cleanup_audit.sh) ---"
-
-test -x "$HOOKS_DIR/cleanup_audit.sh"
-check $? "cleanup_audit.sh 존재 + 실행 가능"
-
-grep -q 'git status --porcelain' "$HOOKS_DIR/cleanup_audit.sh"
-check $? "git status untracked 파일 감지 로직 존재"
-
-grep -q '98_아카이브' "$HOOKS_DIR/cleanup_audit.sh"
-check $? "98_아카이브 이동 권고 메시지 존재"
-
-grep -q 'EXEMPT_PREFIXES\|is_exempt' "$HOOKS_DIR/cleanup_audit.sh"
-check $? "예외 규칙 (EXEMPT) 정의됨"
-
-grep -q 'get_mentioned_files\|mentioned_files' "$HOOKS_DIR/cleanup_audit.sh"
-check $? "TASKS/HANDOFF 언급 파일 예외 로직 존재"
-
-grep -q 'is_domain_output\|DOMAIN_PREFIXES' "$HOOKS_DIR/cleanup_audit.sh"
-check $? "도메인 산출물 예외 로직 존재"
+# === 11. notify_slack.sh (Notification) ===
+echo "--- 11. notify_slack.sh ---"
+test -x "$HOOKS_DIR/notify_slack.sh"
+check $? "notify_slack.sh 존재 + 실행 가능"
 
 echo ""
 
-# === 11. Domain Guard (domain_guard.sh) ===
-echo "--- 11. Domain Guard (domain_guard.sh) ---"
+# === 12. incident_ledger 검증 ===
+echo "--- 12. incident_ledger 검증 ---"
+LEDGER="$PROJECT_DIR/.claude/incident_ledger.jsonl"
+# incident_ledger.jsonl이 존재하거나 생성 가능한지 확인
+touch "$LEDGER" 2>/dev/null
+test -f "$LEDGER"
+check $? "incident_ledger.jsonl 존재/생성 가능"
 
-test -x "$HOOKS_DIR/domain_guard.sh"
-check $? "domain_guard.sh 존재 + 실행 가능"
+# hook_incident 함수 동작 테스트
+source "$HOOKS_DIR/hook_common.sh" 2>/dev/null
+hook_incident "smoke_test" "smoke_test" "" "smoke test 검증" 2>/dev/null
+LAST=$(tail -1 "$LEDGER" 2>/dev/null)
+echo "$LAST" | grep -q '"type":"smoke_test"'
+check $? "hook_incident() 기록 → JSONL 출력 정상"
 
-grep -q 'domain_guard_config.yaml' "$HOOKS_DIR/domain_guard.sh"
-check $? "config.yaml 참조 로직 존재"
-
-grep -rq '_active' "$HOOKS_DIR/domain_guard.sh" "$HOOKS_DIR/domain_guard_logic.py" 2>/dev/null
-check $? "도메인 활성 플래그 검사 로직 존재"
-
-grep -rq '_loaded' "$HOOKS_DIR/domain_guard.sh" "$HOOKS_DIR/domain_guard_logic.py" 2>/dev/null
-check $? "도메인 로드 플래그 검사 로직 존재"
-
-test -f "$HOOKS_DIR/domain_guard_config.yaml"
-check $? "domain_guard_config.yaml 존재"
-
-grep -q 'youtube_analysis' "$HOOKS_DIR/domain_guard_config.yaml"
-check $? "config.yaml에 youtube_analysis 도메인 등록됨"
+# 테스트 데이터 정리 (마지막 줄 제거)
+sed -i '$ d' "$LEDGER" 2>/dev/null
 
 echo ""
 
-# === 12. 입출력 검증 (I/O Tests) — cp949 회귀 방지 ===
-echo "--- 12. 입출력 검증 (I/O Tests) ---"
+# === 13. 구 훅 부재 확인 (아카이브 완료) ===
+echo "--- 13. 구 훅 부재 확인 ---"
+! test -f "$HOOKS_DIR/pre_finish_guard.sh"
+check $? "pre_finish_guard.sh 미존재 (completion_gate에 흡수됨)"
 
-# 12-1. prompt_inject: 한글 키워드 감지 (cp949 회귀 방지)
-IO_RESULT=$(echo '{"prompt":"토론모드 진행해줘"}' | PYTHONIOENCODING=utf-8 bash "$HOOKS_DIR/prompt_inject.sh" 2>/dev/null)
-echo "$IO_RESULT" | grep -q 'additionalContext'
-check $? "prompt_inject 한글 키워드 '토론모드' 감지 → additionalContext 반환"
+! test -f "$HOOKS_DIR/gpt_followup_guard.sh"
+check $? "gpt_followup_guard.sh 미존재 (post/stop 분리됨)"
 
-# 12-2. prompt_inject: Active Laws 5줄 포함
-echo "$IO_RESULT" | grep -q 'Active Laws'
-check $? "prompt_inject Active Laws 문구 포함"
-
-# 12-3. domain_guard: 비활성 도메인 → 통과 (출력 없음)
-# 12-1에서 prompt_inject가 도메인 active flag를 생성하므로 전체 정리
-# glob 대신 YAML에서 모든 flag_prefix를 추출해서 명시적 삭제
-PYTHONIOENCODING=utf-8 python3 -c "
-import yaml, sys, os
-with open(sys.argv[1],'r',encoding='utf-8') as f:
-    cfg = yaml.safe_load(f)
-for d in cfg.get('domains',{}).values():
-    p = d.get('flag_prefix','')
-    if p:
-        for s in ('_active','_phase','_loaded'):
-            try: os.remove(p+s)
-            except: pass
-" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null
-DG_RESULT=$(echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | bash "$HOOKS_DIR/domain_guard.sh" 2>/dev/null)
-test -z "$DG_RESULT"
-check $? "domain_guard 비활성 도메인 → 빈 출력 (통과)"
-
-# 12-4. domain_guard: phase guard 차단 테스트 (활성 도메인 시뮬레이션)
-DEBATE_PREFIX=$(PYTHONIOENCODING=utf-8 python3 -c "
-import yaml, sys
-with open(sys.argv[1],'r',encoding='utf-8') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['domains']['debate']['flag_prefix'])
-" "$HOOKS_DIR/domain_guard_config.yaml" 2>/dev/null)
-if [ -n "$DEBATE_PREFIX" ]; then
-  # 임시 활성 플래그 생성 (phase 파일 없음 = entry_read 상태)
-  echo "debate" > "${DEBATE_PREFIX}_active"
-  rm -f "${DEBATE_PREFIX}_phase" "${DEBATE_PREFIX}_loaded" 2>/dev/null
-  PG_RESULT=$(echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | bash "$HOOKS_DIR/domain_guard.sh" 2>/dev/null)
-  echo "$PG_RESULT" | grep -q 'block'
-  check $? "domain_guard phase:entry_read → Bash 차단 (block)"
-  # 정리
-  rm -f "${DEBATE_PREFIX}_active" "${DEBATE_PREFIX}_phase" "${DEBATE_PREFIX}_loaded" 2>/dev/null
-else
-  TOTAL=$((TOTAL+1)); FAIL=$((FAIL+1))
-  echo "  [FAIL] domain_guard phase guard — debate flag_prefix 추출 실패"
-fi
+! test -f "$HOOKS_DIR/hook_log.txt" || echo "  [INFO] hook_log.txt 아카이브 잔존 (정상 — 새 로그는 .jsonl)"
 
 echo ""
 
