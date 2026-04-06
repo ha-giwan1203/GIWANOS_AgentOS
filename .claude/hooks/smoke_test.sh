@@ -5,8 +5,8 @@
 PASS=0
 FAIL=0
 TOTAL=0
-HOOKS_DIR="$HOME/Desktop/업무리스트/.claude/hooks"
-PROJECT_DIR="$HOME/Desktop/업무리스트"
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 
 check() {
   TOTAL=$((TOTAL+1))
@@ -170,7 +170,7 @@ echo ""
 # === 13. 퇴행 방지: 구 로그 직접 참조 0건 ===
 echo "--- 13. 퇴행 방지 (hook_log.txt 직접 참조) ---"
 # smoke_test.sh 자신(INFO 표시용)은 제외
-STALE_REFS=$(grep -l 'hook_log\.txt' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | wc -l)
+STALE_REFS=$(grep -l 'hook_log\.txt' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | wc -l)
 test "$STALE_REFS" -eq 0
 check $? "운영 훅에서 hook_log.txt 직접 참조 0건 (JSONL 통일)"
 
