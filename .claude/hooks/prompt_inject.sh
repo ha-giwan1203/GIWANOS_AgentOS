@@ -162,6 +162,17 @@ domain_laws = {
 if name in domain_laws:
     ctx_lines.extend(domain_laws[name])
 
+# GPT 프로젝트 라우팅
+gpt_url = d.get('gpt_project', '')
+gpt_name = d.get('gpt_project_name', '')
+if gpt_url:
+    ctx_lines.extend([
+        '',
+        f'GPT 공동작업 대화방: {gpt_name}',
+        f'프로젝트 URL: {gpt_url}',
+        '→ GPT 공유/토론 시 이 프로젝트의 최신 대화로 진입할 것.'
+    ])
+
 output = {'additionalContext': '\n'.join(ctx_lines)}
 result_json = json.dumps(output, ensure_ascii=False)
 

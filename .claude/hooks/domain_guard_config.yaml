@@ -4,6 +4,8 @@
 
 domains:
   debate:
+    gpt_project: "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/project"
+    gpt_project_name: "GPT/클로드 업무 자동화 토론"
     keywords: ["토론모드", "debate", "공동작업", "GPT토론", "토론"]
     keyword_combos:
       - ["GPT", "물어"]
@@ -37,6 +39,8 @@ domains:
     blocked_patterns: []
 
   settlement:
+    gpt_project: "https://chatgpt.com/g/g-p-69b7982ac58c819185d14d12f77a7d04-joribbi-jeongsan-jadonghwa/project"
+    gpt_project_name: "조립비 정산 자동화"
     keywords: ["정산", "조립비", "settlement", "대시보드"]
     claude_path: "05_생산실적/조립비정산/CLAUDE.md"
     entry_path: "05_생산실적/조립비정산/ENTRY.md"
@@ -62,6 +66,8 @@ domains:
       - "settlement_report"
 
   linebatch:
+    gpt_project: ""
+    gpt_project_name: ""
     keywords: ["라인배치", "OUTER", "품번배치", "라인배정", "partLineBatch"]
     claude_path: "10_라인배치/CLAUDE.md"
     flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_linebatch"
@@ -69,6 +75,8 @@ domains:
     blocked_patterns: []
 
   mes_upload:
+    gpt_project: "https://chatgpt.com/g/g-p-69c0a039ed4c81919e4f672820d50a61-saengsansiljeog-deungrog-jadonghwa-mandeulgi/project"
+    gpt_project_name: "생산실적 등록 자동화 만들기"
     keywords: ["MES 업로드", "실적 업로드", "생산실적 업로드", "BI 업로드", "실적 올려", "MES 실적"]
     claude_path: "90_공통기준/스킬/production-result-upload/SKILL.md"
     flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_mes_upload"
@@ -76,6 +84,8 @@ domains:
     blocked_patterns: []
 
   zdm_inspection:
+    gpt_project: ""
+    gpt_project_name: ""
     keywords: ["일상점검", "ZDM", "ZDM 점검", "점검 입력", "일상점검 등록"]
     claude_path: "90_공통기준/스킬/zdm-daily-inspection/SKILL.md"
     flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_zdm"
@@ -83,6 +93,8 @@ domains:
     blocked_patterns: []
 
   youtube_analysis:
+    gpt_project: ""
+    gpt_project_name: ""
     keywords: ["영상분석", "영상 분석", "유튜브 분석", "영상 요약", "youtu.be", "youtube.com/watch"]
     claude_path: "90_공통기준/스킬/youtube-analysis/SKILL.md"
     flag_prefix: "C:/Users/User/AppData/Local/Temp/.claude_domain_youtube"
