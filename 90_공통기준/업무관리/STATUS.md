@@ -104,6 +104,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-06 11:42 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-06 10:55 | modified | zdm-daily-inspection-v3.skill | 스킬 패키지 갱신 |
 | 2026-04-06 10:55 | modified | zdm-daily-inspection-v2.skill | 스킬 패키지 갱신 |
 | 2026-04-06 10:55 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
@@ -133,4 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-06 10:55 | modified | quality-assurance.skill | 스킬 패키지 갱신 |
 | 2026-04-06 10:55 | modified | research.md | 스킬 문서 갱신 |
 | 2026-04-06 10:55 | modified | SKILL.md | 스킬 문서 갱신 |
-| 2026-04-06 10:55 | modified | partno-management.skill | 스킬 패키지 갱신 |
