@@ -1,28 +1,30 @@
 #!/bin/bash
-# completion-gate v2: Stop 이벤트 시 상태 문서 갱신 강제
-# dirty marker 존재 시 TASKS.md/HANDOFF.md가 dirty 이후 수정됐는지 확인
-# 미갱신이면 Stop 차단 → Claude가 자동 갱신 후 재시도
-# GPT+Claude 합의 2026-04-02
+# completion-gate v3: Stop 이벤트 통합 완료 게이트
+# pre_finish_guard(verify.json) + completion_gate(TASKS/HANDOFF) 통합
+# GPT+Claude 토론 합의 2026-04-06
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 hook_log "Stop" "completion_gate 발화"
 
-# Python 내부에서 경로 구성 (한국어 경로 bash→python 인코딩 문제 방지)
 RESULT=$(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 -c "
-import os, sys, json
+import os, sys, json, re
 from datetime import datetime
 from pathlib import Path
 
-# 프로젝트 디렉토리 탐색
 project_dir = os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd())
 root = Path(project_dir)
 
 state_dir = root / '90_공통기준' / 'agent-control' / 'state'
 dirty_flag = state_dir / 'dirty.flag'
+current_task_file = state_dir / 'current_task'
 tasks = root / '90_공통기준' / '업무관리' / 'TASKS.md'
 handoff = root / '90_공통기준' / '업무관리' / 'HANDOFF.md'
 status = root / '90_공통기준' / '업무관리' / 'STATUS.md'
 
-# === finish_state.json 체크 (dirty.flag와 독립) ===
+def block(reason):
+    print(json.dumps({'decision': 'block', 'reason': reason}, ensure_ascii=False))
+    sys.exit(0)
+
+# === 1. finish_state.json 체크 (dirty.flag와 독립) ===
 finish_state_path = state_dir / 'finish_state.json'
 if finish_state_path.exists():
     try:
@@ -36,12 +38,32 @@ if finish_state_path.exists():
             if not fs.get('user_reported'): pending_steps.append('사용자 보고')
             if not fs.get('followup_checked'): pending_steps.append('후속 확인')
             if pending_steps:
-                msg = f'[COMPLETION GATE] finish 루틴 미완료: {", ".join(pending_steps)} — /finish 8단계를 완료하세요.'
-                print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
-                sys.exit(0)
+                block(f'[COMPLETION GATE] finish 루틴 미완료: {\", \".join(pending_steps)} — /finish 8단계를 완료하세요.')
     except:
         pass
 
+# === 2. verify.json 체크 (구 pre_finish_guard 로직) ===
+if current_task_file.exists():
+    raw = current_task_file.read_text(encoding='utf-8').strip()
+    if raw:
+        task_dir = (root / raw).resolve() if not Path(raw).is_absolute() else Path(raw).resolve()
+        plan_path = task_dir / 'plan.md'
+        if plan_path.exists() and dirty_flag.exists():
+            plan_text = plan_path.read_text(encoding='utf-8')
+            if re.search(r'^\s*verify_required\s*:\s*true\s*$', plan_text, re.I | re.M):
+                verify_path = task_dir / 'verify.json'
+                if not verify_path.exists():
+                    block('verify.json 이 없습니다. verifier를 실행하고 PASS 결과를 만든 뒤 완료 보고하세요.')
+                try:
+                    v = json.loads(verify_path.read_text(encoding='utf-8'))
+                    if str(v.get('status', '')).lower().strip() != 'pass':
+                        block('verify.json status=pass 가 아닙니다.')
+                    if verify_path.stat().st_mtime < dirty_flag.stat().st_mtime:
+                        block('verify.json 이 최신 변경보다 오래되었습니다. 재검증하세요.')
+                except json.JSONDecodeError:
+                    block('verify.json 파싱 실패.')
+
+# === 3. TASKS/HANDOFF 갱신 체크 ===
 if not dirty_flag.exists():
     sys.exit(0)
 
@@ -70,13 +92,10 @@ if status.exists():
         status_warn = ' (참고: STATUS.md도 미갱신)'
 
 if missing:
-    msg = f'[COMPLETION GATE] 작업 파일 변경 후 상태 문서 미갱신: {\", \".join(missing)}{status_warn} — 갱신 후 다시 종료하세요.'
-    print(json.dumps({'decision': 'block', 'reason': msg}, ensure_ascii=False))
+    block(f'[COMPLETION GATE] 작업 파일 변경 후 상태 문서 미갱신: {\", \".join(missing)}{status_warn} — 갱신 후 다시 종료하세요.')
 else:
-    # TASKS/HANDOFF 갱신됨 — STATUS만 경고 (차단 아님)
     if status_warn:
         print(json.dumps({'message': f'[COMPLETION GATE] TASKS/HANDOFF 갱신 확인.{status_warn}'}, ensure_ascii=False))
-    # dirty marker 삭제
     try:
         dirty_flag.unlink()
     except:
