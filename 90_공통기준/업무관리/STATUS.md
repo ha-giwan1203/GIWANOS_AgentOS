@@ -104,6 +104,7 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-06 12:42 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-06 12:13 | modified | test_missing_column.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 12:13 | modified | test_normal.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 12:13 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
@@ -132,5 +133,4 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-06 12:13 | modified | 스킬_SP3생산계획_변경이력_v3.0.md | 스킬 문서 갱신 |
 | 2026-04-06 12:13 | modified | 스킬_SP3생산계획_자동화규칙_v3.0.md | 스킬 문서 갱신 |
 | 2026-04-06 12:13 | modified | youtube-analysis.skill | 스킬 패키지 갱신 |
-| 2026-04-06 12:13 | modified | SKILL.md | 스킬 문서 갱신 |
 | 2026-04-06 12:13 | modified | SKILL.md | 스킬 문서 갱신 |
