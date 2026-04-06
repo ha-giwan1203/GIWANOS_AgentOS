@@ -42,7 +42,43 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(1 echo:*)"
+      "Bash(1 echo:*)",
+      "Read(//c/tmp/**)",
+      "Bash(rm /tmp/.claude_domain_debate_active)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 -c \":*)",
+      "Bash(rm -f /tmp/.claude_domain_debate_active)",
+      "Bash(PYTHONIOENCODING=utf-8 bash -x .claude/hooks/domain_guard.sh)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 -c \"import sys; print\\(''''ok''''\\)\")",
+      "Bash(bash -c ':*)",
+      "Bash(rm -f /tmp/.claude_domain_debate_phase /tmp/.claude_domain_debate_loaded)",
+      "Read(//^import yaml, re, sys, json, os$/,/^sys.exit/\\(0/**)",
+      "Bash(WDIR=\"/c/Users/User/Desktop\")",
+      "Read(//c/Users/User/Desktop/업무리스트/$WDIR/**)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 .claude/hooks/domain_guard_logic.py .claude/hooks/domain_guard_config.yaml)",
+      "Bash(python3 -c \"import os; print\\(os.path.isfile\\(''/tmp/test_path_check''\\)\\); print\\(os.path.realpath\\(''/tmp/test_path_check''\\)\\)\")",
+      "Bash(python3 -c \"import tempfile; print\\(tempfile.gettempdir\\(\\).replace\\(chr\\(92\\), ''/''\\)\\)\")",
+      "Bash(rm -f /tmp/.claude_domain_*)",
+      "Bash(rm -f \"C:/Users/User/AppData/Local/Temp/.claude_domain_\"*)",
+      "Bash(gh api:*)",
+      "Bash(gh search:*)",
+      "Bash(pip show:*)",
+      "Bash(dot -V)",
+      "Bash(python3 -c \"import pptx; print\\(''python-pptx'', pptx.__version__\\)\")",
+      "Bash(python3 -c \"import matplotlib; print\\(''matplotlib'', matplotlib.__version__\\)\")",
+      "Bash(python3 -c \"from pathlib import Path; f=Path\\(r''C:\\\\Users\\\\User\\\\Desktop\\\\업무리스트\\\\90_공통기준\\\\agent-control\\\\state\\\\dirty.flag''\\); f.unlink\\(\\) if f.exists\\(\\) else None; print\\(''deleted'' if not f.exists\\(\\) else ''still exists''\\)\")",
+      "Bash(python3 -c \"from pathlib import Path; print\\(''EXISTS'' if Path\\(r''C:\\\\Users\\\\User\\\\Desktop\\\\업무리스트\\\\90_공통기준\\\\agent-control\\\\state\\\\dirty.flag''\\).exists\\(\\) else ''NOT EXISTS''\\)\")",
+      "Bash(python3 -c \"from pathlib import Path; print\\(''''dirty.flag EXISTS'''' if Path\\(r''''C:\\\\Users\\\\User\\\\Desktop\\\\업무리스트\\\\90_공통기준\\\\agent-control\\\\state\\\\dirty.flag''''\\).exists\\(\\) else ''''dirty.flag NOT EXISTS''''\\)\")",
+      "Bash(PYTHONUTF8=1 python3 setup_month.py 03 --dry-run)",
+      "Bash(PYTHONUTF8=1 python3 step8_오류리스트.py)",
+      "Bash(python3:*)",
+      "Bash(/tmp/validation_report.py:*)",
+      "Bash(__NEW_LINE_fc175107ab20a42d__ python3:*)",
+      "Bash(TZ=Asia/Seoul date \"+%Y-%m-%d %A %H:%M KST\")",
+      "Bash(PYTHONUTF8=1 \"C:\\\\Users\\\\User\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" 정산정리_03월.py)",
+      "Bash(start \"\" \"C:\\\\Users\\\\User\\\\Desktop\\\\업무리스트\\\\05_생산실적\\\\조립비정산\\\\04월\\\\정산정리_03월.pptx\")",
+      "Bash(python cdp_tabs.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 cdp_tabs.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python cdp_tabs.py)"
     ],
     "defaultMode": "bypassPermissions"
   },
@@ -81,6 +117,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/pre_write_guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/send_gate.sh"
           }
         ]
       }

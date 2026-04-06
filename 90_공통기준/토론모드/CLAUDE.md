@@ -170,7 +170,12 @@ JSON.stringify({lastSnippet: lastText, isGenerating: !!stopBtn});
 2. GPT가 아직 생성 중(stop-button 존재)이면 → 대기
 3. 이전에 읽은 내용과 다르면 → **새 응답 전체 읽기 → 하네스 재계산 → 반박문 재작성** 후 전송
 4. 같으면 → 변동 없음 → 예정대로 전송 진행
-5. [NEVER] 이 절차를 건너뛰고 바로 execCommand 호출하는 것은 금지
+5. **gate 파일 갱신** — 점검 통과 후 아래 명령으로 gate 파일 생성:
+   ```bash
+   echo "$(date +%s)" > .claude/state/send_gate_passed
+   ```
+6. gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 execCommand 전송을 차단한다
+7. [NEVER] 이 절차를 건너뛰고 바로 execCommand 호출하는 것은 금지 — 훅이 강제 차단
 
 ### [NEVER] GPT 응답 비판적 분석 — 하네스 방식
 
