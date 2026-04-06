@@ -104,6 +104,11 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 ## 자동 감지 변경 이력
 | 시각 | 이벤트 | 파일 | 변경 내용 |
 |------|--------|------|----------|
+| 2026-04-06 15:27 | modified | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:27 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:27 | modified | step5_정산계산.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:27 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
+| 2026-04-06 15:27 | modified | README.md | README.md 수정 |
 | 2026-04-06 15:19 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
 | 2026-04-06 15:14 | modified | _test_helpers.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 15:14 | modified | test_unmatched_parts.py | 정산 파이프라인 스크립트 수정 |
@@ -129,8 +134,3 @@ Git 이력: `git log --oneline` 또는 GitHub `ha-giwan1203/GIWANOS_AgentOS`
 | 2026-04-06 14:15 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 14:08 | modified | _pipeline_config.py | 정산 파이프라인 스크립트 수정 |
 | 2026-04-06 14:08 | modified | step3_구erp처리.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 14:08 | modified | CLAUDE.md | CLAUDE.md 운영 기준 수정 |
-| 2026-04-06 13:54 | modified | step6_검증.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 13:01 | modified | step8_오류리스트.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 13:01 | modified | step7_보고서.py | 정산 파이프라인 스크립트 수정 |
-| 2026-04-06 13:01 | modified | run_settlement_pipeline.py | 정산 파이프라인 스크립트 수정 |
