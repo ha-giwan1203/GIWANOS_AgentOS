@@ -36,10 +36,10 @@ Claude Code 자체진단 — 경량화 이후 잔여 문제 식별 및 정리
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
 | completion_gate.sh | v4→v5 python3→순수bash 전환 | #34457 Windows hooks 멈춤 대응 |
-| CLAUDE.md | 운영 ���정성 섹션 추가 (2줄) | settings 변경 후 재시작 + 장시간 세션 방지 |
+| CLAUDE.md | 운영 안정성 섹션 추가 (2줄) | settings 변경 후 재시작 + 장시간 세션 방지 |
 
 ### Step 4: 자체진단 정리 (커밋 c5016378, -1603줄)
-| 대상 | ��심 변경 | 결과 |
+| 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
 | hooks 20개 + rules 2개 | 삭제 파일 git 반영 | unstaged deletion 해소 |
 | .claudeignore | 신규 생성 | _archive 규칙 세션 로딩 차단 |
