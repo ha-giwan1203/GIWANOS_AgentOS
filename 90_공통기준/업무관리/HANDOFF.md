@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-06 — 기준정보 복구 PASS + GERP단가 126건 업데이트 + 수식버전 생성
+최종 업데이트: 2026-04-06 — CLAUDE.md 경량화 PASS + SEND/THINK GATE 구현 + 야간스캔 PASS
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-기준정보 다중단가 파괴 복구 — 관리DB 기반 재생성 + 파이프라인 재실행 + GPT 검증
+"Opus가 Sonnet처럼 동작" 근본 원인 분석 + 대응 (GPT 공동작업)
 
 ---
 
@@ -19,13 +19,12 @@
 
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
-| 기준정보 엑셀 | 관리DB(02월)에서 완전 재생성, 16,524행, 다중단가 269건 보존 | Git 외 파일 |
-| 기준정보 엑셀 | X9000/X9500 이관품번 삭제 (SP3M3 17, HCAMS02 17, ISAMS03 15 = 49행) | Git 외 파일 |
-| 기준정보 엑셀 | GERP 3월 신규품번 추가 (SD9A01 888201Y000EQ 등) | Git 외 파일 |
-| 파이프라인 | Step1~8 재실행 — Step6 PASS, GERP 261,038,171원 | 완료 |
-| STATUS.md (정산) | 기준정보 재생성 이력 + 최신 정산결과 반영 | 본 커밋 |
-| TASKS.md | 기준정보 복구 완료 기록 | 본 커밋 |
-| memory | feedback_settlement_mistakes.md 작성 (5개 실수 + 검증 체크리스트) | 완료 |
+| night-scan SKILL.md + .claude/commands/night-scan.md | Phase 0~7 통일 | GPT PASS (15783b06) |
+| SEND GATE | send_gate.sh PreToolUse hook + ENTRY.md/CLAUDE.md 규칙 | GPT PASS (54908fab+8957f5e2) |
+| THINK GATE | 루트 CLAUDE.md에 전역 4칸 사고 흔적 강제 | GPT PASS (fc438e3d) |
+| CLAUDE.md | 143→71줄 경량화 (스킬 사용 기준 삭제, 중복 압축) | GPT PASS (de416123) |
+| rules/ | feature-utilization 삭제, cowork/fast-full/parallel/session 압축 (145→64줄) | 포함 |
+| CLAUDE.md 보완 | "대화 요약만으로 승인 금지" 복원 | GPT PASS (8a4fbd11) |
 
 ---
 
@@ -33,9 +32,7 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 높음 | 수식버전 vs Python 비교 | `04월/정산_수식버전_03월.xlsx` 사용자 확인 대기. GERP 조립단가 126건 업데이트 완료 |
-| 높음 | /daily 실전 테스트 | 4/6(월) 실행 예정 |
-| 완료 | GPT 기준정보 재생성 PASS | 42f84a43, GPT 최종 PASS (엑셀 실물 검증) |
-| 대기 | 4월 정산 시 기준단가 복귀 | step5 GERP→기준단가 역전환 + SP3M3 170원 복원 |
-| 대기 | SP3M3 미매칭 RSP 3건 모듈품번 갱신 | RSP3SC0291, 0292, 0294 |
-| 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 |
+| 관찰 | 경량화 체감 효과 확인 | 몇 세션 운영 후 Opus 품질 복원 여부 관찰 |
+| 높음 | 수식버전 vs Python 비교 | `04월/정산_수식버전_03월.xlsx` 사용자 확인 대기 |
+| 대기 | 4월 정산 | 4월 GERP/구ERP 데이터 입수 후 |
+| 대기 | SP3M3 미매칭 RSP 3건 | RSP3SC0291, 0292, 0294 모듈품번 갱신 |

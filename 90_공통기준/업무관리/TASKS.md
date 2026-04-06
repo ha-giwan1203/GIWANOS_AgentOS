@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-06 — 기준정보 재생성 (관리DB 기반 다중단가 보존) + 파이프라인 재실행 PASS
+최종 업데이트: 2026-04-06 — CLAUDE.md+rules/ 경량화 PASS + SEND GATE/THINK GATE 구현 + 야간스캔 스킬 PASS
 
 ---
 
@@ -57,6 +57,10 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| CLAUDE.md+rules/ 경량화 — 143→71줄(CLAUDE.md), rules/ 145→64줄, 전체 135줄. GPT PASS (de416123+8a4fbd11) | 2026-04-06 |
+| SEND GATE 구현 — send_gate.sh PreToolUse hook + 토론모드 ENTRY/CLAUDE.md 반영 (54908fab) | 2026-04-06 |
+| THINK GATE 구현 — 전역 4칸 사고 흔적 강제 규칙 (fc438e3d) | 2026-04-06 |
+| 야간스캔비교 스킬+커맨드 Phase 통일 — SKILL.md v1.1 + night-scan.md Phase 0~7 (15783b06, GPT PASS) | 2026-04-06 |
 | 기준정보 다중단가 파괴 복구 — 관리DB 재생성(16,524행), 다중단가 269건 보존, X9000/X9500 삭제, Step6 PASS | 2026-04-06 |
 | 3월 정산 04월 폴더 재실행 + 스킬화 — setup_month.py + step8 오류리스트 + `/settlement` 슬래시 명령 + SKILL.md, 데이터 검증 PASS (10라인 0원 차이) | 2026-04-05 |
 | 8단계 자동 루틴 강제 — /finish 커맨드 + finish_state.json + completion_gate 연동, GPT 토론 3턴 합의 + 부분반영→PASS (19400bed) | 2026-04-04 |
