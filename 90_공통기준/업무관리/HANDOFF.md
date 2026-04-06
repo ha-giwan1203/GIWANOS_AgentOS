@@ -4,14 +4,14 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-06 — Claude Code 근본 경량화 GPT 토론 (hooks 23→9, rules 6→2, CLAUDE.md 38줄)
+최종 업데이트: 2026-04-06 — 안정 운영 토론 (completion_gate bash 전환 + 오픈소스 검토 + 운영 규칙)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-Claude Code 환경 복잡도 개선 — hooks 28개·규칙 1,356줄·permissions 78개 누적 → GPT 토론으로 진단/합의 → 2단계 실행
+Claude Code 안정 운영 — 오픈소스 생태계 검토 + 공식 이슈 기반 안정성 개선 GPT 토론
 
 ---
 
@@ -32,22 +32,27 @@ Claude Code 환경 복잡도 개선 — hooks 28개·규칙 1,356줄·permission
 | hook_common.sh | 500KB 로그 로테이션 추가 | 무한 누적 방지 |
 | protect_files.sh | echo→hook_log() 전환 | 로테이션 우회 해소 |
 
+### Step 3: 안정 운영 개선 (GPT 토론 합의)
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| completion_gate.sh | v4→v5 python3→순수bash 전환 | #34457 Windows hooks 멈춤 대응 |
+| CLAUDE.md | 운영 안정성 섹션 추가 (2줄) | settings 변경 후 재시작 + 장시간 세션 방지 |
+
 ---
 
 ## 3. 미해결 / 다음 AI 액션
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| 관찰 | completion_gate v3 과차단 가능성 | 중간 진행보고 시 Gate2가 막을 수 있음 (GPT 지적) |
-| 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 (GPT 합의) |
+| 보류 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
+| 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 |
 | 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 `/settlement 04` |
 | 대기 | SP3M3 미매칭 RSP 4건 | RSP3SC0291~0294 모듈품번 갱신 |
 
 ## 4. 이번 세션 확인된 사실
 
-- GPT 합의: 문서 충돌은 "Context Rot" 패턴, 정기 점검 필요
-- .claude/ 파일은 .gitignore 대상이라 GPT가 실물 확인 불가 → 로컬 실물 텍스트 직접 공유로 해결
-- gpt_followup_guard Stop 제거 시 pending flag 차단 기능 소실 (GPT가 식별, 복원 완료)
-- protect_files.sh가 hook_log() 대신 직접 echo 사용 시 로테이션 우회 (GPT가 식별, 수정 완료)
-- 미사용 hook 3개(pre_finish_guard, skill_config_change, instructions_loaded) → _archive 이동 (GPT 채택)
-- GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 — .gitignore 대상이므로 Git PASS 불가는 정상
+- 오픈소스 검토: 외부 도입 가치 있는 소스 없음. 스킬 29개 자체 보유, 공식 문서만 참고 가치
+- 공식 이슈 #34457(Windows hooks 멈춤), #16047(2.5시간 후 미작동), #22679(settings 캐싱) 실존 확인
+- completion_gate python3→bash 전환으로 #34457 위험 감소
+- bypassPermissions는 공식 비권장이나, 즉시 전환 시 실무 팝업 폭탄 위험 → 1주 보류 합의
+- GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 + Step3 로컬 실물 기준 정합
