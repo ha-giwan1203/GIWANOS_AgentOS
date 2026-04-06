@@ -35,7 +35,15 @@
       "WebFetch",
       "mcp__00b6c2d7-87e0-41f1-a983-74975edcd79b__gcal_create_event",
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page",
-      "Bash(bash -n \"C:/Users/User/Desktop/업무리스트/.claude/hooks/completion_gate.sh\")"
+      "Bash(bash -n \"C:/Users/User/Desktop/업무리스트/.claude/hooks/completion_gate.sh\")",
+      "Bash(source .claude/hooks/hook_common.sh)",
+      "Bash(hook_log \"Test\" \"hook_log JSON 출력 검증\")",
+      "Bash(hook_incident \"compile_fail\" \"auto_compile\" \"/test/example.py\" \"SyntaxError: invalid syntax\")",
+      "Bash(bash .claude/hooks/smoke_test.sh)",
+      "Bash(bash .claude/hooks/final_check.sh)",
+      "Bash(STATE_DIR=\"C:/Users/User/Desktop/업무리스트/.claude/state\")",
+      "Bash(mkdir -p \"$STATE_DIR\")",
+      "Bash(\"$STATE_DIR/send_gate_passed\")"
     ],
     "defaultMode": "bypassPermissions"
   },
@@ -47,6 +55,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/block_dangerous.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/commit_gate.sh"
           }
         ]
       },

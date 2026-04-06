@@ -140,15 +140,28 @@ check $? "gate_reject → incident_ledger 연동"
 
 echo ""
 
-# === 11. notify_slack.sh (Notification) ===
-echo "--- 11. notify_slack.sh ---"
+# === 11. commit_gate.sh (PreToolUse/Bash) ===
+echo "--- 11. commit_gate.sh ---"
+test -x "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate.sh 존재 + 실행 가능"
+
+grep -q 'final_check' "$HOOKS_DIR/commit_gate.sh"
+check $? "final_check 호출 로직 존재"
+
+grep -q 'git.*commit\|git.*push' "$HOOKS_DIR/commit_gate.sh"
+check $? "git commit/push 감지 패턴 존재"
+
+echo ""
+
+# === 12. notify_slack.sh (Notification) ===
+echo "--- 12. notify_slack.sh ---"
 test -x "$HOOKS_DIR/notify_slack.sh"
 check $? "notify_slack.sh 존재 + 실행 가능"
 
 echo ""
 
-# === 12. incident_ledger 검증 ===
-echo "--- 12. incident_ledger 검증 ---"
+# === 13. incident_ledger 검증 ===
+echo "--- 13. incident_ledger 검증 ---"
 LEDGER="$PROJECT_DIR/.claude/incident_ledger.jsonl"
 # incident_ledger.jsonl이 존재하거나 생성 가능한지 확인
 touch "$LEDGER" 2>/dev/null
@@ -167,8 +180,8 @@ sed -i '$ d' "$LEDGER" 2>/dev/null
 
 echo ""
 
-# === 13. 퇴행 방지: 구 로그 직접 참조 0건 ===
-echo "--- 13. 퇴행 방지 (hook_log.txt 직접 참조) ---"
+# === 14. 퇴행 방지: 구 로그 직접 참조 0건 ===
+echo "--- 14. 퇴행 방지 (hook_log.txt 직접 참조) ---"
 # smoke_test.sh 자신(INFO 표시용)은 제외
 STALE_REFS=$(grep -l 'hook_log\.txt' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | wc -l)
 test "$STALE_REFS" -eq 0
@@ -176,8 +189,8 @@ check $? "운영 훅에서 hook_log.txt 직접 참조 0건 (JSONL 통일)"
 
 echo ""
 
-# === 14. 구 훅 부재 확인 (아카이브 완료) ===
-echo "--- 14. 구 훅 부재 확인 ---"
+# === 15. 구 훅 부재 확인 (아카이브 완료) ===
+echo "--- 15. 구 훅 부재 확인 ---"
 ! test -f "$HOOKS_DIR/pre_finish_guard.sh"
 check $? "pre_finish_guard.sh 미존재 (completion_gate에 흡수됨)"
 

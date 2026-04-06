@@ -15,7 +15,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 파이프라인 | Phase 1~6 운영 중 (skill_install 포함) |
-| hooks 체계 | 10개 등록 (상시 7 + 토론 3), completion_gate v5, 20개 아카이브 |
+| hooks 체계 | 11개 등록 (상시 8 + 토론 3), completion_gate v5 + commit_gate 신규, 20개 아카이브 |
 
 ---
 

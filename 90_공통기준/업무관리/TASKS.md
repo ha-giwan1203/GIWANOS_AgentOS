@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 문서-구현 정합성 3건 수정 (GPT 부분정합→정합)
+최종 업데이트: 2026-04-07 — python3 전면 제거 + final_check 자체검증 강화 (GPT PASS)
 
 ---
 
@@ -27,8 +27,10 @@
 - ④ send_gate/stop_guard/write_marker/notify_slack python3→bash 전환
 - ⑤ protect_files.sh python3→bash 전환
 - ⑥ final_check.sh 자체검증 4건 추가 (python3잔존/hook개수/HANDOFF교차/cp확인)
-- 결과: 운영 훅 python3 의존 0건 (auto_compile py_compile만 유지)
-- smoke_test 32/32 + final_check ALL PASS
+- ⑦ commit_gate.sh 신규 (git commit/push 전 final_check 강제)
+- ⑧ final_check.sh --fast/--full 2단 분리
+- 결과: 운영 훅 python3 의존 0건, 커밋 전 자체검증 자동 강제
+- smoke_test 35/35 + final_check ALL PASS
 
 ### ~~[진행] GPT Project Instructions Git 관리 방향 토론~~ → 완료됨
 ### ~~[진행] 8단계 자동 루틴 강제 — /finish + completion_gate 연동~~ → 완료됨
