@@ -3,9 +3,6 @@
     "allow": [
       "Bash(git *:*)",
       "Bash(python*:*)",
-      "Bash(python3*:*)",
-      "Bash(PYTHONUTF8=1 python*:*)",
-      "Bash(PYTHONIOENCODING=utf-8 python*:*)",
       "Bash(pip *:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
@@ -40,7 +37,7 @@
       "WebFetch",
       "mcp__00b6c2d7-87e0-41f1-a983-74975edcd79b__gcal_create_event",
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page",
-      "Bash(python3 -c \":*)"
+      "Bash(bash -n \"C:/Users/User/Desktop/업무리스트/.claude/hooks/completion_gate.sh\")"
     ],
     "defaultMode": "bypassPermissions"
   },
@@ -65,24 +62,6 @@
         ]
       },
       {
-        "matcher": "Bash|mcp__Claude_in_Chrome",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/domain_guard.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/pre_write_guard.sh"
-          }
-        ]
-      },
-      {
         "matcher": "mcp__Claude_in_Chrome__javascript_tool",
         "hooks": [
           {
@@ -94,15 +73,6 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/post_validate.sh"
-          }
-        ]
-      },
-      {
         "matcher": "Write|Edit",
         "hooks": [
           {
@@ -112,20 +82,11 @@
         ]
       },
       {
-        "matcher": "Read",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/domain_read_tracker.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/post_write_dirty.sh"
+            "command": "bash .claude/hooks/write_marker.sh"
           }
         ]
       },
@@ -135,15 +96,6 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/gpt_followup_guard.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/bash_audit_log.sh"
           }
         ]
       }
@@ -172,85 +124,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash .claude/hooks/gpt_followup_guard.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash .claude/hooks/completion_gate.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/cleanup_audit.sh"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session_start.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/session_preflight.sh"
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/pre_compact.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/post_tool_failure.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/prompt_inject.sh"
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/subagent_audit_log.sh",
-            "async": true
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/subagent_audit_log.sh",
-            "async": true
           }
         ]
       }

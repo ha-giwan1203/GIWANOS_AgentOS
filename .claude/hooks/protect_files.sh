@@ -31,4 +31,5 @@ fi
 # PreToolUse는 allow/deny/ask 모두 지원하나,
 # 이번 구현에서는 운영 단순화를 위해 ask 대신 log를 채택
 
-echo "[Hook] protect_files: $FILE_PATH ($(date '+%Y-%m-%d %H:%M:%S'))" >> "$HOME/Desktop/업무리스트/.claude/hooks/hook_log.txt"
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+hook_log "PreToolUse" "protect_files: $FILE_PATH" 2>/dev/null || true

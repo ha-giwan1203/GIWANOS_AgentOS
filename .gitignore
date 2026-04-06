@@ -24,6 +24,13 @@
 # Claude Code 로컬 설정 (머신별 경로 하드코딩)
 .claude/
 
+# 세션 락 파일
+.watch.lock
+
+# Dedup 상태 파일
+.notion_dedup_state.json
+.slack_dedup_state.json
+
 # ==========================
 # 대용량 원본 파일 제외
 # ==========================
