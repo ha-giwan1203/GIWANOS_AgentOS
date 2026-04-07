@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — evidence hook 5개 구현 + MES SKILL.md 로그인 판정 수정
+최종 업데이트: 2026-04-07 — evidence hook 5개 GPT PASS + 세션 마무리
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -64,11 +64,10 @@
 
 ## 4. 이번 세션 확인된 사실
 
-- 오픈소스 검토: 외부 도입 가치 있는 소스 없음. 스킬 29개 자체 보유, 공식 문서만 참고 가치
-- 공식 이슈 #34457(Windows hooks 멈춤), #16047(2.5시간 후 미작동), #22679(settings 캐싱) 실존 확인
-- completion_gate python3→bash 전환으로 #34457 위험 감소
-- bypassPermissions는 공식 비권장이나, 즉시 전환 시 실무 팝업 폭탄 위험 → 1주 보류 합의
-- GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 + Step3 로컬 실물 기준 정합
-- 사용자 피드백: GPT 지적 시 실물 확인 없이 바로 수정한 문제 지적 → 메모리 보강 완료 (GPT 지적도 제안과 동일하게 파일 읽고 검증 후 수정)
-- GPT 피드백 실물 검증 강제: Step 5-4→5-0 재진입 연결 합의 (C 단독, B 보류) → 커밋 586a8323 PASS
-- critic-reviewer 세션 검토: 종합 WARN — 독립성 WARN / 하네스 WARN / 0건감사 FAIL / 일방성 WARN
+- 연속 실수 5건 근본 원인: "생각 없이 실행" — 의지력 규칙으로 해결 불가
+- GPT 토론 4턴 → "증거 없는 위험 실행 차단기" 아키텍처 합의 + 구현
+- evidence hook: req 없으면 no-op (일상 마찰 0), 세션 격리 (sha1+mtime)
+- GPT 검증: c0ffc54c 부분반영 → d6fdc413 STATUS 동기화 후 **PASS**
+- MES SKILL.md 로그인 판정: auth-dev URL 부재가 아닌 MES 직접 접속으로 수정
+- completion_gate 순서 버그 발견: 상태문서 갱신 후 다른 파일 수정 시 마커 재생성 → 상태문서는 커밋 직전 마지막에 수정해야 함
+- **세션 재시작 필수**: settings.local.json에 UserPromptSubmit + hook 5개 추가됨 (캐싱)
