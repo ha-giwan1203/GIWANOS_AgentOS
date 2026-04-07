@@ -29,7 +29,6 @@
       "Bash(curl:*)",
       "Bash(gzip:*)",
       "Bash(dot:*)",
-      "Bash(cmd /c:*)",
       "Bash(source .claude/hooks/*:*)",
       "Bash(bash .claude/hooks/*:*)",
       "Bash(bash -n:*)",
@@ -43,6 +42,16 @@
       "Bash(schtasks:*)",
       "mcp__00b6c2d7-87e0-41f1-a983-74975edcd79b__gcal_create_event",
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page"
+    ],
+    "ask": [
+      "Bash(python*:*)",
+      "Bash(pip *:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)",
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)",
+      "Bash(taskkill:*)"
     ]
   },
   "hooks": {
