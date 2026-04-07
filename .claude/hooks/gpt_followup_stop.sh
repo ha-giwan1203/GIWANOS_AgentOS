@@ -14,8 +14,8 @@ if [ ! -f "$PENDING" ]; then
 fi
 
 # 예외 보고 패턴 확인 (timeout, 로그인 만료, 검토만 등)
-# bash-only JSON 파싱 (python3 의존 제거)
-LAST_MSG=$(echo "$INPUT" | sed -n 's/.*"last_assistant_message"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
+LAST_MSG=$(echo "$INPUT" | safe_json_get "last_assistant_message")
 
 if echo "$LAST_MSG" | grep -qiE '(timeout|타임아웃|로그인 만료|재로그인|네트워크 오류|검토만|읽기만|예외 종료)'; then
   rm -f "$PENDING" 2>/dev/null

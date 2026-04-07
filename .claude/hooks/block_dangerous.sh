@@ -3,8 +3,8 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
 hook_log "PreToolUse/Bash" "block_dangerous 발화"
-# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
-COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\(.*\)"/\1/p' | head -1)
+# 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
+COMMAND=$(echo "$INPUT" | safe_json_get "command")
 
 # 1. 극단 파괴 명령 차단
 if echo "$COMMAND" | grep -qE '(rm -rf /|git reset --hard|git clean -fd|git push.*--force.*main)'; then
@@ -22,6 +22,18 @@ if echo "$COMMAND" | grep -qE "$DANGER_CMDS"; then
     hook_log "PreToolUse/Bash" "BLOCKED: 보호 경로 삭제/이동 시도 — $COMMAND"
     echo '{"decision":"deny","reason":"보호 대상 파일 삭제/이동 차단. 사용자 직접 실행 필요."}'
     exit 0
+  fi
+fi
+
+# 3. Python heredoc/inline 경유 파일조작 차단 (GPT 실증 시나리오 대응, 2026-04-07)
+if echo "$COMMAND" | grep -qE '(python|python3)'; then
+  if echo "$COMMAND" | grep -qiE '(os\.remove|os\.unlink|shutil\.(move|rmtree|copy)|open\(.+["\x27]w)'; then
+    if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
+      hook_log "PreToolUse/Bash" "BLOCKED: Python 경유 보호 파일 조작 시도 — $COMMAND"
+      hook_incident "hook_block" "block_dangerous" "" "Python heredoc 보호파일 조작 차단"
+      echo '{"decision":"deny","reason":"Python 경유 보호 대상 파일 조작 차단. 사용자 직접 실행 필요."}'
+      exit 0
+    fi
   fi
 fi
 

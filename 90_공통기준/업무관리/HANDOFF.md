@@ -4,14 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 자체 진단 + 경미 정리 3건
+최종 업데이트: 2026-04-07 — GPT 토론 합의 P1/P2 구현
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-07)
 
-### 작업: Claude Code 자체 진단 + 경미 정리
+### 작업: GPT 토론 합의 — sed 파싱 교체 + Python 우회 차단
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| hook_common.sh | safe_json_get() 공용 파서 추가 | escaped quotes/multiline/nested JSON 처리 |
+| block_dangerous.sh + commit_gate.sh + gpt_followup_post.sh + gpt_followup_stop.sh | sed 단독 파싱 → safe_json_get() 교체 | 4개 스크립트 취약점 해소 |
+| block_dangerous.sh | Python heredoc 경유 보호파일 조작(os.remove/shutil) 차단 | GPT 실증 시나리오 대응 |
+| smoke_test.sh | 엣지케이스 5건 추가 (escaped quotes/multiline/nested/빈키/Python패턴) | 40/40 PASS |
+
+### 미해결
+- bypassPermissions 구조 리스크 (P1, 보류 → 1주 로깅 후 결정)
+- hook 의존 그래프 문서화 (보류)
+
+---
+
+### 이전 작업: Claude Code 자체 진단 + 경미 정리
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
 | 자동 검증 | final_check --fast + smoke_test | ALL CLEAR / 35/35 PASS |

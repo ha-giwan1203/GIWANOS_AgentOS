@@ -51,6 +51,32 @@ hook_log() {
   _rotate_file "$HOOK_LOG_FILE"
 }
 
+# 안전 JSON 값 추출 — sed 단독 파싱의 따옴표/줄바꿈 취약성 대체
+# 사용법: VALUE=$(echo "$JSON" | safe_json_get "key_name")
+# 문자열 값: 따옴표 내부를 이스케이프 인식하며 추출
+# 객체 값: 중괄호 매칭으로 추출
+safe_json_get() {
+  local key="$1"
+  local input
+  input=$(cat)
+  # 1차: 문자열 값 — 이스케이프된 따옴표(\")를 건너뛰며 추출
+  local val
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"\(\([^"\\]\|\\.\)*\)".*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    # 이스케이프 복원: \" → ", \\ → \, \n → 개행
+    val=$(printf '%s' "$val" | sed 's/\\"/"/g; s/\\\\/\\/g')
+    printf '%s' "$val"
+    return 0
+  fi
+  # 2차: 객체/배열 값 — 첫 번째 { 또는 [ 부터 매칭
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*\(\({[^}]*}\)\|\(\[.*\]\)\).*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    printf '%s' "$val"
+    return 0
+  fi
+  return 1
+}
+
 hook_incident() {
   local type="$1"    # hook_block|compile_fail|gate_reject|encoding_error
   local hook="$2"    # 훅 이름

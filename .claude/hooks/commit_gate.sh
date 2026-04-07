@@ -7,7 +7,8 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\(.*\)"/\1/p' | head -1)
+# 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
+COMMAND=$(echo "$INPUT" | safe_json_get "command")
 
 # git commit 또는 git push가 아니면 통과
 if ! echo "$COMMAND" | grep -qE 'git (commit|push)'; then

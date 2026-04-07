@@ -180,8 +180,38 @@ sed -i '$ d' "$LEDGER" 2>/dev/null
 
 echo ""
 
-# === 14. 퇴행 방지: 구 로그 직접 참조 0건 ===
-echo "--- 14. 퇴행 방지 (hook_log.txt 직접 참조) ---"
+# === 14. safe_json_get 엣지케이스 검증 (GPT+Claude 합의 P2) ===
+echo "--- 14. safe_json_get 엣지케이스 ---"
+source "$HOOKS_DIR/hook_common.sh" 2>/dev/null
+
+# 14-1: 이스케이프된 따옴표 포함 값
+ESCAPED_RESULT=$(echo '{"command":"echo \"hello world\""}' | safe_json_get "command")
+echo "$ESCAPED_RESULT" | grep -q 'echo "hello world"'
+check $? "escaped quotes 처리 정상"
+
+# 14-2: 멀티라인 입력 (줄바꿈 포함 JSON)
+MULTILINE_RESULT=$(printf '{\n  "command": "ls -la"\n}' | safe_json_get "command")
+test "$MULTILINE_RESULT" = "ls -la"
+check $? "multiline JSON 입력 처리 정상"
+
+# 14-3: 중첩 JSON 값 (객체 값 추출)
+NESTED_RESULT=$(echo '{"tool_name":"Bash","tool_input":{"cmd":"test"}}' | safe_json_get "tool_name")
+test "$NESTED_RESULT" = "Bash"
+check $? "중첩 JSON에서 문자열 키 추출 정상"
+
+# 14-4: 빈 값 / 키 없음
+EMPTY_RESULT=$(echo '{"other":"val"}' | safe_json_get "command")
+test -z "$EMPTY_RESULT"
+check $? "존재하지 않는 키 → 빈 결과"
+
+# 14-5: Python 파일조작 차단 패턴 존재 확인
+grep -qE 'os\.remove|shutil' "$HOOKS_DIR/block_dangerous.sh"
+check $? "block_dangerous.sh에 Python 파일조작 탐지 패턴 존재"
+
+echo ""
+
+# === 15. 퇴행 방지: 구 로그 직접 참조 0건 ===
+echo "--- 15. 퇴행 방지 (hook_log.txt 직접 참조) ---"
 # smoke_test.sh 자신(INFO 표시용)은 제외
 STALE_REFS=$(grep -l 'hook_log\.txt' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | wc -l)
 test "$STALE_REFS" -eq 0
@@ -189,8 +219,8 @@ check $? "운영 훅에서 hook_log.txt 직접 참조 0건 (JSONL 통일)"
 
 echo ""
 
-# === 15. 구 훅 부재 확인 (아카이브 완료) ===
-echo "--- 15. 구 훅 부재 확인 ---"
+# === 16. 구 훅 부재 확인 (아카이브 완료) ===
+echo "--- 16. 구 훅 부재 확인 ---"
 ! test -f "$HOOKS_DIR/pre_finish_guard.sh"
 check $? "pre_finish_guard.sh 미존재 (completion_gate에 흡수됨)"
 

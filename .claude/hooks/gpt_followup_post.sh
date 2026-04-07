@@ -5,9 +5,9 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 
 INPUT=$(cat)
-# bash-only JSON 파싱 (python3 의존 제거)
-TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-TOOL_INPUT=$(echo "$INPUT" | sed -n 's/.*"tool_input"[[:space:]]*:[[:space:]]*\({.*}\).*/\1/p' | head -1)
+# 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
+TOOL_NAME=$(echo "$INPUT" | safe_json_get "tool_name")
+TOOL_INPUT=$(echo "$INPUT" | safe_json_get "tool_input")
 
 mkdir -p "$STATE_AGENT_CONTROL" 2>/dev/null
 PENDING="$STATE_AGENT_CONTROL/gpt_followup_pending.flag"

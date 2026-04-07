@@ -9,11 +9,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 자체 진단 + 경미 정리 3건
+최종 업데이트: 2026-04-07 — GPT 토론 합의 P1/P2 구현
 
 ---
 
 ## 진행 중
+
+### [진행] GPT 토론 합의 — sed 파싱 교체 + Python 우회 차단 (2026-04-07)
+- P1-a: hook_common.sh에 safe_json_get() 공용 파서 추가, 4개 스크립트 sed→safe_json_get 교체
+- P1-b: block_dangerous.sh에 Python heredoc 경유 보호파일 조작 차단 패턴 추가
+- P2: smoke_test.sh에 escaped quotes / multiline / nested JSON / 빈 키 엣지케이스 5건 추가
+- smoke_test 40/40 ALL PASS
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS
