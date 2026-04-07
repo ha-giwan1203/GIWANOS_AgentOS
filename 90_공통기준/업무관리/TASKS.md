@@ -53,6 +53,11 @@
 - SKILL.md Step 5-0 범위 확장 (제안→제안·지적), Step 5-4 분기 3행에 Step 5-0 재수행 강제
 - 재발 시 A-lite(Read 이력 추적) 승격 경로 유지
 
+### ~~[진행] 토론모드 코어/참조 분리~~ → 완료됨 (2026-04-07)
+- SKILL.md 326→133줄 슬림화, REFERENCE.md 신설 (JS코드/완료감지/오류대응/변경이력 분리)
+- 토론모드 CLAUDE.md ENTRY.md 참조 제거, SKILL.md/REFERENCE.md 구조로 정리
+- completion_gate 역할 문서화: CLAUDE.md 29줄에 이미 명시 확인 (실물 검증)
+
 ### ~~[진행] GPT Project Instructions Git 관리 방향 토론~~ → 완료됨
 ### ~~[진행] 8단계 자동 루틴 강제 — /finish + completion_gate 연동~~ → 완료됨
 ### ~~[대기] PPT 자동 생성 스킬 — 실무 투입 준비~~ → 완료됨

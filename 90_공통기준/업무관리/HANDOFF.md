@@ -53,8 +53,8 @@
 | ~~완료~~ | 토론 품질 게이트 1단계 | send_gate 주력 + stop_guard 백스톱 2중 구성 |
 | ~~완료~~ | 토론 품질 게이트 2단계 | critic-reviewer subagent 신규 + SKILL.md Step 4a/4b 분리 (v2.5) |
 | ~~완료~~ | 토론모드 코어/참조 분리 | SKILL.md 326→133줄 + REFERENCE.md 신설 (v2.6) |
-| 6순위 | completion_gate 역할 문서화 | CLAUDE.md에 "사람/GPT 판정, 자동 게이트 아님" 명시 |
-| 6순위 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
+| ~~완료~~ | completion_gate 역할 문서화 | CLAUDE.md 29줄에 이미 명시 확인 (실물 검증 완료) |
+| 보류 | bypassPermissions→default 전환 | 1주 경과했으나 incident_ledger/hook_log 비어있어 판단 근거 부족. 로그 축적 후 재검토 |
 | 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 |
 | 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 `/settlement 04` |
 | 대기 | SP3M3 미매칭 RSP 4건 | RSP3SC0291~0294 모듈품번 갱신 |
