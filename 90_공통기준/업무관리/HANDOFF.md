@@ -4,14 +4,31 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — GPT 토론 합의 2건 구현 + 보완 3건 반영 (74b51298)
+최종 업데이트: 2026-04-08 — 4/14 판정 대비 (4지표 재집계 + 스킬 5개 실패계약 보강)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-07)
+## 0. 최신 세션 (2026-04-08)
 
-### 작업: GPT 토론 합의 — sed 파싱 교체 + Python 우회 차단
+### 작업: 4/14 판정 대비 — 4지표 재집계 + 스킬 실패계약 보강
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| aggregate_hook_metrics.py | 재집계 실행 | deny 3.37% / 오탐 0 / 우회 0 → 현행 유지 |
+| assembly-cost-settlement SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
+| chomul-module-partno SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
+| night-scan-compare SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
+| line-mapping-validator SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
+| line-batch-management SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
+| GPT 토론방 | 74b51298 응답 확인 | 부분정합 — unknown 45건 지적 |
+
+### 미해결
+- unknown 버킷 45건 해소 (GPT 지적 — KNOWN_HOOKS 편입 or 무시 판단)
+- 4/14 최종 판정: 주간 재집계 1회 더 필요
+
+---
+
+### 이전 작업 (2026-04-07): GPT 토론 합의 — sed 파싱 교체 + Python 우회 차단
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
 | hook_common.sh | safe_json_get() 공용 파서 추가 | escaped quotes/multiline/nested JSON 처리 |

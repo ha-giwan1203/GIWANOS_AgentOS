@@ -99,6 +99,30 @@ python run_settlement_pipeline.py --start-from 5 --use-cache
 - `run_logs/` 최신 `_summary.json`에서 `failed_step` 확인
 - `--start-from N --use-cache`로 실패 step부터 재실행
 
+## 실패 조건
+- step1 파일검증에서 GERP/구ERP 파일 미존재 또는 시트 구조 불일치
+- step4 기준정보매칭에서 미매핑 품번이 전체의 10% 이상
+- step6 검증에서 FAIL 판정 (합계 불일치)
+- `_summary.json`의 `failed_step`이 null이 아닌 경우
+
+## 중단 기준
+- 실적 파일이 없으면 즉시 중단 (Phase 1에서 차단)
+- 기준정보 파일 버전이 최신이 아니면 사용자 확인 전까지 중단
+- step5 계산 중 라인 단가가 0원인 품번 발견 시 중단 → 기준정보 점검
+- 파이프라인 중간 step에서 예외 발생 시 해당 step에서 중단 (캐시 보존)
+
+## 검증 항목
+- step6 검증 결과: 10개 라인 모두 PASS 여부
+- 정산결과 엑셀 13개 시트 존재 + 00_정산집계 합계 = 라인별 합산
+- 오류리스트 건수/금액이 차이분석 시트와 일치
+- GERP 총액 = 라인별 GERP 합산 (교차검증)
+
+## 되돌리기 방법
+- `--start-from N --use-cache`로 실패 step부터 재실행
+- `_cache/*.json` 삭제 후 전체 재실행 (클린 런)
+- 기준정보 파괴 시: `01_기준정보/` 백업에서 복원 후 step4부터 재실행
+- 상세 복구 절차: `03_정산자동화/RUNBOOK.md` 참조
+
 ## 관련 문서
 - 도메인 규칙: `05_생산실적/조립비정산/CLAUDE.md`
 - 파이프라인 계약: `03_정산자동화/pipeline_contract.md`
