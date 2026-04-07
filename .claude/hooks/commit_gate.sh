@@ -10,6 +10,8 @@ INPUT=$(cat)
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
 COMMAND=$(echo "$INPUT" | safe_json_get "command")
 
+# fail-closed: 파싱 실패 시 통과 (commit_gate는 차단 목적이 아닌 감지 목적)
+# command가 빈 문자열이면 git commit/push가 아니므로 통과
 # git commit 또는 git push가 아니면 통과
 if ! echo "$COMMAND" | grep -qE 'git (commit|push)'; then
   exit 0

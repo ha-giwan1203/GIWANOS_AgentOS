@@ -17,8 +17,9 @@ TNAME_LOWER=$(echo "$TOOL_NAME" | tr '[:upper:]' '[:lower:]')
 # GPT 응답 읽기 감지 → pending flag 생성
 if echo "$TNAME_LOWER" | grep -q "javascript"; then
   if echo "$TOOL_INPUT" | grep -qiE '(data-message-author-role.*assistant|innertext|textcontent)'; then
-    # 전송(send-button click)이나 입력(insertText)은 읽기가 아님
-    if echo "$TOOL_INPUT" | grep -qiE '(send-button.*click|inserttext)'; then
+    # 전송(send-button + .click 결합)이나 입력(execCommand + insertText 결합)은 읽기가 아님
+    # GPT 피드백: send-button 문자열 단독 매칭은 읽기용 JS에서 오탐 (2026-04-07)
+    if echo "$TOOL_INPUT" | grep -qiE '(send-button.*\.click|execCommand.*insertText)'; then
       rm -f "$PENDING" 2>/dev/null
       exit 0
     fi
@@ -34,7 +35,7 @@ fi
 
 # GPT 전송 감지 → pending flag 삭제
 if echo "$TNAME_LOWER" | grep -q "javascript"; then
-  if echo "$TOOL_INPUT" | grep -qiE '(send-button|prompt-textarea|execcommand.*inserttext)'; then
+  if echo "$TOOL_INPUT" | grep -qiE '(send-button.*\.click|execCommand.*insertText|prompt-textarea.*execCommand)'; then
     rm -f "$PENDING" 2>/dev/null
     exit 0
   fi
