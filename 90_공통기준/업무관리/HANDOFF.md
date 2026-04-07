@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 4/14 판정 대비 (4지표 재집계 + 스킬 5개 실패계약 보강)
+최종 업데이트: 2026-04-08 — 4/14 판정 대비 완료 (evidence 커버리지 + unknown 해소 + 3등급 분류 + critic 증적)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -32,17 +32,21 @@
 - smoke_test.sh: 헤더 v2→v3, 11개→16개
 - check_skill_contract.py: gap report PASS/FAIL 표기에 대상 구분 추가
 
+### 해결 완료 (2026-04-08 2차)
+- ~~smoke_test evidence 5종 실체 커버리지 보강~~ → **완료**: v4 68/68 ALL PASS
+- ~~unknown 버킷 47건 해소~~ → **완료**: MSG_PATTERN_MAP 추가, unknown 0건
+- ~~스킬 3등급 분류~~ → **완료**: A=7/B=8/C=12, SKILL_TEMPLATE.md+린터 반영
+- ~~critic-reviewer 증적~~ → **완료**: debate_20260407 대상 종합 WARN
+- ~~selector smoke_test~~ → **완료**: 토론모드 CLAUDE.md 셀렉터 4개 정합성 테스트
+
 ### 미해결
-- smoke_test evidence 5종 실체 커버리지 보강 (GPT 지적: 헤더만 바꿈, 테스트 항목 미추가)
-- unknown 버킷 47건 해소 (총계 지표에 무영향, 후순위)
-- 4/14 최종 판정: 주간 재집계 1회
+- 4/14 최종 판정: 최종 재집계 1회만 남음
 
 ---
 
 ## 다음 세션 할 일
 
-### 1순위: 4/14 판정 준비 (마감 4/14)
-- [ ] smoke_test.sh에 evidence 5종 hook 존재/동작 테스트 추가 (GPT 감점 해소)
+### 1순위: 4/14 판정 최종 (마감 4/14)
 - [ ] 4/13~14 aggregate_hook_metrics.py 최종 집계 → 판정 수치 확정
 - [ ] deny <10%, 오탐 0%, 우회 0% 확인 → 현행 유지 or allow 확대
 
@@ -50,11 +54,8 @@
 - [ ] 4월 실적 정산 — GERP/구ERP 데이터 입수 후 `/settlement 04`
 - [ ] SP3M3 미매칭 RSP 4건 갱신 (RSP3SC0291~0294)
 
-### 3순위: 보류 개선 (급하지 않음)
-- [ ] 스킬 3등급 분류 설계 (A=실행형, B=파일수정형, C=분석형)
-- [ ] critic-reviewer 호출 증적 (evidence proof)
-- [ ] 토론모드 selector 점검을 smoke_test에 추가
-- [ ] unknown 버킷 KNOWN_HOOKS 편입 (47건)
+### 3순위: 점진 보강
+- [ ] 각 스킬 SKILL.md에 grade: A|B|C frontmatter 추가 (27개)
 
 ---
 

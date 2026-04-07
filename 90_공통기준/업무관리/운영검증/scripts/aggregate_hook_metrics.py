@@ -50,13 +50,34 @@ KNOWN_HOOKS = {
 }
 
 
+# hook 이름이 msg에 직접 포함되지 않는 경우의 패턴→hook 매핑
+MSG_PATTERN_MAP = [
+    ("git commit 감지", "commit_gate"),
+    ("debate_quality", "send_gate"),
+    ("일요일", "date_scope_guard"),
+    ("요일 확인 없이", "date_scope_guard"),
+    ("date_check.req", "evidence_gate"),
+    ("auth_diag.req", "evidence_gate"),
+    ("skill_read.req", "evidence_gate"),
+    ("tasks_handoff.req", "evidence_gate"),
+    ("보호 경로 삭제", "protect_files"),
+    ("보호 경로", "protect_files"),
+    ("command 파싱 실패", "block_dangerous"),
+    ("python 경유 보호 파일", "block_dangerous"),
+]
+
+
 def extract_hook_name(msg: str) -> str:
-    """hook_log msg에서 hook 이름 추출. 알려진 hook 이름 우선 매칭."""
+    """hook_log msg에서 hook 이름 추출. 알려진 hook 이름 우선 매칭, 패턴 폴백."""
     if not msg:
         return "unknown"
     msg_lower = msg.lower()
     for hook in KNOWN_HOOKS:
         if hook in msg_lower:
+            return hook
+    # 패턴 폴백: msg에 hook 이름이 없지만 내용으로 추론 가능한 경우
+    for pattern, hook in MSG_PATTERN_MAP:
+        if pattern.lower() in msg_lower:
             return hook
     return "unknown"
 

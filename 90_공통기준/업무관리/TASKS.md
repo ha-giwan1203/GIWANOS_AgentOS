@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-08 — 4/14 판정 대비 (4지표 재집계 + 스킬 5개 실패계약 보강)
+최종 업데이트: 2026-04-08 — 4/14 판정 대비 완료 (evidence 커버리지 + unknown 해소 + 3등급 분류 + critic 증적)
 
 ---
 
@@ -58,7 +58,21 @@
   - 감점: 검증 커버리지 불완전(-1.0), 보고 문구 정합성(-1.0), 토론모드 UI 의존(-0.5)
   - 보고 정합성 3건 즉시 수정: 오탐 문구 false_positive 전환, smoke_test 헤더 v3(16개), gap report 표기 개선
 - GPT 3b7d4976 판정: 부분정합 — 보고 문구 OK, smoke_test 실체 커버리지(evidence 5종) 미추가 지적
-- 남은 작업: 4/14 최종 판정 (주간 재집계 + smoke_test evidence 커버리지 보강)
+- **smoke_test evidence 커버리지 보강 완료 (2026-04-08)**: v3→v4, 63→68개 테스트
+  - evidence_gate/evidence_stop_guard/evidence_mark_read/risk_profile_prompt/date_scope_guard 5종 추가
+  - 토론모드 selector 문서 정합성 테스트 추가 (4개 셀렉터)
+  - 68/68 ALL PASS
+- **unknown 버킷 50건 완전 해소 (2026-04-08)**: aggregate_hook_metrics.py MSG_PATTERN_MAP 추가
+  - task_status_sync 41건, debate_quality, 보호경로 등 매핑 → unknown 0건
+  - 재집계: 승인 1686 / deny 53 (3.14%) / 오탐 0 / 우회 0
+- **스킬 3등급 분류 설계 완료 (2026-04-08)**: A(실행7) / B(파일수정8) / C(분석12)
+  - SKILL_TEMPLATE.md에 grade 필드 추가
+  - check_skill_contract.py에 SKILL_GRADE_MAP + grade 검증 추가
+  - 각 스킬 SKILL.md에 grade frontmatter 추가는 점진 보강 예정
+- **critic-reviewer 증적 생성 완료 (2026-04-08)**: debate_20260407 대상 → 종합 WARN
+  - 독립성 WARN (GPT 프레임 부분 수용), 하네스 WARN (A 보류 라벨 실증 부재)
+  - 증적: 90_공통기준/토론모드/logs/critic_review_20260407.md
+- 남은 작업: 4/14 최종 판정 (최종 재집계만 남음)
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS

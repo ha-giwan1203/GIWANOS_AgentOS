@@ -1,14 +1,14 @@
 # Hook 4지표 집계
 
-- 생성시각: 2026-04-08T07:13:39+09:00
-- hook_log: 3376건 / incident_ledger: 53건
+- 생성시각: 2026-04-08T07:37:37+09:00
+- hook_log: 3663건 / incident_ledger: 53건
 
 ## 합계
 
 | 지표 | 건수 | 비율 |
 |------|------|------|
-| 승인 요청 (hook 발화) | 1581 | - |
-| deny (차단) | 53 | 3.35% |
+| 승인 요청 (hook 발화) | 1686 | - |
+| deny (차단) | 53 | 3.14% |
 | 오탐 (false_positive) | 0 | 0.00% |
 | 우회 감지 | 0 | 0.00% |
 
@@ -16,15 +16,20 @@
 
 | hook | 발화 | deny | 오탐 | 우회 |
 |------|------|------|------|------|
-| completion_gate | 4 | 23 | 0 | 0 |
-| commit_gate | 94 | 18 | 0 | 0 |
-| block_dangerous | 756 | 6 | 0 | 0 |
-| date_scope_guard | 405 | 4 | 0 | 0 |
-| evidence_gate | 0 | 1 | 0 | 0 |
-| send_gate | 1 | 1 | 0 | 0 |
-| protect_files | 273 | 0 | 0 | 0 |
-| risk_profile_prompt | 1 | 0 | 0 | 0 |
-| unknown | 47 | 0 | 0 | 0 |
+| completion_gate | 0 | 23 | 0 | 0 |
+| commit_gate | 144 | 18 | 0 | 0 |
+| block_dangerous | 802 | 6 | 0 | 0 |
+| date_scope_guard | 448 | 4 | 0 | 0 |
+| evidence_gate | 4 | 1 | 0 | 0 |
+| send_gate | 2 | 1 | 0 | 0 |
+| evidence_mark_read | 2 | 0 | 0 | 0 |
+| evidence_stop_guard | 2 | 0 | 0 | 0 |
+| gpt_followup_stop | 4 | 0 | 0 | 0 |
+| notify_slack | 3 | 0 | 0 | 0 |
+| protect_files | 262 | 0 | 0 | 0 |
+| risk_profile_prompt | 3 | 0 | 0 | 0 |
+| stop_guard | 5 | 0 | 0 | 0 |
+| write_marker | 5 | 0 | 0 | 0 |
 
 ## 판정 기준
 

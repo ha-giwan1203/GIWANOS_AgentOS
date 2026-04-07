@@ -1,6 +1,6 @@
 #!/bin/bash
-# Hooks Smoke Test v3 — 현행 훅 실물 기준 (2026-04-08)
-# 운영 훅 16개 + hook_common + incident_ledger 검증
+# Hooks Smoke Test v4 — 현행 훅 실물 기준 (2026-04-08)
+# 운영 훅 22개 + hook_common + incident_ledger 검증 (evidence 5종 + selector 추가)
 
 PASS=0
 FAIL=0
@@ -19,7 +19,7 @@ check() {
   fi
 }
 
-echo "=== Hooks Smoke Test v2 ==="
+echo "=== Hooks Smoke Test v4 ==="
 echo ""
 
 # === 1. hook_common.sh ===
@@ -243,6 +243,106 @@ check $? "pre_finish_guard.sh 미존재 (completion_gate에 흡수됨)"
 check $? "gpt_followup_guard.sh 미존재 (post/stop 분리됨)"
 
 ! test -f "$HOOKS_DIR/hook_log.txt" || echo "  [INFO] hook_log.txt 아카이브 잔존 (정상 — 새 로그는 .jsonl)"
+
+echo ""
+
+# === 17. evidence_gate.sh (PreToolUse/Bash|Write|Edit) ===
+echo "--- 17. evidence_gate.sh (증거 없는 위험실행 차단) ---"
+test -x "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate.sh 존재 + 실행 가능"
+
+bash -n "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
+check $? "evidence_gate.sh 구문 검증 (bash -n)"
+
+grep -q 'fresh_req\|fresh_ok' "$HOOKS_DIR/evidence_gate.sh"
+check $? "req/ok 판정 로직 존재"
+
+grep -q 'deny.*date_check' "$HOOKS_DIR/evidence_gate.sh"
+check $? "date_check req→deny 분기 존재"
+
+echo ""
+
+# === 18. evidence_stop_guard.sh (Stop) ===
+echo "--- 18. evidence_stop_guard.sh (근거 없는 결론 차단) ---"
+test -x "$HOOKS_DIR/evidence_stop_guard.sh"
+check $? "evidence_stop_guard.sh 존재 + 실행 가능"
+
+bash -n "$HOOKS_DIR/evidence_stop_guard.sh" 2>/dev/null
+check $? "evidence_stop_guard.sh 구문 검증 (bash -n)"
+
+grep -qE '로그인 실패|수동 로그인' "$HOOKS_DIR/evidence_stop_guard.sh"
+check $? "금지 결론 패턴 (로그인 실패/수동 로그인) 존재"
+
+grep -qE '완료|PASS' "$HOOKS_DIR/evidence_stop_guard.sh"
+check $? "금지 결론 패턴 (완료/PASS) 존재"
+
+echo ""
+
+# === 19. evidence_mark_read.sh (PostToolUse) ===
+echo "--- 19. evidence_mark_read.sh (증거 마커 적립) ---"
+test -x "$HOOKS_DIR/evidence_mark_read.sh"
+check $? "evidence_mark_read.sh 존재 + 실행 가능"
+
+bash -n "$HOOKS_DIR/evidence_mark_read.sh" 2>/dev/null
+check $? "evidence_mark_read.sh 구문 검증 (bash -n)"
+
+grep -q 'mark.*skill_read' "$HOOKS_DIR/evidence_mark_read.sh"
+check $? "skill_read 마커 적립 로직 존재"
+
+grep -q 'mark.*tasks_updated' "$HOOKS_DIR/evidence_mark_read.sh"
+check $? "tasks_updated 마커 적립 로직 존재"
+
+echo ""
+
+# === 20. risk_profile_prompt.sh (UserPromptSubmit) ===
+echo "--- 20. risk_profile_prompt.sh (위험 프롬프트 req 생성) ---"
+test -x "$HOOKS_DIR/risk_profile_prompt.sh"
+check $? "risk_profile_prompt.sh 존재 + 실행 가능"
+
+bash -n "$HOOKS_DIR/risk_profile_prompt.sh" 2>/dev/null
+check $? "risk_profile_prompt.sh 구문 검증 (bash -n)"
+
+grep -q 'touch_req.*date_check' "$HOOKS_DIR/risk_profile_prompt.sh"
+check $? "date_check req 생성 로직 존재"
+
+grep -q 'touch_req.*auth_diag' "$HOOKS_DIR/risk_profile_prompt.sh"
+check $? "auth_diag req 생성 로직 존재"
+
+echo ""
+
+# === 21. date_scope_guard.sh (PreToolUse/Bash) ===
+echo "--- 21. date_scope_guard.sh (위험 날짜 차단) ---"
+test -x "$HOOKS_DIR/date_scope_guard.sh"
+check $? "date_scope_guard.sh 존재 + 실행 가능"
+
+bash -n "$HOOKS_DIR/date_scope_guard.sh" 2>/dev/null
+check $? "date_scope_guard.sh 구문 검증 (bash -n)"
+
+grep -qE '일요일|%u.*7' "$HOOKS_DIR/date_scope_guard.sh"
+check $? "일요일(요일 7) 차단 로직 존재"
+
+grep -q 'MM/DD' "$HOOKS_DIR/date_scope_guard.sh"
+check $? "MM/DD 형식 차단 패턴 존재"
+
+echo ""
+
+# === 22. 토론모드 selector 문서 정합성 ===
+echo "--- 22. 토론모드 selector 문서 정합성 ---"
+DEBATE_CLAUDE="$PROJECT_DIR/90_공통기준/토론모드/CLAUDE.md"
+test -f "$DEBATE_CLAUDE"
+check $? "토론모드 CLAUDE.md 존재"
+
+grep -q '#prompt-textarea' "$DEBATE_CLAUDE"
+check $? "입력창 selector (#prompt-textarea) 문서화됨"
+
+grep -q 'data-testid="send-button"' "$DEBATE_CLAUDE"
+check $? "전송버튼 selector (send-button) 문서화됨"
+
+grep -q 'data-testid="stop-button"' "$DEBATE_CLAUDE"
+check $? "중지버튼 selector (stop-button) 문서화됨"
+
+grep -q 'data-message-author-role="assistant"' "$DEBATE_CLAUDE"
+check $? "응답노드 selector (assistant role) 문서화됨"
 
 echo ""
 

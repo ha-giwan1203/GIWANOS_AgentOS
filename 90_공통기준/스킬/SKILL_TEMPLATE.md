@@ -1,10 +1,18 @@
 ---
 name: {스킬ID}
 description: {한 줄 설명 — 발동 조건 포함}
+grade: {A|B|C}
 version: 1.0
 author: {작성자}
 last_updated: {YYYY-MM-DD}
 ---
+
+<!--
+grade 분류 기준:
+  A (실행형): 브라우저/ERP/MES/API 직접 조작 — 외부 시스템 상태 변경
+  B (파일수정형): 엑셀/코드/문서 파일 생성·수정 — 로컬 파일시스템 변경
+  C (분석형): 읽기 전용 분석·보고 — 상태 변경 없음
+-->
 
 # {스킬명}
 
