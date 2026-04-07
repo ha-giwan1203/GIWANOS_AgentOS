@@ -9,11 +9,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — Claude Code 구조 분석 + P0/P1 개선 + GPT 피드백 반영 PASS
+최종 업데이트: 2026-04-07 — 자체 진단 + 경미 정리 3건
 
 ---
 
 ## 진행 중
+
+### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
+- final_check --fast ALL CLEAR, smoke_test 35/35 PASS
+- 이전 수정 5건 실물 반영 확인 (gpt_followup_guard 제거, DRY, 리네이밍, python3 제거, README 완화)
+- 정리: hook_log.txt 삭제(221KB 구 로그), 토론모드 STATUS.md 갱신(03-29→04-07), _tmp/ 아카이브 이동
 
 ### ~~[진행] Claude Code 구조 분석 + P0/P1 개선~~ → 완료됨 (2026-04-07)
 - P0: git rm gpt_followup_guard.sh, hooks README 실행순서 문서화

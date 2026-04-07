@@ -4,14 +4,27 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — Claude Code 구조 분석 + P0/P1 개선 + GPT PASS (a2c94bdc, 92d684dc)
+최종 업데이트: 2026-04-07 — 자체 진단 + 경미 정리 3건
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-07)
 
-### 작업: Claude Code 전수 분석 + 문제점 개선
+### 작업: Claude Code 자체 진단 + 경미 정리
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| 자동 검증 | final_check --fast + smoke_test | ALL CLEAR / 35/35 PASS |
+| hook_log.txt | 구 텍스트 로그 삭제 (221KB) | JSONL만 남음 |
+| 토론모드 STATUS.md | 03-29 → 04-07 갱신 | v2.6 + critic-reviewer 반영 |
+| _tmp/ | 8개 임시 스크립트 → 98_아카이브/정리대기_20260407/ | _tmp 폴더 제거 |
+
+### 미해결
+- bypassPermissions 1주 로깅 후 결정 (보류 유지)
+
+---
+
+### 이전 작업: Claude Code 전수 분석 + 문제점 개선
 | 대상 | 핵심 변경 | 결과 |
 |------|----------|------|
 | gpt_followup_guard.sh | git rm (삭제 미커밋 해소) | git status 정상화 |
