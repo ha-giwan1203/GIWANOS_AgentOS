@@ -39,8 +39,10 @@ echo ""
 
 # 3. 문서 간 hook 개수 정합성 확인
 echo "--- 3. hook 개수 정합성 ---"
-README_COUNT=$(grep -oP '활성 Hook \(\K\d+' "$HOOKS_DIR/README.md" 2>/dev/null || echo 0)
-STATUS_COUNT=$(grep -oP '\K\d+(?=개 등록)' "$PROJECT_DIR/90_공통기준/업무관리/STATUS.md" 2>/dev/null | head -1 || echo 0)
+README_COUNT=$(sed -n 's/.*활성 Hook (\([0-9]*\)개.*/\1/p' "$HOOKS_DIR/README.md" 2>/dev/null | head -1)
+README_COUNT=${README_COUNT:-0}
+STATUS_COUNT=$(sed -n 's/.*| hooks 체계 | \([0-9]*\)개 등록.*/\1/p' "$PROJECT_DIR/90_공통기준/업무관리/STATUS.md" 2>/dev/null | head -1)
+STATUS_COUNT=${STATUS_COUNT:-0}
 echo "  README: ${README_COUNT}개 / STATUS: ${STATUS_COUNT}개"
 if [ "$README_COUNT" -ne "$STATUS_COUNT" ] 2>/dev/null; then
   echo "  [WARN] README($README_COUNT) ≠ STATUS($STATUS_COUNT) — hook 개수 불일치"
@@ -60,10 +62,55 @@ else
 fi
 echo ""
 
-# 5. TASKS/HANDOFF 최신화 확인
-echo "--- 5. TASKS/HANDOFF 갱신 확인 ---"
+# 5. settings.local.json vs README hook 개수 대조
+echo "--- 5. settings.local hook 개수 대조 ---"
+SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
+if [ -f "$SETTINGS" ]; then
+  # helper 제외 (hook_common, smoke_test, final_check는 훅이 아닌 유틸)
+  SETTINGS_HOOKS=$(grep -o '[a-z_]*\.sh' "$SETTINGS" 2>/dev/null | sort -u | grep -v hook_common | grep -v smoke_test | grep -v final_check | wc -l)
+  echo "  settings.local: ${SETTINGS_HOOKS}개 / README: ${README_COUNT}개"
+  if [ "$SETTINGS_HOOKS" -ne "$README_COUNT" ] 2>/dev/null; then
+    echo "  [WARN] settings.local($SETTINGS_HOOKS) ≠ README($README_COUNT)"
+    FAIL=$((FAIL+1))
+  else
+    echo "  [OK] settings.local-README hook 개수 일치"
+  fi
+else
+  echo "  [WARN] settings.local.json 파일 없음"
+fi
+echo ""
+
+# 6. 상태 문서 3종 날짜 동기화 확인
+echo "--- 6. TASKS/HANDOFF/STATUS 날짜 동기화 ---"
+STATUS_FILE="$PROJECT_DIR/90_공통기준/업무관리/STATUS.md"
 TASKS="$PROJECT_DIR/90_공통기준/업무관리/TASKS.md"
 HANDOFF="$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
+
+TASKS_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$TASKS" 2>/dev/null | head -1)
+HANDOFF_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$HANDOFF" 2>/dev/null | head -1)
+STATUS_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$STATUS_FILE" 2>/dev/null | head -1)
+echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
+
+if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
+  if [[ "$STATUS_DATE" < "$TASKS_DATE" ]]; then
+    echo "  [WARN] STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
+    FAIL=$((FAIL+1))
+  else
+    echo "  [OK] STATUS 날짜 >= TASKS 날짜"
+  fi
+fi
+if [ -n "$TASKS_DATE" ] && [ -n "$HANDOFF_DATE" ]; then
+  if [[ "$HANDOFF_DATE" < "$TASKS_DATE" ]]; then
+    echo "  [WARN] HANDOFF($HANDOFF_DATE) < TASKS($TASKS_DATE) — HANDOFF 드리프트"
+    FAIL=$((FAIL+1))
+  else
+    echo "  [OK] HANDOFF 날짜 >= TASKS 날짜"
+  fi
+fi
+echo ""
+
+# 7. TASKS/HANDOFF 최신화 확인
+echo "--- 7. TASKS/HANDOFF 갱신 확인 ---"
 STATE_DIR="$PROJECT_DIR/90_공통기준/agent-control/state"
 MARKER="$STATE_DIR/write_marker.flag"
 
@@ -92,14 +139,14 @@ echo ""
 # === FULL 구간: smoke_test (--full 시에만) ===
 
 if [ "$MODE" = "--full" ]; then
-  echo "--- 6. smoke_test 실행 ---"
+  echo "--- 8. smoke_test 실행 ---"
   bash "$HOOKS_DIR/smoke_test.sh"
   if [ $? -ne 0 ]; then
     FAIL=$((FAIL+1))
   fi
   echo ""
 
-  echo "--- 7. 미커밋 변경 파일 ---"
+  echo "--- 9. 미커밋 변경 파일 ---"
   CHANGES=$(cd "$PROJECT_DIR" && git diff --name-only 2>/dev/null)
   STAGED=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null)
   if [ -z "$CHANGES" ] && [ -z "$STAGED" ]; then
