@@ -63,8 +63,8 @@ safe_json_get() {
   local val
   val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"\(\([^"\\]\|\\.\)*\)".*/\1/p' | head -1)
   if [ -n "$val" ]; then
-    # 이스케이프 복원: \" → ", \\ → \, \n → 개행
-    val=$(printf '%s' "$val" | sed 's/\\"/"/g; s/\\\\/\\/g')
+    # 이스케이프 복원: \" → ", \\ → \, \n → 개행, \t → 탭
+    val=$(printf '%s' "$val" | sed 's/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g; s/\\\\/\\/g')
     printf '%s' "$val"
     return 0
   fi

@@ -208,6 +208,21 @@ check $? "존재하지 않는 키 → 빈 결과"
 grep -qE 'os\.remove|shutil' "$HOOKS_DIR/block_dangerous.sh"
 check $? "block_dangerous.sh에 Python 파일조작 탐지 패턴 존재"
 
+# 14-6: tool_input 중첩 객체 추출 (GPT 3차 피드백)
+NESTED_OBJ=$(echo '{"tool_name":"Bash","tool_input":{"cmd":"ls"}}' | safe_json_get "tool_input")
+echo "$NESTED_OBJ" | grep -q 'cmd'
+check $? "tool_input 중첩 객체 추출 정상"
+
+# 14-7: 문자열 안 } 포함 케이스
+BRACE_RESULT=$(echo '{"command":"echo }done"}' | safe_json_get "command")
+echo "$BRACE_RESULT" | grep -q '}done'
+check $? "문자열 값 내 } 포함 시 정상 추출"
+
+# 14-8: \\n 이스케이프 복원
+NEWLINE_RESULT=$(echo '{"msg":"line1\\nline2"}' | safe_json_get "msg")
+echo "$NEWLINE_RESULT" | grep -q 'line2'
+check $? "\\n 이스케이프 → 개행 복원 정상"
+
 echo ""
 
 # === 15. 퇴행 방지: 구 로그 직접 참조 0건 ===
