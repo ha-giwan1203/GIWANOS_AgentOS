@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v2.4
+version: v2.5
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -191,10 +191,20 @@ Claude 작업 완료
 4. **승인 없이** 바로 Step 2 방식으로 전송
 5. 완료 감지 → 읽기 → 반복
 
-### Step 4. 종료 및 마무리
+### Step 4a. 종료 판정
 - 설정 턴 수 도달 / "합의" 감지 / 동일 주장 2회 반복 시 종료
 - 합의안 + 미합의 쟁점 + 즉시 실행안 3개 도출
-- 로그 저장 (`.md` + `.json`)
+- 임시 로그 저장 (`.md` + `.json`) — 아직 최종 확정 아님
+
+### Step 4b. 품질 심층 검토 (critic-reviewer 1회)
+1. `critic-reviewer` subagent 호출 — 입력: 토론 로그 .md 파일 경로
+2. 4축 평가: 독립성/하네스 엄밀성(필수) + 0건감사/결론 일방성(보조)
+3. 판정 처리:
+   - **PASS**: 로그에 `[CRITIC] PASS` 기록 → Step 5 진행
+   - **WARN**: 로그에 `[CRITIC] WARN — {사유}` 기록 + 사용자 경고 → Step 5 진행
+   - **FAIL**: 로그에 `[CRITIC] FAIL — {사유}` 기록 + 사용자 품질 경고 → Step 5 진행 전 경고 표시
+4. 세션당 1회만 호출 (재호출 금지)
+5. critic 판정 결과를 .json 로그의 `critic_review` 필드에 저장
 
 ### Step 5. 산출물 저장 → GitHub 푸시 → GPT 최종 검증 (필수)
 
@@ -310,4 +320,6 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v2.0 | 2026-03-30 | GPT 보고 순서 강제: commit → push 완료 확인 → GPT 전송. push 전 GPT 보고 금지 |
 | v2.1 | 2026-03-30 | Step 5 신설: 산출물 저장 → GitHub 푸시 → GPT 최종 검증 → PASS 판정까지 루틴 필수화. Step 4에서 루틴이 끊기는 문제 해결 |
 | v2.2 | 2026-03-30 | Step 5 보완: 5-4 판정 분기를 GPT Evaluator 참조형으로 교체(중복 제거), HOLD/PASS+보류 혼재 추가, 5-5 완료 보고 형식 추가, 5-6 Step 5 전용 오류 경로 추가 |
-| v2.3 | 2026-03-30 | Step 5-0 신설: GPT 제안 내용 검증 필수화 (파일 반영 전 신규/중복/충돌 판정 → 신규만 반영) |
+| v2.3 | 2026-03-30 | Step 5-0 신설: GPT 제안 내용 검증 필수화 (파일 반영 전 신규/중복/충돌 판정 → 신규만 반영) |
+| v2.4 | 2026-04-02 | ENTRY.md PRIMARY 분리, REFERENCE.md 신설, 하네스 분석 규칙 강화 |
+| v2.5 | 2026-04-07 | Step 4 → 4a/4b 분리: critic-reviewer subagent 세션 종료 1회 호출. 2필수(독립성/하네스)+2보조(0건감사/일방성) 4축 평가 |

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — final_check 드리프트 방지 강화 (날짜 동기화 + settings 대조)
+최종 업데이트: 2026-04-07 — 토론 품질 게이트 2단계 (critic-reviewer subagent + SKILL.md v2.5)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -51,7 +51,7 @@
 | ~~완료~~ | 문서-구현 정합성 + python3 전면 제거 | cp추가 + 운영훅 9개 bash화 + hook개수 동기화 + final_check 자체검증 |
 | ~~3순위~~ | gpt_followup_guard 물리 분리 완료 | gpt_followup_post.sh + gpt_followup_stop.sh, 기존 아카이브 |
 | ~~완료~~ | 토론 품질 게이트 1단계 | send_gate 주력 + stop_guard 백스톱 2중 구성 |
-| 4순위 | 토론 품질 게이트 2단계 | critic-reviewer subagent 세션 종료 1회 호출 |
+| ~~완료~~ | 토론 품질 게이트 2단계 | critic-reviewer subagent 신규 + SKILL.md Step 4a/4b 분리 (v2.5) |
 | 5순위 | 토론모드 코어/참조 분리 | 253줄→50줄 코어 + REFERENCE.md |
 | 6순위 | completion_gate 역할 문서화 | CLAUDE.md에 "사람/GPT 판정, 자동 게이트 아님" 명시 |
 | 6순위 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
