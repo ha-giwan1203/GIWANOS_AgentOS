@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 옵션C 적용 (bypassPermissions 제거)
+최종 업데이트: 2026-04-07 — ask 팝업 재검증 완료 (python/python3/cp/mv 4/4 PASS)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -20,10 +20,12 @@
 | smoke_test.sh | 엣지케이스 8건 추가 (escaped quotes/multiline/nested/빈키/Python/객체추출/}포함/\\n복원) | 43/43 PASS |
 
 ### 미해결
+- 글로벌 ~/.claude/settings.local.json 정리 완료 (146건→3건, python 92건 등 1회성 allow 제거)
+- ~~ask 팝업 미동작 원인: 글로벌 allow가 프로젝트 ask를 override~~ → **재검증 완료 4/4 PASS** (글로벌 정리 후 정상)
 - bypassPermissions 제거 후 1주 로깅 진행 중 (~2026-04-14)
   - 판정 기준: 승인 요청 수 / hook deny 수 / 오탐 수 / 우회 감지 수
-  - 위험 Bash(python, cp, mv, chmod, taskkill) → 승인 필요로 전환
   - 팝업이 과도하면 allow 확대, 문제 없으면 현행 유지
+- 4지표 로깅 메커니즘 미구현 (GPT 부분반영 사유)
 - hook 의존 그래프 문서화 (보류)
 
 ---

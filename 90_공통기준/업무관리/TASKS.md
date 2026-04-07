@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 옵션C(부분 우회) 적용 + bypassPermissions 제거
+최종 업데이트: 2026-04-07 — 옵션C 구조 전환 완료 (permissions.ask 추가, 1주 로깅 대기)
 
 ---
 
@@ -30,6 +30,12 @@
 - Write/Edit는 allow 유지 (protect_files.sh hook이 보호)
 - 1주 로깅: 승인 요청 수 / hook deny 수 / 오탐 수 / 우회 감지 수
 - 판정: 1주(~2026-04-14) 후 수치 기반 결정
+- 커밋: 9babb720 (bypassPermissions 제거), 69dbe860 (permissions.ask 추가)
+- GPT 판정: 부분반영 — 구조 전환 확인, 4지표 로깅 메커니즘 미구현
+- 글로벌 ~/.claude/settings.local.json 정리: 146건→3건 (python 92건 등 1회성 allow 제거)
+- ask 팝업 미동작 원인: 글로벌 allow가 프로젝트 ask를 override — 정리 완료
+- **ask 팝업 재검증 완료 (2026-04-07)**: python/python3/cp/mv 4개 명령 모두 승인 팝업 정상 동작 확인 (4/4 PASS)
+- 남은 작업: 1주 로깅 메커니즘 구현 (~2026-04-14 판정)
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS
