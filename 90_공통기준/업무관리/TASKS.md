@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 증거기반 위험실행 차단기(evidence hook) 5개 구현
+최종 업데이트: 2026-04-07 — evidence hook 5개 구현 + MES SKILL.md 로그인 판정 수정
 
 ---
 
@@ -53,18 +53,13 @@
 - SKILL.md Step 5-0 범위 확장 (제안→제안·지적), Step 5-4 분기 3행에 Step 5-0 재수행 강제
 - 재발 시 A-lite(Read 이력 추적) 승격 경로 유지
 
-### [진행] 증거기반 위험실행 차단기(evidence hook) — 구현 완료 (2026-04-07)
+### ~~[진행] 증거기반 위험실행 차단기(evidence hook)~~ → 완료됨 (2026-04-07)
 - 문제: 5건 연속 실수 근본 원인 = "생각 없이 실행", 의지력 의존 규칙으로 해결 불가
 - GPT 토론 4턴 → "증거 없는 위험 실행 차단기" 설계 합의
-- 신규 hook 5개:
-  - risk_profile_prompt.sh (UserPromptSubmit) — 프롬프트 키워드→.req 파일 생성
-  - date_scope_guard.sh (PreToolUse/Bash) — 일요일/1~7일괄/MM-DD 차단
-  - evidence_mark_read.sh (PostToolUse) — SKILL/TASKS 등 읽기→.ok 증거 적립
-  - evidence_gate.sh (PreToolUse/Bash|Write|Edit) — req있고 ok없으면 deny
-  - evidence_stop_guard.sh (Stop) — 증거 없이 실패/완료 결론 차단
-- 핵심: req 없으면 no-op (일상 작업 마찰 0), 세션 격리 (sha1+mtime)
-- settings.local.json 기존 11 + 신규 5 = 16개 hook 정상 merge
-- 기능 테스트 6건 ALL PASS
+- 신규 hook 5개: risk_profile_prompt / date_scope_guard / evidence_mark_read / evidence_gate / evidence_stop_guard
+- 핵심: req 없으면 no-op, 세션 격리 (sha1+mtime)
+- settings.local.json 11→16 hook merge, 기능 테스트 6건 ALL PASS
+- 커밋 c0ffc54c, GPT 부분반영 (STATUS.md 드리프트 지적 → 해소)
 
 ### ~~[진행] 토론모드 코어/참조 분리~~ → 완료됨 (2026-04-07)
 - SKILL.md 326→133줄 슬림화, REFERENCE.md 신설 (JS코드/완료감지/오류대응/변경이력 분리)
@@ -130,6 +125,7 @@
 
 | 항목 | 완료일 |
 |------|--------|
+| 증거기반 위험실행 차단기 — evidence hook 5개 구현 (c0ffc54c), hooks 11→16, 기능테스트 6건 PASS, GPT 부분반영→STATUS 해소 | 2026-04-07 |
 | 에이전트 운영 체계 개선 9건 — JSON로그+incident_ledger+candidate규칙+smoke동기화+구참조제거+퇴행검사+공유규칙+운영규칙+final_check (ba301b41~38c935a1) GPT 전항목 PASS | 2026-04-07 |
 | Claude Code 문제점 6건 개선 — 보안봉합+README동기화+guard분리+토론모드분리+판정문서화 (78c46b72, b0888223) GPT 전항목 PASS | 2026-04-06 |
 | Claude Code 근본 경량화 GPT 토론 — hooks 23→9, rules 6→2, CLAUDE.md 71→38줄, permissions 78→37, completion_gate v4 단순화. 20개 hook + 4개 rules 아카이브 | 2026-04-06 |

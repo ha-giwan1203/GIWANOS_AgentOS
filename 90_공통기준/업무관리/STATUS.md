@@ -3,7 +3,7 @@
 > **이 파일은 운영 요약·재개 위치·주의사항 전용이다.**
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 토론모드 코어/참조 분리 + completion_gate 문서화 (상세: TASKS.md 참조)
+최종 업데이트: 2026-04-07 — evidence hook 5개 구현 + hooks 16개 체계 (상세: TASKS.md 참조)
 
 ---
 
@@ -15,7 +15,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 파이프라인 | Phase 1~6 운영 중 (skill_install 포함) |
-| hooks 체계 | 11개 등록 (상시 8 + 토론 3), completion_gate v5 + commit_gate 신규, 20개 아카이브 |
+| hooks 체계 | 16개 등록 (기존 11 + evidence 5), evidence req/ok 증거 시스템, 20개 아카이브 |
 
 ---
 
@@ -29,6 +29,7 @@
 | Fast/Full Lane | 규칙 확정 (GPT PASS 15b06459), 체크리스트 순차 작성 예정 | `.claude/rules/fast-full-lane.md` |
 | 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 보류 (자연어 대체) | `.claude/rules/feature-utilization.md` |
 | domain_guard | v3 phase guard 구현 완료 (토론모드 3단, GPT 합의 2턴) | `.claude/hooks/domain_guard.sh` |
+| evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
 | PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 | GPT 지침 Git 관리 | 구현 완료 (GPT PASS 4bcd7877) | `90_공통기준/업무관리/gpt-instructions.md` |
 
