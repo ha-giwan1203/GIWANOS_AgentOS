@@ -34,7 +34,7 @@ fi
 
 # 3. Python heredoc/inline 경유 파일조작 차단 (GPT 실증 시나리오 대응, 2026-04-07)
 if echo "$COMMAND" | grep -qE '(python|python3)'; then
-  if echo "$COMMAND" | grep -qiE '(os\.(remove|unlink|rename|replace|system)|shutil\.(move|rmtree|copy|copyfile|copy2)|pathlib\.Path.*(unlink|rename|replace|write_text|write_bytes)|open\(.+["\x27][waxb]|subprocess\.(run|Popen|call))'; then
+  if echo "$COMMAND" | grep -qiE '(os\.(remove|unlink|rename|replace|system)|shutil\.(move|rmtree|copy|copyfile|copy2)|pathlib|Path\(.*\)\.(unlink|rename|replace|write_text|write_bytes)|open\(.+["\x27][waxb]|subprocess\.(run|Popen|call))'; then
     if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
       hook_log "PreToolUse/Bash" "BLOCKED: Python 경유 보호 파일 조작 시도 — $COMMAND"
       hook_incident "hook_block" "block_dangerous" "" "Python heredoc 보호파일 조작 차단"
