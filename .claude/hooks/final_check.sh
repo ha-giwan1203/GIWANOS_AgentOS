@@ -80,15 +80,27 @@ else
 fi
 echo ""
 
-# 6. 상태 문서 3종 날짜 동기화 확인
+# 6. 상태 문서 3종 날짜 동기화 확인 (staged 우선, 없으면 working tree)
 echo "--- 6. TASKS/HANDOFF/STATUS 날짜 동기화 ---"
 STATUS_FILE="$PROJECT_DIR/90_공통기준/업무관리/STATUS.md"
 TASKS="$PROJECT_DIR/90_공통기준/업무관리/TASKS.md"
 HANDOFF="$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
 
-TASKS_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$TASKS" 2>/dev/null | head -1)
-HANDOFF_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$HANDOFF" 2>/dev/null | head -1)
-STATUS_DATE=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$STATUS_FILE" 2>/dev/null | head -1)
+# staged snapshot에서 날짜 추출 시도, 없으면 working tree fallback
+_get_date() {
+  local rel_path="$1"
+  local staged_content
+  staged_content=$(cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null)
+  if [ -n "$staged_content" ]; then
+    echo "$staged_content" | sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' | head -1
+  else
+    sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$PROJECT_DIR/$rel_path" 2>/dev/null | head -1
+  fi
+}
+
+TASKS_DATE=$(_get_date "90_공통기준/업무관리/TASKS.md")
+HANDOFF_DATE=$(_get_date "90_공통기준/업무관리/HANDOFF.md")
+STATUS_DATE=$(_get_date "90_공통기준/업무관리/STATUS.md")
 echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
 
 if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then

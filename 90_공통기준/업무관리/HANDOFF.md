@@ -22,6 +22,11 @@
 | line-batch-management SKILL.md | 실패계약 4섹션 추가 | 린터 PASS |
 | GPT 토론방 | 74b51298 응답 확인 | 부분정합 — unknown 45건 지적 |
 
+### GPT 시스템 전체 분석 (ee40e90c)
+- GPT 판정: "조건부 운영 안정화 단계"
+- 채택 3건: STATUS 드리프트 수정 / production-result-upload 실패계약 / final_check staged 검증
+- 보류 3건: 스킬 3등급 분류 / selector smoke_test / critic-reviewer 증적
+
 ### 미해결
 - unknown 버킷 45건 해소 (GPT 지적 — KNOWN_HOOKS 편입 or 무시 판단)
 - 4/14 최종 판정: 주간 재집계 1회 더 필요

@@ -48,6 +48,12 @@
   - assembly-cost-settlement, chomul-module-partno, night-scan-compare, line-mapping-validator, line-batch-management
   - 갭 리포트: 27개 중 5개 PASS / 22개 FAIL (미자동화 스킬은 보강 대상 아님)
 - GPT 74b51298 응답 확인: 부분정합 — unknown 45건 미분류 잔존 지적
+- **GPT 시스템 전체 분석 요청 (2026-04-08)**: ee40e90c 공유 + 5영역 분석 요청
+  - GPT 응답: "조건부 운영 안정화 단계" — 핵심 지적 3건 채택
+  - ① STATUS.md 드리프트 수정 (04-07→04-08)
+  - ② production-result-upload 실패계약 보강 (린터 6/6 PASS)
+  - ③ final_check #6 staged snapshot 우선 검증으로 개선
+  - 보류: 스킬 3등급 분류, selector smoke_test, critic-reviewer 증적
 - 남은 작업: 4/14 최종 판정 (주간 재집계 + unknown 버킷 해소 검토)
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)

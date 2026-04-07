@@ -1,8 +1,8 @@
 # Skill Contract Gap Report
 
 - 검사 대상: 27개
-- PASS: 5개
-- FAIL: 22개
+- PASS: 6개
+- FAIL: 21개
 
 ## FAIL 목록
 
@@ -48,9 +48,6 @@
 ### 90_공통기준\스킬\production-report\SKILL.md
 - 누락: ## 실패 조건, ## 중단 기준, ## 검증 항목, ## 되돌리기 방법
 
-### 90_공통기준\스킬\production-result-upload\SKILL.md
-- 누락: ## 실패 조건, ## 중단 기준, ## 검증 항목, ## 되돌리기 방법
-
 ### 90_공통기준\스킬\quality-assurance\SKILL.md
 - 누락: ## 실패 조건, ## 중단 기준, ## 검증 항목, ## 되돌리기 방법
 
@@ -79,3 +76,4 @@
 - 90_공통기준\스킬\line-batch-management\SKILL.md
 - 90_공통기준\스킬\line-mapping-validator\SKILL.md
 - 90_공통기준\스킬\night-scan-compare\SKILL.md
+- 90_공통기준\스킬\production-result-upload\SKILL.md
