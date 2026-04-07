@@ -3,9 +3,28 @@
 # 사용법: source .claude/hooks/hook_common.sh && hook_log "이벤트명" "메시지"
 # incident: hook_incident "type" "hook" "file" "detail"
 
-HOOK_LOG_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hook_log.jsonl"
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
+HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
 HOOK_LOG_MAX_SIZE=512000  # 500KB
-INCIDENT_LEDGER="${CLAUDE_PROJECT_DIR:-.}/.claude/incident_ledger.jsonl"
+INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
+
+# 공통 경로 — 개별 훅에서 하드코딩 대신 이 변수 사용
+STATE_EVIDENCE="$PROJECT_ROOT/.claude/state/evidence"
+STATE_AGENT="$PROJECT_ROOT/90_공통기준/agent-control/state"
+PATH_TASKS="$PROJECT_ROOT/90_공통기준/업무관리/TASKS.md"
+PATH_HANDOFF="$PROJECT_ROOT/90_공통기준/업무관리/HANDOFF.md"
+
+# 세션 키 — evidence 시스템의 세션 격리용 (sha1 of transcript path)
+session_key() {
+  local seed="${CLAUDE_TRANSCRIPT_PATH:-$PWD}"
+  if command -v sha1sum >/dev/null 2>&1; then
+    printf '%s' "$seed" | sha1sum | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    printf '%s' "$seed" | shasum | awk '{print $1}'
+  else
+    printf '%s' "$seed" | cksum | awk '{print $1}'
+  fi
+}
 
 _rotate_file() {
   local f="$1"

@@ -4,10 +4,9 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 hook_log "Stop" "completion_gate v5" 2>/dev/null || true
 
-STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
-MARKER="$STATE_DIR/write_marker.flag"
-TASKS="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/업무관리/TASKS.md"
-HANDOFF="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/업무관리/HANDOFF.md"
+MARKER="$STATE_AGENT/write_marker.flag"
+TASKS="$PATH_TASKS"
+HANDOFF="$PATH_HANDOFF"
 
 # write_marker 없으면 skip
 if [ ! -f "$MARKER" ]; then

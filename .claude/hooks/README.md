@@ -13,14 +13,17 @@
 
 ### 차단층 (PreToolUse)
 
-| 훅 | matcher | 역할 |
-|---|---|---|
-| `block_dangerous.sh` | Bash | 극단 파괴 명령 + 보호 경로 삭제/이동 차단 |
-| `commit_gate.sh` | Bash | git commit/push 전 final_check 강제 (--fast/--full 자동 판정) |
-| `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
-| `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
-| `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
-| `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검 |
+> **실행 순서**: settings.local.json 배열 순서대로 실행. 앞 훅이 deny하면 뒤 훅은 실행 안 됨.
+> Bash 매처 3개(①→②→③)는 순서 의존: 파괴 차단 → 커밋 게이트 → 날짜 범위 순.
+
+| 순서 | 훅 | matcher | 역할 |
+|---|---|---|---|
+| ① | `block_dangerous.sh` | Bash | 극단 파괴 명령 + 보호 경로 삭제/이동 차단 |
+| ② | `commit_gate.sh` | Bash | git commit/push 전 final_check 강제 (--fast/--full 자동 판정) |
+| ③ | `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
+| ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
+| ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
+| ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검 |
 
 ### 추적층 (PostToolUse)
 

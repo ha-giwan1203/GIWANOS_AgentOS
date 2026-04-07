@@ -5,21 +5,9 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 
 INPUT="$(cat)"
-STATE_ROOT="${CLAUDE_PROJECT_DIR:-.}/.claude/state/evidence"
-
-session_key() {
-  local seed="${CLAUDE_TRANSCRIPT_PATH:-$PWD}"
-  if command -v sha1sum >/dev/null 2>&1; then
-    printf '%s' "$seed" | sha1sum | awk '{print $1}'
-  elif command -v shasum >/dev/null 2>&1; then
-    printf '%s' "$seed" | shasum | awk '{print $1}'
-  else
-    printf '%s' "$seed" | cksum | awk '{print $1}'
-  fi
-}
 
 SESSION_KEY="$(session_key)"
-SESSION_DIR="$STATE_ROOT/$SESSION_KEY"
+SESSION_DIR="$STATE_EVIDENCE/$SESSION_KEY"
 PROOF_DIR="$SESSION_DIR/proofs"
 START_FILE="$SESSION_DIR/.session_start"
 

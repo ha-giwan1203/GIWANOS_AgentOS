@@ -6,8 +6,7 @@ source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 hook_log "Stop" "gpt_followup_stop 발화" 2>/dev/null || true
 
 INPUT=$(cat)
-STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
-PENDING="$STATE_DIR/gpt_followup_pending.flag"
+PENDING="$STATE_AGENT/gpt_followup_pending.flag"
 
 # pending flag 없으면 통과
 if [ ! -f "$PENDING" ]; then

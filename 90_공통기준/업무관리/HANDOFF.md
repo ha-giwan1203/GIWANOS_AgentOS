@@ -4,10 +4,30 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — evidence hook 5개 GPT PASS + 세션 마무리
+최종 업데이트: 2026-04-07 — Claude Code 구조 분석 + P0/P1 개선
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
+
+## 0. 최신 세션 (2026-04-07)
+
+### 작업: Claude Code 전수 분석 + 문제점 개선
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| gpt_followup_guard.sh | git rm (삭제 미커밋 해소) | git status 정상화 |
+| hooks/README.md | PreToolUse 실행순서 ①~⑥ 문서화 | 순서 의존성 명시 |
+| hook_common.sh | session_key() + 경로 5종(STATE_EVIDENCE/STATE_AGENT/PATH_TASKS/PATH_HANDOFF/PROJECT_ROOT) 집중 | DRY 달성 |
+| evidence_*.sh (4개) + 상태훅 (4개) | 중복 session_key/경로 제거, hook_common source | 9개 파일 정리 |
+| send_gate.sh | Windows 절대경로 → ${TEMP} 변수 | 이식성 개선 |
+| rules/_archive/ | rules_retired/로 이동 (4파일) | 퇴역 규칙 자동로드 방지 |
+| data-and-files.md | fast-full-lane 판정 기준 통합 | 규칙 일원화 |
+
+### 핵심 발견
+- `.claude/rules/_archive/`가 `.claude/rules/` 하위이므로 Claude Code가 퇴역 규칙을 활성 로드하고 있었음
+- settings 권한 목록은 `defaultMode: bypassPermissions` 때문에 현재 무효 (hook만 실질 가드)
+- 토론모드 TASKS.md는 STATUS.md와 일관 (거짓 아님)
+
+### 미해결
 
 ## 1. 이번 세션 작업 목적
 

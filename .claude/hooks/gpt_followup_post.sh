@@ -9,9 +9,8 @@ INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 TOOL_INPUT=$(echo "$INPUT" | sed -n 's/.*"tool_input"[[:space:]]*:[[:space:]]*\({.*}\).*/\1/p' | head -1)
 
-STATE_DIR="${CLAUDE_PROJECT_DIR:-.}/90_공통기준/agent-control/state"
-mkdir -p "$STATE_DIR" 2>/dev/null
-PENDING="$STATE_DIR/gpt_followup_pending.flag"
+mkdir -p "$STATE_AGENT" 2>/dev/null
+PENDING="$STATE_AGENT/gpt_followup_pending.flag"
 
 TNAME_LOWER=$(echo "$TOOL_NAME" | tr '[:upper:]' '[:lower:]')
 

@@ -26,7 +26,7 @@ if [[ "$HAS_INSERT" != "YES" ]]; then
 fi
 
 # debate 도메인 활성 확인 — 토론모드가 아니면 통과
-DEBATE_FLAG="C:/Users/User/AppData/Local/Temp/.claude_domain_debate_active"
+DEBATE_FLAG="${TEMP:-/tmp}/.claude_domain_debate_active"
 if [ -f "$DEBATE_FLAG" ]; then
   ACTIVE_DOMAIN=$(cat "$DEBATE_FLAG" 2>/dev/null)
   if [[ "$ACTIVE_DOMAIN" != "debate" ]]; then
