@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — Claude Code 구조 분석 + P0/P1 개선
+최종 업데이트: 2026-04-07 — Claude Code 구조 분석 + P0/P1 개선 + GPT 피드백 반영 PASS
 
 ---
 
@@ -20,7 +20,8 @@
 - P1: hook_common.sh에 session_key()/경로 집중 (DRY, 9개 파일 중복 제거)
 - P1: rules/_archive/ → rules_retired/ 이동 (자동로드 방지), fast-full-lane 판정 기준 data-and-files.md 통합
 - P2: send_gate.sh Windows 절대경로 → ${TEMP} 변수화
-- 핵심 발견: _archive/ 폴더가 rules/ 하위여서 퇴역 규칙이 활성 로드되고 있었음
+- GPT 피드백: STATE_AGENT→STATE_AGENT_CONTROL 리네이밍, README 순서 가정 완화
+- GPT PASS: a2c94bdc (본체) + 92d684dc (피드백 반영)
 
 ### ~~[진행] Claude Code 문제점 6건 개선~~ → 완료됨 (2026-04-06)
 - 1~5순위 구현 완료, GPT 전항목 PASS (78c46b72, b0888223)
