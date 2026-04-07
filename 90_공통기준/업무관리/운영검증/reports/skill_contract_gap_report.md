@@ -1,8 +1,8 @@
 # Skill Contract Gap Report
 
 - 검사 대상: 27개
-- PASS: 6개
-- FAIL: 21개
+- PASS: 6개 (자동화 완성 스킬)
+- FAIL: 21개 (미자동화 스킬 포함, 의도적 제외 대상 다수)
 
 ## FAIL 목록
 

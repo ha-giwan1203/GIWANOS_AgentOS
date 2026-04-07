@@ -1,45 +1,45 @@
 {
-  "generated_at": "2026-04-08T06:30:09+09:00",
+  "generated_at": "2026-04-08T07:13:39+09:00",
   "source": {
     "hook_log": ".claude\\hooks\\hook_log.jsonl",
     "incident_log": ".claude\\incident_ledger.jsonl"
   },
   "log_stats": {
-    "hook_log_lines": 3097,
-    "incident_log_lines": 50
+    "hook_log_lines": 3376,
+    "incident_log_lines": 53
   },
   "totals": {
-    "approval_requests": 1485,
-    "deny_count": 50,
+    "approval_requests": 1581,
+    "deny_count": 53,
     "false_positive_count": 0,
     "bypass_detected_count": 0
   },
   "rates": {
-    "deny_rate": 0.0337,
+    "deny_rate": 0.0335,
     "false_positive_rate": 0.0,
     "bypass_rate": 0.0
   },
   "by_hook": {
     "block_dangerous": {
-      "approval_requests": 728,
+      "approval_requests": 756,
       "deny_count": 6,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "commit_gate": {
-      "approval_requests": 89,
-      "deny_count": 16,
+      "approval_requests": 94,
+      "deny_count": 18,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "completion_gate": {
-      "approval_requests": 2,
-      "deny_count": 22,
+      "approval_requests": 4,
+      "deny_count": 23,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "date_scope_guard": {
-      "approval_requests": 372,
+      "approval_requests": 405,
       "deny_count": 4,
       "false_positive_count": 0,
       "bypass_detected_count": 0
@@ -50,38 +50,14 @@
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
-    "evidence_stop_guard": {
-      "approval_requests": 2,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "gpt_followup_post": {
-      "approval_requests": 7,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "gpt_followup_stop": {
-      "approval_requests": 4,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "notify_slack": {
-      "approval_requests": 3,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
     "protect_files": {
-      "approval_requests": 224,
+      "approval_requests": 273,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "risk_profile_prompt": {
-      "approval_requests": 3,
+      "approval_requests": 1,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0
@@ -93,13 +69,7 @@
       "bypass_detected_count": 0
     },
     "unknown": {
-      "approval_requests": 45,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "write_marker": {
-      "approval_requests": 5,
+      "approval_requests": 47,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0

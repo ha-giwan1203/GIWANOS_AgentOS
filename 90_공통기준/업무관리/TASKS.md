@@ -54,7 +54,10 @@
   - ② production-result-upload 실패계약 보강 (린터 6/6 PASS)
   - ③ final_check #6 staged snapshot 우선 검증으로 개선
   - 보류: 스킬 3등급 분류, selector smoke_test, critic-reviewer 증적
-- 남은 작업: 4/14 최종 판정 (주간 재집계 + unknown 버킷 해소 검토)
+- **GPT 재평가 (2026-04-08)**: 7.5/10점, "4/14 PASS 가능 권역"
+  - 감점: 검증 커버리지 불완전(-1.0), 보고 문구 정합성(-1.0), 토론모드 UI 의존(-0.5)
+  - 보고 정합성 3건 즉시 수정: 오탐 문구 false_positive 전환, smoke_test 헤더 v3(16개), gap report 표기 개선
+- 남은 작업: 4/14 최종 판정 (주간 재집계 1회만)
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS

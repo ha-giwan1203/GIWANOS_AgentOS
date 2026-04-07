@@ -99,8 +99,8 @@ def main():
     report_lines.append("# Skill Contract Gap Report")
     report_lines.append("")
     report_lines.append(f"- 검사 대상: {len(files)}개")
-    report_lines.append(f"- PASS: {len(passes)}개")
-    report_lines.append(f"- FAIL: {len(failures)}개")
+    report_lines.append(f"- PASS: {len(passes)}개 (자동화 완성 스킬)")
+    report_lines.append(f"- FAIL: {len(failures)}개 (미자동화 스킬 포함, 의도적 제외 대상 다수)")
     report_lines.append("")
 
     if failures:

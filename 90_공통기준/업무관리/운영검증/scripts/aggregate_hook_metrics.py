@@ -160,7 +160,7 @@ def render_markdown(report: dict) -> str:
         f"|------|------|------|",
         f"| 승인 요청 (hook 발화) | {t['approval_requests']} | - |",
         f"| deny (차단) | {t['deny_count']} | {r['deny_rate']:.2%} |",
-        f"| 오탐 (resolved) | {t['false_positive_count']} | {r['false_positive_rate']:.2%} |",
+        f"| 오탐 (false_positive) | {t['false_positive_count']} | {r['false_positive_rate']:.2%} |",
         f"| 우회 감지 | {t['bypass_detected_count']} | {r['bypass_rate']:.2%} |",
         "",
         "## hook별 상세",
@@ -183,7 +183,7 @@ def render_markdown(report: dict) -> str:
     lines.append("- deny_rate = deny / 승인요청 (높으면 규칙이 너무 엄격)")
     lines.append("- false_positive_rate = 오탐 / deny (높으면 잘못 막는 비율 높음)")
     lines.append("- bypass_rate = 우회 / 승인요청 (0이어야 정상)")
-    lines.append("- 오탐 태깅: incident_ledger에서 resolved=true로 수동 표기")
+    lines.append("- 오탐 태깅: incident_ledger에서 false_positive=true 또는 classification=fp/오탐으로 표기")
     lines.append("")
     return "\n".join(lines)
 

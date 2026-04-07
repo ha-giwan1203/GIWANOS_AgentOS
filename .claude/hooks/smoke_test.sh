@@ -1,6 +1,6 @@
 #!/bin/bash
-# Hooks Smoke Test v2 — 현행 훅 실물 기준 (2026-04-07)
-# 운영 훅 11개 + hook_common + incident_ledger 검증
+# Hooks Smoke Test v3 — 현행 훅 실물 기준 (2026-04-08)
+# 운영 훅 16개 + hook_common + incident_ledger 검증
 
 PASS=0
 FAIL=0

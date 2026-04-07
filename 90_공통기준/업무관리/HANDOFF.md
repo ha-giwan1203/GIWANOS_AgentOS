@@ -27,9 +27,14 @@
 - 채택 3건: STATUS 드리프트 수정 / production-result-upload 실패계약 / final_check staged 검증
 - 보류 3건: 스킬 3등급 분류 / selector smoke_test / critic-reviewer 증적
 
+### 보고 정합성 수정 (GPT 재평가 감점 대응)
+- aggregate_hook_metrics.py: 오탐 문구 "resolved" → "false_positive" 전환
+- smoke_test.sh: 헤더 v2→v3, 11개→16개
+- check_skill_contract.py: gap report PASS/FAIL 표기에 대상 구분 추가
+
 ### 미해결
-- unknown 버킷 45건 해소 (GPT 지적 — KNOWN_HOOKS 편입 or 무시 판단)
-- 4/14 최종 판정: 주간 재집계 1회 더 필요
+- unknown 버킷 45건 해소 (GPT 지적 — 총계 지표에 무영향, 후순위)
+- 4/14 최종 판정: 주간 재집계 1회만 남음
 
 ---
 
