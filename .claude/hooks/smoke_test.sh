@@ -1,6 +1,6 @@
 #!/bin/bash
 # Hooks Smoke Test v4 — 현행 훅 실물 기준 (2026-04-08)
-# 운영 훅 22개 + hook_common + incident_ledger 검증 (evidence 5종 + selector 추가)
+# 테스트 22섹션: 운영 훅 16개 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence 5종 + selector 정합성
 
 PASS=0
 FAIL=0
