@@ -8,7 +8,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v2.4
+# 토론모드 (debate-mode) 스킬 v2.5
 
 ## 개요
 
@@ -298,7 +298,7 @@ GitHub: [repo URL]
 └── debate_YYYYMMDD_HHMMSS.json
 ```
 
-JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`
+JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `critic_review`
 
 ---
 
