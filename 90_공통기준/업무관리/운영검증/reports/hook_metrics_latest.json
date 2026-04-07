@@ -1,63 +1,45 @@
 {
-  "generated_at": "2026-04-07T22:12:15+09:00",
+  "generated_at": "2026-04-07T22:22:19+09:00",
   "source": {
     "hook_log": ".claude\\hooks\\hook_log.jsonl",
     "incident_log": ".claude\\incident_ledger.jsonl"
   },
   "log_stats": {
-    "hook_log_lines": 2784,
+    "hook_log_lines": 2867,
     "incident_log_lines": 46
   },
   "totals": {
-    "approval_requests": 1356,
+    "approval_requests": 1396,
     "deny_count": 46,
     "false_positive_count": 0,
     "bypass_detected_count": 0
   },
   "rates": {
-    "deny_rate": 0.0339,
+    "deny_rate": 0.033,
     "false_positive_rate": 0.0,
     "bypass_rate": 0.0
   },
   "by_hook": {
-    "BLOCK:": {
-      "approval_requests": 3,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "BLOCKED:": {
-      "approval_requests": 5,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "WARN:": {
-      "approval_requests": 1,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
     "block_dangerous": {
-      "approval_requests": 681,
+      "approval_requests": 693,
       "deny_count": 6,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "commit_gate": {
-      "approval_requests": 77,
+      "approval_requests": 81,
       "deny_count": 14,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "completion_gate": {
-      "approval_requests": 0,
+      "approval_requests": 2,
       "deny_count": 21,
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
     "date_scope_guard": {
-      "approval_requests": 323,
+      "approval_requests": 335,
       "deny_count": 3,
       "false_positive_count": 0,
       "bypass_detected_count": 0
@@ -68,14 +50,8 @@
       "false_positive_count": 0,
       "bypass_detected_count": 0
     },
-    "evidence_mark_read": {
-      "approval_requests": 2,
-      "deny_count": 0,
-      "false_positive_count": 0,
-      "bypass_detected_count": 0
-    },
-    "git": {
-      "approval_requests": 33,
+    "gpt_followup_post": {
+      "approval_requests": 6,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0
@@ -93,7 +69,7 @@
       "bypass_detected_count": 0
     },
     "protect_files": {
-      "approval_requests": 204,
+      "approval_requests": 209,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0
@@ -112,6 +88,12 @@
     },
     "stop_guard": {
       "approval_requests": 7,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "unknown": {
+      "approval_requests": 43,
       "deny_count": 0,
       "false_positive_count": 0,
       "bypass_detected_count": 0

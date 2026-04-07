@@ -39,6 +39,14 @@ def extract_section(text: str, heading: str) -> str:
     return m.group(1).strip() if m else ""
 
 
+PLACEHOLDER_PATTERNS = re.compile(r"\{[^}]*\}", re.UNICODE)
+
+
+def has_unresolved_placeholder(section_text: str) -> bool:
+    """템플릿 플레이스홀더({실패로 간주할 상황} 등) 미치환 탐지."""
+    return bool(PLACEHOLDER_PATTERNS.search(section_text))
+
+
 def is_meaningful(section_text: str) -> bool:
     cleaned = re.sub(r"[\s\-\*\d\.\{\}]", "", section_text)
     return len(cleaned) > 5
@@ -64,6 +72,7 @@ def main():
         text = file_path.read_text(encoding="utf-8")
         missing = []
         empty = []
+        placeholder = []
 
         for heading in REQUIRED_HEADINGS:
             if heading not in text:
@@ -72,12 +81,15 @@ def main():
             section_text = extract_section(text, heading)
             if not is_meaningful(section_text):
                 empty.append(heading)
+            elif has_unresolved_placeholder(section_text):
+                placeholder.append(heading)
 
-        if missing or empty:
+        if missing or empty or placeholder:
             failures.append({
                 "file": str(file_path),
                 "missing": missing,
                 "empty": empty,
+                "placeholder": placeholder,
             })
         else:
             passes.append(str(file_path))
@@ -100,6 +112,8 @@ def main():
                 report_lines.append(f"- 누락: {', '.join(item['missing'])}")
             if item["empty"]:
                 report_lines.append(f"- 비어있음: {', '.join(item['empty'])}")
+            if item.get("placeholder"):
+                report_lines.append(f"- 플레이스홀더 미치환: {', '.join(item['placeholder'])}")
             report_lines.append("")
 
     if passes:

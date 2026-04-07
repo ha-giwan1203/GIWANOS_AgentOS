@@ -4,7 +4,7 @@
 Hook 4지표 집계 스크립트
 - 승인 요청 수: hook_log에서 PreToolUse 이벤트 총 수
 - deny 수: incident_ledger에서 gate_reject + hook_block 합계
-- 오탐 수: incident_ledger에서 resolved=true 건수
+- 오탐 수: incident_ledger에서 false_positive 태깅 건수 (resolved와 분리)
 - 우회 감지 수: incident_ledger에서 bypass 관련 건수
 """
 import argparse
@@ -58,9 +58,7 @@ def extract_hook_name(msg: str) -> str:
     for hook in KNOWN_HOOKS:
         if hook in msg_lower:
             return hook
-    # fallback: 첫 단어
-    parts = msg.split()
-    return parts[0] if parts else "unknown"
+    return "unknown"
 
 
 def safe_rate(numerator: int, denominator: int) -> float:
@@ -96,8 +94,10 @@ def aggregate(hook_log_path: Path, incident_log_path: Path) -> dict:
             totals["deny_count"] += 1
             by_hook[hook_name]["deny_count"] += 1
 
-        # 오탐 (resolved=true로 태깅된 건)
-        if resolved is True:
+        # 오탐 (false_positive 전용 필드 — resolved와 분리)
+        fp_flag = row.get("false_positive", False)
+        classification = str(row.get("classification", "")).lower()
+        if fp_flag is True or classification in {"false_positive", "fp", "오탐"}:
             totals["false_positive_count"] += 1
             by_hook[hook_name]["false_positive_count"] += 1
 
