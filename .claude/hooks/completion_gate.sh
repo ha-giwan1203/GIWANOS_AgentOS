@@ -4,7 +4,7 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 hook_log "Stop" "completion_gate v5" 2>/dev/null || true
 
-MARKER="$STATE_AGENT/write_marker.flag"
+MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 TASKS="$PATH_TASKS"
 HANDOFF="$PATH_HANDOFF"
 

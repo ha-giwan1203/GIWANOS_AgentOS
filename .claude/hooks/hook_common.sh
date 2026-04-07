@@ -10,7 +10,7 @@ INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
 
 # 공통 경로 — 개별 훅에서 하드코딩 대신 이 변수 사용
 STATE_EVIDENCE="$PROJECT_ROOT/.claude/state/evidence"
-STATE_AGENT="$PROJECT_ROOT/90_공통기준/agent-control/state"
+STATE_AGENT_CONTROL="$PROJECT_ROOT/90_공통기준/agent-control/state"
 PATH_TASKS="$PROJECT_ROOT/90_공통기준/업무관리/TASKS.md"
 PATH_HANDOFF="$PROJECT_ROOT/90_공통기준/업무관리/HANDOFF.md"
 

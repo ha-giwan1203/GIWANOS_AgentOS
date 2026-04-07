@@ -11,7 +11,7 @@ if [ -z "$FILE_PATH" ]; then
   FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 fi
 
-MARKER="$STATE_AGENT/write_marker.flag"
+MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 
 # 상태문서(TASKS/HANDOFF/STATUS) 수정 → marker 삭제 (갱신 완료 의미)
 if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md|STATUS\.md)'; then
