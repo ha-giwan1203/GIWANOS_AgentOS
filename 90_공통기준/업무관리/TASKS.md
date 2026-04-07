@@ -57,7 +57,8 @@
 - **GPT 재평가 (2026-04-08)**: 7.5/10점, "4/14 PASS 가능 권역"
   - 감점: 검증 커버리지 불완전(-1.0), 보고 문구 정합성(-1.0), 토론모드 UI 의존(-0.5)
   - 보고 정합성 3건 즉시 수정: 오탐 문구 false_positive 전환, smoke_test 헤더 v3(16개), gap report 표기 개선
-- 남은 작업: 4/14 최종 판정 (주간 재집계 1회만)
+- GPT 3b7d4976 판정: 부분정합 — 보고 문구 OK, smoke_test 실체 커버리지(evidence 5종) 미추가 지적
+- 남은 작업: 4/14 최종 판정 (주간 재집계 + smoke_test evidence 커버리지 보강)
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS

@@ -33,8 +33,28 @@
 - check_skill_contract.py: gap report PASS/FAIL 표기에 대상 구분 추가
 
 ### 미해결
-- unknown 버킷 45건 해소 (GPT 지적 — 총계 지표에 무영향, 후순위)
-- 4/14 최종 판정: 주간 재집계 1회만 남음
+- smoke_test evidence 5종 실체 커버리지 보강 (GPT 지적: 헤더만 바꿈, 테스트 항목 미추가)
+- unknown 버킷 47건 해소 (총계 지표에 무영향, 후순위)
+- 4/14 최종 판정: 주간 재집계 1회
+
+---
+
+## 다음 세션 할 일
+
+### 1순위: 4/14 판정 준비 (마감 4/14)
+- [ ] smoke_test.sh에 evidence 5종 hook 존재/동작 테스트 추가 (GPT 감점 해소)
+- [ ] 4/13~14 aggregate_hook_metrics.py 최종 집계 → 판정 수치 확정
+- [ ] deny <10%, 오탐 0%, 우회 0% 확인 → 현행 유지 or allow 확대
+
+### 2순위: 실무 업무
+- [ ] 4월 실적 정산 — GERP/구ERP 데이터 입수 후 `/settlement 04`
+- [ ] SP3M3 미매칭 RSP 4건 갱신 (RSP3SC0291~0294)
+
+### 3순위: 보류 개선 (급하지 않음)
+- [ ] 스킬 3등급 분류 설계 (A=실행형, B=파일수정형, C=분석형)
+- [ ] critic-reviewer 호출 증적 (evidence proof)
+- [ ] 토론모드 selector 점검을 smoke_test에 추가
+- [ ] unknown 버킷 KNOWN_HOOKS 편입 (47건)
 
 ---
 
