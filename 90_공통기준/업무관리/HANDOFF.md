@@ -67,3 +67,5 @@
 - bypassPermissions는 공식 비권장이나, 즉시 전환 시 실무 팝업 폭탄 위험 → 1주 보류 합의
 - GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 + Step3 로컬 실물 기준 정합
 - 사용자 피드백: GPT 지적 시 실물 확인 없이 바로 수정한 문제 지적 → 메모리 보강 완료 (GPT 지적도 제안과 동일하게 파일 읽고 검증 후 수정)
+- GPT 피드백 실물 검증 강제: Step 5-4→5-0 재진입 연결 합의 (C 단독, B 보류) → 커밋 586a8323 PASS
+- critic-reviewer 세션 검토: 종합 WARN — 독립성 WARN / 하네스 WARN / 0건감사 FAIL / 일방성 WARN
