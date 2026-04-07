@@ -1,7 +1,6 @@
 # 토론모드 코어 규칙
 
-> **Primary: ENTRY.md** / 코어: 이 파일 / 상세: REFERENCE.md
-> ENTRY.md의 NEVER 규칙이 최우선.
+> **코어: 이 파일** / 실행 절차: SKILL.md / 기술 상세: REFERENCE.md
 
 ## 목적
 Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을 이어가는 코워크 구조.

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — GPT 피드백 실물 검증 강제 (Step 5-4→5-0 재진입 연결)
+최종 업데이트: 2026-04-07 — 토론모드 코어/참조 분리 + completion_gate 문서화
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -52,7 +52,7 @@
 | ~~3순위~~ | gpt_followup_guard 물리 분리 완료 | gpt_followup_post.sh + gpt_followup_stop.sh, 기존 아카이브 |
 | ~~완료~~ | 토론 품질 게이트 1단계 | send_gate 주력 + stop_guard 백스톱 2중 구성 |
 | ~~완료~~ | 토론 품질 게이트 2단계 | critic-reviewer subagent 신규 + SKILL.md Step 4a/4b 분리 (v2.5) |
-| 5순위 | 토론모드 코어/참조 분리 | 253줄→50줄 코어 + REFERENCE.md |
+| ~~완료~~ | 토론모드 코어/참조 분리 | SKILL.md 326→133줄 + REFERENCE.md 신설 (v2.6) |
 | 6순위 | completion_gate 역할 문서화 | CLAUDE.md에 "사람/GPT 판정, 자동 게이트 아님" 명시 |
 | 6순위 | bypassPermissions→default 전환 | 1주 로깅 후 결정 (GPT 합의) |
 | 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 |
