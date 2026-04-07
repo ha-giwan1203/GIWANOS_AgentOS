@@ -4,16 +4,16 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 토론모드 코어/참조 분리 + completion_gate 문서화
+최종 업데이트: 2026-04-07 — 증거기반 위험실행 차단기(evidence hook) 5개 구현
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 1. 이번 세션 작업 목적
 
-1. GPT "클로드 코드 문제 분석" 방 지적 6건 → 실물 검증 → 수정 완료
-2. 사용자 피드백 "Claude가 스스로 문제 못 찾음 + 독립 의견 안 냄" → 구조적 해결
-3. 양쪽 리서치 취합 → 토론 품질 게이트 1단계 합의 → 구현
+1. ZDM 일상점검 밀린 실적 일괄 등록
+2. MES 생산실적 밀린 날짜 업로드
+3. 연속 실수 근본 원인 분석 + GPT 토론 → 증거기반 위험실행 차단기 hook 구현
 
 ---
 
@@ -26,6 +26,16 @@
 | stop_guard.sh | 독립 견해 백스톱 추가 (보조) | 종료 직전 2중 검사 |
 | final_check.sh | settings hook 대조(5번) + 날짜 동기화(6번) | 드리프트 시 커밋 차단 |
 | STATUS.md | 최종 업데이트 04-06→04-07 동기화 | 드리프트 해소 |
+
+### 증거기반 위험실행 차단기(evidence hook) 5개 구현
+| 대상 | 핵심 변경 | 결과 |
+|------|----------|------|
+| risk_profile_prompt.sh | UserPromptSubmit → .req 파일 생성 | 위험 키워드 감지 시 증거 요구 |
+| date_scope_guard.sh | PreToolUse/Bash → 일요일/일괄/MM-DD 차단 | ZDM 4/5(일) 재발 방지 |
+| evidence_mark_read.sh | PostToolUse → .ok 증거 적립 | SKILL/TASKS 등 읽기 추적 |
+| evidence_gate.sh | PreToolUse → req있고 ok없으면 deny | 증거 없는 실행 차단 |
+| evidence_stop_guard.sh | Stop → 증거 없는 결론 차단 | 로그인실패/완료 무근거 주장 차단 |
+| settings.local.json | 기존 11 + 신규 5 = 16개 | UserPromptSubmit 이벤트 추가 |
 
 ### 문서-구현 정합성 복구 + python3 전면 제거 (smoke_test 32/32 + final_check PASS)
 | 대상 | 핵심 변경 | 결과 |
@@ -47,15 +57,8 @@
 
 | 우선순위 | 항목 | 비고 |
 |---------|------|------|
-| ~~완료~~ | 에이전트 운영 체계 개선 3건 | hook_log JSON 전환 + incident_ledger + candidate 브랜치 규칙 |
-| ~~완료~~ | 문서-구현 정합성 + python3 전면 제거 | cp추가 + 운영훅 9개 bash화 + hook개수 동기화 + final_check 자체검증 |
-| ~~3순위~~ | gpt_followup_guard 물리 분리 완료 | gpt_followup_post.sh + gpt_followup_stop.sh, 기존 아카이브 |
-| ~~완료~~ | 토론 품질 게이트 1단계 | send_gate 주력 + stop_guard 백스톱 2중 구성 |
-| ~~완료~~ | 토론 품질 게이트 2단계 | critic-reviewer subagent 신규 + SKILL.md Step 4a/4b 분리 (v2.5) |
-| ~~완료~~ | 토론모드 코어/참조 분리 | SKILL.md 326→133줄 + REFERENCE.md 신설 (v2.6) |
-| ~~완료~~ | completion_gate 역할 문서화 | CLAUDE.md 29줄에 이미 명시 확인 (실물 검증 완료) |
-| 보류 | bypassPermissions→default 전환 | 1주 경과했으나 incident_ledger/hook_log 비어있어 판단 근거 부족. 로그 축적 후 재검토 |
-| 보류 | env prefix permissions 2건 | PYTHONUTF8/PYTHONIOENCODING 축소 — 테스트 후 결정 |
+| ~~완료~~ | ZDM 일상점검 4/5~4/7 일괄 등록 | 4/6, 4/7 등록 PASS. 4/5(일) 오입력→삭제 완료 |
+| ~~완료~~ | MES 생산실적 4/3, 4/4, 4/6 업로드 | 37건 105,063ea, 건수+생산량 ALL PASS |
 | 대기 | 4월 실적 정산 | 4월 GERP/구ERP 데이터 입수 후 `/settlement 04` |
 | 대기 | SP3M3 미매칭 RSP 4건 | RSP3SC0291~0294 모듈품번 갱신 |
 

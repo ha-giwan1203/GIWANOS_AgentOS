@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — 토론모드 코어/참조 분리 + completion_gate 문서화
+최종 업데이트: 2026-04-07 — 증거기반 위험실행 차단기(evidence hook) 5개 구현
 
 ---
 
@@ -52,6 +52,19 @@
 - GPT 토론 합의: C(Step 5-4→5-0 재진입) 단독, B(실물확인 마커) 보류
 - SKILL.md Step 5-0 범위 확장 (제안→제안·지적), Step 5-4 분기 3행에 Step 5-0 재수행 강제
 - 재발 시 A-lite(Read 이력 추적) 승격 경로 유지
+
+### [진행] 증거기반 위험실행 차단기(evidence hook) — 구현 완료 (2026-04-07)
+- 문제: 5건 연속 실수 근본 원인 = "생각 없이 실행", 의지력 의존 규칙으로 해결 불가
+- GPT 토론 4턴 → "증거 없는 위험 실행 차단기" 설계 합의
+- 신규 hook 5개:
+  - risk_profile_prompt.sh (UserPromptSubmit) — 프롬프트 키워드→.req 파일 생성
+  - date_scope_guard.sh (PreToolUse/Bash) — 일요일/1~7일괄/MM-DD 차단
+  - evidence_mark_read.sh (PostToolUse) — SKILL/TASKS 등 읽기→.ok 증거 적립
+  - evidence_gate.sh (PreToolUse/Bash|Write|Edit) — req있고 ok없으면 deny
+  - evidence_stop_guard.sh (Stop) — 증거 없이 실패/완료 결론 차단
+- 핵심: req 없으면 no-op (일상 작업 마찰 0), 세션 격리 (sha1+mtime)
+- settings.local.json 기존 11 + 신규 5 = 16개 hook 정상 merge
+- 기능 테스트 6건 ALL PASS
 
 ### ~~[진행] 토론모드 코어/참조 분리~~ → 완료됨 (2026-04-07)
 - SKILL.md 326→133줄 슬림화, REFERENCE.md 신설 (JS코드/완료감지/오류대응/변경이력 분리)
@@ -123,6 +136,8 @@
 | CLAUDE.md+rules/ 경량화 — 143→71줄(CLAUDE.md), rules/ 145→64줄, 전체 135줄. GPT PASS (de416123+8a4fbd11) | 2026-04-06 |
 | step5 매핑 버그 4건 수정 — 에러 388→190건, 차이 +25.6M→+7.2M. GPT 공동작업 완료 (fb81d7a5) | 2026-04-06 |
 | SEND GATE 구현 — send_gate.sh PreToolUse hook + 토론모드 ENTRY/CLAUDE.md 반영 (54908fab) | 2026-04-06 |
+| MES 생산실적 업로드 — 4/3(12건,39,587ea), 4/4(10건,19,159ea), 4/6(15건,46,317ea) 건수+생산량 ALL PASS | 2026-04-07 |
+| ZDM 일상점검 — SP3M3 75건 OK ×2일(4/6~4/7), 검증 75/75 ALL PASS. 4/5(일) 오입력→삭제 완료 | 2026-04-07 |
 | THINK GATE 구현 — 전역 4칸 사고 흔적 강제 규칙 (fc438e3d) | 2026-04-06 |
 | 야간스캔비교 스킬+커맨드 Phase 통일 — SKILL.md v1.1 + night-scan.md Phase 0~7 (15783b06, GPT PASS) | 2026-04-06 |
 | 기준정보 다중단가 파괴 복구 — 관리DB 재생성(16,524행), 다중단가 269건 보존, X9000/X9500 삭제, Step6 PASS | 2026-04-06 |

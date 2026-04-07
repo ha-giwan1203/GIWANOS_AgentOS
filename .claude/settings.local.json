@@ -43,11 +43,26 @@
       "Bash(bash .claude/hooks/final_check.sh)",
       "Bash(STATE_DIR=\"C:/Users/User/Desktop/업무리스트/.claude/state\")",
       "Bash(mkdir -p \"$STATE_DIR\")",
-      "Bash(\"$STATE_DIR/send_gate_passed\")"
+      "Bash(\"$STATE_DIR/send_gate_passed\")",
+      "Bash(bash .claude/hooks/final_check.sh --fast)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Bash(bash -n \"$f\")",
+      "Bash(done)"
     ],
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/risk_profile_prompt.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -64,6 +79,24 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/commit_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/date_scope_guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/evidence_gate.sh"
           }
         ]
       },
@@ -102,6 +135,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/write_marker.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/evidence_mark_read.sh"
           }
         ]
       },
@@ -148,6 +190,14 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/completion_gate.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/evidence_stop_guard.sh"
           }
         ]
       }
