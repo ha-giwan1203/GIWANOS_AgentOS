@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-04-07T22:12:15+09:00",
+  "source": {
+    "hook_log": ".claude\\hooks\\hook_log.jsonl",
+    "incident_log": ".claude\\incident_ledger.jsonl"
+  },
+  "log_stats": {
+    "hook_log_lines": 2784,
+    "incident_log_lines": 46
+  },
+  "totals": {
+    "approval_requests": 1356,
+    "deny_count": 46,
+    "false_positive_count": 0,
+    "bypass_detected_count": 0
+  },
+  "rates": {
+    "deny_rate": 0.0339,
+    "false_positive_rate": 0.0,
+    "bypass_rate": 0.0
+  },
+  "by_hook": {
+    "BLOCK:": {
+      "approval_requests": 3,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "BLOCKED:": {
+      "approval_requests": 5,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "WARN:": {
+      "approval_requests": 1,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "block_dangerous": {
+      "approval_requests": 681,
+      "deny_count": 6,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "commit_gate": {
+      "approval_requests": 77,
+      "deny_count": 14,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "completion_gate": {
+      "approval_requests": 0,
+      "deny_count": 21,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "date_scope_guard": {
+      "approval_requests": 323,
+      "deny_count": 3,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "evidence_gate": {
+      "approval_requests": 2,
+      "deny_count": 1,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "evidence_mark_read": {
+      "approval_requests": 2,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "git": {
+      "approval_requests": 33,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "gpt_followup_stop": {
+      "approval_requests": 4,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "notify_slack": {
+      "approval_requests": 3,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "protect_files": {
+      "approval_requests": 204,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "risk_profile_prompt": {
+      "approval_requests": 1,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "send_gate": {
+      "approval_requests": 5,
+      "deny_count": 1,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "stop_guard": {
+      "approval_requests": 7,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    },
+    "write_marker": {
+      "approval_requests": 5,
+      "deny_count": 0,
+      "false_positive_count": 0,
+      "bypass_detected_count": 0
+    }
+  }
+}

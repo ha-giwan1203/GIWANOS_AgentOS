@@ -35,7 +35,13 @@
 - 글로벌 ~/.claude/settings.local.json 정리: 146건→3건 (python 92건 등 1회성 allow 제거)
 - ask 팝업 미동작 원인: 글로벌 allow가 프로젝트 ask를 override — 정리 완료
 - **ask 팝업 재검증 완료 (2026-04-07)**: python/python3/cp/mv 4개 명령 모두 승인 팝업 정상 동작 확인 (4/4 PASS)
-- 남은 작업: 1주 로깅 메커니즘 구현 (~2026-04-14 판정)
+- **4지표 집계 스크립트 구현 완료 (2026-04-07)**: aggregate_hook_metrics.py
+  - hook_log.jsonl + incident_ledger.jsonl 파싱 → JSON+MD 리포트 자동 생성
+  - 첫 집계: 승인요청 1356 / deny 46 (3.39%) / 오탐 0 / 우회 0
+- **SKILL 실패계약 표준화 (2026-04-07)**: SKILL_TEMPLATE.md + check_skill_contract.py
+  - 필수 4섹션: 실패 조건 / 중단 기준 / 검증 항목 / 되돌리기 방법
+  - 갭 리포트: 27개 중 27개 FAIL (기존 스킬에 표준 헤딩 없음, 점진 보강 예정)
+- 남은 작업: 4/14 판정일까지 주간 집계 실행, Level 1 스킬 6개 실패계약 보강
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS
