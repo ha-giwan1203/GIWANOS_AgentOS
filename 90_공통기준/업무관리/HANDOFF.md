@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — 토론 품질 게이트 2단계 (critic-reviewer subagent + SKILL.md v2.5)
+최종 업데이트: 2026-04-07 — GPT 피드백 실물 검증 강제 (Step 5-4→5-0 재진입 연결)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -66,3 +66,4 @@
 - completion_gate python3→bash 전환으로 #34457 위험 감소
 - bypassPermissions는 공식 비권장이나, 즉시 전환 시 실무 팝업 폭탄 위험 → 1주 보류 합의
 - GPT 최종 판정: Step1 PASS + Step2 임시검토 정합 + Step3 로컬 실물 기준 정합
+- 사용자 피드백: GPT 지적 시 실물 확인 없이 바로 수정한 문제 지적 → 메모리 보강 완료 (GPT 지적도 제안과 동일하게 파일 읽고 검증 후 수정)
