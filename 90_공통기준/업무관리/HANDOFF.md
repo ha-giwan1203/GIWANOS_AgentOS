@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-07 — GPT 토론 합의 P1/P2 완료 (GPT PASS)
+최종 업데이트: 2026-04-07 — 옵션C 적용 (bypassPermissions 제거)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -20,7 +20,10 @@
 | smoke_test.sh | 엣지케이스 8건 추가 (escaped quotes/multiline/nested/빈키/Python/객체추출/}포함/\\n복원) | 43/43 PASS |
 
 ### 미해결
-- bypassPermissions 구조 리스크 (P1, 보류 → 1주 로깅 후 결정)
+- bypassPermissions 제거 후 1주 로깅 진행 중 (~2026-04-14)
+  - 판정 기준: 승인 요청 수 / hook deny 수 / 오탐 수 / 우회 감지 수
+  - 위험 Bash(python, cp, mv, chmod, taskkill) → 승인 필요로 전환
+  - 팝업이 과도하면 allow 확대, 문제 없으면 현행 유지
 - hook 의존 그래프 문서화 (보류)
 
 ---

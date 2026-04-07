@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-07 — GPT 토론 합의 P1/P2 완료 (GPT PASS)
+최종 업데이트: 2026-04-07 — 옵션C(부분 우회) 적용 + bypassPermissions 제거
 
 ---
 
@@ -22,6 +22,14 @@
 - 커밋 3건: e6d360f1, a63fe826, 7c6798cc
 - smoke_test 43/43 ALL PASS
 - GPT PASS: 7c6798cc
+- 재검증: pathlib 패턴 미차단 발견 → 106d3d45에서 수정, 43/43 + 실동작 13건 PASS
+
+### [진행] 옵션C — bypassPermissions 제거 + 부분 우회 (2026-04-07)
+- defaultMode: "bypassPermissions" 제거
+- 위험 Bash(python, cp, mv, chmod, taskkill) allow에서 제거 → 승인 필요
+- Write/Edit는 allow 유지 (protect_files.sh hook이 보호)
+- 1주 로깅: 승인 요청 수 / hook deny 수 / 오탐 수 / 우회 감지 수
+- 판정: 1주(~2026-04-14) 후 수치 기반 결정
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS
