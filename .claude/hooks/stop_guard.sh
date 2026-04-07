@@ -66,4 +66,19 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
   fi
 fi
 
+# === 3. 토론모드 독립 견해 백스톱 (GPT 합의 2026-04-07) ===
+# send_gate 주력 + stop_guard 백스톱 2중 구성
+if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|debate-mode|토론모드|\[Claude"; then
+  OPINION_MARKERS='(반론|대안|다른 접근|내 판단|Claude 판단|환경상 비적합|내 독립 견해|내 우려)'
+  if ! echo "$LAST_TEXT" | grep -qE "$OPINION_MARKERS"; then
+    # 단순 보고성 메시지는 제외
+    if ! echo "$LAST_TEXT" | grep -qE '(커밋|푸시|SHA|diff|PASS|FAIL|검증 결과|판정 요청|수정 완료)'; then
+      hook_log "Stop/stop_guard" "BLOCK: debate_quality_backstop | 독립 견해 0건" 2>/dev/null
+      hook_incident "hook_block" "stop_guard" "" "백스톱: 독립 견해 0건" 2>/dev/null || true
+      echo '{"decision":"block","reason":"[Stop Guard 백스톱] 토론 응답에 독립 견해(반론/대안/내 판단)가 없습니다. GPT 프레임에 끌려가지 말고 독립 판단을 포함하세요."}'
+      exit 2
+    fi
+  fi
+fi
+
 exit 0
