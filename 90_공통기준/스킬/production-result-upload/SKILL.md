@@ -59,7 +59,13 @@ with sync_playwright() as p:
 
     page.locator('button[type=submit]').first.click()
     time.sleep(4)
-    # 로그인 성공 확인: page.url에 'auth-dev' 없어야 함 또는 '로그아웃' 버튼 존재
+    # 로그인 성공 확인: MES 직접 접속으로 판정 (auth-dev URL 부재로 판정하면 안 됨)
+    # OAuth 로그인 후 auth-dev.samsong.com:18100/ 에 머무르는 것은 정상 (리다이렉트 안 됨)
+    # 반드시 MES로 직접 이동하여 200 응답 여부로 확인
+    page.goto('http://mes-dev.samsong.com:19200/layout/layout.do')
+    page.wait_for_load_state('networkidle')
+    time.sleep(3)
+    # page.url에 'mes-dev' 포함 = 성공, 'auth-dev' 포함 = 실패
 ```
 
 **전제조건:** `pip install pyautogui` 설치 필요
