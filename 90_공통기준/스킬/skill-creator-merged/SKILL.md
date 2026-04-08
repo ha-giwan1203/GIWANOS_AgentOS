@@ -109,7 +109,7 @@ Based on the user interview and selected patterns, fill in these components:
 ```
 skill-name/
 ├── SKILL.md (required)
-│   ├── YAML frontmatter (name, description required)
+│   ├── YAML frontmatter (name, description, grade, version, author, last_updated required)
 │   └── Markdown instructions
 └── Bundled Resources (optional)
     ├── scripts/    - Executable code for deterministic/repetitive tasks
@@ -503,7 +503,7 @@ After packaging, direct the user to the resulting `.skill` file path so they can
 | 트리거 정확도 | 30% | 의도한 상황에서만 발동. 오발동/미발동 없음 |
 | 오류 처리 | 25% | 입력 누락·예외 상황 대응 명시 |
 | 실무 적용성 | 25% | 즉시 사용 가능한 출력 형식 |
-| 문서 완결성 | 20% | SKILL.md 필수 섹션(frontmatter/트리거/입력/절차/출력/오류대응) 완비 |
+| 문서 완결성 | 20% | SKILL.md 필수 섹션(frontmatter 6필드/트리거/입력/절차/출력/실패계약 4섹션) 완비 |
 
 **판정 기준**:
 
