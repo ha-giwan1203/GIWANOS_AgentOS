@@ -4,12 +4,22 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 시스템 평가 후속 3건 + 사고 품질 강제화
+최종 업데이트: 2026-04-08 — 토론모드 브라우저 불편사항 3건 개선
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-08 4차)
+## 0. 최신 세션 (2026-04-08 5차)
+
+### 작업: 토론모드 브라우저 불편사항 3건 개선 (완료)
+- 커밋: 7a4d3fc3
+- polling 간격 단축 (5/10/15초 → 3/5/8초) + 매 주기 사용자 중단 확인
+- debate_chat_url 상태 파일 도입 (.claude/state/debate_chat_url)
+- NEVER 규칙 강화: debate_chat_url 있으면 해당 URL 필수 사용
+- share-result 3단계 debate_chat_url 우선 참조
+- 변경 파일: ENTRY.md, CLAUDE.md, REFERENCE.md, SKILL.md, share-result.md
+
+### 이전 세션 (2026-04-08 4차)
 
 ### 작업: 시스템 평가 후속 3건 (완료)
 - GPT 공동작업으로 3건 검토+실행
