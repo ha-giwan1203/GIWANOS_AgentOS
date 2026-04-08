@@ -4,12 +4,17 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — skill-creator 실동기화 완료 (GPT PASS dee3d57c)
+최종 업데이트: 2026-04-08 — 세션 마무리
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-08)
+
+### 다음 세션 안건
+1. **write_marker hook 개선** — `.claude/` 경로 제외 (메모리 수정 시 오탐 방지)
+2. **completion_gate → pre-commit 전환 검토** — write_marker 수정 후 진행
+3. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
 
 ### 작업: skill-creator 실동기화 보강 (완료)
 - ZIP 내부 + 풀어놓은 Git 원본 양쪽 동기화 완료
