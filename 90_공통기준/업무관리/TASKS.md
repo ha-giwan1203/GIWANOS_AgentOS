@@ -38,9 +38,12 @@
   - 정리 판정은 1~2주 데이터 누적 후
 - 장기: 자가수정 루프 확장 (incident → 패치 → 테스트 → 반영)
 
-#### Claude 사고 품질 지속 적용
-- 이번 세션에서 시스템 지도 + 영향 범위 실전 적용 완료
-- 매 작업 시 습관화 지속 필요
+### [완료] Claude 사고 품질 시스템 강제화 (2026-04-08)
+- GPT 토론 E안 채택: B안(evidence hook) 기반 + A안 흡수 + C안 보조
+- risk_profile_prompt.sh: 고위험 수정 프롬프트 시 map_scope.req 생성
+- evidence_gate.sh: map_scope.req 있고 map_scope.ok 없으면 Write/Edit 차단
+- /map-scope 커맨드: 3줄 선언(변경대상/연쇄영향/후속작업) → map_scope.ok 적립
+- 위험도 기반 조건부 강제 — 읽기/단순수정은 no-op, 고위험만 차단
 
 #### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - 빈도 증가 시 재검토

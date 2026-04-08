@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 시스템 평가 후속 3건 실행
+최종 업데이트: 2026-04-08 — 시스템 평가 후속 3건 + 사고 품질 강제화
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -22,6 +22,13 @@
 - **의제 3**: 스킬 사용 계측 구조 추가
   - hook_common.sh → hook_skill_usage() + skill_usage.jsonl
   - 정리 판정: 1~2주 데이터 누적 후
+
+### 작업: 사고 품질 시스템 강제화 (완료)
+- GPT 토론 E안 채택 (B안 기반 + A안 흡수)
+- risk_profile_prompt.sh → map_scope.req 조건 추가
+- evidence_gate.sh → map_scope 체크 추가 (Write/Edit/MultiEdit만 차단)
+- /map-scope 커맨드 신규: 3줄 선언 → map_scope.ok 적립
+- 의지 기반 → 시스템 강제 전환 완료
 
 ### 이전 세션 (2026-04-08 3차)
 

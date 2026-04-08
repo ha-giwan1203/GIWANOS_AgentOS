@@ -86,7 +86,18 @@ if (fresh_req "skill_read" || fresh_req "identifier_ref") && is_identifier_domai
   fi
 fi
 
-# 4) 종료 문서 갱신 선행 — commit/push 전만 체크
+# 4) 사고 품질 — 고위험 수정 시 map_scope 선행
+if fresh_req "map_scope"; then
+  if ! fresh_ok "map_scope"; then
+    # Write/Edit/MultiEdit만 차단 (Bash read 등은 허용)
+    tool_name=$(echo "$INPUT" | safe_json_get "tool_name" 2>/dev/null || echo "")
+    if echo "$tool_name" | grep -qiE '(Write|Edit|MultiEdit)'; then
+      deny "map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지."
+    fi
+  fi
+fi
+
+# 5) 종료 문서 갱신 선행 — commit/push 전만 체크
 if fresh_req "tasks_handoff" && is_commit_or_push; then
   if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
     deny "tasks_handoff.req 존재. TASKS/HANDOFF 갱신 없이 commit/push 금지."

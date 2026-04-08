@@ -52,6 +52,11 @@ if echo "$TEXT" | grep -qiE '(완료|반영|갱신|커밋|푸시|HANDOFF|TASKS|S
   touch_req "tasks_handoff"
 fi
 
+# 고위험 수정: hook/gate/기준문서/구조변경/다중파일 수정 프롬프트
+if echo "$TEXT" | grep -qiE '(hook|gate|settings|규칙|구조.*변경|리팩터|마이그레이션|전수.*수정|일괄.*변경|파이프라인|스키마|컬럼|시트.*추가|시트.*삭제)'; then
+  touch_req "map_scope"
+fi
+
 hook_log "UserPromptSubmit" "risk_profile_prompt reqs=${REQS:-none}"
 
 # 출력은 선택사항. 최소 마찰 위해 추가 컨텍스트 미주입.
