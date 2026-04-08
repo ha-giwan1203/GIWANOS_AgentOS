@@ -4,12 +4,22 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 폴더 안전 정리 (임시파일·구버전 스크립트 아카이브)
+최종 업데이트: 2026-04-08 — skill-creator 실동기화 보강
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-08)
+
+### 작업: skill-creator 실동기화 보강 (완료)
+- skill-creator-merged.skill 내부 SKILL.md + skill-standards.md 보강
+- frontmatter 6필드 필수화, 실패계약 4섹션 문서 완결성 기준 추가
+- .skill ZIP 재패키징, 구버전 백업 아카이브 이동
+
+### 작업: 스킬생성.md 현행 기준 개정 (완료)
+- 384328e6 — GPT 토론 합의 4개 + Claude 추가 5개 = 9개 보강
+- GPT PASS 확정 — 9개 항목 실물 확인, TASKS 비충돌
+- GPT 제안 후속: skill-creator 샘플 1건 실전 검증 (선택)
 
 ### 작업: 폴더 안전 정리 (완료)
 - 임시파일 4개 + 구버전 스크립트 3개 → `98_아카이브/정리대기_20260408/`
