@@ -9,17 +9,18 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-08 — skill-creator 실동기화 보강 (frontmatter 6필드 + 실패계약 4섹션)
+최종 업데이트: 2026-04-08 — skill-creator 풀어놓은 원본 동기화 완료 (GPT PASS dee3d57c)
 
 ---
 
 ## 진행 중
 
 ### [완료] skill-creator 실동기화 보강 (2026-04-08)
-- skill-creator-merged.skill 내부 보강:
+- skill-creator-merged.skill 내부 + 풀어놓은 Git 원본 양쪽 동기화:
   - SKILL.md: frontmatter 필수 6필드 명시, 문서 완결성에 실패계약 4섹션 추가
   - skill-standards.md: §1-1 Frontmatter 필수 필드, §1-2 실패계약 4섹션 추가, 경로 현행화
-- .skill ZIP 재패키징 완료
+- .skill ZIP 재패키징 완료 (7916a019 → dee3d57c로 풀어놓은 원본도 반영)
+- GPT 판정: PASS (dee3d57c)
 
 ### [완료] 스킬생성.md 현행 기준 개정 (2026-04-08)
 - 대상: 90_공통기준/프롬프트/스킬생성.md
