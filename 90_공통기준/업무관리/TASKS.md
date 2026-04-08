@@ -57,7 +57,7 @@
 - P1: Selector Smoke Test 추가 (토론 시작 시 4개 selector 존재 확인)
 - P1: REFERENCE.md 오류 대응 표 polling 값 드리프트 수정 (5/10/15→3/5/8)
 - AppData SKILL.md + REFERENCE.md 동기화 포함
-- GPT 판정: 대기
+- GPT 판정: PASS (04b83e6d 기준)
 
 #### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - 빈도 증가 시 재검토
