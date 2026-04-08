@@ -4,26 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — write_marker 개선 + 스킬 grade 27개 + 4/14 집계
+최종 업데이트: 2026-04-08 — 4/14 최종 판정 완료 (deny 7.95% 현행 유지)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-08 2차)
+## 0. 최신 세션 (2026-04-08 3차)
 
-### 작업: write_marker hook 개선 + 스킬 grade 27개 (완료)
+### 작업: 4/14 최종 판정 (완료)
+- 재집계 실행: deny_rate 9.27% → **7.95%** (-1.32%p 개선)
+- 승인 요청 852→1,006 / deny 79→80 / 오탐 0 / 우회 0
+- write_marker 세션성 경로 skip 효과: completion_gate 신규 deny 0건 확인
+- **판정: 현행 유지** (deny <10%, 오탐 0%, 우회 0%)
+- GPT 판정: 70ca6d3c 재집계 + TASKS/HANDOFF 최종 갱신 후 PASS
+
+### 작업: 미추적 파일 정리 (완료)
+- b14db6c1: 명찰 HTML (nametag_70x30.html) + fix_clean.py 커밋
+
+### 사고 품질 확장 — 실전 적용 (완료)
+- Task 2(재집계) 착수 시 시스템 지도 트리 + 영향 범위 선언 출력
+- 변경/연쇄/후속을 명시적으로 나열 후 작업 진행
+
+### 다음 세션 안건
+1. **Claude 사고 품질 지속 적용** — 매 작업 시 시스템 지도 + 영향 범위 습관화
+2. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
+
+### 이전 세션 (2026-04-08 2차)
 - write_marker.sh: `.claude/` 세션성 경로(memory/plans/state/settings) skip 추가
 - `.claude/hooks,rules,commands`는 마커 생성 유지 (GPT 합의: 핵심 운영 변경은 추적)
 - smoke_test 70/70 ALL PASS (세션성 경로 skip 검증 2건 추가)
-- completion_gate → pre-commit 전환 검토: commit_gate+final_check이 이미 동일 역할 → 현행 유지
 - check_skill_contract.py 재분류: skill-creator-merged C→B, supanova-deploy B→A
 - 27개 SKILL.md grade frontmatter 일괄 반영 (A:8 / B:8 / C:11)
-- 4/14 판정 집계: 원지표 9.27% PASS / 구조적 오탐 제외 3.99% (이중 표기)
-
-### 다음 세션 안건
-1. **4/14 최종 판정** — 최종 재집계 1회 → deny_rate 확정 (write_marker 개선 후 오탐 감소 확인)
-2. **Claude 사고 품질 확장** — 시스템 지도 + 영향 범위 선언 실전 적용 및 검증
-3. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
 
 ### 작업: skill-creator 실동기화 보강 (완료)
 - ZIP 내부 + 풀어놓은 Git 원본 양쪽 동기화 완료
@@ -92,23 +103,20 @@
 - GPT PASS: smoke_test 헤더 수정 후 전체 묶음 정합 확인
 - "남은 건 4/13~14 최종 재집계 후 4/14 운영 안정화 최종 판정만"
 
-### 미해결
-- 4/14 최종 판정: 최종 재집계 1회만 남음
+### 해결 완료 (2026-04-08 3차)
+- ~~4/14 최종 판정: 최종 재집계 1회만 남음~~ → **완료**: deny 7.95% 현행 유지 PASS
 
 ---
 
 ## 다음 세션 할 일
 
-### 1순위: 4/14 판정 최종 (마감 4/14)
-- [ ] 4/13~14 aggregate_hook_metrics.py 최종 집계 → 판정 수치 확정
-- [ ] deny <10%, 오탐 0%, 우회 0% 확인 → 현행 유지 or allow 확대
-
-### 2순위: 실무 업무
+### 1순위: 실무 업무
 - [ ] 4월 실적 정산 — GERP/구ERP 데이터 입수 후 `/settlement 04`
 - [ ] SP3M3 미매칭 RSP 4건 갱신 (RSP3SC0291~0294)
 
-### 3순위: 점진 보강
-- [ ] 각 스킬 SKILL.md에 grade: A|B|C frontmatter 추가 (27개)
+### 2순위: 점진 보강
+- [x] 각 스킬 SKILL.md에 grade: A|B|C frontmatter 추가 (27개) — 완료 (a6757242)
+- [ ] Claude 사고 품질 지속 적용 — 시스템 지도 + 영향 범위 습관화
 
 ---
 
