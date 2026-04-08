@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대원테크 명찰 (70×30mm)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Malgun Gothic','맑은 고딕',sans-serif; background:#f0f0f0; padding:30px; }
+  h1 { font-size:18px; margin-bottom:4px; color:#333; }
+  .sub { font-size:12px; color:#888; margin-bottom:20px; }
+
+  /* ── 명찰 카드 (A. 상단바 모던) ── */
+  .nametag {
+    width:67mm; height:27mm;
+    display:flex; flex-direction:column;
+    background:#fff;
+    border-radius:1.5mm;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.12);
+    page-break-inside:avoid;
+  }
+  .nametag .bar {
+    height:10mm;
+    background:linear-gradient(135deg,#1a237e,#3949ab);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .nametag .bar .company {
+    color:#fff; font-size:11pt; font-weight:800; letter-spacing:3pt;
+  }
+  .nametag .body {
+    flex:1; display:flex; align-items:center; justify-content:center; gap:3mm;
+  }
+  .nametag .body .name {
+    font-size:15pt; font-weight:900; color:#1a237e; letter-spacing:2pt;
+  }
+  .nametag .body .rank {
+    font-size:8pt; color:#666; font-weight:600;
+  }
+
+  /* ── A4 시트 ── */
+  .print-sheet {
+    width:210mm; min-height:297mm;
+    background:#fff; padding:15mm 10mm;
+    margin:0 auto 20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  }
+  .print-sheet .grid {
+    display:grid;
+    grid-template-columns:repeat(2,70mm);
+    grid-auto-rows:30mm;
+    gap:5mm 10mm;
+    justify-content:center;
+  }
+  .print-sheet .nametag {
+    box-shadow:none;
+    border:0.3mm dashed #bbb;
+    border-radius:0;
+  }
+
+  /* ── 편집기 ── */
+  .editor {
+    background:#fff; border:1px solid #ddd; border-radius:8px;
+    padding:20px; max-width:500px; margin-bottom:30px;
+  }
+  .editor label { display:block; font-size:12px; color:#555; margin:8px 0 2px; }
+  .editor label:first-child { margin-top:0; }
+  .editor input, .editor select {
+    width:100%; padding:6px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px;
+  }
+  .editor input[type=range] { padding:0; }
+  .editor .row { display:flex; gap:10px; }
+  .editor .row > div { flex:1; }
+  .editor textarea {
+    width:100%; height:100px; padding:8px; border:1px solid #ccc;
+    border-radius:4px; font-size:12px; font-family:'Malgun Gothic',monospace; margin-top:8px;
+  }
+  .editor button {
+    margin-top:12px; padding:8px 20px; background:#1a237e; color:#fff;
+    border:none; border-radius:4px; cursor:pointer; font-size:13px;
+  }
+  .editor button:hover { background:#3949ab; }
+  .editor .btn-secondary { background:#888; margin-left:8px; }
+  .editor hr { margin:12px 0; border:none; border-top:1px solid #ddd; }
+
+  /* ── 인쇄 ── */
+  @media print {
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    body { background:#fff; padding:0; margin:0; }
+    h1,.sub,.editor,.no-print { display:none !important; }
+    .print-sheet { box-shadow:none; padding:15mm 10mm; margin:0; page-break-after:always; }
+    .print-sheet .nametag { border:0.3mm dashed #bbb; }
+    @page { size:A4; margin:0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>대원테크 명찰</h1>
+<p class="sub">A. 상단바 모던 · 70×30mm · Ctrl+P로 A4 인쇄 후 절취</p>
+
+<div class="editor no-print">
+  <label>회사명</label>
+  <input type="text" id="companyInput" value="대원테크">
+
+  <label>직급</label>
+  <input type="text" id="rankInput" value="반장" placeholder="반장">
+
+  <label>이름</label>
+  <input type="text" id="nameInput" value="홍길동" placeholder="홍길동">
+
+  <hr>
+  <label style="font-weight:700;color:#333;">폰트 크기 조정</label>
+  <div class="row">
+    <div>
+      <label>회사명 <span id="compFsVal">11</span>pt</label>
+      <input type="range" id="compFs" min="6" max="16" step="0.5" value="11" oninput="applyStyle()">
+    </div>
+    <div>
+      <label>이름 <span id="nameFsVal">15</span>pt</label>
+      <input type="range" id="nameFs" min="8" max="22" step="0.5" value="15" oninput="applyStyle()">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>직급 <span id="rankFsVal">8</span>pt</label>
+      <input type="range" id="rankFs" min="5" max="14" step="0.5" value="8" oninput="applyStyle()">
+    </div>
+    <div>
+      <label>바 높이 <span id="barHVal">10</span>mm</label>
+      <input type="range" id="barH" min="6" max="16" step="0.5" value="10" oninput="applyStyle()">
+    </div>
+  </div>
+
+  <hr>
+  <label>일괄 생성 (한 줄에 하나: 직급,이름)</label>
+  <textarea id="bulkInput">반장,박태순
+사원,곽명옥
+사원,곽은란
+사원,구정옥
+사원,김두이
+사원,김순애
+사원,노승자
+사원,유수영
+사원,이명련
+사원,정말숙
+사원,정은정
+사원,조현미
+사원,최경림
+사원,뉴이
+사원,니니
+사원,리
+사원,미레
+사원,박인희
+사원,빅냔
+사원,안나
+사원,투이
+사원,튀린
+사원,티홍
+사원,홍반
+사원,김경순
+사원,김아름
+사원,박경혜
+사원,박지영
+사원,이민주
+사원,정미량
+사원,최인선
+사원,김미령
+사원,김하이
+사원,도티수안
+사원,이선미
+사원,제인옥
+사원,티란</textarea>
+
+  <button onclick="updateSingle()">단일 미리보기</button>
+  <button class="btn-secondary" onclick="generateBulk()">일괄 생성</button>
+  <button class="btn-secondary" onclick="window.print()">🖨️ 인쇄</button>
+</div>
+
+<div id="previewArea">
+  <div class="print-sheet">
+    <div class="grid" id="tagGrid">
+      <div class="nametag">
+        <div class="bar"><span class="company">대원테크</span></div>
+        <div class="body"><span class="name">홍길동</span><span class="rank">반장</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PER_PAGE = 16;
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function createTag(company, rank, name) {
+  return `<div class="nametag">
+    <div class="bar"><span class="company">${esc(company)}</span></div>
+    <div class="body"><span class="name">${esc(name)}</span><span class="rank">${esc(rank)}</span></div>
+  </div>`;
+}
+
+function renderSheets(tags) {
+  let html='';
+  for(let i=0;i<tags.length;i+=PER_PAGE){
+    html+='<div class="print-sheet"><div class="grid">'+tags.slice(i,i+PER_PAGE).join('')+'</div></div>';
+  }
+  document.getElementById('previewArea').innerHTML=html;
+  applyStyle();
+}
+
+function updateSingle(){
+  const c=document.getElementById('companyInput').value.trim();
+  const r=document.getElementById('rankInput').value.trim();
+  const n=document.getElementById('nameInput').value.trim();
+  renderSheets([createTag(c,r,n)]);
+}
+
+function generateBulk(){
+  const c=document.getElementById('companyInput').value.trim();
+  const raw=document.getElementById('bulkInput').value.trim();
+  if(!raw){alert('일괄 데이터를 입력해주세요.');return;}
+  const tags=[];
+  for(const l of raw.split('\n').filter(l=>l.trim())){
+    const p=l.split(',').map(s=>s.trim());
+    if(p.length>=2) tags.push(createTag(c,p[0],p[1]));
+  }
+  if(!tags.length){alert('형식 오류: 직급,이름');return;}
+  renderSheets(tags);
+}
+
+function applyStyle(){
+  const cf=document.getElementById('compFs').value;
+  const nf=document.getElementById('nameFs').value;
+  const rf=document.getElementById('rankFs').value;
+  const bh=document.getElementById('barH').value;
+  document.getElementById('compFsVal').textContent=cf;
+  document.getElementById('nameFsVal').textContent=nf;
+  document.getElementById('rankFsVal').textContent=rf;
+  document.getElementById('barHVal').textContent=bh;
+  document.querySelectorAll('.nametag .company').forEach(el=>el.style.fontSize=cf+'pt');
+  document.querySelectorAll('.nametag .name').forEach(el=>el.style.fontSize=nf+'pt');
+  document.querySelectorAll('.nametag .rank').forEach(el=>el.style.fontSize=rf+'pt');
+  document.querySelectorAll('.nametag .bar').forEach(el=>el.style.height=bh+'mm');
+}
+
+// 페이지 로드 시 자동 일괄 생성
+window.addEventListener('DOMContentLoaded', function(){ generateBulk(); });
+</script>
+</body>
+</html>
