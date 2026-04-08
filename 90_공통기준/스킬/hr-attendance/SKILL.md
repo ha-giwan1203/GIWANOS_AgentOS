@@ -5,6 +5,7 @@ version: v1.0
 trigger: "출퇴근", "근태", "연차", "인원 배치", "지각", "결근"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 인사/근태 관리 스킬

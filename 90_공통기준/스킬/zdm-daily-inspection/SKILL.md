@@ -6,6 +6,7 @@ trigger: "일상점검", "ZDM", "ZDM 점검", "점검 입력", "일상점검 등
 author: 하지완
 last_updated: 2026-04-01
 status: active
+grade: A
 ---
 
 # ZDM 일상점검 자동 입력

@@ -1,6 +1,7 @@
 ﻿---
 name: chomul-module-partno
 description: "초물표 모듈품번(RSP) 일괄 반영 스킬. 초물표 xls 파일의 공용품번 박스에 모듈품번을 입력/수정하고, 라인코드를 SP3S03에서 SP3M3로 변경하며, 뷰/구분선을 통일한다. '초물표 수정', '모듈품번 입력', '초물표 RSP', 'RSP 반영', '라인코드 변경', '초물표 일괄', 'SP3M3 변경' 등을 언급하면 반드시 이 스킬을 사용할 것. Windows win32com 기반 Excel COM 자동화."
+grade: A
 ---
 
 # 초물표 모듈품번 일괄 반영

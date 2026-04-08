@@ -7,6 +7,7 @@ description: >
   자동 모드 트리거: '영상분석' 단독 또는 '영상분석 {주제}' 패턴만
   수동 모드 트리거: youtu.be/youtube.com URL 포함 메시지
   GPT 공동작업 합의: 2026-04-01 (A/B/C 3단 게이트 + 교차검증 의무화)
+grade: C
 ---
 
 # YouTube 영상 분석 (youtube-analysis)

@@ -5,6 +5,7 @@ version: v1.0
 trigger: "불량 현황", "불량률 보고", "품질 보고서", "불량 집계", "대책서"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 품질 불량 현황 집계/보고 스킬

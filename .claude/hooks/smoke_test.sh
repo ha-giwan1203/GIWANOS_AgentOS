@@ -95,6 +95,15 @@ check $? "write_marker.sh 존재 + 실행 가능"
 grep -q 'write_marker.flag' "$HOOKS_DIR/write_marker.sh"
 check $? "write_marker.flag 생성 로직 존재"
 
+# 세션성 .claude/ 경로 skip 검증
+grep -q '\.claude/(memory|plans|state|settings)' "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker: .claude/ 세션성 경로 skip 존재"
+
+# hooks/rules/commands는 skip 대상이 아닌지 검증 (마커 생성 대상이어야 함)
+! grep -q '\.claude/hooks' "$HOOKS_DIR/write_marker.sh" 2>/dev/null || \
+  ! grep -qP '\.claude/(hooks|rules|commands).*exit' "$HOOKS_DIR/write_marker.sh" 2>/dev/null
+check $? "write_marker: .claude/hooks,rules,commands는 skip 아님"
+
 echo ""
 
 # === 7. gpt_followup_post.sh (PostToolUse) ===

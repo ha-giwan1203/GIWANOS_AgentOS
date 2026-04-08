@@ -44,9 +44,9 @@ SKILL_GRADE_MAP = {
     "production-result-upload": "A",
     "quality-assurance": "C",
     "quality-defect-report": "C",
-    "skill-creator-merged": "C",
+    "skill-creator-merged": "B",
     "sp3-production-plan": "B",
-    "supanova-deploy": "B",
+    "supanova-deploy": "A",
     "youtube-analysis": "C",
     "zdm-daily-inspection": "A",
 }

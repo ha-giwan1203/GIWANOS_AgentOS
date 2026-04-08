@@ -5,6 +5,7 @@ description: >
   "품번 검색 배치", "메인서브 자동화" 등을 언급하면 이 스킬을 사용할 것.
   SP3메인서브 생산지시서 품번을 검색하고, 하단 SUB ASSY 그리드에 조립라인을 자동 입력 후 저장.
   품번 검색 기반 처리 (searchAndProcess / runQueue).
+grade: A
 ---
 
 # ERP 메인서브 라인배치 자동화

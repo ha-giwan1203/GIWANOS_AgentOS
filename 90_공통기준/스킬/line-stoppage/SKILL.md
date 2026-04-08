@@ -5,6 +5,7 @@ version: v1.0
 trigger: "라인 정지", "정지 현황", "손실비용", "라인 중단"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 라인 정지 관리 스킬

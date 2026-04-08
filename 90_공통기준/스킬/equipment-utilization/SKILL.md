@@ -5,6 +5,7 @@ version: v1.0
 trigger: "설비 가동", "가동률", "설비 현황"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 설비 가동률 집계 스킬

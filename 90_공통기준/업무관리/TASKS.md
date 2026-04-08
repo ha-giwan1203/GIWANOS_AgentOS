@@ -9,20 +9,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-08 — 세션 마무리 (다음 세션 안건 기록)
+최종 업데이트: 2026-04-08 — write_marker 개선 + 스킬 grade 27개 반영 + 4/14 판정 집계
 
 ---
 
 ## 다음 세션 안건
 
-### write_marker hook 개선
-- `.claude/` 경로 내 파일 수정은 write_marker 대상에서 제외
-- 현재 메모리 파일 수정 시 completion_gate가 오탐 트리거됨 (이번 세션 2회 발생)
-
-### completion_gate를 pre-commit hook으로 전환 검토
-- 현재 stop hook(대화 종료 시)이라 커밋 자체는 통과 → 사후 차단
-- pre-commit에서 TASKS/HANDOFF 갱신 여부를 검사하면 커밋 단계에서 방지 가능
-- 단, write_marker 오탐 수정이 선행되어야 함
+### 4/14 최종 판정 (마감 4/14)
+- 최종 재집계 1회 실행 → deny_rate 확정
+- 현재: 원지표 9.27% (PASS, <10%) / 구조적 오탐(completion_gate .claude/ 경로) 제외 시 3.99%
+- write_marker 개선 완료로 이후 completion_gate 오탐 감소 예상
 
 ### Claude 사고 품질 확장 — 시스템 지도 + 영향 범위 실전 적용
 - 전략: 작업 착수 전 "이 변경이 속한 시스템 지도"를 트리 형태로 먼저 출력
@@ -38,6 +34,17 @@
 ---
 
 ## 완료
+
+### [완료] write_marker hook 개선 + 스킬 grade 27개 반영 (2026-04-08)
+- write_marker.sh: `.claude/` 세션성 경로(memory, plans, state, settings) skip 추가
+  - `.claude/hooks/`, `.claude/rules/`, `.claude/commands/`는 마커 생성 유지 (GPT 합의)
+  - completion_gate 오탐 해소 → deny_rate 정상화 기대
+- smoke_test: write_marker 세션성 경로 skip 검증 2건 추가 (70/70 ALL PASS)
+- check_skill_contract.py: 재분류 2건 반영 (skill-creator-merged C→B, supanova-deploy B→A)
+- 27개 SKILL.md에 grade: A|B|C frontmatter 일괄 추가 (A:8 / B:8 / C:11)
+- completion_gate → pre-commit 전환 검토: commit_gate+final_check 조합이 이미 동일 역할 → 현행 유지
+- 4/14 판정 집계: 원지표 9.27% PASS / 구조적 오탐 제외 3.99%
+- GPT 토론 PASS: 채택 2건(이중 표기 + 세션성 경로만 제외) / 보류→채택 2건(등급 재분류)
 
 ### [완료] skill-creator 실동기화 보강 (2026-04-08)
 - skill-creator-merged.skill 내부 + 풀어놓은 Git 원본 양쪽 동기화:

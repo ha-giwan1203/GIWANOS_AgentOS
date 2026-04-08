@@ -1,3 +1,10 @@
+---
+name: cdp-wrapper
+description: >
+  CDP(Playwright connect_over_cdp) 브라우저 작업을 Bash 1줄로 호출하는 래퍼 표준.
+grade: A
+---
+
 # CDP 래퍼 표준 사용법
 
 > 위치: `.claude/scripts/cdp/`

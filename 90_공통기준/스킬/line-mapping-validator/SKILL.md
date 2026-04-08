@@ -8,6 +8,7 @@ description: >
   "GERP 품번 비교", "배정 누락 체크", "ENDPART 확인", "품번 매칭" 등을 언급하면
   반드시 이 스킬을 사용할 것. 라인배치 작업(line-batch-management) 후 결과 검증이
   필요할 때도 이 스킬을 사용한다.
+grade: B
 ---
 
 # 품번-라인배정 정합성 검증

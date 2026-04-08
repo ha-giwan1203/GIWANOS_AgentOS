@@ -4,18 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 세션 마무리
+최종 업데이트: 2026-04-08 — write_marker 개선 + 스킬 grade 27개 + 4/14 집계
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-08)
+## 0. 최신 세션 (2026-04-08 2차)
+
+### 작업: write_marker hook 개선 + 스킬 grade 27개 (완료)
+- write_marker.sh: `.claude/` 세션성 경로(memory/plans/state/settings) skip 추가
+- `.claude/hooks,rules,commands`는 마커 생성 유지 (GPT 합의: 핵심 운영 변경은 추적)
+- smoke_test 70/70 ALL PASS (세션성 경로 skip 검증 2건 추가)
+- completion_gate → pre-commit 전환 검토: commit_gate+final_check이 이미 동일 역할 → 현행 유지
+- check_skill_contract.py 재분류: skill-creator-merged C→B, supanova-deploy B→A
+- 27개 SKILL.md grade frontmatter 일괄 반영 (A:8 / B:8 / C:11)
+- 4/14 판정 집계: 원지표 9.27% PASS / 구조적 오탐 제외 3.99% (이중 표기)
 
 ### 다음 세션 안건
-1. **Claude 사고 품질 확장** — 시스템 지도 + 영향 범위 선언 실전 적용 및 검증
-2. **write_marker hook 개선** — `.claude/` 경로 제외 (메모리 수정 시 오탐 방지)
-3. **completion_gate → pre-commit 전환 검토** — write_marker 수정 후 진행
-4. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
+1. **4/14 최종 판정** — 최종 재집계 1회 → deny_rate 확정 (write_marker 개선 후 오탐 감소 확인)
+2. **Claude 사고 품질 확장** — 시스템 지도 + 영향 범위 선언 실전 적용 및 검증
+3. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
 
 ### 작업: skill-creator 실동기화 보강 (완료)
 - ZIP 내부 + 풀어놓은 Git 원본 양쪽 동기화 완료

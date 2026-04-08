@@ -24,5 +24,11 @@ if echo "$FILE_PATH" | grep -qiE '(CLAUDE\.md|hook_log|\.flag)'; then
   exit 0
 fi
 
+# 세션성 .claude/ 하위 경로는 마킹 불필요 (메모리, plans, settings, state 등)
+# 단, .claude/hooks/ .claude/rules/ .claude/commands/ 는 핵심 운영 변경이므로 제외하지 않음
+if echo "$FILE_PATH" | grep -qE '\.claude/(memory|plans|state|settings)'; then
+  exit 0
+fi
+
 # 그 외 구현 파일 수정 → marker 생성/갱신
 date '+%Y-%m-%d %H:%M:%S' > "$MARKER" 2>/dev/null

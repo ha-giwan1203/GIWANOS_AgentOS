@@ -5,6 +5,7 @@ description: >
   엔진: python-pptx (단일 Python 스택)
   QA: 텍스트검사 + 시각검사 + 구조검사 3축
   GPT 합의: 2026-04-03 (C+D 혼합, 재사용 우선, MVP 2종)
+grade: B
 ---
 
 # PPT 자동 생성 (pptx-generator)

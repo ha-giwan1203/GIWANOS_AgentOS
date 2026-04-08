@@ -5,6 +5,7 @@ version: v1.0
 trigger: "공정 개선", "개선 이슈", "개선 실적", "공정 이슈"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 공정 개선 관리 스킬

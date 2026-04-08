@@ -5,6 +5,7 @@ version: v1.0
 trigger: "품번 등록", "품번 변경", "단종", "폐번", "BOM", "품번 관리"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 품번 관리 스킬

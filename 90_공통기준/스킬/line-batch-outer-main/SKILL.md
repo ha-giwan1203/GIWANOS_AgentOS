@@ -5,6 +5,7 @@ description: >
   "메인 라인 배치", "SP3M3 라인배치", "리스트업 배치" 등을 언급하면 이 스킬을 사용할 것.
   검색 없이 현재 화면 리스트 순서대로 처리하는 리스트업 방식.
   OUTER: runOuterLine / MAIN: runMainLine
+grade: A
 ---
 
 # ERP OUTER/MAIN 라인배치 자동화

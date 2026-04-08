@@ -5,6 +5,7 @@ version: v1.0
 trigger: "발주", "납품", "재고 실사", "협력사", "외주 발주", "입고 확인"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 외주 발주/납품 관리 스킬

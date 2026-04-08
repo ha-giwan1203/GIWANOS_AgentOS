@@ -5,6 +5,7 @@ version: v1.0
 trigger: "공정보증", "점검표", "공정보증 점검"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # 공정보증 점검표 관리 스킬

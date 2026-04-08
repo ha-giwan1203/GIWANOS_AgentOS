@@ -5,6 +5,7 @@ version: v1.1
 trigger: "야간스캔", "스캔실적", "야간실적 비교", "night-scan"
 author: Claude
 last_updated: 2026-04-06
+grade: B
 ---
 
 # 야간 스캔실적 비교 스킬

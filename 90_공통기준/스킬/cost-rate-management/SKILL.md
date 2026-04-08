@@ -5,6 +5,7 @@ version: v1.0
 trigger: "임률단가", "단가 갱신", "공정별 단가", "임율 기준", "급여단가"
 author: 하지완
 last_updated: 2026-03-31
+grade: B
 ---
 
 # 임률단가 관리 스킬

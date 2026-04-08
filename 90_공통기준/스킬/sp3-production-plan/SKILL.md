@@ -5,6 +5,7 @@ version: v3.0
 trigger: "생산계획", "SP3 계획", "생산지시서", "APPLY_TO_PLAN", "야간 이월", "수동서열"
 author: 하지완
 last_updated: 2026-03-31
+grade: B
 ---
 
 # SP3 생산계획 자동화 스킬

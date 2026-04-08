@@ -9,6 +9,7 @@ version: v1.0
 trigger: "채팅 분석", "채팅 품질문제 분류", "채팅 설비이슈 집계", "SP3S03 월별 보고", "채팅방 품질/설비 보고", "Flow 채팅 분석"
 author: 하지완
 last_updated: 2026-03-31
+grade: C
 ---
 
 # Flow 채팅방 분석 (flow-chat-analysis)

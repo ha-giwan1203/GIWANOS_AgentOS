@@ -5,6 +5,7 @@ version: v1.0
 trigger: "생산실적 집계", "BI 실적", "생산관리 마스터리스트", "build_master", "생산 보고서"
 author: 하지완
 last_updated: 2026-03-31
+grade: B
 ---
 
 # 생산실적 집계 자동화 스킬
