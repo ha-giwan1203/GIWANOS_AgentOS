@@ -1,14 +1,14 @@
 # Hook 4지표 집계
 
-- 생성시각: 2026-04-08T20:44:58+09:00
-- hook_log: 2576건 / incident_ledger: 79건
+- 생성시각: 2026-04-08T21:19:57+09:00
+- hook_log: 2918건 / incident_ledger: 80건
 
 ## 합계
 
 | 지표 | 건수 | 비율 |
 |------|------|------|
-| 승인 요청 (hook 발화) | 852 | - |
-| deny (차단) | 79 | 9.27% |
+| 승인 요청 (hook 발화) | 1006 | - |
+| deny (차단) | 80 | 7.95% |
 | 오탐 (false_positive) | 0 | 0.00% |
 | 우회 감지 | 0 | 0.00% |
 
@@ -16,13 +16,14 @@
 
 | hook | 발화 | deny | 오탐 | 우회 |
 |------|------|------|------|------|
-| completion_gate | 0 | 45 | 0 | 0 |
-| commit_gate | 56 | 22 | 0 | 0 |
-| block_dangerous | 304 | 6 | 0 | 0 |
-| date_scope_guard | 303 | 4 | 0 | 0 |
+| completion_gate | 1 | 45 | 0 | 0 |
+| commit_gate | 64 | 23 | 0 | 0 |
+| block_dangerous | 371 | 6 | 0 | 0 |
+| date_scope_guard | 371 | 4 | 0 | 0 |
 | evidence_gate | 0 | 1 | 0 | 0 |
 | send_gate | 0 | 1 | 0 | 0 |
-| protect_files | 189 | 0 | 0 | 0 |
+| protect_files | 198 | 0 | 0 | 0 |
+| write_marker | 1 | 0 | 0 | 0 |
 
 ## 판정 기준
 
