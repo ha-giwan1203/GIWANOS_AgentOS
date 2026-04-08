@@ -59,6 +59,12 @@
 - AppData SKILL.md + REFERENCE.md 동기화 포함
 - GPT 판정: PASS (04b83e6d 기준)
 
+### [완료] 근본 원인 대응 — share-result 상태 문서 검증 강제 (2026-04-09)
+- 원인: GPT 공유 전 TASKS/HANDOFF 갱신 누락으로 2회 연속 FAIL
+- 대응 1: share-result 1단계에 "최근 커밋에 TASKS.md 포함 여부" 필수 검증 추가 → 미포함 시 공유 진행 금지
+- 대응 2: share-result 5단계에 "GPT 지적사항 즉시 행동" 절차 추가 → 읽기만 하고 방치 금지
+- GPT 판정: 대기
+
 #### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - 빈도 증가 시 재검토
 

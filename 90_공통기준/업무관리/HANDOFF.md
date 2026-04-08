@@ -11,12 +11,15 @@
 
 ## 0. 최신 세션 (2026-04-09)
 
-### 작업: GPT 분석 기반 P0/P1 보완 (완료)
+### 작업: GPT 분석 기반 P0/P1 보완 + 근본 원인 대응 (완료)
 - GPT "클로드코드 문제 분석" 6건 중 P0 1건 + P1 2건 즉시 조치
 - P0: SKILL.md Step 4b — critic-reviewer FAIL 시 Step 5 차단 (경고→실제 게이트)
 - P1: REFERENCE.md — Selector Smoke Test 신설 (4개 selector 존재 검증)
 - P1: REFERENCE.md — 오류 대응 표 polling 값 5/10/15→3/5/8 드리프트 수정
 - AppData debate-mode 동기화 포함
+- **근본 원인 대응**: share-result 스킬 강화
+  - 1단계: TASKS.md 미포함 커밋 → GPT 공유 금지 (2회 FAIL 재발 방지)
+  - 5단계: GPT 지적사항 즉시 행동 강제 (읽기만 하고 방치 금지)
 
 ### 작업: 시스템 전수 점검 3건 (완료)
 - STATUS.md deny 3.37%→7.95% 현행화
