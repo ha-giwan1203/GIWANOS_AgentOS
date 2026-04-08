@@ -135,11 +135,42 @@ logs/
 └── debate_YYYYMMDD_HHMMSS.json
 ```
 
+## Selector Smoke Test (토론 시작 시 필수)
+
+토론모드 Step 1 완료 직후, 메시지 전송 전에 아래 4개 selector 존재를 검증한다.
+하나라도 실패하면 토론 진행을 중단하고 사용자에게 보고한다.
+
+```javascript
+const selectors = {
+  promptTextarea: '#prompt-textarea',
+  sendButton: '[data-testid="send-button"]',
+  stopButton: '[data-testid="stop-button"]',  // 생성 중이 아니면 null 허용
+  assistantMsg: '[data-message-author-role="assistant"]'
+};
+const results = {};
+for (const [name, sel] of Object.entries(selectors)) {
+  results[name] = !!document.querySelector(sel);
+}
+// stopButton은 생성 중이 아니면 false 허용
+const required = ['promptTextarea', 'sendButton', 'assistantMsg'];
+const missing = required.filter(k => !results[k]);
+JSON.stringify({results, missing, pass: missing.length === 0});
+```
+
+| 결과 | 행동 |
+|------|------|
+| pass: true | 정상 진행 |
+| missing 있음 | 토론 중단 → 사용자에게 "ChatGPT UI 변경 감지: {missing} selector 없음" 보고 |
+
+> ChatGPT UI 업데이트로 selector가 변경되면 REFERENCE.md의 selector 목록과 이 테스트를 함께 갱신한다.
+
+---
+
 ## 오류 대응
 
 | 상황 | 대응 |
 |------|------|
-| ChatGPT 응답 미완료 | 적응형 polling(5/10/15초), 최대 300초 timeout. 초과 시 사용자에게 보고 |
+| ChatGPT 응답 미완료 | 적응형 polling(3/5/8초), 최대 300초 timeout. 초과 시 사용자에게 보고 |
 | 텍스트 추출 실패 | javascript_tool → get_page_text → read_page 순서로 fallback |
 | 로그인 만료 | 사용자에게 재로그인 요청 |
 | 네트워크 오류 | 로그 기록 후 중단 |

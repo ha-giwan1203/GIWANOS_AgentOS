@@ -4,12 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-08 — 토론모드 브라우저 불편사항 3건 개선
+최종 업데이트: 2026-04-09 — GPT 분석 기반 P0/P1 3건 보완
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-08 5차)
+## 0. 최신 세션 (2026-04-09)
+
+### 작업: GPT 분석 기반 P0/P1 보완 (완료)
+- GPT "클로드코드 문제 분석" 6건 중 P0 1건 + P1 2건 즉시 조치
+- P0: SKILL.md Step 4b — critic-reviewer FAIL 시 Step 5 차단 (경고→실제 게이트)
+- P1: REFERENCE.md — Selector Smoke Test 신설 (4개 selector 존재 검증)
+- P1: REFERENCE.md — 오류 대응 표 polling 값 5/10/15→3/5/8 드리프트 수정
+- AppData debate-mode 동기화 포함
+
+### 작업: 시스템 전수 점검 3건 (완료)
+- STATUS.md deny 3.37%→7.95% 현행화
+- 토론모드 TASKS.md 대기 5건 → 완료 처리
+- AppData SKILL.md v2.4→v2.6 동기화
+
+### 이전 세션 (2026-04-08 5차)
 
 ### 작업: 토론모드 브라우저 불편사항 3건 개선 (완료)
 - 커밋: 7a4d3fc3

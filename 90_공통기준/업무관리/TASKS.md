@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-08 — 토론모드 브라우저 불편사항 3건 개선
+최종 업데이트: 2026-04-09 — GPT 분석 기반 P0/P1 3건 보완
 
 ---
 
@@ -51,6 +51,13 @@
 - NEVER 규칙 강화: debate_chat_url 있으면 해당 URL 필수 사용, 새 대화 개설 조건 엄격화
 - share-result 3단계 debate_chat_url 우선 참조로 변경
 - GPT 판정: PASS (71b3b85b 기준 — TASKS/HANDOFF 갱신 후 확인)
+
+### [완료] GPT 분석 기반 토론모드 P0/P1 보완 (2026-04-09)
+- P0: critic-reviewer FAIL 시 Step 5 진행 차단 (게이트 → 실제 차단기로 강화)
+- P1: Selector Smoke Test 추가 (토론 시작 시 4개 selector 존재 확인)
+- P1: REFERENCE.md 오류 대응 표 polling 값 드리프트 수정 (5/10/15→3/5/8)
+- AppData SKILL.md + REFERENCE.md 동기화 포함
+- GPT 판정: 대기
 
 #### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - 빈도 증가 시 재검토

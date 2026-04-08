@@ -75,6 +75,10 @@ HOLD/FAIL: "보류", "FAIL", "재검토", "수정 필요", "문제 있습니다"
 > **URL 보존 정책**: debate_chat_url 파일은 세션 종료 후에도 삭제하지 않는다.
 > 삭제 조건: (a) 사용자가 "새 토론 시작" 명시 요청 (b) 해당 URL이 404 반환
 
+### Step 1.8. Selector Smoke Test (필수)
+- REFERENCE.md의 Selector Smoke Test JS 실행 → 4개 selector 존재 확인
+- 실패 시 토론 중단 + 사용자 보고 (UI 변경 감지)
+
 ### Step 1.5. 입력 전 미확인 응답 점검 (필수)
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
@@ -96,7 +100,10 @@ HOLD/FAIL: "보류", "FAIL", "재검토", "수정 필요", "문제 있습니다"
 ### Step 4b. 품질 심층 검토 (critic-reviewer 1회)
 1. `critic-reviewer` subagent 호출 — 입력: 토론 로그 .md 경로
 2. 4축 평가: 독립성/하네스 엄밀성(필수) + 0건감사/결론 일방성(보조)
-3. PASS → Step 5 / WARN → 경고 후 Step 5 / FAIL → 품질 경고 후 Step 5
+3. 판정별 분기:
+   - **PASS** → Step 5 진행
+   - **WARN** → 경고 기록 후 Step 5 진행 (사용자에게 WARN 사유 1줄 보고)
+   - **FAIL** → **Step 5 진행 차단**. 사용자에게 FAIL 사유 보고 후 대기. 사용자 명시 승인 없이 Step 5로 넘어가지 않는다.
 4. 세션당 1회만 (재호출 금지). 결과는 .json `critic_review` 필드에 저장
 
 ### Step 5. 산출물 → GitHub → GPT 최종 검증
