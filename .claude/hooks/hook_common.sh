@@ -51,6 +51,23 @@ hook_log() {
   _rotate_file "$HOOK_LOG_FILE"
 }
 
+# 스킬 사용 로깅 — 스킬 호출 시 전용 계측
+# 사용법: hook_skill_usage "skill_name" "trigger_type"
+SKILL_USAGE_LOG="$PROJECT_ROOT/.claude/hooks/skill_usage.jsonl"
+
+hook_skill_usage() {
+  local skill_name="$1"
+  local trigger_type="${2:-manual}"  # manual|slash|auto
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  local sk
+  sk=$(session_key)
+  skill_name="${skill_name//\\/\\\\}"
+  skill_name="${skill_name//\"/\\\"}"
+  echo "{\"ts\":\"$ts\",\"skill\":\"$skill_name\",\"trigger\":\"$trigger_type\",\"session\":\"$sk\"}" >> "$SKILL_USAGE_LOG"
+  _rotate_file "$SKILL_USAGE_LOG"
+}
+
 # 안전 JSON 값 추출 — sed 단독 파싱의 따옴표/줄바꿈 취약성 대체
 # 사용법: VALUE=$(echo "$JSON" | safe_json_get "key_name")
 # 문자열 값: 따옴표 내부를 이스케이프 인식하며 추출

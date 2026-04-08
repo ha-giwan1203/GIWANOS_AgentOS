@@ -9,7 +9,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-08 — 4/14 최종 판정 완료 (deny 7.95% 현행 유지)
+최종 업데이트: 2026-04-08 — 시스템 평가 후속 3건 실행
 
 ---
 
@@ -24,12 +24,18 @@
 
 ### 다음 세션 안건
 
-#### 시스템 평가 후속 — GPT+Claude 취합 기반 개선 (신규)
+### [완료] 시스템 평가 후속 — GPT+Claude 취합 기반 개선 (2026-04-08)
 - 취합 문서: `90_공통기준/업무관리/시스템평가_취합_20260408.md`
-- GPT 8.5/10 + Claude 88/100 → 공통 약점 4건 + 개선 의제 6건 도출
-- 1순위: completion_gate 누적 오탐 재분류 (incident_ledger structural_false_positive)
-- 2순위: HANDOFF.md 아카이빙 (4주+ 이력 → 98_아카이브)
-- 3순위: 스킬 사용 빈도 추적 (hook_log 기반)
+- GPT 토론 검토 완료: 채택 12건 / 보류 1건 / 버림 0건
+- 1순위 완료: incident_ledger 82건 백필 (false_positive=true + classification_reason)
+  - completion_gate 45건 → structural_intermediate 분류
+  - aggregate 이중 지표: raw 6.47% / effective 2.92%
+- 2순위 완료: HANDOFF.md 아카이빙 (249줄→131줄)
+  - 아카이브: `98_아카이브/handoff_archive_20260406_20260408.md`
+- 3순위 완료: 스킬 사용 계측 구조 추가
+  - hook_common.sh에 hook_skill_usage() 함수 추가
+  - skill_usage.jsonl 전용 로그 신설
+  - 정리 판정은 1~2주 데이터 누적 후
 - 장기: 자가수정 루프 확장 (incident → 패치 → 테스트 → 반영)
 
 #### Claude 사고 품질 지속 적용
