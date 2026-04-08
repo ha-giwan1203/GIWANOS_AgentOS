@@ -17,8 +17,9 @@
 - QA 결과가 있으면 포함
 
 ### 3단계: GPT 프로젝트방 진입
-- 토론모드 CLAUDE.md의 채팅방 입장 규칙을 따른다
-- 기존 탭 확인 → 없으면 프로젝트 URL 진입 → 최신 대화방 URL 추출 → navigate
+- `.claude/state/debate_chat_url` 읽기 → URL이 있으면 직접 navigate (프로젝트 URL 경유 불필요)
+- debate_chat_url 없을 때만: 기존 탭 확인 → 프로젝트 URL 진입 → 최신 대화방 URL 추출 → navigate
+- 진입 성공 시 debate_chat_url 갱신
 
 ### 4단계: 결과 공유 메시지 전송
 아래 형식으로 GPT에 전송한다:

@@ -8,7 +8,7 @@
 1. 클립보드 붙여넣기 입력 금지 — `execCommand('insertText')` only
 2. ref 클릭 전송 금지 — `[data-testid="send-button"]` JS 클릭 only
 3. find()/form_input 입력 금지
-4. 프로젝트방 외 새 대화 개설 금지
+4. 새 대화 개설 금지 — `.claude/state/debate_chat_url`에 URL이 있으면 반드시 해당 URL로 진입. 새 대화 허용 조건: (a) debate_chat_url 파일 없음 AND (b) 프로젝트 main 영역에 기존 대화 0건
 5. SEND GATE: 전송 직전 assistant 최신 텍스트 재읽기 → 변경 시 재계산 필수 — 생략 금지
 
 ## NEVER (분석)
@@ -26,7 +26,7 @@
    - 같으면 → 예정대로 전송 진행
 4. `#prompt-textarea` + `execCommand('insertText')`
 5. `[data-testid="send-button"]` JS 클릭
-6. stop-button polling 적응형 (5/10/15초)
+6. stop-button polling 적응형 (3/5/8초) + 매 주기 사용자 중단 확인
 
 ## 상세 참조
 

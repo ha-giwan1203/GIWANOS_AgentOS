@@ -9,9 +9,15 @@
 새 Claude 세션 시작 시 브라우저 탭을 먼저 확인한다.
 
 ```
+0. .claude/state/debate_chat_url 읽기 → URL이 있으면 이것을 우선 사용
 1. tabs_context_mcp → 현재 열린 탭 목록 확인
-2. chatgpt.com/g/g-p-69bca... URL 포함 탭 있으면 → switch (새 탭 열지 않음)
-3. 없으면 → navigate로 프로젝트 URL 진입 후 아래 '대화 URL 추출' 절차 실행
+2. chatgpt.com 탭 매칭 우선순위:
+   1순위: /g/g-p-69bca.../c/ 패턴 (프로젝트 내 대화) — debate_chat_url과 일치하면 switch
+   2순위: /g/g-p-69bca... 패턴 (프로젝트 메인) — switch 후 대화 URL 추출
+   기타 chatgpt.com 탭은 무시
+3. 탭에 없으면 → debate_chat_url로 navigate (새 탭 불필요)
+4. debate_chat_url도 없으면 → 프로젝트 URL 진입 후 아래 '대화 URL 추출' 절차 실행
+5. 대화방 진입 성공 시 → .claude/state/debate_chat_url 갱신
 ```
 
 ### 대화 URL 추출 (클릭 대신 JS 직접 추출 — 2026-04-01 실증)
@@ -60,11 +66,18 @@ textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true
 방식:    stop-button 유무 확인 (polling)
 완료:    document.querySelector('[data-testid="stop-button"]') === null
 
-적응형 간격 (3단):
-  0~20초:   sleep 5  (일반 응답 빠르게 캐치)
-  20~60초:  sleep 10 (중간 구간)
-  60초~:    sleep 15 (확장추론 대응)
+적응형 간격 (3단, 단축됨):
+  0~20초:   sleep 3  (일반 응답 빠르게 캐치)
+  20~60초:  sleep 5  (중간 구간)
+  60초~:    sleep 8  (확장추론 대응)
 timeout:    최대 300초 (확장추론 5분 대응)
+
+매 polling 주기 구조:
+  1. sleep N (적응형 간격)
+  2. [사용자 중단 확인] sleep 복귀 후 사용자 메시지 유무 우선 확인
+     "중단", "방향 바꿔", "멈춰" 등 → 즉시 polling 종료 + 현재 상태 보고
+  3. javascript_tool → stop-button 유무 확인
+  4. 조건 판정 (계속/완료/timeout)
 ```
 > CDP 45초 timeout 때문에 javascript_tool 안에서 setInterval/Promise 기반 polling 불가.
 > 반드시 `javascript_tool` + `sleep N` 분리 호출로 루프를 구성한다.

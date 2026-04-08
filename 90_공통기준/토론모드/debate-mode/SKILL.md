@@ -64,9 +64,16 @@ HOLD/FAIL: "보류", "FAIL", "재검토", "수정 필요", "문제 있습니다"
 ## 실행 절차
 
 ### Step 1. 탭 준비
-1. `tabs_context_mcp` → 기존 탭 확인
-2. 최신 로그 JSON에서 `chat_url` 읽기 → 해당 URL 이동 (없으면 프로젝트방 이동)
-3. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+1. `.claude/state/debate_chat_url` 읽기 → URL이 있으면 이것을 우선 사용
+2. `tabs_context_mcp` → chatgpt.com 탭 중 위 chat_url과 일치하면 switch
+3. 탭에 없으면 → chat_url로 navigate (새 탭 불필요)
+4. chat_url 파일이 없거나 빈 경우에만 → 프로젝트 URL 진입 → main 영역 URL 추출 → navigate
+5. 대화방 진입 성공 시 → `.claude/state/debate_chat_url` 에 현재 대화 URL 저장
+6. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+7. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
+
+> **URL 보존 정책**: debate_chat_url 파일은 세션 종료 후에도 삭제하지 않는다.
+> 삭제 조건: (a) 사용자가 "새 토론 시작" 명시 요청 (b) 해당 URL이 404 반환
 
 ### Step 1.5. 입력 전 미확인 응답 점검 (필수)
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
