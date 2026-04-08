@@ -12,9 +12,10 @@
 ## 0. 최신 세션 (2026-04-08)
 
 ### 다음 세션 안건
-1. **write_marker hook 개선** — `.claude/` 경로 제외 (메모리 수정 시 오탐 방지)
-2. **completion_gate → pre-commit 전환 검토** — write_marker 수정 후 진행
-3. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
+1. **Claude 사고 품질 확장** — 시스템 지도 + 영향 범위 선언 실전 적용 및 검증
+2. **write_marker hook 개선** — `.claude/` 경로 제외 (메모리 수정 시 오탐 방지)
+3. **completion_gate → pre-commit 전환 검토** — write_marker 수정 후 진행
+4. **GPT 보류 의제: 스킬 린터** — 빈도 증가 시 재검토
 
 ### 작업: skill-creator 실동기화 보강 (완료)
 - ZIP 내부 + 풀어놓은 Git 원본 양쪽 동기화 완료

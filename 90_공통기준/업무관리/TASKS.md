@@ -24,6 +24,12 @@
 - pre-commit에서 TASKS/HANDOFF 갱신 여부를 검사하면 커밋 단계에서 방지 가능
 - 단, write_marker 오탐 수정이 선행되어야 함
 
+### Claude 사고 품질 확장 — 시스템 지도 + 영향 범위 실전 적용
+- 전략: 작업 착수 전 "이 변경이 속한 시스템 지도"를 트리 형태로 먼저 출력
+- 전술: 파일 변경 전 "변경/연쇄/후속" 영향 범위 명시적 나열
+- 검증: 다음 세션에서 실제로 적용되는지 확인, 미적용 시 원인 분석
+- 참조: memory/feedback_system_map_first.md, feedback_daily_task_mistakes.md
+
 ### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - GPT 제안: 스킬 생성 시 frontmatter/실패계약 위반을 자동 검출하는 린터
 - Claude 판단: 스킬 생성 빈도 낮아 현시점 과잉설계 → 보류
