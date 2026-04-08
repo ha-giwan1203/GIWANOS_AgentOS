@@ -50,7 +50,7 @@
 - debate_chat_url 상태 파일 도입: 세션 간 대화 URL 영속 저장/조회로 탭 중복 방지
 - NEVER 규칙 강화: debate_chat_url 있으면 해당 URL 필수 사용, 새 대화 개설 조건 엄격화
 - share-result 3단계 debate_chat_url 우선 참조로 변경
-- GPT 판정: 7a4d3fc3 기준 (TASKS/HANDOFF 갱신 후 재판정 대기)
+- GPT 판정: PASS (71b3b85b 기준 — TASKS/HANDOFF 갱신 후 확인)
 
 #### GPT 토론 보류 의제: 스킬 생성 규칙 린터/게이트화
 - 빈도 증가 시 재검토
