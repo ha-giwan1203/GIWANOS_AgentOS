@@ -4,12 +4,17 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — 로컬 CDP helper + incident 수리 루프 보강 반영
+최종 업데이트: 2026-04-09 — `cdp_chat_send.py` 에러 원문 예외 정렬 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: `cdp_chat_send.py` 에러 원문 예외 정렬 (완료)
+- 토론방 문서가 허용하던 "에러 원문 최소 인용" 예외를 코드 가드에도 맞췄다.
+- `.claude/scripts/cdp/cdp_chat_send.py`는 이제 `오류 원문:` / `에러 원문:` 라벨 1줄 인용을 영어 차단 예외로 처리한다.
+- `90_공통기준/토론모드/CLAUDE.md`, `REFERENCE.md`, `debate-mode/SKILL.md`, `debate-mode/REFERENCE.md`에도 동일 형식을 명시했다.
 
 ### 작업: 로컬 CDP helper + incident 수리 루프 보강 (완료)
 - `.claude/scripts/cdp/cdp_chat_send.py` 추가

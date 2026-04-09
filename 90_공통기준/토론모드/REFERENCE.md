@@ -77,6 +77,7 @@ python '.claude/scripts/cdp/cdp_chat_send.py' \
 - 토론방에 보내는 자연어 본문은 한국어만 사용한다.
 - 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`만 사용한다.
 - 예외: code block, selector/data-testid, 파일 경로, commit SHA, 에러 원문 최소 인용
+- 에러 원문 최소 인용은 `오류 원문:` 또는 `에러 원문:` 라벨 한 줄로만 허용한다.
 
 ### fallback (execCommand 실패 시)
 ```

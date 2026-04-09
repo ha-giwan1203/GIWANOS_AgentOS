@@ -24,6 +24,7 @@ SHA_RE = re.compile(r"\b[0-9a-f]{7,40}\b", re.I)
 PATH_RE = re.compile(r"(?:[A-Za-z]:\\[^\s]+|(?:\./|\../|/)[^\s]+)")
 FILENAME_RE = re.compile(r"\b[\w.-]+\.(?:py|sh|md|jsonl|json|txt|yml|yaml)\b")
 SELECTOR_RE = re.compile(r"(?:\[[^\]]*data-testid[^\]]*\]|#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+)")
+ERROR_QUOTE_RE = re.compile(r"(?im)^(?:오류 원문|에러 원문)\s*:\s*.+$")
 ENGLISH_WORD_RE = re.compile(r"\b[A-Za-z][A-Za-z'-]{1,}\b")
 
 
@@ -38,6 +39,7 @@ def load_text(args: argparse.Namespace) -> str:
 def strip_allowed_literals(text: str) -> str:
     cleaned = FENCED_CODE_RE.sub(" ", text)
     cleaned = INLINE_CODE_RE.sub(" ", cleaned)
+    cleaned = ERROR_QUOTE_RE.sub(" ", cleaned)
     cleaned = URL_RE.sub(" ", cleaned)
     cleaned = SHA_RE.sub(" ", cleaned)
     cleaned = PATH_RE.sub(" ", cleaned)
