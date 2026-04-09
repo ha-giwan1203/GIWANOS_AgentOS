@@ -13,9 +13,9 @@ Flow.team SP3S03 채팅방 메시지 수집기 (CDP 연결 방식)
   - 카카오 봇 감지 우회 (로그인 자동화 안 함)
 
 출력:
-  - output/messages_raw.json: 수집된 원시 메시지
-  - output/messages.csv: 정규화된 CSV (분류 스킬 입력용)
-  - output/network_debug.json: 네트워크 응답 디버그
+  - output/raw/messages_raw.json: 수집된 원시 메시지
+  - output/raw/messages.csv: 정규화된 CSV (분류 스킬 입력용)
+  - output/debug/network_debug.json: 네트워크 응답 디버그
 """
 
 import argparse
@@ -35,6 +35,8 @@ except ImportError:
 
 SCRIPT_DIR = Path(__file__).parent
 OUTPUT_DIR = SCRIPT_DIR / "output"
+RAW_DIR = OUTPUT_DIR / "raw"
+DEBUG_DIR = OUTPUT_DIR / "debug"
 CDP_URL = "http://127.0.0.1:9222"
 FLOW_URL = "https://flow.team"
 DEFAULT_ROOM_SRNO = "2938379"
@@ -48,7 +50,8 @@ def _make_dedupe_key(text: str) -> str:
 def collect_messages(room_srno: str, max_scroll: int = 200):
     """CDP로 기존 Chrome에 연결하여 채팅 메시지 수집"""
 
-    OUTPUT_DIR.mkdir(exist_ok=True)
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    DEBUG_DIR.mkdir(parents=True, exist_ok=True)
     seen_keys = set()
     messages = []
     network_debug = []
@@ -280,9 +283,10 @@ def collect_messages(room_srno: str, max_scroll: int = 200):
 
 
 def _save_results(room_srno, messages, network_debug, network_items):
-    OUTPUT_DIR.mkdir(exist_ok=True)
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    DEBUG_DIR.mkdir(parents=True, exist_ok=True)
 
-    raw_path = OUTPUT_DIR / "messages_raw.json"
+    raw_path = RAW_DIR / "messages_raw.json"
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump({
             "room_srno": room_srno,
@@ -293,11 +297,11 @@ def _save_results(room_srno, messages, network_debug, network_items):
             "total_network": len(network_items),
         }, f, ensure_ascii=False, indent=2)
 
-    debug_path = OUTPUT_DIR / "network_debug.json"
+    debug_path = DEBUG_DIR / "network_debug.json"
     with open(debug_path, "w", encoding="utf-8") as f:
         json.dump(network_debug, f, ensure_ascii=False, indent=2)
 
-    csv_path = OUTPUT_DIR / "messages.csv"
+    csv_path = RAW_DIR / "messages.csv"
     _normalize_to_csv(messages, room_srno, csv_path)
 
     print(f"[DONE] 원시: {raw_path} (DOM {len(messages)}건, Net {len(network_items)}건)")

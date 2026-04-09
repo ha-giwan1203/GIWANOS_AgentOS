@@ -11,15 +11,17 @@ from openpyxl.utils import get_column_letter
 
 BASE_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = BASE_DIR / "output"
-SOURCE_CSV = OUTPUT_DIR / "sp3m3_integrated_claim_register.csv"
+FINAL_DIR = OUTPUT_DIR / "final"
+DRAFT_DIR = OUTPUT_DIR / "draft"
+SOURCE_CSV = FINAL_DIR / "sp3m3_integrated_claim_register.csv"
 
-MASTER_CSV = OUTPUT_DIR / "sp3m3_issue_classified_master.csv"
-FACILITY_CSV = OUTPUT_DIR / "sp3m3_facility_issues.csv"
-QUALITY_CSV = OUTPUT_DIR / "sp3m3_quality_issues.csv"
-MATERIAL_CSV = OUTPUT_DIR / "sp3m3_material_issues.csv"
-REVIEW_CSV = OUTPUT_DIR / "sp3m3_review_priority.csv"
-REVIEW_TOP_CSV = OUTPUT_DIR / "sp3m3_review_top30.csv"
-WORKBOOK_XLSX = OUTPUT_DIR / "sp3m3_issue_management_workbook.xlsx"
+MASTER_CSV = FINAL_DIR / "sp3m3_issue_classified_master.csv"
+FACILITY_CSV = FINAL_DIR / "sp3m3_facility_issues.csv"
+QUALITY_CSV = FINAL_DIR / "sp3m3_quality_issues.csv"
+MATERIAL_CSV = FINAL_DIR / "sp3m3_material_issues.csv"
+REVIEW_CSV = DRAFT_DIR / "sp3m3_review_priority.csv"
+REVIEW_TOP_CSV = DRAFT_DIR / "sp3m3_review_top30.csv"
+WORKBOOK_XLSX = FINAL_DIR / "sp3m3_issue_management_workbook.xlsx"
 OVERRIDES_CSV = BASE_DIR / "classification_overrides.csv"
 
 
@@ -414,6 +416,8 @@ def sort_review_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
 
 
 def main() -> None:
+    FINAL_DIR.mkdir(parents=True, exist_ok=True)
+    DRAFT_DIR.mkdir(parents=True, exist_ok=True)
     source_rows = load_rows()
     overrides = load_overrides()
     transformed = transform_rows(source_rows, overrides)
