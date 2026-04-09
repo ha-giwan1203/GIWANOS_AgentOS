@@ -4,12 +4,20 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격
+최종 업데이트: 2026-04-09 — Windows Bash 실행 경로를 래퍼로 고정
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: Windows Bash 실행 경로 고정 (완료)
+- 원인: 현재 PowerShell 세션 PATH에는 `C:\Program Files\Git\cmd`만 있고 `bash.exe`가 있는 `C:\Program Files\Git\bin`은 잡히지 않아, `bash ...` 직접 호출은 세션에 따라 실패할 수 있다.
+- 대응:
+  - 루트 `CLAUDE.md`에 Windows PowerShell에서는 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 `C:\Program Files\Git\bin\bash.exe -lc '<command>'`를 사용하라고 명시
+  - `.claude/README.md`에도 같은 기준 추가
+  - `.claude/scripts/run_git_bash.ps1` 신설: Git Bash 후보 경로를 탐색해 `-lc`로 실행
+- 검증: `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'` 실행 → `ALL CLEAR`
 
 ### 작업: 토론모드 기본 전송 경로 승격 (완료)
 - GPT 토론 합의: 다음 한 걸음은 `incident_repair.py` 추가 확장보다 `cdp_chat_send.py` 경로를 토론모드 기본 전송 경로로 굳히는 쪽이 즉시효과가 크고 과잉설계 위험이 낮다.

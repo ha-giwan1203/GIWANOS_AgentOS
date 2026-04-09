@@ -36,6 +36,7 @@
 - 장시간 세션 방치 금지 — 도메인/의제 전환 시 세션 재시작 권장
 - 공통 모듈(hook_common 등) 수정 시 `grep -r` 호출부 전수 확인 선행
 - 파일 변경 후 TASKS/HANDOFF 갱신을 커밋 직전에 함께 수행 (completion_gate 반복 방지)
+- Windows PowerShell 세션에서는 `bash`가 PATH에 없을 수 있다. Bash가 필요하면 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 `C:\Program Files\Git\bin\bash.exe -lc '<command>'`를 사용한다.
 
 ## 금지
 - 원본 xlsx/docx/pdf 직접 수정

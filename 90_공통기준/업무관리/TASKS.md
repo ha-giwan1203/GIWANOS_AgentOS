@@ -10,11 +10,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격
+최종 업데이트: 2026-04-09 — Windows Bash 실행 경로를 래퍼로 고정
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] Windows Bash 실행 경로 고정 (2026-04-09)
+- 루트 `CLAUDE.md`에 PowerShell 세션에서는 `bash`가 PATH에 없을 수 있으니 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 Git Bash 절대경로를 사용하라고 명시
+- `.claude/README.md`에도 같은 실행 기준을 추가
+- `.claude/scripts/run_git_bash.ps1`를 추가해 Git Bash 경로를 찾아 `-lc`로 실행하는 공통 래퍼를 제공
+- 검증: `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'` → `ALL CLEAR`
 
 ### [완료] 토론모드 기본 전송 경로 승격 (2026-04-09)
 - GPT 토론 합의로 `cdp_chat_send.py --require-korean --mark-send-gate`를 토론모드 문서상 기본 전송 경로로 승격
