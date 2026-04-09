@@ -98,10 +98,10 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
 ### Step 2. 메시지 전송
-- `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭 (상세: REFERENCE.md §1)
-- 전송 직전 `send-button` 또는 `#composer-submit-button` 재확인
+- 기본 전송 경로: `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate` (상세: REFERENCE.md §1)
+- 직접 `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭은 helper를 쓸 수 없을 때만 예비 경로
+- 예비 경로에서는 전송 직전 `send-button` 또는 `#composer-submit-button` 재확인
 - 전송 본문 자연어는 한국어만 작성
-- 로컬 CDP 경로에서는 `cdp_chat_send.py --require-korean --mark-send-gate` 우선 사용
 - 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
 - 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)
 

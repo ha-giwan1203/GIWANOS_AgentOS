@@ -45,21 +45,9 @@ url;  // → navigate()에 전달
 
 ## 입력+전송 상세
 
-### 통합 JS (1회 호출)
-```javascript
-const el = document.querySelector('#prompt-textarea');
-el.focus();
-document.execCommand('insertText', false, text);
-setTimeout(() => {
-  const btn = document.querySelector('[data-testid="send-button"], #composer-submit-button');
-  if (btn && !btn.disabled) btn.click();
-}, 100);
-```
+### 기본 전송 경로 (`cdp_chat_send.py`)
 
-빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
-
-### 로컬 CDP helper 우선 사용
-쉘에서 CDP를 직접 호출하는 경로에서는 임시 JS를 매번 만들기보다 아래 helper를 우선 사용한다.
+쉘이나 로컬 CDP 경로에서는 아래 helper를 기본 전송 경로로 사용한다.
 
 ```bash
 python '.claude/scripts/cdp/cdp_chat_send.py' \
@@ -72,6 +60,20 @@ python '.claude/scripts/cdp/cdp_chat_send.py' \
 - `--require-korean`: 자연어 영어 포함 시 전송 차단
 - `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
 - submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
+- 토론모드 문서상 기본 전송 경로는 이것이며, 직접 DOM 조작은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
+
+### 예비 경로: 통합 JS (1회 호출)
+```javascript
+const el = document.querySelector('#prompt-textarea');
+el.focus();
+document.execCommand('insertText', false, text);
+setTimeout(() => {
+  const btn = document.querySelector('[data-testid="send-button"], #composer-submit-button');
+  if (btn && !btn.disabled) btn.click();
+}, 100);
+```
+
+빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
 
 ### 토론방 언어 규칙
 - 토론방에 보내는 자연어 본문은 한국어만 사용한다.
@@ -79,7 +81,7 @@ python '.claude/scripts/cdp/cdp_chat_send.py' \
 - 예외: code block, selector/data-testid, 파일 경로, commit SHA, 에러 원문 최소 인용
 - 에러 원문 최소 인용은 `오류 원문:` 또는 `에러 원문:` 라벨 한 줄로만 허용한다.
 
-### fallback (execCommand 실패 시)
+### 예비 경로 2차 fallback (execCommand 실패 시)
 ```
 textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true}) dispatch
 ```

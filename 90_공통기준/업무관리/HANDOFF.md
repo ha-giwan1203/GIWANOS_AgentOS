@@ -4,12 +4,25 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — `cdp_chat_send.py` 에러 원문 예외 정렬 반영
+최종 업데이트: 2026-04-09 — 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: 토론모드 기본 전송 경로 승격 (완료)
+- GPT 토론 합의: 다음 한 걸음은 `incident_repair.py` 추가 확장보다 `cdp_chat_send.py` 경로를 토론모드 기본 전송 경로로 굳히는 쪽이 즉시효과가 크고 과잉설계 위험이 낮다.
+- 반영 문서
+  - `90_공통기준/토론모드/ENTRY.md`
+  - `90_공통기준/토론모드/CLAUDE.md`
+  - `90_공통기준/토론모드/REFERENCE.md`
+  - `90_공통기준/토론모드/debate-mode/SKILL.md`
+  - `90_공통기준/토론모드/debate-mode/REFERENCE.md`
+- 변경 내용
+  - `cdp_chat_send.py --require-korean --mark-send-gate`를 문서상 기본 전송 경로로 승격
+  - 직접 `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭은 helper를 쓸 수 없을 때만 예비 경로로 하향
+  - debate-mode/REFERENCE 변경 이력에 v2.7 추가
 
 ### 작업: `cdp_chat_send.py` 에러 원문 예외 정렬 (완료)
 - 토론방 문서가 허용하던 "에러 원문 최소 인용" 예외를 코드 가드에도 맞췄다.

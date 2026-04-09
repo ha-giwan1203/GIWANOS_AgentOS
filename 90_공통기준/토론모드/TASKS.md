@@ -8,6 +8,7 @@
 (없음)
 
 ## 완료
+- [x] 토론모드 기본 전송 경로 승격 — `cdp_chat_send.py --require-korean --mark-send-gate`를 기본값으로, 직접 DOM 전송은 예비 경로로 재배치 (2026-04-09)
 - [x] `cdp_chat_send.py` 에러 원문 예외 정렬 — `오류 원문:` / `에러 원문:` 1줄 인용 허용 (2026-04-09)
 - [x] 로컬 CDP 전송 helper 추가 — `cdp_chat_send.py`로 한국어 가드 + send_gate 파일 갱신 + submit fallback 공통화 (2026-04-09)
 - [x] `incident_repair.py` 확장 — 다음 행동만이 아니라 패치 후보와 검증 단계까지 제안 (2026-04-09)
