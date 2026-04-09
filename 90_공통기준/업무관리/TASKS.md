@@ -10,11 +10,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — 토론모드 idle composer 오탐 제거 + gate 정밀화 완료
+최종 업데이트: 2026-04-09 — 토론모드 CONDITIONAL PASS 후속 보정 완료
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] 토론모드 CONDITIONAL PASS 후속 보정 (2026-04-09)
+- `REFERENCE.md` 통합 JS 예시를 실제 전송 기준과 일치하도록 `send-button` + `#composer-submit-button` fallback으로 보정
+- 빈 composer 상태에서는 `composer-speech-button`만 보여도 정상이며, submit 재확인은 `insertText` 이후에 다시 한다는 규칙을 문서 본문에도 반영
+- `hook_common.sh`의 `is_completion_claim()`에서 `commit SHA`, `push 완료` 같은 중간 보고 표현을 제거해 completion gate 오차단 범위를 축소
+- 검증: `bash -n` + `final_check --fast/--full` 재통과, `smoke_test` 70/70 PASS 유지
 
 ### [완료] 폴더 구조 2차 보강 (2026-04-09)
 - 업무관리/토론모드 문서 우선순위 정리

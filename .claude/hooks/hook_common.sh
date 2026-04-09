@@ -130,7 +130,7 @@ is_completion_claim() {
   if [ -z "$text" ]; then
     return 1
   fi
-  echo "$text" | grep -qiE '(완료 보고|잔여 이슈|반영 완료|수정 완료|적용 완료|검증 완료|완료했습니다|완료됐습니다|ALL CLEAR|GPT 판정:[[:space:]]*PASS|커밋[[:space:]]+SHA|commit SHA|푸시 완료|pushed successfully)'
+  echo "$text" | grep -qiE '(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|ALL CLEAR|GPT 판정:[[:space:]]*PASS|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
 }
 
 # Git 변경 중 런타임 산출물을 제외한 "실제 반영 대상"만 수집

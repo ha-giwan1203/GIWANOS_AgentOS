@@ -51,10 +51,12 @@ const el = document.querySelector('#prompt-textarea');
 el.focus();
 document.execCommand('insertText', false, text);
 setTimeout(() => {
-  const btn = document.querySelector('[data-testid="send-button"]');
+  const btn = document.querySelector('[data-testid="send-button"], #composer-submit-button');
   if (btn && !btn.disabled) btn.click();
 }, 100);
 ```
+
+빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
 
 ### fallback (execCommand 실패 시)
 ```

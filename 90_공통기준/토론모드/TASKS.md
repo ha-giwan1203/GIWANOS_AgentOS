@@ -8,6 +8,7 @@
 (없음)
 
 ## 완료
+- [x] GPT `CONDITIONAL PASS` 후속 보정 — REFERENCE submit fallback 정렬 + `is_completion_claim()` 과차단 축소 (2026-04-09)
 - [x] 프로젝트 폴더 구조 생성
 - [x] CLAUDE.md 작성
 - [x] STATUS.md 작성

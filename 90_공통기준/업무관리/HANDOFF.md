@@ -4,12 +4,20 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — 토론모드 idle composer 오탐 제거 + gate 정밀화 완료
+최종 업데이트: 2026-04-09 — 토론모드 CONDITIONAL PASS 후속 보정 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: 토론모드 CONDITIONAL PASS 후속 보정 (완료)
+- GPT 최종 판정 확인: `CONDITIONAL PASS`
+- hold 항목 중 즉시 수정 가능한 2건 반영
+  - `90_공통기준/토론모드/REFERENCE.md`: 통합 JS 예시를 `[data-testid="send-button"], #composer-submit-button`로 보정
+  - `.claude/hooks/hook_common.sh`: `is_completion_claim()`에서 `commit SHA`, `push 완료` 계열 중간 보고 문구 제거
+- 재검증: `bash -n .claude/hooks/*.sh` + `./.claude/hooks/final_check.sh --fast/--full` 통과, `smoke_test` 70/70 PASS 유지
+- 남은 비코드 리스크: GPT 재검증 시에는 실행 산출물 경로/요약을 함께 넘겨 주는 편이 판정 품질에 유리
 
 ### 작업: 토론모드 idle composer 오탐 제거 + gate 정밀화 (완료)
 - 새 `debate_chat_url` 대화방으로 전환 후 시스템 평가 요청 및 재반박 1턴 수행
