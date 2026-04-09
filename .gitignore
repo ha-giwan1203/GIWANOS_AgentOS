@@ -21,8 +21,17 @@
 *api_key*
 *openai*
 
-# Claude Code 로컬 설정 (머신별 경로 하드코딩)
-.claude/
+# Claude Code: 로컬 상태는 제외, 공통 규칙 파일만 선택적으로 추적
+.claude/*
+!.claude/rules/
+!.claude/rules/**
+.claude/settings.local.json
+.claude/settings.local.json.bak_20260401
+.claude/incident_ledger.jsonl
+.claude/command-audit.log
+.claude/subagent-audit.log
+.claude/tool-failure.log
+.claude/launch.json
 
 # 세션 락 파일
 .watch.lock

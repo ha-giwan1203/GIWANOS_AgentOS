@@ -1,6 +1,10 @@
 # 토론모드 코어 규칙
 
-> **코어: 이 파일** / 실행 절차: SKILL.md / 기술 상세: REFERENCE.md
+> 앱 운영 기준: `APP_INSTRUCTIONS.md`
+> 실행 절차: `debate-mode/SKILL.md`
+> 기술 상세: `REFERENCE.md`
+
+> **코어: 이 파일**
 
 ## 목적
 Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을 이어가는 코워크 구조.
