@@ -4,22 +4,24 @@
 > 앱 운영 규칙과 문서 우선순위는 상위 `../CLAUDE.md`, `../APP_INSTRUCTIONS.md`를 따른다.
 > 토론방에 보내는 자연어 본문은 한국어만 사용한다. 예외: code block, selector/data-testid, 파일 경로, commit SHA 같은 literal, 그리고 `오류 원문:`/`에러 원문:` 라벨 1줄 인용.
 
-> 로컬 CDP 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
+> 로컬 CDP 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 직전 최신 답변 기대값을 함께 넘겨 화면이 바뀌면 helper가 전송을 차단한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
 
 ---
 
-## 1. 기본 전송 경로 (v2.7)
+## 1. 기본 전송 경로 (v2.8)
 
 ```bash
 python '.claude/scripts/cdp/cdp_chat_send.py' \
   --match-url '<chat_url>' \
   --text-file '<utf8_text_file>' \
   --require-korean \
-  --mark-send-gate
+  --mark-send-gate \
+  --expect-last-snippet-file '<assistant_snippet_file>'
 ```
 
 - 자연어 영어 포함 시 전송 전 차단
 - assistant 최신 읽기 직후 send_gate 파일 갱신
+- `--expect-last-snippet` / `--expect-last-snippet-file`로 직전에 읽은 최신 답변 100자와 현재 화면의 최신 답변 100자를 다시 대조한다. 다르면 `blocked_reply_changed`로 전송 중단
 - submit selector는 `[data-testid="send-button"], #composer-submit-button` 순서로 내부 fallback 처리
 - 토론모드 문서상 기본 전송 경로는 위 helper다.
 
@@ -63,6 +65,7 @@ const poll = setInterval(() => {
 }, 300);
 ```
 
+> **v2.8 변경**: `cdp_chat_send.py`에 직전 최신 답변 기대값 확인 옵션 추가. helper가 최신 답변 불일치도 직접 막는 기본 경로가 된다.
 > **v2.7 변경**: `cdp_chat_send.py`를 문서상 기본 전송 경로로 승격. 직접 DOM 입력/전송은 helper를 쓸 수 없을 때만 예비 경로로 유지.
 > **v1.7 변경**: `innerHTML` 방식 폐기 → native value setter + InputEvent로 교체 (React 상태 정상 동기화). contenteditable div 분기 추가. 전송 버튼 활성화 확인에 값 반영 1순위 + `aria-disabled` 2순위 조건 추가.
 
@@ -148,3 +151,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v2.5 | 2026-04-07 | Step 4a/4b 분리: critic-reviewer subagent |
 | v2.6 | 2026-04-07 | 코어/참조 물리 분리 실행 — REFERENCE.md 신설, SKILL.md 슬림화 |
 | v2.7 | 2026-04-09 | `cdp_chat_send.py` 기본 전송 경로 승격, 직접 DOM 전송은 예비 경로로 재배치 |
+| v2.8 | 2026-04-10 | `cdp_chat_send.py`에 최신 답변 기대값 확인 옵션 추가, helper가 최신 답변 불일치까지 직접 차단 |

@@ -24,12 +24,12 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 1. 기존 탭 확인 → 있으면 switch, 없으면 navigate
 2. main 영역 JS로 대화 URL 추출 → navigate (클릭 금지)
 3. **SEND GATE**: 전송 직전 assistant 최신 텍스트 재읽기 (NEVER — 생략 금지)
-4. 기본 전송: `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`
+4. 기본 전송: `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate` + 직전 최신 답변 100자 기대값 전달
 5. helper를 쓸 수 없을 때만 `#prompt-textarea` + `execCommand('insertText')` + submit button JS 클릭
 6. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
 7. 응답 읽기 → 하네스 분석 → 반박 생성 → 전송 → 반복
 
-> 로컬 CDP 스크립트 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 허용한다.
+> 로컬 CDP 스크립트 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 직전 최신 답변 기대값을 함께 넘겨 화면이 바뀌면 helper가 전송을 차단해야 한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 허용한다.
 
 ## 고정 Selector (2026-03-31 실증)
 ```

@@ -1,6 +1,7 @@
 #!/bin/bash
-# PreToolUse hook — SEND GATE: ChatGPT 전송 전 미확인 응답 점검 강제
+# PreToolUse hook — SEND GATE: ChatGPT 직접 javascript_tool 예비 전송 전 미확인 응답 점검 강제
 # 대상: mcp__Claude_in_Chrome__javascript_tool 호출 중 execCommand('insertText') 포함 시
+# 참고: cdp_chat_send.py 기본 경로는 최신 답변 기대값 비교 + mark-send-gate를 자체 처리하며, 이 hook은 직접 JS 예비 경로 보호용이다.
 # 조건: .claude/state/send_gate_passed 파일이 120초 이내에 갱신되어 있어야 통과
 # GPT 합의: 2026-04-06 — 문서 규칙만으로 부족, 실행 강제 gate 필요
 
@@ -22,7 +23,7 @@ if [ -z "$TOOL_NAME" ]; then
   TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 fi
 
-# javascript_tool이 아니면 통과
+# javascript_tool 예비 경로가 아니면 통과 (기본 경로 cdp_chat_send.py는 자체 검증)
 if [[ "$TOOL_NAME" != *"javascript_tool"* ]]; then
   exit 0
 fi

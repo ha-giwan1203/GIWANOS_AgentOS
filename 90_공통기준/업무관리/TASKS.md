@@ -10,17 +10,24 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — 남은 토론 안건을 상단에 명시 정리
+최종 업데이트: 2026-04-10 — 최신 토론 결과와 후속 보류 안건 반영
 
 ---
 
 ## 다음 세션 안건
 
-### [대기] `cdp_chat_send.py` 경로 일원화 (다음 우선순위)
-- 최신 GPT 토론 결과에서 `보류 1건`으로 남은 안건
-- 목표: 토론 전송 경로를 `cdp_chat_send.py` 기준으로 더 강하게 수렴시키고, 직접 경로와 보조 경로가 따로 노는 부분을 줄인다
-- 범위 후보: `.claude/scripts/cdp/cdp_chat_send.py`, `.claude/hooks/send_gate.sh`, `90_공통기준/토론모드/CLAUDE.md`, `90_공통기준/토론모드/debate-mode/SKILL.md`
-- 착수 조건: 현재 `send_gate.sh` 보강 반영분 기준으로 새 토론 1회 열고, `채택 / 보류 / 버림` 형식으로 다시 확정 후 진행
+### [보류] `send_gate.sh` 범위 대확장 재검토
+- 최신 GPT 토론 결과에서 `보류 1건`으로 남긴 안건
+- 이유: `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로의 틈을 먼저 메웠고, 지금 단계에서 셸/파이썬 호출 전체로 훅 범위를 넓히면 과잉설계 위험이 크다고 판정
+- 재개 조건: helper 경로 밖에서 동일 문제가 재발하거나, 직접 자바스크립트 예비 경로 사용 지점이 다시 늘어날 때
+
+### [완료] `cdp_chat_send.py` 경로 일원화 (2026-04-10)
+- GPT 토론 판정: 채택 2건 / 보류 1건 / 버림 1건
+- `.claude/scripts/cdp/cdp_chat_send.py`에 `--expect-last-snippet`, `--expect-last-snippet-file` 옵션 추가
+- helper가 직전에 읽은 최신 답변 100자와 현재 화면의 최신 답변 100자를 다시 대조하고, 다르면 `blocked_reply_changed`로 전송을 중단하도록 보강
+- `ENTRY.md`, `CLAUDE.md`, `REFERENCE.md`, `debate-mode/SKILL.md`, `debate-mode/REFERENCE.md`, `.claude/commands/share-result.md`, `.claude/commands/finish.md`를 helper 기본 경로 기준으로 재정렬
+- `.claude/hooks/send_gate.sh` 주석을 직접 자바스크립트 예비 경로 보호용으로 명시하고, `.claude/hooks/smoke_test.sh`에 helper 기대값 확인 문서 정합성 검사 4건 추가
+- 검증: `python -m py_compile '.claude/scripts/cdp/cdp_chat_send.py'`, helper `--dry-run`, 기대값 불일치 `blocked_reply_changed`, `git diff --check`, `smoke_test 76/76 PASS`, `final_check.sh --fast/--full`
 
 ### [완료] `send_gate.sh` 파싱 보강 (2026-04-10)
 - GPT 토론 판정: 채택 1건 / 보류 1건 / 버림 0건, 이번 턴 구현은 `send_gate.sh`만 진행
