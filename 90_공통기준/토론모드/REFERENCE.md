@@ -2,6 +2,7 @@
 
 > CLAUDE.md에서 분리된 상세 배경·fallback·실험 규칙.
 > 코어 규칙은 ENTRY.md(Primary) + CLAUDE.md(코어) 참조.
+> 저수준 입력/DOM 처리 기술 상세는 `debate-mode/REFERENCE.md`를 기준으로 본다.
 
 ## 채팅방 입장 상세
 

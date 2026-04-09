@@ -1,6 +1,7 @@
 # 토론모드 상세 참조 (REFERENCE.md)
 
 > SKILL.md 코어에서 분리된 기술 상세. 실행 중 필요 시 참조.
+> 앱 운영 규칙과 문서 우선순위는 상위 `../CLAUDE.md`, `../APP_INSTRUCTIONS.md`를 따른다.
 
 ---
 

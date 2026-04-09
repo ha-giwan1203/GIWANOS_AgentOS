@@ -3,6 +3,8 @@
 > 앱 운영 기준: `APP_INSTRUCTIONS.md`
 > 실행 절차: `debate-mode/SKILL.md`
 > 기술 상세: `REFERENCE.md`
+> 전역 상태 원본: `../업무관리/TASKS.md`
+> 토론모드 내부 작업 목록: `TASKS.md`
 
 > **코어: 이 파일**
 

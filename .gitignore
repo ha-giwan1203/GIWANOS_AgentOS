@@ -23,6 +23,7 @@
 
 # Claude Code: 로컬 상태는 제외, 공통 규칙 파일만 선택적으로 추적
 .claude/*
+!.claude/README.md
 !.claude/rules/
 !.claude/rules/**
 .claude/settings.local.json
@@ -134,6 +135,12 @@ yarn-error.log*
 _tmp/
 99_임시수집/
 98_아카이브/
+!99_임시수집/
+99_임시수집/**
+!99_임시수집/README.md
+!98_아카이브/
+98_아카이브/**
+!98_아카이브/README.md
 artifacts/
 !artifacts/.keep
 data/

@@ -1,5 +1,16 @@
 auth_state.json
 output/
+!output/
+output/**
+!output/README.md
+!output/raw/
+!output/raw/.keep
+!output/draft/
+!output/draft/.keep
+!output/final/
+!output/final/.keep
+!output/debug/
+!output/debug/.keep
 playwright_profile/
 *.pyc
 __pycache__/

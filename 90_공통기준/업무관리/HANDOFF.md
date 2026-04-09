@@ -4,12 +4,19 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — GPT 프로젝트 지침 품질 강화 (진행중)
+최종 업데이트: 2026-04-09 — 폴더 구조 2차 보강 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: 폴더 구조 2차 보강 (완료)
+- 업무관리/TASKS, STATUS와 토론모드/TASKS, STATUS의 우선순위 관계를 문서로 정리
+- `flow-chat-analysis/output/README.md` 신설 + `raw/draft/final/debug` 하위 폴더 생성
+- `02_급여단가`, `04_생산계획`, `06_생산관리`에 도메인 `STATUS.md`, `CLAUDE.md` 추가
+- `98_아카이브/README.md`, `99_임시수집/README.md` 신설
+- `.claude/README.md` 신설, `.gitignore`에서 `.claude` 공유 문서와 로컬 상태 분리 기준 보강
 
 ### 작업: 3월 지원 비용산출 (완료)
 - 대원테크 3월 지원 비용 4개 파일 생성
