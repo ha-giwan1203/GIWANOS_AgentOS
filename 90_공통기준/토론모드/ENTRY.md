@@ -1,5 +1,8 @@
 # 토론모드 Active Laws (ENTRY.md)
 
+> 앱 자체지침: `90_공통기준/토론모드/APP_INSTRUCTIONS.md`
+> 이 파일은 코어 금지/강제 규칙, `APP_INSTRUCTIONS.md`는 앱 운영 기준이다.
+
 > 이 파일이 Primary. CLAUDE.md는 Reference(상세 배경용).
 > 위반 = 버그. hooks가 강제한다.
 
