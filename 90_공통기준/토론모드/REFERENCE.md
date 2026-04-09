@@ -138,13 +138,16 @@ logs/
 
 ## Selector Smoke Test (토론 시작 시 필수)
 
-토론모드 Step 1 완료 직후, 메시지 전송 전에 아래 4개 selector 존재를 검증한다.
+토론모드 Step 1 완료 직후, 메시지 전송 전에 composer/응답 영역 selector를 검증한다.
+빈 입력창 상태에서는 `send-button` 대신 `composer-speech-button`만 보일 수 있으므로 이를 정상으로 간주한다.
 하나라도 실패하면 토론 진행을 중단하고 사용자에게 보고한다.
 
 ```javascript
 const selectors = {
   promptTextarea: '#prompt-textarea',
   sendButton: '[data-testid="send-button"]',
+  submitButtonById: '#composer-submit-button',
+  composerSpeechButton: '[data-testid="composer-speech-button"]',
   stopButton: '[data-testid="stop-button"]',  // 생성 중이 아니면 null 허용
   assistantMsg: '[data-message-author-role="assistant"]'
 };
@@ -153,9 +156,27 @@ for (const [name, sel] of Object.entries(selectors)) {
   results[name] = !!document.querySelector(sel);
 }
 // stopButton은 생성 중이 아니면 false 허용
-const required = ['promptTextarea', 'sendButton', 'assistantMsg'];
+// 빈 composer에서는 sendButton이 없고 composerSpeechButton만 있을 수 있음
+const required = ['promptTextarea', 'assistantMsg'];
 const missing = required.filter(k => !results[k]);
-JSON.stringify({results, missing, pass: missing.length === 0});
+if (!(results.sendButton || results.submitButtonById || results.composerSpeechButton)) {
+  missing.push('composerAction');
+}
+JSON.stringify({
+  results,
+  missing,
+  pass: missing.length === 0,
+  note: (results.sendButton || results.submitButtonById)
+    ? 'send ready'
+    : 'idle composer; send button appears after text insert'
+});
+```
+
+전송 직전에는 아래 추가 확인을 한 번 더 수행한다.
+
+```javascript
+const hasSubmit = !!document.querySelector('[data-testid="send-button"], #composer-submit-button');
+JSON.stringify({hasSubmit});
 ```
 
 | 결과 | 행동 |

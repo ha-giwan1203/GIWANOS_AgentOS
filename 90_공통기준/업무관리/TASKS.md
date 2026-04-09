@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — 폴더 구조 2차 보강 완료
+최종 업데이트: 2026-04-09 — 토론모드 idle composer 오탐 제거 + gate 정밀화 완료
 
 ---
 
@@ -22,6 +22,21 @@
 - `02_급여단가`, `04_생산계획`, `06_생산관리` 도메인 `STATUS.md`, `CLAUDE.md` 신설
 - `98_아카이브`, `99_임시수집` 운영 README 신설
 - `.claude/README.md` 신설 + `.gitignore`에서 공유 문서와 로컬 상태 범위 재정리
+
+### [완료] 토론모드 idle composer 오탐 제거 + gate 정밀화 (2026-04-09)
+- 시스템 평가 공동작업 수행: 새 `debate_chat_url` 대화방에서 시스템 평가 + 재반박 1턴 완료
+- 토론모드 selector smoke test 보정
+  - 빈 입력창에서 `send-button`이 숨고 `composer-speech-button`만 보이는 현재 UI를 정상으로 인정
+  - 전송 직전 `send-button` 또는 `#composer-submit-button` 재확인 절차 추가
+- hooks gate 정밀화
+  - `completion_gate.sh`: 완료 주장일 때만 차단, Git 실물 변경과 TASKS/HANDOFF 미갱신을 분리 판정
+  - `final_check.sh`: WARN/FAIL 분리, relevant change 목록 한글 경로 출력 정상화
+  - `commit_gate.sh`: incident ledger에 next_action/classification_reason 기록
+- incident 수리 큐 추가
+  - `.claude/hooks/incident_repair.py` 신설
+  - `hook_common.sh`에 incident 추가 메타 + relevant change helper 추가
+  - `.gitignore`에서 `.claude/hooks/*.sh`, `incident_repair.py`, `README.md`만 추적되도록 재조정
+- 검증: `final_check --full` 통과, `smoke_test` 70/70 PASS
 
 ### [완료] 3월 지원 비용산출 (2026-04-09)
 - 4개 파일 생성: 리노텍/유진/화인텍/대원테크(통합)

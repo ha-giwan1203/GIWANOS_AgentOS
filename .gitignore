@@ -24,6 +24,11 @@
 # Claude Code: 로컬 상태는 제외, 공통 규칙 파일만 선택적으로 추적
 .claude/*
 !.claude/README.md
+!.claude/hooks/
+.claude/hooks/*
+!.claude/hooks/*.sh
+!.claude/hooks/README.md
+!.claude/hooks/incident_repair.py
 !.claude/rules/
 !.claude/rules/**
 .claude/settings.local.json

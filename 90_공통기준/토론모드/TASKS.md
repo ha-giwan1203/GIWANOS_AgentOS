@@ -20,3 +20,5 @@
 - [x] 3턴 테스트 시나리오 실행 — 실전 토론 다수 턴 완료
 - [x] 로그 저장 검증 — debate_20260402, debate_20260407 로그 생성 확인
 - [x] 브라우저 불편사항 3건 개선 (2026-04-08) — polling 단축/chat_url 영속화/대화방 고정
+- [x] idle composer selector 오탐 제거 + send-button 재확인 절차 추가 (2026-04-09)
+- [x] 시스템 평가 공동작업 1턴 수행 + gate 정밀화 연계 (`completion_gate`, `final_check`, `incident_repair.py`) (2026-04-09)

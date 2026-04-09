@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — 폴더 구조 2차 보강 완료
+최종 업데이트: 2026-04-09 — 토론모드 idle composer 오탐 제거 + gate 정밀화 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: 토론모드 idle composer 오탐 제거 + gate 정밀화 (완료)
+- 새 `debate_chat_url` 대화방으로 전환 후 시스템 평가 요청 및 재반박 1턴 수행
+- 원인 확인: ChatGPT 빈 composer 상태에서는 `send-button`이 숨고 `composer-speech-button`만 보임
+- 토론모드 문서 동기화
+  - `90_공통기준/토론모드/REFERENCE.md`
+  - `90_공통기준/토론모드/CLAUDE.md`
+  - `90_공통기준/토론모드/debate-mode/SKILL.md`
+- hooks 정밀화
+  - `hook_common.sh`: `last_assistant_text`, `is_completion_claim`, relevant change helper, incident extra metadata
+  - `completion_gate.sh`: 완료 주장 시에만 차단, Git 미반영 변경과 상태문서 미갱신 분리
+  - `final_check.sh`: WARN/FAIL 분리, 변경 파일 목록 정리
+  - `commit_gate.sh`: incident `classification_reason`, `next_action` 기록
+  - `incident_repair.py` 신설: 최신 unresolved incident의 다음 행동 제안
+- `.gitignore` 조정: `.claude/hooks/*.sh`, `README.md`, `incident_repair.py`만 선택 추적
+- 검증: `./.claude/hooks/final_check.sh --full` 2회 통과, `smoke_test` 70/70 PASS
+- 비고: `.claude/settings.local.json`, `.claude/incident_ledger.jsonl`은 런타임 변경이라 이번 커밋 대상에서 제외하는 편이 안전
 
 ### 작업: 폴더 구조 2차 보강 (완료)
 - 업무관리/TASKS, STATUS와 토론모드/TASKS, STATUS의 우선순위 관계를 문서로 정리

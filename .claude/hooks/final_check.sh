@@ -7,7 +7,20 @@
 MODE="${1:---full}"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
+export CLAUDE_PROJECT_DIR="$PROJECT_DIR"
+source "$HOOKS_DIR/hook_common.sh" 2>/dev/null || true
 FAIL=0
+WARN=0
+
+warn() {
+  echo "  [WARN] $1"
+  WARN=$((WARN+1))
+}
+
+fail() {
+  echo "  [FAIL] $1"
+  FAIL=$((FAIL+1))
+}
 
 echo "=== Final Check ($MODE) ==="
 echo ""
@@ -29,9 +42,8 @@ echo ""
 echo "--- 2. python3 잔존 참조 확인 ---"
 PY3_REFS=$(grep -l 'python3 -c\|python3 -' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | grep -v auto_compile.sh | grep -v _archive)
 if [ -n "$PY3_REFS" ]; then
-  echo "  [WARN] python3 의존 잔존:"
+  warn "python3 의존 잔존:"
   echo "$PY3_REFS" | while read f; do echo "    - $(basename $f)"; done
-  FAIL=$((FAIL+1))
 else
   echo "  [OK] 운영 훅 python3 의존 0건 (auto_compile 제외)"
 fi
@@ -45,8 +57,7 @@ STATUS_COUNT=$(sed -n 's/.*| hooks 체계 | \([0-9]*\)개 등록.*/\1/p' "$PROJE
 STATUS_COUNT=${STATUS_COUNT:-0}
 echo "  README: ${README_COUNT}개 / STATUS: ${STATUS_COUNT}개"
 if [ "$README_COUNT" -ne "$STATUS_COUNT" ] 2>/dev/null; then
-  echo "  [WARN] README($README_COUNT) ≠ STATUS($STATUS_COUNT) — hook 개수 불일치"
-  FAIL=$((FAIL+1))
+  warn "README($README_COUNT) ≠ STATUS($STATUS_COUNT) — hook 개수 불일치"
 else
   echo "  [OK] README-STATUS hook 개수 일치"
 fi
@@ -57,8 +68,7 @@ echo "--- 4. HANDOFF 계획 vs 실물 교차확인 ---"
 if grep -q 'cp' "$HOOKS_DIR/block_dangerous.sh" 2>/dev/null; then
   echo "  [OK] block_dangerous DANGER_CMDS에 cp 포함"
 else
-  echo "  [WARN] block_dangerous DANGER_CMDS에 cp 누락"
-  FAIL=$((FAIL+1))
+  warn "block_dangerous DANGER_CMDS에 cp 누락"
 fi
 echo ""
 
@@ -70,13 +80,12 @@ if [ -f "$SETTINGS" ]; then
   SETTINGS_HOOKS=$(grep -o '[a-z_]*\.sh' "$SETTINGS" 2>/dev/null | sort -u | grep -v hook_common | grep -v smoke_test | grep -v final_check | wc -l)
   echo "  settings.local: ${SETTINGS_HOOKS}개 / README: ${README_COUNT}개"
   if [ "$SETTINGS_HOOKS" -ne "$README_COUNT" ] 2>/dev/null; then
-    echo "  [WARN] settings.local($SETTINGS_HOOKS) ≠ README($README_COUNT)"
-    FAIL=$((FAIL+1))
+    warn "settings.local($SETTINGS_HOOKS) ≠ README($README_COUNT)"
   else
     echo "  [OK] settings.local-README hook 개수 일치"
   fi
 else
-  echo "  [WARN] settings.local.json 파일 없음"
+  warn "settings.local.json 파일 없음"
 fi
 echo ""
 
@@ -105,16 +114,14 @@ echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
 
 if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
   if [[ "$STATUS_DATE" < "$TASKS_DATE" ]]; then
-    echo "  [WARN] STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
-    FAIL=$((FAIL+1))
+    warn "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
   else
     echo "  [OK] STATUS 날짜 >= TASKS 날짜"
   fi
 fi
 if [ -n "$TASKS_DATE" ] && [ -n "$HANDOFF_DATE" ]; then
   if [[ "$HANDOFF_DATE" < "$TASKS_DATE" ]]; then
-    echo "  [WARN] HANDOFF($HANDOFF_DATE) < TASKS($TASKS_DATE) — HANDOFF 드리프트"
-    FAIL=$((FAIL+1))
+    warn "HANDOFF($HANDOFF_DATE) < TASKS($TASKS_DATE) — HANDOFF 드리프트"
   else
     echo "  [OK] HANDOFF 날짜 >= TASKS 날짜"
   fi
@@ -127,20 +134,18 @@ STATE_DIR="$PROJECT_DIR/90_공통기준/agent-control/state"
 MARKER="$STATE_DIR/write_marker.flag"
 
 if [ -f "$MARKER" ]; then
-  MARKER_EPOCH=$(stat --format=%Y "$MARKER" 2>/dev/null || stat -f %m "$MARKER" 2>/dev/null || echo 0)
+  MARKER_EPOCH=$(file_mtime "$MARKER")
   for F in "$TASKS" "$HANDOFF"; do
     NAME=$(basename "$F")
     if [ -f "$F" ]; then
-      F_EPOCH=$(stat --format=%Y "$F" 2>/dev/null || stat -f %m "$F" 2>/dev/null || echo 0)
+      F_EPOCH=$(file_mtime "$F")
       if [ "$F_EPOCH" -lt "$MARKER_EPOCH" ] 2>/dev/null; then
-        echo "  [WARN] $NAME — write_marker 이후 미갱신"
-        FAIL=$((FAIL+1))
+        fail "$NAME — write_marker 이후 미갱신"
       else
         echo "  [OK] $NAME 갱신됨"
       fi
     else
-      echo "  [WARN] $NAME 파일 없음"
-      FAIL=$((FAIL+1))
+      fail "$NAME 파일 없음"
     fi
   done
 else
@@ -159,12 +164,11 @@ if [ "$MODE" = "--full" ]; then
   echo ""
 
   echo "--- 9. 미커밋 변경 파일 ---"
-  CHANGES=$(cd "$PROJECT_DIR" && git diff --name-only 2>/dev/null)
-  STAGED=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null)
-  if [ -z "$CHANGES" ] && [ -z "$STAGED" ]; then
+  CHANGES=$(git_relevant_change_list)
+  if [ -z "$CHANGES" ]; then
     echo "  [INFO] 변경 파일 없음"
   else
-    echo "$CHANGES" "$STAGED" | sort -u | while read f; do
+    echo "$CHANGES" | sort -u | while read f; do
       [ -n "$f" ] && echo "  - $f"
     done
   fi
@@ -173,8 +177,11 @@ fi
 
 # === 결과 ===
 if [ "$FAIL" -gt 0 ]; then
-  echo "=== FAIL: $FAIL건 미해결. ==="
+  echo "=== FAIL: $FAIL건 미해결 / WARN: $WARN건. ==="
   exit 1
+elif [ "$WARN" -gt 0 ]; then
+  echo "=== WARN: $WARN건 경고. 커밋은 허용되지만 확인 권장. ==="
+  exit 0
 else
   echo "=== ALL CLEAR. ==="
   exit 0

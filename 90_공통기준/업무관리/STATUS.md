@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-09 — 폴더 구조 2차 보강 완료
+최종 업데이트: 2026-04-09 — 토론모드 idle composer 오탐 제거 + gate 정밀화 완료
 
 ---
 
@@ -12,11 +12,11 @@
 
 | 항목 | 내용 |
 |------|------|
-| 현재 브랜치 | `main` (origin/main 동기화) |
+| 현재 브랜치 | `main` (로컬 변경 진행 중) |
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 파이프라인 | Phase 1~6 운영 중 (skill_install 포함) |
-| hooks 체계 | 16개 등록 (기존 11 + evidence 5), evidence req/ok + map_scope 사고품질 강제, 20개 아카이브 |
+| hooks 체계 | 16개 등록 + `incident_repair.py` 보조 스크립트 추가, completion/final/commit gate 정밀화 반영 |
 
 ---
 
@@ -31,6 +31,7 @@
 | 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 보류 (자연어 대체) | `.claude/rules/feature-utilization.md` |
 | domain_guard | v3 phase guard 구현 완료 (토론모드 3단, GPT 합의 2턴) | `.claude/hooks/domain_guard.sh` |
 | evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
+| 토론모드/게이트 보정 | idle composer 오탐 제거, 완료 주장 기반 completion gate, unresolved incident 수리 큐 추가 | `90_공통기준/토론모드/`, `.claude/hooks/` |
 | PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 | GPT 지침 Git 관리 | 구현 완료 (GPT PASS 4bcd7877) | `90_공통기준/업무관리/gpt-instructions.md` |
 

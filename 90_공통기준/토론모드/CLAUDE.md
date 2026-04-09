@@ -23,14 +23,16 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 1. 기존 탭 확인 → 있으면 switch, 없으면 navigate
 2. main 영역 JS로 대화 URL 추출 → navigate (클릭 금지)
 3. **SEND GATE**: 전송 직전 assistant 최신 텍스트 재읽기 (NEVER — 생략 금지)
-4. `#prompt-textarea` + `execCommand('insertText')` + `send-button` JS 클릭
+4. `#prompt-textarea` + `execCommand('insertText')` + submit button JS 클릭
 5. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
 6. 응답 읽기 → 하네스 분석 → 반박 생성 → 전송 → 반복
 
 ## 고정 Selector (2026-03-31 실증)
 ```
 입력창:      #prompt-textarea              (contenteditable DIV)
-전송버튼:    [data-testid="send-button"]
+전송버튼:    [data-testid="send-button"]   (텍스트 입력 후 표시될 수 있음)
+대체확인:    #composer-submit-button       (동일 버튼 id)
+idle 상태:   [data-testid="composer-speech-button"]  (빈 입력창에서 허용)
 중지버튼:    [data-testid="stop-button"]   (응답 중에만 존재)
 응답 노드:   [data-message-author-role="assistant"]
 ```

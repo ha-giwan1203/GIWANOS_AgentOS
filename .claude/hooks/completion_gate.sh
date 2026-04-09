@@ -1,20 +1,34 @@
 #!/bin/bash
-# completion-gate v5: 순수 bash — python3 subprocess 제거 (#34457 Windows hooks 멈춤 대응)
-# GPT+Claude 토론 합의 2026-04-06
+# completion-gate v6: 완료 주장일 때만 정밀 차단 + Git 미반영 변경 감지
+# GPT+Claude 토론 합의 2026-04-09
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
-hook_log "Stop" "completion_gate v5" 2>/dev/null || true
+hook_log "Stop" "completion_gate v6" 2>/dev/null || true
 
 MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 TASKS="$PATH_TASKS"
 HANDOFF="$PATH_HANDOFF"
 
-# write_marker 없으면 skip
+# 마지막 assistant 메시지가 "완료/최종반영" 주장일 때만 gate 적용
+LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
+if ! is_completion_claim "$LAST_TEXT"; then
+  exit 0
+fi
+
+# 완료 주장인데 Git 실물 변경이 남아 있으면 먼저 차단
+if git_has_relevant_changes; then
+  CHANGES=$(git_relevant_change_list | head -n 3 | paste -sd, -)
+  hook_incident "gate_reject" "completion_gate" "$CHANGES" "Git 미반영 변경이 남은 상태에서 완료 주장" '"classification_reason":"completion_before_git","next_action":"relevant change를 commit/push 또는 정리한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
+  exit 0
+fi
+
+# write_marker 없으면 TASKS/HANDOFF 갱신 gate는 통과
 if [ ! -f "$MARKER" ]; then
   exit 0
 fi
 
 # marker timestamp (epoch seconds)
-MARKER_EPOCH=$(stat --format=%Y "$MARKER" 2>/dev/null || stat -f %m "$MARKER" 2>/dev/null || echo 0)
+MARKER_EPOCH=$(file_mtime "$MARKER")
 
 MISSING=""
 for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF"; do
@@ -24,15 +38,15 @@ for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF"; do
     MISSING="${MISSING}${MISSING:+,}$NAME"
     continue
   fi
-  FILE_EPOCH=$(stat --format=%Y "$FPATH" 2>/dev/null || stat -f %m "$FPATH" 2>/dev/null || echo 0)
+  FILE_EPOCH=$(file_mtime "$FPATH")
   if [ "$FILE_EPOCH" -lt "$MARKER_EPOCH" ] 2>/dev/null; then
     MISSING="${MISSING}${MISSING:+,}$NAME"
   fi
 done
 
 if [ -n "$MISSING" ]; then
-  hook_incident "gate_reject" "completion_gate" "$MISSING" "파일 변경 후 ${MISSING} 미갱신" 2>/dev/null || true
-  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] 파일 변경 후 ${MISSING} 미갱신 — 갱신 후 종료하세요.\"}"
+  hook_incident "gate_reject" "completion_gate" "$MISSING" "완료 주장 전 ${MISSING} 미갱신" '"classification_reason":"completion_before_state_sync","next_action":"TASKS/HANDOFF를 최신 작업 상태로 갱신한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] 완료 보고 전 ${MISSING} 갱신이 필요합니다. 상태 문서를 먼저 갱신한 뒤 종료하세요.\"}"
 else
   rm -f "$MARKER" 2>/dev/null
 fi

@@ -3,17 +3,19 @@
 > 이 파일은 토론모드 하위 도메인의 재개 위치와 운영 메모만 관리한다.
 > 저장소 전체 상태 원본은 `90_공통기준/업무관리/TASKS.md`이며, 전역 판정은 업무관리 문서 우선순위를 따른다.
 
-최종 업데이트: 2026-04-09
+최종 업데이트: 2026-04-09 — idle composer 오탐 제거 + gate 정밀화 반영
 
 ## 현재 상태: 운영 중 (v2.6)
 
 - CLAUDE.md: 코어 규칙 정리 완료 (selector/하네스/금지사항)
 - SKILL.md: v2.6 — Step 4a(종료판정)/4b(critic-reviewer) 분리
 - REFERENCE.md: 기술 상세 분리 완료 (JS 코드, fallback 체인, 오류 대응)
+- Selector smoke test: idle composer 상태(`composer-speech-button`) 허용, 전송 직전 submit button 재확인
 - 문서 우선순위 정리: 전역 상태는 `../업무관리/TASKS.md`, 토론모드 문서는 하위 도메인용으로 역할 고정
 - critic-reviewer subagent: 4축 평가(독립성/하네스 엄밀성 필수 + 0건감사/결론 일방성 보조)
 - send_gate.sh: 토론 품질 경량 검사 (반론/대안/독립견해 0건 차단)
 - stop_guard.sh: 독립 견해 백스톱 추가
+- hooks 연계: `completion_gate` 완료 주장 기반 차단, `incident_repair.py`로 unresolved incident 다음 행동 제안
 - 실전 테스트: 기존 로그(debate_20260402_토론1.md)로 정상 동작 확인
 
 ## 완료 이력
@@ -21,3 +23,4 @@
 - 2026-04-02: 실전 토론 1회 수행
 - 2026-04-07: SKILL.md v2.5→v2.6, REFERENCE.md 분리, critic-reviewer 도입, 코어 규칙 리팩터링
 - 2026-04-09: 전역 업무관리 문서와의 역할 경계 정리
+- 2026-04-09: 새 대화방 시스템 평가 1턴 + idle composer 오탐 제거 + gate 정밀화
