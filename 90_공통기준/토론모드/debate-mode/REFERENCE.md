@@ -33,7 +33,7 @@ const poll = setInterval(() => {
   const valueOk = el.tagName === 'TEXTAREA'
     ? el.value === text
     : el.innerText.trim().length > 0;
-  const btn = document.querySelector('button[data-testid="send-button"]');
+  const btn = document.querySelector('button[data-testid="send-button"], #composer-submit-button');
   const btnReady = btn && btn.disabled === false && btn.getAttribute('aria-disabled') !== 'true';
   if (valueOk && btnReady) {
     btn.click();
