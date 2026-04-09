@@ -4,12 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — 토론모드 CONDITIONAL PASS 후속 보정 완료
+최종 업데이트: 2026-04-09 — 로컬 CDP helper + incident 수리 루프 보강 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: 로컬 CDP helper + incident 수리 루프 보강 (완료)
+- `.claude/scripts/cdp/cdp_chat_send.py` 추가
+  - `#prompt-textarea` 입력 + `[data-testid="send-button"], #composer-submit-button` fallback 클릭 공통화
+  - `--require-korean`으로 자연어 영어 전송 차단
+  - `--mark-send-gate`로 `.claude/state/send_gate_passed` 갱신
+- `.claude/hooks/incident_repair.py` 확장
+  - 최신 unresolved incident에 대해 다음 행동 + 패치 후보 + 검증 단계 출력
+  - JSON 출력에도 `inferred_next_action`, `patch_candidates`, `verify_steps` 포함
+- 토론모드 문서에 helper 우선 사용 기준 반영
+
+### 작업: 토론방 한국어 전용 규칙 반영 (완료)
+- `90_공통기준/토론모드/ENTRY.md`, `CLAUDE.md`, `REFERENCE.md`에 "토론방 자연어는 한국어만" 규칙 추가
+- `90_공통기준/토론모드/debate-mode/SKILL.md`, `debate-mode/REFERENCE.md`에 전송 본문 한국어-only 규칙과 한국어 판정 라벨(`통과 / 조건부 통과 / 실패`) 반영
+- 예외 범위는 code block, selector/data-testid, 파일 경로, commit SHA, 에러 원문 최소 인용으로 제한
+- 다음 세션부터 토론방에 영어 문장 프롬프트를 보내지 않도록 이 기준을 우선 적용하면 된다.
 
 ### 작업: 토론모드 CONDITIONAL PASS 후속 보정 (완료)
 - GPT 최종 판정 확인: `CONDITIONAL PASS`

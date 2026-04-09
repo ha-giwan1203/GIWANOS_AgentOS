@@ -29,6 +29,9 @@
 !.claude/hooks/*.sh
 !.claude/hooks/README.md
 !.claude/hooks/incident_repair.py
+!.claude/scripts/
+!.claude/scripts/cdp/
+!.claude/scripts/cdp/cdp_chat_send.py
 !.claude/rules/
 !.claude/rules/**
 .claude/settings.local.json

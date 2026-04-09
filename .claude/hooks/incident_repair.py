@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Suggest next repair actions for unresolved incidents."""
+"""unresolved incident의 다음 수리 루프를 제안한다."""
 
 from __future__ import annotations
 
@@ -49,17 +49,106 @@ def infer_next_action(entry: dict[str, Any]) -> str:
     return "최근 로그와 관련 파일을 읽고 원인 확인 후 가장 작은 수정부터 재시도"
 
 
+def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
+    hook = str(entry.get("hook", ""))
+    classification = str(entry.get("classification_reason", ""))
+    file_field = str(entry.get("file", "")).strip()
+    candidates: list[str] = []
+
+    if file_field:
+        for chunk in file_field.split(","):
+            path = chunk.strip()
+            if path and path not in candidates:
+                candidates.append(path)
+
+    if hook == "commit_gate":
+        for path in [
+            ".claude/hooks/final_check.sh",
+            "90_공통기준/업무관리/TASKS.md",
+            "90_공통기준/업무관리/HANDOFF.md",
+        ]:
+            if path not in candidates:
+                candidates.append(path)
+    elif hook == "completion_gate" and classification == "completion_before_git":
+        for path in [
+            "90_공통기준/업무관리/TASKS.md",
+            "90_공통기준/업무관리/HANDOFF.md",
+        ]:
+            if path not in candidates:
+                candidates.append(path)
+    elif hook == "completion_gate" and classification == "completion_before_state_sync":
+        for path in [
+            "90_공통기준/업무관리/TASKS.md",
+            "90_공통기준/업무관리/HANDOFF.md",
+            "90_공통기준/업무관리/STATUS.md",
+        ]:
+            if path not in candidates:
+                candidates.append(path)
+    elif hook == "send_gate":
+        for path in [
+            ".claude/hooks/send_gate.sh",
+            "90_공통기준/토론모드/ENTRY.md",
+            "90_공통기준/토론모드/REFERENCE.md",
+            "90_공통기준/토론모드/debate-mode/REFERENCE.md",
+        ]:
+            if path not in candidates:
+                candidates.append(path)
+    elif hook == "evidence_gate":
+        for path in [
+            ".claude/hooks/evidence_gate.sh",
+            ".claude/hooks/evidence_mark_read.sh",
+        ]:
+            if path not in candidates:
+                candidates.append(path)
+
+    return candidates
+
+
+def infer_verify_steps(entry: dict[str, Any]) -> list[str]:
+    hook = str(entry.get("hook", ""))
+    detail = str(entry.get("detail", ""))
+
+    if hook == "commit_gate":
+        mode = "--full" if "--full" in detail else "--fast"
+        return [f"./.claude/hooks/final_check.sh {mode}"]
+    if hook == "completion_gate":
+        return [
+            "./.claude/hooks/final_check.sh --fast",
+            "./.claude/hooks/final_check.sh --full",
+        ]
+    if hook == "send_gate":
+        return [
+            "assistant 최신 응답 재읽기",
+            "반론/대안/독립 판단 포함 후 재전송",
+        ]
+    if hook == "evidence_gate":
+        return ["요구된 req/ok 증거 마커 충족 여부 재확인"]
+    return ["관련 파일 수정 후 가장 작은 검증부터 재실행"]
+
+
 def format_entry(entry: dict[str, Any]) -> str:
-    lines = ["Latest unresolved incident"]
-    lines.append(f"- ts: {entry.get('ts', '')}")
-    lines.append(f"- hook: {entry.get('hook', '')}")
-    lines.append(f"- type: {entry.get('type', '')}")
+    lines = ["최신 unresolved incident"]
+    lines.append(f"- 시각: {entry.get('ts', '')}")
+    lines.append(f"- 훅: {entry.get('hook', '')}")
+    lines.append(f"- 유형: {entry.get('type', '')}")
     if entry.get("file"):
-        lines.append(f"- file: {entry.get('file', '')}")
+        lines.append(f"- 파일: {entry.get('file', '')}")
     if entry.get("classification_reason"):
-        lines.append(f"- classification: {entry.get('classification_reason', '')}")
-    lines.append(f"- detail: {entry.get('detail', '')}")
-    lines.append(f"- next action: {infer_next_action(entry)}")
+        lines.append(f"- 분류: {entry.get('classification_reason', '')}")
+    lines.append(f"- 상세: {entry.get('detail', '')}")
+    lines.append(f"- 다음 행동: {infer_next_action(entry)}")
+
+    patch_candidates = infer_patch_candidates(entry)
+    if patch_candidates:
+        lines.append("- 패치 후보:")
+        for item in patch_candidates:
+            lines.append(f"  - {item}")
+
+    verify_steps = infer_verify_steps(entry)
+    if verify_steps:
+        lines.append("- 검증:")
+        for item in verify_steps:
+            lines.append(f"  - {item}")
     return "\n".join(lines)
 
 
@@ -88,18 +177,25 @@ def main() -> int:
     selected = unresolved[-max(args.limit, 1) :]
 
     if args.json:
-        print(json.dumps(selected, ensure_ascii=False, indent=2))
+        enriched = []
+        for row in selected:
+            copied = dict(row)
+            copied["inferred_next_action"] = infer_next_action(row)
+            copied["patch_candidates"] = infer_patch_candidates(row)
+            copied["verify_steps"] = infer_verify_steps(row)
+            enriched.append(copied)
+        print(json.dumps(enriched, ensure_ascii=False, indent=2))
         return 0
 
     if not selected:
-        print("No unresolved incidents.")
+        print("unresolved incident가 없습니다.")
         return 0
 
     if len(selected) == 1:
         print(format_entry(selected[0]))
         return 0
 
-    print("Latest unresolved incidents")
+    print("최신 unresolved incidents")
     for entry in selected:
         print(f"- {entry.get('ts', '')} | {entry.get('hook', '')} | {infer_next_action(entry)}")
     return 0

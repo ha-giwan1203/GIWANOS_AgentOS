@@ -8,6 +8,9 @@
 (없음)
 
 ## 완료
+- [x] 로컬 CDP 전송 helper 추가 — `cdp_chat_send.py`로 한국어 가드 + send_gate 파일 갱신 + submit fallback 공통화 (2026-04-09)
+- [x] `incident_repair.py` 확장 — 다음 행동만이 아니라 패치 후보와 검증 단계까지 제안 (2026-04-09)
+- [x] 토론방 영어 사용 금지 규칙 반영 — 한국어 전용 전송 규칙 + 판정 라벨 한국어화 (2026-04-09)
 - [x] GPT `CONDITIONAL PASS` 후속 보정 — REFERENCE submit fallback 정렬 + `is_completion_claim()` 과차단 축소 (2026-04-09)
 - [x] 프로젝트 폴더 구조 생성
 - [x] CLAUDE.md 작성

@@ -10,11 +10,21 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — 토론모드 CONDITIONAL PASS 후속 보정 완료
+최종 업데이트: 2026-04-09 — 로컬 CDP helper + incident 수리 루프 보강 반영
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] 로컬 CDP helper + incident 수리 루프 보강 (2026-04-09)
+- `.claude/scripts/cdp/cdp_chat_send.py` 추가: 한국어 가드, send_gate 파일 갱신, submit selector fallback을 전송 경로에 공통 적용
+- `.claude/hooks/incident_repair.py` 확장: 최신 unresolved incident에 대해 다음 행동뿐 아니라 패치 후보와 검증 단계까지 같이 출력
+- 토론모드 문서에도 로컬 CDP 경로 우선 helper 사용 원칙 반영
+
+### [완료] 토론방 한국어 전용 규칙 반영 (2026-04-09)
+- `ENTRY.md`, `CLAUDE.md`, `REFERENCE.md`, `debate-mode/SKILL.md`, `debate-mode/REFERENCE.md`에 토론방 자연어 한국어-only 규칙 추가
+- 토론방에 보내는 질문/반박/검증 요청/완료 보고는 한국어만 사용하도록 고정
+- 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`로 통일하고, 영어 `PASS/FAIL/HOLD`는 내부 해석에만 사용하도록 정리
 
 ### [완료] 토론모드 CONDITIONAL PASS 후속 보정 (2026-04-09)
 - `REFERENCE.md` 통합 JS 예시를 실제 전송 기준과 일치하도록 `send-button` + `#composer-submit-button` fallback으로 보정

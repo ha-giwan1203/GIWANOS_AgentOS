@@ -54,7 +54,7 @@
 | 스크립트 | 용도 |
 |---|---|
 | `hook_common.sh` | 공통 함수 (hook_log, 로그 로테이션) |
-| `incident_repair.py` | 최신 unresolved incident의 다음 수리 행동 제안 |
+| `incident_repair.py` | 최신 unresolved incident의 다음 행동 + 패치 후보 + 검증 단계 제안 |
 | `smoke_test.sh` | 전체 hooks 구조 검증 (수동 실행) |
 
 ## 참조

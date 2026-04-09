@@ -58,6 +58,26 @@ setTimeout(() => {
 
 빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
 
+### 로컬 CDP helper 우선 사용
+쉘에서 CDP를 직접 호출하는 경로에서는 임시 JS를 매번 만들기보다 아래 helper를 우선 사용한다.
+
+```bash
+python '.claude/scripts/cdp/cdp_chat_send.py' \
+  --match-url '<chat_url>' \
+  --text-file '<utf8_text_file>' \
+  --require-korean \
+  --mark-send-gate
+```
+
+- `--require-korean`: 자연어 영어 포함 시 전송 차단
+- `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
+- submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
+
+### 토론방 언어 규칙
+- 토론방에 보내는 자연어 본문은 한국어만 사용한다.
+- 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`만 사용한다.
+- 예외: code block, selector/data-testid, 파일 경로, commit SHA, 에러 원문 최소 인용
+
 ### fallback (execCommand 실패 시)
 ```
 textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true}) dispatch
