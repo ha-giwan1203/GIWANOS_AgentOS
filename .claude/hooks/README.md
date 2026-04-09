@@ -25,7 +25,7 @@
 | ③ | `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
 | ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
 | ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
-| ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검 |
+| ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검, `tool_input` 우선 파싱 |
 
 ### 추적층 (PostToolUse)
 

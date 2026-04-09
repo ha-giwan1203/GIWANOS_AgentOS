@@ -10,11 +10,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — final_check hook 정합성을 실등록 기준으로 전환
+최종 업데이트: 2026-04-10 — send_gate 파싱을 tool_input 기준으로 보강
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] `send_gate.sh` 파싱 보강 (2026-04-10)
+- GPT 토론 판정: 채택 1건 / 보류 1건 / 버림 0건, 이번 턴 구현은 `send_gate.sh`만 진행
+- `send_gate.sh`가 `hook_common.sh`의 `safe_json_get()`로 `tool_name`, `tool_input`, `code`, `text`를 우선 읽고, 실패할 때만 원문 전체 검사로 fallback 하도록 보강
+- 직접 입력 호출 검사와 토론 품질 검사가 payload 전체가 아니라 가능한 한 실제 `tool_input` 본문 기준으로 동작하도록 정리
+- 검증: `bash -n`, `final_check.sh --fast/--full`, `smoke_test.sh`, 샘플 입력 2건, `git diff --check`
 
 ### [완료] `final_check.sh` 실등록 기준 전환 (2026-04-09)
 - GPT 토론 판정: 채택 1건 / 조건부 채택 1건 / 버림 0건, 구현 우선순위는 `final_check.sh`

@@ -72,6 +72,12 @@ check $? "send_gate.sh 존재 + 실행 가능"
 grep -q 'execCommand.*insertText\|insertText' "$HOOKS_DIR/send_gate.sh"
 check $? "execCommand/insertText 전송 감지 패턴 존재"
 
+grep -q 'json_value "\$INPUT" "tool_name"' "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate: tool_name 안전 추출 경유"
+
+grep -q 'json_value "\$INPUT" "tool_input"' "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate: tool_input 범위 추출 사용"
+
 echo ""
 
 # === 5. auto_compile.sh (PostToolUse/Write|Edit) ===

@@ -5,18 +5,49 @@
 # GPT 합의: 2026-04-06 — 문서 규칙만으로 부족, 실행 강제 gate 필요
 
 INPUT=$(cat)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
 
-# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
-TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+json_value() {
+  local payload="$1"
+  local key="$2"
+  if type safe_json_get >/dev/null 2>&1; then
+    printf '%s' "$payload" | safe_json_get "$key" 2>/dev/null || true
+  fi
+}
+
+# hook_common safe_json_get 우선, 실패 시 기존 추출 fallback
+TOOL_NAME=$(json_value "$INPUT" "tool_name")
+if [ -z "$TOOL_NAME" ]; then
+  TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
 
 # javascript_tool이 아니면 통과
 if [[ "$TOOL_NAME" != *"javascript_tool"* ]]; then
   exit 0
 fi
 
+# 가능하면 실제 tool_input/code 범위만 검사하고, 실패 시 원문 전체 fallback
+TOOL_INPUT=$(json_value "$INPUT" "tool_input")
+TOOL_CODE=$(json_value "$TOOL_INPUT" "code")
+TOOL_TEXT=$(json_value "$TOOL_INPUT" "text")
+
+INSPECT_SOURCE="$INPUT"
+if [ -n "$TOOL_INPUT" ]; then
+  INSPECT_SOURCE="$TOOL_INPUT"
+fi
+if [ -n "$TOOL_CODE" ]; then
+  INSPECT_SOURCE="$TOOL_CODE"
+fi
+
+QUALITY_SOURCE="$INSPECT_SOURCE"
+if [ -n "$TOOL_TEXT" ]; then
+  QUALITY_SOURCE="$TOOL_TEXT"
+fi
+
 # text 파라미터에 execCommand + insertText 패턴 확인
 HAS_INSERT="NO"
-if echo "$INPUT" | grep -q 'execCommand' && echo "$INPUT" | grep -q 'insertText'; then
+if echo "$INSPECT_SOURCE" | grep -q 'execCommand' && echo "$INSPECT_SOURCE" | grep -q 'insertText'; then
   HAS_INSERT="YES"
 fi
 
@@ -35,8 +66,6 @@ if [ -f "$DEBATE_FLAG" ]; then
 else
   exit 0
 fi
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # SEND GATE 파일 확인
 STATE_DIR="$SCRIPT_DIR/../state"
@@ -62,15 +91,14 @@ fi
 # debate 도메인 활성 상태에서만 동작 — 반론/대안 0건 금지
 # GPT 합의 2026-04-07: send_gate 내부 경량 검사로 역할 오염 최소화
 OPINION_MARKERS='(반론|대안|다른 접근|내 판단|Claude 판단|환경상 비적합|내 독립 견해|내 우려)'
-if echo "$INPUT" | grep -qE "$OPINION_MARKERS"; then
+if echo "$QUALITY_SOURCE" | grep -qE "$OPINION_MARKERS"; then
   # 독립 견해 마커 존재 → 통과
   :
 else
   # 단순 보고/SHA 공유는 허용 (커밋/푸시/SHA/diff/PASS/검증 키워드)
-  if echo "$INPUT" | grep -qE '(커밋|푸시|SHA|diff|PASS|FAIL|검증 결과|판정 요청|수정 완료)'; then
+  if echo "$QUALITY_SOURCE" | grep -qE '(커밋|푸시|SHA|diff|PASS|FAIL|검증 결과|판정 요청|수정 완료)'; then
     :  # 보고성 메시지 → 검사 건너뜀
   else
-    source "$(dirname "$0")/hook_common.sh" 2>/dev/null
     hook_log "PreToolUse/send_gate" "BLOCK: debate_quality | 독립 견해 마커 0건" 2>/dev/null
     hook_incident "hook_block" "send_gate" "" "토론 품질: 반론/대안/독립견해 0건" 2>/dev/null || true
     echo '{"decision":"block","reason":"[토론 품질 게이트] 독립 견해(반론/대안/내 판단) 없이 GPT에 전송할 수 없습니다. 반론, 대안, 또는 독립 판단을 최소 1건 포함하세요."}'

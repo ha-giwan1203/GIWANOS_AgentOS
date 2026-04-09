@@ -4,12 +4,30 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — final_check hook 정합성을 실등록 기준으로 전환
+최종 업데이트: 2026-04-10 — send_gate 파싱을 tool_input 기준으로 보강
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-09)
+## 0. 최신 세션 (2026-04-10)
+
+### 작업: `send_gate.sh` 파싱 보강 (완료)
+- GPT 토론 결과
+  - 채택: `send_gate.sh`에서 `safe_json_get()`로 `tool_name`과 실제 입력 본문을 우선 읽도록 보강
+  - 보류: `cdp_chat_send.py` 경로 일원화는 다음 커밋으로 분리
+  - 버림: 없음
+- 코드 변경
+  - `.claude/hooks/send_gate.sh`가 `hook_common.sh`를 먼저 읽고 `tool_name`, `tool_input`, `code`, `text`를 우선 추출
+  - 직접 입력 호출 검사와 토론 품질 검사를 payload 전체보다 가능한 한 실제 `tool_input` 범위에서 수행하고, 추출 실패 시 기존 원문 전체 검사로 fallback
+  - `.claude/hooks/smoke_test.sh`에 send_gate의 `safe_json_get tool_name/tool_input` 사용 흔적 검사를 추가
+- 문서 변경
+  - `.claude/hooks/README.md`의 send_gate 설명을 `tool_input` 우선 파싱에 맞게 갱신
+- 검증
+  - `bash -n .claude/hooks/send_gate.sh`
+  - `final_check.sh --fast`, `final_check.sh --full`
+  - `smoke_test.sh`
+  - 샘플 입력 2건으로 `send_gate.sh` 차단/통과 분기 확인
+  - `git diff --check`
 
 ### 작업: `final_check.sh` 실등록 기준 전환 (완료)
 - GPT 토론 결과
