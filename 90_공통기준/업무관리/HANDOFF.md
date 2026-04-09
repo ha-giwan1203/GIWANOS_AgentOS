@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — Windows Bash 실행 경로를 래퍼로 고정
+최종 업데이트: 2026-04-09 — final_check hook 정합성을 실등록 기준으로 전환
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
 ## 0. 최신 세션 (2026-04-09)
+
+### 작업: `final_check.sh` 실등록 기준 전환 (완료)
+- GPT 토론 결과
+  - 채택: `final_check.sh`를 문서 문자열 중심 검사에서 실등록 기준 검사로 전환
+  - 조건부 채택: `send_gate.sh` 입력 파싱 보강은 다음 우선순위로 보류
+  - 버림: 없음
+- 코드 변경
+  - `.claude/hooks/final_check.sh`에 `settings.local.json` 등록 hook 목록 추출 helper 추가
+  - hook 개수 정합성은 `settings.local.json` 실등록 수를 기준으로 `README.md`, `STATUS.md`와 각각 비교하도록 재배치
+  - `settings.local.json`에 등록된 hook 파일이 실제 `.claude/hooks/`에 모두 존재하는지 별도 FAIL 검사 추가
+- 문서 변경
+  - `.claude/hooks/README.md`에 final_check 기준축이 `settings.local.json`이라는 메모 추가
+- 검증
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --full'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/smoke_test.sh'`
+  - `git diff --check`
 
 ### 작업: Windows Bash 실행 경로 고정 (완료)
 - 원인: 현재 PowerShell 세션 PATH에는 `C:\Program Files\Git\cmd`만 있고 `bash.exe`가 있는 `C:\Program Files\Git\bin`은 잡히지 않아, `bash ...` 직접 호출은 세션에 따라 실패할 수 있다.

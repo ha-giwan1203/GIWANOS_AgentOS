@@ -10,11 +10,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-09 — Windows Bash 실행 경로를 래퍼로 고정
+최종 업데이트: 2026-04-09 — final_check hook 정합성을 실등록 기준으로 전환
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] `final_check.sh` 실등록 기준 전환 (2026-04-09)
+- GPT 토론 판정: 채택 1건 / 조건부 채택 1건 / 버림 0건, 구현 우선순위는 `final_check.sh`
+- `final_check.sh`가 README↔STATUS 문구끼리만 비교하던 구조를 줄이고, `settings.local.json`의 실제 등록 hook 목록을 기준축으로 삼도록 변경
+- `README.md`, `STATUS.md` 개수는 이제 실등록 대비 동기화 경고로만 비교하고, `settings.local.json`에 등록된 각 hook 파일의 실존 여부를 별도 확인
+- 검증: `run_git_bash.ps1` 경유 `final_check.sh --fast/--full`, `smoke_test.sh`, `git diff --check`
 
 ### [완료] Windows Bash 실행 경로 고정 (2026-04-09)
 - 루트 `CLAUDE.md`에 PowerShell 세션에서는 `bash`가 PATH에 없을 수 있으니 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 Git Bash 절대경로를 사용하라고 명시

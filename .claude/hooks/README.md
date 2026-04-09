@@ -5,6 +5,8 @@
 
 ## 활성 Hook (16개 스크립트, settings.local.json 등록)
 
+> `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+
 ### 프롬프트층 (UserPromptSubmit)
 
 | 훅 | matcher | 역할 |
