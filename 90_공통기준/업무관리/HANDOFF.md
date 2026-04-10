@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-10 14:09 KST — 세션 3 마무리 (Claude Code 품질 기복 대응 + CDP 인코딩 수정)
+최종 업데이트: 2026-04-11 — 세션 4 (시스템 연결 점검 + Slack/Notion 활성화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-10 세션 3)
+## 0. 최신 세션 (2026-04-11 세션 4)
+
+### 이번 세션 완료
+1. **시스템 전체 연결 점검**: smoke test 76/76, 구문검증 22/22, 훅/커맨드/에이전트/CDP/메모리 참조 전부 정상
+2. **Slack 알림 활성화**: `notify_slack.sh` 27행 python3 호출 주석 해제 (토큰 .env 로드 확인)
+3. **Notion 동기화 단계 추가**: `/finish` 3.5단계에 TASKS/STATUS → `notion-update-page` MCP 연동 추가
+4. **미존재 스크립트 권한 정리**: `_gen_support_cost.py`, `rebuild_v5.py` 권한 제거
+
+### 다음 AI 액션
+- Slack 알림 실제 발송 테스트 (Notification 이벤트 트리거 시)
+- `/finish` 실행 시 Notion 3.5단계 동작 확인
+
+### 커밋
+- f90d5d5d: fix: Slack 알림 활성화 + Notion 동기화 단계 추가 + 미존재 스크립트 권한 정리
+
+---
+
+## 1. 이전 세션 (2026-04-10 세션 3)
 
 ### 이번 세션 완료
 1. **Claude Code 품질 기복 근본 원인 분석 + GPT 3라운드 토론**

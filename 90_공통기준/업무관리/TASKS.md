@@ -10,11 +10,18 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — Claude Code 품질 기복 대응(PreCompact/SessionStart/state_rebind 훅 + CDP UTF-8 인코딩 수정)
+최종 업데이트: 2026-04-11 — 시스템 연결 점검 + Slack/Notion 활성화
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] 시스템 연결 끊김 수정 (2026-04-11)
+- 전체 점검: smoke test 76/76 PASS, 구문검증 22/22 OK, 훅/커맨드/에이전트/CDP 참조 정상
+- notify_slack.sh: python3 slack_notify.py 호출 주석 해제 → Slack 알림 활성화
+- finish.md: 3.5단계 Notion 동기화 추가 (TASKS/STATUS → notion-update-page MCP)
+- settings.local.json: 미존재 스크립트 권한 2건 제거 (_gen_support_cost.py, rebuild_v5.py)
+- 커밋: f90d5d5d
 
 ### [필수] 새 훅 3종 동작 검증 (세션 재시작 후)
 - 이번 세션에서 PreCompact/SessionStart/state_rebind 훅을 settings.local.json에 등록했으나, 훅은 세션 시작 시 캐싱되므로 **이번 세션에서는 미동작**
