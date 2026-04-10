@@ -170,5 +170,5 @@ hook_incident() {
   file="${file//\"/\\\"}"
   extra_json=$(printf '%s' "$extra_json" | tr -d '\n')
   echo "{\"ts\":\"$ts\",\"type\":\"$type\",\"hook\":\"$hook\",\"file\":\"$file\",\"detail\":\"$detail\",\"resolved\":false${extra_json:+,$extra_json}}" >> "$INCIDENT_LEDGER"
-  _rotate_file "$INCIDENT_LEDGER"
+  # incident ledger는 감사/지표 원본이므로 무회전 (hook_log와 달리 _rotate_file 미적용)
 }

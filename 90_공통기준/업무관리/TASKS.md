@@ -10,11 +10,27 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — 토론방 자동 탐지 코드 강제 완료, 일일업무(ZDM+MES) 완료
+최종 업데이트: 2026-04-11 — allowlist 외부 파일 분리 + incident ledger 무회전 전환 (GPT 토론 합의)
 
 ---
 
 ## 다음 세션 안건
+
+### [필수] 새 훅 3종 동작 검증 (세션 재시작 후)
+- 이번 세션에서 PreCompact/SessionStart/state_rebind 훅을 settings.local.json에 등록했으나, 훅은 세션 시작 시 캐싱되므로 **이번 세션에서는 미동작**
+- 다음 세션 시작 직후 확인할 것:
+  1. SessionStart hook 출력 확인 — TASKS/HANDOFF 상단이 주입되는지
+  2. state_rebind_check.sh — Write/Edit 시 stale 판정 + 쿨다운 동작 확인
+  3. PreCompact — compact 발생 시 session_kernel.md 생성 확인
+- 문제 발생 시: hook_common.sh 로그(`$PROJECT_ROOT/.claude/state/hook_debug.log`) 확인
+
+### [완료] PROPER_NOUN_ALLOWLIST 구조 개선 + incident ledger 무회전 (2026-04-11)
+- GPT 토론 2라운드: 채택 2건 / 버림 1건 / 보류 1건
+- allowlist 외부 파일 분리: korean_allowlist.txt(177개) + 코어 목록 19개 코드 유지 + 가산 merge + 로드 실패 시 코어만 사용
+- incident ledger 무회전 전환: hook_incident()에서 _rotate_file 호출 제거 (감사 원본 보존)
+- 훅 로그 JSON 전환: 버림 (이미 JSON 출력이었음, 사전조사 오류)
+- 스키마 확장: 보류 (필요 발생 시 재개)
+- 커밋: 221a03c1
 
 ### [보류] HANDOFF 자동 아카이브 규칙 추가
 - GPT 토론 결과(2026-04-10): 채택 — 구조 결함이 아닌 운영 규칙 보강으로 합의
@@ -26,6 +42,18 @@
 - 최신 GPT 토론 결과에서 `보류 1건`으로 남긴 안건
 - 이유: `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로의 틈을 먼저 메웠고, 지금 단계에서 셸/파이썬 호출 전체로 훅 범위를 넓히면 과잉설계 위험이 크다고 판정
 - 재개 조건: helper 경로 밖에서 동일 문제가 재발하거나, 직접 자바스크립트 예비 경로 사용 지점이 다시 늘어날 때
+
+### [완료] Claude Code 품질 기복 대응 — 상태 유지 체인 + CDP 인코딩 수정 (2026-04-10)
+- GPT 3라운드 토론 + Claude 독립 검증 병행
+- PreCompact hook: compact 직전 TASKS/HANDOFF → session_kernel.md 저장
+- SessionStart hook: 세션 시작 시 session_kernel 재주입 (best effort)
+- state_rebind_check.sh: Write/Edit 직전 stale 시 TASKS/HANDOFF 재바인딩 (1시간/30분 쿨다운)
+- HANDOFF tail→head 방향 오류 수정 (GPT 지적 → Claude 실물 검증 후 반영)
+- cdp_common.py UTF-8 stdout 강제 (cp949→utf-8 인코딩 체인 수정)
+- cdp_chat_send.py 고유명사 허용 목록 확장
+- ENTRY.md 독립 검토/통합 검토 생략 금지 규칙 추가
+- 커밋: 079517bb, 43d88dcc, 16255133, 7691ca96, 42f464d7, 6ee102ec, 9d9d194e
+- GPT 최종 판정: 정합 확인 (42f464d7 + 6ee102ec 실물 diff 일치)
 
 ### [완료] 토론방 자동 탐지 코드 강제 장치 (2026-04-10)
 - `debate_room_detect.py` 신규 추가 — 매 세션 프로젝트 최상단 방 자동 탐지 + 일반 `/c/` URL 거부

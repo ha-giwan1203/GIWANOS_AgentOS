@@ -1,9 +1,16 @@
 """CDP 래퍼 공통 모듈 — Playwright sync API 기반"""
 
 import argparse
+import io
 import sys
 import json
 from playwright.sync_api import sync_playwright
+
+# Windows cp949 stdout → UTF-8 강제 (Git Bash 환경에서 한글 깨짐 방지)
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "buffer"):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 DEFAULT_BROWSER_URL = "http://localhost:9222"
 
