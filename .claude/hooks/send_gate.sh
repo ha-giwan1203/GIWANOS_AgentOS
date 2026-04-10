@@ -88,6 +88,27 @@ if [[ "$GATE_AGE" -gt 120 ]]; then
   exit 0
 fi
 
+# === 독립 검증 게이트 ===
+# 하네스 라벨(채택/보류/버림)이 포함된 반박문이면 independent_review.md 존재 필수
+# GPT 합의 2026-04-10: 의지 기반 규칙 실패 → 코드 강제로 순서 보장
+HARNESS_LABELS='(채택:|보류:|버림:)'
+if echo "$QUALITY_SOURCE" | grep -qE "$HARNESS_LABELS"; then
+  REVIEW_FILE="$STATE_DIR/independent_review.md"
+  if [ ! -f "$REVIEW_FILE" ]; then
+    hook_log "PreToolUse/send_gate" "BLOCK: independent_review missing" 2>/dev/null
+    echo '{"decision":"block","reason":"[독립 검증 게이트] 하네스 분석 결과(채택/보류/버림)가 포함된 반박문입니다. 독립 검증(.claude/state/independent_review.md)을 먼저 수행하세요. GPT 응답을 읽기 전에 관련 파일을 독립적으로 리뷰하고, 내 문제 목록을 만든 뒤 GPT 주장과 대조해야 합니다."}'
+    exit 0
+  fi
+  # 현재 세션에서 생성된 파일인지 확인 (300초 이내)
+  REVIEW_MTIME=$(stat --format=%Y "$REVIEW_FILE" 2>/dev/null || stat -f %m "$REVIEW_FILE" 2>/dev/null || echo 0)
+  REVIEW_AGE=$((NOW_EPOCH - REVIEW_MTIME))
+  if [[ "$REVIEW_AGE" -gt 3600 ]]; then
+    hook_log "PreToolUse/send_gate" "BLOCK: independent_review stale (${REVIEW_AGE}s)" 2>/dev/null
+    echo '{"decision":"block","reason":"[독립 검증 게이트] independent_review.md가 '"$REVIEW_AGE"'초 전 파일입니다. 현재 세션에서 새로 독립 검증을 수행하세요."}'
+    exit 0
+  fi
+fi
+
 # === 토론 품질 경량 검사 (debate_quality_gate-lite) ===
 # debate 도메인 활성 상태에서만 동작 — 반론/대안 0건 금지
 # GPT 합의 2026-04-07: send_gate 내부 경량 검사로 역할 오염 최소화
