@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-10 — 최신 토론 결과와 후속 보류 안건 반영
+최종 업데이트: 2026-04-11 — 스케줄러 제거 + 훅 일원화 아키텍처 전환
 
 ---
 
@@ -12,11 +12,11 @@
 
 | 항목 | 내용 |
 |------|------|
-| 현재 브랜치 | `codex/debate-send-path-default` (로컬 변경 진행 중) |
+| 현재 브랜치 | `claude/hopeful-feistel` |
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
-| 자동화 파이프라인 | Phase 1~6 운영 중 (skill_install 포함) |
-| hooks 체계 | 16개 등록 + `incident_repair.py` 보조 스크립트 추가, completion/final/commit gate 정밀화 반영, `final_check.sh` 실등록 기준 정합성 검사 적용, `send_gate.sh` tool_input 기준 파싱 보강, `cdp_chat_send.py` 최신 답변 기대값 차단 추가 |
+| 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
+| hooks 체계 | 19개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/send gate 운영 중 |
 
 ---
 
@@ -38,16 +38,16 @@
 
 ---
 
-## 자동화 파이프라인 상태
+## 자동화 체계 (2026-04-11 훅 일원화 전환)
 
-| Phase | 스크립트 | 상태 |
-|-------|---------|------|
-| Phase 1 | `watch_changes.py` | 운영 중 (작업 스케줄러 등록) |
-| Phase 2 | `commit_docs.py` | 운영 중 |
-| Phase 3 | `update_status_tasks.py` | 운영 중 |
-| Phase 4 | `slack_notify.py` | 운영 중 (Token 갱신 완료) |
-| Phase 5 | `notion_sync.py` | 운영 중 (per-page dedup 적용) |
-| Phase 6 | `skill_install.py` | 운영 중 (.skill 변경 시 자동 압축 해제) |
+| 기능 | 이전 (폐기) | 현재 |
+|------|------------|------|
+| 파일 감시 | `watch_changes.py` + Windows 스케줄러 | 폐기 (SPOF — 크래시 시 자동복구 불가) |
+| 자동 커밋 | `commit_docs.py` (watch_changes 호출) | 폐기 (hooks 내 completion_gate로 대체) |
+| 상태 갱신 | `update_status_tasks.py` | 폐기 (Edit 도구로 직접 갱신) |
+| Slack 알림 | `slack_notify.py` (watch_changes 호출) | `notify_slack.sh` Notification hook → `slack_notify.py` |
+| Notion 동기화 | `notion_sync.py` (watch_changes 호출) | `/finish` 3.5단계 → MCP `notion-update-page` |
+| 스킬 설치 | `skill_install.py` | 유지 (.skill 변경 시 자동 압축 해제) |
 
 ---
 
@@ -60,8 +60,8 @@
 | 조립비 기준정보 | `05_생산실적\조립비정산\01_기준정보\기준정보_라인별정리_최종_V1_20260316.xlsx` |
 | 스킬 패키지 위치 | `90_공통기준\스킬\` |
 | 운영 지침 문서 | `90_공통기준\업무관리\` |
-| 파일 감시 런처 | `90_공통기준\업무관리\watch_changes_launcher.vbs` |
-| 스케줄러 등록 배치 | `90_공통기준\업무관리\register_watch_task.bat` |
+| ~~파일 감시 런처~~ | ~~`90_공통기준\업무관리\watch_changes_launcher.vbs`~~ (폐기 — 훅 일원화) |
+| ~~스케줄러 등록 배치~~ | ~~`90_공통기준\업무관리\register_watch_task.bat`~~ (폐기 — 훅 일원화) |
 | 마이그레이션 증적 | `98_아카이브\마이그레이션_20260328\` |
 
 ---
