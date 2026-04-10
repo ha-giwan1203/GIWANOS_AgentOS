@@ -47,7 +47,8 @@
       "Bash(python \"90_공통기준/업무관리/운영검증/scripts/check_skill_contract.py\" \"90_공통기준/스킬\" --write-report \"90_공통기준/업무관리/운영검증/reports/skill_contract_gap_report.md\")",
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
-      "Bash(python rebuild_v5.py)"
+      "Bash(python rebuild_v5.py)",
+      "Bash(python3 _gen_support_cost.py)"
     ],
     "ask": [
       "Bash(python*:*)",
