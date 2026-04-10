@@ -30,6 +30,7 @@
 
 ## 종료 시 갱신
 1. TASKS.md → 2. 도메인 STATUS.md → 3. HANDOFF.md → 4. Notion (필요 시)
+- HANDOFF.md가 500줄 또는 50세션 초과 시 `98_아카이브/handoff_archive_YYYYMMDD_YYYYMMDD.md`로 이동 후 최신 세션만 유지 (상태 원본은 TASKS.md 유지)
 
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
