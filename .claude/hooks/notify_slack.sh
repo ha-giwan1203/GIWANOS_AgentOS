@@ -23,5 +23,5 @@ echo "$HASH" > "$DEDUP_FILE"
 echo "$NOW" >> "$DEDUP_FILE"
 
 hook_log "Notification" "$MSG" 2>/dev/null
-# Slack 발송 (활성화 시 주석 해제)
-# python3 "$HOME/Desktop/업무리스트/90_공통기준/업무관리/slack_notify.py" --message "$MSG"
+# Slack 발송
+python3 "$HOME/Desktop/업무리스트/90_공통기준/업무관리/slack_notify.py" --message "$MSG"
