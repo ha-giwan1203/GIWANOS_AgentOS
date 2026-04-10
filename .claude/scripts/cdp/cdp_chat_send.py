@@ -46,6 +46,10 @@ PROPER_NOUN_ALLOWLIST: set[str] = {
     "github", "git",
     # 파일명 패턴 (확장자 없는 것)
     "claude.md", "tasks.md", "memory.md", "handoff.md", "status.md",
+    # 기타 기술/약어
+    "sha", "best", "effort", "lf", "crlf", "utf", "cp",
+    "precompact", "sessionstart", "sessionend",
+    "cowork-rules", "data-and-files",
 }
 
 
