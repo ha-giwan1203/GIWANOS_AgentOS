@@ -21,9 +21,7 @@
 - QA 결과가 있으면 포함
 
 ### 3단계: GPT 프로젝트방 진입
-- `.claude/state/debate_chat_url` 읽기 → URL이 있으면 직접 navigate (프로젝트 URL 경유 불필요)
-- debate_chat_url 없을 때만: 기존 탭 확인 → 프로젝트 URL 진입 → 최신 대화방 URL 추출 → navigate
-- 진입 성공 시 debate_chat_url 갱신
+- `python .claude/scripts/cdp/debate_room_detect.py --navigate` 로 최상단 채팅방 자동 탐지 후 진입
 - 전송 직전 `[data-message-author-role="assistant"]` 마지막 블록 100자를 읽어 UTF-8 파일 또는 변수로 보관
 
 ### 4단계: 결과 공유 메시지 전송

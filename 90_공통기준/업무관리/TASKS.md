@@ -10,11 +10,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — HANDOFF 아카이브 규칙 구현 완료, cdp_chat_send.py 기술 용어 허용 완화
+최종 업데이트: 2026-04-10 — P1/P2/P3 수정 완료 (gate timing, 문서 정리, stop_guard 파서 통일)
 
 ---
 
 ## 다음 세션 안건
+
+### [완료] P1/P2/P3 시스템 보강 (2026-04-10)
+- P1: cdp_chat_send.py gate marking timing 수정 — `write_gate_file()`을 전송 성공 후로 이동 (insert 실패/submit timeout 시 오마킹 방지)
+- P2: share-result.md Step 3 갱신 — 구 debate_chat_url 수동 진입 → `debate_room_detect.py --navigate` 자동 탐지로 교체
+- P3: stop_guard.sh 파서 통일 — sed 기반 추출 제거, `last_assistant_text()` (hook_common.sh) 통일
 
 ### [완료] HANDOFF 자동 아카이브 규칙 추가 (2026-04-10)
 - GPT 토론 결과: 채택 → 통과

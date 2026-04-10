@@ -230,15 +230,14 @@ def main() -> int:
                 print(json.dumps(payload, ensure_ascii=False))
                 return 6
 
-        if args.mark_send_gate:
-            write_gate_file(Path(args.gate_file))
-
         inserted = insert_text(page, text)
         if inserted.get("status") != "inserted":
             print(json.dumps(inserted, ensure_ascii=False))
             return 4
 
         submit = wait_and_click_submit(page, args.submit_timeout_ms)
+        if args.mark_send_gate and submit.get("status") == "clicked":
+            write_gate_file(Path(args.gate_file))
         payload = {
             "status": "sent" if submit.get("status") == "clicked" else submit.get("status"),
             "button": submit.get("selector", ""),
