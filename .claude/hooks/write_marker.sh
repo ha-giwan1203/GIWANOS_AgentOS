@@ -13,8 +13,10 @@ fi
 
 MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 
-# 상태문서(TASKS/HANDOFF/STATUS) 수정 → marker 삭제 (갱신 완료 의미)
-if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md|STATUS\.md)'; then
+# 상태문서(TASKS/HANDOFF) 수정 → marker 삭제 (갱신 완료 의미)
+# STATUS.md는 marker 삭제 대상에서 제외 — completion_gate baseline 우회 방지
+# GPT+Claude 합의 2026-04-10: STATUS.md 편집만으로 marker 소멸 → 무조건 통과 경로 차단
+if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md)'; then
   rm -f "$MARKER" 2>/dev/null
   exit 0
 fi

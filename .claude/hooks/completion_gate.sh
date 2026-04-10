@@ -1,8 +1,8 @@
 #!/bin/bash
-# completion-gate v6: 완료 주장일 때만 정밀 차단 + Git 미반영 변경 감지
-# GPT+Claude 토론 합의 2026-04-09
+# completion-gate v7: 완료 주장 시 무조건 TASKS/HANDOFF 검증 + Git 미반영 차단
+# GPT+Claude 토론 합의 2026-04-10: marker 우회 차단, 3단계 기준선
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
-hook_log "Stop" "completion_gate v6" 2>/dev/null || true
+hook_log "Stop" "completion_gate v7" 2>/dev/null || true
 
 MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 TASKS="$PATH_TASKS"
@@ -14,21 +14,18 @@ if ! is_completion_claim "$LAST_TEXT"; then
   exit 0
 fi
 
-# 완료 주장인데 Git 실물 변경이 남아 있으면 먼저 차단
-if git_has_relevant_changes; then
-  CHANGES=$(git_relevant_change_list | head -n 3 | paste -sd, -)
-  hook_incident "gate_reject" "completion_gate" "$CHANGES" "Git 미반영 변경이 남은 상태에서 완료 주장" '"classification_reason":"completion_before_git","next_action":"relevant change를 commit/push 또는 정리한 뒤 완료 보고 재시도"' 2>/dev/null || true
-  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
-  exit 0
-fi
-
 # 기준선(baseline) 계산: marker 우선 → relevant change 최신 mtime → 없으면 통과
-# GPT+Claude 합의 2026-04-10: marker 없을 때도 relevant change가 있으면 검사
+# 3단계 우선순위로 판정. Git 미반영 변경은 baseline 계산과 통합.
 BASELINE=0
+HAS_UNCOMMITTED="NO"
 
 if [ -f "$MARKER" ]; then
   BASELINE=$(file_mtime "$MARKER")
-elif git_has_relevant_changes; then
+fi
+
+# Git 미반영 변경이 있으면 (1) 커밋 전이면 차단 + (2) baseline 후보로도 사용
+if git_has_relevant_changes; then
+  HAS_UNCOMMITTED="YES"
   while IFS= read -r rpath; do
     [ -z "$rpath" ] && continue
     fpath="$PROJECT_ROOT/$rpath"
@@ -38,8 +35,18 @@ elif git_has_relevant_changes; then
   done <<RCEOF
 $(git_relevant_change_list)
 RCEOF
-else
-  # marker 없고 relevant change도 없으면 통과
+fi
+
+# baseline이 0이면 marker도 없고 relevant change도 없음 → 통과
+if [ "$BASELINE" -eq 0 ] 2>/dev/null; then
+  exit 0
+fi
+
+# Git 미반영 변경이 남아 있으면 차단 (baseline 계산 후 판단)
+if [ "$HAS_UNCOMMITTED" = "YES" ]; then
+  CHANGES=$(git_relevant_change_list | head -n 3 | paste -sd, -)
+  hook_incident "gate_reject" "completion_gate" "$CHANGES" "Git 미반영 변경이 남은 상태에서 완료 주장" '"classification_reason":"completion_before_git","next_action":"relevant change를 commit/push 또는 정리한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
   exit 0
 fi
 
