@@ -15,7 +15,7 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - [NEVER] 토론방에 전송하는 자연어는 한국어만 사용
 
 ## 지정 채팅방
-- 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c/`
+- 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/project`
 - [NEVER] 프로젝트방 외 새 대화 개설 금지
 - [NEVER] `.claude/state/debate_chat_url`에 URL이 있으면 다른 대화방 진입 금지 — 해당 URL 필수 사용
 - [SHOULD] debate_chat_url 없을 때만 첫 번째(최상단) 대화방에 진입

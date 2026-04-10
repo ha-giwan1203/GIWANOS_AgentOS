@@ -34,7 +34,7 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 ## 지정 채팅방
 
-- 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c/`
+- 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/project`
 - **새 대화 임의 개설 금지** — 기존 대화가 없으면 프로젝트 내에서만 개설
 
 ---
