@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — Claude Code 품질 기복 대응(PreCompact/SessionStart/state_rebind 훅 + CDP UTF-8 인코딩 수정)
+최종 업데이트: 2026-04-11 — allowlist 외부 파일 분리 + incident ledger 무회전 전환 (GPT 토론 합의)
 
 ---
 
@@ -24,10 +24,13 @@
   3. PreCompact — compact 발생 시 session_kernel.md 생성 확인
 - 문제 발생 시: hook_common.sh 로그(`$PROJECT_ROOT/.claude/state/hook_debug.log`) 확인
 
-### [필수] PROPER_NOUN_ALLOWLIST 구조 개선 검토
-- 이번 세션에서 허용 목록을 4회 확장 (079517bb → 16255133 → 9d9d194e)
-- 매번 새 기술 용어가 차단될 때마다 코드 수정+커밋이 필요한 구조는 비효율적
-- 검토 방향: 외부 파일(allowlist.txt)로 분리하거나, 정규식 패턴 기반 허용으로 전환
+### [완료] PROPER_NOUN_ALLOWLIST 구조 개선 + incident ledger 무회전 (2026-04-11)
+- GPT 토론 2라운드: 채택 2건 / 버림 1건 / 보류 1건
+- allowlist 외부 파일 분리: korean_allowlist.txt(177개) + 코어 목록 19개 코드 유지 + 가산 merge + 로드 실패 시 코어만 사용
+- incident ledger 무회전 전환: hook_incident()에서 _rotate_file 호출 제거 (감사 원본 보존)
+- 훅 로그 JSON 전환: 버림 (이미 JSON 출력이었음, 사전조사 오류)
+- 스키마 확장: 보류 (필요 발생 시 재개)
+- 커밋: 221a03c1
 
 ### [보류] HANDOFF 자동 아카이브 규칙 추가
 - GPT 토론 결과(2026-04-10): 채택 — 구조 결함이 아닌 운영 규칙 보강으로 합의
