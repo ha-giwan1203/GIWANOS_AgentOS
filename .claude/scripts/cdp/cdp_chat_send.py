@@ -29,46 +29,30 @@ ENGLISH_WORD_RE = re.compile(r"\b[A-Za-z][A-Za-z'-]{1,}\b")
 LAST_SNIPPET_LIMIT = 100
 
 # 고유명사/기술 용어 허용 목록 — --require-korean 체크에서 제외
-PROPER_NOUN_ALLOWLIST: set[str] = {
-    # AI 모델/서비스
-    "claude", "gpt", "api", "ai", "anthropic",
-    "opus", "sonnet", "haiku",
-    # Claude Code 기술 용어
-    "context", "compaction", "compact", "hooks", "hook",
-    "memory", "handoff", "tasks", "status",
-    "precompact", "sessionstart", "sessionend",
-    "userpromptsubmit", "pretooluse", "posttooluse",
-    "stdout", "stderr", "stdin",
-    "resume", "startup", "source",
-    "imports", "import", "loading",
-    "on-demand", "worktree", "worktrees",
-    "read", "write", "edit", "glob", "grep", "bash",
-    "github", "git",
-    # 파일명 패턴 (확장자 없는 것)
-    "claude.md", "tasks.md", "memory.md", "handoff.md", "status.md",
-    # 기타 기술/약어
-    "sha", "best", "effort", "lf", "crlf", "utf", "utf-", "cp",
-    "precompact", "sessionstart", "sessionend",
-    "cowork-rules", "data-and-files",
-    "tail", "head", "stamp", "kernel", "awk", "sed",
-    "mtime", "cooldown", "fallback", "stale",
-    # Git/개발 용어
-    "main", "master", "branch", "merge", "rebase", "stash",
-    "commit", "push", "pull", "fetch", "checkout", "cherry-pick",
-    "conflict", "diff", "patch", "remote", "origin",
-    # 프로그래밍 언어/런타임
-    "python", "node", "npm", "pip", "json", "yaml", "xml",
-    "print", "return", "function", "class", "import",
-    # OS/환경
-    "windows", "linux", "macos", "path", "file", "buffer",
-    "encoding", "decode", "encode",
-    # CDP/브라우저
-    "cdp", "playwright", "chrome", "chromium", "browser",
-    "page", "tab", "url", "html", "css", "dom",
-    # 프로젝트 공통
-    "pass", "fail", "skip", "error", "warning", "info",
-    "config", "settings", "local", "global",
+# 코어 목록: 외부 파일 로드 실패 시에도 유지되는 최소 허용 목록
+_CORE_ALLOWLIST: set[str] = {
+    "claude", "gpt", "git", "hook", "hooks", "cdp", "json", "bash",
+    "tasks", "handoff", "status", "api", "ai", "anthropic",
+    "commit", "push", "merge", "diff", "branch",
 }
+
+_ALLOWLIST_FILE = Path(__file__).with_name("korean_allowlist.txt")
+
+
+def _load_allowlist() -> set[str]:
+    """코어 목록 + 외부 파일(korean_allowlist.txt) 가산 merge."""
+    result = set(_CORE_ALLOWLIST)
+    try:
+        for line in _ALLOWLIST_FILE.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped and not stripped.startswith("#"):
+                result.add(stripped.lower())
+    except (FileNotFoundError, OSError):
+        pass  # 파일 없으면 코어만 사용
+    return result
+
+
+PROPER_NOUN_ALLOWLIST: set[str] = _load_allowlist()
 
 
 def load_text(args: argparse.Namespace) -> str:

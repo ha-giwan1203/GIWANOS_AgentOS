@@ -252,3 +252,10 @@
 {"ts":"2026-04-10T13:58:18Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
 {"ts":"2026-04-10T13:58:38Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
 {"ts":"2026-04-10T13:59:05Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:29:25Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:39:10Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:46:50Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:47:09Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:48:17Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:49:21Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T14:52:47Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
