@@ -50,6 +50,8 @@ PROPER_NOUN_ALLOWLIST: set[str] = {
     "sha", "best", "effort", "lf", "crlf", "utf", "cp",
     "precompact", "sessionstart", "sessionend",
     "cowork-rules", "data-and-files",
+    "tail", "head", "stamp", "kernel", "grep", "awk", "sed",
+    "mtime", "cooldown", "fallback", "stale",
 }
 
 
