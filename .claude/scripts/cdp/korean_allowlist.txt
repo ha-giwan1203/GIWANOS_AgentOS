@@ -202,3 +202,16 @@ wrapper
 helper
 core
 default
+
+# 브랜치명/서비스명 (토론 보고용)
+chatelet
+feistel
+slack
+notion
+fresh
+mcp
+stale
+skip
+idle
+kernel
+rebind

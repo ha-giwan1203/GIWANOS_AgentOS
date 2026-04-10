@@ -19,14 +19,16 @@
 5. **Slack/Notion 테스트** — Slack 스크립트 실행 정상(토큰 미설정), Notion MCP 검색 정상
 
 ### 다음 AI 액션
-- SLACK_BOT_TOKEN 설정 후 Slack 실발송 테스트
-- GPT 토론방 보고 (머지+검증 결과 SHA 포함)
-- 나머지 deny 훅 incident 연동 (evidence_gate/commit_gate/send_gate/stop_guard)
-- HANDOFF 자동 아카이브 규칙 반영 (보류 중)
+1. **[필수] CDP 전송 경로 통일** — Playwright CDP와 Chrome MCP가 다른 탭을 보는 문제. 토론모드 안정성 직결
+2. **[필수] 훅 간소화 검토** — 19개 훅 중 과잉 차단 식별 (incident_ledger 빈도 집계 기반)
+3. **[보류]** deny 훅 incident 연동 / HANDOFF 아카이브 / send_gate 범위 확장
 
 ### 커밋 이력
+- `c4d5076f` chore: 미커밋 allowlist + incident ledger 반영
 - `938bd1aa` merge: kind-chatelet → main
 - `a201b56f` merge: hopeful-feistel → main
+- `b65a576f` fix: send_gate.sh 경로 수정 + TASKS/HANDOFF 갱신
+- `09a5089a` fix: STATUS.md 브랜치 표기 main 수정
 
 ---
 

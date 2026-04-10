@@ -10,41 +10,47 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 워크트리 2건 머지 + send_gate 경로 수정 + 훅 3종 검증 완료
+최종 업데이트: 2026-04-11 — 세션 5 완료 (GPT 통과). 다음 세션 안건 정리
 
 ---
 
 ## 다음 세션 안건
 
-### [완료] 새 훅 3종 동작 검증 + 워크트리 머지 + send_gate 수정 (2026-04-11)
-- 워크트리 2건 main 머지: kind-chatelet (allowlist 외부파일 + incident 무회전), hopeful-feistel (Slack 활성화 + 스케줄러 폐기)
-- send_gate.sh L72 경로 수정: `$SCRIPT_DIR/../state` → `$PROJECT_ROOT/.claude/state` (워크트리 안전)
-- 훅 3종 수동 검증 결과:
-  1. PreCompact: session_kernel.md 저장 정상
-  2. SessionStart: TASKS/HANDOFF 상단 재주입 정상
-  3. state_rebind: kernel fresh → skip (정상), stale 시 TASKS/HANDOFF 직접 출력 경로 코드 확인 완료
-- bash -n 훅 6종 PASS, py_compile cdp 2종 PASS
-- Slack: 스크립트 실행 정상 (SLACK_BOT_TOKEN 미설정 — 토큰 설정 후 발송 가능)
-- Notion MCP: 검색/접근 정상 확인
+### [필수] CDP 전송 경로 통일
+- 현황: cdp_chat_send.py(Playwright CDP)와 Chrome MCP가 다른 탭을 보는 문제 반복 발생
+- 이번 세션에서 CDP로 전송 → Chrome MCP 탭에 미반영, 수동 재전송 필요했음
+- 방안: (1) Chrome MCP로 통일 (2) Playwright CDP로 통일 — 장단점 비교 후 결정
+- 우선순위: 높음 (토론모드 매 세션 장애 원인)
 
-### [완료] PROPER_NOUN_ALLOWLIST 구조 개선 + incident ledger 무회전 (2026-04-11)
-- GPT 토론 2라운드: 채택 2건 / 버림 1건 / 보류 1건
-- allowlist 외부 파일 분리: korean_allowlist.txt(177개) + 코어 목록 19개 코드 유지 + 가산 merge + 로드 실패 시 코어만 사용
-- incident ledger 무회전 전환: hook_incident()에서 _rotate_file 호출 제거 (감사 원본 보존)
-- 훅 로그 JSON 전환: 버림 (이미 JSON 출력이었음, 사전조사 오류)
-- 스키마 확장: 보류 (필요 발생 시 재개)
-- 커밋: 221a03c1
+### [필수] 훅 간소화 검토
+- 현황: 19개 훅 중 세션당 반복 차단 발생 (send_gate 만료, evidence_gate 반복 등)
+- 보호 장치가 생산성을 깎는 구간 식별 → 실효성 낮은 훅 비활성화 또는 통합
+- 방안: incident_ledger에서 훅별 차단 빈도 집계 → 과잉 차단 훅 식별
+
+### [보류] deny 훅 incident 연동 확대
+- evidence_gate/commit_gate/send_gate/stop_guard → incident_ledger 기록 연동
+- 재개 조건: 훅 간소화 검토 완료 후
 
 ### [보류] HANDOFF 자동 아카이브 규칙 추가
-- GPT 토론 결과(2026-04-10): 채택 — 구조 결함이 아닌 운영 규칙 보강으로 합의
-- 내용: HANDOFF.md 500줄 또는 50세션 초과 시 자동 아카이브 실행
-- 반영 위치: 업무관리 기준 문서(CLAUDE.md 또는 별도 운영 규칙)에 규칙 문장 추가
-- 재개 조건: 다음 HANDOFF 정리 시점 또는 규칙 문서 개편 시
+- HANDOFF.md 500줄 또는 50세션 초과 시 자동 아카이브 실행
+- 재개 조건: 다음 HANDOFF 정리 시점
 
-### [보류] `send_gate.sh` 범위 대확장 재검토
-- 최신 GPT 토론 결과에서 `보류 1건`으로 남긴 안건
-- 이유: `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로의 틈을 먼저 메웠고, 지금 단계에서 셸/파이썬 호출 전체로 훅 범위를 넓히면 과잉설계 위험이 크다고 판정
-- 재개 조건: helper 경로 밖에서 동일 문제가 재발하거나, 직접 자바스크립트 예비 경로 사용 지점이 다시 늘어날 때
+### [보류] send_gate.sh 범위 대확장 재검토
+- 재개 조건: helper 경로 밖에서 동일 문제 재발 시
+
+---
+
+## 최근 완료
+
+### [완료] 워크트리 머지 + send_gate 수정 + 훅 검증 (2026-04-11 세션 5)
+- kind-chatelet 머지 (938bd1aa): allowlist 외부파일 + incident 무회전
+- hopeful-feistel 머지 (a201b56f): Slack 활성화 + 스케줄러 폐기
+- send_gate.sh 경로 수정 (b65a576f), STATUS.md 브랜치 수정 (09a5089a)
+- 훅 3종 검증 정상, Slack 실발송 확인, Notion 동기화 정상
+- GPT 판정: 통과
+
+### [완료] PROPER_NOUN_ALLOWLIST 구조 개선 + incident ledger 무회전 (2026-04-11 세션 4)
+- korean_allowlist.txt(177개) + 코어 19개 + 가산 merge. 커밋: 221a03c1
 
 ### [완료] Claude Code 품질 기복 대응 — 상태 유지 체인 + CDP 인코딩 수정 (2026-04-10)
 - GPT 3라운드 토론 + Claude 독립 검증 병행
