@@ -47,9 +47,27 @@ PROPER_NOUN_ALLOWLIST: set[str] = {
     # 파일명 패턴 (확장자 없는 것)
     "claude.md", "tasks.md", "memory.md", "handoff.md", "status.md",
     # 기타 기술/약어
-    "sha", "best", "effort", "lf", "crlf", "utf", "cp",
+    "sha", "best", "effort", "lf", "crlf", "utf", "utf-", "cp",
     "precompact", "sessionstart", "sessionend",
     "cowork-rules", "data-and-files",
+    "tail", "head", "stamp", "kernel", "awk", "sed",
+    "mtime", "cooldown", "fallback", "stale",
+    # Git/개발 용어
+    "main", "master", "branch", "merge", "rebase", "stash",
+    "commit", "push", "pull", "fetch", "checkout", "cherry-pick",
+    "conflict", "diff", "patch", "remote", "origin",
+    # 프로그래밍 언어/런타임
+    "python", "node", "npm", "pip", "json", "yaml", "xml",
+    "print", "return", "function", "class", "import",
+    # OS/환경
+    "windows", "linux", "macos", "path", "file", "buffer",
+    "encoding", "decode", "encode",
+    # CDP/브라우저
+    "cdp", "playwright", "chrome", "chromium", "browser",
+    "page", "tab", "url", "html", "css", "dom",
+    # 프로젝트 공통
+    "pass", "fail", "skip", "error", "warning", "info",
+    "config", "settings", "local", "global",
 }
 
 
