@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 — 세션 4 (시스템 연결 점검 + Slack/Notion 활성화)
+최종 업데이트: 2026-04-11 — 세션 4 (시스템 연결 점검 + 스케줄러 제거 + 훅 일원화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -16,6 +16,13 @@
 2. **Slack 알림 활성화**: `notify_slack.sh` 27행 python3 호출 주석 해제 (토큰 .env 로드 확인)
 3. **Notion 동기화 단계 추가**: `/finish` 3.5단계에 TASKS/STATUS → `notion-update-page` MCP 연동 추가
 4. **미존재 스크립트 권한 정리**: `_gen_support_cost.py`, `rebuild_v5.py` 권한 제거
+5. **Windows 스케줄러 제거**: `업무리스트_WatchChanges` 예약 작업 삭제
+   - watch_changes.py 4/10 크래시 → Notion 5일 미갱신 발견
+   - 로그온 트리거만 있어 자동복구 불가 (구조적 SPOF)
+6. **아키텍처 일원화**: 백그라운드 프로세스 체인 폐기 → Claude hooks 시스템으로 통합
+   - Slack: Notification hook → slack_notify.py
+   - Notion: /finish 3.5단계 → MCP notion-update-page
+7. **Notion 페이지 수동 복구**: TASKS/STATUS 페이지 5일 지연분 MCP로 즉시 갱신
 
 ### 다음 AI 액션
 - Slack 알림 실제 발송 테스트 (Notification 이벤트 트리거 시)
@@ -23,6 +30,7 @@
 
 ### 커밋
 - f90d5d5d: fix: Slack 알림 활성화 + Notion 동기화 단계 추가 + 미존재 스크립트 권한 정리
+- 61bc04a9: docs: TASKS/HANDOFF 갱신 — 시스템 연결 점검 완료 기록
 
 ---
 
