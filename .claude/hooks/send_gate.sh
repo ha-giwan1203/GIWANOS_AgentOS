@@ -69,7 +69,7 @@ else
 fi
 
 # SEND GATE 파일 확인
-STATE_DIR="$SCRIPT_DIR/../state"
+STATE_DIR="$PROJECT_ROOT/.claude/state"
 mkdir -p "$STATE_DIR" 2>/dev/null
 GATE_FILE="$STATE_DIR/send_gate_passed"
 

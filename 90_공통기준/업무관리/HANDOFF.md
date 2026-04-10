@@ -4,29 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 00:10 KST — 세션 4 (allowlist 외부 파일 분리 + incident ledger 무회전)
+최종 업데이트: 2026-04-11 22:54 KST — 세션 5 (워크트리 머지 + send_gate 수정 + 훅 검증)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 4)
+## 0. 최신 세션 (2026-04-11 세션 5)
 
 ### 이번 세션 완료
-1. **미커밋 4파일 회귀 복원** — cdp_common.py UTF-8 수정/allowlist/settings.local.json이 워킹트리에서 롤백된 상태 → git checkout HEAD로 복원
-2. **GPT 토론 2라운드** — 에이전트 운영 체계 개선 3건 (채택 2/버림 1/보류 1)
-3. **allowlist 외부 파일 분리** — korean_allowlist.txt(177개) + 코어 19개 코드 유지 + 가산 merge (커밋 221a03c1)
-4. **incident ledger 무회전 전환** — hook_incident()에서 _rotate_file 제거 (감사 원본 보존)
-5. **TASKS.md 갱신** — PROPER_NOUN_ALLOWLIST 안건 [완료], 코어 개수 정정 (커밋 762fd3a7)
+1. **kind-chatelet 머지** — allowlist 외부파일 분리 + incident ledger 무회전 (충돌 2건 해결: cdp_chat_send.py, incident_ledger.jsonl)
+2. **hopeful-feistel 머지** — Slack 활성화 + 스케줄러 폐기 + STATUS 훅 일원화 (충돌 2건: TASKS/HANDOFF → main 유지)
+3. **send_gate.sh 경로 수정** — L72 `$SCRIPT_DIR/../state` → `$PROJECT_ROOT/.claude/state`
+4. **훅 3종 검증** — PreCompact(kernel 저장 OK), SessionStart(재주입 OK), state_rebind(fresh skip OK)
+5. **Slack/Notion 테스트** — Slack 스크립트 실행 정상(토큰 미설정), Notion MCP 검색 정상
 
 ### 다음 AI 액션
-- 훅 3종 동작 검증 (state_rebind_check/PreCompact 미검증)
+- SLACK_BOT_TOKEN 설정 후 Slack 실발송 테스트
+- GPT 토론방 보고 (머지+검증 결과 SHA 포함)
 - 나머지 deny 훅 incident 연동 (evidence_gate/commit_gate/send_gate/stop_guard)
 - HANDOFF 자동 아카이브 규칙 반영 (보류 중)
-- worktree → main 머지
 
 ### 커밋 이력
-- `221a03c1` feat: allowlist 외부 파일 분리 + incident ledger 무회전 전환
-- `762fd3a7` docs: TASKS.md allowlist/incident 완료 갱신 + 코어 개수 정정
+- `938bd1aa` merge: kind-chatelet → main
+- `a201b56f` merge: hopeful-feistel → main
 
 ---
 

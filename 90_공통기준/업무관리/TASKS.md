@@ -10,19 +10,22 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — allowlist 외부 파일 분리 + incident ledger 무회전 전환 (GPT 토론 합의)
+최종 업데이트: 2026-04-11 — 워크트리 2건 머지 + send_gate 경로 수정 + 훅 3종 검증 완료
 
 ---
 
 ## 다음 세션 안건
 
-### [필수] 새 훅 3종 동작 검증 (세션 재시작 후)
-- 이번 세션에서 PreCompact/SessionStart/state_rebind 훅을 settings.local.json에 등록했으나, 훅은 세션 시작 시 캐싱되므로 **이번 세션에서는 미동작**
-- 다음 세션 시작 직후 확인할 것:
-  1. SessionStart hook 출력 확인 — TASKS/HANDOFF 상단이 주입되는지
-  2. state_rebind_check.sh — Write/Edit 시 stale 판정 + 쿨다운 동작 확인
-  3. PreCompact — compact 발생 시 session_kernel.md 생성 확인
-- 문제 발생 시: hook_common.sh 로그(`$PROJECT_ROOT/.claude/state/hook_debug.log`) 확인
+### [완료] 새 훅 3종 동작 검증 + 워크트리 머지 + send_gate 수정 (2026-04-11)
+- 워크트리 2건 main 머지: kind-chatelet (allowlist 외부파일 + incident 무회전), hopeful-feistel (Slack 활성화 + 스케줄러 폐기)
+- send_gate.sh L72 경로 수정: `$SCRIPT_DIR/../state` → `$PROJECT_ROOT/.claude/state` (워크트리 안전)
+- 훅 3종 수동 검증 결과:
+  1. PreCompact: session_kernel.md 저장 정상
+  2. SessionStart: TASKS/HANDOFF 상단 재주입 정상
+  3. state_rebind: kernel fresh → skip (정상), stale 시 TASKS/HANDOFF 직접 출력 경로 코드 확인 완료
+- bash -n 훅 6종 PASS, py_compile cdp 2종 PASS
+- Slack: 스크립트 실행 정상 (SLACK_BOT_TOKEN 미설정 — 토큰 설정 후 발송 가능)
+- Notion MCP: 검색/접근 정상 확인
 
 ### [완료] PROPER_NOUN_ALLOWLIST 구조 개선 + incident ledger 무회전 (2026-04-11)
 - GPT 토론 2라운드: 채택 2건 / 버림 1건 / 보류 1건
