@@ -78,12 +78,11 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 ## 실행 절차
 
 ### Step 1. 탭 준비
-1. **항상** 프로젝트 URL 진입 → 프로젝트 채팅방 목록에서 **최상단(최신) 방** URL 추출
-   - 프로젝트 채팅방 선택자: `a[href*="프로젝트ID"][href*="/c/"]` (프로젝트 ID 포함 링크만)
-   - 일반 채팅 링크(`/c/` 단독)는 무시 — 반드시 프로젝트 slug 포함 URL만 대상
-2. 추출한 URL을 `.claude/state/debate_chat_url`에 **매번 덮어쓰기** (이전 값 무시)
-3. `tabs_context_mcp` → chatgpt.com 탭 중 위 URL과 일치하면 switch
-4. 탭에 없으면 → 해당 URL로 navigate
+1. **항상** `.claude/scripts/cdp/debate_room_detect.py --navigate` 실행
+   - 프로젝트 페이지에서 최상단 채팅방을 자동 탐지 → `debate_chat_url` 덮어쓰기 → 해당 방으로 이동
+   - 일반 채팅 링크(`/c/` 단독)는 무시 — 프로젝트 ID 포함 URL만 허용
+   - 이전 세션의 debate_chat_url 값을 재사용하지 않음 (매 세션 새로 탐지)
+2. 스크립트 실패 시 → 수동으로 프로젝트 URL 접속하여 최상단 방 진입
 5. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
 6. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
 
