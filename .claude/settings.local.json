@@ -48,7 +48,7 @@
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
       "Bash(python rebuild_v5.py)",
-      "Bash(python3 _gen_support_cost.py)"
+      "Bash(python3 05_생산실적/조립비정산/*/_gen_support_cost.py*)"
     ],
     "ask": [
       "Bash(python*:*)",
