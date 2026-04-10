@@ -40,6 +40,16 @@
   3. PreCompact — compact 발생 시 session_kernel.md 생성 확인
 - 문제 발생 시: hook_common.sh 로그(`$PROJECT_ROOT/.claude/state/hook_debug.log`) 확인
 
+### [필수] send_gate 워크트리 경로 불일치 수정
+- 훅이 메인 레포의 `.claude/state/send_gate_passed`를 참조하지만, 워크트리에서는 워크트리 경로에 파일을 생성
+- 이번 세션에서 양쪽 동시 갱신으로 우회했으나 근본 수정 필요
+- 수정 방향: `send_gate.sh`에서 `$PROJECT_ROOT` 기반 경로를 워크트리 인식하도록 변경
+
+### [필수] Slack/Notion 실동작 테스트
+- Slack: Notification hook 트리거 시 실제 메시지 발송 확인
+- Notion: `/finish` 실행 시 3.5단계 MCP notion-update-page 동작 확인
+- 이번 세션에서는 설정만 했고 실동작 검증은 미실시
+
 ### [필수] PROPER_NOUN_ALLOWLIST 구조 개선 검토
 - 이번 세션에서 허용 목록을 4회 확장 (079517bb → 16255133 → 9d9d194e)
 - 매번 새 기술 용어가 차단될 때마다 코드 수정+커밋이 필요한 구조는 비효율적
