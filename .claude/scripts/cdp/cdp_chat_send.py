@@ -25,6 +25,15 @@ PATH_RE = re.compile(r"(?:[A-Za-z]:\\[^\s]+|(?:\./|\../|/)[^\s]+)")
 FILENAME_RE = re.compile(r"\b[\w.-]+\.(?:py|sh|md|jsonl|json|txt|yml|yaml)\b")
 SELECTOR_RE = re.compile(r"(?:\[[^\]]*data-testid[^\]]*\]|#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+)")
 ERROR_QUOTE_RE = re.compile(r"(?im)^(?:오류 원문|에러 원문)\s*:\s*.+$")
+# 기술 전문 용어 허용 목록 (Git, 툴명, 약어, 상태값 등)
+TECH_TERMS_RE = re.compile(
+    r"\b(?:Git|GitHub|diff|diffs|commit|commits|merge|push|pull|rebase|branch|HEAD|"
+    r"BASELINE|MARKER|TASKS|HANDOFF|STATUS|RUNBOOK|PASS|FAIL|GATE|SEND|CDP|"
+    r"ZDM|MES|ERP|KST|UTC|JSON|YAML|SHA|PR|P0|P1|P2|API|CLI|UI|JS|"
+    r"Claude|GPT|ChatGPT|Anthropic|Python|Bash|PowerShell|Windows|"
+    r"marker|baseline|gate|hook|hooks|subagent)\b",
+    re.I,
+)
 ENGLISH_WORD_RE = re.compile(r"\b[A-Za-z][A-Za-z'-]{1,}\b")
 LAST_SNIPPET_LIMIT = 100
 
@@ -60,6 +69,7 @@ def strip_allowed_literals(text: str) -> str:
     cleaned = PATH_RE.sub(" ", cleaned)
     cleaned = FILENAME_RE.sub(" ", cleaned)
     cleaned = SELECTOR_RE.sub(" ", cleaned)
+    cleaned = TECH_TERMS_RE.sub(" ", cleaned)
     cleaned = cleaned.replace("data-testid", " ")
     return cleaned
 
