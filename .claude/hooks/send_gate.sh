@@ -105,10 +105,15 @@ if echo "$QUALITY_SOURCE" | grep -qE "$HARNESS_LABELS"; then
       echo '{"decision":"block","reason":"[독립 검증 게이트] 하네스 분석 결과(채택/보류/버림)가 포함된 반박문입니다. 독립 검증(.claude/state/independent_review.md)을 먼저 수행하세요. GPT 응답을 읽기 전에 관련 파일을 독립적으로 리뷰하고, 내 문제 목록을 만든 뒤 GPT 주장과 대조해야 합니다."}'
       exit 0
     fi
-    # 세션 기준 확인: .session_start 파일이 있으면 그보다 최신이어야 함, 없으면 1시간 이내
+    # 세션 기준 확인: evidence/<session_key>/.session_start 보다 최신이어야 함
+    # session_key()는 hook_common.sh에서 소싱됨
     REVIEW_MTIME=$(stat --format=%Y "$REVIEW_FILE" 2>/dev/null || stat -f %m "$REVIEW_FILE" 2>/dev/null || echo 0)
-    SESSION_START_FILE="$STATE_DIR/evidence/.session_start"
-    if [ -f "$SESSION_START_FILE" ]; then
+    SK=$(session_key 2>/dev/null || echo "")
+    SESSION_START_FILE=""
+    if [ -n "$SK" ]; then
+      SESSION_START_FILE="$STATE_DIR/evidence/$SK/.session_start"
+    fi
+    if [ -n "$SESSION_START_FILE" ] && [ -f "$SESSION_START_FILE" ]; then
       SESSION_MTIME=$(stat --format=%Y "$SESSION_START_FILE" 2>/dev/null || stat -f %m "$SESSION_START_FILE" 2>/dev/null || echo 0)
       if [[ "$REVIEW_MTIME" -lt "$SESSION_MTIME" ]]; then
         hook_log "PreToolUse/send_gate" "BLOCK: independent_review older than session (review=$REVIEW_MTIME session=$SESSION_MTIME)" 2>/dev/null
@@ -116,6 +121,7 @@ if echo "$QUALITY_SOURCE" | grep -qE "$HARNESS_LABELS"; then
         exit 0
       fi
     else
+      # .session_start 없으면 1시간 이내 보조 기준
       REVIEW_AGE=$((NOW_EPOCH - REVIEW_MTIME))
       if [[ "$REVIEW_AGE" -gt 3600 ]]; then
         hook_log "PreToolUse/send_gate" "BLOCK: independent_review stale (${REVIEW_AGE}s)" 2>/dev/null
