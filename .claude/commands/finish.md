@@ -32,6 +32,12 @@
 - HANDOFF.md 세션 변경사항 갱신
 - STATUS.md 재개 위치 갱신 (필요 시)
 
+### 3.5단계: Notion 동기화
+- TASKS.md 변경사항 → Notion "✅ TASKS — 작업 목록" 페이지 반영 (ID: `331fee67-0be8-818c-b2bc-cd8da0a40db8`)
+- STATUS.md 변경사항 → Notion "📊 STATUS — 전체 운영 현황" 페이지 반영 (ID: `331fee67-0be8-81f7-9f15-c3aaabfbd94a`)
+- MCP `notion-update-page` 도구 사용
+- 실패 시 예외 처리하되 다음 단계 진행 (Notion은 보조 채널)
+
 ### 4단계: 커밋+푸시
 - `git add` → `git commit` → `git push`
 - finish_state.json에 `committed_pushed: true` 기록
