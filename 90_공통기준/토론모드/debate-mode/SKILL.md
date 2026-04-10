@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v2.6
+version: v2.8
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -8,7 +8,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v2.6
+# 토론모드 (debate-mode) 스킬 v2.8
 
 > 기술 상세(JS 코드, 완료 감지, 오류 대응, 변경 이력)는 `REFERENCE.md` 참조.
 
@@ -98,10 +98,11 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
 ### Step 2. 메시지 전송
-- `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭 (상세: REFERENCE.md §1)
-- 전송 직전 `send-button` 또는 `#composer-submit-button` 재확인
+- 기본 전송 경로: `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate` (상세: REFERENCE.md §1)
+- Step 1.5에서 읽은 최신 답변 100자는 `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 같이 넘겨, 화면이 바뀌면 helper가 전송을 차단하게 한다
+- 직접 `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭은 helper를 쓸 수 없을 때만 예비 경로
+- 예비 경로에서는 전송 직전 `send-button` 또는 `#composer-submit-button` 재확인
 - 전송 본문 자연어는 한국어만 작성
-- 로컬 CDP 경로에서는 `cdp_chat_send.py --require-korean --mark-send-gate` 우선 사용
 - 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
 - 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)
 

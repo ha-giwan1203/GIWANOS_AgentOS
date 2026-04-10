@@ -11,6 +11,11 @@ export CLAUDE_PROJECT_DIR="$PROJECT_DIR"
 source "$HOOKS_DIR/hook_common.sh" 2>/dev/null || true
 FAIL=0
 WARN=0
+SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
+README_FILE="$HOOKS_DIR/README.md"
+STATUS_FILE="$PROJECT_DIR/90_공통기준/업무관리/STATUS.md"
+TASKS="$PROJECT_DIR/90_공통기준/업무관리/TASKS.md"
+HANDOFF="$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
 
 warn() {
   echo "  [WARN] $1"
@@ -20,6 +25,38 @@ warn() {
 fail() {
   echo "  [FAIL] $1"
   FAIL=$((FAIL+1))
+}
+
+registered_hook_names() {
+  local settings_file="${1:-$SETTINGS}"
+  if [ ! -f "$settings_file" ]; then
+    return 1
+  fi
+  grep -oE '"command"[[:space:]]*:[[:space:]]*"bash \.claude/hooks/[A-Za-z0-9_-]+\.sh"' "$settings_file" 2>/dev/null \
+    | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/' \
+    | sort -u
+}
+
+readme_active_hook_count() {
+  local readme_file="${1:-$README_FILE}"
+  if [ ! -f "$readme_file" ]; then
+    return 1
+  fi
+  awk '/^## 활성 Hook/{flag=1; next} /^## 보조 스크립트/{flag=0} flag' "$readme_file" 2>/dev/null \
+    | grep -c '^| .*`[A-Za-z0-9_-]\+\.sh` .*|'
+}
+
+status_hook_count() {
+  local status_file="${1:-$STATUS_FILE}"
+  local line
+  if [ ! -f "$status_file" ]; then
+    return 1
+  fi
+  line=$(grep -F '| hooks 체계 |' "$status_file" 2>/dev/null | head -1)
+  if [ -z "$line" ]; then
+    return 1
+  fi
+  printf '%s' "$line" | sed -n 's/.*| hooks 체계 |[^0-9]*\([0-9][0-9]*\)개 등록.*/\1/p'
 }
 
 echo "=== Final Check ($MODE) ==="
@@ -49,17 +86,40 @@ else
 fi
 echo ""
 
-# 3. 문서 간 hook 개수 정합성 확인
+# 3. 실등록 hook 개수 vs 문서 정합성 확인
 echo "--- 3. hook 개수 정합성 ---"
-README_COUNT=$(sed -n 's/.*활성 Hook (\([0-9]*\)개.*/\1/p' "$HOOKS_DIR/README.md" 2>/dev/null | head -1)
-README_COUNT=${README_COUNT:-0}
-STATUS_COUNT=$(sed -n 's/.*| hooks 체계 | \([0-9]*\)개 등록.*/\1/p' "$PROJECT_DIR/90_공통기준/업무관리/STATUS.md" 2>/dev/null | head -1)
-STATUS_COUNT=${STATUS_COUNT:-0}
-echo "  README: ${README_COUNT}개 / STATUS: ${STATUS_COUNT}개"
-if [ "$README_COUNT" -ne "$STATUS_COUNT" ] 2>/dev/null; then
-  warn "README($README_COUNT) ≠ STATUS($STATUS_COUNT) — hook 개수 불일치"
+REGISTERED_HOOKS=$(registered_hook_names)
+if [ -n "$REGISTERED_HOOKS" ]; then
+  SETTINGS_HOOKS=$(printf '%s\n' "$REGISTERED_HOOKS" | sed '/^$/d' | wc -l | tr -d ' ')
+  echo "  settings.local 실등록: ${SETTINGS_HOOKS}개"
 else
-  echo "  [OK] README-STATUS hook 개수 일치"
+  SETTINGS_HOOKS=""
+  warn "settings.local.json에서 활성 hook 목록을 읽지 못함"
+fi
+
+README_COUNT=$(readme_active_hook_count 2>/dev/null || true)
+STATUS_COUNT=$(status_hook_count 2>/dev/null || true)
+
+if [ -n "$README_COUNT" ]; then
+  echo "  README 문서화: ${README_COUNT}개"
+  if [ -n "$SETTINGS_HOOKS" ] && [ "$README_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
+    warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+  else
+    echo "  [OK] README hook 개수 일치"
+  fi
+else
+  warn "README 활성 hook 개수를 읽지 못함"
+fi
+
+if [ -n "$STATUS_COUNT" ]; then
+  echo "  STATUS 문서화: ${STATUS_COUNT}개"
+  if [ -n "$SETTINGS_HOOKS" ] && [ "$STATUS_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
+    warn "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+  else
+    echo "  [OK] STATUS hook 개수 일치"
+  fi
+else
+  warn "STATUS hooks 체계 행에서 개수를 읽지 못함"
 fi
 echo ""
 
@@ -72,29 +132,34 @@ else
 fi
 echo ""
 
-# 5. settings.local.json vs README hook 개수 대조
-echo "--- 5. settings.local hook 개수 대조 ---"
-SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
-if [ -f "$SETTINGS" ]; then
-  # helper 제외 (hook_common, smoke_test, final_check는 훅이 아닌 유틸)
-  SETTINGS_HOOKS=$(grep -o '[a-z_]*\.sh' "$SETTINGS" 2>/dev/null | sort -u | grep -v hook_common | grep -v smoke_test | grep -v final_check | wc -l)
-  echo "  settings.local: ${SETTINGS_HOOKS}개 / README: ${README_COUNT}개"
-  if [ "$SETTINGS_HOOKS" -ne "$README_COUNT" ] 2>/dev/null; then
-    warn "settings.local($SETTINGS_HOOKS) ≠ README($README_COUNT)"
+# 5. settings.local 등록 hook 실존 여부
+echo "--- 5. settings.local 등록 hook 실존 여부 ---"
+if [ -n "$REGISTERED_HOOKS" ]; then
+  MISSING_REGISTERED=""
+  while IFS= read -r hook_name; do
+    [ -z "$hook_name" ] && continue
+    if [ ! -f "$HOOKS_DIR/$hook_name" ]; then
+      MISSING_REGISTERED="${MISSING_REGISTERED}${hook_name}"$'\n'
+    fi
+  done <<EOF
+$REGISTERED_HOOKS
+EOF
+
+  if [ -n "$MISSING_REGISTERED" ]; then
+    fail "settings.local 등록 훅 파일 누락:"
+    printf '%s' "$MISSING_REGISTERED" | while IFS= read -r hook_name; do
+      [ -n "$hook_name" ] && echo "    - $hook_name"
+    done
   else
-    echo "  [OK] settings.local-README hook 개수 일치"
+    echo "  [OK] settings.local 등록 훅 실파일 모두 존재"
   fi
 else
-  warn "settings.local.json 파일 없음"
+  warn "settings.local 등록 훅 실존 여부 검사 건너뜀"
 fi
 echo ""
 
 # 6. 상태 문서 3종 날짜 동기화 확인 (staged 우선, 없으면 working tree)
 echo "--- 6. TASKS/HANDOFF/STATUS 날짜 동기화 ---"
-STATUS_FILE="$PROJECT_DIR/90_공통기준/업무관리/STATUS.md"
-TASKS="$PROJECT_DIR/90_공통기준/업무관리/TASKS.md"
-HANDOFF="$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
-
 # staged snapshot에서 날짜 추출 시도, 없으면 working tree fallback
 _get_date() {
   local rel_path="$1"

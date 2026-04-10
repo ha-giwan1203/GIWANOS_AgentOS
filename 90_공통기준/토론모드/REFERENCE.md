@@ -45,7 +45,26 @@ url;  // → navigate()에 전달
 
 ## 입력+전송 상세
 
-### 통합 JS (1회 호출)
+### 기본 전송 경로 (`cdp_chat_send.py`)
+
+쉘이나 로컬 CDP 경로에서는 아래 helper를 기본 전송 경로로 사용한다.
+
+```bash
+python '.claude/scripts/cdp/cdp_chat_send.py' \
+  --match-url '<chat_url>' \
+  --text-file '<utf8_text_file>' \
+  --require-korean \
+  --mark-send-gate \
+  --expect-last-snippet-file '<assistant_snippet_file>'
+```
+
+- `--require-korean`: 자연어 영어 포함 시 전송 차단
+- `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
+- `--expect-last-snippet` / `--expect-last-snippet-file`: 직전에 읽은 최신 답변 100자와 현재 화면의 최신 답변 100자를 다시 대조. 다르면 `blocked_reply_changed`로 전송 중단
+- submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
+- 토론모드 문서상 기본 전송 경로는 이것이며, 직접 DOM 조작은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
+
+### 예비 경로: 통합 JS (1회 호출)
 ```javascript
 const el = document.querySelector('#prompt-textarea');
 el.focus();
@@ -58,28 +77,13 @@ setTimeout(() => {
 
 빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
 
-### 로컬 CDP helper 우선 사용
-쉘에서 CDP를 직접 호출하는 경로에서는 임시 JS를 매번 만들기보다 아래 helper를 우선 사용한다.
-
-```bash
-python '.claude/scripts/cdp/cdp_chat_send.py' \
-  --match-url '<chat_url>' \
-  --text-file '<utf8_text_file>' \
-  --require-korean \
-  --mark-send-gate
-```
-
-- `--require-korean`: 자연어 영어 포함 시 전송 차단
-- `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
-- submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
-
 ### 토론방 언어 규칙
 - 토론방에 보내는 자연어 본문은 한국어만 사용한다.
 - 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`만 사용한다.
 - 예외: code block, selector/data-testid, 파일 경로, commit SHA, 에러 원문 최소 인용
 - 에러 원문 최소 인용은 `오류 원문:` 또는 `에러 원문:` 라벨 한 줄로만 허용한다.
 
-### fallback (execCommand 실패 시)
+### 예비 경로 2차 fallback (execCommand 실패 시)
 ```
 textContent 직접 삽입 + new InputEvent('input', {bubbles:true, composed:true}) dispatch
 ```
@@ -132,8 +136,9 @@ JSON.stringify({lastSnippet: lastText, isGenerating: !!stopBtn});
 2. GPT가 아직 생성 중(stop-button 존재)이면 → 대기
 3. 이전에 읽은 내용과 다르면 → 새 응답 전체 읽기 → 하네스 재계산 → 반박문 재작성 후 전송
 4. 같으면 → 변동 없음 → 예정대로 전송 진행
-5. gate 파일 갱신: `echo "$(date +%s)" > .claude/state/send_gate_passed`
-6. gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 차단
+5. 기본 경로에서는 Step 1~4에서 확인한 최신 답변 100자를 `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 helper에 함께 넘긴다
+6. helper는 현재 화면의 최신 답변 100자가 기대값과 같을 때만 gate 파일을 갱신하고 전송을 진행한다
+7. 직접 자바스크립트 예비 경로에서는 gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 차단
 
 ## GPT 대기 중 병행 작업
 

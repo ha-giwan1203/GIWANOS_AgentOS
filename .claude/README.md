@@ -35,3 +35,4 @@
 1. `.claude` 안에 새 공유 문서를 추가할 때는 `.gitignore` 예외 규칙도 같이 점검한다.
 2. 세션 URL, 토큰, 로컬 경로 캐시, 디버그 로그는 공유 문서에 남기지 않는다.
 3. 실행 규칙은 `rules/`, 명령 설명은 `commands/`, 구조 설명은 `README.md` 계열에 둔다.
+4. Windows에서 Bash가 필요하면 `.claude/scripts/run_git_bash.ps1 '<command>'`를 기본 경로로 사용한다. `bash`가 PATH에 없더라도 Git Bash 절대경로로 실행된다.

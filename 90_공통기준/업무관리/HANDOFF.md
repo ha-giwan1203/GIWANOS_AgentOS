@@ -4,12 +4,100 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-09 — `cdp_chat_send.py` 에러 원문 예외 정렬 반영
+최종 업데이트: 2026-04-10 — 최신 토론 결과와 후속 보류 안건 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-09)
+## 0. 최신 세션 (2026-04-10)
+
+### 다음 우선순위
+- `send_gate.sh` 범위 대확장 재검토
+- 이유: 오늘 토론에서 보류 판정. `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로를 먼저 닫았고, 셸/파이썬 호출 전체 훅 확장은 과잉설계 위험이 남아 있음
+- 재개 조건: helper 경로 밖 blind spot 재발 또는 직접 자바스크립트 예비 경로 사용 지점 증가
+
+### 작업: `cdp_chat_send.py` 경로 일원화 (완료)
+- GPT 토론 결과
+  - 채택: `cdp_chat_send.py`에 직전 최신 답변 기대값 확인 추가, 토론/명령 문서를 helper 기본 경로 기준으로 재정렬
+  - 보류: `send_gate.sh`를 셸/파이썬 호출 전체로 넓히는 대확장
+  - 버림: 코드 변화 없이 문구만 조금 고치는 수준
+- 코드 변경
+  - `.claude/scripts/cdp/cdp_chat_send.py`에 `--expect-last-snippet`, `--expect-last-snippet-file` 추가
+  - helper가 현재 화면의 최신 답변 100자가 기대값과 다르면 `blocked_reply_changed`로 전송을 중단하도록 보강
+  - `.claude/hooks/send_gate.sh` 상단 주석을 직접 자바스크립트 예비 경로 보호용으로 명시
+  - `.claude/hooks/smoke_test.sh`에 helper 기대값 확인 문서 정합성 검사 4건 추가
+- 문서 변경
+  - `90_공통기준/토론모드/ENTRY.md`
+  - `90_공통기준/토론모드/CLAUDE.md`
+  - `90_공통기준/토론모드/REFERENCE.md`
+  - `90_공통기준/토론모드/debate-mode/SKILL.md`
+  - `90_공통기준/토론모드/debate-mode/REFERENCE.md`
+  - `.claude/commands/share-result.md`
+  - `.claude/commands/finish.md`
+- 검증
+  - `python -m py_compile '.claude/scripts/cdp/cdp_chat_send.py'`
+  - `python '.claude/scripts/cdp/cdp_chat_send.py' --text-file <한국어 파일> --expect-last-snippet-file <파일> --require-korean --dry-run`
+  - 기대값 불일치 샘플로 `blocked_reply_changed` 차단 확인
+  - `git diff --check`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/smoke_test.sh'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --full'`
+
+### 작업: `send_gate.sh` 파싱 보강 (완료)
+- GPT 토론 결과
+  - 채택: `send_gate.sh`에서 `safe_json_get()`로 `tool_name`과 실제 입력 본문을 우선 읽도록 보강
+  - 보류: `cdp_chat_send.py` 경로 일원화는 다음 커밋으로 분리
+  - 버림: 없음
+- 코드 변경
+  - `.claude/hooks/send_gate.sh`가 `hook_common.sh`를 먼저 읽고 `tool_name`, `tool_input`, `code`, `text`를 우선 추출
+  - 직접 입력 호출 검사와 토론 품질 검사를 payload 전체보다 가능한 한 실제 `tool_input` 범위에서 수행하고, 추출 실패 시 기존 원문 전체 검사로 fallback
+  - `.claude/hooks/smoke_test.sh`에 send_gate의 `safe_json_get tool_name/tool_input` 사용 흔적 검사를 추가
+- 문서 변경
+  - `.claude/hooks/README.md`의 send_gate 설명을 `tool_input` 우선 파싱에 맞게 갱신
+- 검증
+  - `bash -n .claude/hooks/send_gate.sh`
+  - `final_check.sh --fast`, `final_check.sh --full`
+  - `smoke_test.sh`
+  - 샘플 입력 2건으로 `send_gate.sh` 차단/통과 분기 확인
+  - `git diff --check`
+
+### 작업: `final_check.sh` 실등록 기준 전환 (완료)
+- GPT 토론 결과
+  - 채택: `final_check.sh`를 문서 문자열 중심 검사에서 실등록 기준 검사로 전환
+  - 조건부 채택: `send_gate.sh` 입력 파싱 보강은 다음 우선순위로 보류
+  - 버림: 없음
+- 코드 변경
+  - `.claude/hooks/final_check.sh`에 `settings.local.json` 등록 hook 목록 추출 helper 추가
+  - hook 개수 정합성은 `settings.local.json` 실등록 수를 기준으로 `README.md`, `STATUS.md`와 각각 비교하도록 재배치
+  - `settings.local.json`에 등록된 hook 파일이 실제 `.claude/hooks/`에 모두 존재하는지 별도 FAIL 검사 추가
+- 문서 변경
+  - `.claude/hooks/README.md`에 final_check 기준축이 `settings.local.json`이라는 메모 추가
+- 검증
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --full'`
+  - `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/smoke_test.sh'`
+  - `git diff --check`
+
+### 작업: Windows Bash 실행 경로 고정 (완료)
+- 원인: 현재 PowerShell 세션 PATH에는 `C:\Program Files\Git\cmd`만 있고 `bash.exe`가 있는 `C:\Program Files\Git\bin`은 잡히지 않아, `bash ...` 직접 호출은 세션에 따라 실패할 수 있다.
+- 대응:
+  - 루트 `CLAUDE.md`에 Windows PowerShell에서는 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 `C:\Program Files\Git\bin\bash.exe -lc '<command>'`를 사용하라고 명시
+  - `.claude/README.md`에도 같은 기준 추가
+  - `.claude/scripts/run_git_bash.ps1` 신설: Git Bash 후보 경로를 탐색해 `-lc`로 실행
+- 검증: `& '.\\.claude\\scripts\\run_git_bash.ps1' './.claude/hooks/final_check.sh --fast'` 실행 → `ALL CLEAR`
+
+### 작업: 토론모드 기본 전송 경로 승격 (완료)
+- GPT 토론 합의: 다음 한 걸음은 `incident_repair.py` 추가 확장보다 `cdp_chat_send.py` 경로를 토론모드 기본 전송 경로로 굳히는 쪽이 즉시효과가 크고 과잉설계 위험이 낮다.
+- 반영 문서
+  - `90_공통기준/토론모드/ENTRY.md`
+  - `90_공통기준/토론모드/CLAUDE.md`
+  - `90_공통기준/토론모드/REFERENCE.md`
+  - `90_공통기준/토론모드/debate-mode/SKILL.md`
+  - `90_공통기준/토론모드/debate-mode/REFERENCE.md`
+- 변경 내용
+  - `cdp_chat_send.py --require-korean --mark-send-gate`를 문서상 기본 전송 경로로 승격
+  - 직접 `#prompt-textarea` + `execCommand('insertText')` + submit button 클릭은 helper를 쓸 수 없을 때만 예비 경로로 하향
+  - debate-mode/REFERENCE 변경 이력에 v2.7 추가
 
 ### 작업: `cdp_chat_send.py` 에러 원문 예외 정렬 (완료)
 - 토론방 문서가 허용하던 "에러 원문 최소 인용" 예외를 코드 가드에도 맞췄다.

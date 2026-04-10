@@ -72,6 +72,12 @@ check $? "send_gate.sh 존재 + 실행 가능"
 grep -q 'execCommand.*insertText\|insertText' "$HOOKS_DIR/send_gate.sh"
 check $? "execCommand/insertText 전송 감지 패턴 존재"
 
+grep -q 'json_value "\$INPUT" "tool_name"' "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate: tool_name 안전 추출 경유"
+
+grep -q 'json_value "\$INPUT" "tool_input"' "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate: tool_input 범위 추출 사용"
+
 echo ""
 
 # === 5. auto_compile.sh (PostToolUse/Write|Edit) ===
@@ -338,6 +344,9 @@ echo ""
 # === 22. 토론모드 selector 문서 정합성 ===
 echo "--- 22. 토론모드 selector 문서 정합성 ---"
 DEBATE_CLAUDE="$PROJECT_DIR/90_공통기준/토론모드/CLAUDE.md"
+DEBATE_REF="$PROJECT_DIR/90_공통기준/토론모드/REFERENCE.md"
+SHARE_RESULT="$PROJECT_DIR/.claude/commands/share-result.md"
+FINISH_CMD="$PROJECT_DIR/.claude/commands/finish.md"
 test -f "$DEBATE_CLAUDE"
 check $? "토론모드 CLAUDE.md 존재"
 
@@ -352,6 +361,22 @@ check $? "중지버튼 selector (stop-button) 문서화됨"
 
 grep -q 'data-message-author-role="assistant"' "$DEBATE_CLAUDE"
 check $? "응답노드 selector (assistant role) 문서화됨"
+
+echo ""
+
+# === 23. 토론모드 helper 경로 문서 정합성 ===
+echo "--- 23. 토론모드 helper 경로 문서 정합성 ---"
+grep -q 'expect-last-snippet' "$PROJECT_DIR/.claude/scripts/cdp/cdp_chat_send.py"
+check $? "cdp_chat_send.py 기대값 확인 옵션 존재"
+
+grep -q 'expect-last-snippet' "$DEBATE_REF"
+check $? "토론모드 REFERENCE.md가 helper 기대값 확인 옵션을 문서화함"
+
+grep -q 'cdp_chat_send.py' "$SHARE_RESULT"
+check $? "share-result 명령이 helper 기본 경로를 문서화함"
+
+grep -q 'cdp_chat_send.py' "$FINISH_CMD"
+check $? "finish 명령이 helper 기본 경로를 문서화함"
 
 echo ""
 
