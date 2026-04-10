@@ -5,7 +5,15 @@
 > 이 파일의 완료/대기 표시는 토론모드 내부 실행 이력만 뜻하며, 전역 우선순위·완료판정은 업무관리 문서를 따른다.
 
 ## 대기
-(없음)
+- [ ] P1: `cdp_chat_send.py` gate marking timing — `write_gate_file()` 전송 성공 후로 이동
+- [ ] P2: `finish.md`/`share-result.md` + `finish_state.json` 문서 정리
+- [ ] P3: `stop_guard.sh` sed → `safe_json_get` 파서 통일
+
+## 완료 (이번 세션)
+- [x] 독립 검증 게이트 구현 — `send_gate.sh`에 `independent_review.md` 검사 추가 + SKILL.md/CLAUDE.md 절차 반영 (2026-04-10, GPT 통과)
+- [x] P0 `evidence_mark_read.sh` — `tool_name` 필드 파싱으로 가짜 증거 적립 차단 (2026-04-10, GPT 채택)
+- [x] P0 `completion_gate.sh` v7 — 3단계 기준선 통합 + 조기 리턴 제거 (2026-04-10, GPT 통과)
+- [x] P0 `write_marker.sh` — STATUS.md 경유 marker 삭제 우회 차단 (2026-04-10, GPT 통과)
 
 ## 완료
 - [x] `debate_room_detect.py` 코드 강제 장치 추가 — 매 세션 프로젝트 최상단 방 자동 탐지 + 일반 `/c/` URL 거부 + SKILL.md Step 1 연동 (2026-04-10)

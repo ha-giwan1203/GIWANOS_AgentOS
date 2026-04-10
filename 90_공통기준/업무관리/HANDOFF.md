@@ -4,26 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-10 07:39 KST — 세션 2 마무리 (일일업무 + codex 분석 + 토론방 자동탐지 코드 강제)
+최종 업데이트: 2026-04-10 11:52 KST — 세션 3 (시스템 감사 P0 게이트 보강 + 독립 검증 게이트)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-10 세션 2)
+## 0. 최신 세션 (2026-04-10 세션 3)
 
 ### 이번 세션 완료
+1. **GPT 시스템 감사 대응**: GPT 11건 지적 → 독립 검증 후 P0 3건 선별 + 독립 검증 게이트 1건 구현
+2. **독립 검증 게이트**: `send_gate.sh`에 `independent_review.md` 필수 검사 추가 (GPT 3회 반복 후 통과, c91b1ad5)
+3. **P0 evidence_mark_read.sh**: `tool_name` 파싱으로 가짜 증거 적립 차단 (d94ad7ec)
+4. **P0 completion_gate.sh v7**: 3단계 기준선 통합 + 조기 리턴 제거 (GPT 통과, 5a22c315)
+5. **P0 write_marker.sh**: STATUS.md 경유 marker 삭제 우회 차단 (GPT 통과, 5a22c315)
+6. **핵심 교훈**: GPT는 감시자/제3자, 실제 운영 책임은 Claude — 메모리 + 코드 강제로 품질 보장
+
+### 다음 우선순위
+- P1: `cdp_chat_send.py` gate marking timing — 전송 성공 후로 이동
+- P2: `finish.md`/`share-result.md` + `finish_state.json` 문서 정리
+- P3: `stop_guard.sh` sed → `safe_json_get` 파서 통일
+- `send_gate.sh` 범위 대확장 재검토 (보류)
+- HANDOFF 자동 아카이브 규칙 추가 (보류)
+
+## 1. 이전 세션 (2026-04-10 세션 2)
+
+### 완료
 1. **일일업무**: ZDM 75/75 PASS + MES 15건/45,018ea PASS
 2. **codex 브랜치 분석**: `codex/debate-send-path-default` 26파일 분석, 미커밋 4건 수정, incident_ledger 정리, main 머지
 3. **토론모드 — 클로드 코드 문제점 분석**: 2턴 토론 + 근본 원인 해결
    - 토론방 오진입 근본 원인: stale URL 재사용 + 일반 `/c/` URL 오인
    - 해결: `debate_room_detect.py` 코드 강제 + SKILL.md v2.8 + 상태 문서 정합성
    - GPT 최종 판정: PASS (ee5cff4b + 0ec62fa7)
-
-### 다음 우선순위
-- `send_gate.sh` 범위 대확장 재검토
-  - 재개 조건: helper 경로 밖 blind spot 재발 시
-- HANDOFF 자동 아카이브 규칙 추가 (보류)
-  - 재개 조건: 다음 HANDOFF 정리 시점
 
 ### 작업: `cdp_chat_send.py` 경로 일원화 (완료)
 - GPT 토론 결과
