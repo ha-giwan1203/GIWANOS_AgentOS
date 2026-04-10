@@ -34,8 +34,10 @@
 - UserPromptSubmit stdout은 불안정 (이슈 #13912, #17550) → PreToolUse가 실질 강제선
 
 ### 다음 우선순위
-- `send_gate.sh` 범위 대확장 재검토 (보류)
-- HANDOFF 자동 아카이브 규칙 추가 (보류)
+1. **[필수] 새 훅 3종 동작 검증** — 세션 재시작 후 SessionStart/state_rebind/PreCompact 실제 동작 확인
+2. **[필수] PROPER_NOUN_ALLOWLIST 구조 개선** — 외부 파일 분리 또는 정규식 허용 검토 (4회 반복 확장 문제)
+3. `send_gate.sh` 범위 대확장 재검토 (보류)
+4. HANDOFF 자동 아카이브 규칙 추가 (보류)
 
 ## 1. 이전 세션 (2026-04-10 세션 2)
 

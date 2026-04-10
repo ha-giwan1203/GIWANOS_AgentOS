@@ -16,6 +16,19 @@
 
 ## 다음 세션 안건
 
+### [필수] 새 훅 3종 동작 검증 (세션 재시작 후)
+- 이번 세션에서 PreCompact/SessionStart/state_rebind 훅을 settings.local.json에 등록했으나, 훅은 세션 시작 시 캐싱되므로 **이번 세션에서는 미동작**
+- 다음 세션 시작 직후 확인할 것:
+  1. SessionStart hook 출력 확인 — TASKS/HANDOFF 상단이 주입되는지
+  2. state_rebind_check.sh — Write/Edit 시 stale 판정 + 쿨다운 동작 확인
+  3. PreCompact — compact 발생 시 session_kernel.md 생성 확인
+- 문제 발생 시: hook_common.sh 로그(`$PROJECT_ROOT/.claude/state/hook_debug.log`) 확인
+
+### [필수] PROPER_NOUN_ALLOWLIST 구조 개선 검토
+- 이번 세션에서 허용 목록을 4회 확장 (079517bb → 16255133 → 9d9d194e)
+- 매번 새 기술 용어가 차단될 때마다 코드 수정+커밋이 필요한 구조는 비효율적
+- 검토 방향: 외부 파일(allowlist.txt)로 분리하거나, 정규식 패턴 기반 허용으로 전환
+
 ### [보류] HANDOFF 자동 아카이브 규칙 추가
 - GPT 토론 결과(2026-04-10): 채택 — 구조 결함이 아닌 운영 규칙 보강으로 합의
 - 내용: HANDOFF.md 500줄 또는 50세션 초과 시 자동 아카이브 실행
