@@ -12,7 +12,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 현재 브랜치 | `claude/hopeful-feistel` |
+| 현재 브랜치 | `main` |
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
