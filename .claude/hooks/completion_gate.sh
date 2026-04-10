@@ -22,13 +22,26 @@ if git_has_relevant_changes; then
   exit 0
 fi
 
-# write_marker 없으면 TASKS/HANDOFF 갱신 gate는 통과
-if [ ! -f "$MARKER" ]; then
+# 기준선(baseline) 계산: marker 우선 → relevant change 최신 mtime → 없으면 통과
+# GPT+Claude 합의 2026-04-10: marker 없을 때도 relevant change가 있으면 검사
+BASELINE=0
+
+if [ -f "$MARKER" ]; then
+  BASELINE=$(file_mtime "$MARKER")
+elif git_has_relevant_changes; then
+  while IFS= read -r rpath; do
+    [ -z "$rpath" ] && continue
+    fpath="$PROJECT_ROOT/$rpath"
+    [ -f "$fpath" ] || continue
+    mt=$(file_mtime "$fpath")
+    [ "$mt" -gt "$BASELINE" ] 2>/dev/null && BASELINE="$mt"
+  done <<RCEOF
+$(git_relevant_change_list)
+RCEOF
+else
+  # marker 없고 relevant change도 없으면 통과
   exit 0
 fi
-
-# marker timestamp (epoch seconds)
-MARKER_EPOCH=$(file_mtime "$MARKER")
 
 MISSING=""
 for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF"; do
@@ -39,7 +52,7 @@ for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF"; do
     continue
   fi
   FILE_EPOCH=$(file_mtime "$FPATH")
-  if [ "$FILE_EPOCH" -lt "$MARKER_EPOCH" ] 2>/dev/null; then
+  if [ "$FILE_EPOCH" -lt "$BASELINE" ] 2>/dev/null; then
     MISSING="${MISSING}${MISSING:+,}$NAME"
   fi
 done

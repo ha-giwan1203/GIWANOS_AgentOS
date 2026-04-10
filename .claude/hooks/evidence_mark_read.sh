@@ -37,8 +37,25 @@ echo "$TEXT" | grep -qE 'date_check(\.sh)?' && mark "date_check"
 echo "$TEXT" | grep -qE 'auth_diag(\.sh)?' && mark "auth_diag"
 echo "$TEXT" | grep -qE 'identifier_ref_check(\.sh)?|기준정보 대조|identifier_ref' && mark "identifier_ref"
 
-# 문서 갱신 흔적
-echo "$TEXT" | grep -qE 'TASKS\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "tasks_updated"
-echo "$TEXT" | grep -qE 'HANDOFF\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "handoff_updated"
+# 문서 갱신 흔적 — tool_name이 Write/Edit/MultiEdit일 때만 갱신 판정
+# 이전: 전체 텍스트에서 "Write|Edit|file_path" 문자열 grep → Read/Grep도 오탐
+# GPT+Claude 합의 2026-04-10: tool_name 필드를 명시적으로 파싱
+TOOL_NAME=""
+if type safe_json_get >/dev/null 2>&1; then
+  TOOL_NAME=$(printf '%s' "$INPUT" | safe_json_get "tool_name" 2>/dev/null || true)
+fi
+if [ -z "$TOOL_NAME" ]; then
+  TOOL_NAME=$(echo "$TEXT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+fi
+
+IS_WRITE_TOOL="NO"
+case "$TOOL_NAME" in
+  Write|Edit|MultiEdit) IS_WRITE_TOOL="YES" ;;
+esac
+
+if [ "$IS_WRITE_TOOL" = "YES" ]; then
+  echo "$TEXT" | grep -qE 'TASKS\.md' && mark "tasks_updated"
+  echo "$TEXT" | grep -qE 'HANDOFF\.md' && mark "handoff_updated"
+fi
 
 exit 0
