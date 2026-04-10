@@ -13,8 +13,8 @@ mkdir -p "$STATE_DIR"
 # TASKS.md 상단 35줄 (현재 의제)
 TASKS_EXCERPT=$(head -35 "$PATH_TASKS" 2>/dev/null || echo "(TASKS.md 없음)")
 
-# HANDOFF.md 하단 50줄 (최신 상태)
-HANDOFF_EXCERPT=$(tail -50 "$PATH_HANDOFF" 2>/dev/null || echo "(HANDOFF.md 없음)")
+# HANDOFF.md 상단 50줄 (최신 세션이 상단에 위치)
+HANDOFF_EXCERPT=$(head -50 "$PATH_HANDOFF" 2>/dev/null || echo "(HANDOFF.md 없음)")
 
 cat > "$KERNEL_FILE" << KERNEL
 # Session Kernel (PreCompact 저장: $TIMESTAMP)

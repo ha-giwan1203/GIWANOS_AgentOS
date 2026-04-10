@@ -28,9 +28,15 @@ if [ "$AGE" -gt 86400 ]; then
     exit 0
 fi
 
-# stdout으로 컨텍스트 주입 시도 (버그 있으면 무시됨 — 비파괴적)
-echo "=== [session_start: $SOURCE] 이전 세션 상태 (session_kernel.md) ==="
-cat "$KERNEL_FILE"
+# stdout으로 컨텍스트 주입 시도 (best effort — UserPromptSubmit 버그와 유사하게 실패할 수 있음)
+# 실패해도 비파괴적. PreToolUse state_rebind_check.sh가 실제 강제선.
+echo "=== [session_start: $SOURCE] 이전 세션 상태 ==="
+# TASKS 섹션 (12줄)
+echo "--- TASKS 상단 ---"
+grep -A 12 "^##\? " "$PATH_TASKS" 2>/dev/null | head -12 || head -12 "$PATH_TASKS" 2>/dev/null
+# HANDOFF 최신 세션 (상단 20줄 — 최신이 상단)
+echo "--- HANDOFF 최신 세션 ---"
+head -20 "$PATH_HANDOFF" 2>/dev/null
 echo "=== session_kernel 끝 ==="
 
 hook_log "session_start_restore" "kernel 출력 완료 source=$SOURCE age=${AGE}s"
