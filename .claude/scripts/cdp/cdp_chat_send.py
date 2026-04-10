@@ -28,6 +28,15 @@ ERROR_QUOTE_RE = re.compile(r"(?im)^(?:오류 원문|에러 원문)\s*:\s*.+$")
 ENGLISH_WORD_RE = re.compile(r"\b[A-Za-z][A-Za-z'-]{1,}\b")
 LAST_SNIPPET_LIMIT = 100
 
+# 고유명사/기술 용어 허용 목록 — --require-korean 체크에서 제외
+PROPER_NOUN_ALLOWLIST: set[str] = {
+    "claude", "gpt", "api", "ai",
+    "opus", "sonnet", "haiku",
+    "context", "compaction", "hooks", "hook",
+    "memory", "handoff", "tasks", "status",
+    "claude.md", "tasks.md", "memory.md",
+}
+
 
 def load_text(args: argparse.Namespace) -> str:
     if args.text_file:
@@ -72,6 +81,8 @@ def find_forbidden_english(text: str) -> list[str]:
         token = match.group(0)
         lowered = token.lower()
         if lowered in seen:
+            continue
+        if lowered in PROPER_NOUN_ALLOWLIST:
             continue
         seen.add(lowered)
         tokens.append(token)
