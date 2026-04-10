@@ -4,17 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-10 — 최신 토론 결과와 후속 보류 안건 반영
+최종 업데이트: 2026-04-10 07:39 KST — 세션 2 마무리 (일일업무 + codex 분석 + 토론방 자동탐지 코드 강제)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-10)
+## 0. 최신 세션 (2026-04-10 세션 2)
+
+### 이번 세션 완료
+1. **일일업무**: ZDM 75/75 PASS + MES 15건/45,018ea PASS
+2. **codex 브랜치 분석**: `codex/debate-send-path-default` 26파일 분석, 미커밋 4건 수정, incident_ledger 정리, main 머지
+3. **토론모드 — 클로드 코드 문제점 분석**: 2턴 토론 + 근본 원인 해결
+   - 토론방 오진입 근본 원인: stale URL 재사용 + 일반 `/c/` URL 오인
+   - 해결: `debate_room_detect.py` 코드 강제 + SKILL.md v2.8 + 상태 문서 정합성
+   - GPT 최종 판정: PASS (ee5cff4b + 0ec62fa7)
 
 ### 다음 우선순위
 - `send_gate.sh` 범위 대확장 재검토
-- 이유: 오늘 토론에서 보류 판정. `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로를 먼저 닫았고, 셸/파이썬 호출 전체 훅 확장은 과잉설계 위험이 남아 있음
-- 재개 조건: helper 경로 밖 blind spot 재발 또는 직접 자바스크립트 예비 경로 사용 지점 증가
+  - 재개 조건: helper 경로 밖 blind spot 재발 시
+- HANDOFF 자동 아카이브 규칙 추가 (보류)
+  - 재개 조건: 다음 HANDOFF 정리 시점
 
 ### 작업: `cdp_chat_send.py` 경로 일원화 (완료)
 - GPT 토론 결과
