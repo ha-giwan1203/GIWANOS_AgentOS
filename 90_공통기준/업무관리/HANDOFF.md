@@ -4,12 +4,33 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-10 14:09 KST — 세션 3 마무리 (Claude Code 품질 기복 대응 + CDP 인코딩 수정)
+최종 업데이트: 2026-04-11 00:10 KST — 세션 4 (allowlist 외부 파일 분리 + incident ledger 무회전)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-10 세션 3)
+## 0. 최신 세션 (2026-04-11 세션 4)
+
+### 이번 세션 완료
+1. **미커밋 4파일 회귀 복원** — cdp_common.py UTF-8 수정/allowlist/settings.local.json이 워킹트리에서 롤백된 상태 → git checkout HEAD로 복원
+2. **GPT 토론 2라운드** — 에이전트 운영 체계 개선 3건 (채택 2/버림 1/보류 1)
+3. **allowlist 외부 파일 분리** — korean_allowlist.txt(177개) + 코어 19개 코드 유지 + 가산 merge (커밋 221a03c1)
+4. **incident ledger 무회전 전환** — hook_incident()에서 _rotate_file 제거 (감사 원본 보존)
+5. **TASKS.md 갱신** — PROPER_NOUN_ALLOWLIST 안건 [완료], 코어 개수 정정 (커밋 762fd3a7)
+
+### 다음 AI 액션
+- 훅 3종 동작 검증 (state_rebind_check/PreCompact 미검증)
+- 나머지 deny 훅 incident 연동 (evidence_gate/commit_gate/send_gate/stop_guard)
+- HANDOFF 자동 아카이브 규칙 반영 (보류 중)
+- worktree → main 머지
+
+### 커밋 이력
+- `221a03c1` feat: allowlist 외부 파일 분리 + incident ledger 무회전 전환
+- `762fd3a7` docs: TASKS.md allowlist/incident 완료 갱신 + 코어 개수 정정
+
+---
+
+## 1. 이전 세션 (2026-04-10 세션 3)
 
 ### 이번 세션 완료
 1. **Claude Code 품질 기복 근본 원인 분석 + GPT 3라운드 토론**
