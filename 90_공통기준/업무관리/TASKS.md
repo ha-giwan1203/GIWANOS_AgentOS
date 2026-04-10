@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-10 — 토론방 자동 탐지 코드 강제 완료, 일일업무(ZDM+MES) 완료
+최종 업데이트: 2026-04-10 — Claude Code 품질 기복 대응(PreCompact/SessionStart/state_rebind 훅 + CDP UTF-8 인코딩 수정)
 
 ---
 
@@ -26,6 +26,17 @@
 - 최신 GPT 토론 결과에서 `보류 1건`으로 남긴 안건
 - 이유: `cdp_chat_send.py` 기대값 확인 옵션으로 기본 경로의 틈을 먼저 메웠고, 지금 단계에서 셸/파이썬 호출 전체로 훅 범위를 넓히면 과잉설계 위험이 크다고 판정
 - 재개 조건: helper 경로 밖에서 동일 문제가 재발하거나, 직접 자바스크립트 예비 경로 사용 지점이 다시 늘어날 때
+
+### [완료] Claude Code 품질 기복 대응 — 상태 유지 체인 + CDP 인코딩 수정 (2026-04-10)
+- GPT 3라운드 토론 + Claude 독립 검증 병행
+- PreCompact hook: compact 직전 TASKS/HANDOFF → session_kernel.md 저장
+- SessionStart hook: 세션 시작 시 session_kernel 재주입 (best effort)
+- state_rebind_check.sh: Write/Edit 직전 stale 시 TASKS/HANDOFF 재바인딩 (1시간/30분 쿨다운)
+- HANDOFF tail→head 방향 오류 수정 (GPT 지적 → Claude 실물 검증 후 반영)
+- cdp_common.py UTF-8 stdout 강제 (cp949→utf-8 인코딩 체인 수정)
+- cdp_chat_send.py 고유명사 허용 목록 확장
+- ENTRY.md 독립 검토/통합 검토 생략 금지 규칙 추가
+- 커밋: 079517bb, 43d88dcc, 16255133, 7691ca96
 
 ### [완료] 토론방 자동 탐지 코드 강제 장치 (2026-04-10)
 - `debate_room_detect.py` 신규 추가 — 매 세션 프로젝트 최상단 방 자동 탐지 + 일반 `/c/` URL 거부

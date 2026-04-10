@@ -4,12 +4,40 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-10 07:39 KST — 세션 2 마무리 (일일업무 + codex 분석 + 토론방 자동탐지 코드 강제)
+최종 업데이트: 2026-04-10 — 세션 3 (Claude Code 품질 기복 대응 + CDP 인코딩 수정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-10 세션 2)
+## 0. 최신 세션 (2026-04-10 세션 3)
+
+### 이번 세션 완료
+1. **Claude Code 품질 기복 근본 원인 분석 + GPT 3라운드 토론**
+   - 원인 3계층: 컨텍스트 압축 ~45% / soft context 미바인딩 ~35% / 모델 비일관성 ~20%
+   - GPT와 3라운드 토론 (문제 분석 → UserPromptSubmit 버그 발견 → 구현 리뷰)
+2. **상태 유지 체인 구현** (PreCompact → SessionStart → PreToolUse)
+   - `precompact_save.sh`: compact 직전 TASKS 35줄 + HANDOFF 50줄 → session_kernel.md 저장
+   - `session_start_restore.sh`: 세션 시작 시 TASKS 12줄 + HANDOFF 20줄 재주입
+   - `state_rebind_check.sh`: Write/Edit 직전 stale 판정 (1시간) + 30분 쿨다운 stamp
+   - settings.local.json에 PreCompact/SessionStart/PreToolUse 이벤트 등록
+3. **GPT 리뷰 반영** (독립 검증 병행)
+   - HANDOFF tail→head 방향 오류 수정 (실물 확인 후 반영)
+   - REBIND_INTERVAL 2h→1h (git log 패턴 분석으로 검증: 7세션 평균 97분, 43% 1시간 초과)
+   - last_rebind_at stamp + TASKS/HANDOFF 섹션별 분리 출력
+4. **CDP 인코딩 수정**
+   - `cdp_common.py`: stdout/stderr UTF-8 강제 (Windows cp949 → Git Bash UTF-8 불일치 해소)
+   - `cdp_chat_send.py`: 고유명사 허용 목록 확장 (기술 용어 차단 방지)
+5. **ENTRY.md 독립 검토/통합 검토 생략 금지 규칙 추가**
+
+### 주의사항
+- **세션 재시작 필요**: settings/hook 변경은 세션 시작 시 캐싱됨. 새 훅은 다음 세션부터 활성화
+- UserPromptSubmit stdout은 불안정 (이슈 #13912, #17550) → PreToolUse가 실질 강제선
+
+### 다음 우선순위
+- `send_gate.sh` 범위 대확장 재검토 (보류)
+- HANDOFF 자동 아카이브 규칙 추가 (보류)
+
+## 1. 이전 세션 (2026-04-10 세션 2)
 
 ### 이번 세션 완료
 1. **일일업무**: ZDM 75/75 PASS + MES 15건/45,018ea PASS
