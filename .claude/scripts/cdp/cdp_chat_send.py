@@ -31,6 +31,8 @@ TECH_TERMS_RE = re.compile(
     r"BASELINE|MARKER|TASKS|HANDOFF|STATUS|RUNBOOK|PASS|FAIL|GATE|SEND|CDP|"
     r"ZDM|MES|ERP|KST|UTC|JSON|YAML|SHA|PR|P0|P1|P2|API|CLI|UI|JS|"
     r"Claude|GPT|ChatGPT|Anthropic|Python|Bash|PowerShell|Windows|Notion|Slack|"
+    r"Step|Steps|timeout|navigate|gitignore|insert|submit|clicked|sed|"
+    r"marking|timing|patch|parser|fallback|polling|payload|"
     r"marker|baseline|gate|hook|hooks|subagent)\b",
     re.I,
 )
