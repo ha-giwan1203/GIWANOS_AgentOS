@@ -31,6 +31,13 @@
 ### 커밋
 - f90d5d5d: fix: Slack 알림 활성화 + Notion 동기화 단계 추가 + 미존재 스크립트 권한 정리
 - 61bc04a9: docs: TASKS/HANDOFF 갱신 — 시스템 연결 점검 완료 기록
+- 66143ef5: docs: 스케줄러 제거 + 훅 일원화 아키텍처 결정 기록
+- 2d281b3a: fix: STATUS.md 아키텍처 전환 반영
+
+### GPT 검증
+- 1차 판정: FAIL — STATUS.md가 이전 Phase 1~6/스케줄러 운영 상태 유지
+- 수정: STATUS.md 브랜치/자동화체계/경로기준 전면 갱신 (2d281b3a)
+- 재판정: PASS — 상태 문서 3종 정합성 확인
 
 ---
 

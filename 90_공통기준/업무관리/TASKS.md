@@ -29,7 +29,8 @@
   - Slack: notify_slack.sh (Notification hook) → slack_notify.py
   - Notion: /finish 3.5단계 → MCP notion-update-page
 - **Notion 페이지 수동 복구**: TASKS/STATUS 페이지 MCP로 즉시 갱신 (5일 지연 해소)
-- 커밋: f90d5d5d, 61bc04a9
+- 커밋: f90d5d5d, 61bc04a9, 66143ef5, 2d281b3a
+- GPT 판정: 1차 FAIL (STATUS.md 미갱신) → 수정 후 재판정 PASS
 
 ### [필수] 새 훅 3종 동작 검증 (세션 재시작 후)
 - 이번 세션에서 PreCompact/SessionStart/state_rebind 훅을 settings.local.json에 등록했으나, 훅은 세션 시작 시 캐싱되므로 **이번 세션에서는 미동작**
