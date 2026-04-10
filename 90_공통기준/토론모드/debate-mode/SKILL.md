@@ -78,16 +78,17 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 ## 실행 절차
 
 ### Step 1. 탭 준비
-1. `.claude/state/debate_chat_url` 읽기 → URL이 있으면 이것을 우선 사용
-2. `tabs_context_mcp` → chatgpt.com 탭 중 위 chat_url과 일치하면 switch
-3. 탭에 없으면 → chat_url로 navigate (새 탭 불필요)
-4. chat_url 파일이 없거나 빈 경우에만 → 프로젝트 URL 진입 → main 영역 URL 추출 → navigate
-5. 대화방 진입 성공 시 → `.claude/state/debate_chat_url` 에 현재 대화 URL 저장
-6. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
-7. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
+1. **항상** 프로젝트 URL 진입 → 프로젝트 채팅방 목록에서 **최상단(최신) 방** URL 추출
+   - 프로젝트 채팅방 선택자: `a[href*="프로젝트ID"][href*="/c/"]` (프로젝트 ID 포함 링크만)
+   - 일반 채팅 링크(`/c/` 단독)는 무시 — 반드시 프로젝트 slug 포함 URL만 대상
+2. 추출한 URL을 `.claude/state/debate_chat_url`에 **매번 덮어쓰기** (이전 값 무시)
+3. `tabs_context_mcp` → chatgpt.com 탭 중 위 URL과 일치하면 switch
+4. 탭에 없으면 → 해당 URL로 navigate
+5. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+6. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
 
-> **URL 보존 정책**: debate_chat_url 파일은 세션 종료 후에도 삭제하지 않는다.
-> 삭제 조건: (a) 사용자가 "새 토론 시작" 명시 요청 (b) 해당 URL이 404 반환
+> **URL 갱신 정책**: debate_chat_url은 매 세션 시작 시 프로젝트에서 최상단 방으로 자동 갱신된다.
+> 이전 세션의 고정 URL에 의존하지 않는다.
 
 ### Step 1.8. Selector Smoke Test (필수)
 - REFERENCE.md의 Selector Smoke Test JS 실행 → 입력창/응답영역/composer action 존재 확인

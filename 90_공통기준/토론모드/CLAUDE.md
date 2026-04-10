@@ -17,8 +17,9 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 ## 지정 채팅방
 - 프로젝트 URL: `https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/project`
 - [NEVER] 프로젝트방 외 새 대화 개설 금지
-- [NEVER] `.claude/state/debate_chat_url`에 URL이 있으면 다른 대화방 진입 금지 — 해당 URL 필수 사용
-- [SHOULD] debate_chat_url 없을 때만 첫 번째(최상단) 대화방에 진입
+- [MUST] 매 세션 시작 시 프로젝트 URL에서 최상단(최신) 채팅방을 자동 탐지하여 `debate_chat_url` 갱신
+- [NEVER] 이전 세션의 debate_chat_url 값을 검증 없이 재사용 금지
+- [NEVER] 일반 채팅 URL(`/c/` 단독)을 프로젝트 채팅방으로 사용 금지 — 프로젝트 slug 포함 URL만 허용
 
 ## 실행 루프
 1. 기존 탭 확인 → 있으면 switch, 없으면 navigate
