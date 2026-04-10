@@ -48,7 +48,8 @@
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
       "Bash(python rebuild_v5.py)",
-      "Bash(python3 05_생산실적/조립비정산/*/_gen_support_cost.py*)"
+      "Bash(python3 05_생산실적/조립비정산/*/_gen_support_cost.py*)",
+      "Bash(start \"\" \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\Users\\\\User\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -62,6 +63,26 @@
     ]
   },
   "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/precompact_save.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session_start_restore.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -115,6 +136,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/protect_files.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/state_rebind_check.sh"
           }
         ]
       },

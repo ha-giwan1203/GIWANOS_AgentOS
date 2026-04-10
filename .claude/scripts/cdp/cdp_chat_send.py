@@ -30,11 +30,22 @@ LAST_SNIPPET_LIMIT = 100
 
 # 고유명사/기술 용어 허용 목록 — --require-korean 체크에서 제외
 PROPER_NOUN_ALLOWLIST: set[str] = {
-    "claude", "gpt", "api", "ai",
+    # AI 모델/서비스
+    "claude", "gpt", "api", "ai", "anthropic",
     "opus", "sonnet", "haiku",
-    "context", "compaction", "hooks", "hook",
+    # Claude Code 기술 용어
+    "context", "compaction", "compact", "hooks", "hook",
     "memory", "handoff", "tasks", "status",
-    "claude.md", "tasks.md", "memory.md",
+    "precompact", "sessionstart", "sessionend",
+    "userpromptsubmit", "pretooluse", "posttooluse",
+    "stdout", "stderr", "stdin",
+    "resume", "startup", "source",
+    "imports", "import", "loading",
+    "on-demand", "worktree", "worktrees",
+    "read", "write", "edit", "glob", "grep", "bash",
+    "github", "git",
+    # 파일명 패턴 (확장자 없는 것)
+    "claude.md", "tasks.md", "memory.md", "handoff.md", "status.md",
 }
 
 

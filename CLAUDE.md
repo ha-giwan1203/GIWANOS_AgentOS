@@ -1,5 +1,8 @@
 # 업무리스트 프로젝트
 
+@.claude/rules/cowork-rules.md
+@.claude/rules/data-and-files.md
+
 자동차 부품 제조업(삼송 G-ERP) 업무 자동화 저장소.
 
 ## 도메인 진입
