@@ -201,3 +201,54 @@
 {"ts": "2026-04-10T06:03:59Z", "type": "gate_reject", "hook": "date_scope_guard", "file": "", "detail": "MM/DD 형식 감지. YYYY-MM-DD 명시 또는 date_check 선행 후 재실행.", "resolved": true, "resolve_note": "resolved: session 2026-04-10 used YYYY-MM-DD throughout /daily run"}
 {"ts":"2026-04-10T06:26:33Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
 {"ts":"2026-04-10T06:26:51Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T06:44:12Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T06:44:14Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:16:17Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T07:16:32Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T07:21:17Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:24:04Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:24:21Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:24:41Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T07:26:56Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:27:18Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:28:06Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T07:35:17Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:35:21Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:35:28Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:35:31Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:39:33Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:39:44Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T07:40:12Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:41:59Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:44:34Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:46:04Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:47:16Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:48:12Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:48:28Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:56:49Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:57:01Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:57:14Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:57:26Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T12:57:36Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T12:57:48Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T13:07:36Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:15:20Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:15:26Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:15:32Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:15:46Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:16:04Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:16:24Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:17:02Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T13:17:13Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T13:18:20Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:24:33Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T13:34:18Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:34:53Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:35:07Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:35:54Z","type":"gate_reject","hook":"commit_gate","file":"","detail":"final_check --fast FAIL","resolved":false,"classification_reason":"pre_commit_check","next_action":"./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리"}
+{"ts":"2026-04-10T13:37:09Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:53:44Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:57:23Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:58:18Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:58:38Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}
+{"ts":"2026-04-10T13:59:05Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지.","resolved":false}

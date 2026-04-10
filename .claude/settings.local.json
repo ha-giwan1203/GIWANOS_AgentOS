@@ -49,7 +49,9 @@
       "Bash(python3 -c ':*)",
       "Bash(python rebuild_v5.py)",
       "Bash(python3 05_생산실적/조립비정산/*/_gen_support_cost.py*)",
-      "Bash(start \"\" \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\Users\\\\User\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)"
+      "Bash(start \"\" \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\Users\\\\User\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)",
+      "Read(//c/Users/User/Desktop/업무리스트/**)",
+      "Bash(python \".claude/scripts/cdp/debate_room_detect.py\" --navigate)"
     ],
     "ask": [
       "Bash(python*:*)",
