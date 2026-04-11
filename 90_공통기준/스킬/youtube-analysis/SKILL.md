@@ -208,33 +208,53 @@ Step 4 결과 중 A/B 등급만 GPT 대화방에 공유하고 토론.
 
 - 메시지에 `youtu.be/`, `youtube.com/watch` URL 포함
 - "유튜브 분석", "영상 요약", "이 영상 분석" + URL
+- `/video <URL>` 슬래시 커맨드
 
 ### 실행 절차
 
-#### Step 1 — 자막 추출
+#### Step 1 — 영상 다운로드 + 프레임 추출 + 자막 추출
 
 ```bash
-PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_transcript.py" "<URL>"
+PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py" "<URL>" --max-frames 15
 ```
 
-- 한국어 수동 → 한국어 자동 → 영어 순서로 시도
-- `--timestamps` 플래그: 타임스탬프 포함
-- 오류 코드: 2=자막비활성화, 3=자막없음, 4=잘못된URL, 5=기타
+파이프라인이 자동 수행하는 작업:
+1. 자막 추출 (youtube_transcript.py, 한국어 우선)
+2. 영상 다운로드 (yt-dlp, 480p)
+3. 프레임 추출 (ffmpeg, 챕터 기준 or 30초 간격)
+4. manifest.json 생성
 
-#### Step 2 — 분석 + 교차검증
+출력 위치: `90_공통기준/스킬/youtube-analysis/cache/<video_id>/`
 
-추출된 자막을 9개 관점(위 표 참조)으로 분석.
-핵심 주장은 공식 문서와 교차검증 후 A/B/C 판정.
+자막만 필요한 경우: `--no-download` 플래그 추가
+
+#### Step 2 — 프레임 + 자막 통합 분석
+
+1. `manifest.json` Read → 영상 메타 정보 확인
+2. `transcript.txt` Read → 전체 내용 파악
+3. `frames/` 폴더의 이미지를 **Read 도구로 직접 열어** 시각 정보 확인
+   - 코드 화면, UI 데모, 설정 화면, 터미널 출력 등
+   - 프레임별로 자막 타임스탬프와 교차 매핑
+4. 9개 관점으로 분석 + 공식 문서 교차검증 + A/B/C 판정
+
+> **프레임 분석이 핵심 차별점**: 자막만으로는 코드 내용, UI 구조, 설정 화면 등을 파악할 수 없음
 
 #### Step 3 — 출력
 
 ```
 ## 영상 정보
-- 제목: [자막/검색 기반 추론]
+- 제목: [manifest.json 기반]
+- 채널: [채널명]
+- 길이: [N분 N초]
+- 분석 프레임: [N장]
 - 자막 언어: [언어 정보]
 
 ## 요약
 [3~5줄 핵심]
+
+## 주요 화면 분석
+| # | 시점 | 화면 내용 | 자막 맥락 | 시사점 |
+|---|------|----------|----------|--------|
 
 ## 적용 판정
 | # | 주제 | 내용 | 등급 | 공식 문서 확인 | 되돌리기 | 근거 |
@@ -248,18 +268,20 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_transcript.
 
 ## 스크립트
 
-```
-90_공통기준/스킬/youtube-analysis/youtube_transcript.py
-```
+| 스크립트 | 용도 | 의존성 |
+|---------|------|--------|
+| `youtube_transcript.py` | 자막만 추출 | `youtube-transcript-api` |
+| `youtube_analyze.py` | **전체 파이프라인** (다운로드+프레임+자막) | `yt-dlp`, `ffmpeg`, `youtube-transcript-api` |
 
-- Python 3.x, `youtube-transcript-api` 필요
-- 설치: `pip install youtube-transcript-api`
+설치: `pip install youtube-transcript-api yt-dlp` + `winget install Gyan.FFmpeg`
 
 ## 오류 처리
 
 | 오류 | 대응 |
 |------|------|
 | 자막 비활성화/없음 | WebSearch로 영상 요약 블로그/리뷰 검색하여 대체 |
+| yt-dlp 다운로드 실패 | `--no-download` 모드로 자막만 분석 |
+| ffmpeg 미설치 | PATH 자동 탐지 실패 시 설치 안내 |
 | URL 오류 | 검색 결과에서 재추출 |
 | 검색 결과 부족 | 키워드 변형 재검색 (최대 2회) |
 | GPT 대화방 진입 실패 | 토론모드 CLAUDE.md 셀렉터 규칙 따름 |
