@@ -52,9 +52,15 @@ if echo "$TEXT" | grep -qiE '(완료|반영|갱신|커밋|푸시|HANDOFF|TASKS|S
   touch_req "tasks_handoff"
 fi
 
-# 고위험 수정: hook/gate/기준문서/구조변경/다중파일 수정 프롬프트
-if echo "$TEXT" | grep -qiE '(hook|gate|settings|규칙|구조.*변경|리팩터|마이그레이션|전수.*수정|일괄.*변경|파이프라인|스키마|컬럼|시트.*추가|시트.*삭제)'; then
+# 고위험 수정 (hard req): 자동화/운영 구조 변경만 차단 대상
+# GPT 합의 2026-04-11: 규칙/리팩터/파이프라인 제거, 스키마/컬럼/시트는 lightweight 분리
+if echo "$TEXT" | grep -qiE '(hook|gate|settings|마이그레이션|전수.*수정|일괄.*변경)'; then
   touch_req "map_scope"
+fi
+
+# 구조 변경 경고 (lightweight req): 차단 아닌 경고용. 스프레드시트/자동화 문맥에서만 참조
+if echo "$TEXT" | grep -qiE '(스키마|컬럼|시트.*추가|시트.*삭제)'; then
+  touch_req "map_scope_warn"
 fi
 
 hook_log "UserPromptSubmit" "risk_profile_prompt reqs=${REQS:-none}"

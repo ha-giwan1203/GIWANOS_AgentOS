@@ -10,37 +10,39 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 세션 5 완료 (GPT 통과). 다음 세션 안건 정리
+최종 업데이트: 2026-04-11 — 세션 6 (CDP 통일 + 훅 간소화 구현)
 
 ---
 
 ## 다음 세션 안건
 
-### [필수] CDP 전송 경로 통일
-- 현황: cdp_chat_send.py(Playwright CDP)와 Chrome MCP가 다른 탭을 보는 문제 반복 발생
-- 이번 세션에서 CDP로 전송 → Chrome MCP 탭에 미반영, 수동 재전송 필요했음
-- 방안: (1) Chrome MCP로 통일 (2) Playwright CDP로 통일 — 장단점 비교 후 결정
-- 우선순위: 높음 (토론모드 매 세션 장애 원인)
-
-### [필수] 훅 간소화 검토
-- 현황: 19개 훅 중 세션당 반복 차단 발생 (send_gate 만료, evidence_gate 반복 등)
-- 보호 장치가 생산성을 깎는 구간 식별 → 실효성 낮은 훅 비활성화 또는 통합
-- 방안: incident_ledger에서 훅별 차단 빈도 집계 → 과잉 차단 훅 식별
-
-### [보류] deny 훅 incident 연동 확대
-- evidence_gate/commit_gate/send_gate/stop_guard → incident_ledger 기록 연동
-- 재개 조건: 훅 간소화 검토 완료 후
+### [보류] 비활동 훅 재검토
+- hook_log + .req/.ok/.flag 생성 기반 재검토 (incident_ledger 단독 판정 금지)
+- 대상: auto_compile, write_marker, evidence_mark_read, gpt_followup_post/stop, risk_profile_prompt
+- 재개 조건: 세션 6 변경 안정화 확인 후
 
 ### [보류] HANDOFF 자동 아카이브 규칙 추가
 - HANDOFF.md 500줄 또는 50세션 초과 시 자동 아카이브 실행
 - 재개 조건: 다음 HANDOFF 정리 시점
 
-### [보류] send_gate.sh 범위 대확장 재검토
-- 재개 조건: helper 경로 밖에서 동일 문제 재발 시
+### [보류] is_completion_claim() 과감지 패턴 축소
+- 매치 구문 로깅 추가됨 (세션 6). 데이터 축적 후 과감지 패턴 식별하여 축소
+- 재개 조건: hook_log에 completion_claim 매치 데이터 10건 이상 축적 시
 
 ---
 
 ## 최근 완료
+
+### [완료] CDP 전송 통일 + 훅 간소화 (2026-04-11 세션 6)
+- GPT 3라운드 토론 → 합의안 5건 확정
+- cdp_common.py: --match-url-exact 정확매칭 + fail-closed + pages[0] 기본 선택 제거
+- send_gate.sh: CDP 단일화, 직접 JS 전송(예비 경로) deprecated 차단
+- risk_profile_prompt.sh: map_scope hard req 6개로 축소 (규칙/리팩터/파이프라인 제거), 스키마/컬럼/시트는 lightweight req 분리
+- commit_gate.sh: incident에 mode/승격여부/FAIL 상위 키워드 기록 추가
+- hook_common.sh: is_completion_claim() 매치 구문 로깅 추가
+- ENTRY.md/SKILL.md/CLAUDE.md: 예비 경로 deprecated 선언, --match-url-exact 반영
+- debate_room_detect.py: UTF-8 인코딩 수정
+- cdp_chat_send.py: 한국어 가드 차단 비활성화
 
 ### [완료] 워크트리 머지 + send_gate 수정 + 훅 검증 (2026-04-11 세션 5)
 - kind-chatelet 머지 (938bd1aa): allowlist 외부파일 + incident 무회전

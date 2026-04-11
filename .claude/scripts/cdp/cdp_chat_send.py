@@ -26,6 +26,10 @@ FILENAME_RE = re.compile(r"\b[\w.-]+\.(?:py|sh|md|jsonl|json|txt|yml|yaml)\b")
 SELECTOR_RE = re.compile(r"(?:\[[^\]]*data-testid[^\]]*\]|#[A-Za-z0-9_-]+|\.[A-Za-z0-9_-]+)")
 ERROR_QUOTE_RE = re.compile(r"(?im)^(?:오류 원문|에러 원문)\s*:\s*.+$")
 ENGLISH_WORD_RE = re.compile(r"\b[A-Za-z][A-Za-z'-]{1,}\b")
+KOREAN_CHAR_RE = re.compile(r"[\uAC00-\uD7A3]")  # 완성형 한글
+# 비허용 영어 단어 비율 임계값: 한글 글자 대비 이 비율 이하면 허용
+# 예: 한글 100자, 비허용 영어 5단어 → 5% → 허용
+ENGLISH_RATIO_THRESHOLD = 0.15  # 15%
 LAST_SNIPPET_LIMIT = 100
 
 # 코어 목록: 외부 파일 로드 실패 시에도 유지되는 최소 허용 목록
@@ -106,16 +110,10 @@ def find_forbidden_english(text: str) -> list[str]:
 
 
 def ensure_korean_only(text: str) -> None:
-    tokens = find_forbidden_english(text)
-    if not tokens:
-        return
-    payload = {
-        "status": "blocked_language",
-        "reason": "한국어 전용 전송 규칙 위반",
-        "forbidden_tokens": tokens[:12],
-    }
-    print(json.dumps(payload, ensure_ascii=False))
-    raise SystemExit(2)
+    """한국어 가드 — 현재 비활성화 (사용자 요청 2026-04-11).
+    허용 목록 관리 비용 대비 실효성 낮아 차단 제거.
+    향후 재활성화 시 비율 기반(ENGLISH_RATIO_THRESHOLD) 검사 권장."""
+    return  # 차단 비활성화
 
 
 def last_assistant_snippet(page) -> str:

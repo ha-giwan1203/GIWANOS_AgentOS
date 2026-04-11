@@ -125,12 +125,21 @@ is_volatile_runtime_path() {
 }
 
 # 사용자에게 완료/최종반영을 주장하는 표현만 좁게 감지
+# GPT 합의 2026-04-11: 매치 구문을 로그에 남겨 과감지 패턴 데이터 수집
+_COMPLETION_PATTERN='(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|ALL CLEAR|GPT 판정:[[:space:]]*PASS|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
+
 is_completion_claim() {
   local text="$1"
   if [ -z "$text" ]; then
     return 1
   fi
-  echo "$text" | grep -qiE '(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|ALL CLEAR|GPT 판정:[[:space:]]*PASS|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
+  local matched
+  matched=$(echo "$text" | grep -oiE "$_COMPLETION_PATTERN" | head -3 | tr '\n' '; ' | sed 's/; $//')
+  if [ -n "$matched" ]; then
+    hook_log "completion_claim" "matched_phrases=$matched" 2>/dev/null
+    return 0
+  fi
+  return 1
 }
 
 # Git 변경 중 런타임 산출물을 제외한 "실제 반영 대상"만 수집

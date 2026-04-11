@@ -24,11 +24,18 @@ def base_parser(description):
                     help="Tab index (0-based)")
     p.add_argument("--match-url", default=None,
                     help="URL 패턴으로 탭 선택 (부분 일치)")
+    p.add_argument("--match-url-exact", default=None,
+                    help="URL 정확 매칭으로 탭 선택 (trailing slash 정규화)")
     p.add_argument("--match-title", default=None,
                     help="Title 패턴으로 탭 선택 (부분 일치)")
     p.add_argument("--timeout", type=int, default=30000,
                     help="Timeout in ms (default: 30000)")
     return p
+
+
+def _normalize_url(url: str) -> str:
+    """URL 정규화: trailing slash 제거, 소문자화 없음 (경로 대소문자 유지)"""
+    return url.rstrip("/")
 
 
 def connect_and_pick(args):
@@ -53,9 +60,23 @@ def connect_and_pick(args):
         pw.stop()
         sys.exit(1)
 
-    # 탭 선택: --match-url > --match-title > --tab > 첫 번째
+    # 탭 선택: --match-url-exact > --match-url > --match-title > --tab
+    # pages[0] 기본 선택 제거 — 반드시 명시적 탭 지정 필요
     page = None
-    if args.match_url:
+    if args.match_url_exact:
+        target = _normalize_url(args.match_url_exact)
+        candidates = [p for p in pages if _normalize_url(p.url) == target]
+        if len(candidates) == 1:
+            page = candidates[0]
+        elif len(candidates) == 0:
+            print(f"[ERROR] URL 정확 매칭 실패: '{args.match_url_exact}' — 일치 탭 0개", file=sys.stderr)
+            pw.stop()
+            sys.exit(1)
+        else:
+            print(f"[ERROR] URL 정확 매칭 모호: '{args.match_url_exact}' — 일치 탭 {len(candidates)}개", file=sys.stderr)
+            pw.stop()
+            sys.exit(1)
+    elif args.match_url:
         for p in pages:
             if args.match_url in p.url:
                 page = p
@@ -80,7 +101,9 @@ def connect_and_pick(args):
             sys.exit(1)
         page = pages[args.tab]
     else:
-        page = pages[0]
+        print("[ERROR] 탭 지정 필수: --match-url-exact, --match-url, --match-title, --tab 중 하나를 사용하세요", file=sys.stderr)
+        pw.stop()
+        sys.exit(1)
 
     return pw, browser, page
 

@@ -8,11 +8,18 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
 import sys
 import time
 from pathlib import Path
+
+# Windows cp949 stdout → UTF-8 강제
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "buffer"):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 STATE_FILE = PROJECT_ROOT / ".claude" / "state" / "debate_chat_url"

@@ -36,8 +36,16 @@ EXIT_CODE=$?
 if [ "$EXIT_CODE" -ne 0 ]; then
   # FAIL 항목만 추출하여 간결한 메시지
   FAILS=$(echo "$RESULT" | grep -E '\[FAIL\]|\[WARN\]' | head -5)
-  hook_log "PreToolUse/Bash" "commit_gate BLOCK: final_check $MODE FAIL" 2>/dev/null
-  hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
+  # 승격 여부 판정
+  PROMOTED="false"
+  if [ "$MODE" = "--full" ]; then
+    PROMOTED="true"
+  fi
+  # FAIL/WARN 상위 키워드 추출 (최대 3개)
+  FAIL_KEYWORDS=$(echo "$RESULT" | grep -oE '\[FAIL\] [^|]+' | head -3 | tr '\n' '; ' | sed 's/; $//')
+  WARN_KEYWORDS=$(echo "$RESULT" | grep -oE '\[WARN\] [^|]+' | head -3 | tr '\n' '; ' | sed 's/; $//')
+  hook_log "PreToolUse/Bash" "commit_gate BLOCK: final_check $MODE FAIL | promoted=$PROMOTED | fails=$FAIL_KEYWORDS | warns=$WARN_KEYWORDS" 2>/dev/null
+  hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"mode\":\"$MODE\",\"promoted_to_full\":$PROMOTED,\"fail_keywords\":\"$FAIL_KEYWORDS\",\"warn_keywords\":\"$WARN_KEYWORDS\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
   echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] final_check $MODE 실패 — 자체검증 통과 후 커밋하세요.\\n$FAILS\"}"
   exit 0
 fi

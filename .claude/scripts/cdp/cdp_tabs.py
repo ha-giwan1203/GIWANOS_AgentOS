@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
-from cdp_common import base_parser, DEFAULT_BROWSER_URL
+from cdp_common import base_parser, DEFAULT_BROWSER_URL  # UTF-8 stdout 강제 포함
 from playwright.sync_api import sync_playwright
 
 def main():

@@ -4,31 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 22:54 KST — 세션 5 (워크트리 머지 + send_gate 수정 + 훅 검증)
+최종 업데이트: 2026-04-11 00:05 KST — 세션 6 (CDP 통일 + 훅 간소화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 5)
+## 0. 최신 세션 (2026-04-11 세션 6)
 
 ### 이번 세션 완료
-1. **kind-chatelet 머지** — allowlist 외부파일 분리 + incident ledger 무회전 (충돌 2건 해결: cdp_chat_send.py, incident_ledger.jsonl)
-2. **hopeful-feistel 머지** — Slack 활성화 + 스케줄러 폐기 + STATUS 훅 일원화 (충돌 2건: TASKS/HANDOFF → main 유지)
+1. **CDP 전송 통일** — GPT 3라운드 토론 합의. cdp_common.py에 --match-url-exact 정확매칭 + fail-closed 추가. pages[0] 기본 선택 제거
+2. **send_gate.sh CDP 단일화** — 직접 JS 전송(예비 경로) deprecated 차단으로 변경
+3. **risk_profile_prompt.sh req 축소** — map_scope hard req 6개(hook/gate/settings/마이그레이션/전수수정/일괄변경). 스키마/컬럼/시트는 map_scope_warn(lightweight) 분리
+4. **commit_gate.sh 상세화** — incident에 mode/승격여부/FAIL 상위 키워드 기록
+5. **is_completion_claim() 로깅** — 매치 구문을 hook_log에 기록하여 과감지 데이터 수집
+6. **문서 정비** — ENTRY.md/SKILL.md/CLAUDE.md에서 예비 경로 deprecated, --match-url-exact 반영
+7. **인코딩 수정** — debate_room_detect.py UTF-8 추가, cdp_chat_send.py 한국어 가드 비활성화
+
+### 다음 AI 액션
+1. **[보류] 비활동 훅 재검토** — hook_log + 생성파일 기반 (세션 6 안정화 후)
+2. **[보류] is_completion_claim 과감지 축소** — 로깅 데이터 10건 축적 후
+3. **[보류] HANDOFF 아카이브** — 다음 정리 시점
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 5)
+
+### 이번 세션 완료
+1. **kind-chatelet 머지** — allowlist 외부파일 분리 + incident ledger 무회전
+2. **hopeful-feistel 머지** — Slack 활성화 + 스케줄러 폐기 + STATUS 훅 일원화
 3. **send_gate.sh 경로 수정** — L72 `$SCRIPT_DIR/../state` → `$PROJECT_ROOT/.claude/state`
 4. **훅 3종 검증** — PreCompact(kernel 저장 OK), SessionStart(재주입 OK), state_rebind(fresh skip OK)
 5. **Slack/Notion 테스트** — Slack 스크립트 실행 정상(토큰 미설정), Notion MCP 검색 정상
-
-### 다음 AI 액션
-1. **[필수] CDP 전송 경로 통일** — Playwright CDP와 Chrome MCP가 다른 탭을 보는 문제. 토론모드 안정성 직결
-2. **[필수] 훅 간소화 검토** — 19개 훅 중 과잉 차단 식별 (incident_ledger 빈도 집계 기반)
-3. **[보류]** deny 훅 incident 연동 / HANDOFF 아카이브 / send_gate 범위 확장
-
-### 커밋 이력
-- `c4d5076f` chore: 미커밋 allowlist + incident ledger 반영
-- `938bd1aa` merge: kind-chatelet → main
-- `a201b56f` merge: hopeful-feistel → main
-- `b65a576f` fix: send_gate.sh 경로 수정 + TASKS/HANDOFF 갱신
-- `09a5089a` fix: STATUS.md 브랜치 표기 main 수정
 
 ---
 

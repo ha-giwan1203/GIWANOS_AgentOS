@@ -1,9 +1,9 @@
 #!/bin/bash
-# PreToolUse hook — SEND GATE: ChatGPT 직접 javascript_tool 예비 전송 전 미확인 응답 점검 강제
+# PreToolUse hook — SEND GATE: ChatGPT 직접 전송 예비 경로 차단
+# CDP 단일화(2026-04-11 GPT 합의): 기본 전송은 cdp_chat_send.py가 자체 검증.
+# 이 hook은 직접 JS 예비 경로(javascript_tool + execCommand)를 deprecated 차단한다.
 # 대상: mcp__Claude_in_Chrome__javascript_tool 호출 중 execCommand('insertText') 포함 시
-# 참고: cdp_chat_send.py 기본 경로는 최신 답변 기대값 비교 + mark-send-gate를 자체 처리하며, 이 hook은 직접 JS 예비 경로 보호용이다.
-# 조건: .claude/state/send_gate_passed 파일이 120초 이내에 갱신되어 있어야 통과
-# GPT 합의: 2026-04-06 — 문서 규칙만으로 부족, 실행 강제 gate 필요
+# 조건: 토론모드 활성 시 직접 JS 전송을 차단하고 CDP 기본 경로 사용을 강제
 
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -68,45 +68,9 @@ else
   exit 0
 fi
 
-# SEND GATE 파일 확인
-STATE_DIR="$PROJECT_ROOT/.claude/state"
-mkdir -p "$STATE_DIR" 2>/dev/null
-GATE_FILE="$STATE_DIR/send_gate_passed"
-
-if [ ! -f "$GATE_FILE" ]; then
-  echo '{"decision":"block","reason":"SEND GATE 미통과: 전송 전 미확인 응답 점검(assistant 최신 텍스트 재읽기)을 먼저 실행하세요. 점검 후 .claude/state/send_gate_passed 파일을 갱신해야 전송이 허용됩니다."}'
-  exit 0
-fi
-
-# 120초 이내 갱신 확인 (bash-only, python3 의존 제거)
-GATE_MTIME=$(stat --format=%Y "$GATE_FILE" 2>/dev/null || stat -f %m "$GATE_FILE" 2>/dev/null || echo 0)
-NOW_EPOCH=$(date +%s 2>/dev/null || echo 9999)
-GATE_AGE=$((NOW_EPOCH - GATE_MTIME))
-
-if [[ "$GATE_AGE" -gt 120 ]]; then
-  echo '{"decision":"block","reason":"SEND GATE 만료('"$GATE_AGE"'초 경과): 전송 전 미확인 응답 점검을 다시 실행하세요. 120초 이내 점검만 유효합니다."}'
-  exit 0
-fi
-
-# === 토론 품질 경량 검사 (debate_quality_gate-lite) ===
-# debate 도메인 활성 상태에서만 동작 — 반론/대안 0건 금지
-# GPT 합의 2026-04-07: send_gate 내부 경량 검사로 역할 오염 최소화
-OPINION_MARKERS='(반론|대안|다른 접근|내 판단|Claude 판단|환경상 비적합|내 독립 견해|내 우려)'
-if echo "$QUALITY_SOURCE" | grep -qE "$OPINION_MARKERS"; then
-  # 독립 견해 마커 존재 → 통과
-  :
-else
-  # 단순 보고/SHA 공유는 허용 (커밋/푸시/SHA/diff/PASS/검증 키워드)
-  if echo "$QUALITY_SOURCE" | grep -qE '(커밋|푸시|SHA|diff|PASS|FAIL|검증 결과|판정 요청|수정 완료)'; then
-    :  # 보고성 메시지 → 검사 건너뜀
-  else
-    hook_log "PreToolUse/send_gate" "BLOCK: debate_quality | 독립 견해 마커 0건" 2>/dev/null
-    hook_incident "hook_block" "send_gate" "" "토론 품질: 반론/대안/독립견해 0건" 2>/dev/null || true
-    echo '{"decision":"block","reason":"[토론 품질 게이트] 독립 견해(반론/대안/내 판단) 없이 GPT에 전송할 수 없습니다. 반론, 대안, 또는 독립 판단을 최소 1건 포함하세요."}'
-    exit 0
-  fi
-fi
-
-# 통과 — gate 파일 삭제 (1회성)
-rm -f "$GATE_FILE"
+# CDP 단일화: 토론모드에서 직접 JS 전송(예비 경로)은 deprecated → 차단
+# 기본 전송 경로인 cdp_chat_send.py(Bash 호출)는 자체 검증 처리
+hook_log "PreToolUse/send_gate" "BLOCK: deprecated_direct_js_send | 토론모드에서 직접 JS 전송 차단, cdp_chat_send.py 사용 필수" 2>/dev/null
+hook_incident "hook_block" "send_gate" "" "deprecated: 직접 JS 전송. CDP 기본 경로(cdp_chat_send.py) 사용 필수" 2>/dev/null || true
+echo '{"decision":"block","reason":"[CDP 단일화] 토론모드에서 직접 JS 전송(execCommand+insertText)은 deprecated되었습니다. cdp_chat_send.py를 사용하세요: python .claude/scripts/cdp/cdp_chat_send.py --match-url <url> --text-file <file> --require-korean --mark-send-gate"}'
 exit 0
