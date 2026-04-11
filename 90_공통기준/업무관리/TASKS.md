@@ -10,28 +10,31 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 세션 6 (CDP 통일 + 훅 간소화 구현)
+최종 업데이트: 2026-04-11 — 세션 7 (GPT 2라운드 합의 3건 구현)
 
 ---
 
 ## 다음 세션 안건
 
-### [보류] 비활동 훅 재검토
-- hook_log + .req/.ok/.flag 생성 기반 재검토 (incident_ledger 단독 판정 금지)
-- 대상: auto_compile, write_marker, evidence_mark_read, gpt_followup_post/stop, risk_profile_prompt
-- 재개 조건: 세션 6 변경 안정화 확인 후
-
-### [보류] HANDOFF 자동 아카이브 규칙 추가
-- HANDOFF.md 500줄 또는 50세션 초과 시 자동 아카이브 실행
-- 재개 조건: 다음 HANDOFF 정리 시점
+### [대기] PR #10 머지
+- 브랜치: `claude/competent-jones` → `main`
+- 커밋: a7db7916 + fe30c904 + 63cd309f (GPT 통과)
+- 내용: completion_claim.jsonl 로그 + handoff_archive.sh + incident_ledger
 
 ### [보류] is_completion_claim() 과감지 패턴 축소
-- 매치 구문 로깅 추가됨 (세션 6). 데이터 축적 후 과감지 패턴 식별하여 축소
-- 재개 조건: hook_log에 completion_claim 매치 데이터 10건 이상 축적 시
+- completion_claim.jsonl 별도 로그 도입 완료 (세션 7). 데이터 10건 축적 후 과감지 패턴 식별
+- 재개 조건: `.claude/logs/completion_claim.jsonl`에 10건 이상 축적 시
 
 ---
 
 ## 최근 완료
+
+### [완료] GPT 합의 3건 구현 (2026-04-11 세션 7)
+- GPT 2라운드 토론 → 합의안 3건 확정 + 구현
+- **비활동 훅 재검토**: 6개 전부 유지 판정 (auto_compile은 조건부 발화, 나머지 활성 확인)
+- **completion_claim.jsonl 별도 로그**: hook_common.sh(감지) + completion_gate.sh(판정) 이중 기록. 로테이션 영향 없는 영속 로그
+- **handoff_archive.sh 자동 아카이브**: PostToolUse(Write|Edit) 훅. HANDOFF 400줄 초과 시 최신 2세션 유지 + 나머지 아카이브. lock/cooldown 5분 재귀 방지
+- 아카이브 실행 결과: HANDOFF 402줄→41줄, `98_아카이브/handoff_archive_20260411_20260411.md` 생성
 
 ### [완료] CDP 전송 통일 + 훅 간소화 (2026-04-11 세션 6)
 - GPT 3라운드 토론 → 합의안 5건 확정

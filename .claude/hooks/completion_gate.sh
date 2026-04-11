@@ -18,6 +18,9 @@ fi
 if git_has_relevant_changes; then
   CHANGES=$(git_relevant_change_list | head -n 3 | paste -sd, -)
   hook_incident "gate_reject" "completion_gate" "$CHANGES" "Git 미반영 변경이 남은 상태에서 완료 주장" '"classification_reason":"completion_before_git","next_action":"relevant change를 commit/push 또는 정리한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  printf '{"ts":"%s","result":"block","reason":"completion_before_git","source":"gate"}\n' "$_CC_TS" \
+    >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
   echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
   exit 0
 fi
@@ -46,8 +49,15 @@ done
 
 if [ -n "$MISSING" ]; then
   hook_incident "gate_reject" "completion_gate" "$MISSING" "완료 주장 전 ${MISSING} 미갱신" '"classification_reason":"completion_before_state_sync","next_action":"TASKS/HANDOFF를 최신 작업 상태로 갱신한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  printf '{"ts":"%s","result":"block","reason":"completion_before_state_sync","missing":"%s","source":"gate"}\n' "$_CC_TS" "$MISSING" \
+    >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
   echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] 완료 보고 전 ${MISSING} 갱신이 필요합니다. 상태 문서를 먼저 갱신한 뒤 종료하세요.\"}"
 else
+  # 정상 통과 시에도 기록
+  _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  printf '{"ts":"%s","result":"pass","reason":"state_sync_ok","source":"gate"}\n' "$_CC_TS" \
+    >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
   rm -f "$MARKER" 2>/dev/null
 fi
 
