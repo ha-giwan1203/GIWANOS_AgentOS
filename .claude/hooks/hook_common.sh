@@ -138,6 +138,13 @@ is_completion_claim() {
   matched=$(echo "$text" | grep -oiE "$_COMPLETION_PATTERN" | head -3 | tr '\n' '; ' | sed 's/; $//')
   if [ -n "$matched" ]; then
     hook_log "completion_claim" "matched_phrases=$matched" 2>/dev/null
+    # GPT 합의 세션7: completion_claim 별도 로그 (로테이션 영향 없이 보존)
+    local _cc_ts
+    _cc_ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+    matched="${matched//\\/\\\\}"
+    matched="${matched//\"/\\\"}"
+    printf '{"ts":"%s","matched_phrases":"%s","source":"detect"}\n' "$_cc_ts" "$matched" \
+      >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
     return 0
   fi
   return 1
