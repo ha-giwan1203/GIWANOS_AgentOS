@@ -343,7 +343,9 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
         └── frames/
 ```
 
-> Drive 전용 폴더 최초 생성: 사용자가 Google Drive에서 `영상분석/raw/` 폴더를 수동 생성해야 함 (Drive MCP는 읽기 전용)
+> Drive 업로드: `python upload_to_drive.py <video_id>` (첫 실행 시 OAuth 인증 필요)
+> `--skip-mp4`: mp4 제외하고 프레임+자막+manifest만 업로드 (용량 절약)
+> 사전 준비: Google Cloud Console에서 OAuth 클라이언트 ID → `credentials.json` 저장
 
 ### 저장 절차 (Claude MCP 호출)
 
@@ -362,7 +364,7 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
    - page_id: 검색 결과의 page_id
    - command: "update_properties" + "replace_content"
 
-3. (선택) Drive 업로드: Drive MCP 쓰기 권한 확보 시 영상분석/raw/{video_id}/ 업로드
+3. Drive 업로드: python upload_to_drive.py {video_id} (자동 폴더 생성 + upsert)
 ```
 
 > `save_to_notion.py`는 데이터 구조/템플릿 정의 파일. MCP 호출은 Claude가 직접 수행.
@@ -375,8 +377,10 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 |---------|------|--------|
 | `youtube_transcript.py` | 자막만 추출 | `youtube-transcript-api` |
 | `youtube_analyze.py` | **전체 파이프라인** (다운로드+프레임+자막) | `yt-dlp`, `ffmpeg`, `youtube-transcript-api` |
+| `upload_to_drive.py` | **Drive 업로드** (캐시→Drive) | `google-api-python-client`, `google-auth-oauthlib` |
+| `save_to_notion.py` | **Notion 저장 헬퍼** (속성+본문 템플릿) | Claude MCP 호출용 |
 
-설치: `pip install youtube-transcript-api yt-dlp` + `winget install Gyan.FFmpeg`
+설치: `pip install youtube-transcript-api yt-dlp google-api-python-client google-auth-oauthlib` + `winget install Gyan.FFmpeg`
 
 ## 오류 처리
 
