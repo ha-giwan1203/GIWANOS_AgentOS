@@ -8,16 +8,18 @@
 
 ---
 
-## 1. 기본 전송 경로 (v2.8)
+## 1. 기본 전송 경로 (v2.9 — CDP 단일화)
 
 ```bash
 python '.claude/scripts/cdp/cdp_chat_send.py' \
-  --match-url '<chat_url>' \
+  --auto-debate-url \
   --text-file '<utf8_text_file>' \
-  --require-korean \
   --mark-send-gate \
   --expect-last-snippet-file '<assistant_snippet_file>'
 ```
+
+- `--auto-debate-url`: debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정
+- `--require-korean`: 비활성화됨 (2026-04-11). 옵션은 호환성 유지를 위해 남아있으나 실제 차단 없음
 
 - 자연어 영어 포함 시 전송 전 차단
 - assistant 최신 읽기 직후 send_gate 파일 갱신

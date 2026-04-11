@@ -16,6 +16,7 @@ from cdp_common import base_parser, connect_and_pick, cleanup  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_GATE_FILE = PROJECT_ROOT / ".claude" / "state" / "send_gate_passed"
+DEBATE_CHAT_URL_FILE = PROJECT_ROOT / ".claude" / "state" / "debate_chat_url"
 
 FENCED_CODE_RE = re.compile(r"```.*?```", re.S)
 INLINE_CODE_RE = re.compile(r"`[^`]+`")
@@ -197,13 +198,26 @@ def main() -> int:
     parser.add_argument("--text-file", default=None, help="전송할 UTF-8 텍스트 파일")
     parser.add_argument("--expect-last-snippet", default=None, help="직전에 읽은 assistant 최신 답변 일부 기대값")
     parser.add_argument("--expect-last-snippet-file", default=None, help="직전에 읽은 assistant 최신 답변 일부 UTF-8 파일")
-    parser.add_argument("--require-korean", action="store_true", help="자연어 영어 포함 시 전송 차단")
+    parser.add_argument("--require-korean", action="store_true", help="(비활성화됨) 한국어 가드")
+    parser.add_argument("--auto-debate-url", action="store_true",
+                        help="debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정")
     parser.add_argument("--allow-generating", action="store_true", help="기존 응답 생성 중이어도 계속 진행")
     parser.add_argument("--mark-send-gate", action="store_true", help="assistant 최신 읽기 직후 send_gate 파일 갱신")
     parser.add_argument("--gate-file", default=str(DEFAULT_GATE_FILE), help=f"send_gate 파일 경로 (default: {DEFAULT_GATE_FILE})")
     parser.add_argument("--submit-timeout-ms", type=int, default=3000, help="submit button 대기 시간 (default: 3000)")
     parser.add_argument("--dry-run", action="store_true", help="검사만 수행하고 실제 전송은 하지 않음")
     args = parser.parse_args()
+
+    # --auto-debate-url: debate_chat_url 상태 파일에서 URL 자동 설정
+    if args.auto_debate_url:
+        if not DEBATE_CHAT_URL_FILE.exists():
+            print(json.dumps({"status": "error", "reason": "debate_chat_url 파일 없음. debate_room_detect.py --navigate를 먼저 실행하세요."}, ensure_ascii=False))
+            return 1
+        url = DEBATE_CHAT_URL_FILE.read_text(encoding="utf-8").strip()
+        if not url:
+            print(json.dumps({"status": "error", "reason": "debate_chat_url 파일이 비어있음"}, ensure_ascii=False))
+            return 1
+        args.match_url_exact = url
 
     text = load_text(args)
     expected_last_snippet = load_expected_last_snippet(args)
