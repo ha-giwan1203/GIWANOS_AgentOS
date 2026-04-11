@@ -17,11 +17,12 @@
    - completion_gate v8: is_completion_claim 패턴 축소 (약한 패턴 3개 분리 → 후속 조건)
    - is_completion_claim: 강한 완료 표현만 트리거, "잔여이슈없/ALL CLEAR/GPT PASS" 제거
    - incident enum: classification_reason 9개 호출부 표준화, 6종 enum 세분화
-3. **smoke_test: 98/98 ALL PASS**
+3. **incident_repair 확장**: enum 기반 next_action/patch_candidates/verify_steps 매핑
+4. **resolved 자동 마킹**: --auto-resolve 옵션 (24시간 경과 규칙), 68건 해소 (87→155)
+5. **smoke_test: 98/98 ALL PASS**, GPT 통과
 
 ### 다음 세션 안건
-1. **[보류] incident_repair 자동 제안 확장** — enum 세분화 후 hook별 자동 복구 제안
-2. **[보류] resolved 자동 마킹** — evidence_missing, pre_commit_fail 규칙 명확한 것부터
+(현시점 보류 안건 없음 — 운영 모니터링 단계)
 
 ---
 

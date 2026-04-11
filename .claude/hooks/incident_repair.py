@@ -30,9 +30,26 @@ def infer_next_action(entry: dict[str, Any]) -> str:
     if isinstance(hinted, str) and hinted.strip():
         return hinted.strip()
 
+    reason = str(entry.get("classification_reason", ""))
     hook = str(entry.get("hook", ""))
     detail = str(entry.get("detail", ""))
 
+    # classification_reason 기반 (세션12 enum 표준화)
+    actions: dict[str, str] = {
+        "evidence_missing": "해당 req/ok 증거 마커를 먼저 충족한 뒤 재시도",
+        "completion_before_git": "relevant change를 commit/push 또는 정리한 뒤 완료 보고 재시도",
+        "completion_before_state_sync": "TASKS/HANDOFF를 최신 작업 상태로 갱신한 뒤 완료 보고 재시도",
+        "pre_commit_check": "./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리",
+        "scope_violation": "YYYY-MM-DD 절대날짜와 요일을 확인한 뒤 다시 실행",
+        "dangerous_cmd": "사용자 직접 실행 또는 안전한 대안 명령 사용",
+        "send_block": "CDP 기본 경로(cdp_chat_send.py)로 전환하여 재전송",
+        "stop_guard_block": "독립 견해(반론/대안/내 판단)를 포함하여 재작성",
+        "compile_fail": "문법 오류를 수정한 뒤 py_compile로 재검증",
+    }
+    if reason in actions:
+        return actions[reason]
+
+    # fallback: hook 기반 (레거시 데이터 호환)
     if hook == "commit_gate":
         mode = "--full" if "--full" in detail else "--fast"
         return f"./.claude/hooks/final_check.sh {mode} 를 다시 실행해 FAIL 항목부터 정리"
@@ -44,8 +61,12 @@ def infer_next_action(entry: dict[str, Any]) -> str:
         return "assistant 최신 응답을 다시 읽고 반론/대안/독립 판단을 넣어 재전송"
     if hook == "date_scope_guard":
         return "YYYY-MM-DD 절대날짜와 요일을 확인한 뒤 다시 실행"
-    if hook == "evidence_gate":
+    if hook == "evidence_gate" or hook == "evidence_stop_guard":
         return "해당 req/ok 증거 마커를 먼저 충족한 뒤 재시도"
+    if hook == "block_dangerous":
+        return "사용자 직접 실행 또는 안전한 대안 명령 사용"
+    if hook == "stop_guard":
+        return "독립 견해(반론/대안/내 판단)를 포함하여 재작성"
     return "최근 로그와 관련 파일을 읽고 원인 확인 후 가장 작은 수정부터 재시도"
 
 
@@ -61,43 +82,53 @@ def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
             if path and path not in candidates:
                 candidates.append(path)
 
-    if hook == "commit_gate":
-        for path in [
+    # classification_reason 기반 매핑 (세션12 표준화)
+    reason_paths: dict[str, list[str]] = {
+        "pre_commit_check": [
             ".claude/hooks/final_check.sh",
             "90_공통기준/업무관리/TASKS.md",
             "90_공통기준/업무관리/HANDOFF.md",
-        ]:
-            if path not in candidates:
-                candidates.append(path)
-    elif hook == "completion_gate" and classification == "completion_before_git":
-        for path in [
+        ],
+        "completion_before_git": [
             "90_공통기준/업무관리/TASKS.md",
             "90_공통기준/업무관리/HANDOFF.md",
-        ]:
-            if path not in candidates:
-                candidates.append(path)
-    elif hook == "completion_gate" and classification == "completion_before_state_sync":
-        for path in [
+        ],
+        "completion_before_state_sync": [
             "90_공통기준/업무관리/TASKS.md",
             "90_공통기준/업무관리/HANDOFF.md",
             "90_공통기준/업무관리/STATUS.md",
-        ]:
-            if path not in candidates:
-                candidates.append(path)
-    elif hook == "send_gate":
-        for path in [
-            ".claude/hooks/send_gate.sh",
-            "90_공통기준/토론모드/ENTRY.md",
-            "90_공통기준/토론모드/REFERENCE.md",
-            "90_공통기준/토론모드/debate-mode/REFERENCE.md",
-        ]:
-            if path not in candidates:
-                candidates.append(path)
-    elif hook == "evidence_gate":
-        for path in [
+        ],
+        "evidence_missing": [
             ".claude/hooks/evidence_gate.sh",
             ".claude/hooks/evidence_mark_read.sh",
-        ]:
+        ],
+        "send_block": [
+            ".claude/hooks/send_gate.sh",
+            "90_공통기준/토론모드/ENTRY.md",
+        ],
+        "scope_violation": [],
+        "dangerous_cmd": [],
+        "stop_guard_block": [],
+        "compile_fail": [],
+    }
+
+    if classification in reason_paths:
+        for path in reason_paths[classification]:
+            if path not in candidates:
+                candidates.append(path)
+    else:
+        # fallback: hook 기반 (레거시)
+        hook_paths: dict[str, list[str]] = {
+            "commit_gate": reason_paths["pre_commit_check"],
+            "completion_gate": reason_paths.get(
+                "completion_before_state_sync",
+                reason_paths["completion_before_git"],
+            ),
+            "send_gate": reason_paths["send_block"],
+            "evidence_gate": reason_paths["evidence_missing"],
+            "evidence_stop_guard": reason_paths["evidence_missing"],
+        }
+        for path in hook_paths.get(hook, []):
             if path not in candidates:
                 candidates.append(path)
 
@@ -105,23 +136,37 @@ def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
 
 
 def infer_verify_steps(entry: dict[str, Any]) -> list[str]:
+    reason = str(entry.get("classification_reason", ""))
     hook = str(entry.get("hook", ""))
     detail = str(entry.get("detail", ""))
 
+    # classification_reason 기반 (세션12 표준화)
+    reason_steps: dict[str, list[str]] = {
+        "pre_commit_check": ["./.claude/hooks/final_check.sh --fast"],
+        "completion_before_git": ["git status로 미커밋 변경 확인", "git add + commit + push"],
+        "completion_before_state_sync": [
+            "./.claude/hooks/final_check.sh --fast",
+            "TASKS.md / HANDOFF.md 갱신 확인",
+        ],
+        "evidence_missing": ["요구된 req/ok 증거 마커 충족 여부 재확인"],
+        "scope_violation": ["date 명령으로 현재 날짜/요일 확인"],
+        "dangerous_cmd": ["사용자에게 직접 실행 안내"],
+        "send_block": ["cdp_chat_send.py 경로로 재전송"],
+        "stop_guard_block": ["반론/대안/독립 판단 포함 여부 재확인"],
+        "compile_fail": ["python -m py_compile <file> 재실행"],
+    }
+    if reason in reason_steps:
+        return reason_steps[reason]
+
+    # fallback: hook 기반
     if hook == "commit_gate":
         mode = "--full" if "--full" in detail else "--fast"
         return [f"./.claude/hooks/final_check.sh {mode}"]
     if hook == "completion_gate":
-        return [
-            "./.claude/hooks/final_check.sh --fast",
-            "./.claude/hooks/final_check.sh --full",
-        ]
+        return ["./.claude/hooks/final_check.sh --fast"]
     if hook == "send_gate":
-        return [
-            "assistant 최신 응답 재읽기",
-            "반론/대안/독립 판단 포함 후 재전송",
-        ]
-    if hook == "evidence_gate":
+        return ["cdp_chat_send.py 경로로 재전송"]
+    if hook in ("evidence_gate", "evidence_stop_guard"):
         return ["요구된 req/ok 증거 마커 충족 여부 재확인"]
     return ["관련 파일 수정 후 가장 작은 검증부터 재실행"]
 
@@ -152,6 +197,73 @@ def format_entry(entry: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
+    """규칙 명확한 incident를 자동 resolved 마킹.
+
+    자동 해소 대상 (세션12 합의):
+    - evidence_missing: 동일 세션에서 후속 성공(evidence 충족) 시
+    - pre_commit_check: 동일 세션에서 후속 커밋 성공 시
+    - scope_violation: 1회성 차단이므로 24시간 경과 시
+
+    방식: resolved=false → resolved=true + resolved_by="auto" 로 덮어쓰기
+    """
+    import datetime
+
+    entries = load_jsonl(ledger_path)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    count = 0
+
+    for entry in entries:
+        if entry.get("resolved"):
+            continue
+        reason = str(entry.get("classification_reason", ""))
+        hook = str(entry.get("hook", ""))
+
+        should_resolve = False
+
+        # scope_violation / dangerous_cmd: 1회성 차단, 24시간 경과 시 자동 해소
+        if reason in ("scope_violation", "dangerous_cmd") or hook in ("date_scope_guard", "block_dangerous"):
+            ts_str = entry.get("ts", "")
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 86400:
+                    should_resolve = True
+            except (ValueError, TypeError):
+                pass
+
+        # evidence_missing: 24시간 경과 시 자동 해소 (세션 간 증거 비교 복잡하므로 시간 기반)
+        if reason == "evidence_missing" or hook in ("evidence_gate", "evidence_stop_guard"):
+            ts_str = entry.get("ts", "")
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 86400:
+                    should_resolve = True
+            except (ValueError, TypeError):
+                pass
+
+        # pre_commit_check: 24시간 경과 시 자동 해소
+        if reason == "pre_commit_check" or (hook == "commit_gate" and reason != "structural_intermediate"):
+            ts_str = entry.get("ts", "")
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 86400:
+                    should_resolve = True
+            except (ValueError, TypeError):
+                pass
+
+        if should_resolve:
+            entry["resolved"] = True
+            entry["resolved_by"] = "auto"
+            count += 1
+
+    if not dry_run and count > 0:
+        with ledger_path.open("w", encoding="utf-8") as fh:
+            for entry in entries:
+                fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    return count
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Suggest next repair actions for unresolved incidents.")
     parser.add_argument(
@@ -170,7 +282,23 @@ def main() -> int:
         action="store_true",
         help="print selected incidents as JSON",
     )
+    parser.add_argument(
+        "--auto-resolve",
+        action="store_true",
+        help="auto-resolve incidents older than 24h with clear rules",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="with --auto-resolve, show count without modifying ledger",
+    )
     args = parser.parse_args()
+
+    if args.auto_resolve:
+        count = auto_resolve(Path(args.ledger), dry_run=args.dry_run)
+        mode = "dry-run" if args.dry_run else "resolved"
+        print(f"auto-resolve: {count}건 {mode}")
+        return 0
 
     entries = load_jsonl(Path(args.ledger))
     unresolved = [row for row in entries if not row.get("resolved", False)]

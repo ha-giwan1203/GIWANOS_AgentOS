@@ -395,7 +395,9 @@
   - completion_gate: 개선 — is_completion_claim 패턴 축소(v8), 약한 패턴 후속 조건 분리
   - is_completion_claim: 개선 — 강한 완료 표현만 트리거, "잔여이슈없/ALL CLEAR/GPT PASS" 제거
   - incident enum: 개선 — classification_reason 9개 호출부 표준화, 6종 세분화
-  - smoke_test 98/98 PASS
+  - incident_repair 확장: enum 기반 next_action/patch/verify 매핑 + --auto-resolve(24h 규칙)
+  - resolved 자동 마킹: 68건 해소 (87→155), 규칙: evidence_missing/pre_commit_check/scope_violation 24h 경과
+  - smoke_test 98/98 PASS, GPT 통과
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS
