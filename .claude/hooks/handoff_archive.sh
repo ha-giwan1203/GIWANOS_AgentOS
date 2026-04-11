@@ -8,9 +8,10 @@ ARCHIVE_DIR="$PROJECT_ROOT/98_아카이브"
 LOCK_FILE="$PROJECT_ROOT/.claude/state/handoff_archive.lock"
 COOLDOWN=300  # 5분
 
-# tool_input에서 HANDOFF 경로 확인 — HANDOFF 변경이 아니면 즉시 종료
-INPUT="${TOOL_INPUT:-}"
-if ! echo "$INPUT" | grep -qi "HANDOFF"; then
+# stdin JSON에서 file_path 추출 — HANDOFF 변경이 아니면 즉시 종료
+INPUT=$(cat)
+FILE_PATH=$(echo "$INPUT" | safe_json_get "file_path" 2>/dev/null || echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+if ! echo "$FILE_PATH" | grep -qi "HANDOFF"; then
   exit 0
 fi
 
