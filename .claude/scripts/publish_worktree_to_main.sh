@@ -98,19 +98,40 @@ if $DRY_RUN; then
   exit 0
 fi
 
+# --- 메인 저장소 경로 확인 ---
+# 워크트리에서는 git checkout main이 불가(다른 워크트리가 main 사용 중)
+# 따라서 메인 저장소 경로에서 -C 옵션으로 cherry-pick 수행
+MAIN_REPO=$(git rev-parse --git-common-dir 2>/dev/null | sed 's|/.git$||; s|/.git/worktrees/.*||')
+if [ -z "$MAIN_REPO" ] || [ ! -d "$MAIN_REPO" ]; then
+  # fallback: PROJECT_ROOT의 부모에서 .git 찾기
+  MAIN_REPO=$(cd "$PROJECT_ROOT" && git worktree list 2>/dev/null | head -1 | awk '{print $1}')
+fi
+
+if [ -z "$MAIN_REPO" ] || [ ! -d "$MAIN_REPO" ]; then
+  echo "오류: 메인 저장소 경로를 찾을 수 없습니다."
+  exit 1
+fi
+
+echo "메인 저장소: $MAIN_REPO"
+
+# main 브랜치가 메인 저장소에서 체크아웃 중인지 확인
+MAIN_BRANCH=$(git -C "$MAIN_REPO" rev-parse --abbrev-ref HEAD 2>/dev/null)
+if [ "$MAIN_BRANCH" != "main" ]; then
+  echo "오류: 메인 저장소가 main 브랜치가 아닙니다 ($MAIN_BRANCH)"
+  exit 1
+fi
+
 # --- 반영 실행 ---
 
 case "$MODE" in
   ff-only)
     echo "=== fast-forward 반영 시작 ==="
-    git checkout main 2>/dev/null
-    if git merge --ff-only "$CURRENT_BRANCH" 2>/dev/null; then
-      NEW_SHA=$(git rev-parse --short HEAD)
+    if git -C "$MAIN_REPO" merge --ff-only "$CURRENT_BRANCH" 2>/dev/null; then
+      NEW_SHA=$(git -C "$MAIN_REPO" rev-parse --short HEAD)
       echo "fast-forward 완료: main → $NEW_SHA"
     else
       echo "오류: fast-forward 불가. main이 분기되었습니다."
       echo "cherry-pick 모드(--cherry-pick)를 사용하세요."
-      git checkout "$CURRENT_BRANCH" 2>/dev/null
       exit 1
     fi
     ;;
@@ -120,21 +141,19 @@ case "$MODE" in
     # unique patch만 추출
     PICK_SHAS=$(git cherry -v main HEAD 2>/dev/null | grep '^+' | awk '{print $2}')
 
-    git checkout main 2>/dev/null
-
     PICK_COUNT=0
     for sha in $PICK_SHAS; do
-      if git cherry-pick "$sha" 2>/dev/null; then
+      if git -C "$MAIN_REPO" cherry-pick "$sha" 2>/dev/null; then
         PICK_COUNT=$((PICK_COUNT + 1))
         echo "  cherry-pick: $sha OK"
       else
         echo "오류: cherry-pick 충돌 — $sha"
-        echo "수동 해결 필요. git cherry-pick --abort로 취소 가능."
+        echo "수동 해결: cd $MAIN_REPO && git cherry-pick --abort"
         exit 1
       fi
     done
 
-    NEW_SHA=$(git rev-parse --short HEAD)
+    NEW_SHA=$(git -C "$MAIN_REPO" rev-parse --short HEAD)
     echo "cherry-pick 완료: ${PICK_COUNT}건 반영, main → $NEW_SHA"
     ;;
 esac
@@ -142,21 +161,16 @@ esac
 # --- push ---
 echo ""
 echo "=== push ==="
-if git push origin main 2>&1; then
-  FINAL_SHA=$(git rev-parse --short HEAD)
+if git -C "$MAIN_REPO" push origin main 2>&1; then
+  FINAL_SHA=$(git -C "$MAIN_REPO" rev-parse --short HEAD)
   echo ""
   echo "반영 완료"
   echo "  브랜치: $CURRENT_BRANCH → main"
   echo "  모드: $MODE"
   echo "  SHA: $FINAL_SHA"
   echo "  git show --stat:"
-  git show --stat --oneline HEAD
+  git -C "$MAIN_REPO" show --stat --oneline HEAD
 else
   echo "오류: push 실패"
   exit 1
 fi
-
-# 원래 브랜치로 복귀
-git checkout "$CURRENT_BRANCH" 2>/dev/null
-echo ""
-echo "브랜치 복귀: $CURRENT_BRANCH"
