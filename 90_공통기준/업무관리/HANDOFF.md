@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 13:05 KST — 세션 9 (GPT 재평가 합의 8.1/10 + 개선 6건 + GPT 리뷰 3건 해소)
+최종 업데이트: 2026-04-11 13:09 KST — 세션 9 (GPT 재평가 합의 8.1/10 + 개선 6건 + GPT 리뷰 3건 해소)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -28,7 +28,9 @@
 ### 다음 세션 안건
 1. **[보류] completion_gate 오탐 실측** — write_marker v6 도입 후 structural_intermediate 재발 여부 5세션 모니터링
 2. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후
-3. 기타 일반 업무 진행 가능
+3. **불필요 워크트리 정리** — 오래된 워크트리 7개(busy-johnson, competent-jones 등) 삭제 검토
+4. **워크트리 main 직접 푸시 자동화** — 새 워크트리 생성 시 자동으로 origin/main 추적 + push.default upstream 설정되도록 훅 또는 스크립트 검토
+5. 일반 업무 진행 가능
 
 ---
 
