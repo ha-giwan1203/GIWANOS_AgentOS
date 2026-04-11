@@ -5,6 +5,6 @@
 
 ## 현행 기준 문서 (Single Source of Truth)
 
-**`.claude/hooks/README.md`** — 19개 활성 훅, 이벤트 계층, 실패 계약표, 보조 스크립트 전체 기재.
+**`.claude/hooks/README.md`** — 20개 활성 훅, 이벤트 계층, 실패 계약표, 보조 스크립트 전체 기재.
 
 이 파일은 리다이렉트 스텁이다. 내용 갱신은 `.claude/hooks/README.md`에서 수행할 것.
