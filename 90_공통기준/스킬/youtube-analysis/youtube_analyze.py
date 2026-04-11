@@ -14,12 +14,94 @@ import json
 import subprocess
 import tempfile
 import shutil
+import time
 from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
 SCRIPT_DIR = Path(__file__).parent
+
+# 캐시 정책
+CACHE_TTL_DAYS = 7
+CACHE_MAX_BYTES = 1 * 1024**3  # 1GB
+
+
+def get_last_used(video_dir: Path) -> float:
+    """LRU 판단용 최종 사용 시각. info.json → transcript.txt → 폴더 mtime fallback."""
+    for pattern in ["*.info.json"]:
+        candidates = list(video_dir.glob(pattern))
+        if candidates:
+            return candidates[0].stat().st_mtime
+    transcript = video_dir / "transcript.txt"
+    if transcript.exists():
+        return transcript.stat().st_mtime
+    return video_dir.stat().st_mtime
+
+
+def get_dir_size(path: Path) -> int:
+    """디렉토리 전체 크기 (bytes)."""
+    total = 0
+    for f in path.rglob("*"):
+        if f.is_file():
+            total += f.stat().st_size
+    return total
+
+
+def cleanup_cache(cache_root: Path):
+    """캐시 TTL + 용량 상한 자동 정리. 실행 시작 시 호출."""
+    if not cache_root.exists():
+        return
+
+    dirs = [d for d in cache_root.iterdir() if d.is_dir() and d.name != ".gitignore"]
+    if not dirs:
+        return
+
+    now = time.time()
+    ttl_seconds = CACHE_TTL_DAYS * 86400
+    deleted_dirs = 0
+    deleted_mp4s = 0
+
+    # 1차: TTL 만료 폴더 삭제
+    remaining = []
+    for d in dirs:
+        age = now - get_last_used(d)
+        if age > ttl_seconds:
+            shutil.rmtree(d)
+            deleted_dirs += 1
+        else:
+            remaining.append(d)
+
+    # 2차: 용량 상한 초과 시 mp4 우선 삭제 (오래된 순)
+    total_size = sum(get_dir_size(d) for d in remaining)
+    if total_size > CACHE_MAX_BYTES:
+        remaining.sort(key=get_last_used)
+        for d in remaining:
+            if total_size <= CACHE_MAX_BYTES:
+                break
+            for mp4 in d.glob("*.mp4"):
+                mp4_size = mp4.stat().st_size
+                mp4.unlink()
+                total_size -= mp4_size
+                deleted_mp4s += 1
+
+    # 3차: 여전히 초과 시 오래된 폴더 전체 삭제
+    if total_size > CACHE_MAX_BYTES:
+        remaining = [d for d in remaining if d.exists()]
+        remaining.sort(key=get_last_used)
+        for d in remaining:
+            if total_size <= CACHE_MAX_BYTES:
+                break
+            dir_size = get_dir_size(d)
+            shutil.rmtree(d)
+            total_size -= dir_size
+            deleted_dirs += 1
+
+    # 로그
+    if deleted_dirs > 0 or deleted_mp4s > 0:
+        final_size_mb = total_size / (1024 * 1024)
+        print(f"[캐시 정리] 폴더 {deleted_dirs}개 삭제 / mp4 {deleted_mp4s}개 삭제 / 잔여 {final_size_mb:.0f}MB")
+
 
 # ffmpeg PATH 자동 탐지 (winget 설치 시 세션에 즉시 반영 안 됨)
 _FFMPEG_WINGET = Path.home() / "AppData/Local/Microsoft/WinGet/Packages"
@@ -241,6 +323,9 @@ def main():
     parser.add_argument("--no-download", action="store_true", help="다운로드/프레임 생략, 자막만 추출")
     parser.add_argument("--refresh", action="store_true", help="캐시 무시, 강제 재다운로드")
     args = parser.parse_args()
+
+    # 캐시 자동 정리 (TTL 7일 + 1GB 상한)
+    cleanup_cache(SCRIPT_DIR / "cache")
 
     video_id = extract_video_id(args.url)
     out_dir = get_output_dir(video_id)

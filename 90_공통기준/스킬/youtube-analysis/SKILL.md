@@ -266,6 +266,23 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 
 ---
 
+## 캐시 정책
+
+| 항목 | 값 |
+|------|-----|
+| TTL | 7일 (마지막 사용 기준) |
+| 용량 상한 | 1GB (전체 cache 디렉토리) |
+| 정리 시점 | `youtube_analyze.py` 실행 시작 시 자동 |
+| 정리 순서 | 1차 TTL만료 폴더 삭제 → 2차 mp4 우선 삭제 → 3차 오래된 폴더 전체 삭제 |
+| LRU 기준 | `info.json` mtime → `transcript.txt` → 폴더 mtime fallback |
+| 수동 정리 | `--refresh` (해당 영상 캐시만 강제 재다운로드) |
+
+- 캐시 경로: `youtube-analysis/cache/{video_id}/`
+- `.gitignore`로 Git 추적 제외
+- cleanup 로그: 삭제 폴더 수 / 삭제 mp4 수 / 정리 후 총용량
+
+---
+
 ## 스크립트
 
 | 스크립트 | 용도 | 의존성 |
