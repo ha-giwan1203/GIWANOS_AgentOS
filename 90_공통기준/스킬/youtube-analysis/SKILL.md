@@ -345,12 +345,27 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 
 > Drive 전용 폴더 최초 생성: 사용자가 Google Drive에서 `영상분석/raw/` 폴더를 수동 생성해야 함 (Drive MCP는 읽기 전용)
 
-### 저장 절차 (Claude 실행)
+### 저장 절차 (Claude MCP 호출)
 
-1. 분석 완료 → Notion DB에서 video_id로 기존 레코드 검색
-2. 없으면 신규 페이지 생성, 있으면 기존 페이지 업데이트
-3. 본문에 요약 + 핵심 프레임 3~5장 + 적용 포인트 + 원본 링크 작성
-4. Drive `영상분석/raw/{video_id}/` 폴더에 원본 파일 업로드 (Drive API 가능 시)
+분석 완료 후 Claude가 아래 순서로 MCP 도구를 호출한다.
+
+```
+1. notion-search: query="video_id값", data_source_url="collection://20920532-0e23-4ddd-97b1-1264b54adb77"
+   → 기존 레코드 있으면 page_id 확보
+
+2-A. 신규: notion-create-pages
+   - parent: { data_source_id: "20920532-0e23-4ddd-97b1-1264b54adb77" }
+   - properties: save_to_notion.py의 build_properties() 참조
+   - content: save_to_notion.py의 build_content() 참조
+
+2-B. 기존: notion-update-page
+   - page_id: 검색 결과의 page_id
+   - command: "update_properties" + "replace_content"
+
+3. (선택) Drive 업로드: Drive MCP 쓰기 권한 확보 시 영상분석/raw/{video_id}/ 업로드
+```
+
+> `save_to_notion.py`는 데이터 구조/템플릿 정의 파일. MCP 호출은 Claude가 직접 수행.
 
 ---
 
