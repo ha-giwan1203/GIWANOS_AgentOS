@@ -18,8 +18,12 @@ if ! has_any_req; then
   exit 0
 fi
 
-TEXT="$(printf '%s' "$INPUT" | tr '\n' ' ' | sed 's/\\"/"/g')"
-COMMAND="$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\(.*\)".*/\1/p' | head -1)"
+# safe_json_get 사용 (sed 직접 파싱 대체, 세션14 GPT 합의)
+COMMAND="$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)"
+TEXT="$(echo "$INPUT" | safe_json_get "tool_input" 2>/dev/null)"
+if [ -z "$TEXT" ]; then
+  TEXT="$(printf '%s' "$INPUT" | tr '\n' ' ')"
+fi
 
 is_bash_risky_date() {
   echo "$COMMAND" | grep -qiE '(zdm|daily[-_ ]inspection|일상점검|점검표|backfill)'
