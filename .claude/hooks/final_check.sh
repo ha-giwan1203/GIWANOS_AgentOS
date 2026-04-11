@@ -103,7 +103,11 @@ STATUS_COUNT=$(status_hook_count 2>/dev/null || true)
 if [ -n "$README_COUNT" ]; then
   echo "  README 문서화: ${README_COUNT}개"
   if [ -n "$SETTINGS_HOOKS" ] && [ "$README_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
-    warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+    if [ "$MODE" = "--full" ]; then
+      fail "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
+    else
+      warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+    fi
   else
     echo "  [OK] README hook 개수 일치"
   fi
@@ -114,7 +118,11 @@ fi
 if [ -n "$STATUS_COUNT" ]; then
   echo "  STATUS 문서화: ${STATUS_COUNT}개"
   if [ -n "$SETTINGS_HOOKS" ] && [ "$STATUS_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
-    warn "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+    if [ "$MODE" = "--full" ]; then
+      fail "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
+    else
+      warn "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+    fi
   else
     echo "  [OK] STATUS hook 개수 일치"
   fi
@@ -196,7 +204,12 @@ echo ""
 # 7. TASKS/HANDOFF 최신화 확인
 echo "--- 7. TASKS/HANDOFF 갱신 확인 ---"
 STATE_DIR="$PROJECT_DIR/90_공통기준/agent-control/state"
-MARKER="$STATE_DIR/write_marker.flag"
+MARKER="$STATE_DIR/write_marker.json"
+LEGACY_MARKER="$STATE_DIR/write_marker.flag"
+# 레거시 .flag 파일도 확인 (마이그레이션 기간)
+if [ ! -f "$MARKER" ] && [ -f "$LEGACY_MARKER" ]; then
+  MARKER="$LEGACY_MARKER"
+fi
 
 if [ -f "$MARKER" ]; then
   MARKER_EPOCH=$(file_mtime "$MARKER")
