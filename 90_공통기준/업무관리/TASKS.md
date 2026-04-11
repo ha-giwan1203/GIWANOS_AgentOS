@@ -22,6 +22,13 @@
 
 ## 최근 완료
 
+### [완료] 취약점 3건 개선 — GPT 토론 합의 (2026-04-11 세션 13)
+- commit_gate fail-open 봉합: JSON 파싱 실패 시 raw INPUT fallback 검사 추가
+- evidence_gate 차단 안내 보강: deny 메시지에 해결 경로 명시 + 동일 incident 연속 3회 초과 중복 기록 억제
+- incident_ledger resolved 아카이브: 30일 경과 resolved 항목 → .archive.jsonl 이동 기능 추가
+- cdp_chat_send.py --expect-last-snippet 기능 폐기 (오차단 유발)
+- GPT 판정: (검증 대기)
+
 ### [완료] 안건 1·2·3 전체 완료 (2026-04-11 세션 11)
 - 워크트리 정리: 10개 삭제 완료 (main + hardcore-raman만 잔존)
 - publish_worktree_to_main.sh 구현 (B-lite: --ff-only/--cherry-pick/--dry-run) + GPT 지적 수정 (git -C 방식)

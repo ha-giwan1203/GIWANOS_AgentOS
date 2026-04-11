@@ -4,12 +4,25 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 15:28 KST — 세션 12 완료 (보류 5건 전체 판정 + 옵션C 유지 확정)
+최종 업데이트: 2026-04-11 16:02 KST — 세션 13 (취약점 3건 개선 — GPT 토론 합의)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 12)
+## 0. 최신 세션 (2026-04-11 세션 13)
+
+### 이번 세션 완료
+1. **commit_gate fail-open 봉합**: JSON 파싱 실패 시 raw INPUT fallback 검사 추가
+2. **evidence_gate 차단 안내 보강**: deny 메시지에 해결 경로 명시 + 동일 incident 연속 3회 초과 중복 기록 억제
+3. **incident_ledger resolved 아카이브**: 30일 경과 resolved 항목 → .archive.jsonl 이동 (--archive 옵션)
+4. **cdp_chat_send.py --expect-last-snippet 폐기**: 인코딩/잘림 차이로 오차단 유발하여 제거
+
+### 다음 세션 안건
+→ TASKS.md "진행중 / 보류" 섹션 참조
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 12)
 
 ### 이번 세션 완료
 1. **옵션C 4/14 재집계**: 승인 1791 / deny 319 / 오탐 45 / 우회 0 → GPT 판정: 유지
@@ -26,7 +39,7 @@
 
 ---
 
-## 1. 이전 세션 (2026-04-11 세션 11)
+## 2. 이전 세션 (2026-04-11 세션 11)
 
 ### 이번 세션 완료
 1. **publish_worktree_to_main.sh 구현** — B-lite 방식 (--ff-only/--cherry-pick/--dry-run)

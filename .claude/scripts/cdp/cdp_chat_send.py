@@ -196,8 +196,10 @@ def main() -> int:
     parser = base_parser("ChatGPT composer에 텍스트 전송")
     parser.add_argument("--text", default=None, help="전송할 텍스트")
     parser.add_argument("--text-file", default=None, help="전송할 UTF-8 텍스트 파일")
-    parser.add_argument("--expect-last-snippet", default=None, help="직전에 읽은 assistant 최신 답변 일부 기대값")
-    parser.add_argument("--expect-last-snippet-file", default=None, help="직전에 읽은 assistant 최신 답변 일부 UTF-8 파일")
+    # --expect-last-snippet / --expect-last-snippet-file 제거 (사용자 지시 2026-04-11)
+    # 스니펫 비교가 인코딩/잘림 차이로 오차단을 유발하므로 폐기
+    parser.add_argument("--expect-last-snippet", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--expect-last-snippet-file", default=None, help=argparse.SUPPRESS)
     parser.add_argument("--require-korean", action="store_true", help="(비활성화됨) 한국어 가드")
     parser.add_argument("--auto-debate-url", action="store_true",
                         help="debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정")
@@ -220,7 +222,8 @@ def main() -> int:
         args.match_url_exact = url
 
     text = load_text(args)
-    expected_last_snippet = load_expected_last_snippet(args)
+    # 스니펫 비교 폐기: 인자가 넘어와도 무시
+    expected_last_snippet = None
     if args.require_korean:
         ensure_korean_only(text)
 

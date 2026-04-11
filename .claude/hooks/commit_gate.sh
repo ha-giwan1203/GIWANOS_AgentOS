@@ -10,9 +10,18 @@ INPUT=$(cat)
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
 COMMAND=$(echo "$INPUT" | safe_json_get "command")
 
-# fail-open: 파싱 실패 시 통과 (commit_gate는 차단 목적이 아닌 감지 목적)
-# command가 빈 문자열이면 git commit/push가 아니므로 통과
-# 주의: JSON 파싱 실패 시에도 COMMAND=""이 되어 게이트 무력화됨
+# fail-closed 보강 (GPT+Claude 합의 2026-04-11):
+# safe_json_get 파싱 실패 시 COMMAND=""이 되어 게이트가 무력화되던 문제 수정.
+# COMMAND가 비어도 raw INPUT에 git commit/push가 있으면 파싱 실패로 간주하여 fallback 검사.
+if [ -z "$COMMAND" ]; then
+  # 파싱 실패 fallback: raw INPUT에서 직접 확인
+  if echo "$INPUT" | grep -qE 'git (commit|push)'; then
+    hook_log "PreToolUse/Bash" "commit_gate: JSON 파싱 실패 fallback — raw INPUT에서 git commit/push 감지" 2>/dev/null
+    COMMAND="git commit"  # fallback 값 설정하여 아래 검사 계속 진행
+  else
+    exit 0
+  fi
+fi
 # git commit 또는 git push가 아니면 통과
 if ! echo "$COMMAND" | grep -qE 'git (commit|push)'; then
   exit 0

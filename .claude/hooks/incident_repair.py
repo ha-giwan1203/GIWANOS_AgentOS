@@ -265,6 +265,48 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     return count
 
 
+def archive_resolved(ledger_path: Path, days: int = 30, dry_run: bool = False) -> int:
+    """resolved=true이고 days일 경과한 항목을 아카이브 파일로 이동.
+
+    GPT+Claude 합의 2026-04-11: ledger 무한 성장 억제.
+    감사 원본은 개별 시점 정보를 보존하되, 오래된 resolved 항목은
+    별도 아카이브로 분리하여 활성 ledger를 경량화한다.
+    """
+    import datetime
+
+    entries = load_jsonl(ledger_path)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    threshold_seconds = days * 86400
+
+    keep: list[dict[str, Any]] = []
+    archive: list[dict[str, Any]] = []
+
+    for entry in entries:
+        if not entry.get("resolved"):
+            keep.append(entry)
+            continue
+        ts_str = entry.get("ts", "")
+        try:
+            ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+            if (now - ts).total_seconds() > threshold_seconds:
+                archive.append(entry)
+            else:
+                keep.append(entry)
+        except (ValueError, TypeError):
+            keep.append(entry)  # 파싱 실패 시 보존
+
+    if not dry_run and archive:
+        archive_path = ledger_path.with_suffix(".archive.jsonl")
+        with archive_path.open("a", encoding="utf-8") as fh:
+            for entry in archive:
+                fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        with ledger_path.open("w", encoding="utf-8") as fh:
+            for entry in keep:
+                fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    return len(archive)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Suggest next repair actions for unresolved incidents.")
     parser.add_argument(
@@ -289,11 +331,28 @@ def main() -> int:
         help="auto-resolve incidents older than 24h with clear rules",
     )
     parser.add_argument(
+        "--archive",
+        action="store_true",
+        help="archive resolved incidents older than 30 days",
+    )
+    parser.add_argument(
+        "--archive-days",
+        type=int,
+        default=30,
+        help="archive threshold in days (default: 30)",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="with --auto-resolve, show count without modifying ledger",
+        help="with --auto-resolve or --archive, show count without modifying ledger",
     )
     args = parser.parse_args()
+
+    if args.archive:
+        count = archive_resolved(Path(args.ledger), days=args.archive_days, dry_run=args.dry_run)
+        mode = "dry-run" if args.dry_run else "archived"
+        print(f"archive: {count}건 {mode}")
+        return 0
 
     if args.auto_resolve:
         count = auto_resolve(Path(args.ledger), dry_run=args.dry_run)
