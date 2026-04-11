@@ -19,7 +19,8 @@
 5. **HANDOFF 아카이브 실행** — 402줄→41줄, `98_아카이브/handoff_archive_20260411_20260411.md` 생성
 
 ### 다음 AI 액션
-1. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후
+1. **[우선] PR #10 머지** — `claude/competent-jones` → `main`. 커밋 3건 (a7db7916, fe30c904, 63cd309f). GPT 통과 완료
+2. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후. 로그 위치: `.claude/logs/completion_claim.jsonl`
 
 ---
 
