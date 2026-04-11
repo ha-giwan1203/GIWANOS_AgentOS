@@ -27,7 +27,7 @@
 - evidence_gate 차단 안내 보강: deny 메시지에 해결 경로 명시 + 동일 incident 연속 3회 초과 중복 기록 억제
 - incident_ledger resolved 아카이브: 30일 경과 resolved 항목 → .archive.jsonl 이동 기능 추가
 - cdp_chat_send.py --expect-last-snippet 기능 폐기 (오차단 유발)
-- GPT 판정: (검증 대기)
+- GPT 판정: 통과 (조건부→보류→수정 2회 후 통과)
 
 ### [완료] 안건 1·2·3 전체 완료 (2026-04-11 세션 11)
 - 워크트리 정리: 10개 삭제 완료 (main + hardcore-raman만 잔존)
