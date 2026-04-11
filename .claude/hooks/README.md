@@ -72,7 +72,7 @@
 | `precompact_save.sh` | fail-open | 없음 | 저장 실패해도 compact 진행 |
 | `risk_profile_prompt.sh` | fail-open | 없음 | .req 생성 실패 시 gate 비활성화 |
 | `block_dangerous.sh` | fail-closed | deny JSON | 파싱 실패 시 안전 차단 |
-| `commit_gate.sh` | fail-open | deny JSON | 파싱 실패 시 통과 (감지 목적) |
+| `commit_gate.sh` | fail-open (hardened) | deny JSON | 파싱 실패 시 raw INPUT fallback 검사 후 통과 |
 | `date_scope_guard.sh` | fail-open | deny JSON | 날짜 파싱 실패 시 통과 |
 | `evidence_gate.sh` | fail-open | deny JSON | req 없으면 전체 통과 |
 | `protect_files.sh` | fail-open | deny JSON | 파싱 실패 시 통과 |

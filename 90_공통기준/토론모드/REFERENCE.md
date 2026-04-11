@@ -53,11 +53,9 @@ url;  // → navigate()에 전달
 python '.claude/scripts/cdp/cdp_chat_send.py' \
   --match-url '<chat_url>' \
   --text-file '<utf8_text_file>' \
-  --require-korean \
   --mark-send-gate
 ```
 
-- `--require-korean`: 자연어 영어 포함 시 전송 차단 (현재 비활성화)
 - `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
 - submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
 - 토론모드 문서상 기본 전송 경로는 이것이며, 직접 DOM 조작은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.

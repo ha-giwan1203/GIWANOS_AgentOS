@@ -4,12 +4,33 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 KST — 세션 17 (문서 정비 + smoke_test 확장 + dead code 정리)
+최종 업데이트: 2026-04-11 KST — 세션 18 (fail-open 재분류 + --require-korean 삭제 + 취약점 모니터링)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 17)
+## 0. 최신 세션 (2026-04-11 세션 18)
+
+### 이번 세션 완료
+1. **동결 취약점 3건 재확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok 강화) — 전부 가정 유효 (2회 연속 확인)
+2. **fail-open 재분류 검토**: commit_gate/completion_gate/evidence_stop_guard 3개 훅 라인별 분석 → 모든 exit 0 경로가 정당한 pass-through 또는 프레임워크 규약. 코드 변경 없음
+3. **README.md**: commit_gate 실패 계약을 "fail-open (hardened)"로 갱신
+4. **--require-korean argparse 정의 완전 삭제**: cdp_chat_send.py L110 삭제 + send_gate.sh 예시 문구 제거 + REFERENCE.md 2개 예시 정리 + CLAUDE.md 문구 갱신
+5. **smoke_test**: 105/105 ALL PASS
+
+### GPT 토론
+- 의제 1 (동결 취약점): 현행 유지 동의
+- 의제 2 (fail-open 재분류): GPT가 이전 P0 지적 철회, 현행 유지 합의. 추가 메모: evidence_stop_guard의 sed 파싱을 last_assistant_text() 공용 함수로 바꾸는 것이 다음 후보
+- 의제 3 (--require-korean 삭제): 진행 합의
+- 채택 3건 / 보류 0건 / 버림 0건
+
+### 다음 세션 안건
+1. 취약점 동결 3건 계속 모니터링
+2. evidence_stop_guard.sh last_assistant_text sed 파싱 → 공용 함수 재사용 검토 (GPT 제안)
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 17)
 
 ### 이번 세션 완료
 1. **CLAUDE.md 경로 명시**: 상태 원본 섹션에 TASKS/HANDOFF/STATUS 실제 경로(`90_공통기준/업무관리/`) 추가
@@ -25,11 +46,6 @@
 - 의제 1~4: 채택 4건 / 보류 0건 / 버림 0건
 - cdp_chat_send.py 정리: 채택 5건 / 보류 0건 / 버림 0건
 - GPT 판정: 의제 1~4 통과 (조건부→수정→통과). cdp 정리 통과
-
-### 다음 세션 안건
-1. 취약점 동결 3건 계속 모니터링
-2. fail-open 재분류 검토 (GPT P0 지적: commit_gate / completion_gate / evidence_stop_guard 일부 fail-closed 전환 가능성)
-3. --require-korean argparse 정의 완전 삭제 (문서 정리 완료 확인 후)
 
 ---
 

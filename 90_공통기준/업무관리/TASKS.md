@@ -22,6 +22,14 @@
 
 ## 최근 완료
 
+### [완료] fail-open 재분류 + --require-korean 삭제 + 취약점 모니터링 — 세션18 (2026-04-11 세션 18)
+- **동결 취약점 3건 재확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok 강화) — 전부 가정 유효 (2회 연속 확인)
+- **fail-open 재분류 검토**: commit_gate/completion_gate/evidence_stop_guard 3개 훅 라인별 분석 → 모든 exit 0 경로가 정당한 pass-through 또는 프레임워크 규약. GPT도 P0 지적 철회, 현행 유지 합의
+- **README.md**: commit_gate 실패 계약을 "fail-open (hardened)"로 갱신
+- **--require-korean argparse 정의 완전 삭제**: cdp_chat_send.py + send_gate.sh 예시 + REFERENCE.md 2개 + CLAUDE.md 문구 정리
+- GPT 토론: 채택 3건 / 보류 0건 / 버림 0건
+- smoke_test: 105/105 ALL PASS
+
 ### [완료] 문서 정비 + smoke_test 확장 + 취약점 모니터링 — 세션17 (2026-04-11 세션 17)
 - **CLAUDE.md 경로 명시**: 상태 원본 섹션에 TASKS/HANDOFF/STATUS 실제 경로 추가
 - **local_hooks_spec.md 아카이브**: Phase 1 미구현 spec → 98_아카이브 이동, 리다이렉트 스텁 남김

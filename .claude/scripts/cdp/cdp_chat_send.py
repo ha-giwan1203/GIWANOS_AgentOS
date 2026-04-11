@@ -107,7 +107,6 @@ def main() -> int:
     parser = base_parser("ChatGPT composer에 텍스트 전송")
     parser.add_argument("--text", default=None, help="전송할 텍스트")
     parser.add_argument("--text-file", default=None, help="전송할 UTF-8 텍스트 파일")
-    parser.add_argument("--require-korean", action="store_true", help="[deprecated, no-op] 한국어 가드 — 비활성화됨")
     parser.add_argument("--auto-debate-url", action="store_true",
                         help="debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정")
     parser.add_argument("--allow-generating", action="store_true", help="기존 응답 생성 중이어도 계속 진행")
