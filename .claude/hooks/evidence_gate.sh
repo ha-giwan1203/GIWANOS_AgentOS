@@ -42,15 +42,26 @@ deny() {
   local req_name="$2"  # optional: 해결 방법 안내용 req 이름
   hook_log "PreToolUse/evidence_gate" "BLOCK: $reason"
 
-  # 중복 incident 억제: 동일 hook+reason 연속 3회 초과 시 기록 생략 (GPT+Claude 합의 2026-04-11)
+  # 중복 incident 억제: 동일 hook+reason+detail 직전 연속 3회 초과 시 기록 생략
+  # GPT 조건부 통과 지적 반영: detail까지 포함한 "연속" 판정으로 정밀화
   local _dup_count=0
+  local _escaped_reason
+  _escaped_reason=$(printf '%s' "$reason" | sed 's/[.[\*^$()+?{|\\]/\\&/g' | head -c 80)
   if [ -f "$INCIDENT_LEDGER" ]; then
-    _dup_count=$(tail -10 "$INCIDENT_LEDGER" 2>/dev/null | grep -c '"hook":"evidence_gate".*"classification_reason":"evidence_missing"' || echo 0)
+    # 직전 연속 카운트: 마지막 줄부터 역순으로 동일 패턴이 몇 줄 연속인지
+    _dup_count=$(tail -20 "$INCIDENT_LEDGER" 2>/dev/null | tac 2>/dev/null | while IFS= read -r _line; do
+      if echo "$_line" | grep -q '"hook":"evidence_gate".*"classification_reason":"evidence_missing"' && \
+         echo "$_line" | grep -qF "$_escaped_reason"; then
+        echo "match"
+      else
+        break
+      fi
+    done | wc -l)
   fi
   if [ "$_dup_count" -lt 3 ]; then
     hook_incident "gate_reject" "evidence_gate" "" "$reason" '"classification_reason":"evidence_missing"' 2>/dev/null || true
   else
-    hook_log "PreToolUse/evidence_gate" "incident 중복 억제: 연속 ${_dup_count}회 (3회 초과)" 2>/dev/null
+    hook_log "PreToolUse/evidence_gate" "incident 중복 억제: 직전 연속 ${_dup_count}회 (3회 초과, detail일치)" 2>/dev/null
   fi
 
   # 해결 방법 안내 포함 (사용자가 탈출 경로를 알 수 있도록)
