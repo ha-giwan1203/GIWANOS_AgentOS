@@ -43,15 +43,15 @@ deny() {
   hook_log "PreToolUse/evidence_gate" "BLOCK: $reason"
 
   # 중복 incident 억제: 동일 hook+reason+detail 직전 연속 3회 초과 시 기록 생략
-  # GPT 조건부 통과 지적 반영: detail까지 포함한 "연속" 판정으로 정밀화
+  # GPT 보류→수정: grep -qF(고정문자열)이므로 sed 이스케이프 제거, 원문 그대로 비교
   local _dup_count=0
-  local _escaped_reason
-  _escaped_reason=$(printf '%s' "$reason" | sed 's/[.[\*^$()+?{|\\]/\\&/g' | head -c 80)
+  local _reason_prefix
+  _reason_prefix=$(printf '%s' "$reason" | head -c 80)
   if [ -f "$INCIDENT_LEDGER" ]; then
     # 직전 연속 카운트: 마지막 줄부터 역순으로 동일 패턴이 몇 줄 연속인지
     _dup_count=$(tail -20 "$INCIDENT_LEDGER" 2>/dev/null | tac 2>/dev/null | while IFS= read -r _line; do
       if echo "$_line" | grep -q '"hook":"evidence_gate".*"classification_reason":"evidence_missing"' && \
-         echo "$_line" | grep -qF "$_escaped_reason"; then
+         echo "$_line" | grep -qF "$_reason_prefix"; then
         echo "match"
       else
         break
