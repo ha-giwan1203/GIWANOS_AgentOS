@@ -13,15 +13,17 @@
 
 ### 이번 세션 완료
 1. **캐시 정책 구현**: TTL 7일 + 1GB 상한 + 실행시 자동 cleanup + mp4 우선 삭제 + LRU fallback
-2. **GPT 토론 2라운드**: 채택 5건 / 버림 1건
-3. **OpenClaw 조사**: GitHub 8개 YT 스킬 전부 자막 기반. 영상 시각 분석 없음
-4. **Gemini 영상 API 조사**: 1FPS 직접 입력, 코드/UI 읽기 가능, $0.01~0.62/건
-5. **GenSpark 조사**: 음성 전사 기반, 시각 분석 제한적
-6. **GPT 검증 PASS**: 1f6f3562 정합 확인
+2. **Notion DB "영상분석 이력" 생성 + 실증**: video_id 기준 upsert, 실제 페이지 생성 확인 (33ffee67)
+3. **save_to_notion.py**: 속성 빌더 + 본문 템플릿 + MCP 호출 시퀀스
+4. **GPT 토론 4라운드**: 채택 9건 / 보류 2건 / 버림 2건
+5. **OpenClaw 조사**: GitHub 8개 YT 스킬 전부 자막 기반. 영상 시각 분석 없음
+6. **Gemini 영상 API 조사**: 1FPS 직접 입력, 코드/UI 읽기 가능, $0.01~0.62/건
+7. **GenSpark 조사**: 음성 전사 기반, 시각 분석 제한적
+8. **GPT 검증**: 캐시 PASS / Notion 저장 PASS / Drive 미완
 
 ### 다음 세션 안건
 1. Gemini 영상 API 통합 설계 (자동 라우팅)
-2. 분석 결과 노션 자동 저장
+2. Drive 쓰기 권한 해결 (MCP 또는 별도 API)
 3. 취약점 동결 3건 계속 모니터링
 
 ---
