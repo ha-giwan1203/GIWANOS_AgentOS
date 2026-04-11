@@ -23,7 +23,7 @@
 5. **smoke_test**: 102/102 ALL PASS
 
 ### GPT 판정
-- (최종 검증 후 기록)
+- 통과 (045eea79 + 64ee18e1). 문서 드리프트 1건 즉시 수정 후 통과
 
 ### 다음 세션 안건
 - smoke_test에 json_escape Windows 경로/제어문자 케이��� 추가 (GPT 권고)
