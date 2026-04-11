@@ -98,8 +98,8 @@ def download_video(url: str, video_id: str, out_dir: Path) -> tuple[Path, dict]:
 
 
 def extract_frames(video_path: Path, out_dir: Path, info: dict,
-                   interval: int = 30, max_frames: int = 20) -> list[Path]:
-    """ffmpeg로 프레임 추출. 챕터 기준 우선, 없으면 일정 간격."""
+                   interval: int = 30, max_frames: int = 15) -> list[Path]:
+    """ffmpeg로 프레임 추출. 챕터 기준 우선(긴 챕터 보강), 없으면 일정 간격."""
     frames_dir = out_dir / "frames"
     frames_dir.mkdir(exist_ok=True)
 
@@ -113,15 +113,21 @@ def extract_frames(video_path: Path, out_dir: Path, info: dict,
     timestamps = []
 
     if chapters:
-        # 챕터 시작 시점 + 각 챕터 중간 지점
+        # 챕터 시작 시점 + 중간 + 긴 챕터(90초 초과) 내부 추가 샘플
         for ch in chapters:
             start = ch.get("start_time", 0)
             end = ch.get("end_time", start + 60)
+            chapter_len = end - start
             timestamps.append(start + 2)  # 챕터 시작 2초 후
-            mid = (start + end) / 2
-            if mid - start > 15:  # 충분히 긴 챕터만 중간 추가
-                timestamps.append(mid)
-        print(f"[프레임] 챕터 기준 {len(timestamps)}개 시점")
+            if chapter_len > 90:
+                # 긴 챕터: 3등분 지점에 추가 샘플
+                third = chapter_len / 3
+                timestamps.append(start + third)
+                timestamps.append(start + third * 2)
+            elif chapter_len > 30:
+                # 보통 챕터: 중간 1장 추가
+                timestamps.append((start + end) / 2)
+        print(f"[프레임] 챕터 기준 (긴 챕터 보강) {len(timestamps)}개 시점")
     else:
         # 영상 길이 확인
         duration = info.get("duration", 0)
@@ -231,12 +237,19 @@ def main():
     parser = argparse.ArgumentParser(description="YouTube 영상 프레임+자막 분석 파이프라인")
     parser.add_argument("url", help="YouTube URL 또는 Video ID")
     parser.add_argument("--interval", type=int, default=30, help="프레임 추출 간격(초), 챕터 없을 때 사용 (기본: 30)")
-    parser.add_argument("--max-frames", type=int, default=20, help="최대 프레임 수 (기본: 20)")
+    parser.add_argument("--max-frames", type=int, default=15, help="최대 프레임 수 (기본: 15)")
     parser.add_argument("--no-download", action="store_true", help="다운로드/프레임 생략, 자막만 추출")
+    parser.add_argument("--refresh", action="store_true", help="캐시 무시, 강제 재다운로드")
     args = parser.parse_args()
 
     video_id = extract_video_id(args.url)
     out_dir = get_output_dir(video_id)
+
+    # --refresh 시 캐시 삭제
+    if args.refresh and out_dir.exists():
+        shutil.rmtree(out_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        print(f"[캐시 삭제] {out_dir}")
 
     print(f"[영상 ID] {video_id}")
     print(f"[출력 폴더] {out_dir}")
