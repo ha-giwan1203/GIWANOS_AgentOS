@@ -23,12 +23,27 @@
 ### GPT 판정
 - 코드 정합 확인, 상태문서 갱신 후 통과 예정
 
-### 다음 세션 안건 (세션 15 — GPT 토론 보류 5건)
-1. safe_json_get Stage 2 nested object 한계 (Python fallback 필요 여부)
-2. auto-resolve 증거 기반 정밀화 (24h 시간 기반 → evidence marker 검증)
-3. TOCTOU/race condition (단일 사용자 환경 실익)
-4. CDP execCommand deprecated (대안 부재)
-5. incident_ledger classification_reason 107건 소급 vs 향후만 적용
+### 다음 세션 안건 (세션 15 — 설계 토론 2건)
+
+**1. safe_json_get Stage 2 nested object 한계**
+- 현황: `{[^}]*}` 패턴이 중첩 브레이스 미지원. `tool_input`이 nested JSON이면 첫 `}`에서 절단
+- 영향: send_gate.sh(32행), gpt_followup_post.sh(10행)에서 tool_input 추출 시 불완전 가능
+- 토론 쟁점: Python fallback 도입 vs sed 개선 vs 현상 유지
+  - Python fallback: 정확하지만 #34457 Windows 멈춤 리스크
+  - sed 개선: brace counting은 sed로 불가, awk/bash 루프는 복잡도↑
+  - 현상 유지: 현재 Claude Code API가 보내는 tool_input은 대부분 depth-1
+- 작업: 실제 tool_input nested depth 실측 → 빈도 기반 판단
+
+**2. auto-resolve 증거 기반 정밀화**
+- 현황: `incident_repair.py` auto_resolve()가 24h 경과만으로 resolved 처리
+- 문제: 원인 미해소 상태에서 시간만 경과 → false positive resolution
+- 토론 쟁점: evidence marker 검증 추가 vs 시간 기반 유지
+  - evidence_missing 유형: 대응 `.ok` 파일 존재 여부 검증 가능
+  - scope_violation/dangerous_cmd: 1회성 차단이므로 24h 해소 합리적
+  - 유형별 분기: evidence_missing만 증거 검증, 나머지는 현행 유지
+- 작업: classification_reason별 auto-resolve 조건 분기 설계
+
+→ 메모리 `project_vulnerability_review_workflow.md` 참조
 
 ---
 
