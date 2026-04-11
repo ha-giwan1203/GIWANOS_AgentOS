@@ -24,10 +24,12 @@
 
 ### GPT 판정
 - 통과 (045eea79 + 64ee18e1). 문서 드리프트 1건 즉시 수정 후 통과
+- **종합 재평가: 9.1/10** (설계 9.2 / 운영 8.8 / 유지보수 8.4) — 세션15 7.8→9.1
 
 ### 다음 세션 안건
-- smoke_test에 json_escape Windows 경로/제어문자 케이��� 추가 (GPT 권고)
-- 취약점 점검 동결 3건(TOCTOU, execCommand, classification 소급) 모니터링
+1. **P1: local_hooks_spec.md 정리** — 구 명세(pre_write_guard 등)가 현행 19훅 체계와 충돌. 아카이브 또는 현행 기준 재작성
+2. **P1: smoke_test payload 기반 확장** — grep 존재 검사 비중 축소, 실제 payload 입력 기반 검증 2~3개 추가 (json_escape Windows 경로/제어문자 케이스 포함)
+3. 취약점 점검 동결 3건(TOCTOU, execCommand, classification 소급) 모니터링
 
 ---
 
