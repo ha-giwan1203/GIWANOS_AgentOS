@@ -181,6 +181,15 @@
         ]
       },
       {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/handoff_archive.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Read|Grep|Glob|Bash|Write|Edit|MultiEdit",
         "hooks": [
           {
