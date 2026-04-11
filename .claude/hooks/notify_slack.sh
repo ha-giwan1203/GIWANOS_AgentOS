@@ -2,12 +2,12 @@
 # Notification hook — Slack 알림 연동 (스팸 방지 포함)
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
-# bash-only JSON 파싱 (python3 의존 제거, #34457 Windows hooks 멈춤 대응)
-MSG=$(echo "$INPUT" | sed -n 's/.*"message"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# safe_json_get 사용 (sed 단독 파싱 대체, GPT+Claude 합의 2026-04-11)
+MSG=$(echo "$INPUT" | safe_json_get "message" 2>/dev/null)
 MSG="${MSG:-알림}"
 
 # 스팸 방지: 동일 메시지 60초 내 중복 전송 차단
-DEDUP_FILE="$HOME/Desktop/업무리스트/.claude/hooks/.notify_dedup"
+DEDUP_FILE="$PROJECT_ROOT/.claude/hooks/.notify_dedup"
 HASH=$(echo "$MSG" | md5sum | cut -d' ' -f1)
 NOW=$(date +%s)
 
@@ -23,5 +23,13 @@ echo "$HASH" > "$DEDUP_FILE"
 echo "$NOW" >> "$DEDUP_FILE"
 
 hook_log "Notification" "$MSG" 2>/dev/null
-# Slack 발송
-python3 "$HOME/Desktop/업무리스트/90_공통기준/업무관리/slack_notify.py" --message "$MSG"
+# Slack 발송 — python3/python 동적 감지
+PY_CMD=""
+if command -v python3 >/dev/null 2>&1; then
+  PY_CMD="python3"
+elif command -v python >/dev/null 2>&1; then
+  PY_CMD="python"
+fi
+if [ -n "$PY_CMD" ]; then
+  $PY_CMD "$PROJECT_ROOT/90_공통기준/업무관리/slack_notify.py" --message "$MSG"
+fi
