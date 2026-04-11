@@ -200,10 +200,11 @@ def format_entry(entry: dict[str, Any]) -> str:
 def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     """규칙 명확한 incident를 자동 resolved 마킹.
 
-    자동 해소 대상 (세션12 합의):
-    - evidence_missing: 동일 세션에서 후속 성공(evidence 충족) 시
-    - pre_commit_check: 동일 세션에서 후속 커밋 성공 시
-    - scope_violation: 1회성 차단이므로 24시간 경과 시
+    자동 해소 대상 (세션12 GPT+Claude 합의):
+    - evidence_missing: 24시간 경과 시 (세션 간 증거 비교 복잡하므로 시간 기반)
+    - pre_commit_check: 24시간 경과 시 (후속 커밋 성공 추적 대신 시간 기반)
+    - scope_violation: 24시간 경과 시 (1회성 차단)
+    - dangerous_cmd: 24시간 경과 시 (1회성 차단)
 
     방식: resolved=false → resolved=true + resolved_by="auto" 로 덮어쓰기
     """
