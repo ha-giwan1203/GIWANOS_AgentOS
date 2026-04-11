@@ -1,9 +1,9 @@
 #!/bin/bash
-# completion-gate v7: JSON 마커 기반 + after_state_sync 즉시 통과
-# v6 대비: write_marker.flag → write_marker.json, source_class/after_state_sync 활용
-# GPT+Claude 토론 합의 2026-04-11
+# completion-gate v8: 강한 완료 표현만 트리거 + 약한 패턴은 후속 조건
+# v7 대비: is_completion_claim 패턴 축소(과감지 86.5% 해소), 약한 패턴 로그만
+# GPT+Claude 토론 합의 2026-04-11 세션12
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
-hook_log "Stop" "completion_gate v7" 2>/dev/null || true
+hook_log "Stop" "completion_gate v8" 2>/dev/null || true
 
 MARKER="$STATE_AGENT_CONTROL/write_marker.json"
 LEGACY_MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
@@ -18,9 +18,14 @@ fi
 TASKS="$PATH_TASKS"
 HANDOFF="$PATH_HANDOFF"
 
-# 마지막 assistant 메시지가 "완료/최종반영" 주장일 때만 gate 적용
+# 마지막 assistant 메시지가 "강한 완료 주장"일 때만 gate 적용
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 if ! is_completion_claim "$LAST_TEXT"; then
+  # 약한 패턴(잔여이슈없음/ALL CLEAR/GPT PASS)만 매칭 시 로그만 남기고 통과
+  WEAK_MATCH=$(echo "$LAST_TEXT" | grep -oiE "$_COMPLETION_WEAK_PATTERN" | head -1)
+  if [ -n "$WEAK_MATCH" ]; then
+    hook_log "Stop" "completion_gate: weak_only pattern='$WEAK_MATCH' — skip" 2>/dev/null
+  fi
   exit 0
 fi
 

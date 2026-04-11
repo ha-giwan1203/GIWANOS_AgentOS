@@ -389,7 +389,13 @@
   - 독립성 WARN (GPT 프레임 부분 수용), 하네스 WARN (A 보류 라벨 실증 부재)
   - 증적: 90_공통기준/토론모드/logs/critic_review_20260407.md
 - **GPT 1e480a13+64576762 PASS (2026-04-08)**: 헤더 문구 수정 후 전체 묶음 정합 확인
-- 남은 작업: 4/14 최종 판정 (최종 재집계만 남음)
+- **4/11 재집계 (세션12)**: 승인 1791 / deny 319(17.8%) / 오탐 45(14.1%) / 우회 0
+- **GPT 판정: 옵션C 유지** — 우회 0건이 핵심, deny 급증은 evidence_gate(4/8 이후 신설) 때문
+- **보류 3건 판정 완료 (2026-04-11)**:
+  - completion_gate: 개선 — is_completion_claim 패턴 축소(v8), 약한 패턴 후속 조건 분리
+  - is_completion_claim: 개선 — 강한 완료 표현만 트리거, "잔여이슈없/ALL CLEAR/GPT PASS" 제거
+  - incident enum: 개선 — classification_reason 9개 호출부 표준화, 6종 세분화
+  - smoke_test 98/98 PASS
 
 ### ~~[진행] Claude Code 자체 진단 + 정리~~ → 완료됨 (2026-04-07)
 - final_check --fast ALL CLEAR, smoke_test 35/35 PASS

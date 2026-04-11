@@ -451,8 +451,17 @@ check $? "completion_gate: write_marker.json 참조"
 grep -q 'after_state_sync' "$HOOKS_DIR/completion_gate.sh"
 check $? "completion_gate: after_state_sync 즉시통과 로직"
 
-grep -q 'v7' "$HOOKS_DIR/completion_gate.sh"
-check $? "completion_gate: v7 버전 표기"
+grep -q 'v8' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: v8 버전 표기"
+
+grep -q '_COMPLETION_WEAK_PATTERN' "$HOOKS_DIR/hook_common.sh"
+check $? "hook_common: 약한 패턴 분리 (_COMPLETION_WEAK_PATTERN)"
+
+grep -q 'weak_only' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: 약한 패턴 로그 (weak_only)"
+
+grep -q 'classification_reason' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: classification_reason 표준화"
 
 echo ""
 

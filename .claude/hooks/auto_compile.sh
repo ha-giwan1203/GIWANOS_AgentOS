@@ -25,7 +25,7 @@ if [[ "$FILE_PATH" == *.py ]] && [ -n "$PY_CMD" ]; then
   if [ -f "$FILE_PATH" ]; then
     RESULT=$($PY_CMD -m py_compile "$FILE_PATH" 2>&1)
     if [ $? -ne 0 ]; then
-      hook_incident "compile_fail" "auto_compile" "$FILE_PATH" "$RESULT" 2>/dev/null || true
+      hook_incident "compile_fail" "auto_compile" "$FILE_PATH" "$RESULT" '"classification_reason":"compile_fail"' 2>/dev/null || true
       echo "{\"message\":\"[COMPILE FAIL] $FILE_PATH 문법 오류: $RESULT\"}"
       exit 2  # Claude에게 수정 요청
     fi

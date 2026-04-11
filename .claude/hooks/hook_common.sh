@@ -1,7 +1,12 @@
 #!/bin/bash
 # 훅 공통 로깅 함수 + 로그 로테이션 + incident 기록
 # 사용법: source .claude/hooks/hook_common.sh && hook_log "이벤트명" "메시지"
-# incident: hook_incident "type" "hook" "file" "detail"
+# incident: hook_incident "type" "hook" "file" "detail" ['"classification_reason":"<enum>"']
+# type: gate_reject | hook_block | compile_fail
+# classification_reason enum (세션12 합의):
+#   evidence_missing | completion_false_positive | pre_commit_fail |
+#   scope_violation | dangerous_cmd | send_block | stop_guard_block |
+#   compile_fail | completion_before_git | completion_before_state_sync
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
@@ -126,9 +131,12 @@ is_volatile_runtime_path() {
   echo "$path" | grep -qE '^(\.claude/(incident_ledger\.jsonl|settings\.local\.json|settings\.local\.json\.bak_[0-9]+|command-audit\.log|subagent-audit\.log|tool-failure\.log|logs/|state/)|90_공통기준/토론모드/logs/)'
 }
 
-# 사용자에게 완료/최종반영을 주장하는 표현만 좁게 감지
-# GPT 합의 2026-04-11: 매치 구문을 로그에 남겨 과감지 패턴 데이터 수집
-_COMPLETION_PATTERN='(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|ALL CLEAR|GPT 판정:[[:space:]]*PASS|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
+# 강한 완료 표현만 1차 트리거 (GPT+Claude 합의 2026-04-11 세션12)
+# v8: 과감지 86.5% 해소 — "잔여 이슈 없", "ALL CLEAR", "GPT 판정: PASS" 단독 트리거 제거
+# 이들은 completion_gate 내부에서 write_marker 존재 시 후속 조건으로만 사용
+_COMPLETION_PATTERN='(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
+# 후속 조건용 약한 패턴 (단독으로는 트리거하지 않음)
+_COMPLETION_WEAK_PATTERN='(잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|ALL CLEAR|GPT 판정:[[:space:]]*PASS)'
 
 is_completion_claim() {
   local text="$1"

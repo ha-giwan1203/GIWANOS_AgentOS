@@ -34,7 +34,7 @@ fi
 block() {
   local reason="$1"
   hook_log "Stop/evidence_stop_guard" "BLOCK: $reason" 2>/dev/null
-  hook_incident "hook_block" "evidence_stop_guard" "" "$reason" 2>/dev/null || true
+  hook_incident "hook_block" "evidence_stop_guard" "" "$reason" '"classification_reason":"evidence_missing"' 2>/dev/null || true
   echo "{\"decision\":\"block\",\"reason\":\"[evidence_stop_guard] $reason\"}"
   exit 2
 }

@@ -17,7 +17,7 @@ fi
 deny() {
   local reason="$1"
   hook_log "PreToolUse/date_scope_guard" "BLOCK: $reason | $COMMAND"
-  hook_incident "gate_reject" "date_scope_guard" "" "$reason" 2>/dev/null || true
+  hook_incident "gate_reject" "date_scope_guard" "" "$reason" '"classification_reason":"scope_violation"' 2>/dev/null || true
   echo "{\"decision\":\"deny\",\"reason\":\"[date_scope_guard] $reason\"}"
   exit 0
 }

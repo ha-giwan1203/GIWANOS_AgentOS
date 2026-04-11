@@ -40,7 +40,7 @@ is_identifier_domain_edit() {
 deny() {
   local reason="$1"
   hook_log "PreToolUse/evidence_gate" "BLOCK: $reason"
-  hook_incident "gate_reject" "evidence_gate" "" "$reason" 2>/dev/null || true
+  hook_incident "gate_reject" "evidence_gate" "" "$reason" '"classification_reason":"evidence_missing"' 2>/dev/null || true
   echo "{\"decision\":\"deny\",\"reason\":\"[evidence_gate] $reason\"}"
   exit 0
 }

@@ -72,6 +72,6 @@ fi
 # CDP 단일화: 토론모드에서 직접 JS 전송(예비 경로)은 deprecated → 차단
 # 기본 전송 경로인 cdp_chat_send.py(Bash 호출)는 자체 검증 처리
 hook_log "PreToolUse/send_gate" "BLOCK: deprecated_direct_js_send | 토론모드에서 직접 JS 전송 차단, cdp_chat_send.py 사용 필수" 2>/dev/null
-hook_incident "hook_block" "send_gate" "" "deprecated: 직접 JS 전송. CDP 기본 경로(cdp_chat_send.py) 사용 필수" 2>/dev/null || true
+hook_incident "hook_block" "send_gate" "" "deprecated: 직접 JS 전송. CDP 기본 경로(cdp_chat_send.py) 사용 필수" '"classification_reason":"send_block"' 2>/dev/null || true
 echo '{"decision":"block","reason":"[CDP 단일화] 토론모드에서 직접 JS 전송(execCommand+insertText)은 deprecated되었습니다. cdp_chat_send.py를 사용하세요: python .claude/scripts/cdp/cdp_chat_send.py --match-url <url> --text-file <file> --require-korean --mark-send-gate"}'
 exit 0

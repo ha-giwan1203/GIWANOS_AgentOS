@@ -37,7 +37,7 @@ if echo "$COMMAND" | grep -qE '(python|python3)'; then
   if echo "$COMMAND" | grep -qiE '(os\.(remove|unlink|rename|replace|system)|shutil\.(move|rmtree|copy|copyfile|copy2)|pathlib|Path\(.*\)\.(unlink|rename|replace|write_text|write_bytes)|open\(.+["\x27][waxb]|subprocess\.(run|Popen|call))'; then
     if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
       hook_log "PreToolUse/Bash" "BLOCKED: Python 경유 보호 파일 조작 시도 — $COMMAND"
-      hook_incident "hook_block" "block_dangerous" "" "Python heredoc 보호파일 조작 차단"
+      hook_incident "hook_block" "block_dangerous" "" "Python heredoc 보호파일 조작 차단" '"classification_reason":"dangerous_cmd"'
       echo '{"decision":"deny","reason":"Python 경유 보호 대상 파일 조작 차단. 사용자 직접 실행 필요."}'
       exit 0
     fi

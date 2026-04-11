@@ -4,29 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 14:30 KST — 세션 11 완료 (안건 1·2·3 전체 완료, GPT 재평가 8.6/10)
+최종 업데이트: 2026-04-11 15:02 KST — 세션 12 진행 중 (보류 3건 판정 + 옵션C 재집계)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 11)
+## 0. 최신 세션 (2026-04-11 세션 12)
+
+### 이번 세션 완료
+1. **옵션C 4/14 재집계**: 승인 1791 / deny 319 / 오탐 45 / 우회 0 → GPT 판정: 유지
+2. **보류 3건 GPT 토론 판정 완료**:
+   - completion_gate v8: is_completion_claim 패턴 축소 (약한 패턴 3개 분리 → 후속 조건)
+   - is_completion_claim: 강한 완료 표현만 트리거, "잔여이슈없/ALL CLEAR/GPT PASS" 제거
+   - incident enum: classification_reason 9개 호출부 표준화, 6종 enum 세분화
+3. **smoke_test: 98/98 ALL PASS**
+
+### 다음 세션 안건
+1. **[보류] incident_repair 자동 제안 확장** — enum 세분화 후 hook별 자동 복구 제안
+2. **[보류] resolved 자동 마킹** — evidence_missing, pre_commit_fail 규칙 명확한 것부터
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 11)
 
 ### 이번 세션 완료
 1. **publish_worktree_to_main.sh 구현** — B-lite 방식 (--ff-only/--cherry-pick/--dry-run)
 2. **하네스 즉시 개선 4건 구현**
-   - gpt_followup_pending.flag → JSON 메타데이터 (session_key, created_at) + 세션 불일치 자동 정리
-   - final_check.sh 마커 해석 통일 (write_marker.json created_at 우선, mtime fallback)
-   - README lint 개선 (개수 비교 → 개별 훅 이름 대조 + 차집합 출력)
-   - send_gate.sh debate 매칭 완화 (exact → contains)
-3. **워크트리 정리 완료** — 이전 세션 프로세스 9개 종료 후 10개 워크트리 삭제 (main + hardcore-raman만 잔존)
-4. **smoke_test: 95/95 ALL PASS**
-5. **GPT 최종 판정: 통과**
-6. **GPT 재평가: 8.4 → 8.6/10** (안전성 8.8, 운영성 8.8, 관측성 7.9, 유지보수성 8.3, 문서정합 7.6, 이식성 7.4)
-
-### 다음 세션 안건
-1. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
-2. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
-3. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
+3. **워크트리 정리 완료** — 10개 삭제
+4. **smoke_test: 95/95 ALL PASS**, GPT 재평가 8.6/10
 
 ---
 
