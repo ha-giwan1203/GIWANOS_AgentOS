@@ -4,12 +4,25 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 KST — 세션 18 (fail-open 재분류 + --require-korean 삭제 + 취약점 모니터링)
+최종 업데이트: 2026-04-11 KST — 세션 19 (취약점 모니터링 + evidence_stop_guard 리팩토링)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 18)
+## 0. 최신 세션 (2026-04-11 세션 19)
+
+### 이번 세션 완료
+1. **동결 취약점 3건 3회 연속 확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok) — 전부 가정 유효
+2. **evidence_stop_guard.sh 리팩토링**: 직접 sed 파싱(L24-29, 6줄) → `last_assistant_text()` 공용 함수 호출(1줄). completion_gate/stop_guard와 패턴 통일 완료
+3. **smoke_test**: 105/105 ALL PASS
+
+### 다음 세션 안건
+1. 취약점 동결 3건 계속 모니터링
+2. GPT 토론 — 세션19 변경 공유 및 추가 개선 의제 발굴
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 18)
 
 ### 이번 세션 완료
 1. **동결 취약점 3건 재확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok 강화) — 전부 가정 유효 (2회 연속 확인)
@@ -20,13 +33,9 @@
 
 ### GPT 토론
 - 의제 1 (동결 취약점): 현행 유지 동의
-- 의제 2 (fail-open 재분류): GPT가 이전 P0 지적 철회, 현행 유지 합의. 추가 메모: evidence_stop_guard의 sed 파싱을 last_assistant_text() 공용 함수로 바꾸는 것이 다음 후보
+- 의제 2 (fail-open 재분류): GPT가 이전 P0 지적 철회, 현행 유지 합의
 - 의제 3 (--require-korean 삭제): 진행 합의
 - 채택 3건 / 보류 0건 / 버림 0건
-
-### 다음 세션 안건
-1. 취약점 동결 3건 계속 모니터링
-2. evidence_stop_guard.sh last_assistant_text sed 파싱 → 공용 함수 재사용 검토 (GPT 제안)
 
 ---
 

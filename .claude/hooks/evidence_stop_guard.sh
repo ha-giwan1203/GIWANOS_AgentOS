@@ -21,12 +21,8 @@ if ! has_any_req; then
   exit 0
 fi
 
-LAST_ASSISTANT="$(tail -n 120 "$TRANSCRIPT" 2>/dev/null | grep '"type":"assistant"' | tail -n 1)"
-if [ -z "$LAST_ASSISTANT" ]; then
-  exit 0
-fi
-
-LAST_TEXT="$(echo "$LAST_ASSISTANT" | sed 's/\\n/\n/g' | sed -n 's/.*"text"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '\n' ' ')"
+# last_assistant_text() 공용 함수 사용 (GPT 제안, 세션19 리팩토링)
+LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 if [ -z "$LAST_TEXT" ]; then
   exit 0
 fi

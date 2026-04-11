@@ -22,6 +22,11 @@
 
 ## 최근 완료
 
+### [완료] 취약점 모니터링 + evidence_stop_guard 리팩토링 — 세션19 (2026-04-11 세션 19)
+- **동결 취약점 3건 3회 연속 확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok) — 전부 가정 유효
+- **evidence_stop_guard.sh 리팩토링**: 직접 sed 파싱(6줄) → `last_assistant_text()` 공용 함수 호출(1줄). completion_gate/stop_guard와 동일 패턴 통일
+- smoke_test: 105/105 ALL PASS
+
 ### [완료] fail-open 재분류 + --require-korean 삭제 + 취약점 모니터링 — 세션18 (2026-04-11 세션 18)
 - **동결 취약점 3건 재확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok 강화) — 전부 가정 유효 (2회 연속 확인)
 - **fail-open 재분류 검토**: commit_gate/completion_gate/evidence_stop_guard 3개 훅 라인별 분석 → 모든 exit 0 경로가 정당한 pass-through 또는 프레임워크 규약. GPT도 P0 지적 철회, 현행 유지 합의
