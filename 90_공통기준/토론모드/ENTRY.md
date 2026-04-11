@@ -36,7 +36,6 @@
    - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
    - 같으면 → 예정대로 전송 진행
 4. 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate`
-   - Step 3에서 읽은 최신 답변 100자는 `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 함께 넘긴다.
    - helper가 현재 화면의 최신 답변 100자와 다르다고 판단하면 전송하지 않고 차단해야 한다.
    - `--match-url-exact`로 정확 매칭 사용. 부분매칭(`--match-url`)은 탭이 1개일 때만 허용.
 5. **[DEPRECATED]** 직접 DOM 전송(`#prompt-textarea` + `execCommand('insertText')`)은 deprecated. 토론모드에서 send_gate.sh가 차단함. CDP 기본 경로만 사용할 것.

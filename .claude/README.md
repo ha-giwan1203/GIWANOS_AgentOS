@@ -17,7 +17,7 @@
 아래 항목은 세션 상태, 로그, 개인 설정으로 보고 커밋하지 않는다.
 
 - `settings.local.json`
-- `incident_ledger.jsonl`
+- ~~`incident_ledger.jsonl`~~ → **Git 추적 유지** (세션15 정책 확정: 감사 로그로 원격 검증에 활용)
 - `command-audit.log`
 - `subagent-audit.log`
 - `tool-failure.log`

@@ -54,13 +54,11 @@ python '.claude/scripts/cdp/cdp_chat_send.py' \
   --match-url '<chat_url>' \
   --text-file '<utf8_text_file>' \
   --require-korean \
-  --mark-send-gate \
-  --expect-last-snippet-file '<assistant_snippet_file>'
+  --mark-send-gate
 ```
 
-- `--require-korean`: 자연어 영어 포함 시 전송 차단
+- `--require-korean`: 자연어 영어 포함 시 전송 차단 (현재 비활성화)
 - `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
-- `--expect-last-snippet` / `--expect-last-snippet-file`: 직전에 읽은 최신 답변 100자와 현재 화면의 최신 답변 100자를 다시 대조. 다르면 `blocked_reply_changed`로 전송 중단
 - submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
 - 토론모드 문서상 기본 전송 경로는 이것이며, 직접 DOM 조작은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
 
@@ -136,9 +134,8 @@ JSON.stringify({lastSnippet: lastText, isGenerating: !!stopBtn});
 2. GPT가 아직 생성 중(stop-button 존재)이면 → 대기
 3. 이전에 읽은 내용과 다르면 → 새 응답 전체 읽기 → 하네스 재계산 → 반박문 재작성 후 전송
 4. 같으면 → 변동 없음 → 예정대로 전송 진행
-5. 기본 경로에서는 Step 1~4에서 확인한 최신 답변 100자를 `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 helper에 함께 넘긴다
-6. helper는 현재 화면의 최신 답변 100자가 기대값과 같을 때만 gate 파일을 갱신하고 전송을 진행한다
-7. 직접 자바스크립트 예비 경로에서는 gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 차단
+5. helper는 `--mark-send-gate` 시 gate 파일을 갱신하고 전송을 진행한다
+6. 직접 자바스크립트 예비 경로에서는 gate 파일이 없거나 120초 초과 시 `send_gate.sh` 훅이 차단
 
 ## GPT 대기 중 병행 작업
 

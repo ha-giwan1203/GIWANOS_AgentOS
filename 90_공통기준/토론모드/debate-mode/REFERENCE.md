@@ -4,7 +4,7 @@
 > 앱 운영 규칙과 문서 우선순위는 상위 `../CLAUDE.md`, `../APP_INSTRUCTIONS.md`를 따른다.
 > 토론방에 보내는 자연어 본문은 한국어만 사용한다. 예외: code block, selector/data-testid, 파일 경로, commit SHA 같은 literal, 그리고 `오류 원문:`/`에러 원문:` 라벨 1줄 인용.
 
-> 로컬 CDP 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. `--expect-last-snippet` 또는 `--expect-last-snippet-file`로 직전 최신 답변 기대값을 함께 넘겨 화면이 바뀌면 helper가 전송을 차단한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
+> 로컬 CDP 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 사용한다.
 
 ---
 
@@ -14,16 +14,12 @@
 python '.claude/scripts/cdp/cdp_chat_send.py' \
   --auto-debate-url \
   --text-file '<utf8_text_file>' \
-  --mark-send-gate \
-  --expect-last-snippet-file '<assistant_snippet_file>'
+  --mark-send-gate
 ```
 
 - `--auto-debate-url`: debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정
 - `--require-korean`: 비활성화됨 (2026-04-11). 옵션은 호환성 유지를 위해 남아있으나 실제 차단 없음
-
-- 자연어 영어 포함 시 전송 전 차단
-- assistant 최신 읽기 직후 send_gate 파일 갱신
-- `--expect-last-snippet` / `--expect-last-snippet-file`로 직전에 읽은 최신 답변 100자와 현재 화면의 최신 답변 100자를 다시 대조한다. 다르면 `blocked_reply_changed`로 전송 중단
+- `--mark-send-gate`: assistant 최신 읽기 직후 send_gate 파일 갱신
 - submit selector는 `[data-testid="send-button"], #composer-submit-button` 순서로 내부 fallback 처리
 - 토론모드 문서상 기본 전송 경로는 위 helper다.
 

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 KST — 세션 15 (설계 토론 2건 합의 + 구현)
+최종 업데이트: 2026-04-11 KST — 세션 15 (설계 토론 2건 + 구조 부채 3건 정리)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -20,14 +20,16 @@
    - scope_violation / dangerous_cmd → 현행 24h 유지
    - evidence_missing → .ok 파일 존재 시에만 auto-resolve (시간 무관)
    - pre_commit_check → auto-resolve 대상 제외 (PASS 마커 체계 미비)
-4. **smoke_test**: 102/102 ALL PASS
+4. **P0**: STATUS.md 날짜 드리프트 해소 (도메인 5개 + 업무관리 + 토론모드)
+5. **P1**: cdp_chat_send.py expect-last-snippet 완전 제거 (코드 40줄 + 문서 5개 + smoke_test)
+6. **P2**: incident_ledger .gitignore 제외 삭제 → Git 추적 유지 정책 확정 + README 반영
+7. **smoke_test**: 102/102 ALL PASS
 
 ### GPT 판정
-- 합의 확정, 구현 검증 대기
+- 설계 토론 합의 통과, 구조 부채 정리 검증 대기
 
 ### 다음 세션 안건
 - 토론 로그 JSON 포맷에 근거 필드 추가 검토 (GPT 지적 채택)
-- incident_ledger .gitignore 정리 (추적 중이나 .gitignore에 명시 — 의도 확인 필요)
 
 ---
 

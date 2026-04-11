@@ -67,19 +67,6 @@ def load_text(args: argparse.Namespace) -> str:
     raise SystemExit("--text 또는 --text-file 중 하나는 필요합니다.")
 
 
-def load_expected_last_snippet(args: argparse.Namespace) -> str | None:
-    if args.expect_last_snippet and args.expect_last_snippet_file:
-        raise SystemExit("--expect-last-snippet 과 --expect-last-snippet-file 중 하나만 사용하세요.")
-    if args.expect_last_snippet_file:
-        return Path(args.expect_last_snippet_file).read_text(encoding="utf-8")
-    return args.expect_last_snippet
-
-
-def normalize_snippet(text: str | None) -> str:
-    if text is None:
-        return ""
-    return text.replace("\r\n", "\n").strip()
-
 
 def strip_allowed_literals(text: str) -> str:
     cleaned = FENCED_CODE_RE.sub(" ", text)
@@ -196,10 +183,6 @@ def main() -> int:
     parser = base_parser("ChatGPT composer에 텍스트 전송")
     parser.add_argument("--text", default=None, help="전송할 텍스트")
     parser.add_argument("--text-file", default=None, help="전송할 UTF-8 텍스트 파일")
-    # --expect-last-snippet / --expect-last-snippet-file 제거 (사용자 지시 2026-04-11)
-    # 스니펫 비교가 인코딩/잘림 차이로 오차단을 유발하므로 폐기
-    parser.add_argument("--expect-last-snippet", default=None, help=argparse.SUPPRESS)
-    parser.add_argument("--expect-last-snippet-file", default=None, help=argparse.SUPPRESS)
     parser.add_argument("--require-korean", action="store_true", help="(비활성화됨) 한국어 가드")
     parser.add_argument("--auto-debate-url", action="store_true",
                         help="debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정")
@@ -222,15 +205,12 @@ def main() -> int:
         args.match_url_exact = url
 
     text = load_text(args)
-    # 스니펫 비교 폐기: 인자가 넘어와도 무시
-    expected_last_snippet = None
     if args.require_korean:
         ensure_korean_only(text)
 
     if args.dry_run:
         payload = {
             "status": "validated",
-            "expected_last_snippet": expected_last_snippet is not None,
             "require_korean": args.require_korean,
             "text_length": len(text),
         }
@@ -249,18 +229,6 @@ def main() -> int:
             return 3
 
         last_snippet = last_assistant_snippet(page)
-        if expected_last_snippet is not None:
-            expected_snippet = normalize_snippet(expected_last_snippet)
-            current_snippet = normalize_snippet(last_snippet)
-            if current_snippet != expected_snippet:
-                payload = {
-                    "status": "blocked_reply_changed",
-                    "reason": "직전에 확인한 최신 답변이 바뀌어 전송 중단",
-                    "expected_last_assistant_snippet": expected_snippet,
-                    "current_last_assistant_snippet": current_snippet,
-                }
-                print(json.dumps(payload, ensure_ascii=False))
-                return 6
 
         if args.mark_send_gate:
             write_gate_file(Path(args.gate_file))
