@@ -22,6 +22,15 @@
 
 ## 최근 완료
 
+### [완료] youtube-analysis 캐시 TTL/용량 상한 + OpenClaw 비교 — 세션21 (2026-04-11 세션 21)
+- **캐시 정책 구현**: TTL 7일 + 1GB 상한 + 실행시 자동 cleanup + mp4 우선 삭제 + LRU fallback 체인
+- **GPT 토론**: 채택 5건(TTL 7일/1GB/cleanup 내장/3단계 삭제/LRU fallback) / 보류→채택 1건 / 버림 1건
+- **OpenClaw 실제 구현 조사**: YT Summary는 자막 텍스트만 (영상 시각 분석 없음). GitHub 8개 변형 전부 자막 기반
+- **Gemini 영상 API 조사**: 1FPS 영상 직접 입력, 코드/UI 읽기 가능, $0.01~0.62/건
+- **GPT 검증**: 정합 PASS (1f6f3562)
+- 커밋: 1f6f3562
+- 다음 안건: Gemini 영상 API 통합, 분석 결과 노션 자동 저장
+
 ### [완료] youtube-analysis 프레임+자막 통합 분석 파이프라인 — 세션20 (2026-04-11 세션 20)
 - **youtube_analyze.py 신규**: 영상 다운로드(yt-dlp 480p) → 프레임 추출(ffmpeg 챕터+보강) → 자막 추출 → manifest.json 생성
 - **SKILL.md 개편**: 수동 모드 Step 1~3을 프레임+자막 통합 분석으로 전환
