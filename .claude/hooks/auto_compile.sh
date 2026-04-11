@@ -6,12 +6,24 @@
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path','') or d.get('tool_input',{}).get('path',''))" 2>/dev/null)
+# safe_json_get 사용 (python3 JSON 파싱 대체, GPT+Claude 합의 2026-04-11)
+FILE_PATH=$(echo "$INPUT" | safe_json_get "file_path" 2>/dev/null)
+if [ -z "$FILE_PATH" ]; then
+  FILE_PATH=$(echo "$INPUT" | safe_json_get "path" 2>/dev/null)
+fi
+
+# python3/python 동적 감지
+PY_CMD=""
+if command -v python3 >/dev/null 2>&1; then
+  PY_CMD="python3"
+elif command -v python >/dev/null 2>&1; then
+  PY_CMD="python"
+fi
 
 # .py 파일만 대상
-if [[ "$FILE_PATH" == *.py ]]; then
+if [[ "$FILE_PATH" == *.py ]] && [ -n "$PY_CMD" ]; then
   if [ -f "$FILE_PATH" ]; then
-    RESULT=$(python3 -m py_compile "$FILE_PATH" 2>&1)
+    RESULT=$($PY_CMD -m py_compile "$FILE_PATH" 2>&1)
     if [ $? -ne 0 ]; then
       hook_incident "compile_fail" "auto_compile" "$FILE_PATH" "$RESULT" 2>/dev/null || true
       echo "{\"message\":\"[COMPILE FAIL] $FILE_PATH 문법 오류: $RESULT\"}"

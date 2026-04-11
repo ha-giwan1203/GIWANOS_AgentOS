@@ -380,6 +380,95 @@ check $? "finish 명령이 helper 기본 경로를 문서화함"
 
 echo ""
 
+# === 24. safe_json_get 이스케이프 순서 회귀 ===
+echo "--- 24. safe_json_get escape 회귀 (placeholder 방식) ---"
+source "$HOOKS_DIR/hook_common.sh" 2>/dev/null
+# \\n 이 개행으로 변환되지 않아야 함
+TEST_VAL=$(printf '{"path":"C:\\\\new_folder\\\\test"}' | safe_json_get "path" 2>/dev/null)
+LINE_COUNT=$(printf '%s' "$TEST_VAL" | wc -l)
+[ "$LINE_COUNT" -le 1 ]
+check $? "safe_json_get: \\\\n 이 개행으로 오변환되지 않음 (lines=$LINE_COUNT)"
+
+grep -q 'BSLASH' "$HOOKS_DIR/hook_common.sh"
+check $? "safe_json_get: placeholder 방식 사용 확인"
+
+echo ""
+
+# === 25. stop_guard.sh — sed JSON 직접 파싱 제거 확인 ===
+echo "--- 25. stop_guard.sh sed 파싱 제거 회귀 ---"
+grep -q 'last_assistant_text' "$HOOKS_DIR/stop_guard.sh"
+check $? "stop_guard: last_assistant_text() 사용"
+
+! grep -q 'sed.*"text".*"type":"assistant"' "$HOOKS_DIR/stop_guard.sh" 2>/dev/null
+check $? "stop_guard: sed JSON 직접 파싱 없음"
+
+echo ""
+
+# === 26. commit_gate.sh — fail-open 주석 확인 ===
+echo "--- 26. commit_gate.sh fail-open 회귀 ---"
+grep -q 'fail-open' "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate: fail-open 주석 존재"
+
+! grep -q 'fail-closed' "$HOOKS_DIR/commit_gate.sh" 2>/dev/null
+check $? "commit_gate: fail-closed 주석 없음"
+
+echo ""
+
+# === 27. evidence_init 중복 제거 확인 ===
+echo "--- 27. evidence_init 중복 제거 ---"
+grep -q 'evidence_init()' "$HOOKS_DIR/hook_common.sh"
+check $? "hook_common: evidence_init() 정의 존재"
+
+grep -q 'evidence_init' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: evidence_init 호출"
+
+grep -q 'evidence_init' "$HOOKS_DIR/evidence_stop_guard.sh"
+check $? "evidence_stop_guard: evidence_init 호출"
+
+! grep -q '^fresh_file()' "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
+check $? "evidence_gate: 로컬 fresh_file 중복 정의 없음"
+
+echo ""
+
+# === 28. write_marker v6 JSON 메타데이터 ===
+echo "--- 28. write_marker JSON 메타데이터 ---"
+grep -q 'source_class' "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker: source_class 분류 존재"
+
+grep -q 'after_state_sync' "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker: after_state_sync 필드 존재"
+
+grep -q 'write_marker.json' "$HOOKS_DIR/write_marker.sh"
+check $? "write_marker: .json 마커 사용 (.flag 대체)"
+
+echo ""
+
+# === 29. completion_gate v7 JSON 마커 연동 ===
+echo "--- 29. completion_gate v7 JSON 마커 ---"
+grep -q 'write_marker.json' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: write_marker.json 참조"
+
+grep -q 'after_state_sync' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: after_state_sync 즉시통과 로직"
+
+grep -q 'v7' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: v7 버전 표기"
+
+echo ""
+
+# === 30. README 훅 개수 정합성 ===
+echo "--- 30. README 훅 개수 ---"
+grep -q '19개' "$HOOKS_DIR/README.md"
+check $? "README: 19개 훅 표기"
+
+grep -q '실패 계약' "$HOOKS_DIR/README.md"
+check $? "README: 실패 계약 (Failure Contract) 표 존재"
+
+grep -q 'final_check.sh' "$HOOKS_DIR/README.md"
+check $? "README: final_check.sh 보조 스크립트 기재"
+
+echo ""
+
 # === 결과 ===
 echo "=== 결과: $PASS/$TOTAL PASS, $FAIL FAIL ==="
 if [ "$FAIL" -gt 0 ]; then

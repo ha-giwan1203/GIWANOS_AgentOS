@@ -6,25 +6,8 @@ source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 
 INPUT="$(cat)"
 
-SESSION_KEY="$(session_key)"
-SESSION_DIR="$STATE_EVIDENCE/$SESSION_KEY"
-REQ_DIR="$SESSION_DIR/requires"
-PROOF_DIR="$SESSION_DIR/proofs"
-START_FILE="$SESSION_DIR/.session_start"
-
-mkdir -p "$REQ_DIR" "$PROOF_DIR"
-
-if [ ! -f "$START_FILE" ]; then
-  : > "$START_FILE"
-fi
-
-fresh_file() {
-  local f="$1"
-  [ -f "$f" ] && [ "$f" -nt "$START_FILE" ]
-}
-
-fresh_req() { fresh_file "$REQ_DIR/$1.req"; }
-fresh_ok()  { fresh_file "$PROOF_DIR/$1.ok"; }
+# hook_common.sh의 evidence_init() 사용 (중복 제거, GPT+Claude 합의 2026-04-11)
+evidence_init
 
 has_any_req() {
   find "$REQ_DIR" -maxdepth 1 -type f -name '*.req' -newer "$START_FILE" | grep -q .

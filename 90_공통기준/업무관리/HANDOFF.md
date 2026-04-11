@@ -4,24 +4,36 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 11:01 KST — 세션 8 (GPT 분석 독립 검증 + 훅 버그 3건 수정)
+최종 업데이트: 2026-04-11 12:40 KST — 세션 9 (GPT 재평가 8.4→8.1 합의 + 개선 6건 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 8)
+## 0. 최신 세션 (2026-04-11 세션 9)
 
 ### 이번 세션 완료
-1. **GPT 하네스 평가 독립 검증** — GPT 7.9/10 분석을 실물 코드로 독립 검증. GPT 주장 채택 0건/보류 2건/버림 2건/부분오류 1건
-2. **GPT 미발견 버그 3건 지적** → GPT가 3건 모두 채택
-3. **hook_common.sh:84 수정** — safe_json_get 이스케이프 복원 순서 (\\를 첫 번째로)
-4. **stop_guard.sh:26 수정** — sed 직접 파싱 → last_assistant_text() 재사용
-5. **commit_gate.sh:13 수정** — 주석 fail-closed → fail-open 정정
+1. **GPT 재평가 8.4/10 독립 검증** — 8.0~8.2 적정 판정, 토론 합의 8.1/10
+2. **P0: write_marker v6 JSON 메타데이터** — source_class(code/doc/runtime), after_state_sync(true/false). completion_gate v7 연동으로 structural_intermediate 오탐 해소
+3. **P1: safe_json_get placeholder 방식** — \\n 오변환 근본 수정 (\\→placeholder→복원)
+4. **P1: evidence_init() 중복 제거** — evidence_gate/evidence_stop_guard 17줄 → hook_common 공통 함수
+5. **P1: README 19개 훅 + 실패 계약 표 + 이벤트층 + final_check.sh**
+6. **P1: auto_compile.sh** — python3→safe_json_get, python3/python 동적 감지
+7. **P2: smoke_test.sh 회귀 테스트 7섹션 추가** — 95/95 ALL PASS
+
+### 변경 파일
+- `.claude/hooks/hook_common.sh` — safe_json_get placeholder + evidence_init()
+- `.claude/hooks/write_marker.sh` — v5→v6 JSON 메타데이터
+- `.claude/hooks/completion_gate.sh` — v6→v7 after_state_sync 즉시통과
+- `.claude/hooks/evidence_gate.sh` — evidence_init 호출로 17줄 중복 제거
+- `.claude/hooks/evidence_stop_guard.sh` — 동일
+- `.claude/hooks/auto_compile.sh` — safe_json_get + python 동적 감지
+- `.claude/hooks/README.md` — 19개 + 이벤트층 + 실패 계약 + final_check
+- `.claude/hooks/smoke_test.sh` — 24~30번 섹션 7개 추가
 
 ### 다음 AI 액션
-1. **[완료] PR #10 머지** — 2026-04-11 10:28 KST 머지 완료 (2f3d11e0)
+1. **[보류] completion_gate 오탐 실측** — write_marker v6 도입 후 structural_intermediate 재발 여부 모니터링
 2. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후
-3. **[보류] completion_gate false_positive 검증** — incident_ledger 실물 샘플 확인 후 판정
+3. GPT에 커밋 SHA 공유 (토론방)
 
 ---
 

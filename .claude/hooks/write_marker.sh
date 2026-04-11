@@ -1,26 +1,46 @@
 #!/bin/bash
 # PostToolUse(Edit|Write) — 파일 변경 추적 마커
 # completion_gate가 이 마커로 TASKS/HANDOFF 갱신 필요 여부 판단
-# v5: python3→bash 전환 (#34457 Windows hooks 멈춤 대응)
+# v6: plain timestamp → JSON 메타데이터 (GPT+Claude 합의 2026-04-11)
+#   source_class: code|doc|runtime 분류 → completion_gate 오탐 감소
+#   after_state_sync: 상태문서 갱신 후 true → 즉시 통과 가능
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 INPUT=$(cat)
 
-# bash-only JSON 파싱 (python3 의존 제거)
-FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# safe_json_get 사용 (sed 단독 파싱 대체)
+FILE_PATH=$(echo "$INPUT" | safe_json_get "file_path" 2>/dev/null)
 if [ -z "$FILE_PATH" ]; then
-  FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  FILE_PATH=$(echo "$INPUT" | safe_json_get "path" 2>/dev/null)
 fi
 
-MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
+MARKER="$STATE_AGENT_CONTROL/write_marker.json"
+LEGACY_MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
 
-# 상태문서(TASKS/HANDOFF/STATUS) 수정 → marker 삭제 (갱신 완료 의미)
+# 레거시 .flag 파일 정리
+if [ -f "$LEGACY_MARKER" ] && [ ! -f "$MARKER" ]; then
+  rm -f "$LEGACY_MARKER" 2>/dev/null
+fi
+
+# 상태문서(TASKS/HANDOFF/STATUS) 수정 → marker의 after_state_sync=true로 갱신
 if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md|STATUS\.md)'; then
-  rm -f "$MARKER" 2>/dev/null
+  if [ -f "$MARKER" ]; then
+    # 기존 마커의 after_state_sync를 true로 업데이트
+    local_ts=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+    SOURCE_FILE=$(echo "$(cat "$MARKER" 2>/dev/null)" | safe_json_get "source_file" 2>/dev/null || echo "unknown")
+    SOURCE_CLASS=$(echo "$(cat "$MARKER" 2>/dev/null)" | safe_json_get "source_class" 2>/dev/null || echo "unknown")
+    FILE_PATH_SAFE="${SOURCE_FILE//\"/\\\"}"
+    printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":true,"session_key":"%s"}\n' \
+      "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER" 2>/dev/null
+  fi
   exit 0
 fi
 
 # 로그·플래그·CLAUDE.md 등 운영 파일은 마킹 불필요
-if echo "$FILE_PATH" | grep -qiE '(CLAUDE\.md|hook_log|\.flag)'; then
+if echo "$FILE_PATH" | grep -qiE '(CLAUDE\.md|hook_log|\.flag|\.json$)' && echo "$FILE_PATH" | grep -qiE '(hook_log|write_marker|\.flag)'; then
+  exit 0
+fi
+# CLAUDE.md는 마킹 불필요
+if echo "$FILE_PATH" | grep -qiE 'CLAUDE\.md$'; then
   exit 0
 fi
 
@@ -30,5 +50,16 @@ if echo "$FILE_PATH" | grep -qE '\.claude/(memory|plans|state|settings)'; then
   exit 0
 fi
 
-# 그 외 구현 파일 수정 → marker 생성/갱신
-date '+%Y-%m-%d %H:%M:%S' > "$MARKER" 2>/dev/null
+# source_class 분류
+SOURCE_CLASS="code"
+if echo "$FILE_PATH" | grep -qE '\.claude/(hooks|rules|commands|scripts)/'; then
+  SOURCE_CLASS="runtime"
+elif echo "$FILE_PATH" | grep -qiE '\.(md|txt|rst)$'; then
+  SOURCE_CLASS="doc"
+fi
+
+# JSON 메타데이터 마커 생성
+local_ts=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+FILE_PATH_SAFE="${FILE_PATH//\"/\\\"}"
+printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":false,"session_key":"%s"}\n' \
+  "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER" 2>/dev/null
