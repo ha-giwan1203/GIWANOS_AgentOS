@@ -17,8 +17,16 @@
 3. **incident_ledger resolved 아카이브**: 30일 경과 resolved 항목 → .archive.jsonl 이동 (--archive 옵션)
 4. **cdp_chat_send.py --expect-last-snippet 폐기**: 인코딩/잘림 차이로 오차단 유발하여 제거
 
-### 다음 세션 안건
-→ TASKS.md "진행중 / 보류" 섹션 참조
+### 다음 세션 안건 (세션 14 — 동일 워크플로우 반복)
+**작업 패턴**: 독립 취약점 점검 → GPT 토론("클로드 코드 평가" 방) → 합의 → 구현 → 검증
+**점검 대상 (세션 13 미처리)**:
+1. safe_json_get sed 파싱 한계 — 모든 훅의 공통 기반, 중첩 객체/이스케이프 취약
+2. Windows 워크트리 잠금 내구성 — 실제 삭제 실패 사례 있음
+3. incident_repair patch_candidates 빈 값 4개 보강 (scope_violation, dangerous_cmd, stop_guard_block, compile_fail)
+4. completion_gate v8 장기 실측 — deny/오탐 비율 추적
+5. auto-resolve 증거 기반 해소 정밀화
+
+→ 메모리 `project_vulnerability_review_workflow.md` 참조
 
 ---
 
