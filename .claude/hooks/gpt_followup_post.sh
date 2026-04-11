@@ -9,6 +9,11 @@ INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | safe_json_get "tool_name")
 TOOL_INPUT=$(echo "$INPUT" | safe_json_get "tool_input")
 
+if [ -z "$TOOL_NAME" ]; then
+  hook_log "PostToolUse/gpt_followup_post" "WARN: tool_name 파싱 실패 — skip" 2>/dev/null
+  exit 0
+fi
+
 mkdir -p "$STATE_AGENT_CONTROL" 2>/dev/null
 PENDING="$STATE_AGENT_CONTROL/gpt_followup_pending.flag"
 

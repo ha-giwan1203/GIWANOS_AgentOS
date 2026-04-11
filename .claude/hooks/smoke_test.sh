@@ -238,6 +238,26 @@ NEWLINE_RESULT=$(echo '{"msg":"line1\\nline2"}' | safe_json_get "msg")
 echo "$NEWLINE_RESULT" | grep -q 'line2'
 check $? "\\n 이스케이프 → 개행 복원 정상"
 
+# 14-9: boolean true 추출 (세션14 Stage 3)
+BOOL_TRUE=$(echo '{"after_state_sync":true,"name":"x"}' | safe_json_get "after_state_sync")
+test "$BOOL_TRUE" = "true"
+check $? "boolean true 추출 정상"
+
+# 14-10: boolean false 추출
+BOOL_FALSE=$(echo '{"flag":false,"name":"x"}' | safe_json_get "flag")
+test "$BOOL_FALSE" = "false"
+check $? "boolean false 추출 정상"
+
+# 14-11: null 추출
+NULL_VAL=$(echo '{"val":null,"name":"x"}' | safe_json_get "val")
+test "$NULL_VAL" = "null"
+check $? "null 리터럴 추출 정상"
+
+# 14-12: 숫자 추출
+NUM_VAL=$(echo '{"count":42,"name":"x"}' | safe_json_get "count")
+test "$NUM_VAL" = "42"
+check $? "숫자 값 추출 정상"
+
 echo ""
 
 # === 15. 퇴행 방지: 구 로그 직접 참조 0건 ===
@@ -404,13 +424,13 @@ check $? "stop_guard: sed JSON 직접 파싱 없음"
 
 echo ""
 
-# === 26. commit_gate.sh — fail-open 주석 확인 ===
-echo "--- 26. commit_gate.sh fail-open 회귀 ---"
-grep -q 'fail-open' "$HOOKS_DIR/commit_gate.sh"
-check $? "commit_gate: fail-open 주석 존재"
+# === 26. commit_gate.sh — fail-closed 봉합 확인 (세션13 수정 → 세션14 테스트 갱신) ===
+echo "--- 26. commit_gate.sh fail-closed 봉합 ---"
+grep -q 'fail-closed' "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate: fail-closed 주석 존재 (세션13 봉합)"
 
-! grep -q 'fail-closed' "$HOOKS_DIR/commit_gate.sh" 2>/dev/null
-check $? "commit_gate: fail-closed 주석 없음"
+grep -qE 'git (commit|push)' "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate: raw INPUT fallback 존재"
 
 echo ""
 

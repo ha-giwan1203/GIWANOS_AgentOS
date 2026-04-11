@@ -30,7 +30,7 @@ if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md|STATUS\.md)'; then
     SOURCE_CLASS=$(echo "$(cat "$MARKER" 2>/dev/null)" | safe_json_get "source_class" 2>/dev/null || echo "unknown")
     FILE_PATH_SAFE="${SOURCE_FILE//\"/\\\"}"
     printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":true,"session_key":"%s"}\n' \
-      "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER" 2>/dev/null
+      "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER.tmp" 2>/dev/null && mv -f "$MARKER.tmp" "$MARKER" 2>/dev/null
   fi
   exit 0
 fi
@@ -62,4 +62,4 @@ fi
 local_ts=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
 FILE_PATH_SAFE="${FILE_PATH//\"/\\\"}"
 printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":false,"session_key":"%s"}\n' \
-  "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER" 2>/dev/null
+  "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER.tmp" 2>/dev/null && mv -f "$MARKER.tmp" "$MARKER" 2>/dev/null

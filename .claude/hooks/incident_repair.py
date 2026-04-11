@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -30,9 +32,9 @@ def infer_next_action(entry: dict[str, Any]) -> str:
     if isinstance(hinted, str) and hinted.strip():
         return hinted.strip()
 
-    reason = str(entry.get("classification_reason", ""))
-    hook = str(entry.get("hook", ""))
-    detail = str(entry.get("detail", ""))
+    reason = entry.get("classification_reason") or ""
+    hook = entry.get("hook") or ""
+    detail = entry.get("detail") or ""
 
     # classification_reason 기반 (세션12 enum 표준화)
     actions: dict[str, str] = {
@@ -71,9 +73,9 @@ def infer_next_action(entry: dict[str, Any]) -> str:
 
 
 def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
-    hook = str(entry.get("hook", ""))
-    classification = str(entry.get("classification_reason", ""))
-    file_field = str(entry.get("file", "")).strip()
+    hook = entry.get("hook") or ""
+    classification = entry.get("classification_reason") or ""
+    file_field = (entry.get("file") or "").strip()
     candidates: list[str] = []
 
     if file_field:
@@ -136,9 +138,9 @@ def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
 
 
 def infer_verify_steps(entry: dict[str, Any]) -> list[str]:
-    reason = str(entry.get("classification_reason", ""))
-    hook = str(entry.get("hook", ""))
-    detail = str(entry.get("detail", ""))
+    reason = entry.get("classification_reason") or ""
+    hook = entry.get("hook") or ""
+    detail = entry.get("detail") or ""
 
     # classification_reason 기반 (세션12 표준화)
     reason_steps: dict[str, list[str]] = {
@@ -217,8 +219,8 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     for entry in entries:
         if entry.get("resolved"):
             continue
-        reason = str(entry.get("classification_reason", ""))
-        hook = str(entry.get("hook", ""))
+        reason = entry.get("classification_reason") or ""
+        hook = entry.get("hook") or ""
 
         should_resolve = False
 
@@ -258,9 +260,21 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             count += 1
 
     if not dry_run and count > 0:
-        with ledger_path.open("w", encoding="utf-8") as fh:
-            for entry in entries:
-                fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        # 원자적 쓰기 (세션14)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(ledger_path.parent), suffix=".tmp"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                for entry in entries:
+                    fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            os.replace(tmp_path, str(ledger_path))
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
 
     return count
 
@@ -300,9 +314,22 @@ def archive_resolved(ledger_path: Path, days: int = 30, dry_run: bool = False) -
         with archive_path.open("a", encoding="utf-8") as fh:
             for entry in archive:
                 fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
-        with ledger_path.open("w", encoding="utf-8") as fh:
-            for entry in keep:
-                fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        # 원자적 쓰기: temp 파일 → os.replace (세션14: 중단 시 데이터 손실 방지)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(ledger_path.parent), suffix=".tmp"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                for entry in keep:
+                    fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            os.replace(tmp_path, str(ledger_path))
+        except Exception:
+            # 실패 시 temp 파일 정리 — 원본 ledger는 보존됨
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
 
     return len(archive)
 

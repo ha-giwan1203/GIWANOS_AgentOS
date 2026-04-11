@@ -77,6 +77,7 @@ hook_skill_usage() {
 # 사용법: VALUE=$(echo "$JSON" | safe_json_get "key_name")
 # 문자열 값: 따옴표 내부를 이스케이프 인식하며 추출
 # 객체 값: 중괄호 매칭으로 추출
+# 원시 값: true/false/null/숫자 추출 (세션14 추가)
 safe_json_get() {
   local key="$1"
   local input
@@ -94,6 +95,12 @@ safe_json_get() {
   fi
   # 2차: 객체/배열 값 — 첫 번째 { 또는 [ 부터 매칭
   val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*\(\({[^}]*}\)\|\(\[.*\]\)\).*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    printf '%s' "$val"
+    return 0
+  fi
+  # 3차: 원시 값 — true/false/null/숫자 (따옴표 없는 리터럴)
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*\(true\|false\|null\|-\?[0-9][0-9.eE+-]*\)[[:space:]]*[,}].*/\1/p' | head -1)
   if [ -n "$val" ]; then
     printf '%s' "$val"
     return 0
@@ -220,5 +227,12 @@ hook_incident() {
   file="${file//\"/\\\"}"
   extra_json=$(printf '%s' "$extra_json" | tr -d '\n')
   echo "{\"ts\":\"$ts\",\"type\":\"$type\",\"hook\":\"$hook\",\"file\":\"$file\",\"detail\":\"$detail\",\"resolved\":false${extra_json:+,$extra_json}}" >> "$INCIDENT_LEDGER"
-  # incident ledger는 감사/지표 원본이므로 무회전 (hook_log와 달리 _rotate_file 미적용)
+  # 크기 경고: 512KB 초과 시 로그 (삭제는 하지 않음 — archive_resolved 수동 실행 유도)
+  if [ -f "$INCIDENT_LEDGER" ]; then
+    local _sz
+    _sz=$(wc -c < "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
+    if [ "$_sz" -gt 512000 ] 2>/dev/null; then
+      hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — python3 .claude/hooks/incident_repair.py --archive 실행 권장" 2>/dev/null || true
+    fi
+  fi
 }
