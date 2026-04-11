@@ -23,13 +23,14 @@
 4. **P0**: STATUS.md 날짜 드리프트 해소 (도메인 5개 + 업무관리 + 토론모드)
 5. **P1**: cdp_chat_send.py expect-last-snippet 완전 제거 (코드 40줄 + 문서 5개 + smoke_test)
 6. **P2**: incident_ledger .gitignore 제외 삭제 → Git 추적 유지 정책 확정 + README 반영
-7. **smoke_test**: 102/102 ALL PASS
+7. **P3**: 토론 로그 JSON 근거 필드 보강 — harness에 summary_counts + item/label/evidence/ref 4필드 스키마 (SKILL.md/REFERENCE.md 갱신)
+8. **smoke_test**: 102/102 ALL PASS
 
 ### GPT 판정
-- 설계 토론 합의 통과, 구조 부채 정리 검증 대기
+- 9.2/10 통과, 구조 부채 + 증거성 보강 완료
 
 ### 다음 세션 안건
-- 토론 로그 JSON 포맷에 근거 필드 추가 검토 (GPT 지적 채택)
+- 신규 세션에서 보강된 JSON 로그 스키마 실전 적용 (첫 사용 검증)
 
 ---
 

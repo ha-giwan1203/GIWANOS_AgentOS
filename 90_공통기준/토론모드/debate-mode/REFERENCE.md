@@ -122,7 +122,9 @@ document.querySelectorAll('[data-message-author-role="assistant"]')
 └── debate_YYYYMMDD_HHMMSS.json
 ```
 
-JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `critic_review`
+JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `result`, `critic_review`
+
+턴별 harness 스키마 → SKILL.md "로그" 섹션 참조. 핵심: `summary_counts`(숫자) + 채택/보류/버림 각각 `{item, label, evidence, ref}` 배열.
 
 ---
 

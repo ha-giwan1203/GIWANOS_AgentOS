@@ -160,6 +160,29 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 ## 로그
 
-JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `critic_review`
+JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `result`, `critic_review`
+
+### 턴별 harness 스키마 (세션15 합의)
+```json
+{
+  "turn": 1,
+  "claude": "의제 요약",
+  "gpt": "응답 요약",
+  "harness": {
+    "summary_counts": {"채택": 2, "보류": 1, "버림": 0},
+    "채택": [
+      {"item": "대상", "label": "실증됨|일반론|환경미스매치|과잉설계", "evidence": "근거 1줄", "ref": "파일:행번호 또는 커밋SHA"}
+    ],
+    "보류": [],
+    "버림": []
+  }
+}
+```
+
+- `summary_counts`: 빠른 스캔용 숫자 요약 (필수)
+- `label`: 실증됨 / 일반론 / 환경미스매치 / 과잉설계 중 1개
+- `evidence`: 판정 근거 1줄
+- `ref`: 파일경로:행번호, 커밋SHA, 로그파일명 중 하나 (없으면 null)
+- `result` 섹션도 동일 스키마 적용
 
 오류 대응, JS 코드 상세, 변경 이력 → `REFERENCE.md`

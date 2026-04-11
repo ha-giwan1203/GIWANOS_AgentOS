@@ -28,6 +28,7 @@
 - **P0**: STATUS.md 날짜 드리프트 해소 (도메인 5개 + 업무관리 + 토론모드)
 - **P1**: cdp_chat_send.py expect-last-snippet 완전 제거 (코드+문서+smoke_test 정리)
 - **P2**: incident_ledger .gitignore 제외 삭제 → Git 추적 유지 정책 확정
+- **P3**: 토론 로그 JSON 근거 필드 보강 — harness에 summary_counts + item/label/evidence/ref 4필드 스키마 확정
 - smoke_test: 102/102 ALL PASS
 
 ### [완료] 취약점 7건 개선 — 독립 점검 세션14 (2026-04-11 세션 14)
