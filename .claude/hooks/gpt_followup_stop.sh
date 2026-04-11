@@ -13,6 +13,15 @@ if [ ! -f "$PENDING" ]; then
   exit 0
 fi
 
+# JSON 메타: 세션 키 불일치(다른 세션 잔재)면 정리하고 통과
+PENDING_SESSION=$(safe_json_get "session_key" < "$PENDING" 2>/dev/null || echo "")
+CURRENT_SESSION=$(session_key 2>/dev/null || echo "")
+if [ -n "$PENDING_SESSION" ] && [ -n "$CURRENT_SESSION" ] && [ "$PENDING_SESSION" != "$CURRENT_SESSION" ]; then
+  rm -f "$PENDING" 2>/dev/null
+  hook_log "Stop" "gpt_followup_stop: stale flag 정리 (session_key 불일치)" 2>/dev/null || true
+  exit 0
+fi
+
 # 예외 보고 패턴 확인 (timeout, 로그인 만료, 검토만 등)
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
 LAST_MSG=$(echo "$INPUT" | safe_json_get "last_assistant_message")

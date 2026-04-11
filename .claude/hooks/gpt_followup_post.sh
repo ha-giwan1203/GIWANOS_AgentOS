@@ -23,13 +23,15 @@ if echo "$TNAME_LOWER" | grep -q "javascript"; then
       rm -f "$PENDING" 2>/dev/null
       exit 0
     fi
-    echo "gpt_response_read" > "$PENDING"
+    printf '{"event":"gpt_response_read","session_key":"%s","created_at":"%s"}\n' \
+      "$(session_key 2>/dev/null || echo unknown)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PENDING"
     exit 0
   fi
 fi
 
 if echo "$TNAME_LOWER" | grep -qiE '(get_page_text|read_page)'; then
-  echo "gpt_response_read" > "$PENDING"
+  printf '{"event":"gpt_response_read","session_key":"%s","created_at":"%s"}\n' \
+    "$(session_key 2>/dev/null || echo unknown)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PENDING"
   exit 0
 fi
 

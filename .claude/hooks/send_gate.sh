@@ -61,7 +61,8 @@ fi
 DEBATE_FLAG="${TEMP:-/tmp}/.claude_domain_debate_active"
 if [ -f "$DEBATE_FLAG" ]; then
   ACTIVE_DOMAIN=$(cat "$DEBATE_FLAG" 2>/dev/null)
-  if [[ "$ACTIVE_DOMAIN" != "debate" ]]; then
+  # 매칭 완화 (세션 11): exact → contains. "debate" 문자열 포함 시 활성 판정
+  if [[ "$ACTIVE_DOMAIN" != *"debate"* ]]; then
     exit 0
   fi
 else

@@ -46,6 +46,18 @@ readme_active_hook_count() {
     | grep -c '^| .*`[A-Za-z0-9_-]\+\.sh` .*|'
 }
 
+# README에서 개별 훅 이름 추출 (세션 11: 이름 대조 lint용)
+readme_active_hook_names() {
+  local readme_file="${1:-$README_FILE}"
+  if [ ! -f "$readme_file" ]; then
+    return 1
+  fi
+  awk '/^## 활성 Hook/{flag=1; next} /^## 보조 스크립트/{flag=0} flag' "$readme_file" 2>/dev/null \
+    | grep -oE '`[A-Za-z0-9_-]+\.sh`' \
+    | sed 's/`//g' \
+    | sort -u
+}
+
 status_hook_count() {
   local status_file="${1:-$STATUS_FILE}"
   local line
@@ -107,6 +119,18 @@ if [ -n "$README_COUNT" ]; then
       fail "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
     else
       warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+    fi
+    # 개별 훅 이름 대조 (세션 11 lint 개선)
+    README_HOOKS=$(readme_active_hook_names 2>/dev/null || true)
+    if [ -n "$README_HOOKS" ] && [ -n "$REGISTERED_HOOKS" ]; then
+      ONLY_SETTINGS=$(comm -23 <(printf '%s\n' "$REGISTERED_HOOKS") <(printf '%s\n' "$README_HOOKS") 2>/dev/null)
+      ONLY_README=$(comm -13 <(printf '%s\n' "$REGISTERED_HOOKS") <(printf '%s\n' "$README_HOOKS") 2>/dev/null)
+      if [ -n "$ONLY_SETTINGS" ]; then
+        echo "    settings에만 있음: $ONLY_SETTINGS"
+      fi
+      if [ -n "$ONLY_README" ]; then
+        echo "    README에만 있음: $ONLY_README"
+      fi
     fi
   else
     echo "  [OK] README hook 개수 일치"
@@ -212,7 +236,13 @@ if [ ! -f "$MARKER" ] && [ -f "$LEGACY_MARKER" ]; then
 fi
 
 if [ -f "$MARKER" ]; then
-  MARKER_EPOCH=$(file_mtime "$MARKER")
+  # write_marker.json의 created_at 필드 우선, 없으면 mtime fallback (마커 해석 통일, 세션 11)
+  MARKER_CREATED=$(safe_json_get "created_at" < "$MARKER" 2>/dev/null || echo "")
+  if [ -n "$MARKER_CREATED" ]; then
+    MARKER_EPOCH=$(date -d "$MARKER_CREATED" +%s 2>/dev/null || file_mtime "$MARKER")
+  else
+    MARKER_EPOCH=$(file_mtime "$MARKER")
+  fi
   for F in "$TASKS" "$HANDOFF"; do
     NAME=$(basename "$F")
     if [ -f "$F" ]; then

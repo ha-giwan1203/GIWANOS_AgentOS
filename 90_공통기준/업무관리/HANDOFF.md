@@ -4,29 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 13:43 KST — 세션 10 (GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 200)
+최종 업데이트: 2026-04-11 14:10 KST — 세션 11 (안건 2·3 구현 + 워크트리 정리 보류)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 10)
+## 0. 최신 세션 (2026-04-11 세션 11)
 
 ### 이번 세션 완료
-1. **GPT 토론 안건 4건 합의 확정**
-   - 안건 1: 워크트리 삭제 기준 5개 (필수 4 + 보조 1 + PR 1회성 + 삭제 금지 예외 4)
-   - 안건 2: publish_worktree_to_main.sh 설계 (B-lite, cherry-pick/ff, --dry-run)
-   - 안건 3: 하네스 즉시 개선 4건 (flag 메타, 마커 통일, README lint, send gate 완화) + 보류 2건
-   - 안건 4: 보류 안건 모니터링 기준 조정 (이중/3축 기준)
-2. **cdp_chat_send.py LAST_SNIPPET_LIMIT 100→200 상향**
-3. **GPT 최종 판정: 합의 확정**
+1. **publish_worktree_to_main.sh 구현** — B-lite 방식 (--ff-only/--cherry-pick/--dry-run)
+2. **하네스 즉시 개선 4건 구현**
+   - gpt_followup_pending.flag → JSON 메타데이터 (session_key, created_at) + 세션 불일치 자동 정리
+   - final_check.sh 마커 해석 통일 (write_marker.json created_at 우선, mtime fallback)
+   - README lint 개선 (개수 비교 → 개별 훅 이름 대조 + 차집합 출력)
+   - send_gate.sh debate 매칭 완화 (exact → contains)
+3. **워크트리 정리 분류 완료** — 9개 전부 삭제 대상 확인 (1군 2개/2군 4개/3군 3개)
+4. **워크트리 삭제 차단** — Windows 프로세스 잠금 (다른 Claude 세션이 디렉토리 참조 중)
+5. **smoke_test: 95/95 ALL PASS**
 
 ### 다음 세션 안건
-1. **워크트리 정리 실행** — 합의 기준으로 8개 워크트리 점검 + 삭제
-2. **publish_worktree_to_main.sh 구현** — B-lite 방식 스크립트 작성
-3. **하네스 즉시 개선 4건 구현** — flag 메타데이터화, 마커 해석 통일, README lint, send gate 완화
-4. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
-5. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
-6. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
+1. **워크트리 삭제 재시도** — 불필요 Claude 세션 종료 후 9개 삭제 실행
+2. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
+3. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
+4. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
 
 ---
 

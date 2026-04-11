@@ -10,25 +10,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 세션 10 (GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 200 상향)
+최종 업데이트: 2026-04-11 — 세션 11 (안건 2·3 구현 + 워크트리 정리 보류)
 
 ---
 
 ## 다음 세션 안건
 
-### [진행중] 안건 1 실행 — 불필요 워크트리 정리
-- 삭제 기준 합의 완료 (세션 10): main 반영 확인 + clean + TASKS/HANDOFF 비활성 + 삭제 금지 예외
-- 실제 워크트리 8개 점검 후 삭제 대상 선별 필요
-
-### [진행중] 안건 2 실행 — publish_worktree_to_main.sh 구현
-- 방향 B-lite 채택: clean 검사 → cherry-pick/ff → push → SHA 출력
-- 옵션: --ff-only, --cherry-pick, --dry-run
-
-### [진행중] 안건 3 실행 — 하네스 즉시 개선 4건
-- gpt_followup_pending.flag JSON 메타데이터화 (session_key, created_at)
-- final_check/completion_gate 마커 해석 규칙 통일
-- README matcher/역할 lint (settings.local.json 기준)
-- send gate 매칭 완화 (exact → prefix/contains)
+### [차단] 안건 1 — 불필요 워크트리 정리
+- 분류 완료: 1군(2개)/2군(4개)/3군(3개) — 전부 삭제 대상
+- **차단 사유**: Windows 프로세스 잠금(다른 Claude Code 세션이 디렉토리 참조 중)
+- 해결: 불필요 Claude 세션 종료 후 재시도
 
 ### [보류] completion_gate 오탐 실측 모니터링
 - write_marker v6 도입 후 재발 여부 모니터링 중 (데이터 0건 오탐)
@@ -45,6 +36,16 @@
 ---
 
 ## 최근 완료
+
+### [완료] 안건 2·3 구현 + 워크트리 정리 보류 (2026-04-11 세션 11)
+- publish_worktree_to_main.sh 구현 (B-lite: --ff-only/--cherry-pick/--dry-run)
+- 하네스 즉시 개선 4건 구현:
+  - gpt_followup_pending.flag JSON 메타데이터화 (session_key, created_at) + 세션 불일치 자동 정리
+  - final_check.sh 마커 해석 통일 (write_marker.json created_at 우선, mtime fallback)
+  - README lint 개선 (개수 비교 → 개별 훅 이름 대조, 차집합 출력)
+  - send_gate.sh debate 매칭 완화 (exact → contains)
+- 워크트리 정리: 9개 분류 완료, Windows 프로세스 잠금으로 삭제 보류
+- smoke_test: 95/95 ALL PASS
 
 ### [완료] GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 상향 (2026-04-11 세션 10)
 - 안건 1: 워크트리 삭제 기준 5개 합의 (필수 4 + 보조 1 + PR 1회성 + 삭제 금지 예외 4)
