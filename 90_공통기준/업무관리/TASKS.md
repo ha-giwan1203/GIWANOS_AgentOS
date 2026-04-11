@@ -28,7 +28,9 @@
 - **README.md 보강**: handoff_archive.sh PostToolUse 누락 추가 (19→20개 훅)
 - **smoke_test 3건 추가**: json_escape payload 테스트 (Windows 경로/제어문자/혼합 입력)
 - **동결 취약점 3건 모니터링**: TOCTOU·execCommand·classification 소급 — 전부 가정 유효 확인
-- GPT 토론: 채택 4건 / 보류 0건 / 버림 0건
+- **cdp_chat_send.py dead code 정리**: 언어 가드 서브시스템(ensure_korean_only, find_forbidden_english, strip_allowed_literals, regex 상수 7개, allowlist 로더) 전부 삭제. --require-korean은 deprecated no-op으로 유지. korean_allowlist.txt 아카이브
+- **문서 정리**: CLAUDE.md, REFERENCE.md, finish.md, share-result.md에서 --require-korean 사용 예시 갱신
+- GPT 토론: 채택 4+5건 / 보류 0건 / 버림 0건
 - smoke_test: 105/105 ALL PASS
 
 ### [완료] 독립 취약점 점검 + JSON 로그 스키마 실전 검증 — 세션16 (2026-04-11 세션 16)

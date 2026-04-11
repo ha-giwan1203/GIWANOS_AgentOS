@@ -46,7 +46,7 @@
 GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ```
 
-- 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate --expect-last-snippet(-file)` 이다.
+- 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate` 이다.
 - helper를 쓸 수 없을 때만 ENTRY.md의 직접 자바스크립트 예비 경로를 사용한다.
 
 ### 5단계: GPT 응답 대기 + 하네스 분석 + 지적사항 즉시 대응

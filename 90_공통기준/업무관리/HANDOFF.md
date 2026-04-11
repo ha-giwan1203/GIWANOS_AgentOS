@@ -17,16 +17,19 @@
 3. **README.md 보강**: handoff_archive.sh PostToolUse 누락 추가, 훅 개수 19→20개 수정
 4. **smoke_test 3건 추가**: json_escape payload 테스트 (Windows 경로 백슬래시 / 제어문자 LF+TAB+CR / 혼합 입력)
 5. **동결 취약점 3건 모니터링**: TOCTOU(단일스레드 유효) / execCommand(CDP 강제 유지) / classification 소급(.req 사전생성 유효) — 전부 가정 유효
-6. **smoke_test**: 105/105 ALL PASS
+6. **cdp_chat_send.py dead code 정리**: 언어 가드 서브시스템 전부 삭제 (함수 3개, regex 7개, allowlist 로더). --require-korean deprecated no-op 유지. korean_allowlist.txt 아카이브
+7. **문서 정리**: 토론모드 CLAUDE.md, REFERENCE.md, finish.md, share-result.md에서 --require-korean 예시 갱신
+8. **smoke_test**: 105/105 ALL PASS
 
 ### GPT 토론
-- 채택 4건 / 보류 0건 / 버림 0건
-- GPT 의견: 우선순위 의제2>3>1>4, 전부 방향 동의
+- 의제 1~4: 채택 4건 / 보류 0건 / 버림 0건
+- cdp_chat_send.py 정리: 채택 5건 / 보류 0건 / 버림 0건
+- GPT 판정: 의제 1~4 통과 (조건부→수정→통과). cdp 정리는 판정 대기 중
 
 ### 다음 세션 안건
-1. 취약점 동결 3건 계속 모니터링 (변경 없으면 다음 세션에서도 읽기 전용 확인)
-2. cdp_chat_send.py deprecated 옵션 잔재 정리 (GPT P1 지적: --expect-last-snippet 숨은 인자, --require-korean 비활성 스위치)
-3. fail-open 재분류 검토 (GPT P0 지적: commit_gate / completion_gate / evidence_stop_guard 일부 fail-closed 전환 가능성)
+1. 취약점 동결 3건 계속 모니터링
+2. fail-open 재분류 검토 (GPT P0 지적: commit_gate / completion_gate / evidence_stop_guard 일부 fail-closed 전환 가능성)
+3. --require-korean argparse 정의 완전 삭제 (문서 정리 완료 확인 후)
 
 ---
 

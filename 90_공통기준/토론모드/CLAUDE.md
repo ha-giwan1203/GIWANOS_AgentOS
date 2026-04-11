@@ -30,7 +30,7 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 6. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
 7. 응답 읽기 → 하네스 분석 → 반박 생성 → 전송 → 반복
 
-> 로컬 CDP 스크립트 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --require-korean --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 허용한다.
+> 로컬 CDP 스크립트 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 허용한다. (`--require-korean`은 deprecated no-op — 호환용으로 잔존하나 차단 없음)
 
 ## 고정 Selector (2026-03-31 실증)
 ```
