@@ -81,7 +81,8 @@ safe_json_get() {
   val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"\(\([^"\\]\|\\.\)*\)".*/\1/p' | head -1)
   if [ -n "$val" ]; then
     # 이스케이프 복원: \" → ", \\ → \, \n → 개행, \t → 탭
-    val=$(printf '%s' "$val" | sed 's/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g; s/\\\\/\\/g')
+    # 복원 순서: \\\\ 먼저 (리터럴 백슬래시), 그 다음 \" \n \t
+    val=$(printf '%s' "$val" | sed 's/\\\\/\\/g; s/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g')
     printf '%s' "$val"
     return 0
   fi

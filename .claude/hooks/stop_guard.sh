@@ -13,17 +13,8 @@ if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
 fi
 
 # === 마지막 assistant 메시지의 text content만 추출 ===
-# transcript는 JSONL. 마지막 type:"assistant" 줄에서 text 블록 추출
-LAST_ASSISTANT=$(tail -n 80 "$TRANSCRIPT" 2>/dev/null | grep '"type":"assistant"' | tail -n 1)
-
-if [ -z "$LAST_ASSISTANT" ]; then
-  # assistant 메시지가 없으면 통과
-  exit 0
-fi
-
-# bash-only: content 배열에서 "text" 필드 추출 (python3 의존 제거, #34457 대응)
-# 금지 문구 검사 대상은 한국어 문장이므로 JSON 키와 충돌하지 않음 — raw line grep 안전
-LAST_TEXT=$(echo "$LAST_ASSISTANT" | sed 's/\\n/\n/g' | sed -n 's/.*"text"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '\n' ' ')
+# hook_common.sh의 last_assistant_text() 재사용 (safe_json_get 기반, 이스케이프 따옴표 처리)
+LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 
 if [ -z "$LAST_TEXT" ]; then
   exit 0
