@@ -1,10 +1,20 @@
 #!/bin/bash
-# completion-gate v6: 완료 주장일 때만 정밀 차단 + Git 미반영 변경 감지
-# GPT+Claude 토론 합의 2026-04-09
+# completion-gate v7: JSON 마커 기반 + after_state_sync 즉시 통과
+# v6 대비: write_marker.flag → write_marker.json, source_class/after_state_sync 활용
+# GPT+Claude 토론 합의 2026-04-11
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
-hook_log "Stop" "completion_gate v6" 2>/dev/null || true
+hook_log "Stop" "completion_gate v7" 2>/dev/null || true
 
-MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
+MARKER="$STATE_AGENT_CONTROL/write_marker.json"
+LEGACY_MARKER="$STATE_AGENT_CONTROL/write_marker.flag"
+
+# 레거시 .flag → .json 마이그레이션
+if [ -f "$LEGACY_MARKER" ] && [ ! -f "$MARKER" ]; then
+  local_ts=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
+  printf '{"source_file":"unknown","source_class":"unknown","created_at":"%s","after_state_sync":false,"session_key":"%s"}\n' \
+    "$local_ts" "$(session_key)" > "$MARKER" 2>/dev/null
+  rm -f "$LEGACY_MARKER" 2>/dev/null
+fi
 TASKS="$PATH_TASKS"
 HANDOFF="$PATH_HANDOFF"
 
@@ -30,7 +40,17 @@ if [ ! -f "$MARKER" ]; then
   exit 0
 fi
 
-# marker timestamp (epoch seconds)
+# JSON 마커 읽기 — after_state_sync=true면 상태문서 갱신 완료이므로 즉시 통과
+MARKER_CONTENT=$(cat "$MARKER" 2>/dev/null)
+AFTER_SYNC=$(echo "$MARKER_CONTENT" | safe_json_get "after_state_sync" 2>/dev/null)
+if [ "$AFTER_SYNC" = "true" ]; then
+  MARKER_CLASS=$(echo "$MARKER_CONTENT" | safe_json_get "source_class" 2>/dev/null || echo "unknown")
+  hook_log "Stop" "completion_gate PASS: after_state_sync=true (class=$MARKER_CLASS)" 2>/dev/null
+  rm -f "$MARKER" 2>/dev/null
+  exit 0
+fi
+
+# marker timestamp (epoch seconds) — fallback: mtime 비교
 MARKER_EPOCH=$(file_mtime "$MARKER")
 
 MISSING=""

@@ -1,11 +1,18 @@
 # Hooks 운영 현황
 
-> 2026-04-07 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
+> 2026-04-11 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (16개 스크립트, settings.local.json 등록)
+## 활성 Hook (19개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+
+### 이벤트층 (SessionStart / PreCompact)
+
+| 훅 | matcher | 역할 |
+|---|---|---|
+| `session_start_restore.sh` | SessionStart | 세션 시작 시 이전 상태 복원 (compact 저장 → 복원) |
+| `precompact_save.sh` | PreCompact | 컨텍스트 압축 직전 핵심 상태 저장 |
 
 ### 프롬프트층 (UserPromptSubmit)
 
@@ -26,6 +33,7 @@
 | ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
 | ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
 | ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검, `tool_input` 우선 파싱 |
+| ⑦ | `state_rebind_check.sh` | Bash | 상태 바인딩 정합성 검사 |
 
 ### 추적층 (PostToolUse)
 
@@ -51,13 +59,42 @@
 | `completion_gate.sh` | (전체) | TASKS/HANDOFF 미갱신 시 Stop 차단 |
 | `evidence_stop_guard.sh` | (전체) | 증거 없는 실패/완료 결론 차단 |
 
+## 훅별 실패 계약 (Failure Contract)
+
+> 각 훅이 내부 오류(파싱 실패, 파일 미존재 등)를 만났을 때의 동작 정책.
+> **fail-open**: 오류 시 통과 (exit 0). **fail-closed**: 오류 시 차단 (deny/block).
+> **detect-only**: 로그만 남기고 통과.
+
+| 훅 | 정책 | stdout intent | 비고 |
+|---|---|---|---|
+| `session_start_restore.sh` | fail-open | 없음 | 복원 실패해도 세션 시작 차단 안 함 |
+| `precompact_save.sh` | fail-open | 없음 | 저장 실패해도 compact 진행 |
+| `risk_profile_prompt.sh` | fail-open | 없음 | .req 생성 실패 시 gate 비활성화 |
+| `block_dangerous.sh` | fail-closed | deny JSON | 파싱 실패 시 안전 차단 |
+| `commit_gate.sh` | fail-open | deny JSON | 파싱 실패 시 통과 (감지 목적) |
+| `date_scope_guard.sh` | fail-open | deny JSON | 날짜 파싱 실패 시 통과 |
+| `evidence_gate.sh` | fail-open | deny JSON | req 없으면 전체 통과 |
+| `protect_files.sh` | fail-open | deny JSON | 파싱 실패 시 통과 |
+| `send_gate.sh` | fail-open | deny JSON | 파싱 실패 시 전송 허용 |
+| `state_rebind_check.sh` | detect-only | 없음 | 불일치 로깅만 |
+| `auto_compile.sh` | fail-open | message JSON | 컴파일 실패만 보고 |
+| `write_marker.sh` | fail-open | 없음 | 마커 생성 실패해도 통과 |
+| `evidence_mark_read.sh` | fail-open | 없음 | .ok 생성 실패해도 통과 |
+| `gpt_followup_post.sh` | fail-open | 없음 | 플래그 생성 실패해도 통과 |
+| `notify_slack.sh` | fail-open | 없음 | 알림 실패해도 통과 |
+| `stop_guard.sh` | fail-open | block JSON | 트랜스크립트 미존재 시 통과 |
+| `gpt_followup_stop.sh` | fail-open | block JSON | 플래그 미존재 시 통과 |
+| `completion_gate.sh` | fail-open | block JSON | 마커 미존재 시 통과 |
+| `evidence_stop_guard.sh` | fail-open | block JSON | req 미존재 시 통과 |
+
 ## 보조 스크립트 (settings 미등록)
 
 | 스크립트 | 용도 |
 |---|---|
-| `hook_common.sh` | 공통 함수 (hook_log, 로그 로테이션) |
+| `hook_common.sh` | 공통 함수 (hook_log, safe_json_get, evidence_init, 로그 로테이션) |
 | `incident_repair.py` | 최신 unresolved incident의 다음 행동 + 패치 후보 + 검증 단계 제안 |
 | `smoke_test.sh` | 전체 hooks 구조 검증 (수동 실행) |
+| `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
 
 ## 참조
 

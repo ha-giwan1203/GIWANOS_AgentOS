@@ -48,7 +48,11 @@
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
       "Bash(start \"\" \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\Users\\\\User\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)",
-      "Bash(python .claude/scripts/cdp/cdp_read.py --selector \"[data-message-author-role='assistant']:last-of-type\" --limit 500)"
+      "Bash(python .claude/scripts/cdp/cdp_read.py --selector \"[data-message-author-role='assistant']:last-of-type\" --limit 500)",
+      "Read(//c/Users/User/Desktop/업무리스트/**)",
+      "Bash(python .claude/scripts/cdp/cdp_tabs.py)",
+      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\); const last = msgs[msgs.length-1]; last ? last.innerText.substring\\(0, 200\\) : 'none';\")",
+      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role]'\\); let res = []; for\\(let i = Math.max\\(0, msgs.length-6\\); i < msgs.length; i++\\) { res.push\\('['+ msgs[i].getAttribute\\('data-message-author-role'\\) +'] ' + msgs[i].innerText.substring\\(0,150\\)\\); } res.join\\('\\\\n---\\\\n'\\);\")"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -173,15 +177,6 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/write_marker.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/handoff_archive.sh"
           }
         ]
       },

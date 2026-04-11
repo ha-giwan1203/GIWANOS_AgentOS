@@ -80,9 +80,10 @@ safe_json_get() {
   local val
   val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"\(\([^"\\]\|\\.\)*\)".*/\1/p' | head -1)
   if [ -n "$val" ]; then
-    # 이스케이프 복원: \" → ", \\ → \, \n → 개행, \t → 탭
-    # 복원 순서: \\\\ 먼저 (리터럴 백슬래시), 그 다음 \" \n \t
-    val=$(printf '%s' "$val" | sed 's/\\\\/\\/g; s/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g')
+    # 이스케이프 복원: \\ → \, \" → ", \n → 개행, \t → 탭
+    # 핵심: \\\\ 를 플레이스홀더로 치환 → 다른 이스케이프 복원 → 플레이스홀더를 \ 로 복원
+    # 이렇게 해야 \\n (리터럴\+n)이 개행으로 오변환되지 않음
+    val=$(printf '%s' "$val" | sed 's/\\\\/\x00BSLASH\x00/g; s/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g; s/\x00BSLASH\x00/\\/g')
     printf '%s' "$val"
     return 0
   fi
@@ -149,6 +150,30 @@ is_completion_claim() {
   fi
   return 1
 }
+
+# evidence 공통: 세션 내 파일 신선도 판정 + evidence 디렉토리 설정
+# evidence_gate.sh / evidence_stop_guard.sh 중복 제거 (GPT+Claude 합의 2026-04-11)
+# 사용법: evidence_init → fresh_file/fresh_req/fresh_ok 사용 가능
+evidence_init() {
+  local sk
+  sk=$(session_key)
+  EVIDENCE_SESSION_DIR="$STATE_EVIDENCE/$sk"
+  REQ_DIR="$EVIDENCE_SESSION_DIR/requires"
+  PROOF_DIR="$EVIDENCE_SESSION_DIR/proofs"
+  START_FILE="$EVIDENCE_SESSION_DIR/.session_start"
+  mkdir -p "$REQ_DIR" "$PROOF_DIR"
+  if [ ! -f "$START_FILE" ]; then
+    : > "$START_FILE"
+  fi
+}
+
+fresh_file() {
+  local f="$1"
+  [ -f "$f" ] && [ "$f" -nt "$START_FILE" ]
+}
+
+fresh_req() { fresh_file "$REQ_DIR/$1.req"; }
+fresh_ok()  { fresh_file "$PROOF_DIR/$1.ok"; }
 
 # Git 변경 중 런타임 산출물을 제외한 "실제 반영 대상"만 수집
 git_relevant_change_list() {
