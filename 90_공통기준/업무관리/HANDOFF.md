@@ -21,10 +21,14 @@
 7. **GenSpark 조사**: 음성 전사 기반, 시각 분석 제한적
 8. **GPT 검증**: 캐시 PASS / Notion 저장 PASS / Drive 미완
 
+### 추가 완료 (Drive 실증)
+7. **Drive OAuth 인증**: credentials.json 생성 + token.json 발급 + CDP 브라우저 인증 처리
+8. **Drive 업로드 실증**: 영상분석/raw/3XhbI597gm8/ 18파일 업로드 성공
+9. **Notion Drive 링크 동기화**: 속성+본문 모두 실제 Drive URL 반영
+10. **GPT 최종 판정: 통과**
+
 ### 다음 세션 안건
-1. Gemini 영상 API 통합 설계 (자동 라우팅)
-2. Drive 쓰기 권한 해결 (MCP 또는 별도 API)
-3. 취약점 동결 3건 계속 모니터링
+1. 취약점 동결 3건 계속 모니터링
 
 ---
 
