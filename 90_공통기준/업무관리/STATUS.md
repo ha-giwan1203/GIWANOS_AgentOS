@@ -31,7 +31,7 @@
 | 기능 활용 | 합의 완료 (GPT PASS), /sp3-verify 보류 (자연어 대체) | `.claude/rules/feature-utilization.md` |
 | domain_guard | v3 phase guard 구현 완료 (토론모드 3단, GPT 합의 2턴) | `.claude/hooks/domain_guard.sh` |
 | evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
-| 토론모드/게이트 보정 | idle composer 오탐 제거, `#composer-submit-button` fallback 반영, 완료 주장 기반 completion gate 추가 축소, 토론방 한국어-only 규칙 반영, `cdp_chat_send.py` helper 추가, 에러 원문 예외 정렬, unresolved incident 수리 큐 보강, 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격, `final_check.sh`를 문서 문자열보다 `settings.local.json` 실등록 기준으로 재정렬, `send_gate.sh`를 `tool_input` 우선 파싱으로 보강, `cdp_chat_send.py` 최신 답변 기대값 확인 옵션과 명령 문서 재정렬 반영 | `90_공통기준/토론모드/`, `.claude/hooks/`, `.claude/scripts/cdp/` |
+| 토론모드/게이트 보정 | idle composer 오탐 제거, `#composer-submit-button` fallback 반영, 완료 주장 기반 completion gate 추가 축소, 토론방 한국어-only 규칙 반영, `cdp_chat_send.py` helper 추가, 에러 원문 예외 정렬, unresolved incident 수리 큐 보강, 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격, `final_check.sh`를 문서 문자열보다 `settings.local.json` 실등록 기준으로 재정렬, `send_gate.sh`를 `tool_input` 우선 파싱으로 보강, `cdp_chat_send.py` deprecated 코드 완전 제거 (expect-last-snippet 폐기, 세션15) | `90_공통기준/토론모드/`, `.claude/hooks/`, `.claude/scripts/cdp/` |
 | 토론모드 보류 안건 | → TASKS.md "진행중 / 보류" 참조 | `90_공통기준/업무관리/TASKS.md` |
 | PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 | GPT 지침 Git 관리 | 구현 완료 (GPT PASS 4bcd7877) | `90_공통기준/업무관리/gpt-instructions.md` |
