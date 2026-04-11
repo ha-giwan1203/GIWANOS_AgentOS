@@ -10,15 +10,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 세션 9 (GPT 재평가 8.4→8.1 합의 + 개선 6건 구현)
+최종 업데이트: 2026-04-11 — 세션 9 (GPT 재평가 합의 8.1/10 + 개선 6건 구현 + GPT 리뷰 3건 해소)
 
 ---
 
 ## 다음 세션 안건
 
-### [보류] completion_gate 오탐 근본 원인 확정
-- structural_intermediate 45건이 진짜 중간 단계인지, 게이트 로직 추가 개선 필요한지 판단
-- write_marker v6 JSON 메타데이터(after_state_sync)로 대부분 해소 예상 → 실측 후 판정
+### [보류] completion_gate 오탐 실측 모니터링
+- write_marker v6 JSON 메타데이터(after_state_sync) 도입 완료
+- structural_intermediate 오탐이 실제로 감소하는지 몇 세션 운영 후 실측 필요
+- 재개 조건: 5세션 이상 운영 후 incident_ledger에서 completion_gate false_positive 건수 재확인
 
 ### [보류] is_completion_claim() 과감지 패턴 축소
 - completion_claim.jsonl 별도 로그 도입 완료 (세션 7). 데이터 10건 축적 후 과감지 패턴 식별
@@ -28,15 +29,20 @@
 
 ## 최근 완료
 
-### [완료] GPT 재평가 독립 검증 + 훅 개선 6건 구현 (2026-04-11 세션 9)
+### [완료] GPT 재평가 합의 8.1/10 + 개선 6건 구현 + GPT 리뷰 3건 해소 (2026-04-11 세션 9)
 - GPT 재평가 8.4/10 독립 검증 → 8.0~8.2 적정 판정 → 토론 합의 8.1/10
-- **P0: write_marker v6** — plain timestamp → JSON 메타데이터 (source_class, after_state_sync). completion_gate v7 연동
-- **P1: safe_json_get 이스케이프 수정** — `\\` first → placeholder 방식 (\\n 오변환 근본 해결)
-- **P1: evidence_init() 중복 제거** — evidence_gate/evidence_stop_guard 17줄 중복 → hook_common.sh 공통 함수
-- **P1: README 갱신** — 16→19개 훅 + 실패 계약(Failure Contract) 표 + final_check.sh
-- **P1: auto_compile.sh python3 동적 감지** — safe_json_get 전환 + python3/python fallback
-- **P2: smoke_test.sh 회귀 테스트 7섹션 추가** — 76→95 체크 (24~30번 섹션)
-- 스모크 테스트: 95/95 ALL PASS
+- 합의안 6건 구현 (커밋 5a574fac):
+  - **P0: write_marker v6** — JSON 메타데이터 (source_class, after_state_sync) + completion_gate v7 연동
+  - **P1: safe_json_get** — placeholder 방식 (\\n 오변환 근본 해결)
+  - **P1: evidence_init()** — 17줄 중복 제거 → hook_common.sh
+  - **P1: README** — 19개 훅 + 실패 계약 표
+  - **P1: auto_compile.sh** — safe_json_get + python3 동적 감지
+  - **P2: smoke_test.sh** — 76→95 체크
+- GPT 리뷰 지적 3건 해소:
+  - notify_slack.sh: sed/하드코딩/python3 → safe_json_get/$PROJECT_ROOT/동적 감지 (76bb0c53)
+  - handoff_archive.sh 복원 (76bb0c53)
+  - final_check.sh: --full 모드 README/STATUS 불일치 FAIL 승격 (34d8af47)
+- GPT 최종 판정: **통과**. 스모크: 95/95 ALL PASS
 
 ### [완료] GPT 분석 독립 검증 + 훅 버그 3건 수정 (2026-04-11 세션 8)
 - GPT 하네스 평가(7.9/10) 독립 검증 → 채택 0건 / 보류 2건 / 버림 2건 / 부분오류 1건
