@@ -202,11 +202,11 @@ def format_entry(entry: dict[str, Any]) -> str:
 def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     """규칙 명확한 incident를 자동 resolved 마킹.
 
-    자동 해소 대상 (세션12 GPT+Claude 합의):
-    - evidence_missing: 24시간 경과 시 (세션 간 증거 비교 복잡하므로 시간 기반)
-    - pre_commit_check: 24시간 경과 시 (후속 커밋 성공 추적 대신 시간 기반)
+    자동 해소 대상 (세션15 GPT+Claude 합의 — 유형별 분기):
     - scope_violation: 24시간 경과 시 (1회성 차단)
     - dangerous_cmd: 24시간 경과 시 (1회성 차단)
+    - evidence_missing: 대응 .ok 파일 존재 시에만 (시간 무관)
+    - pre_commit_check: auto-resolve 대상 제외 (PASS 마커 체계 미비)
 
     방식: resolved=false → resolved=true + resolved_by="auto" 로 덮어쓰기
     """
@@ -234,25 +234,28 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             except (ValueError, TypeError):
                 pass
 
-        # evidence_missing: 24시간 경과 시 자동 해소 (세션 간 증거 비교 복잡하므로 시간 기반)
+        # evidence_missing: .ok 증거 파일 존재 시에만 auto-resolve (세션15 합의)
         if reason == "evidence_missing" or hook in ("evidence_gate", "evidence_stop_guard"):
-            ts_str = entry.get("ts", "")
-            try:
-                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
-                if (now - ts).total_seconds() > 86400:
+            detail = entry.get("detail") or ""
+            # detail에서 .req 파일 경로 추출 → 대응 .ok 파일 존재 여부 확인
+            req_file = entry.get("file") or ""
+            if req_file and req_file.endswith(".req"):
+                ok_file = req_file[:-4] + ".ok"
+                if Path(ok_file).exists():
                     should_resolve = True
-            except (ValueError, TypeError):
-                pass
+            elif req_file == "" and detail:
+                # file 필드 없으면 시간 기반 fallback (하위 호환)
+                ts_str = entry.get("ts", "")
+                try:
+                    ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    if (now - ts).total_seconds() > 86400:
+                        should_resolve = True
+                except (ValueError, TypeError):
+                    pass
 
-        # pre_commit_check: 24시간 경과 시 자동 해소
-        if reason == "pre_commit_check" or (hook == "commit_gate" and reason != "structural_intermediate"):
-            ts_str = entry.get("ts", "")
-            try:
-                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
-                if (now - ts).total_seconds() > 86400:
-                    should_resolve = True
-            except (ValueError, TypeError):
-                pass
+        # pre_commit_check: auto-resolve 대상 제외 (세션15 합의)
+        # PASS 마커 체계 미비 → 수동 해소만 허용
+        # (이전: 24시간 경과 시 자동 해소)
 
         if should_resolve:
             entry["resolved"] = True

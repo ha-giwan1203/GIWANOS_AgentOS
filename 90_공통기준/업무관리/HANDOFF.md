@@ -4,12 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 16:50 KST — 세션 14 (취약점 7건 개선 — 독립 점검)
+최종 업데이트: 2026-04-11 KST — 세션 15 (설계 토론 2건 합의 + 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 14)
+## 0. 최신 세션 (2026-04-11 세션 15)
+
+### 이번 세션 완료
+1. **세션 14 GPT 평가 독립 검증**: fail-open 과다, settings.local.json 의존, JSON 파서 한계, 토론 로그 증거성 — 4건 전부 채택 (실물 확인)
+2. **의제 1 합의 (C+)**: safe_json_get Stage 2 nested object → 현상 유지 + fallback WARN 계측
+   - send_gate.sh: tool_input 추출 실패 시 WARN 로그 추가
+   - gpt_followup_post.sh: tool_input 추출 실패 시 WARN 로그 추가
+3. **의제 2 합의 (유형별 분기)**: auto-resolve 정밀화
+   - scope_violation / dangerous_cmd → 현행 24h 유지
+   - evidence_missing → .ok 파일 존재 시에만 auto-resolve (시간 무관)
+   - pre_commit_check → auto-resolve 대상 제외 (PASS 마커 체계 미비)
+4. **smoke_test**: 102/102 ALL PASS
+
+### GPT 판정
+- 합의 확정, 구현 검증 대기
+
+### 다음 세션 안건
+- 토론 로그 JSON 포맷에 근거 필드 추가 검토 (GPT 지적 채택)
+- incident_ledger .gitignore 정리 (추적 중이나 .gitignore에 명시 — 의도 확인 필요)
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 14)
 
 ### 이번 세션 완료
 1. **safe_json_get Stage 3 추가**: boolean/number/null 리터럴 추출 → completion_gate fast-path 미작동 해소 (확정 버그)
@@ -19,31 +41,6 @@
 5. **incident_ledger 512KB 경고**: 크기 초과 시 로그 (python3 하드코딩 → 일반 표현 수정)
 6. **gpt_followup_post.sh 빈 TOOL_NAME 방어**: 조기 종료 + 경고 로그
 7. **smoke_test**: 95→102 (boolean/number/null 4건 + 테스트26 갱신), 102/102 ALL PASS
-
-### GPT 판정
-- 코드 정합 확인, 상태문서 갱신 후 통과 예정
-
-### 다음 세션 안건 (세션 15 — 설계 토론 2건)
-
-**1. safe_json_get Stage 2 nested object 한계**
-- 현황: `{[^}]*}` 패턴이 중첩 브레이스 미지원. `tool_input`이 nested JSON이면 첫 `}`에서 절단
-- 영향: send_gate.sh(32행), gpt_followup_post.sh(10행)에서 tool_input 추출 시 불완전 가능
-- 토론 쟁점: Python fallback 도입 vs sed 개선 vs 현상 유지
-  - Python fallback: 정확하지만 #34457 Windows 멈춤 리스크
-  - sed 개선: brace counting은 sed로 불가, awk/bash 루프는 복잡도↑
-  - 현상 유지: 현재 Claude Code API가 보내는 tool_input은 대부분 depth-1
-- 작업: 실제 tool_input nested depth 실측 → 빈도 기반 판단
-
-**2. auto-resolve 증거 기반 정밀화**
-- 현황: `incident_repair.py` auto_resolve()가 24h 경과만으로 resolved 처리
-- 문제: 원인 미해소 상태에서 시간만 경과 → false positive resolution
-- 토론 쟁점: evidence marker 검증 추가 vs 시간 기반 유지
-  - evidence_missing 유형: 대응 `.ok` 파일 존재 여부 검증 가능
-  - scope_violation/dangerous_cmd: 1회성 차단이므로 24h 해소 합리적
-  - 유형별 분기: evidence_missing만 증거 검증, 나머지는 현행 유지
-- 작업: classification_reason별 auto-resolve 조건 분기 설계
-
-→ 메모리 `project_vulnerability_review_workflow.md` 참조
 
 ---
 

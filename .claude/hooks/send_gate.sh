@@ -36,6 +36,9 @@ TOOL_TEXT=$(json_value "$TOOL_INPUT" "text")
 INSPECT_SOURCE="$INPUT"
 if [ -n "$TOOL_INPUT" ]; then
   INSPECT_SOURCE="$TOOL_INPUT"
+else
+  # C+ 합의(세션15): Stage 2 object 추출 실패 → fallback 사용 시 WARN 계측
+  hook_log "PreToolUse/send_gate" "WARN: tool_input object 추출 실패, INPUT 전체 fallback 사용" 2>/dev/null
 fi
 if [ -n "$TOOL_CODE" ]; then
   INSPECT_SOURCE="$TOOL_CODE"

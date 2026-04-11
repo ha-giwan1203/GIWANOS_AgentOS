@@ -9,6 +9,11 @@ INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | safe_json_get "tool_name")
 TOOL_INPUT=$(echo "$INPUT" | safe_json_get "tool_input")
 
+# C+ 합의(세션15): Stage 2 object 추출 실패 → fallback 사용 시 WARN 계측
+if [ -n "$TOOL_NAME" ] && [ -z "$TOOL_INPUT" ]; then
+  hook_log "PostToolUse/gpt_followup_post" "WARN: tool_input object 추출 실패 (tool=$TOOL_NAME), 문자열/빈값으로 진행" 2>/dev/null
+fi
+
 if [ -z "$TOOL_NAME" ]; then
   hook_log "PostToolUse/gpt_followup_post" "WARN: tool_name 파싱 실패 — skip" 2>/dev/null
   exit 0

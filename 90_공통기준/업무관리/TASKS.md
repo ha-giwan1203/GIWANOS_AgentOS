@@ -22,6 +22,11 @@
 
 ## 최근 완료
 
+### [완료] 설계 토론 2건 합의 + 구현 — 세션15 (2026-04-11 세션 15)
+- **의제 1 (C+ 합의)**: safe_json_get Stage 2 nested object → 현상 유지 + fallback WARN 계측 추가 (send_gate.sh, gpt_followup_post.sh)
+- **의제 2 (유형별 분기 합의)**: auto-resolve 정밀화 — evidence_missing은 .ok 증거 기반만, pre_commit_check는 auto-resolve 제외, scope_violation/dangerous_cmd는 현행 24h 유지
+- smoke_test: 102/102 ALL PASS
+
 ### [완료] 취약점 7건 개선 — 독립 점검 세션14 (2026-04-11 세션 14)
 - **확정 버그**: safe_json_get Stage 3 추가 (boolean/number/null 리터럴 추출) → completion_gate fast-path 미작동 해소
 - 견고성 보강 6건: write_marker.sh 원자적 쓰기, incident_repair.py null 안전 처리 + 원자적 쓰기, incident_ledger 512KB 경고, gpt_followup_post.sh 빈 TOOL_NAME 방어
