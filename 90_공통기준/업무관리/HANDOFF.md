@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 14:10 KST — 세션 11 (안건 2·3 구현 + 워크트리 정리 보류)
+최종 업데이트: 2026-04-11 14:30 KST — 세션 11 완료 (안건 1·2·3 전체 완료, GPT 재평가 8.6/10)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -21,11 +21,12 @@
 3. **워크트리 정리 완료** — 이전 세션 프로세스 9개 종료 후 10개 워크트리 삭제 (main + hardcore-raman만 잔존)
 4. **smoke_test: 95/95 ALL PASS**
 5. **GPT 최종 판정: 통과**
+6. **GPT 재평가: 8.4 → 8.6/10** (안전성 8.8, 운영성 8.8, 관측성 7.9, 유지보수성 8.3, 문서정합 7.6, 이식성 7.4)
 
 ### 다음 세션 안건
-2. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
-3. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
-4. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
+1. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
+2. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
+3. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
 
 ---
 
