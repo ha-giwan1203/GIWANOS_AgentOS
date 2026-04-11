@@ -264,6 +264,16 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 [A등급: 구현 제안 / B등급: plan 필요 / C등급: 참고만]
 ```
 
+#### Step 4 — 결과 저장 (자동)
+
+분석 완료 후 Notion + Drive에 자동 저장. 별도 지시 불요.
+
+1. Notion DB "영상분석 이력"에 video_id 기준 upsert
+2. 본문: 요약 + 핵심 프레임 3~5장 + 적용 포인트 + 원본 링크
+3. Drive `영상분석/raw/{video_id}/`에 원본 업로드 (API 가능 시)
+
+> 저장 실패 시 분석 결과는 로컬 캐시에 남아 있으므로 수동 재시도 가능
+
 ---
 
 ## 캐시 정책
@@ -280,6 +290,67 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 - 캐시 경로: `youtube-analysis/cache/{video_id}/`
 - `.gitignore`로 Git 추적 제외
 - cleanup 로그: 삭제 폴더 수 / 삭제 mp4 수 / 정리 후 총용량
+
+---
+
+## 분석 결과 저장 (Notion + Drive)
+
+분석 완료 후 결과를 자동 저장한다. 수동 저장(`--save`) 아님 — 분석 정상 종료 시 자동.
+
+### 저장 대상
+
+| 대상 | 저장 위치 | 비고 |
+|------|---------|------|
+| 요약 + 판정표 | Notion DB "영상분석 이력" | video_id 기준 upsert |
+| 핵심 프레임 3~5장 | Notion 본문 임베드 | 분석 결과에서 선택 |
+| 영상 원본 + 전체 프레임 | Google Drive `영상분석/raw/{video_id}/` | 대용량 보관 |
+| 자막 텍스트 | Notion 본문 토글 | 전문 보관 |
+
+### Notion DB 스키마
+
+- DB 위치: `업무리스트 운영` 페이지 하위
+- data_source_id: `20920532-0e23-4ddd-97b1-1264b54adb77`
+- 필드: 제목 / 영상URL / video_id / 채널 / 분석일 / 분석방식 / 자막유무 / 등급요약 / 핵심주제 / Drive링크 / 요약
+- **upsert 규칙**: video_id로 기존 레코드 검색 → 있으면 업데이트, 없으면 신규 생성
+
+### Notion 본문 고정 블록
+
+```
+## 요약
+[3~5줄 핵심]
+
+## 핵심 화면
+[대표 프레임 3~5장 + 시점 + 설명]
+
+## 적용 포인트
+[A/B/C 판정 결과]
+
+## 원본 링크
+- YouTube: [URL]
+- Drive: [폴더 링크]
+```
+
+### Drive 폴더 구조
+
+```
+영상분석/
+└── raw/
+    └── {video_id}/
+        ├── {video_id}.mp4
+        ├── {video_id}.info.json
+        ├── transcript.txt
+        ├── manifest.json
+        └── frames/
+```
+
+> Drive 전용 폴더 최초 생성: 사용자가 Google Drive에서 `영상분석/raw/` 폴더를 수동 생성해야 함 (Drive MCP는 읽기 전용)
+
+### 저장 절차 (Claude 실행)
+
+1. 분석 완료 → Notion DB에서 video_id로 기존 레코드 검색
+2. 없으면 신규 페이지 생성, 있으면 기존 페이지 업데이트
+3. 본문에 요약 + 핵심 프레임 3~5장 + 적용 포인트 + 원본 링크 작성
+4. Drive `영상분석/raw/{video_id}/` 폴더에 원본 파일 업로드 (Drive API 가능 시)
 
 ---
 
