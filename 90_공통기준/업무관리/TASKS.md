@@ -10,24 +10,49 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-11 — 세션 9 (GPT 재평가 합의 8.1/10 + 개선 6건 구현 + GPT 리뷰 3건 해소)
+최종 업데이트: 2026-04-11 — 세션 10 (GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 200 상향)
 
 ---
 
 ## 다음 세션 안건
 
+### [진행중] 안건 1 실행 — 불필요 워크트리 정리
+- 삭제 기준 합의 완료 (세션 10): main 반영 확인 + clean + TASKS/HANDOFF 비활성 + 삭제 금지 예외
+- 실제 워크트리 8개 점검 후 삭제 대상 선별 필요
+
+### [진행중] 안건 2 실행 — publish_worktree_to_main.sh 구현
+- 방향 B-lite 채택: clean 검사 → cherry-pick/ff → push → SHA 출력
+- 옵션: --ff-only, --cherry-pick, --dry-run
+
+### [진행중] 안건 3 실행 — 하네스 즉시 개선 4건
+- gpt_followup_pending.flag JSON 메타데이터화 (session_key, created_at)
+- final_check/completion_gate 마커 해석 규칙 통일
+- README matcher/역할 lint (settings.local.json 기준)
+- send gate 매칭 완화 (exact → prefix/contains)
+
 ### [보류] completion_gate 오탐 실측 모니터링
-- write_marker v6 JSON 메타데이터(after_state_sync) 도입 완료
-- structural_intermediate 오탐이 실제로 감소하는지 몇 세션 운영 후 실측 필요
-- 재개 조건: 5세션 이상 운영 후 incident_ledger에서 completion_gate false_positive 건수 재확인
+- write_marker v6 도입 후 재발 여부 모니터링 중 (데이터 0건 오탐)
+- 재개 조건 조정 (세션 10 합의): **5세션 또는 completion claim 감지 10건** 중 먼저 도달 시 판정
 
 ### [보류] is_completion_claim() 과감지 패턴 축소
-- completion_claim.jsonl 별도 로그 도입 완료 (세션 7). 데이터 10건 축적 후 과감지 패턴 식별
-- 재개 조건: `.claude/logs/completion_claim.jsonl`에 10건 이상 축적 시
+- completion_claim.jsonl 1건 축적 (세션 10 기준)
+- 재개 조건 조정 (세션 10 합의): **10건 또는 동일 과감지 3건 또는 5세션** 중 먼저 충족 시
+
+### [보류] 안건 3 보류 항목
+- incident 분류 코드(enum) 표준화 — 데이터 충분 시
+- incident_repair 자동 적용 범위 확장
 
 ---
 
 ## 최근 완료
+
+### [완료] GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 상향 (2026-04-11 세션 10)
+- 안건 1: 워크트리 삭제 기준 5개 합의 (필수 4 + 보조 1 + PR 1회성 + 삭제 금지 예외 4)
+- 안건 2: publish_worktree_to_main.sh 설계 합의 (B-lite, cherry-pick/ff, --dry-run)
+- 안건 3: 하네스 즉시 개선 4건 합의 (flag 메타, 마커 통일, README lint, send gate 완화)
+- 안건 4: 보류 안건 모니터링 기준 조정 합의 (이중/3축 기준)
+- cdp_chat_send.py LAST_SNIPPET_LIMIT 100→200 상향
+- GPT 최종 판정: **합의 확정**
 
 ### [완료] GPT 재평가 합의 8.1/10 + 개선 6건 구현 + GPT 리뷰 3건 해소 (2026-04-11 세션 9)
 - GPT 재평가 8.4/10 독립 검증 → 8.0~8.2 적정 판정 → 토론 합의 8.1/10

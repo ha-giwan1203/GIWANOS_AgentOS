@@ -4,12 +4,33 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 13:09 KST — 세션 9 (GPT 재평가 합의 8.1/10 + 개선 6건 + GPT 리뷰 3건 해소)
+최종 업데이트: 2026-04-11 13:43 KST — 세션 10 (GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 200)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 9)
+## 0. 최신 세션 (2026-04-11 세션 10)
+
+### 이번 세션 완료
+1. **GPT 토론 안건 4건 합의 확정**
+   - 안건 1: 워크트리 삭제 기준 5개 (필수 4 + 보조 1 + PR 1회성 + 삭제 금지 예외 4)
+   - 안건 2: publish_worktree_to_main.sh 설계 (B-lite, cherry-pick/ff, --dry-run)
+   - 안건 3: 하네스 즉시 개선 4건 (flag 메타, 마커 통일, README lint, send gate 완화) + 보류 2건
+   - 안건 4: 보류 안건 모니터링 기준 조정 (이중/3축 기준)
+2. **cdp_chat_send.py LAST_SNIPPET_LIMIT 100→200 상향**
+3. **GPT 최종 판정: 합의 확정**
+
+### 다음 세션 안건
+1. **워크트리 정리 실행** — 합의 기준으로 8개 워크트리 점검 + 삭제
+2. **publish_worktree_to_main.sh 구현** — B-lite 방식 스크립트 작성
+3. **하네스 즉시 개선 4건 구현** — flag 메타데이터화, 마커 해석 통일, README lint, send gate 완화
+4. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
+5. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
+6. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 9)
 
 ### 이번 세션 완료
 1. **GPT 재평가 합의 8.1/10** — 8.4→8.0~8.2 독립 검증 후 토론 합의
@@ -19,18 +40,6 @@
    - handoff_archive.sh settings 복원 (76bb0c53)
    - final_check.sh: --full 모드 README/STATUS 불일치 FAIL 승격 (34d8af47)
 4. **GPT 최종 판정: 통과**
-
-### 커밋 (PR #12, #13 → main 머지)
-- `5a574fac` — 합의안 6건 본체
-- `76bb0c53` — GPT 지적 2건 (notify_slack + handoff_archive)
-- `34d8af47` — GPT 지적 1건 (final_check FAIL 승격)
-
-### 다음 세션 안건
-1. **[보류] completion_gate 오탐 실측** — write_marker v6 도입 후 structural_intermediate 재발 여부 5세션 모니터링
-2. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후
-3. **불필요 워크트리 정리** — 오래된 워크트리 7개(busy-johnson, competent-jones 등) 삭제 검토
-4. **워크트리 main 직접 푸시 자동화** — 새 워크트리 생성 시 자동으로 origin/main 추적 + push.default upstream 설정되도록 훅 또는 스크립트 검토
-5. 일반 업무 진행 가능
 
 ---
 

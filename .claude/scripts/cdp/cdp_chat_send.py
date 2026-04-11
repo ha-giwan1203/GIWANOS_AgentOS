@@ -31,7 +31,7 @@ KOREAN_CHAR_RE = re.compile(r"[\uAC00-\uD7A3]")  # 완성형 한글
 # 비허용 영어 단어 비율 임계값: 한글 글자 대비 이 비율 이하면 허용
 # 예: 한글 100자, 비허용 영어 5단어 → 5% → 허용
 ENGLISH_RATIO_THRESHOLD = 0.15  # 15%
-LAST_SNIPPET_LIMIT = 100
+LAST_SNIPPET_LIMIT = 200
 
 # 코어 목록: 외부 파일 로드 실패 시에도 유지되는 최소 허용 목록
 _CORE_ALLOWLIST: set[str] = {
