@@ -22,6 +22,14 @@
 
 ## 최근 완료
 
+### [완료] youtube-analysis 프레임+자막 통합 분석 파이프라인 — 세션20 (2026-04-11 세션 20)
+- **youtube_analyze.py 신규**: 영상 다운로드(yt-dlp 480p) → 프레임 추출(ffmpeg 챕터+보강) → 자막 추출 → manifest.json 생성
+- **SKILL.md 개편**: 수동 모드 Step 1~3을 프레임+자막 통합 분석으로 전환
+- **/video 슬래시 커맨드 신규**: 트리거 확실화
+- **GPT 토론**: 채택 3건(max-frames 15 통일 / 긴 챕터 보강 / --refresh) / 보류 1건(캐시 TTL)
+- **GPT 검증**: 정합 PASS (87e2ed9d 실물 확인)
+- 커밋: cf07de18, 87e2ed9d
+
 ### [완료] 취약점 모니터링 + evidence_stop_guard 리팩토링 — 세션19 (2026-04-11 세션 19)
 - **동결 취약점 3건 3회 연속 확인**: TOCTOU(단일스레드) / execCommand(fallback 전용) / classification 소급(.req+.ok) — 전부 가정 유효
 - **evidence_stop_guard.sh 리팩토링**: 직접 sed 파싱(6줄) → `last_assistant_text()` 공용 함수 호출(1줄). completion_gate/stop_guard와 동일 패턴 통일
