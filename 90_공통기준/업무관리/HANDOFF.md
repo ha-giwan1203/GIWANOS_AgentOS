@@ -18,12 +18,11 @@
    - final_check.sh 마커 해석 통일 (write_marker.json created_at 우선, mtime fallback)
    - README lint 개선 (개수 비교 → 개별 훅 이름 대조 + 차집합 출력)
    - send_gate.sh debate 매칭 완화 (exact → contains)
-3. **워크트리 정리 분류 완료** — 9개 전부 삭제 대상 확인 (1군 2개/2군 4개/3군 3개)
-4. **워크트리 삭제 차단** — Windows 프로세스 잠금 (다른 Claude 세션이 디렉토리 참조 중)
-5. **smoke_test: 95/95 ALL PASS**
+3. **워크트리 정리 완료** — 이전 세션 프로세스 9개 종료 후 10개 워크트리 삭제 (main + hardcore-raman만 잔존)
+4. **smoke_test: 95/95 ALL PASS**
+5. **GPT 최종 판정: 통과**
 
 ### 다음 세션 안건
-1. **워크트리 삭제 재시도** — 불필요 Claude 세션 종료 후 9개 삭제 실행
 2. **[보류] completion_gate** — 5세션 또는 completion claim 감지 10건 시 판정
 3. **[보류] is_completion_claim** — 10건 또는 동일 과감지 3건 또는 5세션 시 판정
 4. **[보류] incident enum + incident_repair 확장** — 데이터 충분 시

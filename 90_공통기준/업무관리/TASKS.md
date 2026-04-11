@@ -16,10 +16,7 @@
 
 ## 다음 세션 안건
 
-### [차단] 안건 1 — 불필요 워크트리 정리
-- 분류 완료: 1군(2개)/2군(4개)/3군(3개) — 전부 삭제 대상
-- **차단 사유**: Windows 프로세스 잠금(다른 Claude Code 세션이 디렉토리 참조 중)
-- 해결: 불필요 Claude 세션 종료 후 재시도
+### (안건 1 완료 — 아래 최근 완료 참조)
 
 ### [보류] completion_gate 오탐 실측 모니터링
 - write_marker v6 도입 후 재발 여부 모니터링 중 (데이터 0건 오탐)
@@ -37,15 +34,15 @@
 
 ## 최근 완료
 
-### [완료] 안건 2·3 구현 + 워크트리 정리 보류 (2026-04-11 세션 11)
-- publish_worktree_to_main.sh 구현 (B-lite: --ff-only/--cherry-pick/--dry-run)
+### [완료] 안건 1·2·3 전체 완료 (2026-04-11 세션 11)
+- 워크트리 정리: 10개 삭제 완료 (main + hardcore-raman만 잔존)
+- publish_worktree_to_main.sh 구현 (B-lite: --ff-only/--cherry-pick/--dry-run) + GPT 지적 수정 (git -C 방식)
 - 하네스 즉시 개선 4건 구현:
   - gpt_followup_pending.flag JSON 메타데이터화 (session_key, created_at) + 세션 불일치 자동 정리
   - final_check.sh 마커 해석 통일 (write_marker.json created_at 우선, mtime fallback)
   - README lint 개선 (개수 비교 → 개별 훅 이름 대조, 차집합 출력)
   - send_gate.sh debate 매칭 완화 (exact → contains)
-- 워크트리 정리: 9개 분류 완료, Windows 프로세스 잠금으로 삭제 보류
-- smoke_test: 95/95 ALL PASS
+- GPT 판정: 통과. smoke_test: 95/95 ALL PASS
 
 ### [완료] GPT 토론 4건 합의 + LAST_SNIPPET_LIMIT 상향 (2026-04-11 세션 10)
 - 안건 1: 워크트리 삭제 기준 5개 합의 (필수 4 + 보조 1 + PR 1회성 + 삭제 금지 예외 4)
