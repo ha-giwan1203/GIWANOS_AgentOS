@@ -16,11 +16,6 @@
 
 ## 다음 세션 안건
 
-### [대기] PR #10 머지
-- 브랜치: `claude/competent-jones` → `main`
-- 커밋: a7db7916 + fe30c904 + 63cd309f (GPT 통과)
-- 내용: completion_claim.jsonl 로그 + handoff_archive.sh + incident_ledger
-
 ### [보류] is_completion_claim() 과감지 패턴 축소
 - completion_claim.jsonl 별도 로그 도입 완료 (세션 7). 데이터 10건 축적 후 과감지 패턴 식별
 - 재개 조건: `.claude/logs/completion_claim.jsonl`에 10건 이상 축적 시

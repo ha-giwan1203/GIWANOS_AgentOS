@@ -19,7 +19,7 @@
 5. **commit_gate.sh:13 수정** — 주석 fail-closed → fail-open 정정
 
 ### 다음 AI 액션
-1. **[우선] PR #10 머지** — `claude/competent-jones` → `main`. 커밋 3건. GPT 통과 완료
+1. **[완료] PR #10 머지** — 2026-04-11 10:28 KST 머지 완료 (2f3d11e0)
 2. **[보류] is_completion_claim 과감지 축소** — completion_claim.jsonl 10건 축적 후
 3. **[보류] completion_gate false_positive 검증** — incident_ledger 실물 샘플 확인 후 판정
 
