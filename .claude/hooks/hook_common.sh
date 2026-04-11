@@ -232,7 +232,7 @@ hook_incident() {
     local _sz
     _sz=$(wc -c < "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
     if [ "$_sz" -gt 512000 ] 2>/dev/null; then
-      hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — python3 .claude/hooks/incident_repair.py --archive 실행 권장" 2>/dev/null || true
+      hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — incident_repair.py --archive 실행 권장" 2>/dev/null || true
     fi
   fi
 }

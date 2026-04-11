@@ -4,12 +4,35 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 16:02 KST — 세션 13 (취약점 3건 개선 — GPT 토론 합의)
+최종 업데이트: 2026-04-11 16:50 KST — 세션 14 (취약점 7건 개선 — 독립 점검)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 13)
+## 0. 최신 세션 (2026-04-11 세션 14)
+
+### 이번 세션 완료
+1. **safe_json_get Stage 3 추가**: boolean/number/null 리터럴 추출 → completion_gate fast-path 미작동 해소 (확정 버그)
+2. **write_marker.sh 원자적 쓰기**: temp→mv 패턴 (중단 시 마커 파손 방지)
+3. **incident_repair.py null 안전 처리**: str(None)→"None" 방어 (or "" 패턴)
+4. **archive_resolved/auto_resolve 원자적 쓰기**: tempfile→os.replace
+5. **incident_ledger 512KB 경고**: 크기 초과 시 로그 (python3 하드코딩 → 일반 표현 수정)
+6. **gpt_followup_post.sh 빈 TOOL_NAME 방어**: 조기 종료 + 경고 로그
+7. **smoke_test**: 95→102 (boolean/number/null 4건 + 테스트26 갱신), 102/102 ALL PASS
+
+### GPT 판정
+- 코드 정합 확인, 상태문서 갱신 후 통과 예정
+
+### 다음 세션 안건 (세션 15 — GPT 토론 보류 5건)
+1. safe_json_get Stage 2 nested object 한계 (Python fallback 필요 여부)
+2. auto-resolve 증거 기반 정밀화 (24h 시간 기반 → evidence marker 검증)
+3. TOCTOU/race condition (단일 사용자 환경 실익)
+4. CDP execCommand deprecated (대안 부재)
+5. incident_ledger classification_reason 107건 소급 vs 향후만 적용
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 13)
 
 ### 이번 세션 완료
 1. **commit_gate fail-open 봉합**: JSON 파싱 실패 시 raw INPUT fallback 검사 추가
@@ -17,20 +40,9 @@
 3. **incident_ledger resolved 아카이브**: 30일 경과 resolved 항목 → .archive.jsonl 이동 (--archive 옵션)
 4. **cdp_chat_send.py --expect-last-snippet 폐기**: 인코딩/잘림 차이로 오차단 유발하여 제거
 
-### 다음 세션 안건 (세션 14 — 동일 워크플로우 반복)
-**작업 패턴**: 독립 취약점 점검 → GPT 토론("클로드 코드 평가" 방) → 합의 → 구현 → 검증
-**점검 대상 (세션 13 미처리)**:
-1. safe_json_get sed 파싱 한계 — 모든 훅의 공통 기반, 중첩 객체/이스케이프 취약
-2. Windows 워크트리 잠금 내구성 — 실제 삭제 실패 사례 있음
-3. incident_repair patch_candidates 빈 값 4개 보강 (scope_violation, dangerous_cmd, stop_guard_block, compile_fail)
-4. completion_gate v8 장기 실측 — deny/오탐 비율 추적
-5. auto-resolve 증거 기반 해소 정밀화
-
-→ 메모리 `project_vulnerability_review_workflow.md` 참조
-
 ---
 
-## 1. 이전 세션 (2026-04-11 세션 12)
+## 2. 이전 세션 (2026-04-11 세션 12)
 
 ### 이번 세션 완료
 1. **옵션C 4/14 재집계**: 승인 1791 / deny 319 / 오탐 45 / 우회 0 → GPT 판정: 유지
