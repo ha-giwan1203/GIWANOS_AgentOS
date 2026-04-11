@@ -4,32 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 KST — 세션 16 (독립 취약점 점검 + JSON 로그 스키마 실전 검증)
+최종 업데이트: 2026-04-11 KST — 세션 17 (문서 정비 + smoke_test 확장 + 취약점 모니터링)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 16)
+## 0. 최신 세션 (2026-04-11 세션 17)
+
+### 이번 세션 완료
+1. **CLAUDE.md 경로 명시**: 상태 원본 섹션에 TASKS/HANDOFF/STATUS 실제 경로(`90_공통기준/업무관리/`) 추가
+2. **local_hooks_spec.md 아카이브**: Phase 1 미구현 spec → `98_아카이브/정리대기_20260411/` 이동, 원위치에 리다이렉트 스텁
+3. **README.md 보강**: handoff_archive.sh PostToolUse 누락 추가, 훅 개수 19→20개 수정
+4. **smoke_test 3건 추가**: json_escape payload 테스트 (Windows 경로 백슬래시 / 제어문자 LF+TAB+CR / 혼합 입력)
+5. **동결 취약점 3건 모니터링**: TOCTOU(단일스레드 유효) / execCommand(CDP 강제 유지) / classification 소급(.req 사전생성 유효) — 전부 가정 유효
+6. **smoke_test**: 105/105 ALL PASS
+
+### GPT 토론
+- 채택 4건 / 보류 0건 / 버림 0건
+- GPT 의견: 우선순위 의제2>3>1>4, 전부 방향 동의
+
+### 다음 세션 안건
+1. 취약점 동결 3건 계속 모니터링 (변경 없으면 다음 세션에서도 읽기 전용 확인)
+2. cdp_chat_send.py deprecated 옵션 잔재 정리 (GPT P1 지적: --expect-last-snippet 숨은 인자, --require-korean 비활성 스위치)
+3. fail-open 재분류 검토 (GPT P0 지적: commit_gate / completion_gate / evidence_stop_guard 일부 fail-closed 전환 가능성)
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 16)
 
 ### 이번 세션 완료
 1. **독립 취약점 점검 4건**: write_marker.sh 백슬래시/개행 미이스케이프, precompact heredoc 미인용, handoff lock TOCTOU
 2. **GPT 토론 합의**: 채택 2건 / 버림 2건
-   - 채택: json_escape() 공통함수 → write_marker.sh L32/L64 적용 (백슬래시+개행+CR+탭 이스케이프)
-   - 버림: precompact heredoc 인용(기능 파괴), handoff lock 강화(실익 없음)
 3. **구현**: hook_common.sh에 json_escape() 추가, write_marker.sh 두 곳 적용
 4. **JSON 로그 스키마 첫 실전 적용 검증**: summary_counts + item/label/evidence/ref 4필드 정상 생성 확인
-   - Python 스키마 검증 PASS (turns 2개 + result 전부 4필드 존재)
-   - critic-reviewer: PASS (필수 독립성/하네스 엄밀성 통과, 보조 WARN 2건)
 5. **smoke_test**: 102/102 ALL PASS
-
-### GPT 판정
-- 통과 (045eea79 + 64ee18e1). 문서 드리프트 1건 즉시 수정 후 통과
-- **종합 재평가: 9.1/10** (설계 9.2 / 운영 8.8 / 유지보수 8.4) — 세션15 7.8→9.1
-
-### 다음 세션 안건
-1. **P1: local_hooks_spec.md 정리** — 구 명세(pre_write_guard 등)가 현행 19훅 체계와 충돌. 아카이브 또는 현행 기준 재작성
-2. **P1: smoke_test payload 기반 확장** — grep 존재 검사 비중 축소, 실제 payload 입력 기반 검증 2~3개 추가 (json_escape Windows 경로/제어문자 케이스 포함)
-3. 취약점 점검 동결 3건(TOCTOU, execCommand, classification 소급) 모니터링
+- GPT 판정: 통과. 종합 재평가 9.1/10
 
 ---
 

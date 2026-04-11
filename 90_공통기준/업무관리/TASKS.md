@@ -22,6 +22,15 @@
 
 ## 최근 완료
 
+### [완료] 문서 정비 + smoke_test 확장 + 취약점 모니터링 — 세션17 (2026-04-11 세션 17)
+- **CLAUDE.md 경로 명시**: 상태 원본 섹션에 TASKS/HANDOFF/STATUS 실제 경로 추가
+- **local_hooks_spec.md 아카이브**: Phase 1 미구현 spec → 98_아카이브 이동, 리다이렉트 스텁 남김
+- **README.md 보강**: handoff_archive.sh PostToolUse 누락 추가 (19→20개 훅)
+- **smoke_test 3건 추가**: json_escape payload 테스트 (Windows 경로/제어문자/혼합 입력)
+- **동결 취약점 3건 모니터링**: TOCTOU·execCommand·classification 소급 — 전부 가정 유효 확인
+- GPT 토론: 채택 4건 / 보류 0건 / 버림 0건
+- smoke_test: 105/105 ALL PASS
+
 ### [완료] 독립 취약점 점검 + JSON 로그 스키마 실전 검증 — 세션16 (2026-04-11 세션 16)
 - **독립 점검 4건**: write_marker.sh 백슬래시 미이스케이프, precompact heredoc, handoff lock, 개행문자
 - **GPT 토론 합의**: 채택 2건(json_escape 공통함수 + 1번 흡수), 버림 2건

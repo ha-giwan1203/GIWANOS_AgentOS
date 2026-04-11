@@ -20,8 +20,11 @@
 ## 상태 원본
 
 작업 상태는 **TASKS.md에만 기록**한다.
+- TASKS: `90_공통기준/업무관리/TASKS.md`
+- HANDOFF: `90_공통기준/업무관리/HANDOFF.md`
+- STATUS: 각 도메인 하위 `STATUS.md`
 - 우선순위: TASKS.md → STATUS.md → HANDOFF.md → Notion
-- 현업 업무: `업무_마스터리스트.xlsx` 우선. AI 작업: TASKS.md 우선
+- 현업 업무: `90_공통기준/업무관리/업무_마스터리스트.xlsx` 우선. AI 작업: TASKS.md 우선
 - Git이 기준 원본. Notion은 보조. 중복 유지 금지
 
 ## 완료 판정 (사람/GPT 판정 기준 — 자동 게이트 아님)

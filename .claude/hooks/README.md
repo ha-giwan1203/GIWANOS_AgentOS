@@ -3,7 +3,7 @@
 > 2026-04-11 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (19개 스크립트, settings.local.json 등록)
+## 활성 Hook (20개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 
@@ -43,6 +43,7 @@
 | `write_marker.sh` | Write\|Edit | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
 | `evidence_mark_read.sh` | Read\|Grep\|Glob\|Bash\|Write\|Edit\|MultiEdit | 문서 읽기/갱신 → .ok 증거 마커 적립 |
 | `gpt_followup_post.sh` | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
+| `handoff_archive.sh` | Write\|Edit | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |
 
 ### 알림층 (Notification)
 
@@ -81,6 +82,7 @@
 | `write_marker.sh` | fail-open | 없음 | 마커 생성 실패해도 통과 |
 | `evidence_mark_read.sh` | fail-open | 없음 | .ok 생성 실패해도 통과 |
 | `gpt_followup_post.sh` | fail-open | 없음 | 플래그 생성 실패해도 통과 |
+| `handoff_archive.sh` | fail-open | 없음 | 아카이브 실패해도 통과 |
 | `notify_slack.sh` | fail-open | 없음 | 알림 실패해도 통과 |
 | `stop_guard.sh` | fail-open | block JSON | 트랜스크립트 미존재 시 통과 |
 | `gpt_followup_stop.sh` | fail-open | block JSON | 플래그 미존재 시 통과 |

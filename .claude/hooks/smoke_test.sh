@@ -415,7 +415,32 @@ check $? "safe_json_get: placeholder 방식 사용 확인"
 
 echo ""
 
-# === 25. stop_guard.sh — sed JSON 직접 파싱 제거 확인 ===
+# === 24b. json_escape payload 검증 (세션17) ===
+echo "--- 24b. json_escape payload 검증 ---"
+# hook_common.sh already sourced in section 14/24
+
+# 24b-1: Windows 경로 백슬래시 이스케이프
+WIN_PATH='C:\Users\test\new_folder'
+WIN_ESCAPED=$(json_escape "$WIN_PATH")
+test "$WIN_ESCAPED" = 'C:\\Users\\test\\new_folder'
+check $? "json_escape: Windows 경로 백슬래시 이스케이프"
+
+# 24b-2: 제어문자 (LF + TAB + CR) → 단일 라인 출력
+CTRL_INPUT=$(printf 'line1\nline2\ttab\rCR')
+CTRL_ESCAPED=$(json_escape "$CTRL_INPUT")
+CTRL_LINES=$(printf '%s' "$CTRL_ESCAPED" | wc -l)
+[ "$CTRL_LINES" -le 1 ]
+check $? "json_escape: 제어문자(LF+TAB+CR) 단일 라인 출력 (lines=$CTRL_LINES)"
+
+# 24b-3: 혼합 입력 (백슬래시 + 큰따옴표 + 개행)
+MIXED_INPUT=$(printf 'path\\to\\"file\nend')
+MIXED_ESCAPED=$(json_escape "$MIXED_INPUT")
+printf '%s' "$MIXED_ESCAPED" | grep -q '\\\\' && printf '%s' "$MIXED_ESCAPED" | grep -q '\\"' && printf '%s' "$MIXED_ESCAPED" | grep -q '\\n'
+check $? "json_escape: 혼합 입력(백슬래시+따옴표+개행) 정상 이스케이프"
+
+echo ""
+
+# === 25. stop_guard.sh — sed JSON 직렬 파싱 제거 확인 ===
 echo "--- 25. stop_guard.sh sed 파싱 제거 회귀 ---"
 grep -q 'last_assistant_text' "$HOOKS_DIR/stop_guard.sh"
 check $? "stop_guard: last_assistant_text() 사용"
@@ -488,8 +513,8 @@ echo ""
 
 # === 30. README 훅 개수 정합성 ===
 echo "--- 30. README 훅 개수 ---"
-grep -q '19개' "$HOOKS_DIR/README.md"
-check $? "README: 19개 훅 표기"
+grep -q '20개' "$HOOKS_DIR/README.md"
+check $? "README: 20개 훅 표기"
 
 grep -q '실패 계약' "$HOOKS_DIR/README.md"
 check $? "README: 실패 계약 (Failure Contract) 표 존재"
