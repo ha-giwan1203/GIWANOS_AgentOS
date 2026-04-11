@@ -4,12 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-11 KST — 세션 15 (설계 토론 2건 + 구조 부채 3건 정리)
+최종 업데이트: 2026-04-11 KST — 세션 16 (독립 취약점 점검 + JSON 로그 스키마 실전 검증)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-11 세션 15)
+## 0. 최신 세션 (2026-04-11 세션 16)
+
+### 이번 세션 완료
+1. **독립 취약점 점검 4건**: write_marker.sh 백슬래시/개행 미이스케이프, precompact heredoc 미인용, handoff lock TOCTOU
+2. **GPT 토론 합의**: 채택 2건 / 버림 2건
+   - 채택: json_escape() 공통함수 → write_marker.sh L32/L64 적용 (백슬래시+개행+CR+탭 이스케이프)
+   - 버림: precompact heredoc 인용(기능 파괴), handoff lock 강화(실익 없음)
+3. **구현**: hook_common.sh에 json_escape() 추가, write_marker.sh 두 곳 적용
+4. **JSON 로그 스키마 첫 실전 적용 검증**: summary_counts + item/label/evidence/ref 4필드 정상 생성 확인
+   - Python 스키마 검증 PASS (turns 2개 + result 전부 4필드 존재)
+   - critic-reviewer: PASS (필수 독립성/하네스 엄밀성 통과, 보조 WARN 2건)
+5. **smoke_test**: 102/102 ALL PASS
+
+### GPT 판정
+- (최종 검증 후 기록)
+
+### 다음 세션 안건
+- smoke_test에 json_escape Windows 경로/제어문자 케이��� 추가 (GPT 권고)
+- 취약점 점검 동결 3건(TOCTOU, execCommand, classification 소급) 모니터링
+
+---
+
+## 1. 이전 세션 (2026-04-11 세션 15)
 
 ### 이번 세션 완료
 1. **세션 14 GPT 평가 독립 검증**: fail-open 과다, settings.local.json 의존, JSON 파서 한계, 토론 로그 증거성 — 4건 전부 채택 (실물 확인)
@@ -28,9 +50,6 @@
 
 ### GPT 판정
 - 9.2/10 통과, 구조 부채 + 증거성 보강 완료
-
-### 다음 세션 안건
-- 신규 세션에서 보강된 JSON 로그 스키마 실전 적용 (첫 사용 검증)
 
 ---
 

@@ -132,6 +132,18 @@ last_assistant_text() {
   printf '%s' "$last_assistant" | safe_json_get "text"
 }
 
+# JSON 문자열 이스케이프: 백슬래시, 큰따옴표, 개행, CR, 탭 처리
+# 사용법: SAFE="$(json_escape "$RAW_STRING")"
+json_escape() {
+  local s="$1"
+  s=${s//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\n'/\\n}
+  s=${s//$'\r'/\\r}
+  s=${s//$'\t'/\\t}
+  printf '%s' "$s"
+}
+
 # 운영 중 누적되지만 완료 판정에서 무시할 런타임 산출물
 is_volatile_runtime_path() {
   local path="$1"

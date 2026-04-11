@@ -22,6 +22,14 @@
 
 ## 최근 완료
 
+### [완료] 독립 취약점 점검 + JSON 로그 스키마 실전 검증 — 세션16 (2026-04-11 세션 16)
+- **독립 점검 4건**: write_marker.sh 백슬래시 미이스케이프, precompact heredoc, handoff lock, 개행문자
+- **GPT 토론 합의**: 채택 2건(json_escape 공통함수 + 1번 흡수), 버림 2건
+- **구현**: hook_common.sh에 json_escape() 함수 추가, write_marker.sh L32/L64 두 곳 적용
+- **JSON 로그 스키마 첫 실전 적용**: summary_counts + item/label/evidence/ref 4필드 정상 생성 확인
+- critic-reviewer: PASS (필수 2축 통과, 보조 WARN 2건)
+- smoke_test: 102/102 ALL PASS
+
 ### [완료] 설계 토론 2건 + 구조 부채 3건 정리 — 세션15 (2026-04-11 세션 15)
 - **의제 1 (C+ 합의)**: safe_json_get Stage 2 nested object → 현상 유지 + fallback WARN 계측 추가
 - **의제 2 (유형별 분기 합의)**: auto-resolve 정밀화 — evidence_missing→.ok 기반, pre_commit_check→제외
