@@ -26,13 +26,19 @@
 - 세션28 GPT 합의 완료: 키워드 12개 + 검색 루트 5단계 + 공통 심화 필터 + Notion DB 확장
 - 다음 세션 구현: 키워드 목록 문서화 + Notion DB source_type/depth 필드 추가 + 첫 탐색 실행
 
-### [중] 하네스 후속 — regression 자동 편입 + 자기진화 루프 등록
-- regression: P1/P2 실패 → smoke_test 반자동 편입 스크립트 구현
-- 자기진화: /self-audit scheduled-task 등록 (진단 자동 + 수정 수동 승인)
+### [대] 심화 콘텐츠 첫 탐색 실행
+- 키워드+루트+필터 문서 완료. Notion DB 확장 완료
+- 다음: 키워드로 첫 탐색 → A/B등급 콘텐츠 발굴 → Notion 등록
 
 ---
 
 ## 최근 완료
+
+### [완료] 하네스 후속 구현 — regression 편입 + 자기진화 루프 — 세션28 (2026-04-13)
+- **regression_intake.py**: P1/P2 확정 실패를 smoke_test 후보로 자동 추출 (반자동 편입)
+- **harness_gate 실전 검증**: debate_preflight.req 활성 시 트랜스크립트 없이 commit 차단 확인
+- **/self-audit 주간 자동 등록**: scheduled-task 매주 월 09시 (진단 자동 + 수정 수동 승인)
+- **심화콘텐츠_탐색가이드.md**: 키워드 12개 + 검색 루트 5단계 + 공통 필터 + Notion DB 6필드 추가
 
 ### [완료] yt-dlp 운영 안정화 — transcript-only 기본값 전환 — 세션28 (2026-04-12 세션 28)
 - **youtube_analyze.py**: --no-download를 기본값으로 전환 (default=True)

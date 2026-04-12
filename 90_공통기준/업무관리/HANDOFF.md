@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-12 KST — 세션 28 (하네스 범용 확장 + yt-dlp 안정화 + 심화 콘텐츠 합의)
+최종 업데이트: 2026-04-13 KST — 세션 28 (하네스 범용 확장 + yt-dlp 안정화 + 심화 콘텐츠 + 후속 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -12,29 +12,23 @@
 ## 0. 최신 세션 (2026-04-12 세션 28)
 
 ### 이번 세션 완료
-1. **의제 1: 하네스 범용 확장 GPT 토론 2턴 + 구현**: 6개 출처 리서치(Anthropic/장피엠/업계/GPT웹서치/토론실전/내부) → 합의 → 하네스_운영가이드.md DRAFT→ACTIVE 확장 (4개 섹션: 하네스 맵/스프린트 컨트랙트/regression/자기진화)
-2. **의제 2: yt-dlp 운영 안정화**: transcript-only 기본값 전환 + --force-download 신설. pip upgrade 해결 불가 확인 (2026.03.17 = 최신). deno 보류
-3. **의제 3: 심화 콘텐츠 탐색 합의**: 키워드 12개 + 검색 루트 5단계 + 공통 심화 필터 + Notion DB 확장안 합의 (구현은 다음 세션)
-4. **CDP 유틸 추가**: poll_and_read.py, read_chat_msgs.py
-5. **settings.local.json 보강**: debate_msg_temp.txt + poll_and_read 권한
+1. **의제 1: 하네스 범용 확장 GPT 토론 2턴 + 구현**: 6개 출처 리서치 → 합의 → 하네스_운영가이드.md DRAFT→ACTIVE 확장 (4개 섹션)
+2. **의제 2: yt-dlp 운영 안정화**: transcript-only 기본값 전환 + --force-download 신설
+3. **의제 3: 심화 콘텐츠 탐색 합의 + 구현**: 키워드 12개 + 검색 루트 5단계 + 공통 심화 필터 문서화 + Notion DB 6필드 확장 (콘텐츠 분석 이력)
+4. **harness_gate 실전 검증**: debate_preflight.req 활성 시 commit 차단 정상 확인
+5. **regression_intake.py**: P1/P2 실패 → smoke_test 반자동 편입 스크립트
+6. **/self-audit 주간 자동 등록**: scheduled-task 매주 월 09시
+7. **CDP 유틸 추가**: poll_and_read.py, read_chat_msgs.py
 
 ### GPT 판정
 - 의제 1: 통과 (176db7d4 + 304d490a)
 - 의제 2: 통과 (c53dd0c3 + 35d87f7d)
-- 의제 3: 합의 완료 (구현은 다음 세션)
+- 의제 3: 합의 완료 + 구현 완료
 
 ### 다음 세션 안건
 
-**[대] 심화 콘텐츠 탐색 구현** (의제 3 후속)
-- 키워드 목록 문서화 + Notion DB source_type/depth 필드 추가 + 첫 탐색 실행
-
-**[중] harness_gate 실전 검증** (의제 4)
-- 이번 세션에서 간접 검증 (토론 시 commit/push 차단 없이 진행)
-- 직접 발화 시나리오 1회 확인 필요
-
-**[중] 하네스 후속 구현**
-- regression 자동 편입 스크립트 (P1/P2 → smoke_test)
-- /self-audit scheduled-task 등록 (주간 자동 진단)
+**[대] 심화 콘텐츠 첫 탐색 실행**
+- 키워드로 실제 검색 → A/B등급 콘텐츠 발굴 → Notion 등록
 
 **[보류] yt-dlp 풀다운로드 복구 실험**
 - deno/EJS 설치 — 프레임 분석 필요 시 재검토
