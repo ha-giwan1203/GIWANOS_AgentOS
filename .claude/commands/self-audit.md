@@ -19,7 +19,7 @@
 | 6 | agents | `.claude/agents/*.md` | 에이전트 목록 |
 | 7 | 스킬 | `90_공통기준/스킬/*/SKILL.md` | 스킬 체계 |
 | 8 | CLAUDE.md | 루트 + 도메인 하위 | 운영 지침 |
-| 9 | 운영 흔적 | `incident_ledger.jsonl`, `hook_log.jsonl` | 최근 7일 or 최근 50건만 |
+| 9 | 운영 흔적 | `incident_ledger.jsonl`, `hook_log.jsonl`, `skill_usage.jsonl` | 최근 7일 or 최근 50건만 |
 | 10 | 상태 문서 | `TASKS.md`, `HANDOFF.md`, `STATUS.md` | 드리프트 여부 |
 
 ### Step 2 — 4축 진단
@@ -28,7 +28,7 @@
 |----|------|----------|
 | **활성등록 정합** | settings 등록 vs 실파일 존재 vs 문서 기재 | 등록됐는데 파일 없음 / 파일 있는데 미등록 / 문서 누락 |
 | **문서 드리프트** | Git 실물 vs 문서 기술 불일치 | README/STATUS/HANDOFF가 실제 구조와 다른 곳 |
-| **실패계약 위험** | fail-open/fail-closed 명시 여부 + 위반 | hook에 계약 미명시 / 계약과 다르게 동작 가능성 |
+| **실패계약 위험** | hooks README 표 기준 fail-open/fail-closed 기재 여부 | README 표에 미기재 hook / 표 기재와 실제 동작 불일치 가능성 |
 | **죽은 자산** | 참조되지 않는 파일/hook/rule | 어디서도 호출 안 되는 자산 식별 |
 
 ### Step 3 — 3분류

@@ -46,9 +46,10 @@ README에 기재된 hook 목록 vs settings 등록 vs 실파일 3자 대조.
 
 ## 4. 실패계약 검사
 
-각 active hook 파일을 Read하여:
-- `# fail-open` 또는 `# fail-closed` 주석 존재 여부
-- 미명시 hook → 실패계약 위험으로 기록
+hooks README.md의 실패계약 표를 기준으로 검사:
+- README 표에 해당 hook의 fail-open/fail-closed 기재 여부 확인
+- settings 등록된 active hook 중 README 표에 미기재 → 실패계약 위험
+- README 표 기재와 실제 hook 동작 불일치 가능성 표시
 
 ## 5. rules/commands/agents/스킬 진단
 
@@ -67,7 +68,7 @@ Glob 90_공통기준/스킬/*/SKILL.md
 
 ```
 Read CLAUDE.md (루트)
-Glob */CLAUDE.md (도메인)
+Glob **/CLAUDE.md (도메인, 중첩 경로 포함)
 ```
 
 도메인 진입 테이블과 실제 도메인 CLAUDE.md 존재 대조.
@@ -76,6 +77,7 @@ Glob */CLAUDE.md (도메인)
 
 ```
 Read .claude/incident_ledger.jsonl (tail 50)
+Read .claude/hooks/hook_log.jsonl (tail 50)
 Read .claude/hooks/skill_usage.jsonl (tail 50)
 ```
 
@@ -92,7 +94,7 @@ HANDOFF.md 최신 세션 번호 vs TASKS.md 세션 번호 대조.
 |----|-------------|
 | 활성등록 정합 | settings ↔ 실파일 ↔ README 3자 불일치 |
 | 문서 드리프트 | 문서 기술 vs Git 실물 차이 |
-| 실패계약 위험 | hook에 fail-open/fail-closed 미명시 |
+| 실패계약 위험 | hooks README 표에 fail-open/fail-closed 미기재 |
 | 죽은 자산 | 어디서도 참조되지 않는 파일 |
 
 # 3분류
