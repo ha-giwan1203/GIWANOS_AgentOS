@@ -599,6 +599,42 @@ The references/ directory has additional documentation:
 - `references/domain-guide-manufacturing.md` — Domain-specific guide for manufacturing/ERP/data settlement skills. Read this when the skill involves ERP web automation, Excel data pipelines, or factory floor operations (quality checks, line management, etc.).
 - `references/skill-standards.md` — Naming conventions, description formula, output standards, versioning rules, inter-skill linking rules, and file structure standards. Read this for every new skill to ensure consistent quality.
 
+## 실패 조건
+
+다음 중 하나라도 해당하면 **실행 실패**로 판정한다:
+
+| 조건 | 판정 |
+|------|------|
+| SKILL.md 미생성 (draft 모드 실패) | FAIL |
+| YAML frontmatter 필수 필드 누락 (name/description/grade) | FAIL |
+| eval 실행 결과 0건 (테스트 미수행) | FAIL |
+| .skill 패키지 번들 실패 | FAIL |
+
+## 중단 기준
+
+다음 상황에서는 **즉시 중단**하고 사용자에게 보고한다:
+
+1. 사용자 확인 없이 기존 스킬 덮어쓰기 시도
+2. eval 실행 중 원본 스킬 변경 감지 — 결과 무효화
+3. grader assertion 전수 FAIL — 스킬 설계 재검토 필요
+
+## 검증 항목
+
+실행 완료 후 반드시 확인:
+
+- [ ] SKILL.md YAML frontmatter 유효 (name/description/grade 존재)
+- [ ] description 트리거 커버리지 — undertrigger 방지 확인
+- [ ] 테스트 프롬프트 2건 이상 실행 완료
+- [ ] eval-viewer HTML 정상 생성 (해당 시)
+
+## 되돌리기 방법
+
+| 범위 | 방법 |
+|------|------|
+| workspace 결과물 | iteration 폴더 삭제 |
+| 원본 스킬 | snapshot 방식이므로 원본 미수정 |
+| .skill 패키지 | 패키지 파일 삭제 |
+
 ---
 
 Repeating one more time the core loop here for emphasis:

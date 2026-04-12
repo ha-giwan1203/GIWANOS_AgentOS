@@ -55,7 +55,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 자동/반자동 품질 검증 체계.
 
-### Hooks (.claude/hooks/) — 20개 활성 (settings.local.json 기준)
+### Hooks (.claude/hooks/) — 21개 활성 (settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 

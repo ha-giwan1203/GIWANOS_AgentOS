@@ -4,12 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-12 KST — 세션 25 (P1 계약 보강 + 운영 보고서 갱신)
+최종 업데이트: 2026-04-12 KST — 세션 26 (P2/P3 계약 보강 + 훅 개수 갱신)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 25)
+## 0. 최신 세션 (2026-04-12 세션 26)
+
+### 이번 세션 완료
+1. **P2 4개 계약 보강**: cdp-wrapper / supanova-deploy / youtube-analysis / flow-chat-analysis — 4섹션 추가
+2. **P3 4개+1 계약 보강**: pptx-generator / skill-creator-merged / sp3-production-plan — 4섹션 신규. production-result-upload — 표준 포맷 리포맷. production-report — 4섹션 신규
+3. **PASS 9→17개**: 유지 스킬 전수 계약 보강 완료 (FAIL 0개)
+4. **훅 개수 갱신**: README.md + AGENTS_GUIDE.md — 20→21개 (harness_gate 반영)
+
+### 다음 세션 안건
+1. harness_gate 실전 검증 (다음 토론 세션에서 자동 발화 확인)
+2. GPT 공유 + 판정
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 25)
 
 ### 이번 세션 완료
 1. **P1 스킬 3개 계약 보강**: zdm/mainsub/outer-main — 4섹션 추가. PASS 6→9개

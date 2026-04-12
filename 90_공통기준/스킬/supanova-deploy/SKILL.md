@@ -176,6 +176,45 @@ URL 성격: 검수용 임시 / 운영
 - `prompt_template.md` — Gemini용 / Claude Code용 권장 프롬프트 모음
 - `sample_output_structure.txt` — 최종 산출물 예시 구조
 
+## 실패 조건
+
+다음 중 하나라도 해당하면 **실행 실패**로 판정한다:
+
+| 조건 | 판정 |
+|------|------|
+| 입력 자산 3종(레퍼런스·영상·템플릿) 중 1개 이상 미확보 | FAIL |
+| ffmpeg 미설치 또는 WebP 프레임 변환 실패 | FAIL |
+| 추출 프레임 수 0개 | FAIL |
+| index.html에 절대경로(C:\, /Users 등) 포함 | FAIL |
+| Netlify Drop 업로드 실패 (네트워크/인증 에러) | FAIL |
+
+## 중단 기준
+
+다음 상황에서는 **즉시 중단**하고 사용자에게 보고한다:
+
+1. Gemini 영상 생성 3회 연속 실패 — API 할당량 또는 프롬프트 문제
+2. 프레임 시퀀스 연속성 깨짐 (번호 갭 존재) — validate_frames.py 실패
+3. 로컬 preview 실행 시 콘솔 에러 다수 발생 — 템플릿/프레임 불일치
+4. 원본 템플릿 HTML 직접 수정 시도 감지 — 복사본에서만 작업
+
+## 검증 항목
+
+실행 완료 후 반드시 확인:
+
+- [ ] output/ 폴더에 index.html + assets/ + frames/ 구조 존재
+- [ ] 프레임 파일명 연속성 (validate_frames.py PASS)
+- [ ] index.html 내 절대경로 0건 (상대경로만 사용)
+- [ ] 로컬 브라우저 preview에서 스크롤 애니메이션 정상 동작
+- [ ] README_deploy.txt 배포 기록 존재
+
+## 되돌리기 방법
+
+| 범위 | 방법 |
+|------|------|
+| Netlify 배포 | Netlify 대시보드에서 임시 URL 삭제 |
+| 로컬 산출물 | output/ 폴더 삭제 |
+| 원본 자산 | 템플릿·영상 원본은 미수정이므로 복원 불필요 |
+
 ---
 
 ## 한 줄 운영 원칙

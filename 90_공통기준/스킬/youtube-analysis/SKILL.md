@@ -423,6 +423,46 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 | GPT 대화방 진입 실패 | 토론모드 CLAUDE.md 셀렉터 규칙 따름 |
 | 토론모드 불가 | 분석 전용 모드 강등 (Step 5~6 스킵) |
 
+## 실패 조건
+
+다음 중 하나라도 해당하면 **실행 실패**로 판정한다:
+
+| 조건 | 판정 |
+|------|------|
+| youtube_analyze.py 실행 에러 (yt-dlp 또는 ffmpeg 미설치) | FAIL |
+| 자막 + 프레임 모두 추출 실패 (분석 소스 없음) | FAIL |
+| manifest.json 미생성 | FAIL |
+| Notion DB upsert 실패 (data_source_id 불일치 등) | FAIL |
+| A등급 판정인데 공식 문서 교차검증 미수행 | FAIL |
+
+## 중단 기준
+
+다음 상황에서는 **즉시 중단**하고 사용자에게 보고한다:
+
+1. YouTube API/yt-dlp 다운로드 연속 3회 실패 — 접근 제한 또는 영상 삭제
+2. 캐시 디렉토리 1GB 초과 + 정리 불가 — 디스크 공간 부족
+3. 9개 관점 분석 중 교차검증 없이 A등급 판정 시도
+4. Drive OAuth 인증 만료 — 토큰 갱신 필요
+
+## 검증 항목
+
+실행 완료 후 반드시 확인:
+
+- [ ] cache/{video_id}/manifest.json 존재
+- [ ] transcript.txt 또는 대체 자막 소스 확보
+- [ ] 프레임 최소 3장 이상 추출
+- [ ] A/B/C 판정 근거 표 완성 (9개 관점 전수)
+- [ ] Notion 페이지 저장 + Drive 업로드 완료 (해당 시)
+
+## 되돌리기 방법
+
+| 범위 | 방법 |
+|------|------|
+| 캐시 데이터 | `cache/{video_id}/` 폴더 삭제 |
+| Notion 페이지 | Notion에서 수동 삭제 |
+| Drive 업로드 | Drive 폴더 수동 삭제 |
+| TASKS 이력 | git revert로 이전 상태 복원 |
+
 ## 주의사항
 
 - 자동 모드에서 중간 승인 불요 (비가역 작업 제외)

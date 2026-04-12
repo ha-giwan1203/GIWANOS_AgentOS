@@ -22,6 +22,12 @@
 
 ## 최근 완료
 
+### [완료] P2/P3 계약 보강 + 훅 개수 갱신 — 세션26 (2026-04-12 세션 26)
+- **P2 4개 계약 보강**: cdp-wrapper / supanova-deploy / youtube-analysis / flow-chat-analysis — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
+- **P3 4개 계약 보강**: pptx-generator / skill-creator-merged / sp3-production-plan — 4섹션 신규 추가. production-result-upload — 기존 섹션 표준 포맷 리포맷. production-report — 4섹션 신규 추가
+- **PASS 9→17개**: 유지 스킬 전수 계약 보강 완료 (FAIL 0개)
+- **훅 개수 갱신**: README.md / AGENTS_GUIDE.md 20→21개 (harness_gate 반영)
+
 ### [완료] P1 계약 보강 + harness_gate 구현 — 세션25 (2026-04-12 세션 25)
 - **P1 3개 SKILL.md 계약 보강**: zdm/mainsub/outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
 - **skill_contract_gap_report**: PASS 6→9개. FAIL 8개 잔존 (P2/P3)
