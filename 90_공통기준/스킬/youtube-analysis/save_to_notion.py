@@ -26,14 +26,21 @@ SAVE_TEMPLATE = {
 }
 
 # Notion 본문 템플릿
+# - 핵심 화면: 반드시 아래 표 헤더를 사용. 행만 추가.
+# - 적용 포인트: 반드시 아래 표 헤더를 사용. 행만 추가.
+# - Claude는 {key_frames_rows}와 {action_points_rows}에 표 행(| 1 | ... |)만 채운다.
 PAGE_CONTENT_TEMPLATE = """## 요약
 {summary}
 
 ## 핵심 화면
-{key_frames}
+| # | 시점 | 화면 내용 | 시사점 |
+|---|------|----------|--------|
+{key_frames_rows}
 
 ## 적용 포인트
-{action_points}
+| # | 주제 | 등급 | 근거 |
+|---|------|------|------|
+{action_points_rows}
 
 ## 원본 링크
 - YouTube: {youtube_url}
@@ -63,11 +70,21 @@ def build_properties(manifest: dict, analysis: dict) -> dict:
 
 
 def build_content(analysis: dict) -> str:
-    """Notion 본문 생성"""
+    """Notion 본문 생성
+
+    analysis에 필요한 키:
+        summary: 3~5줄 핵심 요약 (텍스트)
+        key_frames_rows: 핵심 화면 표 행 (마크다운 표 행만, 헤더 제외)
+            예: "| 1 | 1:03 | 에이전트 구성 | 2층 구조 |"
+        action_points_rows: 적용 포인트 표 행 (마크다운 표 행만, 헤더 제외)
+            예: "| 1 | 메타 스킬 | A | 즉시 구현 가능 |"
+        youtube_url: YouTube URL
+        drive_url: Drive 폴더 URL
+    """
     return PAGE_CONTENT_TEMPLATE.format(
         summary=analysis.get("summary", ""),
-        key_frames=analysis.get("key_frames_md", "(프레임 없음)"),
-        action_points=analysis.get("action_points", ""),
+        key_frames_rows=analysis.get("key_frames_rows", "| - | - | (프레임 없음) | - |"),
+        action_points_rows=analysis.get("action_points_rows", "| - | - | - | - |"),
         youtube_url=analysis.get("youtube_url", ""),
         drive_url=analysis.get("drive_url", "없음"),
     )
