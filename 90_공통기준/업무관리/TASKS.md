@@ -26,7 +26,8 @@
 - **P1 3개 SKILL.md 계약 보강**: zdm/mainsub/outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
 - **skill_contract_gap_report**: PASS 6→9개. FAIL 8개 잔존 (P2/P3)
 - **hook_metrics 재생성**: 4/12 기준 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
-- **harness_gate.sh 신규**: GPT 응답 후 하네스 분석 없이 commit/push/공유/완료 차단. 복합 4조건 AND (채택: + 보류:/버림: + 독립견해 + 실물근거)
+- **harness_gate.sh 신규**: GPT 응답 후 하네스 분석 없이 commit/push/공유 차단 (Bash PreToolUse). 복합 4조건 AND (채택: + 보류:/버림: + 독립견해 + 실물근거). completion 백스톱 연동은 보류
+- **cdp_chat_send.py 전송 검증 추가**: submit 클릭 후 user 메시지 DOM 존재 확인 (5초). 미검증 시 send_unverified 반환 (exit 6)
 - **risk_profile_prompt 확장**: 토론 키워드 감지 → debate_preflight.req 생성 (harness_gate 활성화 트리거)
 - **GPT 토론 2라운드**: 채택 8건 / 보류 1건 / 버림 0건. D안(transport/quality gate 분리) 합의
 - smoke_test: 105/105 ALL PASS
