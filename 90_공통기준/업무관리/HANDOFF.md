@@ -13,11 +13,13 @@
 
 ### 이번 세션 완료
 1. **영상 분석**: c-a4GBOxhXQ "나의 AI 에이전트 전환기" (일잘러 장피엠, 28분) — 15프레임+자막 통합
-2. **판정**: A 1건(메타 스킬 /self-audit) / B 2건(오토리서치, 주간 셀프 리뷰) / C 5건
+2. **판정**: A 1건(메타 스킬 /self-audit) / C 5건. 오토리서치·주간 셀프 리뷰는 사용자 판단으로 불채택
 3. **스킬 절차 개선**: video.md + SKILL.md에 플랜모드 감지(Phase 0), 갭 분석(Step 3.5), 상태갱신(Step 5) 추가
-4. **Notion 저장**: 340fee67 (영상분석 이력 DB)
-5. **Drive 업로드**: 영상분석/raw/c-a4GBOxhXQ/ 18파일 (mp4 제외)
-6. **커밋**: 37bfdec4 (main 푸시 완료)
+4. **Notion 본문 포맷 기준 고정**: save_to_notion.py에 표 헤더 템플릿 포함
+5. **Notion 저장**: 340fee67 / **Drive 업로드**: 18파일
+6. **/self-audit 메타 스킬 구현**: commands + read-only agent 분리, 4축 진단, 3분류
+7. **GPT 토론 3라운드 + 실물 검증 3회 → 최종 통과**
+8. 커밋: 37bfdec4, 3aa43cce, a4aaa748, 7b1b2272, 3fc14b4c, 2a3d9fc5, e7e66e2c, bbadd386
 
 ### 다음 세션 안건
 1. /self-audit 실사용 1~2회 돌려서 anomaly 검출 품질 검증
