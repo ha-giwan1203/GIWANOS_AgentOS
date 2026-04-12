@@ -4,12 +4,27 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-12 KST — 세션 24 (스킬 4축 분류 + 운영 검증 3건)
+최종 업데이트: 2026-04-12 KST — 세션 25 (P1 계약 보강 + 운영 보고서 갱신)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 24)
+## 0. 최신 세션 (2026-04-12 세션 25)
+
+### 이번 세션 완료
+1. **P1 스킬 3개 계약 보강**: zdm-daily-inspection / line-batch-mainsub / line-batch-outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
+2. **skill_contract_gap_report 재실행**: PASS 6→9개 (+3). FAIL 8개 잔존 (P2/P3)
+3. **hook_metrics 재생성**: 4/12 기준 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
+4. **skill_usage 계측 확인**: 인프라 정상, 누적 1건. 다음 /command 호출 시 자동 증가 확인 예정
+
+### 다음 세션 안건
+1. P2 스킬 4개 계약 보강 (cdp-wrapper/supanova/youtube/flow-chat)
+2. skill_usage 계측 실제 누적 확인 (다음 /command 호출 시)
+3. P3 스킬 4개 계약 보강 (pptx/skill-creator/production-report/sp3)
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 24)
 
 ### 이번 세션 완료
 1. **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 → 유지 18개 / 아카이브 10개
@@ -19,12 +34,6 @@
 5. **취약점 동결 3건 5회 연속 유효 → "안정" 승격**: TOCTOU/execCommand/classification 소급 전부 유효
 6. **유지 FAIL 11개 계약 보강 우선순위**: P1(zdm/mainsub/outer-main) / P2(4개) / P3(4개)
 7. **GPT 판정**: PASS (b95c86ca)
-
-### 다음 세션 안건
-1. P1 스킬 3개 계약 보강 (실패조건/중단기준/검증항목/되돌리기 4섹션 추가)
-2. skill_usage 계측 실제 누적 확인 (다음 /command 호출 시)
-3. hook_metrics 보고서 재생성 (현재 4/11 기준 → 4/12 이후 반영)
-4. skill_contract_gap_report 재실행 (아카이브 반영 + grade 파싱 수정)
 
 ---
 

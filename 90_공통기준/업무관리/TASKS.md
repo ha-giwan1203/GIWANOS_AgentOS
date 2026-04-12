@@ -22,6 +22,12 @@
 
 ## 최근 완료
 
+### [완료] P1 스킬 계약 보강 + 운영 보고서 갱신 — 세션25 (2026-04-12 세션 25)
+- **P1 3개 SKILL.md 계약 보강 완료**: zdm-daily-inspection / line-batch-mainsub / line-batch-outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
+- **skill_contract_gap_report 재실행**: PASS 6→9개 (+zdm, mainsub, outer-main). FAIL 8개 잔존 (P2/P3)
+- **hook_metrics 재생성**: 4/12 기준 갱신 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
+- skill_usage 계측: 인프라 정상, 누적 데이터 1건 (다음 /command 호출 시 자동 증가 확인 예정)
+
 ### [완료] 스킬 4축 분류 + 운영 검증 + 아카이브 실행 — 세션24 (2026-04-12 세션 24)
 - **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 기준 → 유지 18개 / 아카이브 10개
 - **아카이브 10개 이동 완료**: cost-rate-management, adversarial-review, equipment-utilization, hr-attendance, line-stoppage, partno-management, process-improvement, procurement-delivery, quality-assurance, quality-defect-report → `98_아카이브/정리대기_20260412/스킬/`
