@@ -9,6 +9,15 @@ INPUT=$(cat)
 SOURCE=$(printf '%s' "$INPUT" | safe_json_get "source" 2>/dev/null || echo "unknown")
 KERNEL_FILE="$PROJECT_ROOT/.claude/state/session_kernel.md"
 
+# evidence 세션 경계 갱신: 새 세션 시작 시 START_FILE 타임스탬프 강제 갱신
+# 이전 세션의 .req가 잔존해도 START_FILE이 더 새로우면 evidence_gate가 무시함
+SK=$(session_key)
+EV_START="$STATE_EVIDENCE/$SK/.session_start"
+if [ -d "$STATE_EVIDENCE/$SK" ]; then
+  touch "$EV_START"
+  hook_log "session_start_restore" "evidence START_FILE refreshed sk=$SK"
+fi
+
 hook_log "session_start_restore" "source=$SOURCE"
 
 if [ ! -f "$KERNEL_FILE" ]; then

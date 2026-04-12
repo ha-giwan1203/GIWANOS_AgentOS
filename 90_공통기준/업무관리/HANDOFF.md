@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-12 KST — 세션 22 (영상분석 c-a4GBOxhXQ + 스킬 절차 개선)
+최종 업데이트: 2026-04-12 KST — 세션 23 (/self-audit 첫 실사용 + 문서 드리프트 수정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 22)
+## 0. 최신 세션 (2026-04-12 세션 23)
+
+### 이번 세션 완료
+1. **/self-audit 첫 실사용**: P1 2건 / P2 3건 / P3 2건 검출. anomaly 검출 품질 양호
+2. **GPT 토론 2라운드**: 채택 3건 / 보류 1건 / 버림 0건
+3. **AGENTS_GUIDE.md 현행화**: 폐지 hook 4개 제거 → 현행 20개, 스킬명 수정, 감시계층 운영 상태 표시
+4. **README.md**: state_rebind_check matcher Bash→Write|Edit|MultiEdit 수정
+5. **skill_usage 계측 연결**: /command 감지 → hook_skill_usage 자동 호출
+6. **evidence 세션 경계 수정**: session_start_restore.sh에서 START_FILE 강제 갱신
+
+### 다음 세션 안건
+1. skill_usage 1~2주 누적 데이터 확인 후 스킬 20개 아카이브/유지 판단
+2. evidence 세션 경계 수정 후 .req 잔존 문제 해소 확인
+3. 취약점 동결 3건 계속 모니터링
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 22)
 
 ### 이번 세션 완료
 1. **영상 분석**: c-a4GBOxhXQ "나의 AI 에이전트 전환기" (일잘러 장피엠, 28분) — 15프레임+자막 통합
@@ -20,10 +37,6 @@
 6. **/self-audit 메타 스킬 구현**: commands + read-only agent 분리, 4축 진단, 3분류
 7. **GPT 토론 3라운드 + 실물 검증 3회 → 최종 통과**
 8. 커밋: 37bfdec4, 3aa43cce, a4aaa748, 7b1b2272, 3fc14b4c, 2a3d9fc5, e7e66e2c, bbadd386
-
-### 다음 세션 안건
-1. /self-audit 실사용 1~2회 돌려서 anomaly 검출 품질 검증
-2. 취약점 동결 3건 계속 모니터링
 
 ---
 

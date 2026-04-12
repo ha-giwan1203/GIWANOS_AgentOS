@@ -33,7 +33,7 @@
 | ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
 | ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
 | ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검, `tool_input` 우선 파싱 |
-| ⑦ | `state_rebind_check.sh` | Bash | 상태 바인딩 정합성 검사 |
+| ⑦ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
 
 ### 추적층 (PostToolUse)
 

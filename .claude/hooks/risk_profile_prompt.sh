@@ -63,6 +63,12 @@ if echo "$TEXT" | grep -qiE '(스키마|컬럼|시트.*추가|시트.*삭제)'; 
   touch_req "map_scope_warn"
 fi
 
+# 스킬 사용 계측: /command 패턴 감지 시 skill_usage 로깅
+SKILL_NAME=$(printf '%s' "$TEXT" | grep -oE '^\s*/([a-z][a-z0-9_-]*)' | sed 's|^\s*/||' | head -1)
+if [ -n "$SKILL_NAME" ]; then
+  hook_skill_usage "$SKILL_NAME" "slash"
+fi
+
 hook_log "UserPromptSubmit" "risk_profile_prompt reqs=${REQS:-none}"
 
 # 출력은 선택사항. 최소 마찰 위해 추가 컨텍스트 미주입.

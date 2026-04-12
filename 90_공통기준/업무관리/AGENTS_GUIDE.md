@@ -55,17 +55,32 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 자동/반자동 품질 검증 체계.
 
-### Hooks (.claude/hooks/)
+### Hooks (.claude/hooks/) — 20개 활성 (settings.local.json 기준)
 
-| 스크립트 | 이벤트 | 역할 |
-|---------|--------|------|
-| block_dangerous.sh | PreToolUse(Bash) | 위험 명령 차단 |
-| protect_files.sh | PreToolUse(Write/Edit) | 보호 파일 deny/log |
-| notify_slack.sh | Notification | Slack 알림 (60초 dedup) |
-| session_start.sh | SessionStart | 인수인계 읽기 순서 리마인드 |
-| session_end.sh | SessionEnd | HANDOFF 갱신 리마인드 |
-| instructions_loaded.sh | InstructionsLoaded | CLAUDE.md 로드 로그 |
-| skill_config_change.sh | ConfigChange | 설정 변경 감지 로그 |
+> 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
+
+| 층 | 스크립트 | matcher | 역할 |
+|----|---------|---------|------|
+| 이벤트 | session_start_restore.sh | SessionStart | 세션 시작 시 상태 복원 |
+| 이벤트 | precompact_save.sh | PreCompact | 컨텍스트 압축 전 상태 저장 |
+| 프롬프트 | risk_profile_prompt.sh | UserPromptSubmit | 위험 키워드 감지 → .req 생성 |
+| 차단 | block_dangerous.sh | Bash | 극단 파괴 명령 차단 |
+| 차단 | commit_gate.sh | Bash | git commit/push 전 final_check 강제 |
+| 차단 | date_scope_guard.sh | Bash | ZDM 일요일·일괄범위 차단 |
+| 차단 | evidence_gate.sh | Bash\|Write\|Edit\|MultiEdit | req 있고 ok 없으면 deny |
+| 차단 | protect_files.sh | Write\|Edit\|MultiEdit | 원본 파일 수정 차단 |
+| 차단 | send_gate.sh | mcp__Chrome__javascript_tool | 토론모드 전송 전 점검 |
+| 차단 | state_rebind_check.sh | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
+| 추적 | auto_compile.sh | Write\|Edit | 파일 수정 후 자동 컴파일 |
+| 추적 | write_marker.sh | Write\|Edit | 변경 마커 생성 |
+| 추적 | evidence_mark_read.sh | Read\|Grep\|Glob\|Bash\|Write\|Edit\|MultiEdit | 증거 마커 적립 |
+| 추적 | gpt_followup_post.sh | Chrome\|Bash\|Edit\|Write | GPT 후속작업 감지 |
+| 추적 | handoff_archive.sh | Write\|Edit | HANDOFF 갱신 시 아카이브 |
+| 알림 | notify_slack.sh | Notification | Slack 채널 알림 |
+| 종료 | stop_guard.sh | Stop | 금지 문구 포함 시 차단 |
+| 종료 | gpt_followup_stop.sh | Stop | GPT pending flag 시 차단 |
+| 종료 | completion_gate.sh | Stop | TASKS/HANDOFF 미갱신 시 차단 |
+| 종료 | evidence_stop_guard.sh | Stop | 증거 없는 결론 차단 |
 
 ### Commands (.claude/commands/)
 
@@ -95,7 +110,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 | line-batch-mainsub | 메인서브 품번 배치 |
 | assembly-cost-settlement | 조립비 정산 |
 | zdm-daily-inspection | ZDM 일상점검 |
-| mes-production-upload | MES 생산실적 업로드 |
+| production-result-upload | MES 생산실적 업로드 |
 | xlsx/docx/pdf/pptx | 파일 형식별 처리 |
 | youtube-analysis | YouTube 영상 분석 |
 
@@ -115,14 +130,16 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 외부 파일 변경 감지 → 자동 커밋/상태갱신/알림 체인.
 
-| Phase | 스크립트 | 역할 |
-|-------|---------|------|
-| 1 | watch_changes.py | 파일 변경 감지 (watchdog) + debounce 30분 |
-| 2 | commit_docs.py | allowlist 기준 git add/commit/push |
-| 3 | update_status_tasks.py | STATUS.md/TASKS.md 자동 갱신 |
-| 4 | slack_notify.py | Slack 알림 발송 |
-| 5 | notion_sync.py | Notion 현황판 동기화 |
-| 6 | skill_install.py | .skill 파일 변경 시 자동 설치 |
+> 실파일은 `90_공통기준/업무관리/` 하위에 존재하나, 스케줄러 등록/상시 운영 여부는 미확인.
+
+| Phase | 스크립트 | 역할 | 운영 상태 |
+|-------|---------|------|----------|
+| 1 | watch_changes.py | 파일 변경 감지 (watchdog) + debounce 30분 | 실파일 존재, 운영 미확인 |
+| 2 | commit_docs.py | allowlist 기준 git add/commit/push | 실파일 존재, 운영 미확인 |
+| 3 | update_status_tasks.py | STATUS.md/TASKS.md 자동 갱신 | 실파일 존재, 운영 미확인 |
+| 4 | slack_notify.py | Slack 알림 발송 | 실파일 존재, 운영 미확인 |
+| 5 | notion_sync.py | Notion 현황판 동기화 | 실파일 존재, 운영 미확인 |
+| 6 | skill_install.py | .skill 파일 변경 시 자동 설치 | 실파일 존재, 운영 미확인 |
 
 ---
 
