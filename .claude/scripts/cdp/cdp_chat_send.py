@@ -98,6 +98,25 @@ def wait_and_click_submit(page, timeout_ms: int) -> dict[str, str]:
     return {"status": "timeout"}
 
 
+def verify_sent(page, text_snippet: str, timeout_s: float = 5.0) -> bool:
+    """전송 후 user 메시지가 실제로 추가됐는지 검증."""
+    snippet = text_snippet[:60].replace("'", "\\'").replace("\n", " ")
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        found = page.evaluate(
+            f"""() => {{
+              const msgs = [...document.querySelectorAll('[data-message-author-role="user"]')];
+              const last = msgs[msgs.length - 1];
+              if (!last) return false;
+              return last.innerText.includes('{snippet}');
+            }}"""
+        )
+        if found:
+            return True
+        time.sleep(0.5)
+    return False
+
+
 def write_gate_file(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(str(int(time.time())), encoding="utf-8")
@@ -159,14 +178,29 @@ def main() -> int:
             return 4
 
         submit = wait_and_click_submit(page, args.submit_timeout_ms)
-        payload = {
-            "status": "sent" if submit.get("status") == "clicked" else submit.get("status"),
-            "button": submit.get("selector", ""),
-            "tagName": inserted.get("tagName", ""),
-            "last_assistant_snippet": last_snippet,
-        }
-        print(json.dumps(payload, ensure_ascii=False))
-        return 0 if submit.get("status") == "clicked" else 5
+
+        if submit.get("status") == "clicked":
+            # 전송 후 실제 user 메시지 추가 검증
+            verified = verify_sent(page, text, timeout_s=5.0)
+            payload = {
+                "status": "sent" if verified else "send_unverified",
+                "verified": verified,
+                "button": submit.get("selector", ""),
+                "tagName": inserted.get("tagName", ""),
+                "last_assistant_snippet": last_snippet,
+            }
+            print(json.dumps(payload, ensure_ascii=False))
+            return 0 if verified else 6
+        else:
+            payload = {
+                "status": submit.get("status"),
+                "verified": False,
+                "button": submit.get("selector", ""),
+                "tagName": inserted.get("tagName", ""),
+                "last_assistant_snippet": last_snippet,
+            }
+            print(json.dumps(payload, ensure_ascii=False))
+            return 5
     finally:
         cleanup(pw)
 
