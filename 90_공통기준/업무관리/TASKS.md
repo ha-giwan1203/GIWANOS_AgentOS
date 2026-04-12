@@ -16,11 +16,10 @@
 
 ## 진행중 / 보류
 
-### [보류] yt-dlp 풀다운로드 복구 실험
-- yt-dlp 2026.03.17 = PyPI 최신. pip upgrade로 해결 불가 확인
-- YouTube JS challenge에 외부 JS runtime(deno) 필요 (yt-dlp 공식 공지)
-- deno 설치는 Windows 복잡도 + 불확실한 효과로 보류
-- 프레임 분석이 꼭 필요한 작업 발생 시 재검토
+### [완료] yt-dlp 풀다운로드 복구 — 세션30 (2026-04-13)
+- Node.js v24.14.0 + `--js-runtimes node --remote-components ejs:github` 조합으로 해결
+- deno 불필요. youtube_analyze.py에 옵션 반영 완료
+- 테스트: 4.29MB mp4 정상 다운로드 확인
 
 ### [소] Notion 부모 페이지 / verify_xlsm COM
 

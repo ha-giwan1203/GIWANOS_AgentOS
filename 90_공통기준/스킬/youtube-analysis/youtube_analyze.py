@@ -146,6 +146,8 @@ def download_video(url: str, video_id: str, out_dir: Path) -> tuple[Path | None,
 
     cmd = [
         "yt-dlp",
+        "--js-runtimes", "node",
+        "--remote-components", "ejs:github",
         "-f", "bestvideo[height<=480]+bestaudio/best[height<=480]",
         "--merge-output-format", "mp4",
         "-o", str(video_path),
@@ -352,7 +354,7 @@ def main():
     parser.add_argument("--no-download", action="store_true", default=True,
                         help="(기본값) 자막만 추출. yt-dlp YouTube hang 대응으로 기본 전환 (2026-04-12)")
     parser.add_argument("--force-download", action="store_true",
-                        help="영상 다운로드+프레임 추출 강제. yt-dlp hang 위험 있음")
+                        help="영상 다운로드+프레임 추출 강제. Node.js+EJS로 JS challenge 복구됨")
     parser.add_argument("--refresh", action="store_true", help="캐시 무시, 강제 재다운로드")
     args = parser.parse_args()
 

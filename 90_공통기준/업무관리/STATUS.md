@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-11 — 세션15 설계 토론 2건 합의+구현 + 구조 부채 3건 정리
+최종 업데이트: 2026-04-13 — 세션30 현황점검 + 상태문서 갱신
 
 ---
 
@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 19개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/send gate 운영 중 |
+| hooks 체계 | 21개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/send/harness gate 운영 중 |
 
 ---
 
