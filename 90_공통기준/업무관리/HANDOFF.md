@@ -12,27 +12,20 @@
 ## 0. 최신 세션 (2026-04-13 세션 29)
 
 ### 이번 세션 완료
-1. **심화 콘텐츠 첫 탐색 실행**: 12개 키워드 × 5단계 루트 웹서치 (병렬 2배치)
-2. **심화 필터 적용 + 등급 판정**: penalty/bonus 키워드 기반 A/B/C 분류
-3. **A등급 5건 발굴**:
-   - Anthropic "Effective harnesses for long-running agents" (2-agent, progress file, session smoke test)
-   - Anthropic "Harness design for long-running apps" (3-agent planner/generator/evaluator, sprint contract)
-   - Anthropic "Demystifying evals for AI agents" (pass@k/pass^k, capability→regression 졸업)
-   - Kevin Tan "5 Error Handling Patterns" (circuit breaker/validation gate/saga/budget/escalation)
-   - langchain-ai/agentevals (trajectory matching strict/in-order/any-order)
-4. **B등급 7건 발굴**: OTel tracing, LangChain checklist, DataDome postmortem, Cline evals, MS manufacturing, ICLR 2026, AWS Strands
-5. **Notion 등록 12건**: 콘텐츠 분석 이력 DB에 source_type/depth/domain/actionability 포함
+1. **심화 콘텐츠 첫 탐색 실행**: 12개 키워드 × 5단계 루트 웹서치 (병렬 2배치) → A등급 5건 + B등급 7건 → Notion 12건 등록
+2. **GPT 토론 2턴**: 갭 6건 검토 → 채택 3건(session startup/cap-reg 분리/circuit breaker 최소형) / 보류 1건(pass@k)
+3. **P1 구현: smoke_fast.sh 신규**: SessionStart fast smoke subset (9건, 로컬·결정적). session_start_restore.sh에 호출 연결
+4. **P2 구현: smoke_test 라벨 분류**: regression 27섹션 / capability 3섹션+24b. 105/105 ALL PASS 유지
 
-### 핵심 인사이트
-- Anthropic 3-agent harness ↔ 우리 토론모드(planner) + 구현(generator) + 완료판정(evaluator) 1:1 대응
-- Circuit breaker 패턴은 우리 시스템에 없음 → 도입 검토 가치
-- capability eval→regression eval "졸업" 패턴 = smoke_test 체계 강화 방향
+### GPT 판정
+- 세션28 전체: 정합 (Notion DB 6필드 + self-audit 증적 확인)
+- 세션29 갭 토론: 합의 완료 — 이견 없음
 
 ### 다음 세션 안건
 
-**[대] A등급 5건 적용 검토 — GPT 토론**
-- Anthropic harness 패턴과 우리 시스템 갭 분석 → 구현 우선순위 결정
-- circuit breaker 도입 여부, pass@k 메트릭 도입 여부 토론
+**[대] P3 circuit breaker 최소형 구현**
+- incident 3회 연속+unresolved+동일 경로 → 해당 경로만 차단
+- 범위: send/harness/video 등 side effect 경로만
 
 **[보류] yt-dlp 풀다운로드 복구 실험**
 - deno/EJS 설치 — 프레임 분석 필요 시 재검토

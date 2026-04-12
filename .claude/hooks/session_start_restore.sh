@@ -49,4 +49,13 @@ head -20 "$PATH_HANDOFF" 2>/dev/null
 echo "=== session_kernel 끝 ==="
 
 hook_log "session_start_restore" "kernel 출력 완료 source=$SOURCE age=${AGE}s"
+
+# Fast smoke subset — 로컬·결정적 검증만 (차단 아님, 경고만)
+FAST_SMOKE="$(dirname "$0")/smoke_fast.sh"
+if [ -x "$FAST_SMOKE" ]; then
+  FAST_RESULT=$("$FAST_SMOKE" 2>&1)
+  echo "$FAST_RESULT"
+  hook_log "session_start_restore" "fast_smoke: $FAST_RESULT"
+fi
+
 exit 0
