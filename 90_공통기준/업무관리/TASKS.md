@@ -35,7 +35,7 @@
 - **스킬 절차 개선**: video.md에 Phase 0(플랜모드 감지) + Phase 5(갭 분석) + Phase 6~7(저장/상태갱신) 추가. SKILL.md에 Step 3.5(갭 분석) + Step 5(상태갱신) 추가
 - **Notion 저장**: 340fee67 / **Drive 업로드**: 18파일 (mp4 제외)
 - 커밋: 37bfdec4
-- 다음 안건: A등급 /self-audit 메타 스킬 구현, B등급 오토리서치·주간 셀프 리뷰 plan 작성
+- 다음 안건: /self-audit 실사용 검증, B등급 주간 셀프 리뷰 plan 작성
 
 ### [완료] youtube-analysis 캐시 TTL + Notion 저장 + OpenClaw 비교 — 세션21 (2026-04-11 세션 21)
 - **캐시 정책 구현**: TTL 7일 + 1GB 상한 + 실행시 자동 cleanup + mp4 우선 삭제 + LRU fallback 체인
