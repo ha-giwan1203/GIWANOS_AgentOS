@@ -17,12 +17,15 @@
 3. **AGENTS_GUIDE.md 현행화**: 폐지 hook 4개 제거 → 현행 20개, 스킬명 수정, 감시계층 운영 상태 표시
 4. **README.md**: state_rebind_check matcher Bash→Write|Edit|MultiEdit 수정
 5. **skill_usage 계측 연결**: /command 감지 → hook_skill_usage 자동 호출
-6. **evidence 세션 경계 수정**: session_start_restore.sh에서 START_FILE 강제 갱신
+6. **evidence 세션 경계 수정**: session_start_restore.sh에서 START_FILE 강제 갱신 (보조)
+7. **독립 재검토**: GPT 프레임 종속 탈피 → 2건 이견 제기 → GPT 수용
+8. **map_scope 트리거 AND 조건화**: 대상+의도 AND 조건 (7d5ffbd7) — 40건+ 반복 차단 근본 해소
 
 ### 다음 세션 안건
-1. skill_usage 1~2주 누적 데이터 확인 후 스킬 20개 아카이브/유지 판단
-2. evidence 세션 경계 수정 후 .req 잔존 문제 해소 확인
-3. 취약점 동결 3건 계속 모니터링
+1. 스킬 20개 개별 4축 분류 (grade + 수정일 + 참조 + 호출) → 아카이브/유지 판단
+2. map_scope AND 조건 적용 후 반복 차단 해소 확인
+3. skill_usage 계측 누적 데이터 확인
+4. 취약점 동결 3건 계속 모니터링
 
 ---
 

@@ -28,7 +28,9 @@
 - **AGENTS_GUIDE.md 현행화**: 폐지 hook 4개 제거, 현행 20개 기준 교체, 스킬명 수정(mes→production-result-upload), 감시계층 운영 상태 표시
 - **README.md**: state_rebind_check matcher Bash→Write|Edit|MultiEdit 수정
 - **skill_usage 계측 연결**: risk_profile_prompt.sh에 /command 감지 → hook_skill_usage 호출 추가
-- **evidence 세션 경계 수정**: session_start_restore.sh에서 START_FILE 강제 갱신 (.req 잔존 문제 해소)
+- **evidence 세션 경계 수정**: session_start_restore.sh에서 START_FILE 강제 갱신 (보조 해법)
+- **map_scope 트리거 AND 조건화**: 대상+의도 AND 조건으로 변경 — 40건+ 반복 차단의 근본 해소 (7d5ffbd7)
+- **독립 재검토 GPT 합의**: 스킬 20개 개별 4축 분류로 변경, evidence 트리거 감도가 주원인
 
 ### [완료] /self-audit 메타 스킬 구현 — 세션22 (2026-04-12 세션 22)
 - commands/self-audit.md + agents/self-audit-agent.md 신설
