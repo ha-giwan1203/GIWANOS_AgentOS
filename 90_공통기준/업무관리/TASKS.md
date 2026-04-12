@@ -27,6 +27,7 @@
 - **P3 4개 계약 보강**: pptx-generator / skill-creator-merged / sp3-production-plan — 4섹션 신규 추가. production-result-upload — 기존 섹션 표준 포맷 리포맷. production-report — 4섹션 신규 추가
 - **PASS 9→17개**: 유지 스킬 전수 계약 보강 완료 (FAIL 0개)
 - **훅 개수 갱신**: README.md / AGENTS_GUIDE.md 20→21개 (harness_gate 반영)
+- GPT 판정: PASS (b99a4661)
 
 ### [완료] P1 계약 보강 + harness_gate 구현 — 세션25 (2026-04-12 세션 25)
 - **P1 3개 SKILL.md 계약 보강**: zdm/mainsub/outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
