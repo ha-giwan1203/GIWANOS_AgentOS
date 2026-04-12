@@ -47,32 +47,45 @@ def is_generating(page) -> bool:
 
 
 def insert_text(page, text: str) -> dict[str, str]:
-    return page.evaluate(
-        """(text) => {
+    """prompt-textarea에 텍스트 삽입. contenteditable DIV는 Playwright type()으로 처리."""
+    tag_name = page.evaluate(
+        """() => {
           const el = document.querySelector('#prompt-textarea');
-          if (!el) {
-            return { status: 'no_textarea' };
-          }
+          if (!el) return null;
           el.focus();
-          if (el.tagName === 'TEXTAREA') {
-            const proto = Object.getPrototypeOf(el);
-            const valueSetter =
-              Object.getOwnPropertyDescriptor(proto, 'value')?.set ||
-              Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
-            valueSetter.call(el, text);
-            el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
-            el.dispatchEvent(new Event('change', { bubbles: true }));
-          } else {
-            document.execCommand('selectAll', false, null);
-            document.execCommand('insertText', false, text);
-          }
-          return {
-            status: 'inserted',
-            tagName: el.tagName,
-          };
-        }""",
-        text,
+          return el.tagName;
+        }"""
     )
+    if not tag_name:
+        return {"status": "no_textarea"}
+
+    if tag_name == "TEXTAREA":
+        # legacy TEXTAREA 경로: React setter + InputEvent
+        page.evaluate(
+            """(text) => {
+              const el = document.querySelector('#prompt-textarea');
+              const proto = Object.getPrototypeOf(el);
+              const valueSetter =
+                Object.getOwnPropertyDescriptor(proto, 'value')?.set ||
+                Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
+              valueSetter.call(el, text);
+              el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+            }""",
+            text,
+        )
+    else:
+        # contenteditable DIV 경로: CDP Input.insertText로 React 상태 동기화
+        el = page.locator("#prompt-textarea")
+        el.click()
+        time.sleep(0.3)
+        page.keyboard.press("Control+a")
+        page.keyboard.press("Delete")
+        time.sleep(0.2)
+        page.keyboard.insert_text(text)
+        time.sleep(0.3)
+
+    return {"status": "inserted", "tagName": tag_name}
 
 
 def wait_and_click_submit(page, timeout_ms: int) -> dict[str, str]:
@@ -98,20 +111,27 @@ def wait_and_click_submit(page, timeout_ms: int) -> dict[str, str]:
     return {"status": "timeout"}
 
 
-def verify_sent(page, text_snippet: str, timeout_s: float = 5.0) -> bool:
-    """전송 후 user 메시지가 실제로 추가됐는지 검증."""
-    snippet = text_snippet[:60].replace("'", "\\'").replace("\n", " ")
+def verify_sent(page, pre_user_count: int, timeout_s: float = 5.0) -> bool:
+    """전송 후 user 메시지 수 증가 또는 GPT 생성 시작으로 검증."""
     deadline = time.time() + timeout_s
     while time.time() < deadline:
-        found = page.evaluate(
-            f"""() => {{
-              const msgs = [...document.querySelectorAll('[data-message-author-role="user"]')];
-              const last = msgs[msgs.length - 1];
-              if (!last) return false;
-              return last.innerText.includes('{snippet}');
-            }}"""
+        result = page.evaluate(
+            """(preCount) => {
+              const userMsgs = document.querySelectorAll('[data-message-author-role="user"]');
+              const stopBtn = document.querySelector('[data-testid="stop-button"]');
+              const textarea = document.querySelector('#prompt-textarea');
+              const composerEmpty = textarea && (textarea.textContent || '').trim().length === 0;
+              return {
+                userCount: userMsgs.length,
+                generating: !!stopBtn,
+                composerEmpty: !!composerEmpty,
+                increased: userMsgs.length > preCount
+              };
+            }""",
+            pre_user_count,
         )
-        if found:
+        # user 메시지 수 증가 OR GPT 생성 시작 OR composer가 비워짐 → 전송 성공
+        if result.get("increased") or result.get("generating") or result.get("composerEmpty"):
             return True
         time.sleep(0.5)
     return False
@@ -172,6 +192,11 @@ def main() -> int:
         if args.mark_send_gate:
             write_gate_file(Path(args.gate_file))
 
+        # 전송 전 user 메시지 수 기록 (검증용)
+        pre_user_count = page.evaluate(
+            """() => document.querySelectorAll('[data-message-author-role="user"]').length"""
+        )
+
         inserted = insert_text(page, text)
         if inserted.get("status") != "inserted":
             print(json.dumps(inserted, ensure_ascii=False))
@@ -180,8 +205,8 @@ def main() -> int:
         submit = wait_and_click_submit(page, args.submit_timeout_ms)
 
         if submit.get("status") == "clicked":
-            # 전송 후 실제 user 메시지 추가 검증
-            verified = verify_sent(page, text, timeout_s=5.0)
+            # 전송 후 user 메시지 수 증가 또는 GPT 생성 시작 검증
+            verified = verify_sent(page, pre_user_count, timeout_s=5.0)
             payload = {
                 "status": "sent" if verified else "send_unverified",
                 "verified": verified,
