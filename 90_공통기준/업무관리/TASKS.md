@@ -22,19 +22,17 @@
 - deno 설치는 Windows 복잡도 + 불확실한 효과로 보류
 - 프레임 분석이 꼭 필요한 작업 발생 시 재검토
 
-### [대] circuit breaker 최소형 — P3 (다음 세션)
-- GPT 합의: incident 3회 연속+unresolved+동일 경로 조건으로 해당 경로만 차단
-- 범위: send/harness/video 등 side effect 경로만
-- 전역 circuit breaker 아님 — 경로별 최소형
+### [소] Notion 부모 페이지 / verify_xlsm COM
 
 ---
 
 ## 최근 완료
 
-### [완료] 심화 콘텐츠 A등급 적용 P1+P2 구현 — 세션29 (2026-04-13)
+### [완료] 심화 콘텐츠 A등급 적용 P1+P2+P3 구현 — 세션29 (2026-04-13)
 - **GPT 토론 2턴**: 갭 6건 검토 → 채택 3건 / 보류 1건. 독립 의견 유지하여 circuit breaker 보류→채택(P3) 수정
 - **P1 smoke_fast.sh 신규**: SessionStart 시 자동 실행되는 fast smoke subset (9건, 로컬·결정적만)
-- **P2 smoke_test 라벨 분류**: regression(27섹션) / capability(3섹션+24b) 분리. 105/105 ALL PASS 유지
+- **P2 smoke_test 라벨 분류**: regression(27섹션) / capability(4섹션+24b) 분리. 108/108 ALL PASS
+- **P3 circuit breaker 최소형**: hook_common.sh에 circuit_breaker_tripped() 추가. commit_gate+send_gate에 연동. 경고만(차단 아님)
 - **session_start_restore.sh 확장**: smoke_fast 호출 추가 (차단 아님, 경고만)
 
 ### [완료] 심화 콘텐츠 첫 탐색 실행 — 세션29 (2026-04-13)

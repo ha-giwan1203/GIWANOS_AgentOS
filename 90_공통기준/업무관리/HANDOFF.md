@@ -15,17 +15,15 @@
 1. **심화 콘텐츠 첫 탐색 실행**: 12개 키워드 × 5단계 루트 웹서치 (병렬 2배치) → A등급 5건 + B등급 7건 → Notion 12건 등록
 2. **GPT 토론 2턴**: 갭 6건 검토 → 채택 3건(session startup/cap-reg 분리/circuit breaker 최소형) / 보류 1건(pass@k)
 3. **P1 구현: smoke_fast.sh 신규**: SessionStart fast smoke subset (9건, 로컬·결정적). session_start_restore.sh에 호출 연결
-4. **P2 구현: smoke_test 라벨 분류**: regression 27섹션 / capability 3섹션+24b. 105/105 ALL PASS 유지
+4. **P2 구현: smoke_test 라벨 분류**: regression 27섹션 / capability 4섹션+24b. 108/108 ALL PASS
+5. **P3 구현: circuit breaker 최소형**: hook_common.sh에 circuit_breaker_tripped() 함수. commit_gate+send_gate에 경고 연동. 경고만(차단 아님)
 
 ### GPT 판정
-- 세션28 전체: 정합 (Notion DB 6필드 + self-audit 증적 확인)
-- 세션29 갭 토론: 합의 완료 — 이견 없음
+- 세션28 전체: 정합
+- 세션29 P1+P2: 통과 (004547ee)
+- 세션29 P3: GPT 공유 대기
 
 ### 다음 세션 안건
-
-**[대] P3 circuit breaker 최소형 구현**
-- incident 3회 연속+unresolved+동일 경로 → 해당 경로만 차단
-- 범위: send/harness/video 등 side effect 경로만
 
 **[보류] yt-dlp 풀다운로드 복구 실험**
 - deno/EJS 설치 — 프레임 분석 필요 시 재검토

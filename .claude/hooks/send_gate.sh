@@ -72,6 +72,11 @@ else
   exit 0
 fi
 
+# Circuit breaker: send_gate 연속 실패 경고
+if circuit_breaker_tripped "send_gate" 3 2>/dev/null; then
+  hook_log "PreToolUse/send_gate" "⚠ circuit breaker — 연속 3회 이상 unresolved send_gate incident"
+fi
+
 # CDP 단일화: 토론모드에서 직접 JS 전송(예비 경로)은 deprecated → 차단
 # 기본 전송 경로인 cdp_chat_send.py(Bash 호출)는 자체 검증 처리
 hook_log "PreToolUse/send_gate" "BLOCK: deprecated_direct_js_send | 토론모드에서 직접 JS 전송 차단, cdp_chat_send.py 사용 필수" 2>/dev/null

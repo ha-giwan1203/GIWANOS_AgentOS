@@ -29,6 +29,12 @@ fi
 
 hook_log "PreToolUse/Bash" "commit_gate: git commit/push 감지" 2>/dev/null
 
+# Circuit breaker: 동일 hook에서 연속 3건 이상 unresolved → 경고
+if circuit_breaker_tripped "commit_gate" 3 2>/dev/null; then
+  hook_log "PreToolUse/Bash" "commit_gate: ⚠ circuit breaker — 연속 3회 이상 unresolved incident. 이전 실패 원인 해결 후 커밋 권장"
+  echo "⚠ [CIRCUIT BREAKER] commit_gate 연속 3회+ unresolved incident 감지. 이전 실패 원인(.claude/incident_ledger.jsonl)을 먼저 확인하세요."
+fi
+
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 

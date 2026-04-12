@@ -224,6 +224,31 @@ git_has_relevant_changes() {
   [ -n "$changes" ]
 }
 
+# Circuit breaker 최소형 — 동일 hook에서 unresolved incident 연속 N건 이상이면 경고
+# 사용법: if circuit_breaker_tripped "hook_name" 3; then echo "WARN"; fi
+# 반환: 0=tripped(경고 필요), 1=정상
+circuit_breaker_tripped() {
+  local target_hook="$1"
+  local threshold="${2:-3}"
+  [ ! -f "$INCIDENT_LEDGER" ] && return 1
+  # 최근 20줄에서 해당 hook의 연속 unresolved 카운트
+  local consecutive=0
+  while IFS= read -r line; do
+    local h r
+    h=$(printf '%s' "$line" | safe_json_get "hook" 2>/dev/null)
+    r=$(printf '%s' "$line" | safe_json_get "resolved" 2>/dev/null)
+    if [ "$h" = "$target_hook" ]; then
+      if [ "$r" = "false" ]; then
+        consecutive=$((consecutive + 1))
+      else
+        consecutive=0
+      fi
+    fi
+  done < <(tail -20 "$INCIDENT_LEDGER")
+  [ "$consecutive" -ge "$threshold" ] && return 0
+  return 1
+}
+
 hook_incident() {
   local type="$1"    # hook_block|compile_fail|gate_reject|encoding_error
   local hook="$2"    # 훅 이름
