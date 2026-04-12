@@ -68,7 +68,8 @@ if echo "$TEXT" | grep -qiE '(스키마|컬럼|시트.*추가|시트.*삭제)'; 
 fi
 
 # 스킬 사용 계측: /command 패턴 감지 시 skill_usage 로깅
-SKILL_NAME=$(printf '%s' "$TEXT" | grep -oE '^\s*/([a-z][a-z0-9_-]*)' | sed 's|^\s*/||' | head -1)
+# 주의: TEXT는 JSON 래핑 포함. ^ 앵커 사용 불가 (2026-04-12 세션24 수정)
+SKILL_NAME=$(printf '%s' "$TEXT" | grep -oE '"/([a-z][a-z0-9_-]*)' | sed 's|^"/||' | head -1)
 if [ -n "$SKILL_NAME" ]; then
   hook_skill_usage "$SKILL_NAME" "slash"
 fi

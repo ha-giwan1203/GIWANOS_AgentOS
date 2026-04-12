@@ -1,29 +1,32 @@
 # Hook 4지표 집계
 
-- 생성시각: 2026-04-08T22:10:28+09:00
-- hook_log: 3444건 / incident_ledger: 82건
+- 생성시각: 2026-04-11T14:39:44+09:00
+- hook_log: 3865건 / incident_ledger: 319건
 
 ## 합계
 
 | 지표 | 건수 | 비율 |
 |------|------|------|
-| 승인 요청 (hook 발화) | 1268 | - |
-| deny (raw) | 82 | 6.47% |
-| deny (effective, 오탐 제외) | 37 | 2.92% |
-| 오탐 (false_positive) | 45 | 54.88% |
+| 승인 요청 (hook 발화) | 1791 | - |
+| deny (raw) | 319 | 17.81% |
+| deny (effective, 오탐 제외) | 274 | 15.30% |
+| 오탐 (false_positive) | 45 | 14.11% |
 | 우회 감지 | 0 | 0.00% |
 
 ## hook별 상세
 
 | hook | 발화 | deny | 오탐 | 우회 |
 |------|------|------|------|------|
-| completion_gate | 0 | 45 | 45 | 0 |
-| commit_gate | 80 | 25 | 0 | 0 |
-| block_dangerous | 489 | 6 | 0 | 0 |
-| date_scope_guard | 489 | 4 | 0 | 0 |
-| evidence_gate | 0 | 1 | 0 | 0 |
-| send_gate | 0 | 1 | 0 | 0 |
-| protect_files | 210 | 0 | 0 | 0 |
+| evidence_gate | 2 | 202 | 0 | 0 |
+| completion_gate | 0 | 52 | 45 | 0 |
+| commit_gate | 111 | 46 | 0 | 0 |
+| date_scope_guard | 665 | 7 | 0 | 0 |
+| block_dangerous | 665 | 6 | 0 | 0 |
+| send_gate | 8 | 6 | 0 | 0 |
+| protect_files | 176 | 0 | 0 | 0 |
+| risk_profile_prompt | 2 | 0 | 0 | 0 |
+| unknown | 160 | 0 | 0 | 0 |
+| write_marker | 2 | 0 | 0 | 0 |
 
 ## 판정 기준
 
