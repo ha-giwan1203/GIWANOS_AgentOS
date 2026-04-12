@@ -55,8 +55,15 @@
       "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role]'\\); let res = []; for\\(let i = Math.max\\(0, msgs.length-6\\); i < msgs.length; i++\\) { res.push\\('['+ msgs[i].getAttribute\\('data-message-author-role'\\) +'] ' + msgs[i].innerText.substring\\(0,150\\)\\); } res.join\\('\\\\n---\\\\n'\\);\")",
       "Bash(python .claude/scripts/cdp/debate_room_detect.py --navigate)",
       "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --text-file .claude/state/gpt_share_msg.txt)",
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --text-file .claude/state/debate_msg_temp.txt)",
+      "Bash(python .claude/scripts/cdp/poll_and_read.py*:*)",
       "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -30 {}')",
-      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --match-url https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69daf2c2-cb88-83e8-b96f-f54e8919a4cf --text-file .claude/state/gpt_debate_msg.txt --mark-send-gate)"
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --match-url https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69daf2c2-cb88-83e8-b96f-f54e8919a4cf --text-file .claude/state/gpt_debate_msg.txt --mark-send-gate)",
+      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js ':*)",
+      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"const r = {}; r.prompt = !!document.querySelector\\('#prompt-textarea'\\); r.send = !!document.querySelector\\('[data-testid=\\\\\"send-button\\\\\"]'\\); r.speech = !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\); r.asstMsgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length; JSON.stringify\\(r\\);\")",
+      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"JSON.stringify\\({prompt: !!document.querySelector\\('#prompt-textarea'\\), speech: !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\), msgs: document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length}\\)\")",
+      "Bash(python .claude/scripts/cdp/read_chat_msgs.py)",
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --message '세션28 의제 1: 하네스 범용 확장:*)"
     ],
     "ask": [
       "Bash(python*:*)",
