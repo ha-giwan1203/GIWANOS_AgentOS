@@ -16,11 +16,20 @@
 
 ## 진행중 / 보류
 
-(현시점 진행중·보류 안건 없음)
+### [대기] yt-dlp YouTube 다운로드 hang 해결 — **대기: yt-dlp 업데이트 + JS runtime 설정**
+- yt-dlp 2026.03.17이 YouTube JS challenge에서 무한 hang
+- youtube_analyze.py에 timeout=120 + transcript-only fallback 추가 완료 (즉시 조치)
+- 근본: yt-dlp 업데이트 + deno/node JS runtime 연동 필요
 
 ---
 
 ## 최근 완료
+
+### [완료] 장피엠 영상분석 + yt-dlp 개선 — 세션27 (2026-04-12 세션 27)
+- **장피엠 채널 최근 3개월 영상 4건 자막 전수 분석**: 전부 C등급(참고만), A/B등급 0건
+- **GPT 토론 3턴**: 영상 분석 합의 + yt-dlp 개선 합의
+- **youtube_analyze.py 개선**: subprocess.run timeout 4곳 추가(yt-dlp 120s, ffprobe 15s, ffmpeg 20s, transcript 60s) + download 실패 시 transcript-only fallback + manifest degraded mode 필드 추가
+- **yt-dlp 근본 원인 조사**: YouTube JS challenge hang, 자막 API는 정상, 네트워크 정상
 
 ### [완료] P2/P3 계약 보강 + 훅 개수 갱신 — 세션26 (2026-04-12 세션 26)
 - **P2 4개 계약 보강**: cdp-wrapper / supanova-deploy / youtube-analysis / flow-chat-analysis — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가

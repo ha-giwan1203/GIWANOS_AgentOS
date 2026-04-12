@@ -9,19 +9,31 @@
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 26)
+## 0. 최신 세션 (2026-04-12 세션 27)
+
+### 이번 세션 완료
+1. **장피엠 채널 최근 3개월 영상 4건 자막 전수 분석**: C6xlOsQFyOQ(43분) / Lu-krYyYgUU(16분) / wP48xJLWuB0(13분) / 5sPgWy8jXRQ(90분) — 전부 C등급, A/B 0건
+2. **GPT 토론 3턴**: 영상 분석 합의(GPT 기존 우선순위 철회) + yt-dlp 개선 합의(채택3/보류1/버림1)
+3. **youtube_analyze.py 개선**: subprocess timeout 4곳 추가 + transcript-only fallback + manifest degraded mode 필드
+4. **yt-dlp 근본 원인 조사**: YouTube JS challenge hang (2026.03.17 버전, node 있지만 deno 없음)
+
+### GPT 판정
+- 영상분석: 종합 C등급 동의
+- yt-dlp 개선: 채택 3건(timeout/fallback/전 호출부 timeout)
+
+### 다음 세션 안건
+1. yt-dlp 업데이트 + JS runtime(deno) 설치 → 영상 다운로드 정상화
+2. harness_gate 실전 검증 (commit/push 시 자동 발화 확인 — 이번 세션에서 간접 검증됨)
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 26)
 
 ### 이번 세션 완료
 1. **P2 4개 계약 보강**: cdp-wrapper / supanova-deploy / youtube-analysis / flow-chat-analysis — 4섹션 추가
 2. **P3 4개+1 계약 보강**: pptx-generator / skill-creator-merged / sp3-production-plan — 4섹션 신규. production-result-upload — 표준 포맷 리포맷. production-report — 4섹션 신규
 3. **PASS 9→17개**: 유지 스킬 전수 계약 보강 완료 (FAIL 0개)
 4. **훅 개수 갱신**: README.md + AGENTS_GUIDE.md — 20→21개 (harness_gate 반영)
-
-### GPT 판정
-- PASS (b99a4661) — 지적사항 없음
-
-### 다음 세션 안건
-1. harness_gate 실전 검증 (다음 토론 세션에서 자동 발화 확인)
 
 ---
 

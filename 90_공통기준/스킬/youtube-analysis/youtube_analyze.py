@@ -133,8 +133,8 @@ def get_output_dir(video_id: str) -> Path:
     return out
 
 
-def download_video(url: str, video_id: str, out_dir: Path) -> tuple[Path, dict]:
-    """yt-dlp로 영상 다운로드 (480p). 챕터 정보 포함 info.json도 저장."""
+def download_video(url: str, video_id: str, out_dir: Path) -> tuple[Path | None, dict]:
+    """yt-dlp로 영상 다운로드 (480p). 실패/타임아웃 시 (None, {}) 반환."""
     video_path = out_dir / f"{video_id}.mp4"
     info_path = out_dir / f"{video_id}.info.json"
 
@@ -156,16 +156,22 @@ def download_video(url: str, video_id: str, out_dir: Path) -> tuple[Path, dict]:
         url,
     ]
     print(f"[다운로드] {url} → 480p mp4 ...")
-    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True,
+                                encoding="utf-8", timeout=120)
+    except subprocess.TimeoutExpired:
+        print("[다운로드 타임아웃] yt-dlp 120초 초과 — transcript-only 모드로 전환", file=sys.stderr)
+        return None, {}
+
     if result.returncode != 0:
-        print(f"ERROR: yt-dlp 실패\n{result.stderr}", file=sys.stderr)
-        sys.exit(10)
+        print(f"[다운로드 실패] yt-dlp exit={result.returncode}", file=sys.stderr)
+        if result.stderr:
+            print(f"  stderr: {result.stderr[:300]}", file=sys.stderr)
+        return None, {}
 
     if not info_path.exists():
-        # info.json 경로가 다를 수 있음
         alt = out_dir / f"{video_id}.info.json"
         if not alt.exists():
-            # fallback: 빈 info
             info = {}
             with open(info_path, "w", encoding="utf-8") as f:
                 json.dump(info, f)
@@ -218,7 +224,7 @@ def extract_frames(video_path: Path, out_dir: Path, info: dict,
             probe = subprocess.run(
                 ["ffprobe", "-v", "error", "-show_entries", "format=duration",
                  "-of", "default=noprint_wrappers=1:nokey=1", str(video_path)],
-                capture_output=True, text=True
+                capture_output=True, text=True, timeout=15
             )
             duration = float(probe.stdout.strip()) if probe.stdout.strip() else 600
 
@@ -239,7 +245,10 @@ def extract_frames(video_path: Path, out_dir: Path, info: dict,
             "-y", "-loglevel", "error",
             str(frame_path)
         ]
-        subprocess.run(cmd, capture_output=True)
+        try:
+            subprocess.run(cmd, capture_output=True, timeout=20)
+        except subprocess.TimeoutExpired:
+            print(f"[프레임 타임아웃] {ts}s 지점 스킵", file=sys.stderr)
         if frame_path.exists():
             frames.append(frame_path)
 
@@ -256,11 +265,17 @@ def extract_transcript(video_id: str, out_dir: Path) -> Path:
         return transcript_path
 
     script = SCRIPT_DIR / "youtube_transcript.py"
-    result = subprocess.run(
-        [sys.executable, str(script), video_id, "--timestamps"],
-        capture_output=True, text=True, encoding="utf-8",
-        env={**os.environ, "PYTHONUTF8": "1"}
-    )
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script), video_id, "--timestamps"],
+            capture_output=True, text=True, encoding="utf-8",
+            env={**os.environ, "PYTHONUTF8": "1"}, timeout=60
+        )
+    except subprocess.TimeoutExpired:
+        print("[자막 추출 타임아웃] 60초 초과", file=sys.stderr)
+        with open(transcript_path, "w", encoding="utf-8") as f:
+            f.write("[자막 추출 타임아웃]\n")
+        return transcript_path
 
     if result.returncode == 0:
         with open(transcript_path, "w", encoding="utf-8") as f:
@@ -276,8 +291,18 @@ def extract_transcript(video_id: str, out_dir: Path) -> Path:
 
 
 def generate_manifest(video_id: str, out_dir: Path, info: dict,
-                      frames: list[Path], transcript_path: Path):
+                      frames: list[Path], transcript_path: Path,
+                      download_status: str = "ok",
+                      download_error: str = ""):
     """분석 매니페스트 생성 — Claude가 이 파일을 읽고 분석 시작"""
+    frames_available = len(frames) > 0
+    if download_status == "ok" and frames_available:
+        analysis_mode = "full"
+    elif transcript_path.exists() and transcript_path.stat().st_size > 50:
+        analysis_mode = "transcript_only"
+    else:
+        analysis_mode = "failed"
+
     manifest = {
         "video_id": video_id,
         "title": info.get("title", "알 수 없음"),
@@ -289,6 +314,10 @@ def generate_manifest(video_id: str, out_dir: Path, info: dict,
         "transcript_path": str(transcript_path),
         "frames": [str(f) for f in frames],
         "frames_dir": str(out_dir / "frames"),
+        "download_status": download_status,
+        "frames_available": frames_available,
+        "analysis_mode": analysis_mode,
+        "download_error": download_error,
         "analysis_guide": (
             "1. transcript.txt를 읽어 전체 내용 파악\n"
             "2. frames/ 폴더의 이미지를 Read 도구로 열어 시각 정보(코드, UI, 설정 화면 등) 확인\n"
@@ -349,6 +378,14 @@ def main():
 
     # Step 2: 영상 다운로드
     video_path, info = download_video(args.url, video_id, out_dir)
+
+    if video_path is None:
+        # 다운로드 실패 → transcript-only fallback
+        print("\n[transcript-only 모드] 다운로드 실패, 자막만으로 분석 계속")
+        generate_manifest(video_id, out_dir, {}, [], transcript_path,
+                          download_status="timeout" if not info else "error",
+                          download_error="yt-dlp timeout or failure")
+        return
 
     # Step 3: 프레임 추출
     frames = extract_frames(video_path, out_dir, info,
