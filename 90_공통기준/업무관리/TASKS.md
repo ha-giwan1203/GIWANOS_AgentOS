@@ -22,11 +22,14 @@
 
 ## 최근 완료
 
-### [완료] P1 스킬 계약 보강 + 운영 보고서 갱신 — 세션25 (2026-04-12 세션 25)
-- **P1 3개 SKILL.md 계약 보강 완료**: zdm-daily-inspection / line-batch-mainsub / line-batch-outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
-- **skill_contract_gap_report 재실행**: PASS 6→9개 (+zdm, mainsub, outer-main). FAIL 8개 잔존 (P2/P3)
-- **hook_metrics 재생성**: 4/12 기준 갱신 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
-- skill_usage 계측: 인프라 정상, 누적 데이터 1건 (다음 /command 호출 시 자동 증가 확인 예정)
+### [완료] P1 계약 보강 + harness_gate 구현 — 세션25 (2026-04-12 세션 25)
+- **P1 3개 SKILL.md 계약 보강**: zdm/mainsub/outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
+- **skill_contract_gap_report**: PASS 6→9개. FAIL 8개 잔존 (P2/P3)
+- **hook_metrics 재생성**: 4/12 기준 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
+- **harness_gate.sh 신규**: GPT 응답 후 하네스 분석 없이 commit/push/공유/완료 차단. 복합 4조건 AND (채택: + 보류:/버림: + 독립견해 + 실물근거)
+- **risk_profile_prompt 확장**: 토론 키워드 감지 → debate_preflight.req 생성 (harness_gate 활성화 트리거)
+- **GPT 토론 2라운드**: 채택 8건 / 보류 1건 / 버림 0건. D안(transport/quality gate 분리) 합의
+- smoke_test: 105/105 ALL PASS
 
 ### [완료] 스킬 4축 분류 + 운영 검증 + 아카이브 실행 — 세션24 (2026-04-12 세션 24)
 - **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 기준 → 유지 18개 / 아카이브 10개

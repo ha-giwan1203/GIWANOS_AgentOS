@@ -12,15 +12,23 @@
 ## 0. 최신 세션 (2026-04-12 세션 25)
 
 ### 이번 세션 완료
-1. **P1 스킬 3개 계약 보강**: zdm-daily-inspection / line-batch-mainsub / line-batch-outer-main — 실패조건/중단기준/검증항목/되돌리기 4섹션 추가
-2. **skill_contract_gap_report 재실행**: PASS 6→9개 (+3). FAIL 8개 잔존 (P2/P3)
-3. **hook_metrics 재생성**: 4/12 기준 (승인 1114 / deny 370 / 오탐 45 / 우회 0)
-4. **skill_usage 계측 확인**: 인프라 정상, 누적 1건. 다음 /command 호출 시 자동 증가 확인 예정
+1. **P1 스킬 3개 계약 보강**: zdm/mainsub/outer-main — 4섹션 추가. PASS 6→9개
+2. **hook_metrics 재생성**: 4/12 기준
+3. **harness_gate.sh 신규 구현**: GPT 응답 후 하네스 미수행 시 commit/push/공유/완료 차단
+   - 발화 조건: debate_preflight.req 존재 시에만
+   - 복합 4조건 AND: 채택: + 보류:/버림: + 독립견해 + 실물근거
+   - settings.local.json PreToolUse/Bash에 등록
+4. **risk_profile_prompt 확장**: 토론 키워드 감지 → debate_preflight.req 생성
+5. **GPT 토론 2라운드**: 채택 8건 / 보류 1건 / 버림 0건
+   - 합의: transport gate(send_gate)와 quality gate(harness_gate) 분리
+   - 보류→수정채택: gpt_harness를 .req/.ok 파일 기반 대신 트랜스크립트 패턴 검사
+6. smoke_test: 105/105 ALL PASS
 
 ### 다음 세션 안건
-1. P2 스킬 4개 계약 보강 (cdp-wrapper/supanova/youtube/flow-chat)
-2. skill_usage 계측 실제 누적 확인 (다음 /command 호출 시)
+1. harness_gate 실전 검증 (다음 토론 세션에서 자동 발화 확인)
+2. P2 스킬 4개 계약 보강 (cdp-wrapper/supanova/youtube/flow-chat)
 3. P3 스킬 4개 계약 보강 (pptx/skill-creator/production-report/sp3)
+4. README.md 훅 개수 갱신 (20→21개)
 
 ---
 

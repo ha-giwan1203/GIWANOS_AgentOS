@@ -67,6 +67,12 @@ if echo "$TEXT" | grep -qiE '(스키마|컬럼|시트.*추가|시트.*삭제)'; 
   touch_req "map_scope_warn"
 fi
 
+# 토론 도메인 감지 → debate_preflight.req 생성
+# GPT 합의(세션25): 토론 키워드 감지 시 harness_gate 활성화용 req 생성
+if echo "$TEXT" | grep -qiE '(토론|GPT.*공유|GPT.*판정|하네스|harness|debate|채택.*보류|반박문|share.result)'; then
+  touch_req "debate_preflight"
+fi
+
 # 스킬 사용 계측: /command 패턴 감지 시 skill_usage 로깅
 # 주의: TEXT는 JSON 래핑 포함. ^ 앵커 사용 불가 (2026-04-12 세션24 수정)
 SKILL_NAME=$(printf '%s' "$TEXT" | grep -oE '"/([a-z][a-z0-9_-]*)' | sed 's|^"/||' | head -1)

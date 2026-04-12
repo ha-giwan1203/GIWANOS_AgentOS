@@ -52,7 +52,11 @@
       "Read(//c/Users/User/Desktop/업무리스트/**)",
       "Bash(python .claude/scripts/cdp/cdp_tabs.py)",
       "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\); const last = msgs[msgs.length-1]; last ? last.innerText.substring\\(0, 200\\) : 'none';\")",
-      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role]'\\); let res = []; for\\(let i = Math.max\\(0, msgs.length-6\\); i < msgs.length; i++\\) { res.push\\('['+ msgs[i].getAttribute\\('data-message-author-role'\\) +'] ' + msgs[i].innerText.substring\\(0,150\\)\\); } res.join\\('\\\\n---\\\\n'\\);\")"
+      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role]'\\); let res = []; for\\(let i = Math.max\\(0, msgs.length-6\\); i < msgs.length; i++\\) { res.push\\('['+ msgs[i].getAttribute\\('data-message-author-role'\\) +'] ' + msgs[i].innerText.substring\\(0,150\\)\\); } res.join\\('\\\\n---\\\\n'\\);\")",
+      "Bash(python .claude/scripts/cdp/debate_room_detect.py --navigate)",
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --text-file .claude/state/gpt_share_msg.txt)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -30 {}')",
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --match-url https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69daf2c2-cb88-83e8-b96f-f54e8919a4cf --text-file .claude/state/gpt_debate_msg.txt --mark-send-gate)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -157,6 +161,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/send_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/harness_gate.sh"
           }
         ]
       }
