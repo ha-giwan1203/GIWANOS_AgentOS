@@ -8,6 +8,11 @@ YouTube URL을 받아 영상 다운로드 → 프레임 추출 → 자막 추출
 
 ## 실행 순서
 
+### Phase 0 — 플랜모드 감지
+현재 플랜모드 상태인지 확인한다.
+- **플랜모드 ON**: Phase 1~7 실행 계획을 플랜 파일에 작성 → ExitPlanMode로 승인 요청 → 승인 후 Phase 1부터 실행
+- **플랜모드 OFF**: Phase 1로 바로 진행
+
 ### Phase 1 — 파이프라인 실행
 ```bash
 PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py" "$ARGUMENTS" --max-frames 15
@@ -24,6 +29,20 @@ PYTHONUTF8=1 python "90_공통기준/스킬/youtube-analysis/youtube_analyze.py"
 
 ### Phase 4 — 구조화 출력
 SKILL.md 수동 모드 Step 3 출력 포맷을 따른다.
+
+### Phase 5 — 우리 환경 대비 갭 분석 + 개선안
+1. 영상 기법/구조를 현재 저장소(hooks, rules, settings, 스킬, MCP 등)와 대조
+2. 갭 식별 → 개선안 도출 → A/B/C 판정
+3. 출력: 갭 비교표 + 개선 제안 목록
+
+### Phase 6 — 결과 저장
+- Notion DB에 upsert + Drive 업로드 (SKILL.md Step 4 참조)
+
+### Phase 7 — 상태 갱신 + 커밋 + GPT 공유
+1. TASKS.md / HANDOFF.md 갱신
+2. 커밋 + 푸시
+3. GPT에 SHA + 결과 요약 공유
+4. 사용자 보고
 
 ## 참조 스킬
 `90_공통기준/스킬/youtube-analysis/SKILL.md`
