@@ -16,11 +16,11 @@
 
 ## 진행중 / 보류
 
-### [대] yt-dlp YouTube 다운로드 hang 해결
-- yt-dlp 2026.03.17이 YouTube JS challenge에서 무한 hang (4/11 22:54 이후)
-- youtube_analyze.py에 timeout=120 + transcript-only fallback 추가 완료 (즉시 조치)
-- 근본: yt-dlp 업데이트 + deno JS runtime 설치 필요
-- 세션28: pip upgrade 시도 중
+### [보류] yt-dlp 풀다운로드 복구 실험
+- yt-dlp 2026.03.17 = PyPI 최신. pip upgrade로 해결 불가 확인
+- YouTube JS challenge에 외부 JS runtime(deno) 필요 (yt-dlp 공식 공지)
+- deno 설치는 Windows 복잡도 + 불확실한 효과로 보류
+- 프레임 분석이 꼭 필요한 작업 발생 시 재검토
 
 ### [대] 심화 콘텐츠 탐색 루트 확보
 - 장피엠 채널 = 입문/중급. 우리 수준에 맞는 영어권 고급 사례 채널 발굴 필요
@@ -32,6 +32,13 @@
 ---
 
 ## 최근 완료
+
+### [완료] yt-dlp 운영 안정화 — transcript-only 기본값 전환 — 세션28 (2026-04-12 세션 28)
+- **youtube_analyze.py**: --no-download를 기본값으로 전환 (default=True)
+- **--force-download 신설**: 프레임 필요 시 명시 요청
+- **no_download 경로 manifest 생성**: download_status=skipped
+- yt-dlp 2026.03.17 = 최신, pip upgrade 해결 불가 확인. deno 보류
+- GPT 판정: A/B 채택, C 보류, D 분리
 
 ### [완료] 하네스 범용 확장 — GPT 토론 합의 + 운영가이드 확장 — 세션28 (2026-04-12 세션 28)
 - **GPT 토론 2턴**: 6개 출처 리서치 취합(Anthropic/장피엠/업계/GPT웹서치/토론실전/내부) → 합의
