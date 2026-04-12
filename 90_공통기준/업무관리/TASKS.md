@@ -22,13 +22,14 @@
 
 ## 최근 완료
 
-### [완료] 스킬 4축 분류 + 운영 검증 3건 — 세션24 (2026-04-12 세션 24)
-- **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 기준 → 유지 18개 / 아카이브 후보 10개 (이동 보류)
+### [완료] 스킬 4축 분류 + 운영 검증 + 아카이브 실행 — 세션24 (2026-04-12 세션 24)
+- **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 기준 → 유지 18개 / 아카이브 10개
+- **아카이브 10개 이동 완료**: cost-rate-management, adversarial-review, equipment-utilization, hr-attendance, line-stoppage, partno-management, process-improvement, procurement-delivery, quality-assurance, quality-defect-report → `98_아카이브/정리대기_20260412/스킬/`
 - **map_scope AND 조건 해소 확인**: 236건 중 4/12 이후 6건 전부 정탐 → PASS
 - **skill_usage 계측 버그 수정**: regex `^` 앵커가 JSON 래핑에서 미매칭 → `"` 기준으로 수정
-- **취약점 동결 3건 4회 연속 유효**: TOCTOU/execCommand/classification 소급 전부 가정 유효
-- 아카이브 후보: cost-rate-management, adversarial-review, equipment-utilization, hr-attendance, line-stoppage, partno-management, process-improvement, procurement-delivery, quality-assurance, quality-defect-report
-- sp3-production-plan은 v3.0 상세 설계로 유지 판정
+- **취약점 동결 3건 5회 연속 유효 → "안정" 등급 승격**: TOCTOU/execCommand/classification 소급
+- **유지 FAIL 11개 계약 보강 우선순위**: P1(zdm/mainsub/outer-main) / P2(cdp-wrapper/supanova/youtube/flow-chat) / P3(pptx/skill-creator/production-report/sp3)
+- GPT 판정: PASS (b95c86ca)
 
 ### [완료] /self-audit 첫 실사용 + 문서 드리프트 수정 — 세션23 (2026-04-12 세션 23)
 - **/self-audit 실행**: P1 2건 / P2 3건 / P3 2건 검출

@@ -12,17 +12,19 @@
 ## 0. 최신 세션 (2026-04-12 세션 24)
 
 ### 이번 세션 완료
-1. **스킬 28개 4축 분류 완료**: grade/수정일/커밋수/코드유무 → 유지 18개 / 아카이브 후보 10개 (이동 보류, 사용자 판단 대기)
-2. **map_scope AND 조건 해소 확인**: PASS. 236건 중 4/12 이후 6건 전부 정탐, 오탐 0
-3. **skill_usage 계측 버그 수정**: `risk_profile_prompt.sh` L71 regex `^\s*/` → `"/` 변경. `^` 앵커가 JSON 래핑된 TEXT에서 미매칭되던 근본 원인 해소
-4. **취약점 동결 3건 4회 연속 유효**: TOCTOU(단일스레드) / execCommand(send_gate 차단 추가로 강화) / classification 소급(.req+.ok 세션격리) — 전부 가정 유효
-5. **독립 의견**: 에이전트 "20개" → 실제 28개 교정 / skill_contract_gap_report grade경고 → 구버전 파싱 확인 / sp3-production-plan 아카이브 제외 근거
+1. **스킬 28개 4축 분류**: grade/수정일/커밋수/코드유무 → 유지 18개 / 아카이브 10개
+2. **아카이브 10개 이동**: cost-rate-management 등 10개 → `98_아카이브/정리대기_20260412/스킬/`
+3. **map_scope AND 조건 해소 확인**: PASS. 236건 중 4/12 이후 6건 전부 정탐, 오탐 0
+4. **skill_usage 계측 버그 수정**: `risk_profile_prompt.sh` L71 regex `^\s*/` → `"/`. JSON 래핑 미매칭 근본 해소
+5. **취약점 동결 3건 5회 연속 유효 → "안정" 승격**: TOCTOU/execCommand/classification 소급 전부 유효
+6. **유지 FAIL 11개 계약 보강 우선순위**: P1(zdm/mainsub/outer-main) / P2(4개) / P3(4개)
+7. **GPT 판정**: PASS (b95c86ca)
 
 ### 다음 세션 안건
-1. 아카이브 후보 10개 이동 실행 (사용자 승인 시)
-2. skill_usage 계측 수정 후 실제 누적 확인 (다음 세션에서 /command 호출 시)
-3. 취약점 동결 3건 5회차 모니터링 → "안정" 등급 승격 판단
-4. FAIL 21개 스킬 계약 보강 우선순위 결정 (유지 대상 중 FAIL인 12개)
+1. P1 스킬 3개 계약 보강 (실패조건/중단기준/검증항목/되돌리기 4섹션 추가)
+2. skill_usage 계측 실제 누적 확인 (다음 /command 호출 시)
+3. hook_metrics 보고서 재생성 (현재 4/11 기준 → 4/12 이후 반영)
+4. skill_contract_gap_report 재실행 (아카이브 반영 + grade 파싱 수정)
 
 ---
 

@@ -46,7 +46,7 @@ def get_service():
                 print(f"[오류] {CREDS_PATH} 없음. Google Cloud Console에서 OAuth 클라이언트 ID 다운로드 필요.", file=sys.stderr)
                 sys.exit(1)
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDS_PATH), SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server(port=18080, open_browser=False)  # 브라우저 자동 열기 비활성화
         with open(TOKEN_PATH, "w") as f:
             f.write(creds.to_json())
     return build("drive", "v3", credentials=creds)
