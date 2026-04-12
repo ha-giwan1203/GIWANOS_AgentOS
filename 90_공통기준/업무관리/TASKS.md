@@ -16,10 +16,18 @@
 
 ## 진행중 / 보류
 
-### [대기] yt-dlp YouTube 다운로드 hang 해결 — **대기: yt-dlp 업데이트 + JS runtime 설정**
-- yt-dlp 2026.03.17이 YouTube JS challenge에서 무한 hang
+### [대] 하네스 범용 확장 — GPT 토론 의제
+- 현재: 토론모드 전용 (GPT 응답 채택/보류/버림)
+- 목표: 모든 외부 입력·스킬 결과·파이프라인 출력에 품질 판정 게이트 적용
+- GPT 공동 설계 필요
+
+### [대] yt-dlp YouTube 다운로드 hang 해결
+- yt-dlp 2026.03.17이 YouTube JS challenge에서 무한 hang (4/11 22:54 이후)
 - youtube_analyze.py에 timeout=120 + transcript-only fallback 추가 완료 (즉시 조치)
-- 근본: yt-dlp 업데이트 + deno/node JS runtime 연동 필요
+- 근본: yt-dlp 업데이트 + deno JS runtime 설치 필요
+
+### [대] 심화 콘텐츠 탐색 루트 확보
+- 장피엠 채널 = 입문/중급. 우리 수준에 맞는 영어권 고급 사례 채널 발굴 필요
 
 ---
 
