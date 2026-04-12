@@ -4,12 +4,47 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-12 KST — 세션 27 (영상분석 + yt-dlp 개선 + 하네스 범용화 의제)
+최종 업데이트: 2026-04-12 KST — 세션 28 (하네스 범용 확장 합의 + 운영가이드 확장)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 27)
+## 0. 최신 세션 (2026-04-12 세션 28)
+
+### 이번 세션 완료
+1. **하네스 범용 확장 GPT 토론 2턴**: 6개 출처 리서치(Anthropic/장피엠/업계/GPT웹서치/토론실전/내부) → 합의
+2. **하네스_운영가이드.md 확장**: DRAFT → ACTIVE. 4개 섹션 추가 (하네스 맵/스프린트 컨트랙트/regression 편입/자기진화 루프)
+3. **CDP 유틸 추가**: poll_and_read.py(GPT 응답 polling), read_chat_msgs.py(대화 읽기)
+4. **settings.local.json 보강**: debate_msg_temp.txt 전송 + poll_and_read 실행 권한
+
+### GPT 판정
+- 의제 1 (하네스 범용 확장): 부분반영 → TASKS/HANDOFF 갱신 후 재판정 예정
+
+### 진행중
+- yt-dlp pip upgrade 시도 중
+
+### 다음 세션 안건
+
+**[대] yt-dlp 복구** (의제 2)
+- pip upgrade 결과 확인 → 영상 다운로드 테스트
+- 실패 시 deno 설치 또는 transcript-only 기본값 격하
+
+**[대] 심화 콘텐츠 탐색 루트 확보** (의제 3)
+- 영어권 고급 사례 채널 발굴
+
+**[중] harness_gate 실전 검증** (의제 4)
+- 토론 과정에서 간접 검증됨 (의제 1 토론 시 harness_gate 차단 없이 진행)
+- 직접 발화 시나리오 1회 확인 필요
+
+**[중] 하네스 후속 구현**
+- regression 자동 편입 스크립트
+- /self-audit scheduled-task 등록
+
+**[소] Notion 부모 페이지 / verify_xlsm COM**
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 27)
 
 ### 이번 세션 완료
 1. **장피엠 채널 최근 3개월 영상 4건 자막 전수 분석**: C6xlOsQFyOQ(43분) / Lu-krYyYgUU(16분) / wP48xJLWuB0(13분) / 5sPgWy8jXRQ(90분) — 전부 C등급, A/B 0건
