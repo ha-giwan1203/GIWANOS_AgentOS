@@ -349,9 +349,16 @@ def main():
     parser.add_argument("url", help="YouTube URL 또는 Video ID")
     parser.add_argument("--interval", type=int, default=30, help="프레임 추출 간격(초), 챕터 없을 때 사용 (기본: 30)")
     parser.add_argument("--max-frames", type=int, default=15, help="최대 프레임 수 (기본: 15)")
-    parser.add_argument("--no-download", action="store_true", help="다운로드/프레임 생략, 자막만 추출")
+    parser.add_argument("--no-download", action="store_true", default=True,
+                        help="(기본값) 자막만 추출. yt-dlp YouTube hang 대응으로 기본 전환 (2026-04-12)")
+    parser.add_argument("--force-download", action="store_true",
+                        help="영상 다운로드+프레임 추출 강제. yt-dlp hang 위험 있음")
     parser.add_argument("--refresh", action="store_true", help="캐시 무시, 강제 재다운로드")
     args = parser.parse_args()
+
+    # --force-download 시 no_download 해제
+    if args.force_download:
+        args.no_download = False
 
     # 캐시 자동 정리 (TTL 7일 + 1GB 상한)
     cleanup_cache(SCRIPT_DIR / "cache")
@@ -372,8 +379,10 @@ def main():
     transcript_path = extract_transcript(video_id, out_dir)
 
     if args.no_download:
-        print("\n[--no-download] 자막만 추출 완료")
-        print(f"자막 경로: {transcript_path}")
+        print("\n[transcript-only 모드] 자막만 추출 (기본값)")
+        generate_manifest(video_id, out_dir, {}, [], transcript_path,
+                          download_status="skipped",
+                          download_error="transcript-only default mode (yt-dlp YouTube hang 대응)")
         return
 
     # Step 2: 영상 다운로드
