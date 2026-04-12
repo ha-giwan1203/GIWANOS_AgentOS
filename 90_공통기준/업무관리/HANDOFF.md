@@ -4,12 +4,44 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 KST — 세션 28 (하네스 범용 확장 + yt-dlp 안정화 + 심화 콘텐츠 + 후속 구현)
+최종 업데이트: 2026-04-13 KST — 세션 29 (심화 콘텐츠 첫 탐색 실행)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-12 세션 28)
+## 0. 최신 세션 (2026-04-13 세션 29)
+
+### 이번 세션 완료
+1. **심화 콘텐츠 첫 탐색 실행**: 12개 키워드 × 5단계 루트 웹서치 (병렬 2배치)
+2. **심화 필터 적용 + 등급 판정**: penalty/bonus 키워드 기반 A/B/C 분류
+3. **A등급 5건 발굴**:
+   - Anthropic "Effective harnesses for long-running agents" (2-agent, progress file, session smoke test)
+   - Anthropic "Harness design for long-running apps" (3-agent planner/generator/evaluator, sprint contract)
+   - Anthropic "Demystifying evals for AI agents" (pass@k/pass^k, capability→regression 졸업)
+   - Kevin Tan "5 Error Handling Patterns" (circuit breaker/validation gate/saga/budget/escalation)
+   - langchain-ai/agentevals (trajectory matching strict/in-order/any-order)
+4. **B등급 7건 발굴**: OTel tracing, LangChain checklist, DataDome postmortem, Cline evals, MS manufacturing, ICLR 2026, AWS Strands
+5. **Notion 등록 12건**: 콘텐츠 분석 이력 DB에 source_type/depth/domain/actionability 포함
+
+### 핵심 인사이트
+- Anthropic 3-agent harness ↔ 우리 토론모드(planner) + 구현(generator) + 완료판정(evaluator) 1:1 대응
+- Circuit breaker 패턴은 우리 시스템에 없음 → 도입 검토 가치
+- capability eval→regression eval "졸업" 패턴 = smoke_test 체계 강화 방향
+
+### 다음 세션 안건
+
+**[대] A등급 5건 적용 검토 — GPT 토론**
+- Anthropic harness 패턴과 우리 시스템 갭 분석 → 구현 우선순위 결정
+- circuit breaker 도입 여부, pass@k 메트릭 도입 여부 토론
+
+**[보류] yt-dlp 풀다운로드 복구 실험**
+- deno/EJS 설치 — 프레임 분석 필요 시 재검토
+
+**[소] Notion 부모 페이지 / verify_xlsm COM**
+
+---
+
+## 1. 이전 세션 (2026-04-12 세션 28)
 
 ### 이번 세션 완료
 1. **의제 1: 하네스 범용 확장 GPT 토론 2턴 + 구현**: 6개 출처 리서치 → 합의 → 하네스_운영가이드.md DRAFT→ACTIVE 확장 (4개 섹션)
@@ -25,15 +57,7 @@
 - 의제 2: 통과 (c53dd0c3 + 35d87f7d)
 - 의제 3: 합의 완료 + 구현 완료
 
-### 다음 세션 안건
-
-**[대] 심화 콘텐츠 첫 탐색 실행**
-- 키워드로 실제 검색 → A/B등급 콘텐츠 발굴 → Notion 등록
-
-**[보류] yt-dlp 풀다운로드 복구 실험**
-- deno/EJS 설치 — 프레임 분석 필요 시 재검토
-
-**[소] Notion 부모 페이지 / verify_xlsm COM**
+### 다음 세션 안건 → 세션 29에서 실행 완료
 
 ---
 

@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-12
+최종 업데이트: 2026-04-13
 
 ---
 
@@ -22,17 +22,17 @@
 - deno 설치는 Windows 복잡도 + 불확실한 효과로 보류
 - 프레임 분석이 꼭 필요한 작업 발생 시 재검토
 
-### [대] 심화 콘텐츠 탐색 — 키워드+루트+필터 구현
-- 세션28 GPT 합의 완료: 키워드 12개 + 검색 루트 5단계 + 공통 심화 필터 + Notion DB 확장
-- 다음 세션 구현: 키워드 목록 문서화 + Notion DB source_type/depth 필드 추가 + 첫 탐색 실행
-
-### [대] 심화 콘텐츠 첫 탐색 실행
-- 키워드+루트+필터 문서 완료. Notion DB 확장 완료
-- 다음: 키워드로 첫 탐색 → A/B등급 콘텐츠 발굴 → Notion 등록
-
 ---
 
 ## 최근 완료
+
+### [완료] 심화 콘텐츠 첫 탐색 실행 — 세션29 (2026-04-13)
+- **12개 키워드 × 5단계 루트 웹서치 실행**: 병렬 배치 2회 (6+6)
+- **심화 필터 적용**: penalty/bonus 키워드 기반 등급 판정
+- **A등급 5건 발굴**: Anthropic harness 2건 + Anthropic evals 1건 + error handling 1건 + agentevals repo 1건
+- **B등급 7건 발굴**: OpenTelemetry tracing, LangChain checklist, DataDome postmortem, Cline evals, Microsoft manufacturing, ICLR 2026, AWS Strands
+- **Notion 콘텐츠 분석 이력 DB에 12건 등록**: source_type/depth/domain/actionability 필드 활용
+- 핵심 인사이트: Anthropic 3-agent harness ↔ 우리 토론모드+완료판정 1:1 대응, circuit breaker 패턴 신규 도입 검토
 
 ### [완료] 하네스 후속 구현 — regression 편입 + 자기진화 루프 — 세션28 (2026-04-13)
 - **regression_intake.py**: P1/P2 확정 실패를 smoke_test 후보로 자동 추출 (반자동 편입)
