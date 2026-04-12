@@ -22,10 +22,13 @@
    - settings.local.json PreToolUse/Bash에 등록
 3-1. **cdp_chat_send.py 전송 검증**: submit 후 user 메시지 DOM 확인 추가 (ddca77d1). send_unverified 시 exit 6
 4. **risk_profile_prompt 확장**: 토론 키워드 감지 → debate_preflight.req 생성
-5. **GPT 토론 2라운드**: 채택 8건 / 보류 1건 / 버림 0건
+5. **GPT 토론 4라운드**: 채택 9건 / 보류 2건 / 버림 1건
    - 합의: transport gate(send_gate)와 quality gate(harness_gate) 분리
    - 보류→수정채택: gpt_harness를 .req/.ok 파일 기반 대신 트랜스크립트 패턴 검사
-6. smoke_test: 105/105 ALL PASS
+   - fail-closed 전환 (f63a1139), 문서 과장 수정 (c57aa084)
+6. **cdp_chat_send.py 버그 수정**: contenteditable 입력 execCommand→keyboard.insert_text 전환 + 전송 검증 로직 개선 (ddca77d1, b9dd6179)
+7. smoke_test: 105/105 ALL PASS
+8. **GPT 최종 PASS**
 
 ### 다음 세션 안건
 1. harness_gate 실전 검증 (다음 토론 세션에서 자동 발화 확인)
