@@ -22,9 +22,12 @@
 - `06a1b14e` feat: smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비
 
 ### GPT 판정
-- 06a1b14e: 부분반영 (HANDOFF placeholder 잔존 지적 → 즉시 수정)
+- 06a1b14e: 부분반영 (HANDOFF placeholder 잔존 지적)
+- f0fab11e: 정합 (코드 정합 확인. 최종 완료는 실전 검증 후)
 
 ### 다음 세션 안건
+**[중] GPT 전송 스킬화** — 채팅 입력+전송+완료감지를 단일 스킬로 통합
+
 **[소] verify_xlsm COM 검증**
 
 **[소] Notion 부모 페이지 동기화 실전 검증**

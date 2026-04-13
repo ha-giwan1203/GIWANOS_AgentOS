@@ -16,6 +16,10 @@
 
 ## 다음 세션 안건
 
+### [중] GPT 전송 스킬화
+- 채팅 입력(insertText) + 전송(send button click) + 완료감지(stop-button polling)를 단일 스킬로 통합
+- 현재 3단계 분리 호출 → 중간 끊김/버튼 탐색 실패 해소
+
 ### [소] verify_xlsm COM 검증
 - Excel XLSM 파일 COM 기반 검증 스크립트 실전 테스트
 
