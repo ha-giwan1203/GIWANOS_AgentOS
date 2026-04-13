@@ -332,6 +332,7 @@ def run_mes(today):
         if ds not in mes_dates:
             targets.append(ds)
 
+    has_fail = False
     if not targets:
         print("  누락 없음")
     else:
@@ -343,20 +344,26 @@ def run_mes(today):
                 continue
             if not mes_validate(items):
                 print(f"  {t}: FAIL 생산량 빈값")
+                has_fail = True
                 continue
 
             bi_qty = sum(int(r["COL15"]) for r in items if r["COL15"].isdigit())
             v = mes_upload_and_verify(page, iframe_name, items, t)
             if v is None:
                 print(f"  {t}: FAIL 업로드 실패")
+                has_fail = True
                 continue
 
-            cnt_ok = "OK" if v["count"] == len(items) else "FAIL"
-            qty_ok = "OK" if int(v["qty"]) == bi_qty else "FAIL"
-            print(f"  {t}: {v['count']}/{len(items)}건({cnt_ok}), qty {int(v['qty']):,}/{bi_qty:,}({qty_ok})")
+            cnt_ok = v["count"] == len(items)
+            qty_ok = int(v["qty"]) == bi_qty
+            status_c = "OK" if cnt_ok else "FAIL"
+            status_q = "OK" if qty_ok else "FAIL"
+            print(f"  {t}: {v['count']}/{len(items)}건({status_c}), qty {int(v['qty']):,}/{bi_qty:,}({status_q})")
+            if not cnt_ok or not qty_ok:
+                has_fail = True
 
     cdp_close(page, pw)
-    return True
+    return not has_fail
 
 # ─── main ───────────────────────────────────────────
 def main():
@@ -367,9 +374,19 @@ def main():
         print("일요일 -전체 스킵")
         sys.exit(0)
 
-    run_zdm(today)
-    run_mes(today)
-    print("\n=== 완료 ===")
+    zdm_ok = run_zdm(today)
+    mes_ok = run_mes(today)
+
+    if zdm_ok and mes_ok:
+        print("\n=== 완료 (ALL PASS) ===")
+    else:
+        failed = []
+        if not zdm_ok:
+            failed.append("ZDM")
+        if not mes_ok:
+            failed.append("MES")
+        print(f"\n=== 완료 (FAIL: {', '.join(failed)}) ===")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
