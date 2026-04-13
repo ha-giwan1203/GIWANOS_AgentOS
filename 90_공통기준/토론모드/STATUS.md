@@ -3,7 +3,7 @@
 > 이 파일은 토론모드 하위 도메인의 재개 위치와 운영 메모만 관리한다.
 > 저장소 전체 상태 원본은 `90_공통기준/업무관리/TASKS.md`이며, 전역 판정은 업무관리 문서 우선순위를 따른다.
 
-최종 업데이트: 2026-04-11 — 세션15 설계 토론 2건 합의 (C+ fallback 계측 + auto-resolve 분기)
+최종 업데이트: 2026-04-13 — 세션36 GPT 전송 스킬 실사용 PASS + 토론 2턴 정상 완료
 
 ## 현재 상태: 운영 중 (v2.8)
 
@@ -14,7 +14,7 @@
 - REFERENCE.md 통합 JS: `[data-testid="send-button"], #composer-submit-button` fallback으로 실전 selector와 일치
 - 언어 규칙: 토론방 자연어는 한국어만 사용, 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`로 고정
 - GPT 전송 경로: `javascript_tool` + `insertText` 기본 (세션32 확정). CDP 폐기됨
-- /gpt-send, /gpt-read 명령 추가 (세션34)
+- /gpt-send, /gpt-read 명령 추가 (세션34) → 실사용 검증 PASS (세션36)
 - 에러 원문 예외: `오류 원문:` / `에러 원문:` 1줄 인용은 한국어 가드 예외로 허용
 - incident 수리 루프: `incident_repair.py`가 패치 후보와 검증 단계까지 제안
 - 문서 우선순위 정리: 전역 상태는 `../업무관리/TASKS.md`, 토론모드 문서는 하위 도메인용으로 역할 고정

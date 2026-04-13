@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-13 — 세션30 현황점검 + 상태문서 갱신
+최종 업데이트: 2026-04-13 — 세션36 이월 안건 3건 전부 해소
 
 ---
 
@@ -33,6 +33,9 @@
 | evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
 | 토론모드/게이트 보정 | Chrome MCP 단일화(세션32). CDP 폐기, send_gate→mcp_send_gate 교체, harness_gate 유지. idle composer 오탐 제거, completion gate 축소, 한국어-only, final_check settings 기준 재정렬 | `90_공통기준/토론모드/`, `.claude/hooks/` |
 | 토론모드 보류 안건 | → TASKS.md "진행중 / 보류" 참조 | `90_공통기준/업무관리/TASKS.md` |
+| GPT 전송 스킬 | /gpt-send, /gpt-read 실사용 PASS (세션36) | `.claude/commands/gpt-send.md` |
+| verify_xlsm | 1차 구조 검증 10/10 PASS, 2차 COM 불필요(결과 시트) | `90_공통기준/agent-control/verifiers/verify_xlsm.py` |
+| Notion 부모 페이지 | Integration 연결 + sync_parent_page() 정상 동작 (세션36) | `90_공통기준/업무관리/notion_sync.py` |
 | PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 | GPT 지침 Git 관리 | 구현 완료 (GPT PASS 4bcd7877) | `90_공통기준/업무관리/gpt-instructions.md` |
 
