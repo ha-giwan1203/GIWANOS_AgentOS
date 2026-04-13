@@ -34,7 +34,7 @@
 ### [완료] 이월 안건 3건 토론+검증 — 세션36 (2026-04-13)
 - **GPT 토론 2턴**: 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건 / 버림 0건
 - **안건1 GPT 전송 스킬**: 실사용 검증 PASS — 세션36 토론 자체가 gpt-send 경로(URL→탐지→insertText→polling→읽기) 실사용
-- **안건2 verify_xlsm**: 기대값 조정 완료 (DEFAULT_HEADERS 29개, KEEP_SHEETS 3개, min-cols 29, 수식/테이블 optional). 1차 구조 검증 10/10 ALL PASS. 2차 COM은 입력 시트 재설계 필요 → 이월
+- **안건2 verify_xlsm**: 기대값 조정 완료 + 1차 구조 검증 10/10 ALL PASS. 2차 COM은 결과 시트(수식 없음)라 불필요 → 종료
 - **안건3 Notion 부모 페이지**: Integration 연결 + sync_parent_page() 실행 성공. 부모 페이지 "📌 운영 현황" 섹션 자동 갱신 확인 (PASS)
 
 
@@ -740,7 +740,7 @@
 
 
 
-### [대기] verify_xlsm.py COM 실검증 — **대기: 다음 xlsm 작업 시 실행**
+### [종료] verify_xlsm.py COM 실검증 — **불필요 (PLAN_RESULT_FIXED는 수식 없는 결과 시트)**
 - 출처: 1단계 구조적 가드레일 GPT 공동작업
 - verify_xlsm.py 구조는 완료. COM 실검증 산출물(verify.json PASS)은 xlsm 작업 재개 시 확인
 - hooks 3개 + settings merge 구현 완료 (GPT 구조 PASS)
