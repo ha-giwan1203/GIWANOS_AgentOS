@@ -19,10 +19,10 @@
 5. **토론모드 문서 3개 수정**: SKILL.md + REFERENCE.md 2개 — 입력방식 insertText 일괄 수정
 
 ### 커밋 이력
-- (커밋 예정)
+- `06a1b14e` feat: smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비
 
 ### GPT 판정
-- (판정 대기)
+- 06a1b14e: 부분반영 (HANDOFF placeholder 잔존 지적 → 즉시 수정)
 
 ### 다음 세션 안건
 **[소] verify_xlsm COM 검증**
