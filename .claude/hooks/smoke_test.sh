@@ -392,9 +392,23 @@ check $? "토론모드 CLAUDE.md에 CDP 참조 없음 (Chrome MCP 단일화)"
 grep -q 'Chrome MCP' "$DEBATE_CLAUDE"
 check $? "토론모드 CLAUDE.md가 Chrome MCP 기본 전송을 명시함"
 
-# share-result, finish에서 CDP 참조 잔존 여부는 별도 정비 대상
-true
-check $? "CDP 폐기 확인 (placeholder)"
+# share-result, finish 명령에서 CDP 참조 없음 확인
+! grep -q 'cdp_chat_send' "$SHARE_RESULT"
+check $? "share-result에 CDP 참조 없음"
+
+! grep -q 'cdp_chat_send' "$FINISH_CMD"
+check $? "finish에 CDP 참조 없음"
+
+# settings allow에 CDP 스크립트 허용 없음 확인
+! grep -q 'scripts/cdp/' "$SETTINGS"
+check $? "settings.local.json에 CDP 스크립트 허용 없음"
+
+# mcp_send_gate.sh 존재 확인 (Chrome MCP SEND GATE)
+test -f "$HOOKS_DIR/mcp_send_gate.sh"
+check $? "mcp_send_gate.sh 존재 (Chrome MCP 전송 게이트)"
+
+grep -q 'mcp_send_gate' "$SETTINGS"
+check $? "mcp_send_gate settings 등록 확인"
 
 echo ""
 
@@ -510,8 +524,8 @@ echo ""
 
 # === 30. README 훅 개수 정합성 ===
 echo "--- 30. README 훅 개수 ---"
-grep -q '21개' "$HOOKS_DIR/README.md"
-check $? "README: 21개 훅 표기 (send_gate 폐기 반영)"
+grep -q '22개' "$HOOKS_DIR/README.md"
+check $? "README: 22개 훅 표기 (mcp_send_gate 추가 반영)"
 
 grep -q '실패 계약' "$HOOKS_DIR/README.md"
 check $? "README: 실패 계약 (Failure Contract) 표 존재"

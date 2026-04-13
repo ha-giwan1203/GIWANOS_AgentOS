@@ -47,23 +47,9 @@
       "Bash(python \"90_공통기준/업무관리/운영검증/scripts/check_skill_contract.py\" \"90_공통기준/스킬\" --write-report \"90_공통기준/업무관리/운영검증/reports/skill_contract_gap_report.md\")",
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
-      "Bash(start \"\" \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\Users\\\\User\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)",
-      "Bash(python .claude/scripts/cdp/cdp_read.py --selector \"[data-message-author-role='assistant']:last-of-type\" --limit 500)",
       "Read(//c/Users/User/Desktop/업무리스트/**)",
-      "Bash(python .claude/scripts/cdp/cdp_tabs.py)",
-      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\); const last = msgs[msgs.length-1]; last ? last.innerText.substring\\(0, 200\\) : 'none';\")",
-      "Bash(python .claude/scripts/cdp/cdp_exec.py --tab 0 \"const msgs = document.querySelectorAll\\('[data-message-author-role]'\\); let res = []; for\\(let i = Math.max\\(0, msgs.length-6\\); i < msgs.length; i++\\) { res.push\\('['+ msgs[i].getAttribute\\('data-message-author-role'\\) +'] ' + msgs[i].innerText.substring\\(0,150\\)\\); } res.join\\('\\\\n---\\\\n'\\);\")",
-      "Bash(python .claude/scripts/cdp/debate_room_detect.py --navigate)",
-      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate*:*)",
-      "Bash(python .claude/scripts/cdp/poll_and_read.py*:*)",
       "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -30 {}')",
-      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --match-url*:*)",
-      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js ':*)",
-      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"const r = {}; r.prompt = !!document.querySelector\\('#prompt-textarea'\\); r.send = !!document.querySelector\\('[data-testid=\\\\\"send-button\\\\\"]'\\); r.speech = !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\); r.asstMsgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length; JSON.stringify\\(r\\);\")",
-      "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"JSON.stringify\\({prompt: !!document.querySelector\\('#prompt-textarea'\\), speech: !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\), msgs: document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length}\\)\")",
-      "Bash(python .claude/scripts/cdp/read_chat_msgs.py)",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)",
-      "Bash(start \"\" \"C:\\\\\\\\Program Files\\\\\\\\Google\\\\\\\\Chrome\\\\\\\\Application\\\\\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\\\\\Users\\\\\\\\User\\\\\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)"
+      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -159,6 +145,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/state_rebind_check.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__form_input",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/mcp_send_gate.sh"
           }
         ]
       },

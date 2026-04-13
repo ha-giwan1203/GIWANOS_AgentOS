@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 21개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/harness gate 운영 중. CDP 폐기 → Chrome MCP 단일화 (2026-04-13) |
+| hooks 체계 | 22개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/harness/mcp_send gate 운영 중. CDP 폐기 → Chrome MCP 단일화 (2026-04-13) |
 
 ---
 
@@ -31,7 +31,7 @@
 | 기능 활용 | 합의 완료 (GPT PASS). 별도 규칙 파일 폐기, CLAUDE.md 본문으로 흡수 | `CLAUDE.md` |
 | domain_guard | v3 구현 후 폐기 → _archive 이동. risk_profile_prompt로 대체 | `.claude/hooks/_archive/domain_guard.sh` |
 | evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
-| 토론모드/게이트 보정 | idle composer 오탐 제거, `#composer-submit-button` fallback 반영, 완료 주장 기반 completion gate 추가 축소, 토론방 한국어-only 규칙 반영, `cdp_chat_send.py` helper 추가, 에러 원문 예외 정렬, unresolved incident 수리 큐 보강, 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격, `final_check.sh`를 문서 문자열보다 `settings.local.json` 실등록 기준으로 재정렬, `send_gate.sh`를 `tool_input` 우선 파싱으로 보강, `cdp_chat_send.py` deprecated 코드 완전 제거 (expect-last-snippet 폐기, 세션15) | `90_공통기준/토론모드/`, `.claude/hooks/`, `.claude/scripts/cdp/` |
+| 토론모드/게이트 보정 | Chrome MCP 단일화(세션32). CDP 폐기, send_gate→mcp_send_gate 교체, harness_gate 유지. idle composer 오탐 제거, completion gate 축소, 한국어-only, final_check settings 기준 재정렬 | `90_공통기준/토론모드/`, `.claude/hooks/` |
 | 토론모드 보류 안건 | → TASKS.md "진행중 / 보류" 참조 | `90_공통기준/업무관리/TASKS.md` |
 | PPT 자동 생성 | 실무 투입 최종 PASS — 실데이터+육안검수 5/5 완료 | `90_공통기준/스킬/pptx-generator/SKILL.md` |
 | GPT 지침 Git 관리 | 구현 완료 (GPT PASS 4bcd7877) | `90_공통기준/업무관리/gpt-instructions.md` |
