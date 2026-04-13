@@ -78,34 +78,66 @@ fi
 DOMAIN_REGISTRY="$PROJECT_ROOT/.claude/domain_entry_registry.json"
 DOMAIN_REQ="$PROJECT_ROOT/.claude/state/active_domain.req"
 if [ -f "$DOMAIN_REGISTRY" ]; then
-  MATCHED_DOMAIN=""
-  MATCHED_KEYWORD=""
-  MATCHED_PRIORITY=999
-  # priority 순으로 JSON 파싱 (jq 없이 grep+sed)
-  DOMAIN_COUNT=$(grep -c '"domain_id"' "$DOMAIN_REGISTRY" 2>/dev/null || echo 0)
-  for i in $(seq 0 $((DOMAIN_COUNT - 1))); do
-    # 각 도메인 블록에서 keywords 추출
-    BLOCK=$(awk -v idx="$i" 'BEGIN{c=-1} /\{/{c++} c==idx{print} /\}/{if(c==idx) c=999}' "$DOMAIN_REGISTRY")
-    D_ID=$(echo "$BLOCK" | grep '"domain_id"' | sed 's/.*: *"//;s/".*//')
-    D_PRI=$(echo "$BLOCK" | grep '"priority"' | sed 's/.*: *//;s/,.*//')
-    D_KEYWORDS=$(echo "$BLOCK" | grep -oE '"keywords"[^]]*\]' | grep -oE '"[^"]*"' | tail -n +2 | sed 's/"//g')
-    for kw in $D_KEYWORDS; do
-      if echo "$TEXT" | grep -qiF "$kw"; then
-        if [ "${D_PRI:-999}" -lt "$MATCHED_PRIORITY" ]; then
-          MATCHED_DOMAIN="$D_ID"
-          MATCHED_KEYWORD="$kw"
-          MATCHED_PRIORITY="$D_PRI"
+  # GPT FAIL 대응: awk 블록 카운터 오류 + 공백 키워드 분리 수정
+  # 접근: 임시 파일에 매칭 후보를 기록, priority 정렬로 최우선 선택
+  MATCH_TMP=$(mktemp)
+  CUR_ID="" CUR_PRI="" IN_KW=0
+  while IFS= read -r line; do
+    if echo "$line" | grep -q '"domain_id"'; then
+      CUR_ID=$(echo "$line" | sed 's/.*: *"//;s/".*//')
+      CUR_PRI="" IN_KW=0
+    fi
+    if echo "$line" | grep -q '"priority"'; then
+      CUR_PRI=$(echo "$line" | sed 's/.*: *//;s/[^0-9]//g')
+    fi
+    if echo "$line" | grep -q '"keywords"'; then
+      IN_KW=1
+    fi
+    if [ "$IN_KW" -eq 1 ]; then
+      # 공백 포함 키워드를 원자 단위로 추출
+      while IFS= read -r kw; do
+        [ -z "$kw" ] && continue
+        if echo "$TEXT" | grep -qiF "$kw"; then
+          printf '%s\t%s\t%s\n' "${CUR_PRI:-999}" "$CUR_ID" "$kw" >> "$MATCH_TMP"
         fi
-        break
+      done <<< "$(echo "$line" | grep -oE '"[^"]*"' | grep -v 'keywords' | sed 's/"//g')"
+      if echo "$line" | grep -q '\]'; then
+        IN_KW=0
       fi
-    done
-  done
-  if [ -n "$MATCHED_DOMAIN" ]; then
+    fi
+  done < "$DOMAIN_REGISTRY"
+
+  # priority 최소값 선택 (첫 일치 승리)
+  BEST=$(sort -t$'\t' -k1 -n "$MATCH_TMP" | head -1)
+  rm -f "$MATCH_TMP"
+
+  if [ -n "$BEST" ]; then
+    MATCHED_PRIORITY=$(echo "$BEST" | cut -f1)
+    MATCHED_DOMAIN=$(echo "$BEST" | cut -f2)
+    MATCHED_KEYWORD=$(echo "$BEST" | cut -f3)
     # required_doc_ids 추출
-    BLOCK=$(awk -v did="$MATCHED_DOMAIN" '$0 ~ "\"domain_id\".*\""did"\""{found=1} found{print} found && /\]/{if(p) exit} found && /required_docs/{p=1}' "$DOMAIN_REGISTRY")
-    DOC_IDS=$(echo "$BLOCK" | grep '"id"' | sed 's/.*: *"//;s/".*//' | tr '\n' ',' | sed 's/,$//')
-    mkdir -p "$(dirname "$DOMAIN_REQ")"
-    printf 'domain_id=%s\nmatched_keyword=%s\nrequired_doc_ids=%s\n' "$MATCHED_DOMAIN" "$MATCHED_KEYWORD" "$DOC_IDS" > "$DOMAIN_REQ"
+    DOC_IDS=""
+    IN_TARGET=0 IN_DOCS=0
+    while IFS= read -r dline; do
+      if echo "$dline" | grep -q "\"$MATCHED_DOMAIN\""; then
+        IN_TARGET=1
+      fi
+      if [ "$IN_TARGET" -eq 1 ] && echo "$dline" | grep -q '"required_docs"'; then
+        IN_DOCS=1
+      fi
+      if [ "$IN_TARGET" -eq 1 ] && [ "$IN_DOCS" -eq 1 ]; then
+        DID=$(echo "$dline" | grep '"id"' | sed 's/.*: *"//;s/".*//')
+        if [ -n "$DID" ]; then
+          DOC_IDS="${DOC_IDS}${DOC_IDS:+,}$DID"
+        fi
+        if echo "$dline" | grep -q '^\s*\]'; then
+          IN_DOCS=0 IN_TARGET=0
+        fi
+      fi
+    done < "$DOMAIN_REGISTRY"
+    mkdir -p "$PROJECT_ROOT/.claude/state"
+    printf 'domain_id=%s\nmatched_keyword=%s\nrequired_doc_ids=%s\n' \
+      "$MATCHED_DOMAIN" "$MATCHED_KEYWORD" "$DOC_IDS" > "$DOMAIN_REQ"
     hook_log "UserPromptSubmit" "active_domain=$MATCHED_DOMAIN keyword=$MATCHED_KEYWORD"
   else
     rm -f "$DOMAIN_REQ" 2>/dev/null || true
