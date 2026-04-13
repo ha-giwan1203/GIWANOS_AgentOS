@@ -7,6 +7,8 @@ description: >
   BI 엑셀 파일에서 지정 날짜 데이터를 추출하여 MES SaveExcelData.do API로 직접 POST한다.
   기존 수동 업로드(엑셀 다운 → MES 팝업 → 파일 선택 → 저장) 프로세스를 완전 자동화.
 grade: A
+last_updated: 2026-04-13
+note: 통합 스킬 daily-routine/run.py에 포함됨. 단독 실행도 가능 (run.py)
 ---
 
 # MES 생산실적 자동 업로드 (API 직호출)

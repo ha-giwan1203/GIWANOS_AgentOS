@@ -4,8 +4,9 @@ description: ZDM 시스템 일상점검 자동 입력 (SP3M3 라인)
 version: v1.0
 trigger: "일상점검", "ZDM", "ZDM 점검", "점검 입력", "일상점검 등록"
 author: 하지완
-last_updated: 2026-04-01
+last_updated: 2026-04-13
 status: active
+note: 통합 스킬 daily-routine/run.py에 포함됨. 단독 실행도 가능 (run.py)
 grade: A
 ---
 
@@ -94,6 +95,29 @@ grade: A
 | 리벳팅 압력 | 작업자 | 공정 200 | 60~80 bar |
 | 그리스 도포량 | 작업자 | 공정 330 | 5~10mg |
 | MGG 작동 시간 | 관리자 | 공정 200 | 1.7~2.3초 |
+
+## 일요일 차단 (최우선 규칙)
+
+**실행 전 반드시 요일 검사를 수행한다. 일요일이면 즉시 중단.**
+
+```python
+from datetime import datetime, date
+
+def assert_not_sunday(target_date):
+    """일요일이면 ValueError 발생. 모든 입력 전 필수 호출."""
+    if isinstance(target_date, str):
+        target_date = date.fromisoformat(target_date)
+    if target_date.weekday() == 6:  # 6 = Sunday
+        raise ValueError(f"{target_date} 은(는) 일요일 — 입력 금지")
+
+# 사용 예시
+assert_not_sunday(datetime.now().date())          # 당일 점검 시
+assert_not_sunday(date(2026, 4, 5))               # 누락분 보정 시
+```
+
+- 당일 점검, 누락분 보정, 일괄 입력 등 **모든 경로**에서 이 함수를 거친다
+- 일요일 데이터가 이미 입력된 경우: check_result="" POST로 삭제 후 보고
+- cron 스케줄도 `* * 1-6` (월~토)이지만, 수동 실행 시에도 이 검사가 방어선
 
 ## 실행 절차
 
