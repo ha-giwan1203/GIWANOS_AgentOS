@@ -28,8 +28,16 @@ fi
 
 # 2. 보호 대상 경로에 대한 삭제/이동/인플레이스 수정 차단
 # GPT 합의: "명령어 + 보호 경로" 조합으로만 차단. 임시파일/로그/아카이브 정리는 허용.
+# hook_config.json에서 설정 읽기 (Phase 2: 중앙 설정형, fallback: 하드코딩)
+CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 PROTECTED_PATTERNS='(CLAUDE\.md|README\.md|STATUS\.md|RUNBOOK\.md|AGENTS_GUIDE\.md|settings.*\.json|\.skill|기준정보.*최종)'
 DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee |cat >|cat >>)'
+if [ -f "$CONFIG_FILE" ]; then
+  _pp=$(grep -A 20 '"protected_path_patterns"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'protected_path' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  [ -n "$_pp" ] && PROTECTED_PATTERNS="($_pp)"
+  _dc=$(grep -A 20 '"danger_commands"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'danger_commands' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  [ -n "$_dc" ] && DANGER_CMDS="($_dc)"
+fi
 
 # 2b. 보호 경로에 대한 직접 리다이렉션(> file) 차단 (GPT 지적 반영)
 if echo "$COMMAND" | grep -qE '>\s*[^|]' 2>/dev/null; then

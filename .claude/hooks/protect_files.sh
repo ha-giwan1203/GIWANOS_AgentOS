@@ -10,19 +10,27 @@ if [ -z "$FILE_PATH" ]; then
   FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 fi
 
-# Layer 1: 즉시 차단 (deny)
-if echo "$FILE_PATH" | grep -qiE '\.(xlsx|xls|xlsm|csv|docx|pdf)$'; then
+# hook_config.json에서 설정 읽기 (Phase 2: 중앙 설정형, fallback: 하드코딩)
+CONFIG_FILE="$(dirname "$0")/../hook_config.json"
+DENY_EXT_PATTERN='\.(xlsx|xls|xlsm|csv|docx|pdf)$'
+DENY_PATH_PATTERN='(98_아카이브|기준정보.*최종)'
+if [ -f "$CONFIG_FILE" ]; then
+  # deny_extensions → regex 조립
+  _exts=$(grep -A 10 '"deny_extensions"' "$CONFIG_FILE" 2>/dev/null | grep '"\\.' | sed 's/.*"\.\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  [ -n "$_exts" ] && DENY_EXT_PATTERN="\\.($_exts)$"
+  # deny_path_patterns → regex 조립
+  _paths=$(grep -A 10 '"deny_path_patterns"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'deny_path' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  [ -n "$_paths" ] && DENY_PATH_PATTERN="($_paths)"
+fi
+
+# Layer 1: 즉시 차단 (deny) — config 기반
+if echo "$FILE_PATH" | grep -qiE "$DENY_EXT_PATTERN"; then
   echo '{"decision":"deny","reason":"원본 파일 직접 수정 금지. 복사본에서 작업하세요."}'
   exit 0
 fi
 
-if echo "$FILE_PATH" | grep -qi '98_아카이브'; then
-  echo '{"decision":"deny","reason":"아카이브 폴더 직접 수정 금지."}'
-  exit 0
-fi
-
-if echo "$FILE_PATH" | grep -qi '기준정보.*최종'; then
-  echo '{"decision":"deny","reason":"기준정보 원본 파일 수정 금지. 사용자 확인 후 진행하세요."}'
+if echo "$FILE_PATH" | grep -qiE "$DENY_PATH_PATTERN"; then
+  echo '{"decision":"deny","reason":"보호 경로 직접 수정 금지. 사용자 확인 후 진행하세요."}'
   exit 0
 fi
 

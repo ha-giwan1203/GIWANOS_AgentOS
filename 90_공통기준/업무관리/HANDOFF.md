@@ -21,8 +21,7 @@
 
 ### 다음 세션 참고
 - Phase 3 순서: E2E → 2-Agent → 오토리서치 (GPT 합의)
-- hook_config.json은 아직 protect_files.sh/block_dangerous.sh에서 실제 참조하지 않음 (읽기만 생성)
-- 다음 단계: 각 hook 스크립트가 hook_config.json에서 값을 읽도록 연동
+- hook_config.json → protect_files.sh/block_dangerous.sh/session_start_restore.sh 3개 전부 연동 완료 (GPT 부분반영 지적 즉시 대응)
 
 ---
 
