@@ -47,6 +47,10 @@ def infer_next_action(entry: dict[str, Any]) -> str:
         "send_block": "CDP 기본 경로(cdp_chat_send.py)로 전환하여 재전송",
         "stop_guard_block": "독립 견해(반론/대안/내 판단)를 포함하여 재작성",
         "compile_fail": "문법 오류를 수정한 뒤 py_compile로 재검증",
+        "harness_missing": "독립 분석(반론/대안)을 포함하여 하네스 분석 보완",
+        "meta_drift": "TASKS/HANDOFF/STATUS 날짜를 동기화한 뒤 재확인",
+        "test_fail": "실패한 테스트를 확인하고 원인 수정 후 재실행",
+        "task_consecutive_fail": "스케줄 태스크 스크립트 점검 및 실행 환경 확인",
     }
     if reason in actions:
         return actions[reason]
@@ -112,6 +116,21 @@ def infer_patch_candidates(entry: dict[str, Any]) -> list[str]:
         "dangerous_cmd": [],
         "stop_guard_block": [],
         "compile_fail": [],
+        "harness_missing": [
+            ".claude/hooks/harness_gate.sh",
+        ],
+        "meta_drift": [
+            "90_공통기준/업무관리/TASKS.md",
+            "90_공통기준/업무관리/HANDOFF.md",
+            "90_공통기준/업무관리/STATUS.md",
+        ],
+        "test_fail": [
+            ".claude/hooks/smoke_test.sh",
+            ".claude/hooks/e2e_test.sh",
+        ],
+        "task_consecutive_fail": [
+            ".claude/logs/task_results.jsonl",
+        ],
     }
 
     if classification in reason_paths:

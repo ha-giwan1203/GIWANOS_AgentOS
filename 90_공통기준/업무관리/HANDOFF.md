@@ -4,12 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 07:30 KST — 세션 39 (에이전트 도입 토론 + 스크립트 다듬기)
+최종 업데이트: 2026-04-14 08:55 KST — 세션 40 (학습 루프 규칙 승격기 도입)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션 39)
+## 0. 최신 세션 (2026-04-14 세션 40)
+
+### 이번 세션 완료
+1. **GPT 토론 1턴**: 규칙 승격기 설계 3건 검토. 채택 5건 / 보류 3건 / 버림 0건
+2. **incident_review.py 신규**: 빈도 집계 → 5갈래 제안 (규칙보강/문서보강/절차항목/자동화불가/분류누락)
+3. **task 로그 분리**: hook_common.sh에 hook_task_result() + fail_streak 캐싱 + escalation. hook_config.json task_escalation 섹션 (기본3, daily-routine 2)
+4. **MEMORY feedback 3분류**: classify_feedback.py로 33개 파일 태깅 (hookable 8 / promptable 22 / human_only 3)
+5. **enum 정규화**: hook_common.sh + incident_repair.py에 harness_missing/meta_drift/test_fail/task_consecutive_fail 추가
+6. smoke_test 135/135 + E2E 10/10 ALL PASS
+
+### 다음 세션 참고
+- 모델 믹싱/Worktree 병렬은 별도 안건 (보류 유지)
+- 학습 루프 완성도 70→90% 수준. 남은 갭: incident_review를 주기���으로 돌리는 트리거 (수동 or 주간 self-audit 연동)
+
+---
+
+## 1. 이전 세션 (2026-04-14 세션 39)
 
 ### 이번 세션 완료
 1. **에이전트 도입 GPT 토론 1턴**: 5건 검토 → **에이전트 필요 0건** 합의. 채택 6건 / 보류 0건
@@ -19,13 +35,6 @@
 5. **hook_config.json**: drift_check 섹션 추가 + 실연동
 6. **학습 루프 점검 GPT 토론**: 완성도 70~75% 합의. 다음 안건 3건 도출
 7. smoke_test 120/120 + E2E 10/10 ALL PASS
-
-### 다음 세션 참고
-- **학습 루프 완성 3건** (GPT 합의):
-  1. incident_review.py — 빈도 집계 → 규칙/문서/절차/불가 4갈래 제안
-  2. scheduled task 로그 분리 → 반복 실패만 incident 승격
-  3. MEMORY feedback 3분류 (hookable/promptable/human_only)
-- 모델 믹싱/Worktree 병렬은 별도 안건 (보류 유지)
 
 ---
 

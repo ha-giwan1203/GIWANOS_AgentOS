@@ -3,10 +3,11 @@
 # 사용법: source .claude/hooks/hook_common.sh && hook_log "이벤트명" "메시지"
 # incident: hook_incident "type" "hook" "file" "detail" ['"classification_reason":"<enum>"']
 # type: gate_reject | hook_block | compile_fail
-# classification_reason enum (세션12 합의):
-#   evidence_missing | completion_false_positive | pre_commit_fail |
+# classification_reason enum (세션12 합의, 세션40 정규화):
+#   evidence_missing | pre_commit_check | compile_fail | test_fail |
 #   scope_violation | dangerous_cmd | send_block | stop_guard_block |
-#   compile_fail | completion_before_git | completion_before_state_sync
+#   completion_before_git | completion_before_state_sync |
+#   harness_missing | meta_drift | task_consecutive_fail
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
@@ -272,5 +273,77 @@ hook_incident() {
     if [ "$_sz" -gt 512000 ] 2>/dev/null; then
       hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — incident_repair.py --archive 실행 권장" 2>/dev/null || true
     fi
+  fi
+}
+
+# === Task Result Logging (세션40) ===
+# scheduled task 실행 결과를 별도 로그에 기록.
+# incident_ledger와 분리하여 1회 실패 노이즈 방지.
+# 연속 실패 시에만 incident로 승격.
+
+TASK_RESULTS_LOG="$PROJECT_ROOT/.claude/logs/task_results.jsonl"
+
+# hook_task_result "task_id" "success|fail|partial" "detail" [duration_ms]
+hook_task_result() {
+  local task_id="$1"
+  local status="$2"
+  local detail="$3"
+  local duration_ms="${4:-0}"
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  # escape
+  detail="${detail//\\/\\\\}"
+  detail="${detail//\"/\\\"}"
+  detail="${detail//$'\n'/\\n}"
+  task_id="${task_id//\"/\\\"}"
+  mkdir -p "$(dirname "$TASK_RESULTS_LOG")" 2>/dev/null
+  # fail_streak 계산
+  local streak=0
+  if [ "$status" = "fail" ] && [ -f "$TASK_RESULTS_LOG" ]; then
+    while IFS= read -r line; do
+      local tid sts
+      tid=$(printf '%s' "$line" | safe_json_get "task_id" 2>/dev/null)
+      sts=$(printf '%s' "$line" | safe_json_get "result" 2>/dev/null)
+      if [ "$tid" = "$task_id" ]; then
+        if [ "$sts" = "fail" ]; then
+          streak=$((streak + 1))
+        else
+          streak=0
+        fi
+      fi
+    done < <(tail -30 "$TASK_RESULTS_LOG")
+    streak=$((streak + 1))  # 현재 실패 포함
+  elif [ "$status" = "fail" ]; then
+    streak=1
+  fi
+  # escalation 여부
+  local escalated="false"
+  local threshold=3
+  # hook_config.json에서 per_task/default threshold 읽기
+  if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
+    local pt
+    pt=$(python3 -c "
+import json,sys
+try:
+  c=json.load(open('$PROJECT_ROOT/.claude/hook_config.json'))
+  te=c.get('task_escalation',{})
+  pt=te.get('per_task',{}).get('$task_id')
+  if pt: print(pt)
+  else: print(te.get('default_threshold',3))
+except: print(3)
+" 2>/dev/null)
+    threshold="${pt:-3}"
+  fi
+  if [ "$streak" -ge "$threshold" ] && [ "$status" = "fail" ]; then
+    escalated="true"
+  fi
+  echo "{\"ts\":\"$ts\",\"task_id\":\"$task_id\",\"result\":\"$status\",\"detail\":\"$detail\",\"duration_ms\":$duration_ms,\"fail_streak\":$streak,\"escalated\":$escalated}" >> "$TASK_RESULTS_LOG"
+  _rotate_file "$TASK_RESULTS_LOG"
+  # escalation → incident
+  if [ "$escalated" = "true" ]; then
+    hook_incident "gate_reject" "scheduled_task" "" \
+      "Task '$task_id' failed $streak consecutive times" \
+      "\"classification_reason\":\"task_consecutive_fail\",\"task_id\":\"$task_id\",\"fail_streak\":$streak"
+    hook_log "task_escalation" "Task '$task_id' escalated after $streak consecutive failures"
   fi
 }

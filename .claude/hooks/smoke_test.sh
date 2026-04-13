@@ -585,14 +585,77 @@ check $? "settings.local.json: instruction_read_gate 등록됨"
 grep -q 'instruction_reads' "$HOOKS_DIR/session_start_restore.sh"
 check $? "session_start_restore: instruction_reads 초기화 로직 존재"
 
+# === 33. incident_review.py (세션40 학습 루프) ===
+echo "--- 33. incident_review.py ---"
+test -f "$HOOKS_DIR/incident_review.py"
+check $? "incident_review.py 존재"
+
+python3 "$HOOKS_DIR/incident_review.py" --help >/dev/null 2>&1
+check $? "incident_review.py --help 실행 가능"
+
+python3 "$HOOKS_DIR/incident_review.py" --days 1 --threshold 999 2>&1 | grep -q "임계치 초과 항목 없음"
+check $? "incident_review.py 빈 결과 정상 출력"
+
+echo ""
+
+# === 34. classify_feedback.py (세션40 MEMORY 3분류) ===
+echo "--- 34. classify_feedback.py ---"
+test -f "$HOOKS_DIR/classify_feedback.py"
+check $? "classify_feedback.py 존재"
+
+python3 "$HOOKS_DIR/classify_feedback.py" --help >/dev/null 2>&1
+check $? "classify_feedback.py --help 실행 가능"
+
+python3 "$HOOKS_DIR/classify_feedback.py" --validate 2>&1 | grep -q "ALL OK"
+check $? "classify_feedback.py --validate ALL OK"
+
+echo ""
+
+# === 35. hook_common.sh task_result 함수 (세션40 로그 분리) ===
+echo "--- 35. hook_common.sh task_result ---"
+grep -q 'hook_task_result()' "$HOOKS_DIR/hook_common.sh"
+check $? "hook_task_result() 함수 정의됨"
+
+grep -q 'TASK_RESULTS_LOG' "$HOOKS_DIR/hook_common.sh"
+check $? "TASK_RESULTS_LOG 변수 정의됨"
+
+grep -q 'task_consecutive_fail' "$HOOKS_DIR/hook_common.sh"
+check $? "task_consecutive_fail classification 사용됨"
+
+echo ""
+
+# === 36. hook_config.json task_escalation (세션40) ===
+echo "--- 36. hook_config.json task_escalation ---"
+grep -q 'task_escalation' "$PROJECT_DIR/.claude/hook_config.json"
+check $? "hook_config.json: task_escalation 섹션 존재"
+
+grep -q 'default_threshold' "$PROJECT_DIR/.claude/hook_config.json"
+check $? "hook_config.json: default_threshold 설정됨"
+
+grep -q 'daily-routine' "$PROJECT_DIR/.claude/hook_config.json"
+check $? "hook_config.json: daily-routine per_task override 존재"
+
+echo ""
+
+# === 37. incident_repair.py 세션40 매핑 (task_consecutive_fail) ===
+echo "--- 37. incident_repair.py 세션40 매핑 ---"
+grep -q 'task_consecutive_fail' "$HOOKS_DIR/incident_repair.py"
+check $? "incident_repair.py: task_consecutive_fail 매핑 존재"
+
+grep -q 'meta_drift' "$HOOKS_DIR/incident_repair.py"
+check $? "incident_repair.py: meta_drift 매핑 존재"
+
+grep -q 'harness_missing' "$HOOKS_DIR/incident_repair.py"
+check $? "incident_repair.py: harness_missing 매핑 존재"
+
 echo ""
 
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32"
-# 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate 신규
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37"
+# 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""
 echo "=== 라벨 분류 ==="
