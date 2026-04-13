@@ -35,8 +35,8 @@
    - 마지막 assistant 블록 텍스트 100자 읽기
    - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
    - 같으면 → 예정대로 전송 진행
-4. **기본 전송**: Chrome MCP (`find` → `form_input` → `computer(left_click)`)
-5. CDP 스크립트는 폐기됨. Chrome MCP 단일 사용.
+4. **기본 전송**: `javascript_tool` + `insertText` → send button JS 클릭 (세션32 확정)
+5. `type` / `form_input` / CDP 스크립트 전부 금지.
 6. stop-button polling 적응형 (3/5/8초) + 매 주기 사용자 중단 확인
 
 ## 상세 참조

@@ -13,8 +13,8 @@
 - Selector smoke test: idle composer 상태(`composer-speech-button`) 허용, 전송 직전 submit button 재확인
 - REFERENCE.md 통합 JS: `[data-testid="send-button"], #composer-submit-button` fallback으로 실전 selector와 일치
 - 언어 규칙: 토론방 자연어는 한국어만 사용, 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`로 고정
-- GPT 전송 경로: `cdp_chat_send.py` 기본. Chrome MCP는 CDP 불가 시 fallback
-- javascript_tool execCommand+insertText 직접 사용은 send_gate.sh가 차단
+- GPT 전송 경로: `javascript_tool` + `insertText` 기본 (세션32 확정). CDP 폐기됨
+- /gpt-send, /gpt-read 명령 추가 (세션34)
 - 에러 원문 예외: `오류 원문:` / `에러 원문:` 1줄 인용은 한국어 가드 예외로 허용
 - incident 수리 루프: `incident_repair.py`가 패치 후보와 검증 단계까지 제안
 - 문서 우선순위 정리: 전역 상태는 `../업무관리/TASKS.md`, 토론모드 문서는 하위 도메인용으로 역할 고정
@@ -35,8 +35,7 @@
 - 2026-04-09: GPT `CONDITIONAL PASS` 후속 보정 — submit fallback 정렬 + completion claim 판별식 축소
 - 2026-04-09: 토론방 영어 사용 금지 — 한국어 전용 전송 규칙 + 판정 라벨 한국어화
 - 2026-04-09: 로컬 CDP helper 추가 + incident 수리 루프 보강
-- 2026-04-09: 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격, 직접 DOM 전송은 예비 경로로 재배치
-- 2026-04-09: v2.7 버전 표기를 토론모드 기본 전송 경로 승격과 정렬
-- 2026-04-09: `cdp_chat_send.py` 에러 원문 예외 정렬
-- 2026-04-10: `debate_room_detect.py` 신규 — 매 세션 프로젝트 최상단 방 자동 탐지 + 진입 코드 강제
-- 2026-04-10: SKILL.md v2.8 — Step 1에서 `debate_room_detect.py --navigate` 필수 실행으로 변경
+- 2026-04-09: 토론모드 기본 전송 경로를 `cdp_chat_send.py`로 승격 (이후 세션32에서 CDP 폐기)
+- 2026-04-10: `debate_room_detect.py` 신규 (이후 세션32에서 CDP 폐기, JS URL 추출로 대체)
+- 2026-04-13: 세션32 CDP 전체 폐기 → Chrome MCP 단일화. javascript_tool + insertText 확정
+- 2026-04-13: 세션34 /gpt-send, /gpt-read 명령 추가. 토론모드 문서 4개 입력방식 일괄 수정
