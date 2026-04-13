@@ -4,12 +4,38 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 11:34 KST — 세션 32 종료 (CDP 폐기 + Chrome MCP 단일화 GPT PASS)
+최종 업데이트: 2026-04-13 12:21 KST — 세션 33 (하네스 2차 도메인 진입 구현 + GPT 정합)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-13 세션 32)
+## 0. 최신 세션 (2026-04-13 세션 33)
+
+### 이번 세션 완료
+1. **GPT 토론 2턴**: 하네스 2차 도메인 진입 설계 쟁점 5개. 채택 7건 / 보류 1건
+2. **domain_entry_registry.json 신규**: 8개 도메인 매핑 (priority/keywords/required_docs)
+3. **risk_profile_prompt.sh 확장**: UserPromptSubmit 키워드 매칭 → active_domain.req 생성
+4. **evidence_mark_read.sh 확장**: JSON required_docs 기반 동적 마커 생성
+5. **instruction_read_gate.sh 확장**: 활성 도메인 마커 검사 + 레거시 fallback
+6. **GPT 1차 FAIL → 즉시 수정**: awk 파싱 → 라인 상태 머신 + tmpfile / 공백 키워드 원자 매칭
+7. **GPT 재판정 정합** (6be7cf30)
+
+### 커밋 이력
+- `531d3f80` feat: 하네스 2차 — 도메인 진입 게이트 구현 (GPT 합의 7건)
+- `6be7cf30` fix: GPT FAIL 대응 — JSON 파싱 재작성 + 공백 키워드 보존
+
+### GPT 판정
+- 531d3f80: FAIL (awk 파싱 오류 + 공백 키워드 분리)
+- 6be7cf30: 정합 (TASKS/HANDOFF 갱신 후 최종 판정)
+
+### 다음 세션 안건
+**[소] Notion 부모 페이지 / verify_xlsm COM**
+
+**[소] smoke_test 기존 FAIL 2건 정리**
+
+---
+
+## 1. 이전 세션 (2026-04-13 세션 32)
 
 ### 이번 세션 완료
 1. **self-audit 실행**: anomaly 8건 + GPT 선제 리스크 2건 = 10건 식별

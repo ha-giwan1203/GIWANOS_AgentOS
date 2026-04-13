@@ -10,20 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13 — 세션32 종료 (CDP 폐기 + Chrome MCP 단일화 + GPT PASS)
+최종 업데이트: 2026-04-13 — 세션33 (하네스 2차 도메인 진입 구현 + GPT 정합)
 
 ---
 
 ## 다음 세션 안건
 
-### [보류] 지침 강제 읽기 하네스 2차 — 도메인 진입
-- 키워드→경로 매핑이 복잡, 별도 설계 필요 (1차 GPT 합의)
-
 ### [소] Notion 부모 페이지 / verify_xlsm COM
+
+### [소] smoke_test 기존 FAIL 2건 정리
+- 토론모드 CLAUDE.md CDP 금지 선언 문구 오탐 / mcp_send_gate settings 변수 경로
 
 ---
 
 ## 최근 완료
+
+### [완료] 지침 강제 읽기 하네스 2차 — 도메인 진입 — 세션33 (2026-04-13)
+- **GPT 토론 2턴**: 설계 쟁점 5개 → 채택 7건 / 보류 1건(detect-only 경고)
+- **domain_entry_registry.json 신규**: 8개 도메인 매핑 (domain_id, priority, keywords, required_docs[{id,path}], gate_scope)
+- **risk_profile_prompt.sh 확장**: UserPromptSubmit에서 키워드 매칭 → active_domain.req 생성
+- **evidence_mark_read.sh 확장**: JSON required_docs 기반 동적 마커 (domain_<id>__<doc_id>.ok)
+- **instruction_read_gate.sh 확장**: 활성 도메인 required_docs 마커 검사 + 레거시 fallback
+- GPT 1차 FAIL (awk 파싱 오류 + 공백 키워드 분리) → 즉시 수정 → GPT 재판정 정합
+- 8개 도메인 전체 실검증 PASS + 우선순위 충돌 테스트 PASS
 
 ### [완료] CDP 전송 허용 패턴 와일드카드 통합 — 세션31 (2026-04-13)
 - 개별 패턴 5개 → 와일드카드 2개로 통합. 승인 팝업 해소
