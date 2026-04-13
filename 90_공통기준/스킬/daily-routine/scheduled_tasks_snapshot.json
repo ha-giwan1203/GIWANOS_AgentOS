@@ -1,0 +1,22 @@
+{
+  "snapshot_date": "2026-04-13T14:50:00+09:00",
+  "purpose": "스케줄 태스크 통합 실물 증적 (GPT 검증용)",
+  "tasks": [
+    {
+      "taskId": "daily-routine",
+      "description": "매일 반복 업무 통합 (ZDM 점검 + MES 실적 업로드, 월~토)",
+      "cronExpression": "7 8 * * 1-6",
+      "enabled": true
+    },
+    {
+      "taskId": "daily-zdm-inspection",
+      "description": "ZDM 일상점검 자동 입력 (SP3M3, 월~토) — 통합으로 비활성",
+      "enabled": false
+    },
+    {
+      "taskId": "daily-mes-upload",
+      "description": "MES 생산실적 업로드 — 통합으로 비활성",
+      "enabled": false
+    }
+  ]
+}
