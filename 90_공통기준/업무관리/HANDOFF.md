@@ -31,10 +31,13 @@
 17. smoke_test 120/120 + E2E 10/10 ALL PASS (Phase 3-1 반영 후)
 
 ### 다음 세션 참고
-- **하네스 강화 Phase 1~3 전체 완료**
-- 모델 믹싱/Worktree 병렬은 별도 안건으로 분리
+- **하네스 고도화: 에이전트 도입** — 조사 완료, GPT 토론 필요
+- 우선순위: (1) Drift Detector (2) Parallel Review 3개 (3) Night Watch (4) Continue Sites (5) Harness Generator
+- 조사 출처: Anthropic Harness Engineering, Google 8대 패턴, HAMY 9-Agent 병렬 리뷰, revfactory/harness, VoltAgent 100+ subagents
+- smoke_fast.sh send_gate→mcp_send_gate 수정 완료 (3cfe2f38), 9/9 ALL PASS
 - e2e_test.sh는 수동 검증용 (세션 시작 자동 실행 금지 합의)
 - /auto-fix는 반자동 — 분석+제안만, 자동 수정 없음
+- 모델 믹싱/Worktree 병렬은 에이전트 도입과 별도 안건
 
 ---
 

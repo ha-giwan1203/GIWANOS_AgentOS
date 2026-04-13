@@ -16,7 +16,16 @@
 
 ## 다음 세션 안건
 
-**(없음)** — 하네스 강화 Phase 1~3 전체 완료
+**[중] 하네스 고도화 — 에이전트 도입 (조사 완료, GPT 토론 미진행)**
+
+도입 우선순위 (세션38 인터넷 조사 기반):
+1. **Drift Detector** — TASKS↔HANDOFF↔STATUS↔README 메타 드리프트 자동 탐지 (세션38에서만 3회 발생)
+2. **Parallel Review Team (3개)** — commit 전 보안/품질/상태문서 병렬 리뷰 (HAMY 9-Agent 축소)
+3. **Night Watch** — 야간 에러 로그 스캔 → incident 자동 분류 → 아침 요약 (스케줄 태스크 연동)
+4. **Continue Sites** — hook 실패 시 자동 복구 전략 (incident_repair auto-resolve 확장)
+5. **Harness Generator** — 도메인 키워드 → 전용 agent+skill 자동 scaffolding
+
+진행 방식: GPT 토론 → 합의 → 1~2번부터 순차 구현
 
 ---
 
