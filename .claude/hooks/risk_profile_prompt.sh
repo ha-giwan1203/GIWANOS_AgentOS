@@ -73,6 +73,45 @@ if echo "$TEXT" | grep -qiE '(토론|GPT.*공유|GPT.*판정|하네스|harness|d
   touch_req "debate_preflight"
 fi
 
+# 도메인 진입 감지 → active_domain.req 생성
+# GPT 합의(세션33): UserPromptSubmit에서 키워드 매칭 → 활성 도메인 기록
+DOMAIN_REGISTRY="$PROJECT_ROOT/.claude/domain_entry_registry.json"
+DOMAIN_REQ="$PROJECT_ROOT/.claude/state/active_domain.req"
+if [ -f "$DOMAIN_REGISTRY" ]; then
+  MATCHED_DOMAIN=""
+  MATCHED_KEYWORD=""
+  MATCHED_PRIORITY=999
+  # priority 순으로 JSON 파싱 (jq 없이 grep+sed)
+  DOMAIN_COUNT=$(grep -c '"domain_id"' "$DOMAIN_REGISTRY" 2>/dev/null || echo 0)
+  for i in $(seq 0 $((DOMAIN_COUNT - 1))); do
+    # 각 도메인 블록에서 keywords 추출
+    BLOCK=$(awk -v idx="$i" 'BEGIN{c=-1} /\{/{c++} c==idx{print} /\}/{if(c==idx) c=999}' "$DOMAIN_REGISTRY")
+    D_ID=$(echo "$BLOCK" | grep '"domain_id"' | sed 's/.*: *"//;s/".*//')
+    D_PRI=$(echo "$BLOCK" | grep '"priority"' | sed 's/.*: *//;s/,.*//')
+    D_KEYWORDS=$(echo "$BLOCK" | grep -oE '"keywords"[^]]*\]' | grep -oE '"[^"]*"' | tail -n +2 | sed 's/"//g')
+    for kw in $D_KEYWORDS; do
+      if echo "$TEXT" | grep -qiF "$kw"; then
+        if [ "${D_PRI:-999}" -lt "$MATCHED_PRIORITY" ]; then
+          MATCHED_DOMAIN="$D_ID"
+          MATCHED_KEYWORD="$kw"
+          MATCHED_PRIORITY="$D_PRI"
+        fi
+        break
+      fi
+    done
+  done
+  if [ -n "$MATCHED_DOMAIN" ]; then
+    # required_doc_ids 추출
+    BLOCK=$(awk -v did="$MATCHED_DOMAIN" '$0 ~ "\"domain_id\".*\""did"\""{found=1} found{print} found && /\]/{if(p) exit} found && /required_docs/{p=1}' "$DOMAIN_REGISTRY")
+    DOC_IDS=$(echo "$BLOCK" | grep '"id"' | sed 's/.*: *"//;s/".*//' | tr '\n' ',' | sed 's/,$//')
+    mkdir -p "$(dirname "$DOMAIN_REQ")"
+    printf 'domain_id=%s\nmatched_keyword=%s\nrequired_doc_ids=%s\n' "$MATCHED_DOMAIN" "$MATCHED_KEYWORD" "$DOC_IDS" > "$DOMAIN_REQ"
+    hook_log "UserPromptSubmit" "active_domain=$MATCHED_DOMAIN keyword=$MATCHED_KEYWORD"
+  else
+    rm -f "$DOMAIN_REQ" 2>/dev/null || true
+  fi
+fi
+
 # 스킬 사용 계측: /command 패턴 감지 시 skill_usage 로깅
 # 주의: TEXT는 JSON 래핑 포함. ^ 앵커 사용 불가 (2026-04-12 세션24 수정)
 SKILL_NAME=$(printf '%s' "$TEXT" | grep -oE '"/([a-z][a-z0-9_-]*)' | sed 's|^"/||' | head -1)

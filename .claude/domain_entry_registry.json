@@ -1,0 +1,75 @@
+[
+  {
+    "domain_id": "debate_mode",
+    "priority": 1,
+    "keywords": ["토론", "토론모드", "공동작업", "debate"],
+    "required_docs": [
+      {"id": "entry", "path": "90_공통기준/토론모드/ENTRY.md"},
+      {"id": "claude", "path": "90_공통기준/토론모드/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "settlement",
+    "priority": 2,
+    "keywords": ["정산", "조립비", "settlement"],
+    "required_docs": [
+      {"id": "claude", "path": "05_생산실적/조립비정산/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "line_assign",
+    "priority": 3,
+    "keywords": ["라인배치", "OUTER", "ERP 라인배정", "메인서브"],
+    "required_docs": [
+      {"id": "claude", "path": "10_라인배치/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "mes_upload",
+    "priority": 4,
+    "keywords": ["MES 업로드", "실적 올려", "생산실적 업로드"],
+    "required_docs": [
+      {"id": "skill", "path": "90_공통기준/스킬/production-result-upload/SKILL.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "zdm_inspection",
+    "priority": 5,
+    "keywords": ["일상점검", "ZDM", "zdm"],
+    "required_docs": [
+      {"id": "skill", "path": "90_공통기준/스킬/zdm-daily-inspection/SKILL.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "wage",
+    "priority": 6,
+    "keywords": ["급여", "단가", "급여단가"],
+    "required_docs": [
+      {"id": "claude", "path": "02_급여단가/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "production_plan",
+    "priority": 7,
+    "keywords": ["생산계획", "계획수립"],
+    "required_docs": [
+      {"id": "claude", "path": "04_생산계획/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  },
+  {
+    "domain_id": "production_mgmt",
+    "priority": 8,
+    "keywords": ["생산관리", "관리현황"],
+    "required_docs": [
+      {"id": "claude", "path": "06_생산관리/CLAUDE.md"}
+    ],
+    "gate_scope": "gpt_send"
+  }
+]
