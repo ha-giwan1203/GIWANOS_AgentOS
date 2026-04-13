@@ -20,10 +20,15 @@
 6. **Phase 3-2 E2E 테스트 GPT 토론**: 시나리오 6→10개 확장 합의. 채택 4건
 7. **e2e_test.sh 신규**: 10개 시나리오 구현. hook_config.json 파싱 버그 수정(grep→awk)
 8. E2E 10/10 + smoke_test 120/120 ALL PASS
+9. **Phase 3-3 GPT 토론**: 채택 4건. Initializer 분리 불필요, session_start 강화로 대체
+10. **session_start_restore.sh**: Getting Bearings Protocol (pwd + git log --oneline -5)
+11. **task_cursor.json 파생 캐시**: precompact_save.sh에서 TASKS.md 파싱
+12. smoke_test 120/120 + E2E 10/10 ALL PASS (Phase 3-3 반영 후)
 
 ### 다음 세션 참고
-- Phase 3 남은 순서: 3-3 2-Agent 패턴 → 3-1 오토리서치 루프
-- e2e_test.sh는 smoke_test.sh와 별도 실행 (정적 vs 동적 분리)
+- Phase 3-1 오토리서치 루프 남음
+- 모델 믹싱/Worktree 병렬은 별도 안건으로 분리
+- e2e_test.sh는 수동 검증용 (세션 시작 자동 실행 금지 합의)
 
 ---
 

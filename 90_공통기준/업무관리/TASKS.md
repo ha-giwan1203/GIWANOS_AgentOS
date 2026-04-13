@@ -16,11 +16,20 @@
 
 ## 다음 세션 안건
 
-**[중] 하네스 강화 Phase 3 계속** — 3-3 2-Agent 패턴 → 3-1 오토리서치 루프
+**[중] 하네스 강화 Phase 3-1** — 오토리서치 루프 (smoke_test FAIL→자동 원인 분석→수정→재검증)
 
 ---
 
 ## 최근 완료
+
+### [완료] 하네스 강화 Phase 3-3: 2-Agent 패턴 — 세션38 (2026-04-16)
+- **GPT 토론 1턴**: 채택 4건 / 보류 0건
+- **Initializer 분리 불필요 합의**: session_start_restore.sh 강화로 대체
+- **session_start_restore.sh**: Getting Bearings Protocol 추가 (pwd + git log --oneline -5)
+- **task_cursor.json 파생 캐시**: precompact_save.sh에서 TASKS.md 파싱 → current_phase/next_step/last_completed/last_verified_sha 자동 생성
+- **e2e_test.sh 세션 자동 실행 금지 합의**: 상태 변경하는 동적 테스트는 수동 검증용
+- 모델 믹싱/Worktree 병렬은 별도 안건으로 분리
+- smoke_test 120/120 + E2E 10/10 ALL PASS
 
 ### [완료] 하네스 강화 Phase 3-2: E2E 테스트 — 세션38 (2026-04-16)
 - **GPT 토론 1턴**: 시나리오 6개→10개 확장 합의. 채택 4건 / 보류 0건

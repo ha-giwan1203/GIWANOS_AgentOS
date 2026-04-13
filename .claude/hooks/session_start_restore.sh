@@ -60,6 +60,11 @@ fi
 if [ "$KERNEL_STATE" = "fresh" ]; then
   echo "=== [session_start: $SOURCE] 이전 세션 상태 ==="
 
+  # Getting Bearings: pwd + git log (Anthropic 패턴, Phase 3-3)
+  echo "--- 현재 위치: $(pwd) ---"
+  echo "--- 최근 커밋 5건 ---"
+  git log --oneline -5 2>/dev/null || echo "(git log 실패)"
+
   # TASKS 상단 (원본 문서 우선)
   echo "--- TASKS 상단 ---"
   head -"$FALLBACK_TASKS_LINES" "$PATH_TASKS" 2>/dev/null
@@ -89,6 +94,11 @@ else
   fi
 
   echo "=== [session_start: $SOURCE] fallback — 원본 문서 직접 읽기 ==="
+
+  # Getting Bearings: pwd + git log (Anthropic 패턴, Phase 3-3)
+  echo "--- 현재 위치: $(pwd) ---"
+  echo "--- 최근 커밋 5건 ---"
+  git log --oneline -5 2>/dev/null || echo "(git log 실패)"
 
   # TASKS 상단 (복구 우선순위 1위)
   echo "--- TASKS 상단 (${FALLBACK_TASKS_LINES}줄) ---"

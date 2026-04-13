@@ -59,6 +59,28 @@ if [ -s "$PROGRESS_TMP" ]; then
   mv "$PROGRESS_TMP" "$PROGRESS_FILE"
 fi
 
+# task_cursor.json 파생 캐시 (Phase 3-3: TASKS.md 파싱 강화)
+# TASKS.md에서만 읽어 생성. 수동 편집 금지. 원본은 항상 TASKS.md.
+CURSOR_FILE="$STATE_DIR/task_cursor.json"
+CURSOR_TMP="${CURSOR_FILE}.tmp"
+NEXT_STEP=$(grep -A 2 "^## 다음 세션 안건" "$PATH_TASKS" 2>/dev/null | grep -v "^##" | grep -v "^--" | head -1 | sed 's/^[[:space:]]*//')
+LAST_COMPLETED=$(grep -A 1 "^### \[완료\]" "$PATH_TASKS" 2>/dev/null | head -1 | sed 's/^### \[완료\] //' | sed 's/ — .*//')
+LAST_SHA=$(git log --oneline -1 --format='%h' 2>/dev/null || echo "")
+cat > "$CURSOR_TMP" << TCJSON
+{
+  "_comment": "파생 캐시 — TASKS.md에서만 생성. 수동 편집 금지. 원본: TASKS.md",
+  "saved_at": "$SAVE_TS",
+  "current_phase": "$CURRENT_TASK",
+  "next_step": "$NEXT_STEP",
+  "last_completed": "$LAST_COMPLETED",
+  "last_verified_sha": "$LAST_SHA",
+  "blocked": false
+}
+TCJSON
+if [ -s "$CURSOR_TMP" ]; then
+  mv "$CURSOR_TMP" "$CURSOR_FILE"
+fi
+
 # progress.json 스냅샷 (있으면 kernel에 포함)
 PROGRESS_SECTION=""
 if [ -f "$PROGRESS_FILE" ]; then
