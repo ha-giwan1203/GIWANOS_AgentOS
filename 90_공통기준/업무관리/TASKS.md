@@ -16,9 +16,8 @@
 
 ## 다음 세션 안건
 
-### [중] GPT 전송 스킬화
-- 채팅 입력(insertText) + 전송(send button click) + 완료감지(stop-button polling)를 단일 스킬로 통합
-- 현재 3단계 분리 호출 → 중간 끊김/버튼 탐색 실패 해소
+### [소] GPT 전송 스킬 실사용 검증
+- /gpt-send, /gpt-read 실제 share-result 흐름에서 1회 실사용 검증
 
 ### [소] verify_xlsm COM 검증
 - Excel XLSM 파일 COM 기반 검증 스크립트 실전 테스트
@@ -29,6 +28,12 @@
 ---
 
 ## 최근 완료
+
+### [완료] GPT 전송/읽기 스킬 신규 — 세션34 (2026-04-13)
+- /gpt-send: 채팅 입력+전송+완료대기+응답읽기 단일 명령
+- /gpt-read: 응답 읽기+판정 키워드 우선순위 자동 감지
+- share-result.md: form_input 잔존 → /gpt-send 호출로 수정
+- GPT 1차 부분반영(stale URL + 판정 우선순위) → 즉시 수정 → GPT 통과
 
 ### [완료] smoke_test FAIL 3건 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비 — 세션34 (2026-04-13)
 - **GPT 토론 2턴**: smoke_test 수정안 + Notion 부모 페이지 설계 검토. 채택 5건 / 보류 0건

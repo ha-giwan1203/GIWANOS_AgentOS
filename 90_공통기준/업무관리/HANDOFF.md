@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 12:54 KST — 세션 34 (smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비)
+최종 업데이트: 2026-04-13 13:25 KST — 세션 34 (smoke_test FAIL + Notion 동기화 + 토론모드 문서 + GPT 전송 스킬)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -12,21 +12,28 @@
 ## 0. 최신 세션 (2026-04-13 세션 34)
 
 ### 이번 세션 완료
-1. **GPT 토론 2턴**: smoke_test 수정안 + Notion 부모 페이지 설계. 채택 5건 / 보류 0건
-2. **smoke_test FAIL 3건 해소**: SETTINGS 변수 추가 + CDP 오탐 grep 정교화 + send_gate 정확 매칭. 120/120 ALL PASS
+1. **GPT 토론 2턴**: smoke_test + Notion 설계. 채택 5건 / 보류 0건
+2. **smoke_test FAIL 3건 해소**: SETTINGS 변수 + CDP 오탐 grep + send_gate 정확 매칭. 120/120 ALL PASS
 3. **notion_config.yaml**: parent_page_id 추가
-4. **notion_sync.py**: sync_parent_page() 신규 — HANDOFF+TASKS 기반, 운영 현황 섹션만 갱신, best-effort
-5. **토론모드 문서 3개 수정**: SKILL.md + REFERENCE.md 2개 — 입력방식 insertText 일괄 수정
+4. **notion_sync.py**: sync_parent_page() 신규 — HANDOFF+TASKS 기반, best-effort
+5. **토론모드 문서 3개 수정**: 입력방식 insertText 일괄 수정
+6. **/gpt-send 신규**: 채팅 입력+전송+완료대기+응답읽기 단일 명령
+7. **/gpt-read 신규**: 응답 읽기+판정 키워드 우선순위 자동 감지
+8. **share-result.md**: form_input → /gpt-send 호출로 수정
 
 ### 커밋 이력
-- `06a1b14e` feat: smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비
+- `06a1b14e` feat: smoke_test FAIL 수정 + Notion 동기화 + 문서 정비
+- `f0fab11e` docs: HANDOFF placeholder 수정
+- `7446dbf0` docs: 세션34 GPT 정합 판정 + 안건 갱신
+- `bc3b5648` feat: GPT 전송/읽기 스킬 신규
+- `27228ebc` fix: GPT 지적 — 재탐지 강제 + 판정 우선순위
 
 ### GPT 판정
-- 06a1b14e: 부분반영 (HANDOFF placeholder 잔존 지적)
-- f0fab11e: 정합 (코드 정합 확인. 최종 완료는 실전 검증 후)
+- 06a1b14e: 부분반영 → f0fab11e: 정합
+- bc3b5648: 부분반영 → 27228ebc: **통과**
 
 ### 다음 세션 안건
-**[중] GPT 전송 스킬화** — 채팅 입력+전송+완료감지를 단일 스킬로 통합
+**[소] GPT 전송 스킬 실사용 검증** — share-result 흐름에서 1회 검증
 
 **[소] verify_xlsm COM 검증**
 
