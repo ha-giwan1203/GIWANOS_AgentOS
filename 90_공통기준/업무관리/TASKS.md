@@ -10,17 +10,25 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13 — 세션37 (하네스 강화 Phase 1)
+최종 업데이트: 2026-04-16 — 세션38 (하네스 강화 Phase 2)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] 하네스 강화 Phase 2** — Hook 프로파일 전환(중앙 설정형) + Session Startup 정비 (메타 스킬 스케줄은 이미 등록 완료)
+**[중] 하네스 강화 Phase 3** — E2E 테스트 → 2-Agent 패턴 → 오토리서치 루프 (GPT 합의 순서)
 
 ---
 
 ## 최근 완료
+
+### [완료] 하네스 강화 Phase 2 — 세션38 (2026-04-16)
+- **GPT 토론 1턴**: 의제 3건 검토. 채택 5건 / 보류 1건 / 버림 0건
+- **프로파일 전환 보류 합의**: GPT도 "프로파일 전환 대신 파라미터 외부화가 낫다"로 동의. Phase 2를 "설정 외부화 + Startup fallback + settings 위생"으로 재정의
+- **2-1 hook_config.json 신규**: protect_files/block_dangerous/session_startup 파라미터 중앙 외부화
+- **2-2 Session Startup fallback**: kernel stale/missing 시 TASKS+HANDOFF 직접 읽기 + progress.json 참고용 후순위
+- **2-3 settings.local.json 위생**: youtube 개별 7개→와일드카드 1개, slack 테스트 2개 삭제, 운영검증 스크립트 와일드카드화
+- smoke_test 120/120 ALL PASS
 
 ### [완료] 하네스 강화 Phase 1 — 세션37 (2026-04-13)
 - **자료 조사**: 공식문서, GPTers, ECC, WaveSpeed, Anthropic Engineering, 장피엠 2건 종합

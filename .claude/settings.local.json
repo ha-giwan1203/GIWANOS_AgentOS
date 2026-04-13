@@ -42,15 +42,16 @@
       "Bash(schtasks:*)",
       "mcp__00b6c2d7-87e0-41f1-a983-74975edcd79b__gcal_create_event",
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-update-page",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/aggregate_hook_metrics.py\")",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/check_skill_contract.py\" \"90_공통기준/스킬\")",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/check_skill_contract.py\" \"90_공통기준/스킬\" --write-report \"90_공통기준/업무관리/운영검증/reports/skill_contract_gap_report.md\")",
+      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/*\":*)",
       "Bash(bash .claude/hooks/smoke_test.sh)",
       "Bash(python3 -c ':*)",
       "Read(//c/Users/User/Desktop/업무리스트/**)",
-      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -30 {}')",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)",
-      "Bash(python \"90_공통기준/업무관리/slack_notify.py\" --message \"세션34 Slack 연결 점검 테스트 \\($\\(date '+%H:%M KST'\\)\\)\")"
+      "Bash(python3)",
+      "Bash(PYTHONUTF8=1 python \"90_공통기준/스킬/youtube-analysis/*\":*)",
+      "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-create-pages",
+      "Bash(python -c ':*)",
+      "Bash(bash .claude/scripts/hook_registry.sh sync)",
+      "mcp__scheduled-tasks__list_scheduled_tasks"
     ],
     "ask": [
       "Bash(python*:*)",

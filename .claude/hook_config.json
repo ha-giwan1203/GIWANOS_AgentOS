@@ -1,0 +1,20 @@
+{
+  "_comment": "Hook 동작 파라미터 중앙 설정. 각 hook 스크립트에서 참조. 수동 편집 가능.",
+  "schema_version": 1,
+  "protect_files": {
+    "deny_extensions": [".xlsx", ".xls", ".xlsm", ".csv", ".docx", ".pdf"],
+    "deny_path_patterns": ["98_아카이브", "기준정보.*최종"],
+    "log_paths": ["TASKS.md", "HANDOFF.md", "STATUS.md"]
+  },
+  "block_dangerous": {
+    "extreme_commands": ["rm -rf /", "git reset --hard", "git clean -fd", "git push.*--force.*main"],
+    "destructive_patterns": ["truncate\\s", "find\\s.*-delete", "xargs\\s+rm"],
+    "protected_path_patterns": ["CLAUDE\\.md", "README\\.md", "STATUS\\.md", "RUNBOOK\\.md", "AGENTS_GUIDE\\.md", "settings.*\\.json", "\\.skill", "기준정보.*최종"],
+    "danger_commands": ["rm ", "rm -f ", "rm -rf ", "del ", "Remove-Item ", "mv ", "cp ", "sed -i ", "tee ", "cat >", "cat >>"]
+  },
+  "session_startup": {
+    "kernel_stale_threshold_hours": 24,
+    "fallback_tasks_lines": 20,
+    "fallback_handoff_lines": 20
+  }
+}

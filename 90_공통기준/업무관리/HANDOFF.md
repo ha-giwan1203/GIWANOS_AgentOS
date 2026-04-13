@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 20:39 KST — 세션 37 (하네스 강화 Phase 1)
+최종 업데이트: 2026-04-16 21:20 KST — 세션 38 (하네스 강화 Phase 2)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-13 세션 37)
+## 0. 최신 세션 (2026-04-16 세션 38)
+
+### 이번 세션 완료
+1. **GPT 토론 1턴**: Phase 2 의제 3건 — 채택 5건 / 보류 1건
+2. **프로파일 전환 보류 합의**: GPT 동의. Phase 2를 "설정 외부화 + Startup fallback + settings 위생"으로 재정의
+3. **hook_config.json 신규**: protect_files/block_dangerous/session_startup 파라미터 중앙 외부화
+4. **session_start_restore.sh 개선**: kernel stale/missing 시 TASKS+HANDOFF fallback 직접 읽기
+5. **settings.local.json 위생**: youtube 7개→와일드카드 1개, slack 테스트 삭제, 운영검증 와일드카드화 (allow 70→52개)
+6. smoke_test 120/120 ALL PASS
+
+### 다음 세션 참고
+- Phase 3 순서: E2E → 2-Agent → 오토리서치 (GPT 합의)
+- hook_config.json은 아직 protect_files.sh/block_dangerous.sh에서 실제 참조하지 않음 (읽기만 생성)
+- 다음 단계: 각 hook 스크립트가 hook_config.json에서 값을 읽도록 연동
+
+---
+
+## 1. 이전 세션 (2026-04-13 세션 37)
 
 ### 이번 세션 완료
 1. **하네스 세팅 자료 조사**: 인터넷 검색(공식문서, GPTers, ECC, WaveSpeed, Anthropic Engineering) + Notion 장피엠 2건 + GPT 내부 문서 3건 종합
