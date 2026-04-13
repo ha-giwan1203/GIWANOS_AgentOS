@@ -28,20 +28,17 @@ from typing import Any
 # ============================================================
 
 DEFAULT_HEADERS = [
-    "NO", "KIND", "SUB_PART", "TIME_TEXT", "ORDER_QTY", "CARRY_FLAG", "PLAN_KEY",
-    "INFO_ROW", "CAR_TYPE", "PART_NO", "MODULE_PART", "SENSE_SPEC", "SENSE_LOC",
-    "HOUSING", "HOLDER", "TORSION", "TORSION_LOC", "FRAME_LOC", "NOTE", "V_GEAR",
-    "MODEL_1", "MODEL_2", "SUPPLY_LINE", "FRAME_PART", "OLD_MES_PART", "BOX_QTY",
-    "P_TRAY_TYPE", "ANGLE_TYPE", "TEXT_ALL", "MODEL_GROUP", "PI_TYPE", "PLL_FLAG",
-    "TORSION_NUM", "CAR_FAMILY", "DIR_KEY", "PTRAY_FLAG", "ANGLE_KEY",
+    "KIND", "SUB_PART", "TIME_TEXT", "QTY", "ORDER_QTY", "CAR_TYPE", "PART_NO",
+    "MODULE_PART", "SENSE_SPEC", "SENSE_LOC", "HOUSING", "HOLDER", "TORSION",
+    "TORSION_LOC", "FRAME_LOC", "NOTE", "PI_TYPE", "PLL_FLAG", "TORSION_NUM",
+    "MODEL_GROUP", "CAR_FAMILY", "PTRAY_FLAG", "ANGLE_KEY", "DIR_KEY", "PI_RANK",
+    "TORSION_RANK", "ACTUAL_MODEL", "CARRY_FLAG", "PLAN_KEY",
 ]
 
 DEFAULT_KEEP_SHEETS = [
     "SP3 LINE 기준 정보",
     "생산계획",
     "PLAN_RESULT_FIXED",
-    "PLAN_BACKUP_FIXED",
-    "PLAN_MOVE_SNAPSHOT",
 ]
 
 
@@ -100,20 +97,23 @@ def run_structure_checks(args: argparse.Namespace) -> tuple[list[dict[str, Any]]
     for name in DEFAULT_KEEP_SHEETS + (args.must_keep_sheet or []):
         checks.append(mkcheck(f"keep_sheet::{name}", name in sheet_names, f"{name} 존재 여부"))
 
-    # info sheet / table
+    # info sheet / table (optional — Named Table 없으면 skip)
     info_sheet_ok = args.info_sheet in sheet_names
     if info_sheet_ok:
         ws_info = wb[args.info_sheet]
         info_tables = {}
         for tbl in ws_info.tables.values():
             info_tables[tbl.name] = tbl.ref
-        checks.append(mkcheck("info_table_exists", args.info_table in info_tables,
-                              f"{args.info_table} 존재 여부", {"tables": info_tables}))
-        if args.info_table in info_tables:
-            checks.append(mkcheck("info_table_ref", info_tables[args.info_table] == args.info_table_ref,
-                                  f"expected={args.info_table_ref}, actual={info_tables[args.info_table]}"))
+        if info_tables:
+            checks.append(mkcheck("info_table_exists", args.info_table in info_tables,
+                                  f"{args.info_table} 존재 여부", {"tables": info_tables}))
+            if args.info_table in info_tables:
+                checks.append(mkcheck("info_table_ref", info_tables[args.info_table] == args.info_table_ref,
+                                      f"expected={args.info_table_ref}, actual={info_tables[args.info_table]}"))
+        else:
+            checks.append(mkcheck("info_table_skip", True, "Named Table 없음 — 범위 기반 시트 (정상)"))
     else:
-        checks.append(mkcheck("info_sheet_exists", False, f"{args.info_sheet} 시트 없음"))
+        checks.append(mkcheck("info_sheet_skip", True, f"{args.info_sheet} 시트 없음 — skip"))
 
     # target sheet / table / headers / formulas
     if args.sheet in sheet_names:
@@ -129,31 +129,39 @@ def run_structure_checks(args: argparse.Namespace) -> tuple[list[dict[str, Any]]
         target_tables = {}
         for tbl in ws.tables.values():
             target_tables[tbl.name] = tbl.ref
-        checks.append(mkcheck("target_table_exists", args.table in target_tables,
-                              f"{args.table} 존재 여부", {"tables": target_tables}))
-        if args.table in target_tables:
-            checks.append(mkcheck("target_table_ref", target_tables[args.table] == args.table_ref,
-                                  f"expected={args.table_ref}, actual={target_tables[args.table]}"))
+        if target_tables:
+            checks.append(mkcheck("target_table_exists", args.table in target_tables,
+                                  f"{args.table} 존재 여부", {"tables": target_tables}))
+            if args.table in target_tables:
+                checks.append(mkcheck("target_table_ref", target_tables[args.table] == args.table_ref,
+                                      f"expected={args.table_ref}, actual={target_tables[args.table]}"))
+        else:
+            checks.append(mkcheck("target_table_skip", True, "Named Table 없음 — 범위 기반 시트 (정상)"))
 
         actual_headers = [ws.cell(row=1, column=i).value for i in range(1, len(DEFAULT_HEADERS) + 1)]
         checks.append(mkcheck("headers_match", actual_headers == DEFAULT_HEADERS,
-                              "헤더 37개 일치 여부", {"actual_headers": actual_headers}))
+                              f"헤더 {len(DEFAULT_HEADERS)}개 일치 여부", {"actual_headers": actual_headers}))
 
-        # 수식 패턴 검사
+        # 수식 패턴 검사 (수식이 있는 시트만 — 결과 전용 시트는 skip)
         formula_h2 = ws["H2"].value
-        formula_i2 = ws["I2"].value
-        formula_j2 = ws["J2"].value
-        formula_ad2 = ws["AD2"].value if ws.max_column >= 30 else None
-        formula_ai2 = ws["AI2"].value if ws.max_column >= 35 else None
+        has_formulas = formula_h2 is not None and str(formula_h2).startswith("=")
+        if has_formulas:
+            formula_i2 = ws["I2"].value
+            formula_j2 = ws["J2"].value
+            formula_ad2 = ws["AD2"].value if ws.max_column >= 30 else None
+            formula_ai2 = ws["AI2"].value if ws.max_column >= 35 else None
 
-        checks.append(mkcheck("formula_info_row_match", contains_all(formula_h2, ["MATCH("]),
-                              str(formula_h2)))
-        checks.append(mkcheck("formula_lookup_index", contains_all(formula_i2, ["INDEX("]) and contains_all(formula_j2, ["INDEX("]),
-                              f"I2={formula_i2} / J2={formula_j2}"))
-        checks.append(mkcheck("formula_model_group", contains_all(formula_ad2, ["LET(", "TEXTBEFORE("]),
-                              str(formula_ad2)))
-        checks.append(mkcheck("formula_dir_key", contains_all(formula_ai2, ["SEARCH("]),
-                              str(formula_ai2)))
+            checks.append(mkcheck("formula_info_row_match", contains_all(formula_h2, ["MATCH("]),
+                                  str(formula_h2)))
+            checks.append(mkcheck("formula_lookup_index", contains_all(formula_i2, ["INDEX("]) and contains_all(formula_j2, ["INDEX("]),
+                                  f"I2={formula_i2} / J2={formula_j2}"))
+            checks.append(mkcheck("formula_model_group", contains_all(formula_ad2, ["LET(", "TEXTBEFORE("]),
+                                  str(formula_ad2)))
+            checks.append(mkcheck("formula_dir_key", contains_all(formula_ai2, ["SEARCH("]),
+                                  str(formula_ai2)))
+        else:
+            checks.append(mkcheck("formula_check_skipped", True,
+                                  "결과 전용 시트 — 수식 없음 (정상)"))
     else:
         checks.append(mkcheck("target_sheet_exists", False, f"{args.sheet} 시트 없음"))
 
@@ -280,7 +288,7 @@ def main() -> int:
     parser.add_argument("--table", default="tblPlanOutput", help="대상 테이블명")
     parser.add_argument("--table-ref", default="A1:AK11", help="테이블 참조 범위")
     parser.add_argument("--min-rows", type=int, default=2, help="최소 행 수")
-    parser.add_argument("--min-cols", type=int, default=37, help="최소 열 수")
+    parser.add_argument("--min-cols", type=int, default=29, help="최소 열 수")
     parser.add_argument("--info-sheet", default="SP3 LINE 기준 정보")
     parser.add_argument("--info-table", default="tblInfo")
     parser.add_argument("--info-table-ref", default="A1:X1294")

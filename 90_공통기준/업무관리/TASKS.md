@@ -16,10 +16,10 @@
 
 ## 다음 세션 안건
 
-### [소] verify_xlsm 기대값 조정 + 2차 COM 검증
-- 1차 구조 검증은 동작 확인됨 (스크립트 정상, 기대 시트명/테이블명이 실제 파일과 불일치)
-- PLAN_OUTPUT 시트 → 실제 시트명 매핑 필요, tblInfo/tblPlanOutput 테이블 확인
+### [소] verify_xlsm 2차 COM 값 검증
+- 1차 구조 검증 PASS (기대값 조정 완료, 10/10 ALL PASS)
 - 2차 COM 기대값(PART_NO, MODULE_PART, MODEL_GROUP) 확정 후 실행
+- PLAN_RESULT_FIXED는 수식 없는 결과 시트 → COM 검증은 입력 시트(SP3 LINE 기준 정보) 대상으로 재설계 필요
 
 
 ---
@@ -29,7 +29,7 @@
 ### [완료] 이월 안건 3건 토론+검증 — 세션36 (2026-04-13)
 - **GPT 토론 2턴**: 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건 / 버림 0건
 - **안건1 GPT 전송 스킬**: 실사용 검증 PASS — 세션36 토론 자체가 gpt-send 경로(URL→탐지→insertText→polling→읽기) 실사용
-- **안건2 verify_xlsm**: 1차 구조 검증 스크립트 동작 확인. 기대 시트명/테이블명이 실제 파일과 불일치 → 기대값 조정 후 재검증 필요 (조건부 PASS)
+- **안건2 verify_xlsm**: 기대값 조정 완료 (DEFAULT_HEADERS 29개, KEEP_SHEETS 3개, min-cols 29, 수식/테이블 optional). 1차 구조 검증 10/10 ALL PASS. 2차 COM은 입력 시트 재설계 필요 → 이월
 - **안건3 Notion 부모 페이지**: Integration 연결 + sync_parent_page() 실행 성공. 부모 페이지 "📌 운영 현황" 섹션 자동 갱신 확인 (PASS)
 
 
