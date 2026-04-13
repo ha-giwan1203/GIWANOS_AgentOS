@@ -78,13 +78,12 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 ## 실행 절차
 
 ### Step 1. 탭 준비
-1. **항상** `.claude/scripts/cdp/debate_room_detect.py --navigate` 실행
-   - 프로젝트 페이지에서 최상단 채팅방을 자동 탐지 → `debate_chat_url` 덮어쓰기 → 해당 방으로 이동
-   - 일반 채팅 링크(`/c/` 단독)는 무시 — 프로젝트 ID 포함 URL만 허용
-   - 이전 세션의 debate_chat_url 값을 재사용하지 않음 (매 세션 새로 탐지)
-2. 스크립트 실패 시 → 수동으로 프로젝트 URL 접속하여 최상단 방 진입
-5. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
-6. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
+1. Chrome MCP `tabs_context_mcp` → 기존 ChatGPT 탭 확인
+2. 프로젝트 URL(`https://chatgpt.com/g/g-p-.../project`)로 `navigate` → 최상단 채팅방 진입
+   - 프로젝트 ID 포함 URL만 허용. 일반 `/c/` 단독 금지
+   - 이전 세션의 URL 값 재사용 금지 (매 세션 새로 탐지)
+3. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+4. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
 
 > **URL 갱신 정책**: debate_chat_url은 매 세션 시작 시 프로젝트에서 최상단 방으로 자동 갱신된다.
 > 이전 세션의 고정 URL에 의존하지 않는다.
@@ -98,8 +97,8 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
 ### Step 2. 메시지 전송
-- 기본 전송 경로: `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate` (상세: REFERENCE.md §1)
-- **[FALLBACK]** Chrome MCP type은 CDP 불가 시에만. javascript_tool execCommand+insertText는 send_gate.sh가 차단
+- **기본 전송**: Chrome MCP (`find` 입력창 → `form_input` 텍스트 입력 → `computer(left_click)` 전송버튼)
+- CDP 스크립트 폐기됨. Chrome MCP 단일 사용
 - 전송 본문 자연어는 한국어만 작성
 - 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
 - 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)

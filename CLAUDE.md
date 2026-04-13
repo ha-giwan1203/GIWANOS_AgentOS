@@ -14,6 +14,9 @@
 | 라인배치 / OUTER / ERP 라인배정 | `10_라인배치/CLAUDE.md` |
 | MES 업로드 / 실적 올려 | `90_공통기준/스킬/production-result-upload/SKILL.md` |
 | 일상점검 / ZDM | `90_공통기준/스킬/zdm-daily-inspection/SKILL.md` |
+| 급여 / 단가 | `02_급여단가/CLAUDE.md` |
+| 생산계획 / 계획 | `04_생산계획/CLAUDE.md` |
+| 생산관리 / 관리 | `06_생산관리/CLAUDE.md` |
 
 도메인 키워드 감지 시 해당 문서를 먼저 읽는다.
 

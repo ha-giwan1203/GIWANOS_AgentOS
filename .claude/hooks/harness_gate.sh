@@ -37,7 +37,7 @@ if [ -z "$TOOL_NAME" ]; then
   TOOL_NAME=$(echo "$INPUT" | sed -n 's/.*"tool_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 fi
 
-# Bash 도구만 검사 (commit/push/cdp_chat_send 경로)
+# Bash 도구만 검사 (commit/push/share 경로)
 if [[ "$TOOL_NAME" != *"Bash"* ]]; then
   exit 0
 fi
@@ -51,9 +51,9 @@ if [ -z "$TOOL_INPUT" ]; then
   TOOL_INPUT="$INPUT"
 fi
 
-# git commit, git push, cdp_chat_send, finish 중 하나가 포함된 경우만 검사
+# git commit, git push, share-result, finish 중 하나가 포함된 경우만 검사
 IS_ACTION="NO"
-if echo "$TOOL_INPUT" | grep -qiE '(git commit|git push|cdp_chat_send|share.result|finish)'; then
+if echo "$TOOL_INPUT" | grep -qiE '(git commit|git push|share.result|finish)'; then
   IS_ACTION="YES"
 fi
 

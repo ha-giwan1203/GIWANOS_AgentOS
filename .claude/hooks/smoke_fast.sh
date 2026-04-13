@@ -29,7 +29,8 @@ grep -q 'hook_log()' "$HOOKS_DIR/hook_common.sh"
 check $? "hook_log() 함수 존재"
 
 # 2. settings.local.json 유효 JSON
-python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS" 2>/dev/null
+PY_CMD="python"; command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+$PY_CMD -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS" 2>/dev/null
 check $? "settings.local.json 유효 JSON"
 
 # 3. 핵심 게이트 훅 존재 + 실행 가능

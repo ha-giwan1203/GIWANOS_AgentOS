@@ -163,15 +163,6 @@
         ]
       },
       {
-        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/send_gate.sh"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {

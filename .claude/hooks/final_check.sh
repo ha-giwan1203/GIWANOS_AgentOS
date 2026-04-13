@@ -4,7 +4,16 @@
 # 기본값: --full (수동 실행 시)
 # GPT+Claude 합의 2026-04-07
 
-MODE="${1:---full}"
+# 인자 파싱: --fast, --full, --fix (자동 교정)
+MODE="--full"
+FIX_MODE=false
+for arg in "$@"; do
+  case "$arg" in
+    --fast) MODE="--fast" ;;
+    --full) MODE="--full" ;;
+    --fix)  FIX_MODE=true ;;
+  esac
+done
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 export CLAUDE_PROJECT_DIR="$PROJECT_DIR"
@@ -42,7 +51,7 @@ readme_active_hook_count() {
   if [ ! -f "$readme_file" ]; then
     return 1
   fi
-  awk '/^## 활성 Hook/{flag=1; next} /^## 보조 스크립트/{flag=0} flag' "$readme_file" 2>/dev/null \
+  awk '/^## 활성 Hook/{flag=1; next} /^## (훅별 실패|보조 스크립트)/{flag=0} flag' "$readme_file" 2>/dev/null \
     | grep -c '^| .*`[A-Za-z0-9_-]\+\.sh` .*|'
 }
 
@@ -52,7 +61,7 @@ readme_active_hook_names() {
   if [ ! -f "$readme_file" ]; then
     return 1
   fi
-  awk '/^## 활성 Hook/{flag=1; next} /^## 보조 스크립트/{flag=0} flag' "$readme_file" 2>/dev/null \
+  awk '/^## 활성 Hook/{flag=1; next} /^## (훅별 실패|보조 스크립트)/{flag=0} flag' "$readme_file" 2>/dev/null \
     | grep -oE '`[A-Za-z0-9_-]+\.sh`' \
     | sed 's/`//g' \
     | sort -u
@@ -115,8 +124,12 @@ STATUS_COUNT=$(status_hook_count 2>/dev/null || true)
 if [ -n "$README_COUNT" ]; then
   echo "  README 문서화: ${README_COUNT}개"
   if [ -n "$SETTINGS_HOOKS" ] && [ "$README_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
-    if [ "$MODE" = "--full" ]; then
-      fail "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
+    if $FIX_MODE; then
+      echo "  [FIX] hook_registry.sh sync 실행..."
+      bash "$PROJECT_DIR/.claude/scripts/hook_registry.sh" sync 2>&1 | sed 's/^/    /'
+      echo "  [FIX] 완료. README/STATUS hook 수 자동 갱신됨"
+    elif [ "$MODE" = "--full" ]; then
+      fail "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격). --fix로 자동 교정 가능"
     else
       warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
     fi

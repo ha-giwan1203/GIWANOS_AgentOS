@@ -3,7 +3,7 @@
 > 2026-04-11 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (22개 스크립트, settings.local.json 등록)
+## 활성 Hook (21개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 
@@ -32,8 +32,8 @@
 | ③ | `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
 | ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
 | ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
-| ⑥ | `send_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 전송 전 미확인 응답 점검, `tool_input` 우선 파싱 |
-| ⑦ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
+| ⑥ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
+| ⑦ | `harness_gate.sh` | Bash | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
 | ⑧ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 (deny+exit 2) |
 
 ### 추적층 (PostToolUse)
@@ -77,7 +77,7 @@
 | `date_scope_guard.sh` | fail-open | deny JSON | 날짜 파싱 실패 시 통과 |
 | `evidence_gate.sh` | fail-open | deny JSON | req 없으면 전체 통과 |
 | `protect_files.sh` | fail-open | deny JSON | 파싱 실패 시 통과 |
-| `send_gate.sh` | fail-open | deny JSON | 파싱 실패 시 전송 허용 |
+| `harness_gate.sh` | fail-closed | block JSON | transcript 미확인 시 안전 차단 |
 | `instruction_read_gate.sh` | fail-closed | deny JSON | 마커 없으면 GPT 전송 차단 |
 | `state_rebind_check.sh` | detect-only | 없음 | 불일치 로깅만 |
 | `auto_compile.sh` | fail-open | message JSON | 컴파일 실패만 보고 |
@@ -98,6 +98,7 @@
 | `hook_common.sh` | 공통 함수 (hook_log, safe_json_get, evidence_init, 로그 로테이션) |
 | `incident_repair.py` | 최신 unresolved incident의 다음 행동 + 패치 후보 + 검증 단계 제안 |
 | `smoke_test.sh` | 전체 hooks 구조 검증 (수동 실행) |
+| `smoke_fast.sh` | SessionStart용 빠른 smoke (5~8건, 로컬/결정적만). session_start_restore.sh에서 호출 |
 | `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
 
 ## 참조
@@ -105,4 +106,4 @@
 | 파일 | 역할 |
 |---|---|
 | `hook_log.jsonl` | hook 실행 이력 JSONL (500KB 로테이션) |
-| `_archive/` | 비활성화된 hook 20개 보관 |
+| `_archive/` | 비활성화된 hook 보관 (send_gate.sh 포함) |

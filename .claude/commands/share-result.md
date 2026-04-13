@@ -46,8 +46,7 @@
 GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ```
 
-- 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate` 이다.
-- Chrome MCP type은 CDP 불가 시에만 fallback으로 사용한다.
+- 기본 전송: Chrome MCP (find → form_input → computer click). CDP 스크립트는 폐기됨.
 
 ### 5단계: GPT 응답 대기 + 하네스 분석 + 지적사항 즉시 대응
 - 적응형 polling으로 응답 대기
@@ -96,7 +95,7 @@ GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ## 주의사항
 - **모든 커밋은 예외 없이 GPT에 공유한다** — 상태 문서 갱신, docs 커밋 포함. 커밋 종류에 따라 공유를 임의 생략하지 않는다
 - 커밋 없이 결과만 공유 금지 — 반드시 SHA 포함
-- 토론모드 ENTRY.md 규칙 준수 (`cdp_chat_send.py` 기본, 직접 `execCommand`는 예비 경로만)
+- 토론모드 규칙 준수 (Chrome MCP 단일 전송)
 - 입력 전 미확인 응답 점검 필수
 - **GPT 판정 수신 후 사용자 보고만 하고 멈추는 것 금지** — 상태 갱신까지 연속 실행
 - **Stop guard가 finish_state.json의 terminal_state를 확인** — done/exception 아니면 종료 차단

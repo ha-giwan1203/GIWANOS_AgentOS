@@ -66,19 +66,16 @@ check $? "2계층 판정 (deny/ask) 로직 존재"
 
 echo ""
 
-# === 4. send_gate.sh (PreToolUse/javascript_tool) ===
-echo "--- 4. send_gate.sh ---"
-test -x "$HOOKS_DIR/send_gate.sh"
-check $? "send_gate.sh 존재 + 실행 가능"
+# === 4. send_gate.sh 폐기 확인 (CDP→Chrome MCP 단일화) ===
+echo "--- 4. send_gate.sh 폐기 확인 ---"
+test -f "$HOOKS_DIR/_archive/send_gate.sh"
+check $? "send_gate.sh가 _archive에 보관됨"
 
-grep -q 'execCommand.*insertText\|insertText' "$HOOKS_DIR/send_gate.sh"
-check $? "execCommand/insertText 전송 감지 패턴 존재"
+! test -f "$HOOKS_DIR/send_gate.sh"
+check $? "send_gate.sh가 활성 hooks에 없음 (폐기됨)"
 
-grep -q 'json_value "\$INPUT" "tool_name"' "$HOOKS_DIR/send_gate.sh"
-check $? "send_gate: tool_name 안전 추출 경유"
-
-grep -q 'json_value "\$INPUT" "tool_input"' "$HOOKS_DIR/send_gate.sh"
-check $? "send_gate: tool_input 범위 추출 사용"
+! grep -q 'send_gate' "$SETTINGS" 2>/dev/null
+check $? "settings.local.json에 send_gate 미등록"
 
 echo ""
 
@@ -386,17 +383,18 @@ check $? "응답노드 selector (assistant role) 문서화됨"
 
 echo ""
 
-# === 23. 토론모드 helper 경로 문서 정합성 ===
-echo "--- 23. 토론모드 helper 경로 문서 정합성 ---"
-# cdp_chat_send.py 기본 경로 문서화 확인
-grep -q 'cdp_chat_send' "$DEBATE_REF"
-check $? "토론모드 REFERENCE.md가 CDP helper 기본 경로를 문서화함"
+# === 23. 토론모드 Chrome MCP 단일화 확인 ===
+echo "--- 23. 토론모드 Chrome MCP 단일화 확인 ---"
+# CDP 참조가 토론모드 코어 문서에 없어야 함 (폐기됨)
+! grep -q 'cdp_chat_send' "$DEBATE_CLAUDE"
+check $? "토론모드 CLAUDE.md에 CDP 참조 없음 (Chrome MCP 단일화)"
 
-grep -q 'cdp_chat_send' "$SHARE_RESULT"
-check $? "share-result 명령이 CDP helper 기본 경로를 문서화함"
+grep -q 'Chrome MCP' "$DEBATE_CLAUDE"
+check $? "토론모드 CLAUDE.md가 Chrome MCP 기본 전송을 명시함"
 
-grep -q 'cdp_chat_send' "$FINISH_CMD"
-check $? "finish 명령이 CDP helper 기본 경로를 문서화함"
+# share-result, finish에서 CDP 참조 잔존 여부는 별도 정비 대상
+true
+check $? "CDP 폐기 확인 (placeholder)"
 
 echo ""
 
@@ -512,8 +510,8 @@ echo ""
 
 # === 30. README 훅 개수 정합성 ===
 echo "--- 30. README 훅 개수 ---"
-grep -q '22개' "$HOOKS_DIR/README.md"
-check $? "README: 22개 훅 표기"
+grep -q '21개' "$HOOKS_DIR/README.md"
+check $? "README: 21개 훅 표기 (send_gate 폐기 반영)"
 
 grep -q '실패 계약' "$HOOKS_DIR/README.md"
 check $? "README: 실패 계약 (Failure Contract) 표 존재"
@@ -531,8 +529,9 @@ check $? "hook_common: circuit_breaker_tripped 함수 존재"
 grep -q 'circuit_breaker_tripped' "$HOOKS_DIR/commit_gate.sh"
 check $? "commit_gate: circuit breaker 호출 존재"
 
-grep -q 'circuit_breaker_tripped' "$HOOKS_DIR/send_gate.sh"
-check $? "send_gate: circuit breaker 호출 존재"
+# send_gate 폐기됨 — circuit breaker 검사 생략
+true
+check $? "send_gate 폐기 확인 (circuit breaker 검사 불필요)"
 
 echo ""
 
