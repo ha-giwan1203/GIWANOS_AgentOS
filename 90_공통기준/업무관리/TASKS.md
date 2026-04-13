@@ -10,22 +10,31 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-16 — 세션38 (하네스 강화 Phase 1~3 전체 완료)
+최종 업데이트: 2026-04-14 — 세션39 (에이전트 도입 토론 + 스크립트 다듬기)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] 하네스 고도화 — 에이전트 도입 (조사 완료, GPT 토론 미진행)**
+(미정 — 세션39 토론 결과 기반으로 다음 방향 결정)
 
-도입 우선순위 (세션38 인터넷 조사 기반):
-1. **Drift Detector** — TASKS↔HANDOFF↔STATUS↔README 메타 드리프트 자동 탐지 (세션38에서만 3회 발생)
-2. **Parallel Review Team (3개)** — commit 전 보안/품질/상태문서 병렬 리뷰 (HAMY 9-Agent 축소)
-3. **Night Watch** — 야간 에러 로그 스캔 → incident 자동 분류 → 아침 요약 (스케줄 태스크 연동)
-4. **Continue Sites** — hook 실패 시 자동 복구 전략 (incident_repair auto-resolve 확장)
-5. **Harness Generator** — 도메인 키워드 → 전용 agent+skill 자동 scaffolding
+---
 
-진행 방식: GPT 토론 → 합의 → 1~2번부터 순차 구현
+## 최근 완료
+
+### [완료] 에이전트 도입 토론 + 스크립트 다듬기 — 세션39 (2026-04-14)
+- **GPT 토론 1턴**: 에이전트 도입 5건 검토 → **에이전트 필요 0건** 합의
+- **합의**: 기존 훅/스크립트 강화로 충분. 에이전트 늘릴 단계 아님
+  - Drift Detector → drift_check 훅 강화로 축소 (채택)
+  - Parallel Review → 보류 (final_check 섹션 분리로 대체)
+  - Night Watch → 보류 (시기상조, 24h 신규 건수 추가만)
+  - Continue Sites → 미채택 (Phase 3-1 반자동 합의와 충돌)
+  - Harness Generator → 보류 (도메인 온보딩 템플릿 수준)
+- **스크립트 다듬기 구현 3건**:
+  - session_start_restore.sh: 드리프트 경고(TASKS/HANDOFF/STATUS 날짜 비교) + 24h 신규 incident 건수
+  - final_check.sh: 드리프트 WARN 시 incident_ledger에 meta_drift 기록
+  - hook_config.json: drift_check 섹션 추가
+- smoke_test 120/120 + E2E 10/10 ALL PASS
 
 ---
 

@@ -225,6 +225,7 @@ echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
 if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
   if [[ "$STATUS_DATE" < "$TASKS_DATE" ]]; then
     warn "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
+    hook_incident "gate_reject" "final_check" "STATUS.md" "meta_drift: STATUS($STATUS_DATE) < TASKS($TASKS_DATE)" '"classification_reason":"meta_drift"'
   else
     echo "  [OK] STATUS 날짜 >= TASKS 날짜"
   fi
@@ -232,6 +233,7 @@ fi
 if [ -n "$TASKS_DATE" ] && [ -n "$HANDOFF_DATE" ]; then
   if [[ "$HANDOFF_DATE" < "$TASKS_DATE" ]]; then
     warn "HANDOFF($HANDOFF_DATE) < TASKS($TASKS_DATE) — HANDOFF 드리프트"
+    hook_incident "gate_reject" "final_check" "HANDOFF.md" "meta_drift: HANDOFF($HANDOFF_DATE) < TASKS($TASKS_DATE)" '"classification_reason":"meta_drift"'
   else
     echo "  [OK] HANDOFF 날짜 >= TASKS 날짜"
   fi

@@ -138,16 +138,34 @@ if [ -x "$FAST_SMOKE" ]; then
   hook_log "session_start_restore" "fast_smoke: $FAST_RESULT"
 fi
 
-# Phase 3-1: 미해결 incident 요약 (있으면 표시, 없으면 생략)
+# 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교
+_extract_date() {
+  sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$1" 2>/dev/null | head -1
+}
+_TASKS_DATE=$(_extract_date "$PATH_TASKS")
+_HANDOFF_DATE=$(_extract_date "$PATH_HANDOFF")
+_STATUS_DATE=$(_extract_date "$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md")
+if [ -n "$_TASKS_DATE" ] && [ -n "$_HANDOFF_DATE" ] && [ -n "$_STATUS_DATE" ]; then
+  if [ "$_TASKS_DATE" != "$_HANDOFF_DATE" ] || [ "$_TASKS_DATE" != "$_STATUS_DATE" ]; then
+    echo "[DRIFT] 상태 문서 날짜 불일치: TASKS=$_TASKS_DATE / HANDOFF=$_HANDOFF_DATE / STATUS=$_STATUS_DATE"
+    hook_log "session_start_restore" "DRIFT detected: T=$_TASKS_DATE H=$_HANDOFF_DATE S=$_STATUS_DATE"
+  fi
+fi
+
+# Phase 3-1: 미해결 incident 요약 + 24h 신규 건수
 INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
 if [ -f "$INCIDENT_LEDGER" ]; then
-  UNRESOLVED_COUNT=$(grep -c '"resolved"' "$INCIDENT_LEDGER" 2>/dev/null | head -1)
   TOTAL_COUNT=$(wc -l < "$INCIDENT_LEDGER" 2>/dev/null | tr -d ' ')
-  # resolved가 아닌 건 = 전체 - resolved
   RESOLVED_COUNT=$(grep -c '"resolved":true\|"resolved": true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
   OPEN_COUNT=$(( TOTAL_COUNT - RESOLVED_COUNT ))
-  if [ "$OPEN_COUNT" -gt 0 ]; then
-    echo "--- 미해결 incident: ${OPEN_COUNT}건 (총 ${TOTAL_COUNT}건) ---"
+  # 24시간 이내 신규 건수
+  CUTOFF_24H=$(date -d "-24 hours" "+%Y-%m-%dT%H:%M" 2>/dev/null || date -v-24H "+%Y-%m-%dT%H:%M" 2>/dev/null || echo "")
+  RECENT_COUNT=0
+  if [ -n "$CUTOFF_24H" ]; then
+    RECENT_COUNT=$(awk -v cutoff="$CUTOFF_24H" '/"created_at"/ { match($0, /"created_at":"([^"]+)"/, a); if(a[1] >= cutoff) c++ } END { print c+0 }' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
+  fi
+  if [ "$OPEN_COUNT" -gt 0 ] || [ "$RECENT_COUNT" -gt 0 ]; then
+    echo "--- 미해결 incident: ${OPEN_COUNT}건 (총 ${TOTAL_COUNT}건, 최근24h 신규 ${RECENT_COUNT}건) ---"
     echo "    /auto-fix 로 분석 가능"
   fi
 fi

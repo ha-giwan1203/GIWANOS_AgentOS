@@ -16,5 +16,10 @@
     "kernel_stale_threshold_hours": 24,
     "fallback_tasks_lines": 20,
     "fallback_handoff_lines": 20
+  },
+  "drift_check": {
+    "state_files": ["TASKS.md", "HANDOFF.md", "STATUS.md"],
+    "date_pattern": "최종 업데이트",
+    "incident_classification": "meta_drift"
   }
 }

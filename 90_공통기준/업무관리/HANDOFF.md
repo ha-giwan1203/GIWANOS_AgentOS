@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-16 22:30 KST — 세션 38 (하네스 강화 Phase 1~3 전체 완료)
+최종 업데이트: 2026-04-14 07:30 KST — 세션 39 (에이전트 도입 토론 + 스크립트 다듬기)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-16 세션 38)
+## 0. 최신 세션 (2026-04-14 세션 39)
+
+### 이번 세션 완료
+1. **에이전트 도입 GPT 토론 1턴**: 5건 검토 → **에이전트 필요 0건** 합의. 채택 6건 / 보류 0건
+2. **합의**: 기존 훅/스크립트 강화로 충분. "에이전트 늘릴 단계가 아니라 기존 체계를 다듬을 단계"
+3. **session_start_restore.sh 강화**: 드리프트 경고(TASKS/HANDOFF/STATUS 날짜 비교) + 24h 신규 incident 건수
+4. **final_check.sh 강화**: 드리프트 WARN 시 incident_ledger에 `meta_drift` classification 기록
+5. **hook_config.json**: drift_check 섹션 추가
+6. smoke_test 120/120 + E2E 10/10 ALL PASS
+
+### 다음 세션 참고
+- 에이전트 도입 5건 전부 보류/미채택 — 현 단계에서 불필요 합의
+- 스크립트 다듬기 완료: drift 탐지 → incident 기록 → 세션 시작 경고 체인 구축
+- 모델 믹싱/Worktree 병렬은 별도 안건 (보류 유지)
+
+---
+
+## 1. 이전 세션 (2026-04-16 세션 38)
 
 ### 이번 세션 완료
 1. **Phase 2 GPT 토론 1턴**: 의제 3건 — 채택 5건 / 보류 1건. 프로파일 전환 보류 합의
@@ -31,13 +48,9 @@
 17. smoke_test 120/120 + E2E 10/10 ALL PASS (Phase 3-1 반영 후)
 
 ### 다음 세션 참고
-- **하네스 고도화: 에이전트 도입** — 조사 완료, GPT 토론 필요
-- 우선순위: (1) Drift Detector (2) Parallel Review 3개 (3) Night Watch (4) Continue Sites (5) Harness Generator
-- 조사 출처: Anthropic Harness Engineering, Google 8대 패턴, HAMY 9-Agent 병렬 리뷰, revfactory/harness, VoltAgent 100+ subagents
-- smoke_fast.sh send_gate→mcp_send_gate 수정 완료 (3cfe2f38), 9/9 ALL PASS
+- 하네스 고도화: 에이전트 도입 → 세션39에서 토론 완료 (에이전트 0건 필요 합의)
 - e2e_test.sh는 수동 검증용 (세션 시작 자동 실행 금지 합의)
 - /auto-fix는 반자동 — 분석+제안만, 자동 수정 없음
-- 모델 믹싱/Worktree 병렬은 에이전트 도입과 별도 안건
 
 ---
 
