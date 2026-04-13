@@ -16,16 +16,21 @@
 
 ## 진행중 / 보류
 
-### [완료] yt-dlp 풀다운로드 복구 — 세션30 (2026-04-13)
-- Node.js v24.14.0 + `--js-runtimes node --remote-components ejs:github` 조합으로 해결
-- deno 불필요. youtube_analyze.py에 옵션 반영 완료
-- 테스트: 4.29MB mp4 정상 다운로드 확인
-
 ### [소] Notion 부모 페이지 / verify_xlsm COM
 
 ---
 
 ## 최근 완료
+
+### [완료] CDP→Chrome MCP 통일 — GPT 대화 전송 경로 전수 갱신 — 세션30 (2026-04-13)
+- GPT 대화 전송을 Chrome MCP type 액션으로 통일 (CDP 스크립트는 사내 시스템 전용)
+- send_gate/harness_gate/smoke_test/토론모드 문서 6개/share-result/finish 전부 갱신 (11파일)
+- smoke_test 107/107 ALL PASS
+
+### [완료] yt-dlp 풀다운로드 복구 — 세션30 (2026-04-13)
+- Node.js v24.14.0 + `--js-runtimes node --remote-components ejs:github` 조합으로 해결
+- deno 불필요. youtube_analyze.py에 옵션 반영 완료
+- 테스트: 4.29MB mp4 정상 다운로드 확인
 
 ### [완료] 심화 콘텐츠 A등급 적용 P1+P2+P3 구현 — 세션29 (2026-04-13)
 - **GPT 토론 2턴**: 갭 6건 검토 → 채택 3건 / 보류 1건. 독립 의견 유지하여 circuit breaker 보류→채택(P3) 수정
