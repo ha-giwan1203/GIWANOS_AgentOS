@@ -16,10 +16,7 @@
 
 ## 다음 세션 안건
 
-### [소] verify_xlsm 2차 COM 값 검증
-- 1차 구조 검증 PASS (기대값 조정 완료, 10/10 ALL PASS)
-- 2차 COM 기대값(PART_NO, MODULE_PART, MODEL_GROUP) 확정 후 실행
-- PLAN_RESULT_FIXED는 수식 없는 결과 시트 → COM 검증은 입력 시트(SP3 LINE 기준 정보) 대상으로 재설계 필요
+(없음 — 세션36에서 이월 안건 전부 해소)
 
 
 ---
