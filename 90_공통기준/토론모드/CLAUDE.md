@@ -25,11 +25,19 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 1. Chrome MCP `tabs_context_mcp` → 기존 ChatGPT 탭 확인, 없으면 `navigate`
 2. 프로젝트 URL → 최상단 채팅방 URL 추출 → `navigate`
 3. **SEND GATE**: 전송 직전 `get_page_text` 또는 `read_page`로 assistant 최신 텍스트 재읽기 (NEVER — 생략 금지)
-4. **기본 전송**: Chrome MCP `find` → 입력창 ref 획득 → `form_input`으로 텍스트 입력 → `computer(left_click)` 전송버튼
-5. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
-6. 응답 읽기(`get_page_text`) → 하네스 분석 → 반박 생성 → 전송 → 반복
+4. **기본 입력**: `javascript_tool`로 `#prompt-textarea` focus → `insertText`로 한 번에 삽입 (줄바꿈 포함)
+5. **전송 클릭**: `find`(send button) → `computer(left_click)`
+6. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
+7. 응답 읽기(`get_page_text`) → 하네스 분석 → 반박 생성 → 전송 → 반복
 
-> 모든 브라우저 조작은 Chrome MCP 도구 하나로 통일한다. CDP 스크립트는 사용하지 않는다.
+> 입력은 반드시 `javascript_tool` + `insertText` 사용. `type`(느림)이나 `form_input`(줄바꿈 불가) 금지.
+
+```javascript
+// 표준 입력 패턴
+const ta = document.querySelector('#prompt-textarea');
+ta.focus();
+document.execCommand('insertText', false, text);
+```
 
 ## 고정 Selector (2026-03-31 실증)
 ```
