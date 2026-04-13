@@ -47,6 +47,17 @@ fi
 # stdout으로 컨텍스트 주입 시도 (best effort — UserPromptSubmit 버그와 유사하게 실패할 수 있음)
 # 실패해도 비파괴적. PreToolUse state_rebind_check.sh가 실제 강제선.
 echo "=== [session_start: $SOURCE] 이전 세션 상태 ==="
+
+# progress.json 캐시 (있으면 먼저 출력 — 복구 우선순위: TASKS > STATUS > HANDOFF > progress.json)
+PROGRESS_FILE="$PROJECT_ROOT/.claude/state/session_progress.json"
+if [ -f "$PROGRESS_FILE" ]; then
+  CURRENT_TASK=$(grep '"current_task"' "$PROGRESS_FILE" 2>/dev/null | sed 's/.*: *"\(.*\)".*/\1/' | head -1)
+  if [ -n "$CURRENT_TASK" ] && [ "$CURRENT_TASK" != "" ]; then
+    echo "--- 이전 작업 (캐시, 참고용) ---"
+    echo "진행 중: $CURRENT_TASK"
+  fi
+fi
+
 # TASKS 섹션 (12줄)
 echo "--- TASKS 상단 ---"
 grep -A 12 "^##\? " "$PATH_TASKS" 2>/dev/null | head -12 || head -12 "$PATH_TASKS" 2>/dev/null

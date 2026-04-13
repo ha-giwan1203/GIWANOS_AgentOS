@@ -19,10 +19,17 @@ if echo "$COMMAND" | grep -qE '(rm -rf /|git reset --hard|git clean -fd|git push
   exit 0
 fi
 
+# 1b. 추가 파괴 패턴 차단 (하네스 강화 Phase 1, GPT 채택)
+# tee로 덮어쓰기, cat >로 덮어쓰기, truncate, find -delete, xargs rm
+if echo "$COMMAND" | grep -qE '(truncate\s|find\s.*-delete|xargs\s+rm)'; then
+  echo '{"decision":"deny","reason":"위험 명령 차단: truncate/find -delete/xargs rm은 사용자 직접 실행 필요"}'
+  exit 0
+fi
+
 # 2. 보호 대상 경로에 대한 삭제/이동/인플레이스 수정 차단
 # GPT 합의: "명령어 + 보호 경로" 조합으로만 차단. 임시파일/로그/아카이브 정리는 허용.
 PROTECTED_PATTERNS='(CLAUDE\.md|README\.md|STATUS\.md|RUNBOOK\.md|AGENTS_GUIDE\.md|settings.*\.json|\.skill|기준정보.*최종)'
-DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i )'
+DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee |cat >|cat >>)'
 
 if echo "$COMMAND" | grep -qE "$DANGER_CMDS"; then
   if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
