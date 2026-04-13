@@ -1,6 +1,6 @@
 #!/bin/bash
-# Hooks Smoke Test v4 — 현행 훅 실물 기준 (2026-04-08)
-# 테스트 22섹션: 운영 훅 16개 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence 5종 + selector 정합성
+# Hooks Smoke Test v5 — 현행 훅 실물 기준 (2026-04-13)
+# 테스트 32섹션: 운영 훅 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence + selector + instruction_read_gate
 
 export LC_ALL=en_US.UTF-8
 
@@ -512,8 +512,8 @@ echo ""
 
 # === 30. README 훅 개수 정합성 ===
 echo "--- 30. README 훅 개수 ---"
-grep -q '20개' "$HOOKS_DIR/README.md"
-check $? "README: 20개 훅 표기"
+grep -q '22개' "$HOOKS_DIR/README.md"
+check $? "README: 22개 훅 표기"
 
 grep -q '실패 계약' "$HOOKS_DIR/README.md"
 check $? "README: 실패 계약 (Failure Contract) 표 존재"
