@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 13:25 KST — 세션 34 (smoke_test FAIL + Notion 동기화 + 토론모드 문서 + GPT 전송 스킬)
+최종 업데이트: 2026-04-13 13:40 KST — 세션 34 (smoke_test FAIL + Notion 동기화 + 문서 정비 + GPT 전송 스킬 + Slack 알림 복구)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -20,6 +20,8 @@
 6. **/gpt-send 신규**: 채팅 입력+전송+완료대기+응답읽기 단일 명령
 7. **/gpt-read 신규**: 응답 읽기+판정 키워드 우선순위 자동 감지
 8. **share-result.md**: form_input → /gpt-send 호출로 수정
+9. **Slack 자동 알림 복구**: Notification 이벤트 미트리거 → PostToolUse/Bash push 후 알림 hook 추가
+10. **ENTRY.md + STATUS.md**: form_input/CDP 잔존 수정
 
 ### 커밋 이력
 - `06a1b14e` feat: smoke_test FAIL 수정 + Notion 동기화 + 문서 정비
@@ -27,6 +29,8 @@
 - `7446dbf0` docs: 세션34 GPT 정합 판정 + 안건 갱신
 - `bc3b5648` feat: GPT 전송/읽기 스킬 신규
 - `27228ebc` fix: GPT 지적 — 재탐지 강제 + 판정 우선순위
+- `45d3cdd1` fix: ENTRY.md + STATUS.md 입력방식 잔존 수정
+- `57b7219e` fix: Slack 자동 알림 복구 — PostToolUse/Bash push 후 알림 hook
 
 ### GPT 판정
 - 06a1b14e: 부분반영 → f0fab11e: 정합

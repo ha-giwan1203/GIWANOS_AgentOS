@@ -18,6 +18,7 @@
 
 ### [소] GPT 전송 스킬 실사용 검증
 - /gpt-send, /gpt-read 실제 share-result 흐름에서 1회 실사용 검증
+- 통합 JS(insertText + send click 1회 호출) 최적화 검토
 
 ### [소] verify_xlsm COM 검증
 - Excel XLSM 파일 COM 기반 검증 스크립트 실전 테스트
@@ -28,6 +29,12 @@
 ---
 
 ## 최근 완료
+
+### [완료] Slack 자동 알림 복구 — 세션34 (2026-04-13)
+- 근본 원인: Notification 이벤트가 일반 작업에서 트리거 안 됨 → 4월 11일 이후에도 자동 알림 미발송
+- post_commit_notify.sh 신규: PostToolUse/Bash에서 git push 성공 시 Slack 자동 발송
+- settings.local.json: PostToolUse/Bash async hook 등록
+- 실전 검증: 테스트 메시지 + 커밋 알림 즉시 도착 확인
 
 ### [완료] GPT 전송/읽기 스킬 신규 — 세션34 (2026-04-13)
 - /gpt-send: 채팅 입력+전송+완료대기+응답읽기 단일 명령
