@@ -63,17 +63,23 @@ fi
 # TASKS.md에서만 읽어 생성. 수동 편집 금지. 원본은 항상 TASKS.md.
 CURSOR_FILE="$STATE_DIR/task_cursor.json"
 CURSOR_TMP="${CURSOR_FILE}.tmp"
+# next_step: "다음 세션 안건" 아래 첫 비빈 줄
 NEXT_STEP=$(grep -A 2 "^## 다음 세션 안건" "$PATH_TASKS" 2>/dev/null | grep -v "^##" | grep -v "^--" | head -1 | sed 's/^[[:space:]]*//')
+# last_completed: 가장 최근 [완료] 항목 제목
 LAST_COMPLETED=$(grep -A 1 "^### \[완료\]" "$PATH_TASKS" 2>/dev/null | head -1 | sed 's/^### \[완료\] //' | sed 's/ — .*//')
-LAST_SHA=$(git log --oneline -1 --format='%h' 2>/dev/null || echo "")
+# current_phase: TASKS.md "최종 업데이트" 행에서 괄호 안 Phase 추출
+CURRENT_PHASE=$(grep "^최종 업데이트:" "$PATH_TASKS" 2>/dev/null | sed 's/.*(\(.*\)).*/\1/' | head -1)
+# last_verified_sha: HANDOFF.md에서 GPT 통과/정합 판정이 있는 마지막 커밋 SHA (없으면 빈값)
+LAST_VERIFIED_SHA=$(grep -oE '[0-9a-f]{7,8}' "$PATH_HANDOFF" 2>/dev/null | tail -1)
+[ -z "$LAST_VERIFIED_SHA" ] && LAST_VERIFIED_SHA=""
 cat > "$CURSOR_TMP" << TCJSON
 {
-  "_comment": "파생 캐시 — TASKS.md에서만 생성. 수동 편집 금지. 원본: TASKS.md",
+  "_comment": "파생 캐시 — TASKS.md/HANDOFF.md에서만 생성. 수동 편집 금지.",
   "saved_at": "$SAVE_TS",
-  "current_phase": "$CURRENT_TASK",
+  "current_phase": "$CURRENT_PHASE",
   "next_step": "$NEXT_STEP",
   "last_completed": "$LAST_COMPLETED",
-  "last_verified_sha": "$LAST_SHA",
+  "last_verified_sha": "$LAST_VERIFIED_SHA",
   "blocked": false
 }
 TCJSON
