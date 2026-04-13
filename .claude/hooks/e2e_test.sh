@@ -1,6 +1,6 @@
 #!/bin/bash
 # E2E Hook Tests — 실제 입출력 검증 (Phase 3-2)
-# smoke_test.sh(정적 구조)와 분리. smoke_test.sh --with-e2e로 연결 가능.
+# smoke_test.sh(정적 구조)와 별도 실행. 실행: bash .claude/hooks/e2e_test.sh
 # 10개 시나리오: block_dangerous(2) + protect_files(2) + session_start(3) + evidence_gate(3)
 
 export LC_ALL=en_US.UTF-8
