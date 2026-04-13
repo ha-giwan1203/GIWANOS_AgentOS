@@ -15,12 +15,12 @@
 1. **GPT 토론 2턴**: 이월 안건 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건
 2. **안건1 GPT 전송 스킬 실사용 검증 PASS**: 세션36 토론 자체가 gpt-send 경로 전체 실사용 (URL탐지→insertText→polling→응답읽기)
 3. **안건2 verify_xlsm 1차 구조 검증**: 스크립트 동작 확인. 기대 시트명(PLAN_OUTPUT)/테이블명(tblInfo,tblPlanOutput) 불일치 → 기대값 조정 필요
-4. **안건3 Notion 부모 페이지 동기화**: 부모 페이지 구조 확인 (📌 운영 현황 heading_2 존재). API 404 원인: Integration 미연결 → 사용자 Notion 설정 필요
+4. **안건3 Notion 부모 페이지 동기화 PASS**: Integration 연결(Chrome MCP) + sync_parent_page() 실행 성공. "📌 운영 현황" 섹션 자동 갱신 확인
 5. **share-result 3단계 정리**: share-result.md 3단계는 /gpt-send에 진입 위임 문구만 보유. 실제 진입 로직(debate_chat_url/fallback)은 gpt-send.md 내부에 존재. GPT는 "자체 진입 로직 잔존"으로 지적했으나, 이는 gpt-send 호출 시 실행되는 내부 로직이므로 share-result 차원의 위임 구조는 정상
 
 ### 다음 세션 참고
 - verify_xlsm: 실제 시트명 매핑 + 2차 COM 기대값 확정 필요
-- Notion: 부모 페이지에 'GPT 자동 분류 시스템' Integration 연결 후 sync_parent_page() 재실행
+- Notion: 부모 페이지 동기화 완전 해결 (Integration 연결 + sync 성공)
 - /gpt-read 단독 호출 재탐지 보강은 실익 낮으므로 보류 유지
 
 ---

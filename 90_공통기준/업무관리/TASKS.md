@@ -21,10 +21,6 @@
 - PLAN_OUTPUT 시트 → 실제 시트명 매핑 필요, tblInfo/tblPlanOutput 테이블 확인
 - 2차 COM 기대값(PART_NO, MODULE_PART, MODEL_GROUP) 확정 후 실행
 
-### [소] Notion 부모 페이지 Integration 연결 후 sync 재실행
-- sync_parent_page() 코드 정상, 부모 페이지 구조(📌 운영 현황 heading_2) 확인됨
-- 404 원인: 부모 페이지가 'GPT 자동 분류 시스템' Integration에 미연결
-- 사용자가 Notion 페이지 → '...' → '연결' → 'GPT 자동 분류 시스템' 추가 후 재실행
 
 ---
 
@@ -34,7 +30,7 @@
 - **GPT 토론 2턴**: 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건 / 버림 0건
 - **안건1 GPT 전송 스킬**: 실사용 검증 PASS — 세션36 토론 자체가 gpt-send 경로(URL→탐지→insertText→polling→읽기) 실사용
 - **안건2 verify_xlsm**: 1차 구조 검증 스크립트 동작 확인. 기대 시트명/테이블명이 실제 파일과 불일치 → 기대값 조정 후 재검증 필요 (조건부 PASS)
-- **안건3 Notion 부모 페이지**: 부모 페이지 구조 확인 (📌 운영 현황 heading_2 존재). sync_parent_page() 호출 시 404 — Integration 미연결 환경 문제 (조건부 PASS)
+- **안건3 Notion 부모 페이지**: Integration 연결 + sync_parent_page() 실행 성공. 부모 페이지 "📌 운영 현황" 섹션 자동 갱신 확인 (PASS)
 
 
 ### [완료] 매일 반복 업무 통합 스킬 daily-routine — 세션35 (2026-04-13)
