@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 — 세션 32 근본 문제 4건 해결
+최종 업데이트: 2026-04-13 11:34 KST — 세션 32 종료 (CDP 폐기 + Chrome MCP 단일화 GPT PASS)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -13,15 +13,24 @@
 
 ### 이번 세션 완료
 1. **self-audit 실행**: anomaly 8건 + GPT 선제 리스크 2건 = 10건 식별
-2. **CDP→Chrome MCP 단일화**: CDP 스크립트 전체 폐기(98_아카이브 이동), send_gate.sh 폐기, 토론모드/share-result/finish 문서 Chrome MCP로 갱신, 메모리 5건 정리
+2. **CDP→Chrome MCP 단일화**: CDP 스크립트 11파일 폐기(98_아카이브), send_gate.sh 폐기, 토론모드/share-result/finish 문서 갱신, 메모리 5건 정리
 3. **hook_registry.sh 신규**: settings↔README↔STATUS hook 수 자동 동기화 도구
 4. **final_check.sh --fix 모드**: 드리프트 감지 시 hook_registry sync 자동 호출
-5. **anomaly 정비**: STATUS 유령참조 3건 삭제, 도메인 진입 테이블 3건 추가, smoke_fast.sh README 등록, python3→python shim
-6. **smoke_test 갱신**: send_gate 폐기 반영, CDP→Chrome MCP 확인 테스트, README 21개 표기
+5. **anomaly 정비**: STATUS 유령참조 3건 삭제, 도메인 진입 테이블 3건 추가, smoke_fast README 등록, python3→python shim, instruction_read_gate JSON escape
+6. **GPT 1차 FAIL → 즉시 대응 4건**: mcp_send_gate.sh 신규(Chrome MCP SEND GATE), settings CDP allow 14건 제거, STATUS CDP 잔존 정리, smoke_test placeholder→실검증
+7. **GPT 재판정 PASS** (358628af)
+8. **토론모드 입력 방식 확정**: javascript_tool + insertText (type/form_input 금지)
+
+### 커밋 이력
+- `bf630390` refactor: CDP 폐기 + Chrome MCP 단일화 + 근본 문제 4건 해결
+- `358628af` fix: GPT 지적 4건 즉시 대응 — MCP send gate + CDP allow 정리
+- `7e7b7e57` docs: 토론모드 입력 방식 insertText로 확정 + GPT PASS
+
+### GPT 판정
+- bf630390: FAIL (지적 4건)
+- 358628af: PASS (지적 4건 전부 해소)
 
 ### 다음 세션 안건
-**[검증] Chrome MCP 단일화 GPT 교차검증**
-
 **[보류] 지침 강제 읽기 하네스 2차 — 도메인 진입**
 
 **[소] Notion 부모 페이지 / verify_xlsm COM**
