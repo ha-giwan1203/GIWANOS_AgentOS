@@ -14,14 +14,17 @@
 ### 이번 세션 완료
 1. **에이전트 도입 GPT 토론 1턴**: 5건 검토 → **에이전트 필요 0건** 합의. 채택 6건 / 보류 0건
 2. **합의**: 기존 훅/스크립트 강화로 충분. "에이전트 늘릴 단계가 아니라 기존 체계를 다듬을 단계"
-3. **session_start_restore.sh 강화**: 드리프트 경고(TASKS/HANDOFF/STATUS 날짜 비교) + 24h 신규 incident 건수
-4. **final_check.sh 강화**: 드리프트 WARN 시 incident_ledger에 `meta_drift` classification 기록
-5. **hook_config.json**: drift_check 섹션 추가
-6. smoke_test 120/120 + E2E 10/10 ALL PASS
+3. **session_start_restore.sh 강화**: 드리프트 경고 + 24h 신규 incident 건수
+4. **final_check.sh 강화**: 드리프트 WARN 시 incident_ledger에 `meta_drift` 기록
+5. **hook_config.json**: drift_check 섹션 추가 + 실연동
+6. **학습 루프 점검 GPT 토론**: 완성도 70~75% 합의. 다음 안건 3건 도출
+7. smoke_test 120/120 + E2E 10/10 ALL PASS
 
 ### 다음 세션 참고
-- 에이전트 도입 5건 전부 보류/미채택 — 현 단계에서 불필요 합의
-- 스크립트 다듬기 완료: drift 탐지 → incident 기록 → 세션 시작 경고 체인 구축
+- **학습 루프 완성 3건** (GPT 합의):
+  1. incident_review.py — 빈도 집계 → 규칙/문서/절차/불가 4갈래 제안
+  2. scheduled task 로그 분리 → 반복 실패만 incident 승격
+  3. MEMORY feedback 3분류 (hookable/promptable/human_only)
 - 모델 믹싱/Worktree 병렬은 별도 안건 (보류 유지)
 
 ---

@@ -16,13 +16,17 @@
 
 ## 다음 세션 안건
 
-(미정 — 세션39 토론 결과 기반으로 다음 방향 결정)
+**[중] 학습 루프 완성 — 규칙 승격기 도입 (GPT 토론 합의 완료)**
+
+1. **incident_review.py 신규** — 최근 N일 incident 빈도 집계 → 임계치 초과 시 규칙 보강/문서 보강/절차 항목/자동화 불가 4갈래 제안
+2. **scheduled task 로그 분리** — task result log 전용 → 반복 실패(연속 2~3회)만 incident 승격
+3. **MEMORY feedback 3분류** — hookable / promptable / human_only 태깅으로 "미반영"과 "강제 불가" 분리
 
 ---
 
 ## 최근 완료
 
-### [완료] 에이전트 도입 토론 + 스크립트 다듬기 — 세션39 (2026-04-14)
+### [완료] 에이전트 도입 토론 + 스크립트 다듬기 + 학습 루프 점검 — 세션39 (2026-04-14)
 - **GPT 토론 1턴**: 에이전트 도입 5건 검토 → **에이전트 필요 0건** 합의
 - **합의**: 기존 훅/스크립트 강화로 충분. 에이전트 늘릴 단계 아님
   - Drift Detector → drift_check 훅 강화로 축소 (채택)
@@ -35,6 +39,9 @@
   - final_check.sh: 드리프트 WARN 시 incident_ledger에 meta_drift 기록
   - hook_config.json: drift_check 섹션 추가
 - smoke_test 120/120 + E2E 10/10 ALL PASS
+- **학습 루프 점검** (GPT 토론 2턴째):
+  - 완성도 70~75% 합의 (운영 루프 OK, 규칙 승격 없음)
+  - 다음 안건 3건 합의: incident_review.py + task log 분리 + feedback 3분류
 
 ---
 
