@@ -104,6 +104,7 @@
 | `smoke_test.sh` | 전체 hooks 구조 검증 (수동 실행) |
 | `smoke_fast.sh` | SessionStart용 빠른 smoke (5~8건, 로컬/결정적만). session_start_restore.sh에서 호출 |
 | `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
+| `e2e_test.sh` | E2E 테스트 (block_dangerous/protect_files/session_start/evidence_gate 10개 시나리오). 수동 실행 |
 
 ## 참조
 
