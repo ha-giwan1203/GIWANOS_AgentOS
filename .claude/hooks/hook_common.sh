@@ -18,6 +18,7 @@ STATE_EVIDENCE="$PROJECT_ROOT/.claude/state/evidence"
 STATE_AGENT_CONTROL="$PROJECT_ROOT/90_공통기준/agent-control/state"
 PATH_TASKS="$PROJECT_ROOT/90_공통기준/업무관리/TASKS.md"
 PATH_HANDOFF="$PROJECT_ROOT/90_공통기준/업무관리/HANDOFF.md"
+PATH_STATUS="$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md"
 
 # 세션 키 — evidence 시스템의 세션 격리용 (sha1 of transcript path)
 session_key() {
