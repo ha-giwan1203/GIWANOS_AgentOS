@@ -12,16 +12,18 @@
 ## 0. 최신 세션 (2026-04-16 세션 38)
 
 ### 이번 세션 완료
-1. **GPT 토론 1턴**: Phase 2 의제 3건 — 채택 5건 / 보류 1건
-2. **프로파일 전환 보류 합의**: GPT 동의. Phase 2를 "설정 외부화 + Startup fallback + settings 위생"으로 재정의
-3. **hook_config.json 신규**: protect_files/block_dangerous/session_startup 파라미터 중앙 외부화
-4. **session_start_restore.sh 개선**: kernel stale/missing 시 TASKS+HANDOFF fallback 직접 읽기
-5. **settings.local.json 위생**: youtube 7개→와일드카드 1개, slack 테스트 삭제, 운영검증 와일드카드화 (allow 70→52개)
-6. smoke_test 120/120 ALL PASS
+1. **Phase 2 GPT 토론 1턴**: 의제 3건 — 채택 5건 / 보류 1건. 프로파일 전환 보류 합의
+2. **hook_config.json 신규**: protect_files/block_dangerous/session_startup 파라미터 중앙 외부화
+3. **session_start_restore.sh 개선**: kernel stale/missing 시 TASKS+HANDOFF fallback 직접 읽기
+4. **settings.local.json 위생**: allow 70→52개
+5. **Phase 2 GPT 최종**: 1차 부분반영(config 미연동) → 수정 → 통과
+6. **Phase 3-2 E2E 테스트 GPT 토론**: 시나리오 6→10개 확장 합의. 채택 4건
+7. **e2e_test.sh 신규**: 10개 시나리오 구현. hook_config.json 파싱 버그 수정(grep→awk)
+8. E2E 10/10 + smoke_test 120/120 ALL PASS
 
 ### 다음 세션 참고
-- Phase 3 순서: E2E → 2-Agent → 오토리서치 (GPT 합의)
-- hook_config.json → protect_files.sh/block_dangerous.sh/session_start_restore.sh 3개 전부 연동 완료 (GPT 부분반영 지적 즉시 대응)
+- Phase 3 남은 순서: 3-3 2-Agent 패턴 → 3-1 오토리서치 루프
+- e2e_test.sh는 smoke_test.sh와 별도 실행 (정적 vs 동적 분리)
 
 ---
 

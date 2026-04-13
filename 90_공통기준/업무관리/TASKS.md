@@ -16,11 +16,17 @@
 
 ## 다음 세션 안건
 
-**[중] 하네스 강화 Phase 3** — E2E 테스트 → 2-Agent 패턴 → 오토리서치 루프 (GPT 합의 순서)
+**[중] 하네스 강화 Phase 3 계속** — 3-3 2-Agent 패턴 → 3-1 오토리서치 루프
 
 ---
 
 ## 최근 완료
+
+### [완료] 하네스 강화 Phase 3-2: E2E 테스트 — 세션38 (2026-04-16)
+- **GPT 토론 1턴**: 시나리오 6개→10개 확장 합의. 채택 4건 / 보류 0건
+- **e2e_test.sh 신규**: 10개 시나리오 (block_dangerous 2 + protect_files 2 + session_start 3 + evidence_gate 3)
+- hook_config.json 파싱 버그 수정 (grep→awk): protect_files/block_dangerous 모두 config 연동 정상화
+- E2E 10/10 + smoke_test 120/120 ALL PASS
 
 ### [완료] 하네스 강화 Phase 2 — 세션38 (2026-04-16)
 - **GPT 토론 1턴**: 의제 3건 검토. 채택 5건 / 보류 1건 / 버림 0건

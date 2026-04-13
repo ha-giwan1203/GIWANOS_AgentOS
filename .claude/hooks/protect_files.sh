@@ -15,11 +15,11 @@ CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 DENY_EXT_PATTERN='\.(xlsx|xls|xlsm|csv|docx|pdf)$'
 DENY_PATH_PATTERN='(98_아카이브|기준정보.*최종)'
 if [ -f "$CONFIG_FILE" ]; then
-  # deny_extensions → regex 조립
-  _exts=$(grep -A 10 '"deny_extensions"' "$CONFIG_FILE" 2>/dev/null | grep '"\\.' | sed 's/.*"\.\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  # deny_extensions: JSON 배열에서 확장자만 추출 (awk로 배열 경계 안전 파싱)
+  _exts=$(awk '/"deny_extensions"/{found=1;next} found && /\]/{exit} found && /"\.[^"]*"/{gsub(/.*"\./, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
   [ -n "$_exts" ] && DENY_EXT_PATTERN="\\.($_exts)$"
-  # deny_path_patterns → regex 조립
-  _paths=$(grep -A 10 '"deny_path_patterns"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'deny_path' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  # deny_path_patterns: JSON 배열에서 패턴만 추출
+  _paths=$(awk '/"deny_path_patterns"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
   [ -n "$_paths" ] && DENY_PATH_PATTERN="($_paths)"
 fi
 

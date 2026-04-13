@@ -33,9 +33,9 @@ CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 PROTECTED_PATTERNS='(CLAUDE\.md|README\.md|STATUS\.md|RUNBOOK\.md|AGENTS_GUIDE\.md|settings.*\.json|\.skill|기준정보.*최종)'
 DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee |cat >|cat >>)'
 if [ -f "$CONFIG_FILE" ]; then
-  _pp=$(grep -A 20 '"protected_path_patterns"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'protected_path' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  _pp=$(awk '/"protected_path_patterns"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
   [ -n "$_pp" ] && PROTECTED_PATTERNS="($_pp)"
-  _dc=$(grep -A 20 '"danger_commands"' "$CONFIG_FILE" 2>/dev/null | grep '"[^"]*"' | grep -v 'danger_commands' | sed 's/.*"\([^"]*\)".*/\1/' | tr '\n' '|' | sed 's/|$//')
+  _dc=$(awk '/"danger_commands"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
   [ -n "$_dc" ] && DANGER_CMDS="($_dc)"
 fi
 
