@@ -16,7 +16,7 @@
 
 ## 다음 세션 안건
 
-**[중] 하네스 강화 Phase 2** — Hook 프로파일 전환 + Session Startup 정비 + 메타 스킬 스케줄
+**[중] 하네스 강화 Phase 2** — Hook 프로파일 전환(중앙 설정형) + Session Startup 정비 (메타 스킬 스케줄은 이미 등록 완료)
 
 ---
 
