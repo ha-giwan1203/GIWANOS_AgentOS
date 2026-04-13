@@ -4,12 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 15:10 KST — 세션 35 (daily-routine 통합 + GPT 통과 + gpt-send 최적화)
+최종 업데이트: 2026-04-13 16:55 KST — 세션 36 (이월 안건 3건 토론+검증)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-13 세션 35)
+## 0. 최신 세션 (2026-04-13 세션 36)
+
+### 이번 세션 완료
+1. **GPT 토론 2턴**: 이월 안건 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건
+2. **안건1 GPT 전송 스킬 실사용 검증 PASS**: 세션36 토론 자체가 gpt-send 경로 전체 실사용 (URL탐지→insertText→polling→응답읽기)
+3. **안건2 verify_xlsm 1차 구조 검증**: 스크립트 동작 확인. 기대 시트명(PLAN_OUTPUT)/테이블명(tblInfo,tblPlanOutput) 불일치 → 기대값 조정 필요
+4. **안건3 Notion 부모 페이지 동기화**: 부모 페이지 구조 확인 (📌 운영 현황 heading_2 존재). API 404 원인: Integration 미연결 → 사용자 Notion 설정 필요
+5. **독립 의견 유지**: GPT share-result 3단계 위임 지적 → 실물 확인 후 반박 유지 (위임 문구 정상)
+
+### 다음 세션 참고
+- verify_xlsm: 실제 시트명 매핑 + 2차 COM 기대값 확정 필요
+- Notion: 부모 페이지에 'GPT 자동 분류 시스템' Integration 연결 후 sync_parent_page() 재실행
+- /gpt-read 단독 호출 재탐지 보강은 실익 낮으므로 보류 유지
+
+---
+
+## 1. 이전 세션 (2026-04-13 세션 35)
 
 ### 이번 세션 완료
 1. **daily-routine 통합 스킬 신규**: ZDM 일상점검 + MES 생산실적 업로드를 `daily-routine/run.py` 단일 스크립트로 통합

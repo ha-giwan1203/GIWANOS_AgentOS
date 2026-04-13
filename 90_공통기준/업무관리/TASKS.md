@@ -10,25 +10,32 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13 — 세션35 (daily-routine 통합 + GPT 통과 + gpt-send 최적화)
+최종 업데이트: 2026-04-13 — 세션36 (이월 안건 3건 토론+검증)
 
 ---
 
 ## 다음 세션 안건
 
-### [소] GPT 전송 스킬 실사용 검증
-- /gpt-send, /gpt-read 실제 share-result 흐름에서 1회 실사용 검증
-- 통합 JS(insertText + send click 1회 호출) 최적화 검토
+### [소] verify_xlsm 기대값 조정 + 2차 COM 검증
+- 1차 구조 검증은 동작 확인됨 (스크립트 정상, 기대 시트명/테이블명이 실제 파일과 불일치)
+- PLAN_OUTPUT 시트 → 실제 시트명 매핑 필요, tblInfo/tblPlanOutput 테이블 확인
+- 2차 COM 기대값(PART_NO, MODULE_PART, MODEL_GROUP) 확정 후 실행
 
-### [소] verify_xlsm COM 검증
-- Excel XLSM 파일 COM 기반 검증 스크립트 실전 테스트
-
-### [소] Notion 부모 페이지 동기화 실전 검증
-- sync_parent_page() dry-run → 실행 → 부모 페이지 갱신 확인
+### [소] Notion 부모 페이지 Integration 연결 후 sync 재실행
+- sync_parent_page() 코드 정상, 부모 페이지 구조(📌 운영 현황 heading_2) 확인됨
+- 404 원인: 부모 페이지가 'GPT 자동 분류 시스템' Integration에 미연결
+- 사용자가 Notion 페이지 → '...' → '연결' → 'GPT 자동 분류 시스템' 추가 후 재실행
 
 ---
 
 ## 최근 완료
+
+### [완료] 이월 안건 3건 토론+검증 — 세션36 (2026-04-13)
+- **GPT 토론 2턴**: 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건 / 버림 0건
+- **안건1 GPT 전송 스킬**: 실사용 검증 PASS — 세션36 토론 자체가 gpt-send 경로(URL→탐지→insertText→polling→읽기) 실사용
+- **안건2 verify_xlsm**: 1차 구조 검증 스크립트 동작 확인. 기대 시트명/테이블명이 실제 파일과 불일치 → 기대값 조정 후 재검증 필요 (조건부 PASS)
+- **안건3 Notion 부모 페이지**: 부모 페이지 구조 확인 (📌 운영 현황 heading_2 존재). sync_parent_page() 호출 시 404 — Integration 미연결 환경 문제 (조건부 PASS)
+
 
 ### [완료] 매일 반복 업무 통합 스킬 daily-routine — 세션35 (2026-04-13)
 - ZDM 일상점검 + MES 생산실적 업로드를 `daily-routine/run.py` 단일 스크립트로 통합
