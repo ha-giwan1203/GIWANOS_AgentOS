@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 16:55 KST — 세션 36 (이월 안건 3건 토론+검증)
+최종 업데이트: 2026-04-13 17:45 KST — 세션 36 (이월3건 + 영상분석 + completion_gate개선)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -18,9 +18,13 @@
 4. **안건3 Notion 부모 페이지 동기화 PASS**: Integration 연결(Chrome MCP) + sync_parent_page() 실행 성공. "📌 운영 현황" 섹션 자동 갱신 확인
 5. **share-result 3단계 정리**: share-result.md 3단계는 /gpt-send에 진입 위임 문구만 보유. 실제 진입 로직(debate_chat_url/fallback)은 gpt-send.md 내부에 존재. GPT는 "자체 진입 로직 잔존"으로 지적했으나, 이는 gpt-send 호출 시 실행되는 내부 로직이므로 share-result 차원의 위임 구조는 정상
 
+6. **장피엠 영상분석**: n8n AI 에이전트 (YFBoaGs5S60) — 15프레임+자막 분석, C등급 전체. Notion 저장 완료
+7. **completion_gate 개선**: STATUS.md 검사 추가 — 상태 문서 3개 전부 검사
+
 ### 다음 세션 참고
-- verify_xlsm: 1차 구조 PASS (기대값 조정 완료). 2차 COM은 입력 시트(SP3 LINE 기준 정보) 대상 재설계 필요
-- Notion: 부모 페이지 동기화 완전 해결 (Integration 연결 + sync 성공)
+- verify_xlsm 2차 COM은 불필요로 종료 (결과 시트에 수식 없음)
+- Notion 부모 페이지 동기화 완전 해결
+- Drive 업로드 YFBoaGs5S60 재시도 필요 (타임아웃, 로컬 캐시 보존)
 - /gpt-read 단독 호출 재탐지 보강은 실익 낮으므로 보류 유지
 
 ---
