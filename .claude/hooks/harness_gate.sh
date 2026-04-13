@@ -2,7 +2,7 @@
 # PreToolUse hook — HARNESS GATE: 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단
 #
 # 발화 조건: debate_preflight.req 존재 시에만 활성
-# 차단 경로: Bash(git commit/push/cdp_chat_send), completion_gate 경유 완료 선언
+# 차단 경로: Bash(git commit/push/share-result/finish). GPT 전송은 Chrome MCP로 통일(2026-04-13)
 # 검사 대상: 트랜스크립트에서 하네스 분석 복합 조건 충족 여부
 #
 # 복합 조건 (GPT 합의 2라운드):

@@ -384,20 +384,17 @@ check $? "응답노드 selector (assistant role) 문서화됨"
 
 echo ""
 
-# === 23. 토론모드 helper 경로 문서 정합성 ===
-echo "--- 23. 토론모드 helper 경로 문서 정합성 ---"
-# expect-last-snippet 폐기 확인 (세션15 P1): 코드에서 완전 제거됨
-! grep -q 'expect-last-snippet' "$PROJECT_DIR/.claude/scripts/cdp/cdp_chat_send.py"
-check $? "cdp_chat_send.py expect-last-snippet 완전 제거됨"
+# === 23. GPT 전송 경로 문서 정합성 (Chrome MCP 통일) ===
+echo "--- 23. GPT 전송 경로 문서 정합성 (Chrome MCP 통일) ---"
+# Chrome MCP 통일 문서화 확인
+grep -q 'Chrome MCP' "$DEBATE_REF"
+check $? "토론모드 REFERENCE.md가 Chrome MCP 통일을 문서화함"
 
-grep -q 'cdp_chat_send' "$DEBATE_REF"
-check $? "토론모드 REFERENCE.md가 helper 기본 경로를 문서화함"
+grep -q 'Chrome MCP' "$SHARE_RESULT"
+check $? "share-result 명령이 Chrome MCP 전송을 문서화함"
 
-grep -q 'cdp_chat_send.py' "$SHARE_RESULT"
-check $? "share-result 명령이 helper 기본 경로를 문서화함"
-
-grep -q 'cdp_chat_send.py' "$FINISH_CMD"
-check $? "finish 명령이 helper 기본 경로를 문서화함"
+grep -q 'Chrome MCP' "$FINISH_CMD"
+check $? "finish 명령이 Chrome MCP 전송을 문서화함"
 
 echo ""
 

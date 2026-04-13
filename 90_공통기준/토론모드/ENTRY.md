@@ -35,10 +35,8 @@
    - 마지막 assistant 블록 텍스트 100자 읽기
    - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
    - 같으면 → 예정대로 전송 진행
-4. 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate`
-   - helper가 현재 화면의 최신 답변 100자와 다르다고 판단하면 전송하지 않고 차단해야 한다.
-   - `--match-url-exact`로 정확 매칭 사용. 부분매칭(`--match-url`)은 탭이 1개일 때만 허용.
-5. **[DEPRECATED]** 직접 DOM 전송(`#prompt-textarea` + `execCommand('insertText')`)은 deprecated. 토론모드에서 send_gate.sh가 차단함. CDP 기본 경로만 사용할 것.
+4. 기본 전송: Chrome MCP `type` 액션으로 입력 → 전송 버튼 클릭 (2026-04-13 통일)
+5. **[DEPRECATED]** javascript_tool에서 execCommand+insertText 직접 사용은 deprecated. send_gate.sh가 차단함. Chrome MCP type 액션 사용할 것.
 6. stop-button polling 적응형 (3/5/8초) + 매 주기 사용자 중단 확인
 
 ## 상세 참조

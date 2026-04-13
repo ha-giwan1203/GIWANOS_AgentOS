@@ -98,9 +98,8 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
 ### Step 2. 메시지 전송
-- 기본 전송 경로: `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate` (상세: REFERENCE.md §1)
-- `--match-url-exact`로 정확 매칭 사용 (trailing slash 정규화). 부분매칭은 탭 1개일 때만 허용
-- **[DEPRECATED]** 직접 DOM 전송(execCommand+insertText)은 deprecated. send_gate.sh가 토론모드에서 차단함
+- 기본 전송: Chrome MCP `type` 액션으로 입력 → 전송 버튼 `left_click` (상세: REFERENCE.md §1)
+- **[DEPRECATED]** javascript_tool에서 execCommand+insertText 직접 사용은 deprecated. send_gate.sh가 차단
 - 전송 본문 자연어는 한국어만 작성
 - 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
 - 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)

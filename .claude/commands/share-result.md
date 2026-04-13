@@ -46,8 +46,8 @@
 GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ```
 
-- 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate` 이다.
-- helper를 쓸 수 없을 때만 ENTRY.md의 직접 자바스크립트 예비 경로를 사용한다.
+- 기본 전송: Chrome MCP `type` 액션으로 입력 → 전송 버튼 클릭 (2026-04-13 통일)
+- CDP 스크립트(cdp_chat_send.py)는 사내 시스템 전용. GPT 대화에 사용하지 않는다.
 
 ### 5단계: GPT 응답 대기 + 하네스 분석 + 지적사항 즉시 대응
 - 적응형 polling으로 응답 대기

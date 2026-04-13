@@ -25,12 +25,12 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 1. 기존 탭 확인 → 있으면 switch, 없으면 navigate
 2. main 영역 JS로 대화 URL 추출 → navigate (클릭 금지)
 3. **SEND GATE**: 전송 직전 assistant 최신 텍스트 재읽기 (NEVER — 생략 금지)
-4. 기본 전송: `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate`
-5. **[DEPRECATED]** 직접 DOM 전송(execCommand+insertText)은 deprecated → send_gate.sh가 차단. CDP 기본 경로만 사용
+4. 기본 전송: Chrome MCP `type` 액션으로 입력 → 전송 버튼 클릭
+5. **[DEPRECATED]** javascript_tool에서 execCommand+insertText 직접 사용은 deprecated → send_gate.sh가 차단. Chrome MCP type 액션 사용
 6. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
 7. 응답 읽기 → 하네스 분석 → 반박 생성 → 전송 → 반복
 
-> 로컬 CDP 스크립트 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 허용한다. (직접 DOM 전송은 helper 미사용 시에만 예비 경로)
+> GPT 대화는 Chrome MCP 도구로 통일한다 (2026-04-13). CDP 스크립트(cdp_chat_send.py)는 사내 시스템(ZDM/MES/ERP) 전용.
 
 ## 고정 Selector (2026-03-31 실증)
 ```

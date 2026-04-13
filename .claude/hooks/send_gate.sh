@@ -1,9 +1,10 @@
 #!/bin/bash
-# PreToolUse hook — SEND GATE: ChatGPT 직접 전송 예비 경로 차단
-# CDP 단일화(2026-04-11 GPT 합의): 기본 전송은 cdp_chat_send.py가 자체 검증.
-# 이 hook은 직접 JS 예비 경로(javascript_tool + execCommand)를 deprecated 차단한다.
+# PreToolUse hook — SEND GATE: ChatGPT 직접 JS 전송 차단
+# Chrome MCP 통일(2026-04-13): GPT 대화는 Chrome MCP 도구(type/left_click 등)로 통일.
+# 이 hook은 javascript_tool로 execCommand+insertText 패턴 사용을 차단한다.
+# Chrome MCP의 type 액션이나 form_input은 차단 대상 아님.
 # 대상: mcp__Claude_in_Chrome__javascript_tool 호출 중 execCommand('insertText') 포함 시
-# 조건: 토론모드 활성 시 직접 JS 전송을 차단하고 CDP 기본 경로 사용을 강제
+# 조건: 토론모드 활성 시 직접 JS 전송을 차단하고 Chrome MCP type 사용을 안내
 
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -77,9 +78,9 @@ if circuit_breaker_tripped "send_gate" 3 2>/dev/null; then
   hook_log "PreToolUse/send_gate" "⚠ circuit breaker — 연속 3회 이상 unresolved send_gate incident"
 fi
 
-# CDP 단일화: 토론모드에서 직접 JS 전송(예비 경로)은 deprecated → 차단
-# 기본 전송 경로인 cdp_chat_send.py(Bash 호출)는 자체 검증 처리
-hook_log "PreToolUse/send_gate" "BLOCK: deprecated_direct_js_send | 토론모드에서 직접 JS 전송 차단, cdp_chat_send.py 사용 필수" 2>/dev/null
-hook_incident "hook_block" "send_gate" "" "deprecated: 직접 JS 전송. CDP 기본 경로(cdp_chat_send.py) 사용 필수" '"classification_reason":"send_block"' 2>/dev/null || true
-echo '{"decision":"block","reason":"[CDP 단일화] 토론모드에서 직접 JS 전송(execCommand+insertText)은 deprecated되었습니다. cdp_chat_send.py를 사용하세요: python .claude/scripts/cdp/cdp_chat_send.py --match-url <url> --text-file <file> --mark-send-gate"}'
+# Chrome MCP 통일: javascript_tool로 execCommand 직접 호출은 차단
+# Chrome MCP의 type/left_click/form_input 액션을 사용할 것
+hook_log "PreToolUse/send_gate" "BLOCK: deprecated_direct_js_send | javascript_tool execCommand 차단, Chrome MCP type 사용 필수" 2>/dev/null
+hook_incident "hook_block" "send_gate" "" "deprecated: javascript_tool execCommand. Chrome MCP type 액션 사용 필수" '"classification_reason":"send_block"' 2>/dev/null || true
+echo '{"decision":"block","reason":"[Chrome MCP 통일] javascript_tool에서 execCommand+insertText 직접 사용은 deprecated입니다. Chrome MCP의 type 액션 또는 form_input을 사용하세요."}'
 exit 0

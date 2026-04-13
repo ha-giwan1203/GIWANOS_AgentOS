@@ -4,22 +4,22 @@
 > 앱 운영 규칙과 문서 우선순위는 상위 `../CLAUDE.md`, `../APP_INSTRUCTIONS.md`를 따른다.
 > 토론방에 보내는 자연어 본문은 한국어만 사용한다. 예외: code block, selector/data-testid, 파일 경로, commit SHA 같은 literal, 그리고 `오류 원문:`/`에러 원문:` 라벨 1줄 인용.
 
-> 로컬 CDP 경로에서는 `.claude/scripts/cdp/cdp_chat_send.py --mark-send-gate`를 기본 전송 경로로 사용한다. 직접 DOM 전송은 helper를 쓸 수 없을 때만 예비 경로로 사용한다. (직접 DOM 전송은 helper 미사용 시에만 예비 경로)
+> GPT 대화는 Chrome MCP 도구로 통일한다 (2026-04-13). CDP 스크립트(cdp_chat_send.py)는 사내 시스템(ZDM/MES/ERP) 전용.
 
 ---
 
-## 1. 기본 전송 경로 (v2.9 — CDP 단일화)
+## 1. 기본 전송 경로 (v3.0 — Chrome MCP 통일)
 
-```bash
-python '.claude/scripts/cdp/cdp_chat_send.py' \
-  --auto-debate-url \
-  --text-file '<utf8_text_file>' \
-  --mark-send-gate
-```
+GPT 대화 전송은 Chrome MCP 도구로 수행한다.
 
-- `--auto-debate-url`: debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정
-- `--mark-send-gate`: assistant 최신 읽기 직후 send_gate 파일 갱신
-- submit selector는 `[data-testid="send-button"], #composer-submit-button` 순서로 내부 fallback 처리
+1. `tabs_context_mcp` → 기존 ChatGPT 탭 확인
+2. `read_page` / `find`로 입력창 확인
+3. `type` 액션으로 메시지 입력
+4. 전송 버튼 `left_click`으로 전송
+
+- javascript_tool에서 execCommand+insertText 직접 사용은 deprecated → send_gate.sh가 차단
+- 이전 CDP 스크립트(cdp_chat_send.py)는 사내 시스템 전용으로 유지
+- submit selector 참조: `[data-testid="send-button"]`
 - 토론모드 문서상 기본 전송 경로는 위 helper다.
 
 ### 예비 경로: 직접 DOM 입력 + 전송 (v1.7)
