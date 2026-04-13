@@ -45,17 +45,20 @@ url;  // → navigate()에 전달
 
 ## 입력+전송 상세
 
-### 기본 전송 경로 (Chrome MCP 통일 — 2026-04-13)
+### 기본 전송 경로 (`cdp_chat_send.py`)
 
-GPT 대화 전송은 Chrome MCP 도구로 통일한다.
+GPT 대화 전송은 CDP 스크립트를 기본으로 사용한다.
 
-1. `tabs_context_mcp` → 기존 ChatGPT 탭 확인
-2. `read_page` / `find`로 입력창 확인
-3. `type` 액션으로 메시지 입력
-4. 전송 버튼 `left_click`으로 전송
+```bash
+python '.claude/scripts/cdp/cdp_chat_send.py' \
+  --match-url '<chat_url>' \
+  --text-file '<utf8_text_file>' \
+  --mark-send-gate
+```
 
-- javascript_tool에서 execCommand+insertText 직접 사용은 deprecated → send_gate.sh가 차단
-- 이전 CDP 스크립트(cdp_chat_send.py)는 사내 시스템(ZDM/MES/ERP) 전용으로 유지
+- `--mark-send-gate`: assistant 최신 읽기 직후 `.claude/state/send_gate_passed` 갱신
+- submit selector는 내부에서 `[data-testid="send-button"], #composer-submit-button` fallback 사용
+- Chrome MCP type은 CDP 불가 시 fallback으로만 사용
 
 ### 예비 경로: 통합 JS (1회 호출)
 ```javascript

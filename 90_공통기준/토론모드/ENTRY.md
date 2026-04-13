@@ -35,8 +35,8 @@
    - 마지막 assistant 블록 텍스트 100자 읽기
    - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
    - 같으면 → 예정대로 전송 진행
-4. 기본 전송: Chrome MCP `type` 액션으로 입력 → 전송 버튼 클릭 (2026-04-13 통일)
-5. **[DEPRECATED]** javascript_tool에서 execCommand+insertText 직접 사용은 deprecated. send_gate.sh가 차단함. Chrome MCP type 액션 사용할 것.
+4. 기본 전송 경로는 `.claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate`
+5. **[FALLBACK]** Chrome MCP type 액션은 CDP 불가 시에만 사용. javascript_tool execCommand+insertText는 send_gate.sh가 차단.
 6. stop-button polling 적응형 (3/5/8초) + 매 주기 사용자 중단 확인
 
 ## 상세 참조

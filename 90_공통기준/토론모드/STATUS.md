@@ -13,8 +13,8 @@
 - Selector smoke test: idle composer 상태(`composer-speech-button`) 허용, 전송 직전 submit button 재확인
 - REFERENCE.md 통합 JS: `[data-testid="send-button"], #composer-submit-button` fallback으로 실전 selector와 일치
 - 언어 규칙: 토론방 자연어는 한국어만 사용, 판정 요청 라벨도 `통과 / 조건부 통과 / 실패`로 고정
-- GPT 전송 경로: Chrome MCP 도구로 통일 (2026-04-13). CDP 스크립트(cdp_chat_send.py)는 사내 시스템 전용
-- 기본 전송: Chrome MCP `type` 액션 → 전송 버튼 클릭. javascript_tool execCommand 직접 사용은 send_gate.sh가 차단
+- GPT 전송 경로: `cdp_chat_send.py` 기본. Chrome MCP는 CDP 불가 시 fallback
+- javascript_tool execCommand+insertText 직접 사용은 send_gate.sh가 차단
 - 에러 원문 예외: `오류 원문:` / `에러 원문:` 1줄 인용은 한국어 가드 예외로 허용
 - incident 수리 루프: `incident_repair.py`가 패치 후보와 검증 단계까지 제안
 - 문서 우선순위 정리: 전역 상태는 `../업무관리/TASKS.md`, 토론모드 문서는 하위 도메인용으로 역할 고정

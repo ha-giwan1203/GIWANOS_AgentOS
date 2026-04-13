@@ -384,17 +384,17 @@ check $? "응답노드 selector (assistant role) 문서화됨"
 
 echo ""
 
-# === 23. GPT 전송 경로 문서 정합성 (Chrome MCP 통일) ===
-echo "--- 23. GPT 전송 경로 문서 정합성 (Chrome MCP 통일) ---"
-# Chrome MCP 통일 문서화 확인
-grep -q 'Chrome MCP' "$DEBATE_REF"
-check $? "토론모드 REFERENCE.md가 Chrome MCP 통일을 문서화함"
+# === 23. 토론모드 helper 경로 문서 정합성 ===
+echo "--- 23. 토론모드 helper 경로 문서 정합성 ---"
+# cdp_chat_send.py 기본 경로 문서화 확인
+grep -q 'cdp_chat_send' "$DEBATE_REF"
+check $? "토론모드 REFERENCE.md가 CDP helper 기본 경로를 문서화함"
 
-grep -q 'Chrome MCP' "$SHARE_RESULT"
-check $? "share-result 명령이 Chrome MCP 전송을 문서화함"
+grep -q 'cdp_chat_send' "$SHARE_RESULT"
+check $? "share-result 명령이 CDP helper 기본 경로를 문서화함"
 
-grep -q 'Chrome MCP' "$FINISH_CMD"
-check $? "finish 명령이 Chrome MCP 전송을 문서화함"
+grep -q 'cdp_chat_send' "$FINISH_CMD"
+check $? "finish 명령이 CDP helper 기본 경로를 문서화함"
 
 echo ""
 

@@ -43,7 +43,7 @@
 - finish_state.json에 `committed_pushed: true` 기록
 
 ### 5단계: GPT 공유
-- GPT 전송: Chrome MCP `type` 액션 → 전송 버튼 클릭 (2026-04-13 통일)
+- 토론모드 ENTRY.md 규칙 준수 (`cdp_chat_send.py --mark-send-gate` 기본, Chrome MCP는 fallback만)
 - 입력 전 미확인 응답 점검 필수
 - SHA + 수정 내용 + 판정 요청
 - finish_state.json에 `gpt_shared: true` 기록
