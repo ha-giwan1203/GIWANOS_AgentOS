@@ -249,26 +249,32 @@ if [ ! -f "$MARKER" ] && [ -f "$LEGACY_MARKER" ]; then
 fi
 
 if [ -f "$MARKER" ]; then
-  # write_marker.json의 created_at 필드 우선, 없으면 mtime fallback (마커 해석 통일, 세션 11)
-  MARKER_CREATED=$(safe_json_get "created_at" < "$MARKER" 2>/dev/null || echo "")
-  if [ -n "$MARKER_CREATED" ]; then
-    MARKER_EPOCH=$(date -d "$MARKER_CREATED" +%s 2>/dev/null || file_mtime "$MARKER")
+  # after_state_sync=true면 상태문서 갱신 완료 — skip (completion_gate와 동일 판정)
+  AFTER_SYNC=$(safe_json_get "after_state_sync" < "$MARKER" 2>/dev/null)
+  if [ "$AFTER_SYNC" = "true" ]; then
+    echo "  [OK] after_state_sync=true — 상태문서 갱신 완료"
   else
-    MARKER_EPOCH=$(file_mtime "$MARKER")
-  fi
-  for F in "$TASKS" "$HANDOFF"; do
-    NAME=$(basename "$F")
-    if [ -f "$F" ]; then
-      F_EPOCH=$(file_mtime "$F")
-      if [ "$F_EPOCH" -lt "$MARKER_EPOCH" ] 2>/dev/null; then
-        fail "$NAME — write_marker 이후 미갱신"
-      else
-        echo "  [OK] $NAME 갱신됨"
-      fi
+    # write_marker.json의 created_at 필드 우선, 없으면 mtime fallback (마커 해석 통일, 세션 11)
+    MARKER_CREATED=$(safe_json_get "created_at" < "$MARKER" 2>/dev/null || echo "")
+    if [ -n "$MARKER_CREATED" ]; then
+      MARKER_EPOCH=$(date -d "$MARKER_CREATED" +%s 2>/dev/null || file_mtime "$MARKER")
     else
-      fail "$NAME 파일 없음"
+      MARKER_EPOCH=$(file_mtime "$MARKER")
     fi
-  done
+    for F in "$TASKS" "$HANDOFF"; do
+      NAME=$(basename "$F")
+      if [ -f "$F" ]; then
+        F_EPOCH=$(file_mtime "$F")
+        if [ "$F_EPOCH" -lt "$MARKER_EPOCH" ] 2>/dev/null; then
+          fail "$NAME — write_marker 이후 미갱신"
+        else
+          echo "  [OK] $NAME 갱신됨"
+        fi
+      else
+        fail "$NAME 파일 없음"
+      fi
+    done
+  fi
 else
   echo "  [INFO] write_marker 없음 (파일 변경 없는 세션)"
 fi
