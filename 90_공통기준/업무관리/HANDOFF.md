@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 14:30 KST — 세션 35 (매일 반복 업무 통합 daily-routine 스킬 신규)
+최종 업데이트: 2026-04-13 15:10 KST — 세션 35 (daily-routine 통합 + GPT 통과 + gpt-send 최적화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -19,10 +19,14 @@
 5. **스케줄 태스크 정리**: `daily-routine` 1개로 통합, 기존 `daily-zdm-inspection`/`daily-mes-upload` 비활성
 6. **데이터 정비**: 4/5(일) ZDM 오입력 삭제, 4/10-11 ZDM+MES 누락분 보정
 7. **문서 갱신**: SKILL.md 3개(daily-routine 신규, zdm/mes 참조 추가), TASKS.md, HANDOFF.md
+8. **GPT 지적 대응**: run.py 실패 시 exit(1) + 스케줄 태스크 증적 파일 → GPT 최종 통과
+9. **gpt-send 최적화**: 프로젝트 URL `.claude/state/gpt_project_url`에 고정, 입력+전송 JS 통합 (tool call 절감)
+10. **share-result 통일**: 프로젝트 진입을 gpt-send에 위임
 
 ### 다음 세션 참고
 - daily-routine/run.py 내일(4/14 월) 첫 자동 실행 시 도구 권한 승인 필요
 - 개별 실행 필요 시 zdm/mes 각각의 run.py도 사용 가능
+- GPT 프로젝트 URL 변경 시: `.claude/state/gpt_project_url` 파일만 수정
 
 ---
 
