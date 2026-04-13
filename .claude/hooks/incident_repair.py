@@ -282,6 +282,68 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     return count
 
 
+def parse_test_output(output: str) -> list[dict[str, Any]]:
+    """smoke_test.sh / e2e_test.sh 출력에서 [FAIL] 라인을 파싱해 incident 포맷으로 변환.
+
+    Phase 3-1: 오토리서치 루프 기반.
+    반환 형식: [{"hook": "smoke_test|e2e_test", "type": "test_fail",
+                 "detail": "FAIL 내용", "classification_reason": "test_fail",
+                 "inferred_next_action": "...", "patch_candidates": [...]}]
+    """
+    import re
+    import datetime
+
+    incidents: list[dict[str, Any]] = []
+    current_section = ""
+    ts = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    for line in output.splitlines():
+        # 섹션 헤더 감지: "--- 1. hook_common.sh ---" 또는 "--- E2E-1. ..."
+        section_match = re.match(r"---\s*(.*?)\s*---", line)
+        if section_match:
+            current_section = section_match.group(1).strip()
+            continue
+
+        # [FAIL] 라인 감지
+        if "[FAIL]" in line:
+            detail = line.strip().replace("[FAIL] ", "").strip()
+            # 테스트 유형 판별
+            is_e2e = "E2E" in current_section or "e2e" in current_section.lower()
+            hook_name = "e2e_test" if is_e2e else "smoke_test"
+
+            # 패치 후보 추론: detail에서 파일명/함수명 추출
+            candidates: list[str] = []
+            file_match = re.search(r"(\S+\.(sh|py|json|md))", detail)
+            if file_match:
+                candidates.append(f".claude/hooks/{file_match.group(1)}")
+
+            # 다음 행동 추론
+            if "존재" in detail or "없" in detail:
+                next_action = f"파일 존재/내용 확인: {detail}"
+            elif "등록" in detail:
+                next_action = f"settings.local.json 등록 확인: {detail}"
+            elif "함수" in detail or "정의" in detail:
+                next_action = f"함수 정의/참조 확인: {detail}"
+            else:
+                next_action = f"FAIL 항목 직접 확인 후 수정: {detail}"
+
+            incidents.append({
+                "ts": ts,
+                "hook": hook_name,
+                "type": "test_fail",
+                "detail": detail,
+                "section": current_section,
+                "classification_reason": "test_fail",
+                "inferred_next_action": next_action,
+                "patch_candidates": candidates,
+                "verify_steps": [
+                    f"bash .claude/hooks/{'e2e_test' if is_e2e else 'smoke_test'}.sh"
+                ],
+            })
+
+    return incidents
+
+
 def archive_resolved(ledger_path: Path, days: int = 30, dry_run: bool = False) -> int:
     """resolved=true이고 days일 경과한 항목을 아카이브 파일로 이동.
 
@@ -376,7 +438,36 @@ def main() -> int:
         action="store_true",
         help="with --auto-resolve or --archive, show count without modifying ledger",
     )
+    parser.add_argument(
+        "--parse-test-output",
+        type=str,
+        default=None,
+        metavar="FILE",
+        help="smoke/e2e test output file to parse for FAIL incidents",
+    )
     args = parser.parse_args()
+
+    # Phase 3-1: smoke/e2e FAIL 파싱
+    if args.parse_test_output:
+        test_path = Path(args.parse_test_output)
+        if not test_path.exists():
+            print(f"파일 없음: {args.parse_test_output}")
+            return 1
+        output = test_path.read_text(encoding="utf-8")
+        incidents = parse_test_output(output)
+        if not incidents:
+            print("FAIL 없음 — ALL PASS.")
+            return 0
+        if args.json:
+            print(json.dumps(incidents, ensure_ascii=False, indent=2))
+        else:
+            print(f"FAIL {len(incidents)}건 발견:")
+            for inc in incidents:
+                print(f"  [{inc['hook']}] {inc['detail']}")
+                print(f"    → 다음 행동: {inc['inferred_next_action']}")
+                if inc.get("patch_candidates"):
+                    print(f"    → 패치 후보: {', '.join(inc['patch_candidates'])}")
+        return 0
 
     if args.archive:
         count = archive_resolved(Path(args.ledger), days=args.archive_days, dry_run=args.dry_run)

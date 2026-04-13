@@ -138,4 +138,18 @@ if [ -x "$FAST_SMOKE" ]; then
   hook_log "session_start_restore" "fast_smoke: $FAST_RESULT"
 fi
 
+# Phase 3-1: 미해결 incident 요약 (있으면 표시, 없으면 생략)
+INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
+if [ -f "$INCIDENT_LEDGER" ]; then
+  UNRESOLVED_COUNT=$(grep -c '"resolved"' "$INCIDENT_LEDGER" 2>/dev/null | head -1)
+  TOTAL_COUNT=$(wc -l < "$INCIDENT_LEDGER" 2>/dev/null | tr -d ' ')
+  # resolved가 아닌 건 = 전체 - resolved
+  RESOLVED_COUNT=$(grep -c '"resolved":true\|"resolved": true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
+  OPEN_COUNT=$(( TOTAL_COUNT - RESOLVED_COUNT ))
+  if [ "$OPEN_COUNT" -gt 0 ]; then
+    echo "--- 미해결 incident: ${OPEN_COUNT}건 (총 ${TOTAL_COUNT}건) ---"
+    echo "    /auto-fix 로 분석 가능"
+  fi
+fi
+
 exit 0

@@ -24,11 +24,17 @@
 10. **session_start_restore.sh**: Getting Bearings Protocol (pwd + git log --oneline -5)
 11. **task_cursor.json 파생 캐시**: precompact_save.sh에서 TASKS.md 파싱
 12. smoke_test 120/120 + E2E 10/10 ALL PASS (Phase 3-3 반영 후)
+13. **Phase 3-1 GPT 토론**: 채택 4건. 반자동 합의, incident_repair 확장, /auto-fix 스킬
+14. **incident_repair.py**: `--parse-test-output` smoke/e2e FAIL 파싱
+15. **/auto-fix 스킬 신규**: 수동 트리거 반자동 수리
+16. **session_start_restore.sh**: 미해결 incident 요약 표시
+17. smoke_test 120/120 + E2E 10/10 ALL PASS (Phase 3-1 반영 후)
 
 ### 다음 세션 참고
-- Phase 3-1 오토리서치 루프 남음
+- **하네스 강화 Phase 1~3 전체 완료**
 - 모델 믹싱/Worktree 병렬은 별도 안건으로 분리
 - e2e_test.sh는 수동 검증용 (세션 시작 자동 실행 금지 합의)
+- /auto-fix는 반자동 — 분석+제안만, 자동 수정 없음
 
 ---
 
