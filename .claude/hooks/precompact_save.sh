@@ -34,7 +34,32 @@ $REQUIRED_DOCS"
   fi
 fi
 
-# progress.json 스냅샷 (있으면 포함)
+# progress.json writer: compact 직전 현재 상태를 JSON으로 갱신 (원자적 저장)
+# TASKS.md "다음 세션 안건" 행에서 current_task 추출
+CURRENT_TASK=$(grep -A 1 "^## 다음 세션 안건" "$PATH_TASKS" 2>/dev/null | tail -1 | sed 's/^[[:space:]]*//')
+[ "$CURRENT_TASK" = "(없음)" ] && CURRENT_TASK=""
+SAVE_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
+SESSION_ID="${CLAUDE_TRANSCRIPT_PATH:-unknown}"
+
+PROGRESS_TMP="${PROGRESS_FILE}.tmp"
+cat > "$PROGRESS_TMP" << PJSON
+{
+  "_comment": "캐시 전용 — 상태 원본이 아님. 복구 우선순위: TASKS.md > STATUS.md > HANDOFF.md > 이 파일",
+  "schema_version": 1,
+  "saved_at": "$SAVE_TS",
+  "session_id": "$SESSION_ID",
+  "active_domain": "${ACTIVE_DOMAIN:-}",
+  "current_task": "$CURRENT_TASK",
+  "completed_this_session": [],
+  "next_actions": [],
+  "blockers": []
+}
+PJSON
+if [ -s "$PROGRESS_TMP" ]; then
+  mv "$PROGRESS_TMP" "$PROGRESS_FILE"
+fi
+
+# progress.json 스냅샷 (있으면 kernel에 포함)
 PROGRESS_SECTION=""
 if [ -f "$PROGRESS_FILE" ]; then
   PROGRESS_SECTION="## 작업 진행 상태 (session_progress.json)

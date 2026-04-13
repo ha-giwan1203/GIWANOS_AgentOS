@@ -4,12 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 19:15 KST — 세션 36 (이월3건 + 영상분석 + self-audit + commit_gate수정)
+최종 업데이트: 2026-04-13 20:39 KST — 세션 37 (하네스 강화 Phase 1)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-13 세션 36)
+## 0. 최신 세션 (2026-04-13 세션 37)
+
+### 이번 세션 완료
+1. **하네스 세팅 자료 조사**: 인터넷 검색(공식문서, GPTers, ECC, WaveSpeed, Anthropic Engineering) + Notion 장피엠 2건 + GPT 내부 문서 3건 종합
+2. **하네스 강화 3단계 계획 수립**: Phase 1(즉시) / Phase 2(구조) / Phase 3(심화) — 계획 문서 작성
+3. **Phase 1 구현**: PreCompact 강화(도메인+progress.json+원자적 저장) + 위험 명령어 차단 보강(truncate/tee/리다이렉션) + JSON progress file(writer+reader)
+4. **GPT 토론 2턴**: 1턴 채택 6건/보류 1건, 2턴 부분반영→지적 3건 즉시 수정(writer 추가, > file 차단, 상태 문서 갱신)
+5. smoke_test 120/120 ALL PASS
+
+### 다음 세션 참고
+- Phase 2: Hook 프로파일 전환(중앙 설정형) + Session Startup 정비 + /self-audit 주간 스케줄
+- Phase 3 순서: E2E 테스트 → 2-Agent 패턴 → 오토리서치 루프 (GPT 합의)
+- daily-routine 4/14(월) 첫 자동 실행 시 도구 권한 승인 필요
+
+---
+
+## 1. 이전 세션 (2026-04-13 세션 36)
 
 ### 이번 세션 완료
 1. **GPT 토론 2턴**: 이월 안건 3건 일괄 검증 요청 → 실행 순서 합의. 채택 5건 / 보류 1건

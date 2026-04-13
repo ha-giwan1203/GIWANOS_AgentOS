@@ -31,6 +31,15 @@ fi
 PROTECTED_PATTERNS='(CLAUDE\.md|README\.md|STATUS\.md|RUNBOOK\.md|AGENTS_GUIDE\.md|settings.*\.json|\.skill|기준정보.*최종)'
 DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee |cat >|cat >>)'
 
+# 2b. 보호 경로에 대한 직접 리다이렉션(> file) 차단 (GPT 지적 반영)
+if echo "$COMMAND" | grep -qE '>\s*[^|]' 2>/dev/null; then
+  if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
+    hook_log "PreToolUse/Bash" "BLOCKED: 보호 경로 리다이렉션 덮어쓰기 — $COMMAND"
+    echo '{"decision":"deny","reason":"보호 대상 파일 리다이렉션 덮어쓰기 차단. 사용자 직접 실행 필요."}'
+    exit 0
+  fi
+fi
+
 if echo "$COMMAND" | grep -qE "$DANGER_CMDS"; then
   if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
     hook_log "PreToolUse/Bash" "BLOCKED: 보호 경로 삭제/이동 시도 — $COMMAND"

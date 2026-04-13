@@ -10,13 +10,26 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13 — 세션36 (이월3건 + 영상분석 + self-audit P2 해소 + commit_gate 수정)
+최종 업데이트: 2026-04-13 — 세션37 (하네스 강화 Phase 1)
 
 ---
 
 ## 다음 세션 안건
 
-(없음)
+**[중] 하네스 강화 Phase 2** — Hook 프로파일 전환 + Session Startup 정비 + 메타 스킬 스케줄
+
+---
+
+## 최근 완료
+
+### [완료] 하네스 강화 Phase 1 — 세션37 (2026-04-13)
+- **자료 조사**: 공식문서, GPTers, ECC, WaveSpeed, Anthropic Engineering, 장피엠 2건 종합
+- **GPT 토론 2턴**: 채택 6건 + 부분반영 지적 3건 즉시 수정
+- **1-1 PreCompact 강화**: 활성 도메인 규칙 + progress.json 스냅샷 주입, 원자적 저장(tmp→rename)
+- **1-2 위험 명령어 차단**: truncate/find -delete/xargs rm + 보호경로 tee/cat>/리다이렉션 차단
+- **1-3 JSON progress file**: session_progress.json 캐시(writer+reader), 복구 우선순위 명시
+- smoke_test 120/120 ALL PASS
+- Phase 3 순서 재정렬: 3-2 E2E → 3-3 2-Agent → 3-1 오토리서치
 
 ---
 
