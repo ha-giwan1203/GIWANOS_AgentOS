@@ -13,15 +13,21 @@
 
 ### 이번 세션 완료
 1. **현황 점검**: smoke_test 108/108 ALL PASS, STATUS.md 날짜 드리프트 해소(19→21개 훅 갱신)
-2. **세션29 P3 GPT 판정 확인**: 통과 (18e8e05c). GPT가 이미 판정 완료 상태였음
-3. **yt-dlp 풀다운로드 복구**: `--js-runtimes node --remote-components ejs:github` 조합으로 해결. Node.js v24.14.0 이미 설치되어 있어 deno 불필요. youtube_analyze.py에 옵션 반영
-4. **GPT 대화 Chrome MCP 통일**: CDP 우선 규칙 폐기, GPT 대화는 Chrome MCP로 통일 (메모리 3건 갱신)
+2. **세션29 P3 GPT 판정 확인**: 통과 (18e8e05c)
+3. **yt-dlp 풀다운로드 복구**: `--js-runtimes node --remote-components ejs:github` 조합으로 해결. Node.js v24.14.0. youtube_analyze.py 반영. GPT 통과
+4. **GPT 전송 경로 정리**: Chrome MCP 통일 시도 → type 줄바꿈/속도 퇴보 → CDP 기본 복원. 문서 11파일 2회 갱신
+5. **지침 강제 읽기 하네스 설계**: TASKS.md에 다음 세션 안건으로 등록. Claude가 지시문 미읽기로 삽질하는 문제를 PreToolUse 훅으로 강제
 
 ### GPT 판정
 - 세션29 P3: 통과 (18e8e05c)
-- 세션30: GPT 공유 대기
+- 세션30 yt-dlp: 통과 (b2a639d1)
+- 세션30 전송경로: 부분반영 → TASKS 갱신 후 재판정 필요 (다음 세션)
 
 ### 다음 세션 안건
+**[다음] 지침 강제 읽기 하네스 설계+구현**
+- PreToolUse 훅: 특정 도구 호출 전 관련 지시문 Read 이력 검증
+- GPT 전송(ENTRY.md), 도메인 진입(CLAUDE.md), 토론모드 필수
+
 **[소] Notion 부모 페이지 / verify_xlsm COM**
 
 ---

@@ -18,14 +18,20 @@
 
 ### [소] Notion 부모 페이지 / verify_xlsm COM
 
+### [다음] 지침 강제 읽기 하네스 설계
+- 문제: Claude가 도메인 진입/GPT 전송 시 관련 지시문을 안 읽고 행동 → 반복 삽질
+- 방향: PreToolUse 훅으로 특정 도구 호출 전 관련 지시문 Read 이력 검증
+- 대상: GPT 전송(ENTRY.md), 도메인 진입(CLAUDE.md), 토론모드(토론모드 CLAUDE.md)
+- 미읽기 시: 차단 + 읽기 안내
+
 ---
 
 ## 최근 완료
 
-### [완료] CDP→Chrome MCP 통일 — GPT 대화 전송 경로 전수 갱신 — 세션30 (2026-04-13)
-- GPT 대화 전송을 Chrome MCP type 액션으로 통일 (CDP 스크립트는 사내 시스템 전용)
-- send_gate/harness_gate/smoke_test/토론모드 문서 6개/share-result/finish 전부 갱신 (11파일)
-- smoke_test 107/107 ALL PASS
+### [완료] GPT 전송 경로 정리 — CDP 기본 복원 — 세션30 (2026-04-13)
+- Chrome MCP 통일 시도 → type 액션 줄바꿈/속도 퇴보 확인 → CDP 기본 복원
+- cdp_chat_send.py 기본, Chrome MCP는 fallback만
+- 문서 11파일 2회 갱신(Chrome MCP 통일→CDP 복원). smoke_test 107/107 ALL PASS
 
 ### [완료] yt-dlp 풀다운로드 복구 — 세션30 (2026-04-13)
 - Node.js v24.14.0 + `--js-runtimes node --remote-components ejs:github` 조합으로 해결
