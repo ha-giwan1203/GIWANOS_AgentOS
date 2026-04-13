@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13
+최종 업데이트: 2026-04-13 — 지침 강제 읽기 하네스 1차 구현 (GPT 토론 합의)
 
 ---
 
@@ -18,15 +18,20 @@
 
 ### [소] Notion 부모 페이지 / verify_xlsm COM
 
-### [다음] 지침 강제 읽기 하네스 설계
-- 문제: Claude가 도메인 진입/GPT 전송 시 관련 지시문을 안 읽고 행동 → 반복 삽질
-- 방향: PreToolUse 훅으로 특정 도구 호출 전 관련 지시문 Read 이력 검증
-- 대상: GPT 전송(ENTRY.md), 도메인 진입(CLAUDE.md), 토론모드(토론모드 CLAUDE.md)
-- 미읽기 시: 차단 + 읽기 안내
+### [보류] 지침 강제 읽기 하네스 2차 — 도메인 진입
+- 키워드→경로 매핑이 복잡, 별도 설계 필요 (1차 GPT 합의)
 
 ---
 
 ## 최근 완료
+
+### [완료] 지침 강제 읽기 하네스 1차 — GPT 전송 전 강제 — 세션31 (2026-04-13)
+- **GPT 토론 2라운드**: 방안 B(PostToolUse 기록 + PreToolUse 검증) 합의. 채택 4건 / 보류 0건 / 버림 0건
+- **instruction_read_gate.sh 신규**: cdp_chat_send.py/share-result/finish 실행 전 ENTRY.md + 토론모드 CLAUDE.md 읽기 확인. deny+exit 2
+- **evidence_mark_read.sh 정밀화**: Windows 경로 정규화(NORM_TEXT) + 토론모드 전용 마커(debate_entry_read.ok, debate_claude_read.ok)
+- **session_start_restore.sh**: instruction_reads/ 세션 초기화 추가
+- **smoke_test**: 108→117 (9건 추가). 117/117 ALL PASS
+- 독립 보강: Windows 경로 백슬래시 정규화 (GPT 미언급, 실물 확인 후 추가)
 
 ### [완료] GPT 전송 경로 정리 — CDP 기본 복원 — 세션30 (2026-04-13)
 - Chrome MCP 통일 시도 → type 액션 줄바꿈/속도 퇴보 확인 → CDP 기본 복원

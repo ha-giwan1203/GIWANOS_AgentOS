@@ -18,6 +18,13 @@ if [ -d "$STATE_EVIDENCE/$SK" ]; then
   hook_log "session_start_restore" "evidence START_FILE refreshed sk=$SK"
 fi
 
+# instruction_reads 세션 초기화: 이전 세션의 읽기 마커 무효화
+INSTRUCTION_DIR="$PROJECT_ROOT/.claude/state/instruction_reads"
+if [ -d "$INSTRUCTION_DIR" ]; then
+  rm -f "$INSTRUCTION_DIR"/*.ok 2>/dev/null
+  hook_log "session_start_restore" "instruction_reads cleared"
+fi
+
 hook_log "session_start_restore" "source=$SOURCE"
 
 if [ ! -f "$KERNEL_FILE" ]; then

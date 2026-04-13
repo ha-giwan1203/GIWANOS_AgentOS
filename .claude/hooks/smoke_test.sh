@@ -2,6 +2,8 @@
 # Hooks Smoke Test v4 — 현행 훅 실물 기준 (2026-04-08)
 # 테스트 22섹션: 운영 훅 16개 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence 5종 + selector 정합성
 
+export LC_ALL=en_US.UTF-8
+
 PASS=0
 FAIL=0
 TOTAL=0
@@ -534,12 +536,49 @@ check $? "send_gate: circuit breaker 호출 존재"
 
 echo ""
 
+# === 32. instruction_read_gate (capability) ===
+echo "--- 32. instruction_read_gate ---"
+test -f "$HOOKS_DIR/instruction_read_gate.sh"
+check $? "instruction_read_gate.sh 존재"
+
+grep -q 'instruction_read_gate' "$HOOKS_DIR/instruction_read_gate.sh"
+check $? "instruction_read_gate: 함수명/로그 참조"
+
+grep -q 'debate_entry_read.ok' "$HOOKS_DIR/instruction_read_gate.sh"
+check $? "instruction_read_gate: ENTRY.md 마커 확인"
+
+grep -q 'debate_claude_read.ok' "$HOOKS_DIR/instruction_read_gate.sh"
+check $? "instruction_read_gate: CLAUDE.md 마커 확인"
+
+# evidence_mark_read.sh 전용 마커 정밀 매칭 (cat|grep로 한글 경로 우회)
+cat "$HOOKS_DIR/evidence_mark_read.sh" | grep -q 'ENTRY'
+check $? "evidence_mark_read: ENTRY.md 전용 경로 매칭"
+
+cat "$HOOKS_DIR/evidence_mark_read.sh" | grep -q 'debate_entry_read'
+check $? "evidence_mark_read: debate_entry_read 마커 생성 로직"
+
+cat "$HOOKS_DIR/evidence_mark_read.sh" | grep -q 'debate_claude_read'
+check $? "evidence_mark_read: debate_claude_read 마커 생성 로직"
+
+grep -q 'NORM_TEXT' "$HOOKS_DIR/evidence_mark_read.sh"
+check $? "evidence_mark_read: Windows 경로 정규화(NORM_TEXT) 존재"
+
+# settings.local.json 등록 확인
+grep -q 'instruction_read_gate.sh' "$PROJECT_DIR/.claude/settings.local.json"
+check $? "settings.local.json: instruction_read_gate 등록됨"
+
+# session_start_restore.sh 초기화 확인
+grep -q 'instruction_reads' "$HOOKS_DIR/session_start_restore.sh"
+check $? "session_start_restore: instruction_reads 초기화 로직 존재"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31"
-# 24b는 24 하위 — capability로 분류. 31은 circuit breaker 신규
+CAPABILITY_SECTIONS="22 23 24 31 32"
+# 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate 신규
 
 echo ""
 echo "=== 라벨 분류 ==="

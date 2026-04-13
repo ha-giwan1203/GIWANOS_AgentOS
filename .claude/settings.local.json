@@ -63,7 +63,10 @@
       "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"const r = {}; r.prompt = !!document.querySelector\\('#prompt-textarea'\\); r.send = !!document.querySelector\\('[data-testid=\\\\\"send-button\\\\\"]'\\); r.speech = !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\); r.asstMsgs = document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length; JSON.stringify\\(r\\);\")",
       "Bash(python .claude/scripts/cdp/cdp_common.py --match-url-partial chatgpt.com --js \"JSON.stringify\\({prompt: !!document.querySelector\\('#prompt-textarea'\\), speech: !!document.querySelector\\('[data-testid=\\\\\"composer-speech-button\\\\\"]'\\), msgs: document.querySelectorAll\\('[data-message-author-role=\\\\\"assistant\\\\\"]'\\).length}\\)\")",
       "Bash(python .claude/scripts/cdp/read_chat_msgs.py)",
-      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --message '세션28 의제 1: 하네스 범용 확장:*)"
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --message '세션28 의제 1: 하네스 범용 확장:*)",
+      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)",
+      "Bash(python .claude/scripts/cdp/cdp_chat_send.py --auto-debate-url --mark-send-gate --text-file .claude/state/gpt_debate_msg.txt)",
+      "Bash(start \"\" \"C:\\\\\\\\Program Files\\\\\\\\Google\\\\\\\\Chrome\\\\\\\\Application\\\\\\\\chrome.exe\" --remote-debugging-port=9222 \"--user-data-dir=C:\\\\\\\\Users\\\\\\\\User\\\\\\\\.flow-chrome-debug\" --no-first-run --no-default-browser-check)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -177,6 +180,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/harness_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/instruction_read_gate.sh"
           }
         ]
       }
