@@ -46,7 +46,7 @@
 GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ```
 
-- 기본 전송: Chrome MCP (find → form_input → computer click). CDP 스크립트는 폐기됨.
+- 기본 전송: `/gpt-send` 명령 사용 (javascript_tool + insertText → send button click → 응답 대기). form_input/CDP 금지.
 
 ### 5단계: GPT 응답 대기 + 하네스 분석 + 지적사항 즉시 대응
 - 적응형 polling으로 응답 대기
