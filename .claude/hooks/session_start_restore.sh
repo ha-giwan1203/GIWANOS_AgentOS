@@ -138,9 +138,14 @@ if [ -x "$FAST_SMOKE" ]; then
   hook_log "session_start_restore" "fast_smoke: $FAST_RESULT"
 fi
 
-# 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교
+# 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교 (hook_config.json drift_check 연동)
+DRIFT_PATTERN="최종 업데이트"
+if [ -f "$CONFIG_FILE" ]; then
+  _dp=$(grep '"date_pattern"' "$CONFIG_FILE" 2>/dev/null | sed 's/.*: *"\(.*\)".*/\1/' | head -1)
+  [ -n "$_dp" ] && DRIFT_PATTERN="$_dp"
+fi
 _extract_date() {
-  sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$1" 2>/dev/null | head -1
+  sed -n "s/.*${DRIFT_PATTERN}: \([0-9-]*\).*/\1/p" "$1" 2>/dev/null | head -1
 }
 _TASKS_DATE=$(_extract_date "$PATH_TASKS")
 _HANDOFF_DATE=$(_extract_date "$PATH_HANDOFF")
@@ -158,11 +163,11 @@ if [ -f "$INCIDENT_LEDGER" ]; then
   TOTAL_COUNT=$(wc -l < "$INCIDENT_LEDGER" 2>/dev/null | tr -d ' ')
   RESOLVED_COUNT=$(grep -c '"resolved":true\|"resolved": true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
   OPEN_COUNT=$(( TOTAL_COUNT - RESOLVED_COUNT ))
-  # 24시간 이내 신규 건수
+  # 24시간 이내 신규 건수 (incident 필드명: "ts")
   CUTOFF_24H=$(date -d "-24 hours" "+%Y-%m-%dT%H:%M" 2>/dev/null || date -v-24H "+%Y-%m-%dT%H:%M" 2>/dev/null || echo "")
   RECENT_COUNT=0
   if [ -n "$CUTOFF_24H" ]; then
-    RECENT_COUNT=$(awk -v cutoff="$CUTOFF_24H" '/"created_at"/ { match($0, /"created_at":"([^"]+)"/, a); if(a[1] >= cutoff) c++ } END { print c+0 }' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
+    RECENT_COUNT=$(awk -v cutoff="$CUTOFF_24H" '/"ts"/ { match($0, /"ts":"([^"]+)"/, a); if(a[1] >= cutoff) c++ } END { print c+0 }' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
   fi
   if [ "$OPEN_COUNT" -gt 0 ] || [ "$RECENT_COUNT" -gt 0 ]; then
     echo "--- 미해결 incident: ${OPEN_COUNT}건 (총 ${TOTAL_COUNT}건, 최근24h 신규 ${RECENT_COUNT}건) ---"
