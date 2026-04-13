@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 22개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/harness/mcp_send gate 운영 중. CDP 폐기 → Chrome MCP 단일화 (2026-04-13) |
+| hooks 체계 | 23개 등록 + `incident_repair.py` 보조. Slack: `notify_slack.sh` (Notification hook). Notion: `/finish` 3.5단계 MCP. completion/final/commit/harness/mcp_send gate 운영 중. CDP 폐기 → Chrome MCP 단일화 (2026-04-13) |
 
 ---
 
