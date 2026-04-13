@@ -10,20 +10,30 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-13 — 세션33 (하네스 2차 도메인 진입 구현 + GPT 정합)
+최종 업데이트: 2026-04-13 — 세션34 (smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비)
 
 ---
 
 ## 다음 세션 안건
 
-### [소] Notion 부모 페이지 / verify_xlsm COM
+### [소] verify_xlsm COM 검증
+- Excel XLSM 파일 COM 기반 검증 스크립트 실전 테스트
 
-### [소] smoke_test 기존 FAIL 2건 정리
-- 토론모드 CLAUDE.md CDP 금지 선언 문구 오탐 / mcp_send_gate settings 변수 경로
+### [소] Notion 부모 페이지 동기화 실전 검증
+- sync_parent_page() dry-run → 실행 → 부모 페이지 갱신 확인
 
 ---
 
 ## 최근 완료
+
+### [완료] smoke_test FAIL 3건 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비 — 세션34 (2026-04-13)
+- **GPT 토론 2턴**: smoke_test 수정안 + Notion 부모 페이지 설계 검토. 채택 5건 / 보류 0건
+- **smoke_test.sh FAIL 3건 해소**: SETTINGS 변수 미정의 추가, CDP 금지 선언 오탐 grep 패턴 정교화, send_gate→send_gate.sh 정확 매칭. 120/120 ALL PASS
+- **notion_config.yaml**: parent_page_id 추가 (optional)
+- **notion_sync.py**: sync_parent_page() 신규 — HANDOFF(세션 번호) + TASKS(최근 완료) 기반, "운영 현황" 섹션만 블록 단위 갱신, best-effort (배치 실패 불승격)
+- **토론모드 문서 3개 수정**: SKILL.md/REFERENCE.md/debate-mode REFERENCE.md — 입력방식 `form_input`/CDP → `javascript_tool + insertText` 일괄 수정 (세션32 확정 반영 누락분)
+
+
 
 ### [완료] 지침 강제 읽기 하네스 2차 — 도메인 진입 — 세션33 (2026-04-13)
 - **GPT 토론 2턴**: 설계 쟁점 5개 → 채택 7건 / 보류 1건(detect-only 경고)

@@ -9,6 +9,7 @@ FAIL=0
 TOTAL=0
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
+SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
 
 check() {
   TOTAL=$((TOTAL+1))
@@ -74,8 +75,8 @@ check $? "send_gate.sh가 _archive에 보관됨"
 ! test -f "$HOOKS_DIR/send_gate.sh"
 check $? "send_gate.sh가 활성 hooks에 없음 (폐기됨)"
 
-! grep -q 'send_gate' "$SETTINGS" 2>/dev/null
-check $? "settings.local.json에 send_gate 미등록"
+! grep -q '"send_gate\.sh"' "$SETTINGS" 2>/dev/null
+check $? "settings.local.json에 send_gate.sh 미등록 (mcp_send_gate는 정상)"
 
 echo ""
 
@@ -386,8 +387,8 @@ echo ""
 # === 23. 토론모드 Chrome MCP 단일화 확인 ===
 echo "--- 23. 토론모드 Chrome MCP 단일화 확인 ---"
 # CDP 참조가 토론모드 코어 문서에 없어야 함 (폐기됨)
-! grep -q 'cdp_chat_send' "$DEBATE_CLAUDE"
-check $? "토론모드 CLAUDE.md에 CDP 참조 없음 (Chrome MCP 단일화)"
+! grep -v '\[NEVER\]' "$DEBATE_CLAUDE" | grep -q 'cdp_chat_send'
+check $? "토론모드 CLAUDE.md에 CDP 실사용 참조 없음 (금지 선언 제외)"
 
 grep -q 'Chrome MCP' "$DEBATE_CLAUDE"
 check $? "토론모드 CLAUDE.md가 Chrome MCP 기본 전송을 명시함"

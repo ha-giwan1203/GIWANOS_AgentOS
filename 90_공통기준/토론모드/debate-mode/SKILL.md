@@ -97,8 +97,8 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
 ### Step 2. 메시지 전송
-- **기본 전송**: Chrome MCP (`find` 입력창 → `form_input` 텍스트 입력 → `computer(left_click)` 전송버튼)
-- CDP 스크립트 폐기됨. Chrome MCP 단일 사용
+- **기본 전송**: `javascript_tool`로 `#prompt-textarea` focus → `insertText`로 한 번에 삽입 → `find`(send button) → `computer(left_click)` 전송
+- `type`(느림) / `form_input`(줄바꿈 불가) / CDP 스크립트 전부 금지
 - 전송 본문 자연어는 한국어만 작성
 - 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
 - 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)

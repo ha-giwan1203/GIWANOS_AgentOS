@@ -580,6 +580,112 @@ def sync_tasks_page(batch_id: str, events: list, phase3_result: dict,
     return _append_blocks(page_id, new_blocks, token, logger)
 
 
+# ── 부모 페이지 동기화 ────────────────────────────────────────────────────
+
+PARENT_SECTION_HEADING = "📌 운영 현황"
+
+
+def _parse_parent_summary(repo_root: Path) -> list[str]:
+    """HANDOFF(세션 번호) + TASKS(최근 완료 3건)에서 부모 페이지 요약 생성."""
+    lines = []
+
+    # HANDOFF에서 최신 세션 번호 추출
+    handoff = repo_root / "90_공통기준" / "업무관리" / "HANDOFF.md"
+    if handoff.exists():
+        for line in handoff.read_text(encoding="utf-8").splitlines():
+            if line.startswith("최종 업데이트:"):
+                lines.append(line.strip())
+                break
+
+    # TASKS에서 최근 완료 항목 3건 추출
+    tasks = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if tasks.exists():
+        in_completed = False
+        count = 0
+        for line in tasks.read_text(encoding="utf-8").splitlines():
+            if "## 최근 완료" in line:
+                in_completed = True
+                continue
+            if in_completed and line.startswith("### [완료]"):
+                item = line.replace("### ", "").strip()
+                lines.append(item)
+                count += 1
+                if count >= 3:
+                    break
+            if in_completed and line.startswith("## ") and "완료" not in line:
+                break
+
+    return lines
+
+
+def sync_parent_page(token: str, cfg: dict, repo_root: Path,
+                     logger: logging.Logger) -> bool:
+    """부모 페이지 '운영 현황' 섹션만 블록 단위 갱신 (best-effort)."""
+    parent_id = cfg["notion"].get("parent_page_id", "")
+    if not parent_id:
+        return True  # optional — 설정 없으면 skip
+
+    summary_lines = _parse_parent_summary(repo_root)
+    if not summary_lines:
+        if logger:
+            logger.info("부모 페이지 요약 데이터 없음 — skip")
+        return True
+
+    blocks = _get_page_blocks(parent_id, token)
+    if not blocks:
+        if logger:
+            logger.error(f"부모 페이지 블록 조회 실패: page_id={parent_id}")
+        return False
+
+    # "운영 현황" 헤딩 다음 블록들을 찾아서 교체
+    heading_idx = None
+    for i, b in enumerate(blocks):
+        btype = b.get("type", "")
+        if btype == "heading_2":
+            rich = b.get("heading_2", {}).get("rich_text", [])
+            text = "".join(r.get("plain_text", "") for r in rich)
+            if PARENT_SECTION_HEADING in text:
+                heading_idx = i
+                break
+
+    if heading_idx is None:
+        if logger:
+            logger.error(f"부모 페이지에서 '{PARENT_SECTION_HEADING}' 헤딩 없음")
+        return False
+
+    # 헤딩 다음부터 다음 heading_2 또는 divider까지의 블록 삭제
+    to_delete = []
+    for j in range(heading_idx + 1, len(blocks)):
+        bt = blocks[j].get("type", "")
+        if bt in ("heading_2", "divider"):
+            break
+        to_delete.append(blocks[j]["id"])
+
+    for bid in to_delete:
+        _delete_block(bid, token, logger)
+
+    # 새 블록 삽입 — 헤딩 바로 아래 append (after 파라미터 사용)
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    new_blocks = [
+        _text_block(f"자동 갱신: {ts}"),
+        _text_block("운영 요약·작업 현황·완료 이력은 아래 페이지에서 확인:"),
+    ]
+    for line in summary_lines:
+        new_blocks.append(_bullet_block(line))
+
+    # heading 블록의 after에 삽입
+    heading_block_id = blocks[heading_idx]["id"]
+    pid = parent_id.replace("-", "")
+    result = _notion_request(
+        "PATCH", f"/blocks/{pid}/children",
+        token, {
+            "children": new_blocks,
+            "after": heading_block_id,
+        }, logger=logger
+    )
+    return result is not None
+
+
 # ── 핵심: 배치 동기화 ─────────────────────────────────────────────────────
 
 def sync_batch(batch_id: str, events: list,
@@ -647,6 +753,20 @@ def sync_batch(batch_id: str, events: list,
         ok3 = False
         if logger:
             logger.error(f"요약 블록 갱신 예외: {e}")
+
+    # 부모 페이지 동기화 (best-effort — 실패해도 배치 결과 불승격)
+    parent_done = _is_dup(batch_id + "_p", dedup_hours)
+    if not parent_done and notion_cfg.get("parent_page_id"):
+        try:
+            repo_root = Path(__file__).parent.parent.parent
+            ok_parent = sync_parent_page(token, cfg, repo_root, logger)
+            if ok_parent:
+                _mark_done(batch_id + "_p", dedup_hours)
+            elif logger:
+                logger.warning("부모 페이지 동기화 실패 (배치 결과에 영향 없음)")
+        except Exception as e:
+            if logger:
+                logger.warning(f"부모 페이지 동기화 예외 (무시): {e}")
 
     # 이력 보존 정책 — 오래된 이력 자동 삭제
     max_entries = notion_cfg.get("max_history_entries", MAX_HISTORY_ENTRIES)

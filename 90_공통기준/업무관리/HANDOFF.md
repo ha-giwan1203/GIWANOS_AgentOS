@@ -4,12 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 12:21 KST — 세션 33 (하네스 2차 도메인 진입 구현 + GPT 정합)
+최종 업데이트: 2026-04-13 12:54 KST — 세션 34 (smoke_test FAIL 수정 + Notion 부모 페이지 동기화 + 토론모드 문서 정비)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-13 세션 33)
+## 0. 최신 세션 (2026-04-13 세션 34)
+
+### 이번 세션 완료
+1. **GPT 토론 2턴**: smoke_test 수정안 + Notion 부모 페이지 설계. 채택 5건 / 보류 0건
+2. **smoke_test FAIL 3건 해소**: SETTINGS 변수 추가 + CDP 오탐 grep 정교화 + send_gate 정확 매칭. 120/120 ALL PASS
+3. **notion_config.yaml**: parent_page_id 추가
+4. **notion_sync.py**: sync_parent_page() 신규 — HANDOFF+TASKS 기반, 운영 현황 섹션만 갱신, best-effort
+5. **토론모드 문서 3개 수정**: SKILL.md + REFERENCE.md 2개 — 입력방식 insertText 일괄 수정
+
+### 커밋 이력
+- (커밋 예정)
+
+### GPT 판정
+- (판정 대기)
+
+### 다음 세션 안건
+**[소] verify_xlsm COM 검증**
+
+**[소] Notion 부모 페이지 동기화 실전 검증**
+
+---
+
+## 1. 이전 세션 (2026-04-13 세션 33)
 
 ### 이번 세션 완료
 1. **GPT 토론 2턴**: 하네스 2차 도메인 진입 설계 쟁점 5개. 채택 7건 / 보류 1건

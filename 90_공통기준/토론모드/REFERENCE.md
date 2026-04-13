@@ -45,32 +45,26 @@ url;  // → navigate()에 전달
 
 ## 입력+전송 상세
 
-### 기본 전송 경로 (Chrome MCP)
+### 기본 전송 경로 (javascript_tool + insertText — 세션32 확정)
 
-GPT 대화 전송은 Chrome MCP 도구를 사용한다. CDP 스크립트는 폐기됨.
+GPT 대화 전송은 `javascript_tool` + `insertText`를 사용한다. CDP 스크립트·`type`·`form_input` 전부 금지.
 
 ```
-1. find(query="prompt textarea") → 입력창 ref 획득
-2. form_input(ref=<ref>, value=<message>) → 텍스트 입력
-3. find(query="send button") → 전송버튼 ref 획득
-4. computer(action="left_click", ref=<ref>) → 전송
+1. javascript_tool → #prompt-textarea focus + insertText로 텍스트 삽입
+2. find(query="send button") → 전송버튼 ref 획득
+3. computer(action="left_click", ref=<ref>) → 전송
+```
+
+```javascript
+// 표준 입력 패턴
+const ta = document.querySelector('#prompt-textarea');
+ta.focus();
+document.execCommand('insertText', false, text);
 ```
 
 - submit selector: `[data-testid="send-button"]`, `#composer-submit-button` fallback
 - SEND GATE: 전송 직전 `get_page_text`로 assistant 최신 텍스트 재읽기 필수
-
-### 예비 경로: 통합 JS (1회 호출)
-```javascript
-const el = document.querySelector('#prompt-textarea');
-el.focus();
-document.execCommand('insertText', false, text);
-setTimeout(() => {
-  const btn = document.querySelector('[data-testid="send-button"], #composer-submit-button');
-  if (btn && !btn.disabled) btn.click();
-}, 100);
-```
-
-빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, 실제 submit button 재확인은 항상 `insertText` 이후에 다시 수행한다.
+- 빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, submit button 재확인은 `insertText` 이후에 수행한다.
 
 ### 토론방 언어 규칙
 - 토론방에 보내는 자연어 본문은 한국어만 사용한다.

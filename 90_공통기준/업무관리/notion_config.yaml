@@ -8,6 +8,7 @@ notion:
   # 동기화 대상 페이지
   status_page_id: "331fee67-0be8-81f7-9f15-c3aaabfbd94a"   # 📊 STATUS — 전체 운영 현황
   tasks_page_id:  "331fee67-0be8-818c-b2bc-cd8da0a40db8"   # ✅ TASKS — 작업 목록
+  parent_page_id: "331fee67-0be8-81fd-9bf7-d0c2af54bc07"   # 📁 업무리스트 운영 (optional)
 
   # 중복 방지
   dedup_window_hours: 1

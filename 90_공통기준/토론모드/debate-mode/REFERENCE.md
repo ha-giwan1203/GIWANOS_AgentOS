@@ -4,68 +4,37 @@
 > 앱 운영 규칙과 문서 우선순위는 상위 `../CLAUDE.md`, `../APP_INSTRUCTIONS.md`를 따른다.
 > 토론방에 보내는 자연어 본문은 한국어만 사용한다. 예외: code block, selector/data-testid, 파일 경로, commit SHA 같은 literal, 그리고 `오류 원문:`/`에러 원문:` 라벨 1줄 인용.
 
-> GPT 대화 기본 전송은 `cdp_chat_send.py`를 사용한다. Chrome MCP는 CDP 불가 시 fallback으로만 사용.
+> GPT 대화 기본 전송은 `javascript_tool` + `insertText`를 사용한다. CDP 스크립트·`type`·`form_input` 전부 금지 (세션32 확정).
 
 ---
 
-## 1. 기본 전송 경로 (v2.9 — CDP 기본)
-
-```bash
-python '.claude/scripts/cdp/cdp_chat_send.py' \
-  --auto-debate-url \
-  --text-file '<utf8_text_file>' \
-  --mark-send-gate
-```
-
-- `--auto-debate-url`: debate_chat_url 상태 파일에서 URL을 읽어 --match-url-exact로 자동 설정
-- `--mark-send-gate`: assistant 최신 읽기 직후 send_gate 파일 갱신
-- submit selector는 `[data-testid="send-button"], #composer-submit-button` 순서로 내부 fallback 처리
-- Chrome MCP type은 CDP 불가 시 fallback으로만 사용
-- 토론모드 문서상 기본 전송 경로는 위 helper다.
-
-### 예비 경로: 직접 DOM 입력 + 전송 (v1.7)
+## 1. 기본 전송 경로 (v3.0 — javascript_tool + insertText)
 
 ```javascript
-const el = document.querySelector('#prompt-textarea');
-
-if (el.tagName === 'TEXTAREA') {
-  // --- textarea 경로: native value setter로 React 상태 정상 동기화 ---
-  el.focus();
-  const proto = Object.getPrototypeOf(el);
-  const valueSetter =
-    Object.getOwnPropertyDescriptor(proto, 'value')?.set ||
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
-  valueSetter.call(el, text);
-  el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
-  el.dispatchEvent(new Event('change', { bubbles: true })); // React fallback
-} else {
-  // --- contenteditable div 경로: execCommand가 현재 ChatGPT UI에서 가장 안정적 ---
-  el.focus();
-  document.execCommand('selectAll', false, null);
-  document.execCommand('insertText', false, text); // deprecated이나 현재 ChatGPT UI에서 안정적 동작
-}
-
-// 값 반영 확인 (1순위) → 전송 버튼 활성화 확인 (2순위) → polling 전송
-let tries = 0;
-const poll = setInterval(() => {
-  const valueOk = el.tagName === 'TEXTAREA'
-    ? el.value === text
-    : el.innerText.trim().length > 0;
-  const btn = document.querySelector('button[data-testid="send-button"], #composer-submit-button');
-  const btnReady = btn && btn.disabled === false && btn.getAttribute('aria-disabled') !== 'true';
-  if (valueOk && btnReady) {
-    btn.click();
-    clearInterval(poll);
-  } else if (++tries >= 10) {
-    clearInterval(poll);
-    console.warn('send-button not activated after 3s');
-  }
-}, 300);
+// 표준 입력 패턴
+const ta = document.querySelector('#prompt-textarea');
+ta.focus();
+document.execCommand('insertText', false, text);
 ```
 
-> **v2.8 변경**: `cdp_chat_send.py`에 직전 최신 답변 기대값 확인 옵션 추가. helper가 최신 답변 불일치도 직접 막는 기본 경로가 된다.
-> **v2.7 변경**: `cdp_chat_send.py`를 문서상 기본 전송 경로로 승격. 직접 DOM 입력/전송은 helper를 쓸 수 없을 때만 예비 경로로 유지.
-> **v1.7 변경**: `innerHTML` 방식 폐기 → native value setter + InputEvent로 교체 (React 상태 정상 동기화). contenteditable div 분기 추가. 전송 버튼 활성화 확인에 값 반영 1순위 + `aria-disabled` 2순위 조건 추가.
+전송:
+```
+1. javascript_tool → 위 코드로 텍스트 삽입
+2. find(query="send button") → 전송버튼 ref 획득
+3. computer(action="left_click", ref=<ref>) → 전송
+```
+
+- submit selector: `[data-testid="send-button"]`, `#composer-submit-button` fallback
+- SEND GATE: 전송 직전 `get_page_text`로 assistant 최신 텍스트 재읽기 필수
+- 빈 입력창에서는 `composer-speech-button`만 보일 수 있으므로, submit button 재확인은 `insertText` 이후에 수행
+
+### 금지된 입력 방식
+- `type` 액션: 느림, 줄바꿈 퇴보
+- `form_input`: 줄바꿸 불가
+- CDP 스크립트 (`cdp_chat_send.py` 등): 세션32에서 전체 폐기
+
+> **v3.0 변경** (세션32): CDP 폐기 + Chrome MCP 단일화. `javascript_tool + insertText`가 유일한 기본 전송 경로.
+> **v2.8 이전**: CDP `cdp_chat_send.py` 기반. 아카이브: `98_아카이브/정리대기_20260413/cdp_scripts/`
 
 ---
 
