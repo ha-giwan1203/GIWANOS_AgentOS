@@ -49,7 +49,8 @@
       "Bash(python3 -c ':*)",
       "Read(//c/Users/User/Desktop/업무리스트/**)",
       "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -30 {}')",
-      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)"
+      "Bash(python \"90_공통기준/업무관리/운영검증/scripts/regression_intake.py\" --dry-run)",
+      "Bash(python \"90_공통기준/업무관리/slack_notify.py\" --message \"세션34 Slack 연결 점검 테스트 \\($\\(date '+%H:%M KST'\\)\\)\")"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -219,6 +220,16 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/gpt_followup_post.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/post_commit_notify.sh",
+            "async": true
           }
         ]
       }
