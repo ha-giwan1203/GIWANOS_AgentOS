@@ -16,7 +16,7 @@
 2. **안건1 GPT 전송 스킬 실사용 검증 PASS**: 세션36 토론 자체가 gpt-send 경로 전체 실사용 (URL탐지→insertText→polling→응답읽기)
 3. **안건2 verify_xlsm 1차 구조 검증**: 스크립트 동작 확인. 기대 시트명(PLAN_OUTPUT)/테이블명(tblInfo,tblPlanOutput) 불일치 → 기대값 조정 필요
 4. **안건3 Notion 부모 페이지 동기화**: 부모 페이지 구조 확인 (📌 운영 현황 heading_2 존재). API 404 원인: Integration 미연결 → 사용자 Notion 설정 필요
-5. **독립 의견 유지**: GPT share-result 3단계 위임 지적 → 실물 확인 후 반박 유지 (위임 문구 정상)
+5. **share-result 3단계 정리**: share-result.md 3단계는 /gpt-send에 진입 위임 문구만 보유. 실제 진입 로직(debate_chat_url/fallback)은 gpt-send.md 내부에 존재. GPT는 "자체 진입 로직 잔존"으로 지적했으나, 이는 gpt-send 호출 시 실행되는 내부 로직이므로 share-result 차원의 위임 구조는 정상
 
 ### 다음 세션 참고
 - verify_xlsm: 실제 시트명 매핑 + 2차 COM 기대값 확정 필요
