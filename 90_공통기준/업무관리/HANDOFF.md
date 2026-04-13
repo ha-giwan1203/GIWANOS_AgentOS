@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-13 KST — 세션 31 (지침 강제 읽기 하네스 1차 구현)
+최종 업데이트: 2026-04-13 10:33 KST — 세션 31 종료 (하네스 1차 + CDP 와일드카드)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -13,17 +13,26 @@
 
 ### 이번 세션 완료
 1. **GPT 토론 2라운드**: 지침 강제 읽기 하네스 설계. 방안 B 합의 (PostToolUse 기록 + PreToolUse 검증). 채택 4건 / 보류 0건 / 버림 0건
-2. **instruction_read_gate.sh 신규**: GPT 전송(cdp_chat_send.py/share-result/finish) 직전 ENTRY.md + 토론모드 CLAUDE.md 읽기 강제. deny+exit 2
+2. **instruction_read_gate.sh 신규**: GPT 전송 직전 ENTRY.md + 토론모드 CLAUDE.md 읽기 강제. deny+exit 2
 3. **evidence_mark_read.sh 정밀화**: Windows 경로 정규화(NORM_TEXT) + 토론모드 전용 마커 2개
 4. **session_start_restore.sh**: instruction_reads/ 세션 초기화 추가
-5. **smoke_test 9건 추가**: 108→117. 117/117 ALL PASS
+5. **smoke_test v5**: 108→117 (9건 추가). README 21→22개 훅 갱신
+6. **CDP 전송 허용 와일드카드 통합**: 개별 패턴 5개 → 2개 와일드카드. 승인 팝업 해소
+
+### 커밋 이력
+- `9755c852` feat: instruction_read_gate — GPT 전송 전 지침 읽기 강제 하네스 1차
+- `10260b38` docs: smoke_test v5 주석 갱신 + README 훅 21→22개
+- `b6b75541` fix: CDP 전송 허용 패턴 와일드카드 통합 — 승인 팝업 해소
 
 ### GPT 판정
-- 세션31 하네스: 합의 완료. 구현 SHA 공유 후 판정 예정
+- 9755c852: 통과
+- 10260b38: 정합
+- b6b75541: 정합
 
 ### 다음 세션 안건
+**[검증] CDP 전송 승인 팝업 해소 실사용 검증** — 세션 재시작 후 확인
+
 **[보류] 지침 강제 읽기 하네스 2차 — 도메인 진입**
-- 키워드→경로 매핑 복잡, 별도 설계 필요
 
 **[소] Notion 부모 페이지 / verify_xlsm COM**
 
