@@ -20,15 +20,17 @@
 - TASKS.md에서 해당 작업 항목의 현재 상태 확인
 - QA 결과가 있으면 포함
 
-### 3단계: GPT 프로젝트방 진입
-- `.claude/state/debate_chat_url` 읽기 → URL이 있으면 직접 navigate (프로젝트 URL 경유 불필요)
-- debate_chat_url 없을 때만: 기존 탭 확인 → 프로젝트 URL 진입 → 최신 대화방 URL 추출 → navigate
-- 진입 성공 시 debate_chat_url 갱신
-- 전송 직전 `[data-message-author-role="assistant"]` 마지막 블록 100자를 읽어 UTF-8 파일 또는 변수로 보관
+### 3~4단계: GPT 전송 (gpt-send 스킬 필수 호출)
 
-### 4단계: 결과 공유 메시지 전송
-아래 형식으로 GPT에 전송한다:
+**[MUST] 아래 형식으로 메시지를 조립한 뒤 반드시 `/gpt-send` 스킬을 호출한다.**
+수동 탭 탐색·navigate·스크린샷·클릭으로 프로젝트방에 진입하는 것은 금지다.
+프로젝트 진입~대화방 탐지~전송~응답 대기 전체를 `/gpt-send`가 처리한다.
 
+```
+Skill(skill="gpt-send", args="조립된 메시지 텍스트")
+```
+
+메시지 형식:
 ```
 ## 실물 결과 공유
 
@@ -42,11 +44,12 @@
 - TASKS.md: {해당 항목 상태}
 
 ### 판정 요청
-커밋 실물 확인 후 PASS/FAIL 판정 요청한다.
+커밋 실물 확인 후 PASS/FAIL 판정 요청합니다.
 GitHub: ha-giwan1203/GIWANOS_AgentOS main 브랜치.
 ```
 
-- 기본 전송: `/gpt-send` 명령 사용 (javascript_tool + insertText → send button click → 응답 대기). form_input/CDP 금지.
+**[NEVER]** tabs_context_mcp → navigate → screenshot → click 순서로 수동 진입 금지.
+**[NEVER]** gpt-send 스킬 호출 전에 ChatGPT 탭을 먼저 열거나 탐색하는 행위 금지.
 
 ### 5단계: GPT 응답 대기 + 하네스 분석 + 지적사항 즉시 대응
 - 적응형 polling으로 응답 대기
