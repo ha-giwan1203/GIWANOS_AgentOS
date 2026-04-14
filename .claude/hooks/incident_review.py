@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
@@ -64,6 +65,12 @@ RECOMMENDATION_MAP: dict[str, str] = {
     # 기타
     "meta_drift": "절차항목",
     "structural_intermediate": "절차항목",
+    # 세션45: 외부 피드백 소스
+    "gpt_verdict": "문서보강",
+    "user_correction": "규칙보강",
+    # 세션45 C2: WARN 승격 분류
+    "doc_drift": "문서보강",
+    "python3_dependency": "규칙보강",
 }
 
 CATEGORY_DETAIL: dict[str, str] = {
@@ -90,6 +97,12 @@ SUGGESTED_TARGETS: dict[str, str] = {
     "stop_guard_block": "독립 견해 포함 습관 유지",
     "meta_drift": "세션 종료 시 상태 문서 동기화 절차 보강",
     "structural_intermediate": "완료 루틴에서 TASKS/HANDOFF 갱신 순서 보강",
+    # 세션45: 외부 피드백 소스
+    "gpt_verdict": "GPT 지적 사항 기반 CLAUDE.md/SKILL.md 보강",
+    "user_correction": "사용자 교정 패턴 분석 → hook/gate 자동화 검토",
+    # 세션45 C2: WARN 승격 분류
+    "doc_drift": "README/STATUS 문서 동기화 자동 강제 또는 hook sync 점검",
+    "python3_dependency": "auto_compile.sh python3 의존 제거 또는 대체 정책 점검",
 }
 
 
@@ -160,6 +173,95 @@ def aggregate_frequency(
     return clusters
 
 
+# === WARN 빈도 분석 (세션45 A1: 학습 루프 사각지대 해소) ===
+
+def normalize_warn(raw: str) -> str:
+    """WARN 문자열 정규화 — 숫자 차이를 무시하여 동일 패턴끼리 그룹화."""
+    s = raw.strip().rstrip(";")
+    if s.startswith("[WARN] "):
+        s = s[7:]
+    # 괄호 속 숫자 정규화: README(40) → README(N)
+    s = re.sub(r"\(\d+\)", "(N)", s)
+    # 날짜 정규화: STATUS(2026-04-11) → STATUS(DATE)
+    s = re.sub(r"\(\d{4}-\d{2}-\d{2}\)", "(DATE)", s)
+    return s.strip()
+
+
+# WARN 패턴 → 승격 제안 매핑
+WARN_PROMOTION_MAP: dict[str, dict[str, str]] = {
+    "드리프트": {"candidate": True, "suggestion": "FAIL 승격 검토 (문서 동기화 자동 강제)"},
+    "python3 의존": {"candidate": False, "suggestion": "규칙보강 검토 (auto_compile 정책 점검)"},
+}
+
+
+def aggregate_warn_frequency(
+    entries: list[dict[str, Any]],
+    days: int = 7,
+    min_count: int = 1,
+    include_resolved: bool = False,
+    include_normal_flow: bool = False,
+) -> list[dict[str, Any]]:
+    """N일간 warn_keywords 개별 빈도 집계."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    freq: dict[str, dict] = defaultdict(
+        lambda: {"count": 0, "first_ts": None, "last_ts": None, "sample_raw": ""}
+    )
+
+    for e in entries:
+        if not include_resolved and e.get("resolved", False):
+            continue
+        if not include_normal_flow:
+            if e.get("normal_flow", False):
+                continue
+            reason_check = (e.get("classification_reason") or "").strip()
+            if reason_check == "structural_intermediate":
+                continue
+        ts = parse_ts(e.get("ts", ""))
+        if ts is None or ts < cutoff:
+            continue
+        wk = e.get("warn_keywords", "")
+        if not wk:
+            continue
+        for w_raw in wk.split(";"):
+            w_raw = w_raw.strip()
+            if not w_raw:
+                continue
+            w_norm = normalize_warn(w_raw)
+            if not w_norm:
+                continue
+            bucket = freq[w_norm]
+            bucket["count"] += 1
+            if not bucket["sample_raw"]:
+                bucket["sample_raw"] = w_raw.strip()
+            if bucket["first_ts"] is None or ts < bucket["first_ts"]:
+                bucket["first_ts"] = ts
+            if bucket["last_ts"] is None or ts > bucket["last_ts"]:
+                bucket["last_ts"] = ts
+
+    clusters = []
+    for w_norm, data in freq.items():
+        if data["count"] < min_count:
+            continue
+        # 승격 후보 판정
+        promotion = {"candidate": False, "suggestion": "모니터링 유지 — 빈도 증가 시 FAIL 승격 검토"}
+        for keyword, promo in WARN_PROMOTION_MAP.items():
+            if keyword in w_norm:
+                promotion = promo
+                break
+        clusters.append({
+            "warn_type": w_norm,
+            "count": data["count"],
+            "first_ts": data["first_ts"].isoformat() if data["first_ts"] else "",
+            "last_ts": data["last_ts"].isoformat() if data["last_ts"] else "",
+            "sample_raw": data["sample_raw"],
+            "promotion_candidate": promotion["candidate"],
+            "suggestion": promotion["suggestion"],
+        })
+
+    clusters.sort(key=lambda x: x["count"], reverse=True)
+    return clusters
+
+
 def recommend_action(cluster: dict[str, Any]) -> dict[str, str]:
     """빈도 클러스터에 대한 4갈래 제안 생성."""
     reason = cluster["reason"]
@@ -183,15 +285,19 @@ def format_report(
     days: int,
     threshold: int,
     as_json: bool = False,
+    warn_clusters: list[dict] | None = None,
 ) -> str:
     if as_json:
         combined = []
         for c, r in zip(clusters, recommendations):
             combined.append({**c, "hooks": c["hooks"], **r})
-        return json.dumps(combined, ensure_ascii=False, indent=2)
+        result = {"incidents": combined}
+        if warn_clusters is not None:
+            result["warn_analysis"] = warn_clusters
+        return json.dumps(result, ensure_ascii=False, indent=2)
 
     lines = [f"=== Incident Review (최근 {days}일, 임계치 {threshold}건) ===", ""]
-    if not clusters:
+    if not clusters and not warn_clusters:
         lines.append("임계치 초과 항목 없음.")
         return "\n".join(lines)
 
@@ -220,6 +326,20 @@ def format_report(
     for cat, cnt in sorted(cat_counts.items(), key=lambda x: -x[1]):
         lines.append(f"  {cat}: {cnt}건")
 
+    # WARN 빈도 분석 섹션 (A1: 학습 루프 사각지대 해소)
+    if warn_clusters:
+        lines.append("")
+        lines.append(f"=== WARN 빈도 분석 (최근 {days}일) ===")
+        lines.append("")
+        lines.append(f"{'#':>3}  {'warn_type':<45} {'건수':>5}  {'승격':>4}  {'제안'}")
+        lines.append("-" * 110)
+        for i, wc in enumerate(warn_clusters, 1):
+            promo = "Yes" if wc["promotion_candidate"] else "No"
+            lines.append(f"{i:>3}  {wc['warn_type']:<45} {wc['count']:>5}  {promo:>4}  {wc['suggestion']}")
+        total_warns = sum(wc["count"] for wc in warn_clusters)
+        promo_count = sum(1 for wc in warn_clusters if wc["promotion_candidate"])
+        lines.append(f"\n  총 WARN: {total_warns}건, 승격 후보: {promo_count}건")
+
     return "\n".join(lines)
 
 
@@ -236,6 +356,7 @@ def main():
     parser.add_argument("--json", action="store_true", help="JSON 출력")
     parser.add_argument("--include-resolved", action="store_true", help="해결 건 포함")
     parser.add_argument("--include-normal-flow", action="store_true", help="정상 안전장치 발화(normal_flow=true) 포함 (기본: 제외)")
+    parser.add_argument("--no-warns", action="store_true", help="WARN 빈도 분석 섹션 생략")
     args = parser.parse_args()
 
     ledger_path = args.ledger
@@ -248,7 +369,19 @@ def main():
                                    include_resolved=args.include_resolved,
                                    include_normal_flow=args.include_normal_flow)
     recommendations = [recommend_action(c) for c in clusters]
-    print(format_report(clusters, recommendations, args.days, args.threshold, as_json=args.json))
+
+    # WARN 빈도 분석 (A1: 학습 루프 사각지대 해소)
+    warn_clusters = None
+    if not args.no_warns:
+        warn_min = max(1, args.threshold // 2)
+        warn_clusters = aggregate_warn_frequency(
+            entries, days=args.days, min_count=warn_min,
+            include_resolved=args.include_resolved,
+            include_normal_flow=args.include_normal_flow,
+        )
+
+    print(format_report(clusters, recommendations, args.days, args.threshold,
+                        as_json=args.json, warn_clusters=warn_clusters))
 
 
 if __name__ == "__main__":

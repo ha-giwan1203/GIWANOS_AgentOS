@@ -114,5 +114,22 @@ if [ "$EXIT_CODE" -ne 0 ]; then
   exit 0
 fi
 
+# === C2: WARN 개별 incident 기록 (세션45 학습 루프 사각지대 해소) ===
+# 커밋 성공(PASS)이어도 WARN이 있으면 학습 루프에 기록 (normal_flow=true)
+# PASS 경로에서는 WARN_KEYWORDS가 미정의이므로 여기서 추출
+if [ -z "${WARN_KEYWORDS+x}" ]; then
+  WARN_KEYWORDS=$(echo "$RESULT" | grep -oE '\[WARN\] [^|]+' | head -3 | tr '\n' '; ' | sed 's/; $//')
+fi
+if [ -n "$WARN_KEYWORDS" ]; then
+  if echo "$WARN_KEYWORDS" | grep -qi '드리프트'; then
+    hook_incident "warn_recorded" "commit_gate" "" "문서 드리프트 감지" \
+      "\"classification_reason\":\"doc_drift\",\"source\":\"final_check\",\"warn_raw\":\"$WARN_KEYWORDS\",\"normal_flow\":true" 2>/dev/null || true
+  fi
+  if echo "$WARN_KEYWORDS" | grep -qi 'python3'; then
+    hook_incident "warn_recorded" "commit_gate" "" "python3 의존 잔존" \
+      "\"classification_reason\":\"python3_dependency\",\"source\":\"final_check\",\"warn_raw\":\"$WARN_KEYWORDS\",\"normal_flow\":true" 2>/dev/null || true
+  fi
+fi
+
 hook_log "PreToolUse/Bash" "commit_gate PASS: final_check $MODE" 2>/dev/null
 exit 0

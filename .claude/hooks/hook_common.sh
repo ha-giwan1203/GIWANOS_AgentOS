@@ -3,11 +3,12 @@
 # 사용법: source .claude/hooks/hook_common.sh && hook_log "이벤트명" "메시지"
 # incident: hook_incident "type" "hook" "file" "detail" ['"classification_reason":"<enum>"']
 # type: gate_reject | hook_block | compile_fail
-# classification_reason enum (세션12 합의, 세션40 정규화):
+# classification_reason enum (세션12 합의, 세션40 정규화, 세션45 확장):
 #   evidence_missing | pre_commit_check | compile_fail | test_fail |
 #   scope_violation | dangerous_cmd | send_block | stop_guard_block |
 #   completion_before_git | completion_before_state_sync |
-#   harness_missing | meta_drift | task_consecutive_fail
+#   harness_missing | meta_drift | task_consecutive_fail |
+#   gpt_verdict | user_correction | doc_drift | python3_dependency
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
@@ -274,6 +275,16 @@ hook_incident() {
       hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — incident_repair.py --archive 실행 권장" 2>/dev/null || true
     fi
   fi
+}
+
+# === 사용자 교정 피드백 기록 (세션45 D1) ===
+# 사용자가 AI 동작을 교정할 때 incident로 기록.
+# 학습 루프에서 자동화 후보로 집계된다.
+hook_user_correction() {
+  local detail="$1"
+  local issue_code="${2:-unclassified}"
+  hook_incident "user_correction" "manual" "" "$detail" \
+    "\"source\":\"user\",\"verdict\":\"correction\",\"issue_code\":\"$issue_code\",\"classification_reason\":\"user_correction\""
 }
 
 # === Task Result Logging (세션40) ===

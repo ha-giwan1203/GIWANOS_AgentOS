@@ -10,18 +10,11 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션44 (commit_gate suppress + STATUS 자동강제 + 학습 루프 진단)
+최종 업데이트: 2026-04-14 — 세션45 (학습 루프 사각지대 해소 A1+B1+D1+C2 구현)
 
 ---
 
 ## 다음 세션 안건
-
-**[상] 학습 루프 사각지대 해소 (GPT+Claude 합의 세션44)**
-- **A1**: incident_review.py에 warn_keywords 빈도 분석 추가
-- **B1**: GPT 판정 structured incident 적재 (source="gpt", verdict="partial|fail", issue_code 정규화)
-- **D1**: 사용자 교정 피드백 incident 적재 (source="user", verdict="correction", issue_code 정규화)
-- **C2**: warn_keywords 분석으로 분류 해상도 보완 (C1 세분화는 필요 시 승격)
-- 구현 순서: A1 → B1 → D1 → (C1 필요 시)
 
 **[낮] AGENTS_GUIDE 자동생성화 (세션46+ 안건)**
 - settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
@@ -34,6 +27,14 @@
 ---
 
 ## 최근 완료
+
+### [완료] 학습 루프 사각지대 해소 A1+B1+D1+C2 — 세션45 (2026-04-14)
+- **A1**: incident_review.py에 warn_keywords 빈도 분석 추가 — normalize_warn() + aggregate_warn_frequency() + WARN 빈도 섹션
+- **B1**: record_incident.py 신규 — Python CLI 인시던트 기록 유틸. gpt-read에 비통과 판정 시 incident 기록 단계 추가
+- **D1**: hook_user_correction() 편의 함수 추가 (hook_common.sh). record_incident.py로도 기록 가능
+- **C2**: doc_drift/python3_dependency 신규 classification. commit_gate PASS에서도 WARN 별도 incident 기록
+- RECOMMENDATION_MAP/SUGGESTED_TARGETS에 gpt_verdict, user_correction, doc_drift, python3_dependency 매핑 추가
+- smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈, 본건 무관)
 
 ### [완료] commit_gate suppress + STATUS 자동강제 + 학습 루프 진단 — 세션44 (2026-04-14)
 - **GPT 토론 1턴 (commit_gate suppress)**: A2(60초)+B1(전체 적용)+C1 보강(mode|normal_flow|fail_keywords) 합의. 채택 4건

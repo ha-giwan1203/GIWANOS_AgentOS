@@ -36,6 +36,27 @@ last ? last.innerText : '';
 - "조건부 통과"는 "통과"보다 먼저 매칭되므로 오분류 방지
 - 감지된 판정과 원문 키워드를 함께 보고한다.
 
+### 5. 비통과 판정 시 incident 기록 (세션45 B1)
+판정이 "통과" 이외일 때 학습 루프에 기록한다:
+
+```bash
+python3 .claude/hooks/record_incident.py \
+  --type gpt_verdict \
+  --hook gpt-read \
+  --detail "GPT 판정: {판정결과} — {원문 키워드}" \
+  --field source=gpt \
+  --field verdict={판정코드} \
+  --field classification_reason=gpt_verdict \
+  --quiet
+```
+
+판정코드 매핑:
+- 실패 → `fail`
+- 부분반영 → `partial`
+- 조건부 → `conditional`
+- 정합 → `consistency`
+- 통과 → 기록 안 함 (정상)
+
 ## 에러 처리
 - 탭 소실: `tabs_context_mcp`(createIfEmpty=true) 후 재진입
 - assistant 블록 없음: "GPT 응답 없음" 보고
