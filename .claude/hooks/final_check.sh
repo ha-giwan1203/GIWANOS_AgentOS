@@ -238,6 +238,25 @@ if [ -n "$TASKS_DATE" ] && [ -n "$HANDOFF_DATE" ]; then
     echo "  [OK] HANDOFF 날짜 >= TASKS 날짜"
   fi
 fi
+
+# 6b. 세션 번호 비교 (세션46 GPT 합의: 같은 날 세션 드리프트 감지)
+_get_session() {
+  local rel_path="$1"
+  local content
+  content=$(cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null)
+  [ -z "$content" ] && content=$(cat "$PROJECT_DIR/$rel_path" 2>/dev/null)
+  echo "$content" | grep -oE '세션[0-9]+' | head -1 | grep -oE '[0-9]+'
+}
+TASKS_SESSION=$(_get_session "90_공통기준/업무관리/TASKS.md")
+HANDOFF_SESSION=$(_get_session "90_공통기준/업무관리/HANDOFF.md")
+echo "  TASKS 세션: $TASKS_SESSION / HANDOFF 세션: $HANDOFF_SESSION"
+if [ -n "$TASKS_SESSION" ] && [ -n "$HANDOFF_SESSION" ]; then
+  if [ "$HANDOFF_SESSION" -lt "$TASKS_SESSION" ] 2>/dev/null; then
+    warn "HANDOFF(세션$HANDOFF_SESSION) < TASKS(세션$TASKS_SESSION) — 세션 드리프트"
+  else
+    echo "  [OK] HANDOFF 세션 >= TASKS 세션"
+  fi
+fi
 echo ""
 
 # 7. TASKS/HANDOFF 최신화 확인

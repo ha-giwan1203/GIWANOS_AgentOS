@@ -38,6 +38,7 @@
 - **push 오탐 수정**: 상태문서 동봉 강제를 git commit에만 적용 (push 시 staged 비어 오탐 차단 방지)
 - **잔여 드리프트 정리**: commit_gate PROJECT_DIR 중복 제거, smoke_test 주석 32→42섹션
 - **deny-path 테스트 추가**: smoke_test 섹션 43(completion_gate deny) + 44(evidence_gate deny) — 152/152 ALL PASS
+- **세션 번호 비교**: final_check.sh 6b 섹션 추가 — 같은 날짜 내 세션 드리프트 감지
 - 핫픽스: smoke_test v4→v5, classify_feedback 2건 추가
 
 ### [완료] 학습 루프 사각지대 해소 A1+B1+D1+C2 — 세션45 (2026-04-14)
