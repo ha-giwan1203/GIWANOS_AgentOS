@@ -35,7 +35,7 @@
 
 ### [완료] daily-routine MES 직접HTTP 전환 + 업로드 로직 강화 — 세션42 (2026-04-14)
 - **MES Playwright/CDP 제거**: OAuth SSO 직접 HTTP 로그인(requests)으로 전환 — Chrome 불필요, 실행 수분→5초
-- **Chrome 저장 자격증명 분석**: Login Data For Account에서 `0109/samsong1234` 복호화
+- **자격증명**: run.py에 `0109/samsong1234` 하드코딩 (초기 분석 시 Login Data For Account SQLite에서 확인, 런타임은 하드코딩)
 - **OAuth 플로우 구현**: SSO ssoUrl 파싱 → authorize → POST /login → SESSION 쿠키 획득
 - **누락 확인 범위 확장**: 이번달 1일 → 최근 7일(어제 기준)로 변경
 - **전체 컬럼 공백 검사**: COL1~COL22 중 COL13(품질,설비비가동) 제외, 공백 시 업로드 금지+보고
