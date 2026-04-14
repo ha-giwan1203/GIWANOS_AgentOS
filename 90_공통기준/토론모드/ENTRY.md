@@ -34,17 +34,17 @@
     - GPT 일치 부분 / 이견 부분(내 근거 명시) / 두 분석 모두 놓친 맹점
     - 사용자 보고: `채택 N건 / 보류 N건 / 버림 N건` + 실행 우선순위 3가지 + GPT와 쟁점 명시
 
-## 필수 순서 (SHOULD → NEVER 승격 대상)
+## 브라우저 조작 금지 (NEVER)
 
-1. 기존 탭 확인 → 있으면 switch
-2. main 영역 JS로 대화 URL 추출 → navigate
-3. **[SEND GATE] 전송 직전 미확인 응답 점검** (NEVER 5 강제)
-   - 마지막 assistant 블록 텍스트 100자 읽기
-   - 이전에 읽은 내용과 다르면 → 새 응답 먼저 전체 읽기 → 하네스 재계산 → 그 다음 전송
-   - 같으면 → 예정대로 전송 진행
-4. **기본 전송**: `javascript_tool` + `insertText` → send button JS 클릭 (세션32 확정)
-5. `type` / `form_input` / CDP 스크립트 전부 금지.
-6. stop-button polling 적응형 (3/5/8초) + 매 주기 사용자 중단 확인
+11. **debate-mode 안에서 Chrome MCP 도구 직접 호출 금지** — tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer 등 전부 금지. 브라우저 조작은 gpt-send/gpt-read 스킬이 내부에서 처리한다. debate-mode는 토론 로직(독립 점검, 하네스 분석, 반박 생성, 로그 기록)만 담당한다.
+
+## gpt-send/gpt-read 내부 순서 (참고 — debate-mode가 직접 실행하지 않음)
+
+1. 탭 확인 → 프로젝트 URL navigate → 최상단 채팅방 재탐지 (gpt-send 1-A/1-B)
+2. SEND GATE: 미확인 응답 점검 (gpt-send Step 2)
+3. insertText + send button 클릭 (gpt-send Step 3)
+4. 적응형 polling 대기 (gpt-send Step 4)
+5. 응답 읽기 (gpt-send Step 5 / gpt-read Step 3)
 
 ## 상세 참조
 

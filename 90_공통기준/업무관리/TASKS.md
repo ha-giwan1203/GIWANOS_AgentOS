@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션47 (navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신)
+최종 업데이트: 2026-04-15 — 세션48 (debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test 추가)
 
 ---
 
@@ -24,9 +24,22 @@
 - AGENTS_GUIDE에 [분류: 확인 필요]로 임시 등재됨
 - 실운영/실험/도구 분류 사용자 확인 후 확정 필요
 
+**[낮] deny-path 런타임 검증 2차 확장**
+- completion_gate/evidence_gate 실제 조건 조성 후 런타임 deny 테스트 추가
+- safe_json_get 잔존 범위 축소 + 매직넘버 설정화 (장기)
+
 ---
 
 ## 최근 완료
+
+### [완료] debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test — 세션48 (2026-04-15)
+- **debate-mode SKILL.md 구조 변경**: Step 1에서 Chrome MCP 직접 조작 지시 전부 제거, gpt-send/gpt-read 전면 위임
+- **ENTRY.md 강화**: NEVER 11 추가 — debate-mode 안 Chrome MCP 직접 호출 금지
+- **CLAUDE.md 실행 루프 정합**: 수동 navigate/JS 조작 → gpt-send/gpt-read 위임 구조로 변경
+- **smoke_test 섹션 45 신규**: navigate_gate 런타임 테스트 6건 (파일존재/bash-n/settings등록/비chatgpt통과/deny런타임/오탐방지)
+- **smoke_test 헤더 42→45섹션 수정 + CAPABILITY_SECTIONS 45 추가**
+- smoke_test 158/158 ALL PASS (이전 152 → +6)
+
 
 ### [완료] navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신 — 세션47 (2026-04-15)
 - **navigate_gate.sh 신규**: ChatGPT navigate 시 토론모드 CLAUDE.md 읽기 강제 (PreToolUse)

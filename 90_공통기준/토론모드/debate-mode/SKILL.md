@@ -77,32 +77,23 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 ## 실행 절차
 
-### Step 1. 탭 준비
-1. Chrome MCP `tabs_context_mcp` → 기존 ChatGPT 탭 확인
-2. 프로젝트 URL(`https://chatgpt.com/g/g-p-.../project`)로 `navigate` → 최상단 채팅방 진입
-   - 프로젝트 ID 포함 URL만 허용. 일반 `/c/` 단독 금지
-   - 이전 세션의 URL 값 재사용 금지 (매 세션 새로 탐지)
-3. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
-4. JSON 로그 초기화: `{"session_id":"...","chat_url":"<진입 URL>","turn_number":0}` 저장
+### Step 1. 세션 초기화 (로그만 — 브라우저 조작 금지)
+1. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+2. JSON 로그 초기화: `{"session_id":"...","chat_url":"","turn_number":0}` 저장
+3. `chat_url`은 첫 gpt-send 호출 후 `.claude/state/debate_chat_url`에서 읽어 갱신
 
-> **URL 갱신 정책**: debate_chat_url은 매 세션 시작 시 프로젝트에서 최상단 방으로 자동 갱신된다.
-> 이전 세션의 고정 URL에 의존하지 않는다.
-
-### Step 1.8. Selector Smoke Test (필수)
-- REFERENCE.md의 Selector Smoke Test JS 실행 → 입력창/응답영역/composer action 존재 확인
-- 빈 입력창 상태에서는 `composer-speech-button`만 보여도 정상으로 간주
-- 실패 시 토론 중단 + 사용자 보고 (UI 변경 감지)
-
-### Step 1.5. 입력 전 미확인 응답 점검 (필수)
-- `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
+> **[NEVER] debate-mode 안에서 Chrome MCP 도구를 직접 호출하지 않는다.**
+> tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer 등
+> 브라우저 조작은 전부 gpt-send/gpt-read 스킬이 내부에서 처리한다.
+> 탭 준비, 채팅방 진입, 셀렉터 확인, SEND GATE 모두 gpt-send/gpt-read 책임이다.
 
 ### Step 2. 메시지 전송 + 응답 읽기
 
-**[MUST] 전송과 응답 읽기는 전용 스킬을 호출한다:**
+**[MUST] 모든 브라우저 상호작용은 전용 스킬로만:**
 - 전송: `Skill(skill="gpt-send", args="메시지 텍스트")`
 - 응답 읽기: `Skill(skill="gpt-read")`
-- 수동 javascript_tool/navigate로 직접 조작 금지 — gpt-send/gpt-read가 처리
 - 전송 본문 자연어는 한국어만 작성
+- gpt-send가 탭 준비 → 채팅방 진입 → SEND GATE → 입력 → 전송 → 응답 읽기를 일괄 처리
 
 ### Step 3. 반박 생성 및 자동 전송
 1. GPT 응답 핵심 주장 3줄 요약

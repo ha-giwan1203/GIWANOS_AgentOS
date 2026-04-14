@@ -4,14 +4,24 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-15 KST — 세션47 (navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신)
+최종 업데이트: 2026-04-15 KST — 세션48 (debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test 추가)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-15 세션47)
+## 0. 최신 세션 (2026-04-15 세션48)
 
 ### 이번 세션 완료
+1. **debate-mode SKILL.md 구조 변경**: Step 1 Chrome MCP 직접 조작 지시 전부 제거 → gpt-send/gpt-read 전면 위임. 근본 원인: "Step 1에서 수동 navigate 허가 → 관성으로 Step 2도 수동" 패턴
+2. **ENTRY.md NEVER 11 추가**: debate-mode 안 Chrome MCP 직접 호출 금지 (tabs_context_mcp, navigate, javascript_tool 등)
+3. **CLAUDE.md 실행 루프 정합**: 수동 조작 상세 → gpt-send/gpt-read 위임 구조로 변경
+4. **smoke_test 섹션 45 신규**: navigate_gate 런타임 테스트 6건 (stdin JSON 주입 실제 분기 테스트 포함)
+5. **smoke_test 헤더 42→45섹션 수정**: 메타 드리프트 해소
+6. smoke_test 158/158 ALL PASS (이전 152 → +6)
+
+### 이전 세션 (2026-04-15 세션47)
+
+#### 세션47 완료
 1. **navigate_gate.sh 신규**: 토론 도메인 활성 + ChatGPT navigate 시 CLAUDE.md 읽기 강제
 2. **risk_profile_prompt.sh 보강**: 토론/공동/공유 키워드 → systemMessage로 debate-mode 스킬 안내
 3. **미등록 스킬 12개 등록**: .claude/commands/ 래퍼 생성 (debate-mode, auto-fix 등)
@@ -39,8 +49,9 @@
 12. **final_check 세션 번호 비교**: 6b 섹션 추가 — _get_session()으로 TASKS/HANDOFF의 "세션NN" 추출 후 비교. 같은 날 세션 드리프트 감지
 
 ### 다음 세션 안건 (우선순위순)
-1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)
-2. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
+1. **[낮] deny-path 런타임 검증 2차 확장** — completion_gate/evidence_gate 실제 조건 조성 테스트
+2. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)
+3. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
 
 ---
 

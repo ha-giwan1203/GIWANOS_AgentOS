@@ -27,24 +27,16 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - [NEVER] 일반 채팅 URL(`/c/` 단독)을 프로젝트 채팅방으로 사용 금지 — 프로젝트 slug 포함 URL만 허용
 
 ## 실행 루프
-1. Chrome MCP `tabs_context_mcp` → 기존 ChatGPT 탭 확인, 없으면 `navigate`
-2. 프로젝트 URL → 최상단 채팅방 URL 추출 → `navigate`
-3. **SEND GATE**: 전송 직전 `get_page_text` 또는 `read_page`로 assistant 최신 텍스트 재읽기 (NEVER — 생략 금지)
-4. **기본 입력**: `javascript_tool`로 `#prompt-textarea` focus → `insertText`로 한 번에 삽입 (줄바꿈 포함)
-5. **전송 클릭**: `find`(send button) → `computer(left_click)`
-6. stop-button polling 적응형 (3/5/8초, 최대 300초) + 매 주기 사용자 중단 확인
-7. 응답 읽기(`get_page_text`) → 하네스 분석 → 반박 생성 → 전송 → 반복
+1. **토론 로직만 담당**: 독립 점검 → 하네스 분석 → 반박 생성 → 로그 기록
+2. **전송**: `Skill(skill="gpt-send", args="메시지")` — 탭 준비/진입/SEND GATE/입력/전송/응답읽기 일괄
+3. **응답 읽기**: `Skill(skill="gpt-read")` — 응답 완료 확인 + 최신 텍스트 반환
+4. 하네스 분석 → 반박 생성 → gpt-send → 반복
 
-> 입력은 반드시 `javascript_tool` + `insertText` 사용. `type`(느림)이나 `form_input`(줄바꿈 불가) 금지.
+> **[NEVER] debate-mode 안에서 Chrome MCP 도구 직접 호출 금지.**
+> tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer 등
+> 브라우저 조작은 전부 gpt-send/gpt-read 내부에서 처리한다.
 
-```javascript
-// 표준 입력 패턴
-const ta = document.querySelector('#prompt-textarea');
-ta.focus();
-document.execCommand('insertText', false, text);
-```
-
-## 고정 Selector (2026-03-31 실증)
+## 고정 Selector (gpt-send/gpt-read 내부 참조용)
 ```
 입력창:      #prompt-textarea              (contenteditable DIV)
 전송버튼:    [data-testid="send-button"]   (텍스트 입력 후 표시될 수 있음)
