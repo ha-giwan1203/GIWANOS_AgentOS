@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션41 (학습 루프 마무리: self-audit 연동 + normal_flow 분리)
+최종 업데이트: 2026-04-14 — 세션42 (daily-routine MES 직접HTTP 전환 + 업로드 로직 강화)
 
 ---
 
@@ -32,6 +32,15 @@
 ---
 
 ## 최근 완료
+
+### [완료] daily-routine MES 직접HTTP 전환 + 업로드 로직 강화 — 세션42 (2026-04-14)
+- **MES Playwright/CDP 제거**: OAuth SSO 직접 HTTP 로그인(requests)으로 전환 — Chrome 불필요, 실행 수분→5초
+- **Chrome 저장 자격증명 분석**: Login Data For Account에서 `0109/samsong1234` 복호화
+- **OAuth 플로우 구현**: SSO ssoUrl 파싱 → authorize → POST /login → SESSION 쿠키 획득
+- **누락 확인 범위 확장**: 이번달 1일 → 최근 7일(어제 기준)로 변경
+- **전체 컬럼 공백 검사**: COL1~COL22 중 COL13(품질,설비비가동) 제외, 공백 시 업로드 금지+보고
+- **2026-04-07 COL16 공백 발견**: 사용자 수정 후 강제 재업로드 완료 (덮어쓰기 확인)
+- 커밋: 9a85927c, 50a84957
 
 ### [완료] 학습 루프 마무리: self-audit 연동 + normal_flow 분리 — 세션41 (2026-04-14)
 - **안건1 self-audit 연동**: self-audit-agent.md Step 7.5 추가 (incident_review.py --days 7 --threshold 3 자동 실행)

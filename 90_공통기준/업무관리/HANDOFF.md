@@ -4,12 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션 41 (학습 루프 마무리: self-audit 연동 + normal_flow 분리)
+최종 업데이트: 2026-04-14 KST — 세션 42 (daily-routine MES 직접HTTP 전환 + 업로드 로직 강화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션 41)
+## 0. 최신 세션 (2026-04-14 세션 42)
+
+### 이번 세션 완료
+1. **MES Playwright/CDP 제거**: requests OAuth 직접 HTTP로 전환. Chrome 미실행 시 수분 지연 → 5초로 해결
+2. **OAuth 플로우**: SSO ssoUrl 파싱 → /oauth/authorize → POST /login → SESSION 쿠키 → X-XSRF-TOKEN 헤더
+3. **자격증명**: Chrome Login Data For Account SQLite에서 `0109/samsong1234` AES-GCM 복호화
+4. **누락 확인 범위**: 이번달 1일 → 최근 7일(어제 기준)로 변경
+5. **공백 검사 강화**: COL1~COL22 전체 검사 (COL13 품질,설비비가동 제외), 공백 시 업로드 금지+행번호 보고
+6. **2026-04-07 COL16 공백 처리**: 감지→사용자 수동 수정→강제 재업로드(덮어쓰기) 완료
+
+### 다음 세션 안건 (우선순위순)
+
+1. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
+2. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가
+
+---
+
+## 1. 이전 세션 (2026-04-14 세션 41)
 
 ### 이번 세션 완료
 1. **self-audit에 incident_review 연동**: self-audit-agent.md Step 7.5 추가 (incident_review.py --days 7 --threshold 3 자동 실행)
@@ -18,20 +35,12 @@
 4. **completion_gate.sh**: `completion_before_state_sync`에 `"normal_flow":true` 추가
 5. **incident_review.py 필터**: `--include-normal-flow` 옵션 추가 (기본: 제외), structural_intermediate 기본 제외
 6. smoke_test 140/140 ALL PASS
-7. 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
-8. **share-result 구조개선**: 3~4단계 gpt-send 필수 호출로 교체, 수동 진입 [NEVER] 금지
-9. **gpt-send 탭 재사용**: gpt_tab_id 캐시로 세션 간 탭 재사용, 새 탭 생성 최소화
-
-### 다음 세션 안건 (우선순위순)
-
-1. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
-   - evidence_missing 177건/30일 최다. 워밍업 기록 생략이 진단에 줄 효과 큼
-2. **[중] 학습 루프 GPT 토론 검증**
-   - 세션41 결과 GPT 공유 → 학습 루프 완성도 재평가 (70~75% → 90%+)
+7. **share-result 구조개선**: 3~4단계 gpt-send 필수 호출로 교체, 수동 진입 [NEVER] 금지
+8. **gpt-send 탭 재사용**: gpt_tab_id 캐시로 세션 간 탭 재사용, 새 탭 생성 최소화
 
 ---
 
-## 1. 이전 세션 (2026-04-14 세션 40)
+## 2. 이전 세션 (2026-04-14 세션 40)
 
 ### 이번 세션 완료
 1. **GPT 토론 1턴 (규칙 승격기 설계)**: 채택 5건 / 보류 3건
