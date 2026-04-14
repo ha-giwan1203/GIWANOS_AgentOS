@@ -1,9 +1,9 @@
 {
-  "terminal_state": "in_progress",
+  "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "통과",
+  "gpt_judgment": "조건부통과",
   "user_reported": true,
-  "followup_checked": false,
+  "followup_checked": true,
   "exception_reason": null
 }

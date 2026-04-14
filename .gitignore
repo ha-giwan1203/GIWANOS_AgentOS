@@ -172,3 +172,4 @@ config/private/
 05_생산실적/조립비정산/04월/
 03_품번관리/초물관리/_output/
 03_품번관리/초물관리/_backup/
+.claude/state/gpt_tab_id
