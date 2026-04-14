@@ -140,8 +140,28 @@ def mes_extract(bi_path, target_str):
     wb.close()
     return items
 
-def mes_validate(items):
-    return not any(r.get("COL15") in (None, "", "0", "None") for r in items)
+# 공백 허용 컬럼: 품질,설비 비가동(h) = COL13
+BLANK_OK = {"COL13"}
+
+def mes_find_blanks(items):
+    """공백 셀 목록 반환 [(행번호, 컬럼명, 컬럼제목), ...]. 빈 리스트면 OK."""
+    COL_NAMES = {
+        "COL1":"업체명","COL2":"유형","COL3":"기종구분","COL4":"대표기종",
+        "COL5":"라인명","COL6":"야간구분","COL7":"생산인원","COL8":"날짜",
+        "COL9":"표준UPH","COL10":"C/T","COL11":"적용효율","COL12":"근무시간(h)",
+        "COL13":"품질,설비비가동(h)","COL14":"실가동시간(h)","COL15":"생산량(ea)",
+        "COL16":"품번수(ea)","COL17":"실가동목표수량","COL18":"실적UPH",
+        "COL19":"UPMH","COL20":"실가동UPH","COL21":"가동효율","COL22":"순가동효율",
+    }
+    blanks = []
+    for row_idx, item in enumerate(items, 1):
+        for col in [f"COL{i}" for i in range(1, 23)]:
+            if col in BLANK_OK:
+                continue
+            val = item.get(col, "")
+            if val in (None, ""):
+                blanks.append((row_idx, col, COL_NAMES.get(col, col)))
+    return blanks
 
 def mes_login():
     """OAuth SSO 직접 HTTP 로그인. requests.Session 반환. 실패 시 None."""
@@ -222,14 +242,21 @@ def run_mes(today):
         return False
     print("  MES 로그인 OK")
 
-    # MES 기등록 날짜 조회 (이번 달 1일 ~ 어제)
-    first_day = date(today.year, today.month, 1).isoformat()
-    yesterday = (today - timedelta(days=1)).isoformat()
+    # 기준: 어제까지 최근 7일 (일요일 제외)
+    yesterday = today - timedelta(days=1)
+    week_ago  = today - timedelta(days=7)
+    check_range = [
+        (week_ago + timedelta(days=i)).isoformat()
+        for i in range(7)
+        if not is_sunday(week_ago + timedelta(days=i))
+        and (week_ago + timedelta(days=i)) <= yesterday
+    ]
 
+    # MES 기등록 날짜 조회
     try:
         r = s.get(
             "http://mes-dev.samsong.com:19200/prdtstatus/selectPrdtRsltByLine.do",
-            params={"S_FROM": first_day, "S_TO": yesterday,
+            params={"S_FROM": week_ago.isoformat(), "S_TO": yesterday.isoformat(),
                     "S_CMPY_NM": "대원테크", "pq_curPage": "1", "pq_rPP": "1000"},
             timeout=15,
         )
@@ -239,40 +266,45 @@ def run_mes(today):
         print(f"  FAIL: 기등록 조회 오류 — {e}")
         return False
 
-    # BI 데이터 있는 날짜 수집 (이번 달, 어제까지)
+    # BI 데이터 날짜 수집 (check_range 범위)
     wb = openpyxl.load_workbook(bi, data_only=True, read_only=True)
     ws = wb.active
-    bi_dates = {}
+    bi_dates = set()
     for row in ws.iter_rows(min_row=2, values_only=True):
         dv = row[7]
         if dv is None: continue
         ds = str(dv)[:10]
-        if first_day <= ds <= yesterday:
-            bi_dates[ds] = bi_dates.get(ds, 0) + 1
+        if ds in check_range:
+            bi_dates.add(ds)
     wb.close()
 
-    # 누락일 산출 (일요일 제외)
-    targets = [
-        ds for ds in sorted(bi_dates)
-        if not is_sunday(date.fromisoformat(ds)) and ds not in mes_dates
-    ]
+    # 누락일: check_range 중 BI 있고 MES 미등록
+    targets = [ds for ds in check_range if ds in bi_dates and ds not in mes_dates]
 
     has_fail = False
+    incomplete = []  # 데이터 누락으로 업로드 금지된 날짜
+
     if not targets:
         print("  누락 없음")
     else:
-        print(f"  누락: {targets}")
+        print(f"  누락일: {targets}")
         for t in targets:
             items = mes_extract(bi, t)
             if not items:
-                print(f"  {t}: BI 0건 SKIP")
+                print(f"  {t}: BI 데이터 없음 SKIP")
                 continue
-            if not mes_validate(items):
-                print(f"  {t}: FAIL 생산량 빈값")
+
+            # 공백 검사 (COL13 제외)
+            blanks = mes_find_blanks(items)
+            if blanks:
+                print(f"  {t}: 데이터 누락 — 업로드 금지")
+                for row_idx, col, col_name in blanks:
+                    print(f"    행{row_idx} {col}({col_name}) 공백")
+                incomplete.append(t)
                 has_fail = True
                 continue
 
-            bi_qty = sum(int(r["COL15"]) for r in items if r["COL15"].isdigit())
+            bi_qty = sum(int(r["COL15"]) for r in items if r.get("COL15", "").isdigit())
             v = mes_upload_and_verify(s, items, t)
             if v is None:
                 print(f"  {t}: FAIL 업로드 실패")
@@ -285,6 +317,14 @@ def run_mes(today):
                   f"qty {v['qty']:,}/{bi_qty:,}({'OK' if qty_ok else 'FAIL'})")
             if not cnt_ok or not qty_ok:
                 has_fail = True
+
+    # 데이터 누락 날짜 사용자 보고
+    if incomplete:
+        print()
+        print("  [!] 데이터 누락으로 업로드 보류된 날짜:")
+        for t in incomplete:
+            print(f"      {t} — BI 파일 해당 날짜 공백 셀 확인 필요")
+        print("      (품질,설비 비가동(h) 공백은 제외하고 검사)")
 
     return not has_fail
 
