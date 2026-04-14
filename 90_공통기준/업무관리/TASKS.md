@@ -10,17 +10,17 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션43 (AGENTS_GUIDE 갱신 + evidence_gate fingerprint grace + pre_commit_check 분해)
+최종 업데이트: 2026-04-14 — 세션44 (commit_gate fingerprint grace suppress 구현)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] commit_gate 연속 중복 suppress 검토**
-- pre_commit_check 174건/7일 중 146건(84%)이 연속 중복 — fingerprint grace 적용 여부 GPT 토론
-- evidence_gate와 동일 방식으로 commit_gate에도 suppress 로직 추가 가능
+**[중] 학습 루프 GPT 토론 검증**
+- 세션41 구현 결과(self-audit 연동 + normal_flow 분리)를 GPT에 공유
+- 학습 루프 완성도 재평가 (세션40 합의 70~75% → 목표 90%+)
 
-**[낮] AGENTS_GUIDE 자동생성화 (세션44+ 안건)**
+**[낮] AGENTS_GUIDE 자동생성화 (세션45+ 안건)**
 - settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
 - GPT+Claude 합의 세션43: 방향 확정, 구현은 다음 세션
 
@@ -28,15 +28,18 @@
 - AGENTS_GUIDE에 [분류: 확인 필요]로 임시 등재됨
 - 실운영/실험/도구 분류 사용자 확인 후 확정 필요
 
-### 학습 루프 후속
-
-**[중] 학습 루프 GPT 토론 검증**
-- 세션41 구현 결과(self-audit 연동 + normal_flow 분리)를 GPT에 공유
-- 학습 루프 완성도 재평가 (세션40 합의 70~75% → 목표 90%+)
-
 ---
 
 ## 최근 완료
+
+### [완료] commit_gate fingerprint grace suppress 구현 — 세션44 (2026-04-14)
+- **GPT 토론 1턴**: A2(60초)+B1(전체 적용)+C1 보강(mode|normal_flow|fail_keywords) 합의. 채택 4건 / 보류 0건
+- **commit_gate.sh 수정**: evidence_gate 동일 패턴 복사 적용 — 60초 grace window, fingerprint 16자리 해시
+- **동작**: deny(차단)은 유지, incident 기록만 grace window 내 중복 생략
+- **효과**: 174건/7일 중 146건(84%) 연속 중복 → 1건만 기록으로 축소 예상
+- smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py — 기존 이슈, 본건 무관)
+
+---
 
 ### [완료] daily-routine MES 직접HTTP 전환 + 업로드 로직 강화 — 세션42 (2026-04-14)
 - **MES Playwright/CDP 제거**: OAuth SSO 직접 HTTP 로그인(requests)으로 전환 — Chrome 불필요, 실행 수분→5초

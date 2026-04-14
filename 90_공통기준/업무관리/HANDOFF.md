@@ -4,12 +4,27 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션43 (AGENTS_GUIDE 갱신 + evidence_gate fingerprint grace + pre_commit_check 분해)
+최종 업데이트: 2026-04-14 KST — 세션44 (commit_gate fingerprint grace suppress 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션43)
+## 0. 최신 세션 (2026-04-14 세션44)
+
+### 이번 세션 완료
+1. **commit_gate fingerprint grace suppress**: GPT 토론 1턴 → A2(60초)+B1(전체)+C1 보강 합의(채택 4건)
+2. **commit_gate.sh 수정**: evidence_gate 동일 패턴 — 60초 grace window, sha1 fingerprint(mode|normal_flow|fail_keywords), tail -30 스캔
+3. **동작**: deny(차단) 유지, incident 기록만 grace window 내 중복 생략
+4. smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈)
+
+### 다음 세션 안건 (우선순위순)
+1. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가
+2. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션45+)
+3. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
+
+---
+
+## 1. 이전 세션 (2026-04-14 세션43)
 
 ### 이번 세션 완료
 1. **주간 self-audit 자동 실행**: weekly-self-audit 스케줄 실행 → P1×2, P2×2 발견
@@ -18,15 +33,9 @@
 4. **evidence_gate fingerprint grace 구현**: deny() 함수 교체 — 연속카운트 방식 → fingerprint hash + 30초 time window suppress
 5. **pre_commit_check 174건 분해**: fast FAIL 159건/full FAIL 15건, 연속 중복 146건(84%) — 완화 불필요, commit_gate fingerprint suppress 검토 안건으로 격상
 
-### 다음 세션 안건 (우선순위순)
-1. **[중] commit_gate 연속 중복 suppress** — 174건 중 146건 duplicate, fingerprint grace 적용 GPT 토론
-2. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가
-3. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션44+)
-4. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
-
 ---
 
-## 1. 이전 세션 (2026-04-14 세션 41)
+## 2. 이전 세션 (2026-04-14 세션 41)
 
 ### 이번 세션 완료
 1. **self-audit에 incident_review 연동**: self-audit-agent.md Step 7.5 추가 (incident_review.py --days 7 --threshold 3 자동 실행)
