@@ -59,6 +59,8 @@ CLASSIFICATION: dict[str, str] = {
     "feedback_tone_rules": "promptable",
     "feedback_use_skills_not_manual": "promptable",
     "feedback_worktree_main_direct": "promptable",
+    "feedback_gpt_send_1b_skip": "promptable",
+    "feedback_gpt_send_skill_entry": "promptable",
 }
 
 

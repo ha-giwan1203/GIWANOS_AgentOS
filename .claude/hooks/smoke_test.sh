@@ -22,7 +22,7 @@ check() {
   fi
 }
 
-echo "=== Hooks Smoke Test v4 ==="
+echo "=== Hooks Smoke Test v5 ==="
 echo ""
 
 # === 1. hook_common.sh ===
@@ -673,11 +673,65 @@ check $? "incident_repair.py: --backfill-classification CLI 옵션"
 
 echo ""
 
+# === 40. commit_gate.sh 실행 테스트 (세션46 GPT+Claude 합의: 최소 시나리오) ===
+echo "--- 40. commit_gate.sh 실행 테스트 ---"
+# 40-1: git 아닌 명령 → 통과 (exit 0, 출력 없음)
+_cg_out=$(echo '{"command":"ls -la"}' | bash "$HOOKS_DIR/commit_gate.sh" 2>/dev/null)
+_cg_exit=$?
+[ "$_cg_exit" -eq 0 ] && [ -z "$_cg_out" ]
+check $? "commit_gate: non-git 명령 → 통과"
+
+# 40-2: build_fingerprint 함수 존재 + 호출 가능
+(source "$HOOKS_DIR/commit_gate.sh" <<< '{"command":"echo test"}' >/dev/null 2>&1; type build_fingerprint >/dev/null 2>&1)
+# 함수 정의 검증 (grep 대신 source 후 type 확인이 이상적이나, side-effect 회피를 위해 grep)
+grep -q 'build_fingerprint()' "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate: build_fingerprint() 함수 정의됨"
+
+# 40-3: should_suppress_incident 함수 존재
+grep -q 'should_suppress_incident()' "$HOOKS_DIR/commit_gate.sh"
+check $? "commit_gate: should_suppress_incident() 함수 정의됨"
+
+# 40-4: 함수 밖 local 사용 없음 (회귀 방지)
+# 함수 내부 local은 허용, 함수 밖 local은 결함
+_outside_local=$(awk '/^[a-zA-Z_]+\(\)/{in_func=1} /^\}/{if(in_func) in_func=0} !in_func && /^[[:space:]]*local /{print NR}' "$HOOKS_DIR/commit_gate.sh")
+[ -z "$_outside_local" ]
+check $? "commit_gate: 함수 밖 local 사용 없음 (회귀 방지)"
+
+echo ""
+
+# === 41. completion_gate.sh 실행 테스트 (세션46) ===
+echo "--- 41. completion_gate.sh 실행 테스트 ---"
+# 41-1: write_marker 없으면 통과
+_comp_out=$(echo '{"tool_name":"Bash","input":{"command":"echo done"}}' | CLAUDE_PROJECT_DIR="$PROJECT_DIR" bash "$HOOKS_DIR/completion_gate.sh" 2>/dev/null)
+_comp_exit=$?
+[ "$_comp_exit" -eq 0 ]
+check $? "completion_gate: marker 없으면 통과"
+
+# 41-2: completion_gate.sh bash -n 구문 검사
+bash -n "$HOOKS_DIR/completion_gate.sh" 2>/dev/null
+check $? "completion_gate: bash -n 구문 검사 통과"
+
+echo ""
+
+# === 42. evidence_gate.sh 실행 테스트 (세션46) ===
+echo "--- 42. evidence_gate.sh 실행 테스트 ---"
+# 42-1: evidence 요구사항 없으면 no-op (통과)
+_ev_out=$(echo '{"tool_name":"Bash","input":{"command":"echo hi"}}' | CLAUDE_PROJECT_DIR="$PROJECT_DIR" bash "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null)
+_ev_exit=$?
+[ "$_ev_exit" -eq 0 ]
+check $? "evidence_gate: req 없으면 통과"
+
+# 42-2: evidence_gate.sh bash -n 구문 검사
+bash -n "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
+check $? "evidence_gate: bash -n 구문 검사 통과"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""

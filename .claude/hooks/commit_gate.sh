@@ -6,6 +6,46 @@
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 
+# --- fingerprint suppress 함수 (세션46 GPT+Claude 합의: 2단 분리) ---
+
+# build_fingerprint: 모드+흐름+키워드로 16자 해시 생성
+# Usage: fp=$(build_fingerprint "$MODE" "$NORMAL_FLOW" "$FAIL_KEYWORDS")
+build_fingerprint() {
+  local mode="$1" normal_flow="$2" fail_kw="$3"
+  local raw="${mode:0:20}|${normal_flow}|${fail_kw:0:80}"
+  if command -v sha1sum >/dev/null 2>&1; then
+    printf '%s' "$raw" | sha1sum | cut -c1-16
+  elif command -v md5sum >/dev/null 2>&1; then
+    printf '%s' "$raw" | md5sum | cut -c1-16
+  else
+    printf '%s' "$raw" | cksum | awk '{print $1}' | cut -c1-16
+  fi
+}
+
+# should_suppress_incident: grace window 내 동일 fingerprint 중복이면 true(0)
+# Usage: if should_suppress_incident "$fingerprint" 60; then ...suppress...
+should_suppress_incident() {
+  local fingerprint="$1" grace_window="${2:-60}"
+  local ledger="${INCIDENT_LEDGER:-${PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}/.claude/incident_ledger.jsonl}"
+  [ -f "$ledger" ] || return 1
+  local now cutoff
+  now=$(date +%s 2>/dev/null || echo 0)
+  cutoff=$((now - grace_window))
+  local line fp_in ts_in epoch
+  while IFS= read -r line; do
+    fp_in=$(printf '%s' "$line" | safe_json_get "fingerprint" 2>/dev/null)
+    if [ "$fp_in" = "$fingerprint" ]; then
+      ts_in=$(printf '%s' "$line" | safe_json_get "ts" 2>/dev/null)
+      epoch=$(date -d "$ts_in" +%s 2>/dev/null || \
+              date -jf "%Y-%m-%dT%H:%M:%SZ" "$ts_in" +%s 2>/dev/null || echo 0)
+      if [ "$epoch" -gt "$cutoff" ] 2>/dev/null; then
+        return 0  # suppress
+      fi
+    fi
+  done < <(tail -30 "$ledger")
+  return 1  # no suppress — should record
+}
+
 INPUT=$(cat)
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
 COMMAND=$(echo "$INPUT" | safe_json_get "command")
@@ -70,45 +110,12 @@ if [ "$EXIT_CODE" -ne 0 ]; then
   fi
   hook_log "PreToolUse/Bash" "commit_gate BLOCK: final_check $MODE FAIL | promoted=$PROMOTED | normal_flow=$NORMAL_FLOW | fails=$FAIL_KEYWORDS | warns=$WARN_KEYWORDS" 2>/dev/null
 
-  # fingerprint 기반 incident suppress (GPT+Claude 합의 세션44):
-  # evidence_gate 동일 패턴. 차단(deny)은 유지, incident 기록만 grace window 내 중복 생략
-  local GRACE_WINDOW=60
-  local _fp_raw
-  _fp_raw="${MODE:0:20}|${NORMAL_FLOW}|${FAIL_KEYWORDS:0:80}"
-  local _fingerprint
-  if command -v sha1sum >/dev/null 2>&1; then
-    _fingerprint=$(printf '%s' "$_fp_raw" | sha1sum | cut -c1-16)
-  elif command -v md5sum >/dev/null 2>&1; then
-    _fingerprint=$(printf '%s' "$_fp_raw" | md5sum | cut -c1-16)
+  # fingerprint 기반 incident suppress (GPT+Claude 합의 세션44, 세션46 2단 함수화):
+  _fingerprint=$(build_fingerprint "$MODE" "$NORMAL_FLOW" "$FAIL_KEYWORDS")
+  if should_suppress_incident "$_fingerprint" 60; then
+    hook_log "PreToolUse/Bash" "commit_gate: incident suppress (fingerprint=$_fingerprint, grace=60s)" 2>/dev/null
   else
-    _fingerprint=$(printf '%s' "$_fp_raw" | cksum | awk '{print $1}' | cut -c1-16)
-  fi
-
-  local _should_record=true
-  INCIDENT_LEDGER="${INCIDENT_LEDGER:-$PROJECT_DIR/.claude/incident_ledger.jsonl}"
-  if [ -f "$INCIDENT_LEDGER" ]; then
-    local _now _cutoff
-    _now=$(date +%s 2>/dev/null || echo 0)
-    _cutoff=$((_now - GRACE_WINDOW))
-    while IFS= read -r _line; do
-      local _fp_in_line _ts_in_line _epoch
-      _fp_in_line=$(printf '%s' "$_line" | safe_json_get "fingerprint" 2>/dev/null)
-      if [ "$_fp_in_line" = "$_fingerprint" ]; then
-        _ts_in_line=$(printf '%s' "$_line" | safe_json_get "ts" 2>/dev/null)
-        _epoch=$(date -d "$_ts_in_line" +%s 2>/dev/null || \
-                 date -jf "%Y-%m-%dT%H:%M:%SZ" "$_ts_in_line" +%s 2>/dev/null || echo 0)
-        if [ "$_epoch" -gt "$_cutoff" ] 2>/dev/null; then
-          _should_record=false
-          break
-        fi
-      fi
-    done < <(tail -30 "$INCIDENT_LEDGER")
-  fi
-
-  if [ "$_should_record" = "true" ]; then
     hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"mode\":\"$MODE\",\"promoted_to_full\":$PROMOTED,\"normal_flow\":$NORMAL_FLOW,\"fail_keywords\":\"$FAIL_KEYWORDS\",\"warn_keywords\":\"$WARN_KEYWORDS\",\"fingerprint\":\"$_fingerprint\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
-  else
-    hook_log "PreToolUse/Bash" "commit_gate: incident suppress (fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s)" 2>/dev/null
   fi
   echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] final_check $MODE 실패 — 자체검증 통과 후 커밋하세요.\\n$FAILS\"}"
   exit 0

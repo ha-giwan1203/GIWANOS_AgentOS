@@ -295,13 +295,8 @@ hook_user_correction() {
 # task_results 로그 경로: hook_config.json > 기본값
 _task_log_path=""
 if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
-  _task_log_path=$(python3 -c "
-import json
-try:
-  c=json.load(open('$PROJECT_ROOT/.claude/hook_config.json'))
-  print(c.get('task_escalation',{}).get('log_path',''))
-except: pass
-" 2>/dev/null)
+  _task_log_path=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+    "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.log_path" "" 2>/dev/null)
 fi
 TASK_RESULTS_LOG="${_task_log_path:+$PROJECT_ROOT/$_task_log_path}"
 TASK_RESULTS_LOG="${TASK_RESULTS_LOG:-$PROJECT_ROOT/.claude/logs/task_results.jsonl}"
@@ -345,16 +340,12 @@ hook_task_result() {
   # hook_config.json에서 per_task/default threshold 읽기
   if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
     local pt
-    pt=$(python3 -c "
-import json,sys
-try:
-  c=json.load(open('$PROJECT_ROOT/.claude/hook_config.json'))
-  te=c.get('task_escalation',{})
-  pt=te.get('per_task',{}).get('$task_id')
-  if pt: print(pt)
-  else: print(te.get('default_threshold',3))
-except: print(3)
-" 2>/dev/null)
+    pt=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+      "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.per_task.$task_id" "" 2>/dev/null)
+    if [ -z "$pt" ]; then
+      pt=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+        "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.default_threshold" "3" 2>/dev/null)
+    fi
     threshold="${pt:-3}"
   fi
   if [ "$streak" -ge "$threshold" ] && [ "$status" = "fail" ]; then
