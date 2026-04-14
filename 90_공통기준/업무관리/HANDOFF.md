@@ -4,14 +4,24 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션46 (GPT 합의 코드 품질 개선 A+B+C)
+최종 업데이트: 2026-04-15 KST — 세션47 (navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션46)
+## 0. 최신 세션 (2026-04-15 세션47)
 
 ### 이번 세션 완료
+1. **navigate_gate.sh 신규**: 토론 도메인 활성 + ChatGPT navigate 시 CLAUDE.md 읽기 강제
+2. **risk_profile_prompt.sh 보강**: 토론/공동/공유 키워드 → systemMessage로 debate-mode 스킬 안내
+3. **미등록 스킬 12개 등록**: .claude/commands/ 래퍼 생성 (debate-mode, auto-fix 등)
+4. **토론모드 지침 갱신**: CLAUDE.md/ENTRY.md/SKILL.md에 /debate-mode 스킬 필수 진입 명시
+5. **domain_entry_registry 키워드 확장**: 공동/공유/토론방 추가
+6. **.gitignore 수정**: .claude/commands/ Git 추적 허용
+
+### 이전 세션 (2026-04-14 세션46)
+
+#### 세션46 완료
 1. **GPT 정밀 평가 확인**: 종합 8.1점 (설계 A- / 코드 B) — 지적 5건 전부 실물 검증 확인
 2. **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리. 함수 밖 local 6곳 제거
 3. **B. smoke_test 3게이트 실행 테스트 추가**: 섹션 40(commit_gate) + 41(completion_gate) + 42(evidence_gate). 최소 시나리오 우선 설계

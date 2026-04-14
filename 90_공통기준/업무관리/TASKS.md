@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션46 (GPT 합의 코드 품질 개선 A+B+C)
+최종 업데이트: 2026-04-15 — 세션47 (navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신)
 
 ---
 
@@ -27,6 +27,14 @@
 ---
 
 ## 최근 완료
+
+### [완료] navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신 — 세션47 (2026-04-15)
+- **navigate_gate.sh 신규**: ChatGPT navigate 시 토론모드 CLAUDE.md 읽기 강제 (PreToolUse)
+- **risk_profile_prompt.sh 보강**: 토론/공동/공유 키워드 감지 시 systemMessage로 debate-mode 스킬 안내 주입
+- **미등록 스킬 12개 등록**: debate-mode, auto-fix, line-batch-management, line-batch-outer-main, line-mapping-validator, chomul-module-partno, sp3-production-plan, production-report, supanova-deploy, flow-chat-analysis, pptx-generator, skill-creator
+- **토론모드 지침 갱신**: CLAUDE.md/ENTRY.md/SKILL.md에 /debate-mode 스킬 진입 필수 명시, 전송/읽기 gpt-send/gpt-read 위임
+- **domain_entry_registry 키워드 확장**: 공동/공유/토론방 추가
+- **.gitignore 수정**: .claude/commands/ Git 추적 허용
 
 ### [완료] GPT 합의 코드 품질 개선 + 상태문서 동봉 강제 — 세션46 (2026-04-14)
 - **GPT 평가 → 토론 → 구현**: 지적 5건 실물 확인 후 의제 3개 합의, 전부 구현
