@@ -41,6 +41,7 @@
 - **안건2 incident_review.py**: `--include-normal-flow` 옵션 추가, 기본=제외. structural_intermediate 기본 제외
 - smoke_test 140/140 ALL PASS
 - 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
+- **share-result 구조개선**: 3~4단계를 /gpt-send 스킬 필수 호출로 교체. 수동 탭 진입 [NEVER] 금지 명시
 
 ---
 

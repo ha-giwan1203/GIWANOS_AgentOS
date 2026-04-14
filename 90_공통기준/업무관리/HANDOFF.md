@@ -19,6 +19,7 @@
 5. **incident_review.py 필터**: `--include-normal-flow` 옵션 추가 (기본: 제외), structural_intermediate 기본 제외
 6. smoke_test 140/140 ALL PASS
 7. 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
+8. **share-result 구조개선**: 3~4단계 gpt-send 필수 호출로 교체, 수동 진입 [NEVER] 금지
 
 ### 다음 세션 안건 (우선순위순)
 
