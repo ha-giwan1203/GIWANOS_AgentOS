@@ -69,6 +69,24 @@ fi
 
 hook_log "PreToolUse/Bash" "commit_gate: git commit/push 감지" 2>/dev/null
 
+# === 상태문서 동봉 강제 (세션46: 2회 커밋 패턴 해소) ===
+# write_marker가 존재하면 "이 세션에서 의미 있는 변경이 있었다"는 뜻.
+# 이 경우 TASKS.md 또는 HANDOFF.md가 staged에 없으면 커밋 차단.
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
+_MARKER="$PROJECT_DIR/90_공통기준/agent-control/state/write_marker.json"
+if [ -f "$_MARKER" ]; then
+  STAGED=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null)
+  _has_tasks=$(echo "$STAGED" | grep -c 'TASKS.md' || true)
+  _has_handoff=$(echo "$STAGED" | grep -c 'HANDOFF.md' || true)
+  if [ "$_has_tasks" -eq 0 ] && [ "$_has_handoff" -eq 0 ]; then
+    # staged에 TASKS/HANDOFF 변경 파일이 이미 있으면 통과 (docs 전용 커밋)
+    # 둘 다 없으면 차단
+    echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] write_marker 존재 — TASKS.md 또는 HANDOFF.md를 함께 staged하세요.\\n상태문서 갱신 없이는 커밋할 수 없습니다.\"}"
+    hook_log "PreToolUse/Bash" "commit_gate BLOCK: 상태문서 미동봉 (write_marker 존재, TASKS/HANDOFF 미staged)" 2>/dev/null
+    exit 0
+  fi
+fi
+
 # Circuit breaker: 동일 hook에서 연속 3건 이상 unresolved → 경고
 if circuit_breaker_tripped "commit_gate" 3 2>/dev/null; then
   hook_log "PreToolUse/Bash" "commit_gate: ⚠ circuit breaker — 연속 3회 이상 unresolved incident. 이전 실패 원인 해결 후 커밋 권장"

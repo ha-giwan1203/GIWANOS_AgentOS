@@ -28,14 +28,13 @@
 
 ## 최근 완료
 
-### [완료] GPT 합의 코드 품질 개선 A+B+C — 세션46 (2026-04-14)
-- **GPT 평가**: 종합 8.1점 (설계 A- / 코드 B) — 지적 5건 전부 실물 확인
-- **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리 (함수 밖 local 6곳 제거)
-- **B. smoke_test 3게이트 실행 테스트**: 섹션 40-42 추가 (commit_gate/completion_gate/evidence_gate 최소 시나리오)
+### [완료] GPT 합의 코드 품질 개선 + 상태문서 동봉 강제 — 세션46 (2026-04-14)
+- **GPT 평가 → 토론 → 구현**: 지적 5건 실물 확인 후 의제 3개 합의, 전부 구현
+- **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리
+- **B. smoke_test 3게이트 실행 테스트**: 섹션 40-42 추가 (148/148 ALL PASS)
 - **C. JSON 처리 단일화**: json_helper.py 신규 + hook_common.sh python3 인라인 2곳 교체
-- 핫픽스: smoke_test v4→v5 표기, classify_feedback 2건 누락 추가
-- smoke_test 148/148 ALL PASS (이전 147/148에서 개선)
-- 커밋: ac549431
+- **상태문서 동봉 강제**: commit_gate에 write_marker 존재 시 TASKS/HANDOFF 미staged → 차단 로직 추가 (2회 커밋 패턴 해소)
+- 핫픽스: smoke_test v4→v5, classify_feedback 2건 추가
 
 ### [완료] 학습 루프 사각지대 해소 A1+B1+D1+C2 — 세션45 (2026-04-14)
 - **A1**: incident_review.py에 warn_keywords 빈도 분석 추가 — normalize_warn() + aggregate_warn_frequency() + WARN 빈도 섹션
