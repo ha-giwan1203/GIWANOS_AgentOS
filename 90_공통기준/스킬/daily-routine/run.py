@@ -1,17 +1,22 @@
 """매일 반복 업무 통합 실행 (일요일 자동 차단, KST 기준)
 1. ZDM 일상점검 (API 직호출)
-2. MES 생산실적 업로드 (CDP iframe jQuery)
+2. MES 생산실적 업로드 (직접 HTTP — Playwright/CDP 불필요)
 """
 import json
 import os
+import re
 import shutil
-import subprocess
 import sys
 import time
 from datetime import datetime, date, timedelta, timezone
 
+
 import openpyxl
 import requests
+
+# ─── MES 인증 정보 ────────────────────────────────────
+MES_USER_ID  = "0109"
+MES_PASSWORD = "samsong1234"
 
 # ─── 공통 ───────────────────────────────────────────
 KST = timezone(timedelta(hours=9))
@@ -138,118 +143,70 @@ def mes_extract(bi_path, target_str):
 def mes_validate(items):
     return not any(r.get("COL15") in (None, "", "0", "None") for r in items)
 
-def mes_upload_and_verify(page, iframe_name, items, target_str):
-    """업로드 + 검증. 성공 시 (건수, 합계) 반환, 실패 시 None"""
+def mes_login():
+    """OAuth SSO 직접 HTTP 로그인. requests.Session 반환. 실패 시 None."""
+    s = requests.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    try:
+        # 1. SSO 페이지에서 ssoUrl(state 포함) 추출
+        r1 = s.get("http://mes-dev.samsong.com:19200/oauth2/sso", timeout=10)
+        m = re.search(r"ssoUrl\s*=\s*'([^']+)'", r1.text)
+        if not m:
+            print("  FAIL: ssoUrl 파싱 실패")
+            return None
+        sso_url = m.group(1)
+        # 2. OAuth authorize 방문 (auth-dev JSESSIONID 발급)
+        s.get(sso_url, allow_redirects=True, timeout=10)
+        # 3. 로그인 POST
+        r3 = s.post("http://auth-dev.samsong.com:18100/login", data={
+            "userId": MES_USER_ID, "password": MES_PASSWORD,
+            "clientId": "MES", "ssoUrl": sso_url, "clientName": "", "lang": "ko"
+        }, allow_redirects=True, timeout=15)
+        if "layout.do" not in r3.url:
+            print(f"  FAIL: 로그인 후 URL={r3.url}")
+            return None
+        # XSRF 헤더 설정 (POST 요청에 필요)
+        s.headers["X-XSRF-TOKEN"] = s.cookies.get("XSRF-TOKEN", "")
+        return s
+    except Exception as e:
+        print(f"  FAIL: 로그인 오류 — {e}")
+        return None
+
+
+def mes_upload_and_verify(s, items, target_str):
+    """직접 HTTP 업로드 + 검증. 성공 시 {count, qty} 반환, 실패 시 None."""
     payload = json.dumps({"excelList": items}, ensure_ascii=False)
-    result = page.evaluate(f"""async () => {{
-        const iframe = document.querySelector('iframe[name="{iframe_name}"]');
-        const $ = iframe.contentWindow.$;
-        return new Promise((resolve) => {{
-            $.ajax({{
-                url: "/prdtstatus/SaveExcelData.do",
-                type: "post",
-                data: {json.dumps(payload)},
-                contentType: "application/json; charset=utf-8",
-                success: function(res) {{ resolve(res); }},
-                error: function(x,s,e) {{ resolve({{statusCode:"500",statusTxt:s+' '+e}}); }}
-            }});
-        }});
-    }}""")
-    if str(result.get("statusCode", "")) not in ("200", "OK"):
+    try:
+        r = s.post(
+            "http://mes-dev.samsong.com:19200/prdtstatus/SaveExcelData.do",
+            data=payload.encode("utf-8"),
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            timeout=30,
+        )
+        result = r.json()
+        if str(result.get("statusCode", "")) not in ("200", "OK"):
+            print(f"    업로드 응답: {result}")
+            return None
+    except Exception as e:
+        print(f"    업로드 오류: {e}")
         return None
 
     time.sleep(2)
-    verify = page.evaluate(f"""async () => {{
-        const params = new URLSearchParams({{
-            S_FROM:'{target_str}',S_TO:'{target_str}',S_CMPY_NM:'대원테크',pq_curPage:'1',pq_rPP:'1000'
-        }});
-        const resp = await fetch('/prdtstatus/selectPrdtRsltByLine.do?'+params);
-        const r = await resp.json();
-        const rows = r.data.list;
-        return {{count:rows.length, qty:rows.reduce((s,r)=>s+Number(r.RESULT_QUANTITY||0),0)}};
-    }}""")
-    return verify
-
-def cdp_ensure_connected():
-    """CDP 브라우저 연결 + MES 로그인까지 보장. (page, pw) 반환. 실패 시 (None, None)."""
-    from playwright.sync_api import sync_playwright
-    import pyautogui
-
-    pw = sync_playwright().start()
-
-    # 1. 연결 시도, 없으면 실행
     try:
-        browser = pw.chromium.connect_over_cdp("http://localhost:9222")
-    except:
-        print("  CDP 미실행 -자동 시작")
-        subprocess.Popen([
-            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-            "--remote-debugging-port=9222",
-            r"--user-data-dir=C:\Users\User\.flow-chrome-debug",
-            "http://mes-dev.samsong.com:19200/layout/layout.do",
-            "--no-first-run", "--no-default-browser-check"
-        ])
-        time.sleep(6)
-        try:
-            browser = pw.chromium.connect_over_cdp("http://localhost:9222")
-        except Exception as e:
-            print(f"  FAIL: CDP 연결 실패 -{e}")
-            pw.stop()
-            return None, None
-
-    page = browser.contexts[0].pages[0]
-
-    # 2. 로그인 필요 시 자동 로그인
-    if "auth-dev" in page.url:
-        print("  MES 로그인 시도...")
-        try:
-            page.bring_to_front()
-            time.sleep(0.5)
-            info = page.evaluate("()=>({screenX:window.screenX,screenY:window.screenY,chromeH:window.outerHeight-window.innerHeight})")
-            box = page.locator('input[name="userId"]').bounding_box()
-            sx = int(info['screenX'] + box['x'] + box['width']/2)
-            sy = int(info['screenY'] + info['chromeH'] + box['y'] + box['height']/2)
-            pyautogui.click(sx, sy)
-            time.sleep(1.5)
-            pyautogui.press('down')
-            time.sleep(0.5)
-            pyautogui.press('return')
-            time.sleep(1.5)
-            page.locator('button[type=submit]').first.click()
-            time.sleep(5)
-            # OAuth 후 auth-dev에 머무는 것은 정상 - MES로 직접 이동
-            for attempt in range(3):
-                try:
-                    page.goto("http://mes-dev.samsong.com:19200/layout/layout.do", timeout=15000)
-                    break
-                except:
-                    time.sleep(2)
-            time.sleep(3)
-            page.wait_for_load_state("domcontentloaded")
-            if "mes-dev" not in page.url and "layout" not in page.url:
-                print("  FAIL: 자동 로그인 실패")
-                pw.stop()
-                return None, None
-            print("  MES 로그인 OK")
-        except Exception as e:
-            print(f"  FAIL: 로그인 에러 -{e}")
-            pw.stop()
-            return None, None
-
-    return page, pw
-
-
-def cdp_close(page, pw):
-    """CDP 브라우저 정상 종료"""
-    try:
-        cdp = page.context.new_cdp_session(page)
-        cdp.send("Browser.close")
-    except:
-        pass
-    try:
-        pw.stop()
-    except:
-        pass
+        vr = s.get(
+            "http://mes-dev.samsong.com:19200/prdtstatus/selectPrdtRsltByLine.do",
+            params={"S_FROM": target_str, "S_TO": target_str,
+                    "S_CMPY_NM": "대원테크", "pq_curPage": "1", "pq_rPP": "1000"},
+            timeout=10,
+        )
+        rows = vr.json().get("data", {}).get("list", [])
+        return {
+            "count": len(rows),
+            "qty": sum(int(row.get("RESULT_QUANTITY") or 0) for row in rows),
+        }
+    except Exception as e:
+        print(f"    검증 오류: {e}")
+        return None
 
 
 def run_mes(today):
@@ -260,58 +217,29 @@ def run_mes(today):
     if not bi:
         return False
 
-    page, pw = cdp_ensure_connected()
-    if not page:
+    s = mes_login()
+    if not s:
         return False
+    print("  MES 로그인 OK")
 
-    # MES 레이아웃 확인 + iframe 대기
-    if "layout/layout.do" not in page.url:
-        try:
-            page.goto("http://mes-dev.samsong.com:19200/layout/layout.do", timeout=15000)
-        except:
-            pass
-        time.sleep(5)
-
-    # iframe이 뜰 때까지 최대 15초 대기
-    iframe_name = None
-    for _ in range(5):
-        iframe_name = page.evaluate("()=>{const f=document.querySelectorAll('iframe[name]');return f.length?f[0].name:null;}")
-        if iframe_name:
-            break
-        time.sleep(3)
-
-    if not iframe_name:
-        print("  FAIL: iframe 없음")
-        cdp_close(page, pw)
-        return False
-
-    page.evaluate(f"document.querySelector('iframe[name=\"{iframe_name}\"]').src='/prdtstatus/viewPrdtRsltByLine.do'")
-    time.sleep(3)
-
-    has_jq = page.evaluate(f"()=>{{const f=document.querySelector('iframe[name=\"{iframe_name}\"]');return !!(f&&f.contentWindow&&f.contentWindow.$);}}")
-    if not has_jq:
-        print("  FAIL: jQuery 미로드")
-        cdp_close(page, pw)
-        return False
-
-    # MES 기등록 날짜 조회 (이번 달)
-    ym = today.strftime("%Y-%m")
+    # MES 기등록 날짜 조회 (이번 달 1일 ~ 어제)
     first_day = date(today.year, today.month, 1).isoformat()
     yesterday = (today - timedelta(days=1)).isoformat()
 
-    existing_raw = page.evaluate(f"""async () => {{
-        const params = new URLSearchParams({{
-            S_FROM:'{first_day}',S_TO:'{yesterday}',S_CMPY_NM:'대원테크',pq_curPage:'1',pq_rPP:'1000'
-        }});
-        const resp = await fetch('/prdtstatus/selectPrdtRsltByLine.do?'+params);
-        const r = await resp.json();
-        const byDate = {{}};
-        for (const row of r.data.list) byDate[row.TRX_DA] = (byDate[row.TRX_DA]||0)+1;
-        return byDate;
-    }}""")
-    mes_dates = set(existing_raw.keys())
+    try:
+        r = s.get(
+            "http://mes-dev.samsong.com:19200/prdtstatus/selectPrdtRsltByLine.do",
+            params={"S_FROM": first_day, "S_TO": yesterday,
+                    "S_CMPY_NM": "대원테크", "pq_curPage": "1", "pq_rPP": "1000"},
+            timeout=15,
+        )
+        rows = r.json().get("data", {}).get("list", [])
+        mes_dates = {row["TRX_DA"] for row in rows if row.get("TRX_DA")}
+    except Exception as e:
+        print(f"  FAIL: 기등록 조회 오류 — {e}")
+        return False
 
-    # BI 데이터 있는 날짜 (이번 달, 어제까지, 일요일 제외)
+    # BI 데이터 있는 날짜 수집 (이번 달, 어제까지)
     wb = openpyxl.load_workbook(bi, data_only=True, read_only=True)
     ws = wb.active
     bi_dates = {}
@@ -319,18 +247,15 @@ def run_mes(today):
         dv = row[7]
         if dv is None: continue
         ds = str(dv)[:10]
-        if ds >= first_day and ds <= yesterday:
+        if first_day <= ds <= yesterday:
             bi_dates[ds] = bi_dates.get(ds, 0) + 1
     wb.close()
 
-    # 누락일 산출
-    targets = []
-    for ds in sorted(bi_dates.keys()):
-        dt = date.fromisoformat(ds)
-        if is_sunday(dt):
-            continue
-        if ds not in mes_dates:
-            targets.append(ds)
+    # 누락일 산출 (일요일 제외)
+    targets = [
+        ds for ds in sorted(bi_dates)
+        if not is_sunday(date.fromisoformat(ds)) and ds not in mes_dates
+    ]
 
     has_fail = False
     if not targets:
@@ -348,21 +273,19 @@ def run_mes(today):
                 continue
 
             bi_qty = sum(int(r["COL15"]) for r in items if r["COL15"].isdigit())
-            v = mes_upload_and_verify(page, iframe_name, items, t)
+            v = mes_upload_and_verify(s, items, t)
             if v is None:
                 print(f"  {t}: FAIL 업로드 실패")
                 has_fail = True
                 continue
 
             cnt_ok = v["count"] == len(items)
-            qty_ok = int(v["qty"]) == bi_qty
-            status_c = "OK" if cnt_ok else "FAIL"
-            status_q = "OK" if qty_ok else "FAIL"
-            print(f"  {t}: {v['count']}/{len(items)}건({status_c}), qty {int(v['qty']):,}/{bi_qty:,}({status_q})")
+            qty_ok = v["qty"] == bi_qty
+            print(f"  {t}: {v['count']}/{len(items)}건({'OK' if cnt_ok else 'FAIL'}), "
+                  f"qty {v['qty']:,}/{bi_qty:,}({'OK' if qty_ok else 'FAIL'})")
             if not cnt_ok or not qty_ok:
                 has_fail = True
 
-    cdp_close(page, pw)
     return not has_fail
 
 # ─── main ───────────────────────────────────────────
