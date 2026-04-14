@@ -224,7 +224,7 @@ echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
 
 if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
   if [[ "$STATUS_DATE" < "$TASKS_DATE" ]]; then
-    warn "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
+    fail "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
     hook_incident "gate_reject" "final_check" "STATUS.md" "meta_drift: STATUS($STATUS_DATE) < TASKS($TASKS_DATE)" '"classification_reason":"meta_drift"'
   else
     echo "  [OK] STATUS 날짜 >= TASKS 날짜"
@@ -263,7 +263,7 @@ if [ -f "$MARKER" ]; then
     else
       MARKER_EPOCH=$(file_mtime "$MARKER")
     fi
-    for F in "$TASKS" "$HANDOFF"; do
+    for F in "$TASKS" "$HANDOFF" "$STATUS_FILE"; do
       NAME=$(basename "$F")
       if [ -f "$F" ]; then
         F_EPOCH=$(file_mtime "$F")

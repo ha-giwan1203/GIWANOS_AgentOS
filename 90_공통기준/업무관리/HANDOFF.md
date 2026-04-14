@@ -15,7 +15,8 @@
 1. **commit_gate fingerprint grace suppress**: GPT 토론 1턴 → A2(60초)+B1(전체)+C1 보강 합의(채택 4건)
 2. **commit_gate.sh 수정**: evidence_gate 동일 패턴 — 60초 grace window, sha1 fingerprint(mode|normal_flow|fail_keywords), tail -30 스캔
 3. **동작**: deny(차단) 유지, incident 기록만 grace window 내 중복 생략
-4. smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈)
+4. **STATUS.md 자동강제**: final_check.sh 갱신 검사에 STATUS_FILE 추가 (기존 TASKS/HANDOFF만 검사 → 3종 동급), 날짜 드리프트 warn→fail 승격
+5. smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈)
 
 ### 다음 세션 안건 (우선순위순)
 1. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가

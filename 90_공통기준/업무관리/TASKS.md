@@ -32,11 +32,12 @@
 
 ## 최근 완료
 
-### [완료] commit_gate fingerprint grace suppress 구현 — 세션44 (2026-04-14)
+### [완료] commit_gate fingerprint grace suppress + STATUS.md 자동강제 — 세션44 (2026-04-14)
 - **GPT 토론 1턴**: A2(60초)+B1(전체 적용)+C1 보강(mode|normal_flow|fail_keywords) 합의. 채택 4건 / 보류 0건
 - **commit_gate.sh 수정**: evidence_gate 동일 패턴 복사 적용 — 60초 grace window, fingerprint 16자리 해시
 - **동작**: deny(차단)은 유지, incident 기록만 grace window 내 중복 생략
 - **효과**: 174건/7일 중 146건(84%) 연속 중복 → 1건만 기록으로 축소 예상
+- **STATUS.md 자동강제**: final_check.sh 갱신 검사에 STATUS_FILE 추가 (TASKS/HANDOFF와 동급), 날짜 드리프트 warn→fail 승격
 - smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py — 기존 이슈, 본건 무관)
 
 ---
