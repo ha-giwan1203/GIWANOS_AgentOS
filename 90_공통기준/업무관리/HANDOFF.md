@@ -20,6 +20,7 @@
 6. smoke_test 140/140 ALL PASS
 7. 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
 8. **share-result 구조개선**: 3~4단계 gpt-send 필수 호출로 교체, 수동 진입 [NEVER] 금지
+9. **gpt-send 탭 재사용**: gpt_tab_id 캐시로 세션 간 탭 재사용, 새 탭 생성 최소화
 
 ### 다음 세션 안건 (우선순위순)
 
