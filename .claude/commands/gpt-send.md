@@ -32,6 +32,7 @@ links.length > 0 ? links[0].href : null;
    - `.claude/state/gpt_tab_id`에 현재 tabId 저장 (다음 세션 재사용용)
 
 - **[NEVER]** 이전 세션의 debate_chat_url 값을 검증 없이 재사용 금지
+- **[NEVER]** 탭 URL이 올바르게 보여도 1-B 생략 금지 — 탭 상태와 무관하게 매 세션 navigate + 재탐지 필수
 - 같은 세션 내 2회차 이후 호출에서만 debate_chat_url 캐시 허용
 
 ### 2. SEND GATE (생략 금지)
