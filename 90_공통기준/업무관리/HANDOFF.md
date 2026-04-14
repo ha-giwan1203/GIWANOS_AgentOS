@@ -4,29 +4,40 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션45 (학습 루프 사각지대 해소 A1+B1+D1+C2 구현)
+최종 업데이트: 2026-04-14 KST — 세션46 (GPT 합의 코드 품질 개선 A+B+C)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션45)
+## 0. 최신 세션 (2026-04-14 세션46)
 
 ### 이번 세션 완료
-1. **A1 warn_keywords 빈도 분석**: incident_review.py에 normalize_warn() + aggregate_warn_frequency() 추가. WARN 빈도 섹션 리포트 출력
-   - 206건 WARN 중 3패턴(문서 드리프트 188건 + python3 의존 18건) 가시화
-2. **B1 GPT 판정 incident 적재**: record_incident.py 신규 생성 (Python CLI 인시던트 기록). gpt-read.md에 비통과 판정 시 자동 기록 단계 추가
-3. **D1 사용자 교정 incident 적재**: hook_common.sh에 hook_user_correction() 편의 함수 추가. record_incident.py로도 기록 가능
-4. **C2 warn 분류 해상도 보완**: doc_drift/python3_dependency 신규 classification 추가. commit_gate PASS에서도 WARN 별도 incident 기록 (normal_flow=true)
-5. **incident_review.py 매핑 확장**: RECOMMENDATION_MAP/SUGGESTED_TARGETS에 6개 항목 추가 (gpt_verdict, user_correction, doc_drift, python3_dependency)
-6. smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈)
+1. **GPT 정밀 평가 확인**: 종합 8.1점 (설계 A- / 코드 B) — 지적 5건 전부 실물 검증 확인
+2. **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리. 함수 밖 local 6곳 제거
+3. **B. smoke_test 3게이트 실행 테스트 추가**: 섹션 40(commit_gate) + 41(completion_gate) + 42(evidence_gate). 최소 시나리오 우선 설계
+4. **C. JSON 처리 단일화**: json_helper.py 신규 (dotted key path). hook_common.sh python3 -c 인라인 2곳 교체. safe_json_get은 유지
+5. 핫픽스: smoke_test v4→v5 표기, classify_feedback.py CLASSIFICATION 2건 추가
+6. smoke_test 148/148 ALL PASS (이전 세션45 147/148 → 1건 개선)
+7. 커밋: ac549431
 
 ### 다음 세션 안건 (우선순위순)
-1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션46+)
+1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)
 2. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
 
 ---
 
-## 1. 이전 세션 (2026-04-14 세션44)
+## 1. 이전 세션 (2026-04-14 세션45)
+
+### 이번 세션 완료
+1. **A1 warn_keywords 빈도 분석**: incident_review.py에 normalize_warn() + aggregate_warn_frequency() 추가
+2. **B1 GPT 판정 incident 적재**: record_incident.py 신규 생성
+3. **D1 사용자 교정 incident 적재**: hook_user_correction() 편의 함수 추가
+4. **C2 warn 분류 해상도 보완**: doc_drift/python3_dependency 신규 classification 추가
+5. smoke_test 139/140 PASS
+
+---
+
+## 2. 이전 세션 (2026-04-14 세션44)
 
 ### 이번 세션 완료
 1. **commit_gate fingerprint grace suppress**: GPT 토론 1턴 → A2(60초)+B1(전체)+C1 보강 합의(채택 4건)

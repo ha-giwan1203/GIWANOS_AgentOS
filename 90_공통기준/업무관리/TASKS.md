@@ -10,13 +10,13 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션45 (학습 루프 사각지대 해소 A1+B1+D1+C2 구현)
+최종 업데이트: 2026-04-14 — 세션46 (GPT 합의 코드 품질 개선 A+B+C)
 
 ---
 
 ## 다음 세션 안건
 
-**[낮] AGENTS_GUIDE 자동생성화 (세션46+ 안건)**
+**[낮] AGENTS_GUIDE 자동생성화 (세션47+ 안건)**
 - settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
 - GPT+Claude 합의 세션43: 방향 확정, 구현은 다음 세션
 
@@ -27,6 +27,15 @@
 ---
 
 ## 최근 완료
+
+### [완료] GPT 합의 코드 품질 개선 A+B+C — 세션46 (2026-04-14)
+- **GPT 평가**: 종합 8.1점 (설계 A- / 코드 B) — 지적 5건 전부 실물 확인
+- **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리 (함수 밖 local 6곳 제거)
+- **B. smoke_test 3게이트 실행 테스트**: 섹션 40-42 추가 (commit_gate/completion_gate/evidence_gate 최소 시나리오)
+- **C. JSON 처리 단일화**: json_helper.py 신규 + hook_common.sh python3 인라인 2곳 교체
+- 핫픽스: smoke_test v4→v5 표기, classify_feedback 2건 누락 추가
+- smoke_test 148/148 ALL PASS (이전 147/148에서 개선)
+- 커밋: ac549431
 
 ### [완료] 학습 루프 사각지대 해소 A1+B1+D1+C2 — 세션45 (2026-04-14)
 - **A1**: incident_review.py에 warn_keywords 빈도 분석 추가 — normalize_warn() + aggregate_warn_frequency() + WARN 빈도 섹션
