@@ -72,9 +72,10 @@ hook_log "PreToolUse/Bash" "commit_gate: git commit/push 감지" 2>/dev/null
 # === 상태문서 동봉 강제 (세션46: 2회 커밋 패턴 해소) ===
 # write_marker가 존재하면 "이 세션에서 의미 있는 변경이 있었다"는 뜻.
 # 이 경우 TASKS.md 또는 HANDOFF.md가 staged에 없으면 커밋 차단.
+# git push에서는 staged가 비어 오탐 → commit일 때만 적용 (GPT 세션46 지적)
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 _MARKER="$PROJECT_DIR/90_공통기준/agent-control/state/write_marker.json"
-if [ -f "$_MARKER" ]; then
+if [ -f "$_MARKER" ] && echo "$COMMAND" | grep -q 'git commit'; then
   STAGED=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null)
   _has_tasks=$(echo "$STAGED" | grep -c 'TASKS.md' || true)
   _has_handoff=$(echo "$STAGED" | grep -c 'HANDOFF.md' || true)
@@ -93,7 +94,6 @@ if circuit_breaker_tripped "commit_gate" 3 2>/dev/null; then
   echo "⚠ [CIRCUIT BREAKER] commit_gate 연속 3회+ unresolved incident 감지. 이전 실패 원인(.claude/incident_ledger.jsonl)을 먼저 확인하세요."
 fi
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 
 # hook/settings 변경이 포함된 커밋인지 확인 → --full 승격

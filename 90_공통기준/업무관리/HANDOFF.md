@@ -23,6 +23,8 @@
    - `debate_gate.sh`: 지침읽기 + 채팅방진입 + SEND GATE 3단 검사. insertText 직전 차단
    - `debate_send_gate_mark.sh`: get_page_text 실행 시 1회용 마커 생성
    - `debate_independent_gate.sh`: 하네스 분석(독립의견) 없이 GPT에 답장 차단
+9. **push 오탐 수정**: 상태문서 동봉 강제를 `git commit`에만 적용 (GPT 지적 — push 시 staged 비어 무조건 차단)
+10. **잔여 드리프트 정리**: commit_gate PROJECT_DIR 중복 제거, smoke_test 주석 32→42섹션
 
 ### 다음 세션 안건 (우선순위순)
 1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)

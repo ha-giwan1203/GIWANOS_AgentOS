@@ -1,6 +1,6 @@
 #!/bin/bash
 # Hooks Smoke Test v5 — 현행 훅 실물 기준 (2026-04-13)
-# 테스트 32섹션: 운영 훅 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence + selector + instruction_read_gate
+# 테스트 42섹션: 운영 훅 + hook_common + incident_ledger + safe_json_get + 퇴행방지 + evidence + selector + instruction_read_gate + 게이트 실행 테스트
 
 export LC_ALL=en_US.UTF-8
 
