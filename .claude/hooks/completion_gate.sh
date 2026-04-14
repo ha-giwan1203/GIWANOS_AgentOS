@@ -74,7 +74,7 @@ for NAME_PATH in "TASKS.md:$TASKS" "HANDOFF.md:$HANDOFF" "STATUS.md:$STATUS"; do
 done
 
 if [ -n "$MISSING" ]; then
-  hook_incident "gate_reject" "completion_gate" "$MISSING" "완료 주장 전 ${MISSING} 미갱신" '"classification_reason":"completion_before_state_sync","next_action":"TASKS/HANDOFF/STATUS를 최신 작업 상태로 갱신한 뒤 완료 보고 재시도"' 2>/dev/null || true
+  hook_incident "gate_reject" "completion_gate" "$MISSING" "완료 주장 전 ${MISSING} 미갱신" '"classification_reason":"completion_before_state_sync","normal_flow":true,"next_action":"TASKS/HANDOFF/STATUS를 최신 작업 상태로 갱신한 뒤 완료 보고 재시도"' 2>/dev/null || true
   _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
   printf '{"ts":"%s","result":"block","reason":"completion_before_state_sync","missing":"%s","source":"gate"}\n' "$_CC_TS" "$MISSING" \
     >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null

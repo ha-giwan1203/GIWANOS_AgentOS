@@ -10,32 +10,37 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션40 (학습 루프 규칙 승격기 + 확장 점검)
+최종 업데이트: 2026-04-14 — 세션41 (학습 루프 마무리: self-audit 연동 + normal_flow 분리)
 
 ---
 
 ## 다음 세션 안건
 
-### 학습 루프 마무리 — 진단 품질 개선 + self-audit 연동
-
-**[높] weekly-self-audit에 incident_review 연동**
-- self-audit 실행 시 `incident_review.py --days 7 --threshold 3` 자동 포함
-- 임계치 초과 항목 있으면 사용자 보고 + 다음 세션 안건 자동 등록
-- 이것만 붙이면 학습 루프 사실상 완성 (수집→탐지→제안→반영 전체 자동)
-
-**[중] pre_commit_check normal_flow 분리**
-- commit_gate.sh에서 TASKS/HANDOFF 미갱신 등 정상 중간차단은 `normal_flow=true` 플래그 부여
-- incident_review 기본 집계에서 정상 플로우 제외 (`--include-normal-flow` 옵션)
-- 현재 30일 142건 중 대부분이 정상 안전장치 발화 → 진단 왜곡 원인
+### evidence_gate 노이즈 대응 — GPT 토론 후 결정
 
 **[낮] evidence_gate 워밍업 incident 기록 grace (보류)**
 - 차단은 유지, incident 기록만 req_age < 90초이면 생략
 - 보안 게이트라서 GPT 토론 후 결정
+- evidence_missing 177건/30일로 최다 — normal_flow 분리 이후에도 가장 큰 노이즈
 
-### 참고 자료 (세션40 리서치)
-- [Addy Osmani — Self-Improving Coding Agents](https://addyosmani.com/blog/self-improving-agents/) — 우리 구조와 가장 유사
-- [Arize — Closing the Loop](https://arize.com/blog/closing-the-loop-coding-agents-telemetry-and-the-path-to-self-improving-software/) — 텔레메트리→패턴→행동개선 루프
-- [Rootly — AI Incident Automation](https://rootly.com/sre/2025-devops-trend-ai-incident-automation-cuts-mttr-40) — incident 빈도 분석 → 자동 remediation
+### 학습 루프 후속
+
+**[중] 학습 루프 GPT 토론 검증**
+- 세션41 구현 결과(self-audit 연동 + normal_flow 분리)를 GPT에 공유
+- 학습 루프 완성도 재평가 (세션40 합의 70~75% → 목표 90%+)
+
+---
+
+## 최근 완료
+
+### [완료] 학습 루프 마무리: self-audit 연동 + normal_flow 분리 — 세션41 (2026-04-14)
+- **안건1 self-audit 연동**: self-audit-agent.md Step 7.5 추가 (incident_review.py --days 7 --threshold 3 자동 실행)
+- **안건1 리포트 확장**: 인시던트 빈도 분석 + 다음 세션 안건 추천 섹션 추가
+- **안건2 normal_flow 분리**: commit_gate.sh에 TASKS/HANDOFF 전용 FAIL → `normal_flow:true` 자동 부여
+- **안건2 completion_gate**: `completion_before_state_sync`에 `normal_flow:true` 추가
+- **안건2 incident_review.py**: `--include-normal-flow` 옵션 추가, 기본=제외. structural_intermediate 기본 제외
+- smoke_test 140/140 ALL PASS
+- 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
 
 ---
 

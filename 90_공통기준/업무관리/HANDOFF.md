@@ -4,12 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 09:40 KST — 세션 40 (학습 루프 규칙 승격기 + 확장 점검)
+최종 업데이트: 2026-04-14 KST — 세션 41 (학습 루프 마무리: self-audit 연동 + normal_flow 분리)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션 40)
+## 0. 최신 세션 (2026-04-14 세션 41)
+
+### 이번 세션 완료
+1. **self-audit에 incident_review 연동**: self-audit-agent.md Step 7.5 추가 (incident_review.py --days 7 --threshold 3 자동 실행)
+2. **self-audit 리포트 확장**: 인시던트 빈도 분석 + 다음 세션 안건 추천 섹션 추가
+3. **commit_gate.sh normal_flow 판정**: TASKS/HANDOFF 전용 FAIL → `"normal_flow":true` 자동 부여
+4. **completion_gate.sh**: `completion_before_state_sync`에 `"normal_flow":true` 추가
+5. **incident_review.py 필터**: `--include-normal-flow` 옵션 추가 (기본: 제외), structural_intermediate 기본 제외
+6. smoke_test 140/140 ALL PASS
+7. 학습 루프: 수집→탐지→제안→(self-audit 통합 보고) 전체 자동화 완성
+
+### 다음 세션 안건 (우선순위순)
+
+1. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
+   - evidence_missing 177건/30일 최다. 워밍업 기록 생략이 진단에 줄 효과 큼
+2. **[중] 학습 루프 GPT 토론 검증**
+   - 세션41 결과 GPT 공유 → 학습 루프 완성도 재평가 (70~75% → 90%+)
+
+---
+
+## 1. 이전 세션 (2026-04-14 세션 40)
 
 ### 이번 세션 완료
 1. **GPT 토론 1턴 (규칙 승격기 설계)**: 채택 5건 / 보류 3건
@@ -18,30 +38,7 @@
 4. **task 로그 분리**: hook_task_result() + fail_streak + task_runner.sh 래퍼 + daily-routine 연동
 5. **feedback 3분류**: classify_feedback.py로 33개 태깅 (hookable 8 / promptable 22 / human_only 3)
 6. **레거시 backfill**: incident_repair.py --backfill-classification으로 230건 소급 태깅 → 분류누락 0건
-7. **enum 정규화**: hook_common.sh + incident_repair.py 매핑 확장
-8. GPT 조건부통과 대응: 문자 깨짐 + log_path 연동 + 주석 정정
-9. smoke_test 140/140 + E2E 10/10 ALL PASS
-
-### 다음 세션 안건 (우선순위순)
-
-1. **[높] weekly-self-audit에 incident_review 연동**
-   - self-audit 실행 시 `incident_review.py --days 7 --threshold 3` 자동 포함
-   - 임계치 초과 → 사용자 보고 + 안건 자동 등록
-   - 이것만 붙이면 학습 루프 완성 (수집→탐지→제안→반영 전체 자동)
-
-2. **[중] pre_commit_check normal_flow 분리**
-   - commit_gate.sh: 정상 중간차단에 `normal_flow=true` 플래그
-   - incident_review: `--include-normal-flow` 옵션으로 기본 집계에서 제외
-   - 142건/30일 중 대부분 정상 발화 → 진단 왜곡
-
-3. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
-
-### 세션40 리서치 메모
-- 업계 용어: "Self-Improving Agent + Feedback Loop"
-- 우리 시스템은 Addy Osmani 글 구조의 80% 수준
-- "구멍이 많다"가 아니라 "측정 시작으로 비로소 보이는 것"
-- 남은 갭: 자동 반영 (현재는 수동 반영) + 진단 노이즈 제거
-- 참고: Addy Osmani, Arize Closing the Loop, Rootly MTTR 40% 감소
+7. smoke_test 140/140 + E2E 10/10 ALL PASS
 
 ---
 

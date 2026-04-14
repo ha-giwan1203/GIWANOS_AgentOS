@@ -83,6 +83,16 @@ Read .claude/hooks/skill_usage.jsonl (tail 50)
 
 반복 실패 패턴, 미사용 스킬 식별.
 
+## 7.5. 인시던트 빈도 분석
+
+```bash
+python3 .claude/hooks/incident_review.py --days 7 --threshold 3
+```
+
+incident_review.py 출력 결과를 리포트에 포함한다.
+- 임계치 초과 항목이 있으면 → `### 다음 세션 안건 추천` 섹션 생성
+- 임계치 초과 항목이 없으면 → "임계치 초과 항목 없음" 1줄로 마무리
+
 ## 8. 상태 문서 드리프트
 
 TASKS.md 최종 업데이트 날짜 vs 오늘 날짜 비교.
@@ -125,6 +135,13 @@ Git 기준: [HEAD SHA]
 | # | 대상 | 분류 | 축 | 문제 | 영향 범위 | 되돌리기 난이도 |
 |---|------|------|-----|------|----------|--------------|
 
+### 인시던트 빈도 분석
+[incident_review.py --days 7 --threshold 3 출력 결과]
+
+### 다음 세션 안건 추천 (해당 시)
+| 안건 | 근거 | 우선순위 |
+|------|------|----------|
+
 ### 교차검증 권장
 [GPT 토론모드 검토 권장 항목]
 
@@ -137,4 +154,4 @@ Git 기준: [HEAD SHA]
 - [NEVER] 파일 수정 금지
 - [NEVER] 자동 적용 금지
 - [NEVER] 진단 결과 기반 hook/rule 변경 금지
-- Bash는 읽기 명령만 (cat/wc/ls/date/git log/git show)
+- Bash는 읽기 명령만 (cat/wc/ls/date/git log/git show/python3 .claude/hooks/incident_review.py)

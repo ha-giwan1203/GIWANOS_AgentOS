@@ -111,6 +111,7 @@ def aggregate_frequency(
     days: int = 7,
     min_count: int = 5,
     include_resolved: bool = False,
+    include_normal_flow: bool = False,
 ) -> list[dict[str, Any]]:
     """N일간 incident 빈도 집계. classification_reason 기준, 없으면 분류누락 버킷으로 집계."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
@@ -119,6 +120,14 @@ def aggregate_frequency(
     for e in entries:
         if not include_resolved and e.get("resolved", False):
             continue
+        # normal_flow 필터: 정상 안전장치 발화는 기본 제외
+        if not include_normal_flow:
+            if e.get("normal_flow", False):
+                continue
+            # structural_intermediate는 항상 정상 발화로 간주
+            reason_check = (e.get("classification_reason") or "").strip()
+            if reason_check == "structural_intermediate":
+                continue
         ts = parse_ts(e.get("ts", ""))
         if ts is None or ts < cutoff:
             continue
@@ -226,6 +235,7 @@ def main():
     parser.add_argument("--threshold", type=int, default=5, help="최소 빈도 임계치")
     parser.add_argument("--json", action="store_true", help="JSON 출력")
     parser.add_argument("--include-resolved", action="store_true", help="해결 건 포함")
+    parser.add_argument("--include-normal-flow", action="store_true", help="정상 안전장치 발화(normal_flow=true) 포함 (기본: 제외)")
     args = parser.parse_args()
 
     ledger_path = args.ledger
@@ -234,7 +244,9 @@ def main():
         sys.exit(1)
 
     entries = load_jsonl(Path(ledger_path))
-    clusters = aggregate_frequency(entries, days=args.days, min_count=args.threshold, include_resolved=args.include_resolved)
+    clusters = aggregate_frequency(entries, days=args.days, min_count=args.threshold,
+                                   include_resolved=args.include_resolved,
+                                   include_normal_flow=args.include_normal_flow)
     recommendations = [recommend_action(c) for c in clusters]
     print(format_report(clusters, recommendations, args.days, args.threshold, as_json=args.json))
 
