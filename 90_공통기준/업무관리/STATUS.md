@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-14 — 세션44 (commit_gate suppress + STATUS 자동강제 + 학습 루프 진단)
+최종 업데이트: 2026-04-14 — 세션45 (학습 루프 사각지대 해소 A1+B1+D1+C2 구현)
 
 ---
 
@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 23개 등록 + `incident_repair.py` + `incident_review.py` 보조. 학습 루프 완성: 수집→탐지→제안→self-audit 통합 보고 자동화. normal_flow 분리로 진단 노이즈 제거 (세션41). evidence_gate fingerprint grace(30초) + commit_gate fingerprint grace(60초) suppress 구현 (세션43~44). AGENTS_GUIDE 23개/18스킬로 갱신 (세션43) |
+| hooks 체계 | 23개 등록 + `incident_repair.py` + `incident_review.py` + `record_incident.py` 보조. 학습 루프 완성: 수집→탐지→제안→self-audit 통합 보고 자동화. WARN 빈도 분석 추가(세션45). GPT 판정/사용자 교정 incident 적재(세션45). doc_drift/python3_dependency classification(세션45). evidence_gate fingerprint grace(30초) + commit_gate fingerprint grace(60초) suppress(세션43~44). AGENTS_GUIDE 23개/18스킬로 갱신(세션43) |
 
 ---
 
