@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션44 (commit_gate fingerprint grace suppress 구현)
+최종 업데이트: 2026-04-14 KST — 세션44 (commit_gate suppress + STATUS 자동강제 + 학습 루프 진단)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -14,13 +14,16 @@
 ### 이번 세션 완료
 1. **commit_gate fingerprint grace suppress**: GPT 토론 1턴 → A2(60초)+B1(전체)+C1 보강 합의(채택 4건)
 2. **commit_gate.sh 수정**: evidence_gate 동일 패턴 — 60초 grace window, sha1 fingerprint(mode|normal_flow|fail_keywords), tail -30 스캔
-3. **동작**: deny(차단) 유지, incident 기록만 grace window 내 중복 생략
-4. **STATUS.md 자동강제**: final_check.sh 갱신 검사에 STATUS_FILE 추가 (기존 TASKS/HANDOFF만 검사 → 3종 동급), 날짜 드리프트 warn→fail 승격
+3. **STATUS.md 자동강제**: final_check.sh 갱신 검사에 STATUS_FILE 추가 (3종 동급), 날짜 드리프트 warn→fail 승격
+4. **학습 루프 사각지대 진단**: GPT 토론 2~3턴 → 결함 3건 발견, 해소 합의 A1+B1+C2+D1
+   - 결함1: warn_keywords 미분석 (79건 STATUS 드리프트 누락)
+   - 결함2: WARN은 학습 대상 아님 (FAIL만 추적)
+   - 결함3: GPT/사용자 피드백이 incident로 수집되지 않음
 5. smoke_test 139/140 PASS (FAIL 1건: classify_feedback.py 기존 이슈)
 
 ### 다음 세션 안건 (우선순위순)
-1. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가
-2. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션45+)
+1. **[상] 학습 루프 사각지대 해소** — A1(warn_keywords) → B1(GPT incident) → D1(사용자 incident) → C2
+2. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션46+)
 3. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
 
 ---

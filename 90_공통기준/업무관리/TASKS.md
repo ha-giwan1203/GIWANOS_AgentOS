@@ -10,17 +10,20 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션44 (commit_gate fingerprint grace suppress 구현)
+최종 업데이트: 2026-04-14 — 세션44 (commit_gate suppress + STATUS 자동강제 + 학습 루프 진단)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] 학습 루프 GPT 토론 검증**
-- 세션41 구현 결과(self-audit 연동 + normal_flow 분리)를 GPT에 공유
-- 학습 루프 완성도 재평가 (세션40 합의 70~75% → 목표 90%+)
+**[상] 학습 루프 사각지대 해소 (GPT+Claude 합의 세션44)**
+- **A1**: incident_review.py에 warn_keywords 빈도 분석 추가
+- **B1**: GPT 판정 structured incident 적재 (source="gpt", verdict="partial|fail", issue_code 정규화)
+- **D1**: 사용자 교정 피드백 incident 적재 (source="user", verdict="correction", issue_code 정규화)
+- **C2**: warn_keywords 분석으로 분류 해상도 보완 (C1 세분화는 필요 시 승격)
+- 구현 순서: A1 → B1 → D1 → (C1 필요 시)
 
-**[낮] AGENTS_GUIDE 자동생성화 (세션45+ 안건)**
+**[낮] AGENTS_GUIDE 자동생성화 (세션46+ 안건)**
 - settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
 - GPT+Claude 합의 세션43: 방향 확정, 구현은 다음 세션
 
@@ -32,8 +35,10 @@
 
 ## 최근 완료
 
-### [완료] commit_gate fingerprint grace suppress + STATUS.md 자동강제 — 세션44 (2026-04-14)
-- **GPT 토론 1턴**: A2(60초)+B1(전체 적용)+C1 보강(mode|normal_flow|fail_keywords) 합의. 채택 4건 / 보류 0건
+### [완료] commit_gate suppress + STATUS 자동강제 + 학습 루프 진단 — 세션44 (2026-04-14)
+- **GPT 토론 1턴 (commit_gate suppress)**: A2(60초)+B1(전체 적용)+C1 보강(mode|normal_flow|fail_keywords) 합의. 채택 4건
+- **GPT 토론 2턴 (학습 루프 진단)**: A1+B1+C2 합의. 채택 4건 — WARN 사각지대 + GPT 피드백 미수집 발견
+- **GPT 토론 3턴 (사용자 피드백)**: D1 합의. 채택 3건 — 교정 피드백 incident 적재
 - **commit_gate.sh 수정**: evidence_gate 동일 패턴 복사 적용 — 60초 grace window, fingerprint 16자리 해시
 - **동작**: deny(차단)은 유지, incident 기록만 grace window 내 중복 생략
 - **효과**: 174건/7일 중 146건(84%) 연속 중복 → 1건만 기록으로 축소 예상

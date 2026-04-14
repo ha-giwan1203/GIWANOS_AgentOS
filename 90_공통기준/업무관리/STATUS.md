@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-14 — 세션44 (commit_gate fingerprint grace suppress 구현)
+최종 업데이트: 2026-04-14 — 세션44 (commit_gate suppress + STATUS 자동강제 + 학습 루프 진단)
 
 ---
 
