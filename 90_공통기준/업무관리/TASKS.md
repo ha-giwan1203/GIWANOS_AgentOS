@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션49 (토론모드 GPT 교차검증: README 4게이트 추가 + req clear 규칙 합의)
+최종 업데이트: 2026-04-15 — 세션50 (MES 500오류 진단+보정, skill_instruction_gate 훅 신규)
 
 ---
 
@@ -41,6 +41,14 @@
 ---
 
 ## 최근 완료
+
+### [완료] MES 500오류 진단·보정 + skill_instruction_gate 훅 신규 — 세션50 (2026-04-15)
+- **MES 스케줄 실행 500 오류 진단**: daily-routine 스케줄 실행 시 4/14 업로드 서버 500 → 수동 재업로드 성공
+- **4/13 누락 14건 발견·보정**: SKILL.md 지침대로 최근 7일 전체 검증 → 4/13 MES 1건/BI 15건 불일치 → 15건 보정 업로드
+- **최근 7일 전수 검증 PASS**: 6일 전체 BI↔MES 건수·수량 일치 확인
+- **skill_instruction_gate.sh 신규**: 인라인 python에서 MES/ZDM 접근 시 SKILL.md 읽기 강제 + MES 업로드 시 기등록 확인(selectPrdtRsltByLine.do) 포함 강제
+- **evidence_mark_read.sh 보강**: 스킬별 SKILL.md 개별 마커(skill_read__{skill_name}.ok) 생성
+- settings.local.json 훅 등록 완료, 테스트 5건 전 PASS
 
 ### [완료] debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test — 세션48 (2026-04-15)
 - **debate-mode SKILL.md 구조 변경**: Step 1에서 Chrome MCP 직접 조작 지시 전부 제거, gpt-send/gpt-read 전면 위임

@@ -30,6 +30,12 @@ NORM_TEXT="$(echo "$TEXT" | sed 's/\\\\/\//g')"
 
 # 도메인/기준 문서 읽기
 echo "$NORM_TEXT" | grep -qE 'SKILL\.md' && mark "skill_read"
+
+# 스킬별 SKILL.md 개별 마커 (skill_instruction_gate.sh 연동)
+SKILL_ID=$(echo "$NORM_TEXT" | sed -n 's|.*[/\\]스킬[/\\]\([^/\\]*\)[/\\]SKILL\.md.*|\1|p' | head -1)
+if [ -n "$SKILL_ID" ]; then
+  mark "skill_read__${SKILL_ID}"
+fi
 echo "$NORM_TEXT" | grep -qE '(^|/|\\)CLAUDE\.md' && mark "domain_read"
 echo "$NORM_TEXT" | grep -qE 'TASKS\.md' && mark "tasks_read"
 echo "$NORM_TEXT" | grep -qE 'HANDOFF\.md' && mark "handoff_read"

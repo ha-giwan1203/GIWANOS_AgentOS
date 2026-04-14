@@ -4,23 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-15 KST — 세션49 (토론모드 GPT 교차검증: README 4게이트 추가 + req clear 규칙 합의)
+최종 업데이트: 2026-04-15 KST — 세션50 (MES 500오류 진단+보정, skill_instruction_gate 훅 신규)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-15 세션49)
+## 0. 최신 세션 (2026-04-15 세션50)
 
 ### 이번 세션 완료
+1. **daily-routine 스케줄 실행**: ZDM PASS, MES 4/14 서버 500 FAIL
+2. **MES 4/14 수동 재업로드**: requests.post() 직접 호출로 성공 (간헐적 500 — SKILL.md 기재된 iframe jQuery 방식과 차이)
+3. **SKILL.md 미읽기 지적**: 지침 안 읽고 ad-hoc 진단 → 기등록 확인 누락, MES 필드명 오류
+4. **최근 7일 전수 검증**: 4/13 누락 14건 발견 → 보정 업로드 → 6일 전체 ALL PASS
+5. **skill_instruction_gate.sh 신규**: 인라인 python MES/ZDM 접근 시 SKILL.md 강제 + 업로드 작업순서 검증
+6. **evidence_mark_read.sh 보강**: 스킬별 개별 마커 추가
+
+### 다음 AI 액션
+- req clear 규칙 3개 risk_profile_prompt.sh 구현 (TASKS.md 중간 안건)
+- status_sync.sh 신규 설계 및 구현 (TASKS.md 중간 안건)
+- MES requests.post() 간헐 500 원인 추적 — SKILL.md 기재 iframe jQuery 방식과 직접 HTTP 방식 안정성 비교 필요
+
+## 이전 세션 (2026-04-15 세션49)
+
+### 세션49 완료
 1. **self-audit 자동 실행**: scheduled weekly-self-audit → P1×2, P2×2, P3×3 식별
 2. **토론모드 GPT 교차검증 1턴**: 3개 의제 (evidence_missing, 실패계약, STATUS 갱신)
 3. **README.md 수정**: 4개 게이트 추가 (23→26, ⑩~⑫ 차단층 + 추적층 1개) + 실패계약 4행
 4. **TASKS.md 갱신**: req clear 3규칙 + status_sync.sh 중간 안건 등재
 5. GPT 합의: req clear 3규칙 채택, navigate_gate conditional fail-closed, status_sync.sh 전용 구조
-
-### 다음 AI 액션
-- req clear 규칙 3개 risk_profile_prompt.sh 구현 (TASKS.md 중간 안건)
-- status_sync.sh 신규 설계 및 구현 (TASKS.md 중간 안건)
 
 ## 이전 세션 (2026-04-15 세션48)
 

@@ -11,7 +11,8 @@ COMMAND="$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)"
 
 # GPT 전송 관련 명령만 검사
 is_gpt_send() {
-  echo "$COMMAND" | grep -qE 'share-result|/finish'
+  # /finish 스킬만 매칭, finish_state.json 등 오탐 방지
+  echo "$COMMAND" | grep -qE 'share-result|/finish([^_a-zA-Z0-9]|$)'
 }
 
 if ! is_gpt_send; then
