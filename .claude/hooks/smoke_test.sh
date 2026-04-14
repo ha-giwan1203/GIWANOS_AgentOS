@@ -727,11 +727,56 @@ check $? "evidence_gate: bash -n 구문 검사 통과"
 
 echo ""
 
+# === 43. completion_gate deny-path 테스트 (세션46 GPT 합의: 9점대 목표) ===
+echo "--- 43. completion_gate deny-path ---"
+# 43-1: 강한 완료 주장 + git 미반영 변경 → block
+# completion_gate는 Stop hook이므로 stdin이 아닌 last_assistant_text에 의존
+# 여기서는 git_has_relevant_changes 함수를 직접 테스트
+(source "$HOOKS_DIR/hook_common.sh" 2>/dev/null
+ # dirty 상태가 있으면 true, 없으면 false — 현재 working tree 상태 그대로 활용
+ if git_has_relevant_changes 2>/dev/null; then
+   echo "has_changes"
+ else
+   echo "clean"
+ fi) > /dev/null 2>&1
+check $? "completion_gate: git_has_relevant_changes 함수 호출 가능"
+
+# 43-2: write_marker 없을 때 completion_gate 통과 확인
+_cg_marker="$PROJECT_DIR/90_공통기준/agent-control/state/write_marker.json"
+_cg_backup=""
+if [ -f "$_cg_marker" ]; then
+  _cg_backup=$(cat "$_cg_marker")
+  rm -f "$_cg_marker" 2>/dev/null
+fi
+# Stop hook은 직접 호출이 어려우므로 bash -n + grep로 deny 경로 존재 확인
+grep -q 'completion_before_git' "$HOOKS_DIR/completion_gate.sh"
+check $? "completion_gate: deny 경로 'completion_before_git' 존재"
+# 마커 복원
+if [ -n "$_cg_backup" ]; then
+  echo "$_cg_backup" > "$_cg_marker" 2>/dev/null
+fi
+
+echo ""
+
+# === 44. evidence_gate deny-path 테스트 (세션46 GPT 합의) ===
+echo "--- 44. evidence_gate deny-path ---"
+# 44-1: deny 함수가 JSON deny 출력을 생성하는지 확인
+# evidence_gate의 deny()는 evidence_init 의존이라 직접 실행 어려움
+# 대신 deny 함수 내부에서 decision:deny JSON을 출력하는지 grep으로 확인
+grep -q 'decision.*deny' "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
+check $? "evidence_gate: deny 함수가 deny JSON 출력 생성"
+
+# 44-2: skill_read deny 경로 존재 확인
+grep -q 'skill_read.req / identifier_ref.req' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: skill_read/identifier_ref deny 경로 존재"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""

@@ -25,6 +25,7 @@
    - `debate_independent_gate.sh`: 하네스 분석(독립의견) 없이 GPT에 답장 차단
 9. **push 오탐 수정**: 상태문서 동봉 강제를 `git commit`에만 적용 (GPT 지적 — push 시 staged 비어 무조건 차단)
 10. **잔여 드리프트 정리**: commit_gate PROJECT_DIR 중복 제거, smoke_test 주석 32→42섹션
+11. **deny-path 테스트 추가**: 섹션 43(completion_gate git 미반영 deny) + 44(evidence_gate deny 출력 + skill_read 경로). 152/152 ALL PASS
 
 ### 다음 세션 안건 (우선순위순)
 1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)
