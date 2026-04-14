@@ -4,12 +4,25 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-15 KST — 세션48 (debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test 추가)
+최종 업데이트: 2026-04-15 KST — 세션49 (토론모드 GPT 교차검증: README 4게이트 추가 + req clear 규칙 합의)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-15 세션48)
+## 0. 최신 세션 (2026-04-15 세션49)
+
+### 이번 세션 완료
+1. **self-audit 자동 실행**: scheduled weekly-self-audit → P1×2, P2×2, P3×3 식별
+2. **토론모드 GPT 교차검증 1턴**: 3개 의제 (evidence_missing, 실패계약, STATUS 갱신)
+3. **README.md 수정**: 4개 게이트 추가 (23→26, ⑩~⑫ 차단층 + 추적층 1개) + 실패계약 4행
+4. **TASKS.md 갱신**: req clear 3규칙 + status_sync.sh 중간 안건 등재
+5. GPT 합의: req clear 3규칙 채택, navigate_gate conditional fail-closed, status_sync.sh 전용 구조
+
+### 다음 AI 액션
+- req clear 규칙 3개 risk_profile_prompt.sh 구현 (TASKS.md 중간 안건)
+- status_sync.sh 신규 설계 및 구현 (TASKS.md 중간 안건)
+
+## 이전 세션 (2026-04-15 세션48)
 
 ### 이번 세션 완료
 1. **debate-mode SKILL.md 구조 변경**: Step 1 Chrome MCP 직접 조작 지시 전부 제거 → gpt-send/gpt-read 전면 위임. 근본 원인: "Step 1에서 수동 navigate 허가 → 관성으로 Step 2도 수동" 패턴

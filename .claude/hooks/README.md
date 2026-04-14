@@ -1,9 +1,9 @@
 # Hooks 운영 현황
 
-> 2026-04-11 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
+> 2026-04-15 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (23개 스크립트, settings.local.json 등록)
+## 활성 Hook (26개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 
@@ -36,6 +36,9 @@
 | ⑦ | `mcp_send_gate.sh` | mcp__Claude_in_Chrome__form_input | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
 | ⑧ | `harness_gate.sh` | Bash | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
 | ⑨ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 (deny+exit 2) |
+| ⑩ | `debate_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
+| ⑪ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
+| ⑫ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
 
 ### 추적층 (PostToolUse)
 
@@ -46,6 +49,7 @@
 | `evidence_mark_read.sh` | Read\|Grep\|Glob\|Bash\|Write\|Edit\|MultiEdit | 문서 읽기/갱신 → .ok 증거 마커 적립 |
 | `gpt_followup_post.sh` | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 | `handoff_archive.sh` | Write\|Edit | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |
+| `debate_send_gate_mark.sh` | mcp__Claude_in_Chrome__get_page_text | 토론모드 활성 시 GPT 응답 읽기 후 send_gate 마커 갱신 |
 
 ### 알림층 (Notification)
 
@@ -94,6 +98,10 @@
 | `gpt_followup_stop.sh` | fail-open | block JSON | 플래그 미존재 시 통과 |
 | `completion_gate.sh` | fail-open | block JSON | 마커 미존재 시 통과 |
 | `evidence_stop_guard.sh` | fail-open | block JSON | req 미존재 시 통과 |
+| `debate_gate.sh` | fail-closed | deny JSON | 마커 미존재·파싱 실패 시 안전 차단 |
+| `debate_independent_gate.sh` | fail-closed | deny JSON | 독립견해 마커 미존재 시 전송 차단 |
+| `navigate_gate.sh` | conditional fail-closed | deny JSON | debate_mode 활성 시 fail-closed, 그 외 fail-open |
+| `debate_send_gate_mark.sh` | fail-open + WARN | 없음 | 마커 생성 실패 시 WARN 로그 후 통과 (debate_gate가 2차 차단) |
 
 ## 보조 스크립트 (settings 미등록)
 

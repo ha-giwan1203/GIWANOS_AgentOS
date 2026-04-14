@@ -1,0 +1,51 @@
+{
+  "session_id": "debate_20260415_071900",
+  "chat_url": "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69de2ef6-c75c-83e8-92f4-76fe7f4d136e",
+  "turn_number": 1,
+  "last_reply_hash": "gpt_20260415_071900_t1",
+  "agenda": [
+    "evidence_missing 201건 구조적 해결 방향",
+    "debate_gate/navigate_gate 실패계약 설계",
+    "STATUS.md 자동 갱신 강제 구조"
+  ],
+  "turns": [
+    {
+      "turn": 1,
+      "claude": "self-audit P1/P2 GPT 교차검증 3건 (req clear, 실패계약, STATUS.md 갱신 구조)",
+      "gpt": "의제1: req clear 3규칙. 의제2: navigate_gate conditional fail-closed. 의제3: status_sync.sh 전용+마커 블록",
+      "harness": {
+        "summary_counts": {"채택": 8, "보류": 0, "버림": 0},
+        "채택": [
+          {"item": "req 수명주기 애매 (재발행+ok만 적립)", "label": "실증됨", "evidence": "risk_profile_prompt.sh 재발행 메커니즘", "ref": null},
+          {"item": "ok 자동생성 반대", "label": "실증됨", "evidence": "증거 기반 게이트 원칙", "ref": null},
+          {"item": "req clear 규칙 3개", "label": "실증됨", "evidence": "위험 미검출/ok 생성/작업단계 전환", "ref": null},
+          {"item": "navigate_gate conditional fail-closed", "label": "환경미스매치 보정", "evidence": "active_domain=debate_mode 시에만", "ref": null},
+          {"item": "debate_gate/debate_independent_gate fail-closed", "label": "실증됨", "evidence": "목적 일치", "ref": null},
+          {"item": "debate_send_gate_mark fail-open+WARN", "label": "실증됨", "evidence": "마킹 실패 시 debate_gate 2차 차단", "ref": null},
+          {"item": "completion_gate/handoff_archive 부적합", "label": "실증됨", "evidence": "역할 혼재 위험 명확", "ref": null},
+          {"item": "status_sync.sh + 마커 블록", "label": "실증됨", "evidence": "포맷 파괴 최소화", "ref": null}
+        ],
+        "보류": [],
+        "버림": []
+      }
+    }
+  ],
+  "result": {
+    "합의안": [
+      "req clear 규칙 3개 명시화 (위험 미검출/ok 생성/작업단계 전환)",
+      "README 실패계약 표 4행 추가 (navigate_gate: conditional fail-closed)",
+      "status_sync.sh 전용 신규 + /finish or final_check --fix 연동"
+    ],
+    "미합의_쟁점": [],
+    "즉시_실행안": [
+      "README.md hooks 실패계약 4행 추가",
+      "req clear 규칙 문서화 (TASKS.md 등재)",
+      "status_sync.sh 계획 TASKS.md 등재"
+    ]
+  },
+  "critic_review": {
+    "판정": "WARN",
+    "사유": "하네스 8건 전부 실증 근거(SHA/테스트) 미병기, status_sync.sh 신규 설계 채택이 보류가 적절",
+    "진행": "WARN 기록 후 Step 5 진행"
+  }
+}

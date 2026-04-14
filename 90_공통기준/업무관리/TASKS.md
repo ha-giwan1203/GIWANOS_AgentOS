@@ -10,11 +10,21 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션48 (debate-mode 브라우저 조작 근본 분리 + navigate_gate smoke_test 추가)
+최종 업데이트: 2026-04-15 — 세션49 (토론모드 GPT 교차검증: README 4게이트 추가 + req clear 규칙 합의)
 
 ---
 
 ## 다음 세션 안건
+
+**[중] req clear 규칙 3개 명시화 (세션49 합의)**
+- GPT 합의: 위험 미검출 / ok 생성 / 작업단계 전환 시 req clear
+- 대상: risk_profile_prompt.sh 코드 + README/RUNBOOK 문서화
+- 동일 핑거프린트 반복 차단(bb52c08fe5cd7cd9) 근본 해결
+
+**[중] status_sync.sh 전용 스크립트 신규 (세션49 합의)**
+- GPT 합의: completion_gate/handoff_archive 혼재 금지 → 전용 스크립트
+- 구현: 전역 업무관리/STATUS.md 마커 블록(<!-- STATUS_SYNC_START -->) 자동 갱신
+- /finish 또는 final_check --fix에서 호출, 도메인 STATUS.md는 opt-in
 
 **[낮] AGENTS_GUIDE 자동생성화 (세션47+ 안건)**
 - settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
