@@ -6,6 +6,13 @@
 > 이 파일이 Primary. CLAUDE.md는 Reference(상세 배경용).
 > 위반 = 버그. hooks가 강제한다.
 
+## 스킬 진입 (MUST)
+
+- 토론/공동작업/공유 관련 요청 → **`/debate-mode` 스킬 호출 필수**
+- 수동 navigate, gpt-send 스킬로 우회 진입 금지
+- UserPromptSubmit 훅이 토론 키워드 감지 시 systemMessage로 안내
+- navigate_gate 훅이 CLAUDE.md 미읽기 시 ChatGPT 진입 차단
+
 ## NEVER (위반 시 hooks 차단)
 
 1. 직접 DOM 예비 경로에서 클립보드 붙여넣기 입력 금지 — `execCommand('insertText')` only

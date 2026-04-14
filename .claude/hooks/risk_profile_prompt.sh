@@ -69,7 +69,8 @@ fi
 
 # 토론 도메인 감지 → debate_preflight.req 생성
 # GPT 합의(세션25): 토론 키워드 감지 시 harness_gate 활성화용 req 생성
-if echo "$TEXT" | grep -qiE '(토론|GPT.*공유|GPT.*판정|하네스|harness|debate|채택.*보류|반박문|share.result)'; then
+# 세션47 확장: 토론/공동/공유 모두 동일 조건 — 우회 접근 차단
+if echo "$TEXT" | grep -qiE '(토론|공동작업|공동|GPT.*공유|GPT.*판정|하네스|harness|debate|채택.*보류|반박문|share.result|토론방)'; then
   touch_req "debate_preflight"
 fi
 
@@ -153,5 +154,11 @@ fi
 
 hook_log "UserPromptSubmit" "risk_profile_prompt reqs=${REQS:-none}"
 
-# 출력은 선택사항. 최소 마찰 위해 추가 컨텍스트 미주입.
+# 토론 도메인 감지 시 debate-mode 스킬 사용 안내 주입 (세션47)
+# 수동 브라우저 조작·gpt-send 우회 방지
+if [ -f "$REQ_DIR/debate_preflight.req" ]; then
+  echo '{"systemMessage":"[토론 절차 안내] 토론/공동작업 관련 요청입니다. 반드시 debate-mode 스킬을 사용하세요.\n- Skill 도구로 debate-mode 호출\n- 수동 navigate/gpt-send 사용 금지\n- debate-mode가 지침 읽기 → 탭 준비 → 전송 절차를 자동 처리합니다."}'
+  exit 0
+fi
+
 exit 0

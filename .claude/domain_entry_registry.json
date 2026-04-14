@@ -2,7 +2,7 @@
   {
     "domain_id": "debate_mode",
     "priority": 1,
-    "keywords": ["토론", "토론모드", "공동작업", "debate"],
+    "keywords": ["토론", "토론모드", "공동작업", "공동", "토론방", "debate"],
     "required_docs": [
       {"id": "entry", "path": "90_공통기준/토론모드/ENTRY.md"},
       {"id": "claude", "path": "90_공통기준/토론모드/CLAUDE.md"}

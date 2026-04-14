@@ -8,6 +8,11 @@
 
 > **코어: 이 파일**
 
+## 진입점
+**[MUST] 토론/공동작업/공유 관련 요청 시 반드시 `/debate-mode` 스킬로 진입한다.**
+- `Skill(skill="debate-mode")` 호출 — 수동 navigate/gpt-send 사용 금지
+- navigate_gate 훅이 CLAUDE.md 미읽기 시 ChatGPT 진입을 차단한다
+
 ## 목적
 Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을 이어가는 코워크 구조.
 - [NEVER] API 사용 금지 — 브라우저 화면 텍스트 직접 읽기만

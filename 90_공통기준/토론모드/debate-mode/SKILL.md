@@ -96,12 +96,13 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 ### Step 1.5. 입력 전 미확인 응답 점검 (필수)
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 새 응답 있으면 먼저 읽고 반영
 
-### Step 2. 메시지 전송
-- **기본 전송**: `javascript_tool`로 `#prompt-textarea` focus → `insertText`로 한 번에 삽입 → `find`(send button) → `computer(left_click)` 전송
-- `type`(느림) / `form_input`(줄바꿈 불가) / CDP 스크립트 전부 금지
+### Step 2. 메시지 전송 + 응답 읽기
+
+**[MUST] 전송과 응답 읽기는 전용 스킬을 호출한다:**
+- 전송: `Skill(skill="gpt-send", args="메시지 텍스트")`
+- 응답 읽기: `Skill(skill="gpt-read")`
+- 수동 javascript_tool/navigate로 직접 조작 금지 — gpt-send/gpt-read가 처리
 - 전송 본문 자연어는 한국어만 작성
-- 완료 감지: stop-button polling 또는 get_page_text 비교 (상세: REFERENCE.md §2)
-- 응답 읽기: assistant 마지막 블록 innerText (상세: REFERENCE.md §3)
 
 ### Step 3. 반박 생성 및 자동 전송
 1. GPT 응답 핵심 주장 3줄 요약

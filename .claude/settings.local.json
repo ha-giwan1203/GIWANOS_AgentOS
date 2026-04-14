@@ -63,7 +63,11 @@
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/01_인사근태/숙련도평가\")",
       "Bash(rmdir \"C:/Users/User/Desktop/업무리스트/공정 매트릭스\")",
       "Bash(python3 ./.claude/hooks/classify_feedback.py --validate)",
-      "Bash(awk '/^[a-zA-Z_][a-zA-Z0-9_]*\\\\s*\\\\\\(\\\\\\)/ {in_func=1; func_name=$1; print NR\": Function START: \"func_name} /^}/ && in_func {in_func=0; print NR\": Function END\"} /local / && !in_func {print NR\": ⚠ local 함수밖 => \"$0}' /c/Users/User/Desktop/업무리스트/.claude/hooks/commit_gate.sh)"
+      "Bash(awk '/^[a-zA-Z_][a-zA-Z0-9_]*\\\\s*\\\\\\(\\\\\\)/ {in_func=1; func_name=$1; print NR\": Function START: \"func_name} /^}/ && in_func {in_func=0; print NR\": Function END\"} /local / && !in_func {print NR\": ⚠ local 함수밖 => \"$0}' /c/Users/User/Desktop/업무리스트/.claude/hooks/commit_gate.sh)",
+      "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/.claude/state\")",
+      "Bash(date -u '+%Y-%m-%dT%H:%M:%SZ')",
+      "Bash(rm -f .claude/state/active_domain.req)",
+      "Bash(rm -f .claude/state/instruction_reads/debate_claude_read.ok)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -204,6 +208,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/debate_independent_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__navigate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/navigate_gate.sh"
           }
         ]
       }
