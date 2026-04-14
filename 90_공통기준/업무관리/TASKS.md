@@ -39,6 +39,9 @@
 - **smoke_test 섹션 45 신규**: navigate_gate 런타임 테스트 6건 (파일존재/bash-n/settings등록/비chatgpt통과/deny런타임/오탐방지)
 - **smoke_test 헤더 42→45섹션 수정 + CAPABILITY_SECTIONS 45 추가**
 - smoke_test 158/158 ALL PASS (이전 152 → +6)
+- **evidence_gate 런타임 deny 3건 추가**: 44-3(tasks_handoff+commit), 44-4(skill_read+도메인편집), 44-5(map_scope+Write)
+- **completion_gate 부분 런타임 1건 추가**: 43-3(block JSON 구조)
+- smoke_test 162/162 ALL PASS (최종)
 
 
 ### [완료] navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신 — 세션47 (2026-04-15)

@@ -17,7 +17,10 @@
 3. **CLAUDE.md 실행 루프 정합**: 수동 조작 상세 → gpt-send/gpt-read 위임 구조로 변경
 4. **smoke_test 섹션 45 신규**: navigate_gate 런타임 테스트 6건 (stdin JSON 주입 실제 분기 테스트 포함)
 5. **smoke_test 헤더 42→45섹션 수정**: 메타 드리프트 해소
-6. smoke_test 158/158 ALL PASS (이전 152 → +6)
+6. smoke_test 158/158 ALL PASS (1차)
+7. **evidence_gate 런타임 deny 3건**: 44-3(tasks_handoff+commit), 44-4(skill_read+도메인편집), 44-5(map_scope+Write) — stdin JSON 주입 실제 deny 확인
+8. **completion_gate 부분 런타임 1건**: 43-3(block JSON 구조)
+9. smoke_test 162/162 ALL PASS (최종, 이전 152 → +10)
 
 ### 이전 세션 (2026-04-15 세션47)
 

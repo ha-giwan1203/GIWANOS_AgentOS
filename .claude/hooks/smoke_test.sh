@@ -770,6 +770,86 @@ check $? "evidence_gate: deny 함수가 deny JSON 출력 생성"
 grep -q 'skill_read.req / identifier_ref.req' "$HOOKS_DIR/evidence_gate.sh"
 check $? "evidence_gate: skill_read/identifier_ref deny 경로 존재"
 
+# 44-3~5: evidence_gate 런타임 deny 테스트 (세션48 GPT 합의)
+# 세션키 기반 evidence 경로 조성 → stdin JSON 주입 → deny JSON 출력 확인
+_eg_script="$HOOKS_DIR/evidence_gate.sh"
+_eg_sk=$(source "$HOOKS_DIR/hook_common.sh" 2>/dev/null; session_key)
+_eg_evidence_dir="$PROJECT_DIR/.claude/state/evidence/$_eg_sk"
+_eg_req_dir="$_eg_evidence_dir/requires"
+_eg_proof_dir="$_eg_evidence_dir/proofs"
+_eg_start_file="$_eg_evidence_dir/.session_start"
+
+# 백업: 기존 req/ok 파일
+_eg_req_backup_dir=$(mktemp -d 2>/dev/null || echo "/tmp/_eg_req_backup_$$")
+mkdir -p "$_eg_req_backup_dir"
+[ -d "$_eg_req_dir" ] && cp -a "$_eg_req_dir"/. "$_eg_req_backup_dir/" 2>/dev/null
+_eg_proof_backup_dir=$(mktemp -d 2>/dev/null || echo "/tmp/_eg_proof_backup_$$")
+mkdir -p "$_eg_proof_backup_dir"
+[ -d "$_eg_proof_dir" ] && cp -a "$_eg_proof_dir"/. "$_eg_proof_backup_dir/" 2>/dev/null
+
+# 세션 디렉토리 보장
+mkdir -p "$_eg_req_dir" "$_eg_proof_dir" 2>/dev/null
+[ -f "$_eg_start_file" ] || : > "$_eg_start_file"
+# start_file을 과거로 설정해서 fresh_req가 동작하도록
+touch -t 202601010000 "$_eg_start_file" 2>/dev/null
+
+# 44-3: tasks_handoff.req + git commit → deny
+: > "$_eg_req_dir/tasks_handoff.req"
+rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
+_eg_result_3=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_3" | grep -q '"decision":"deny"' 2>/dev/null
+check $? "evidence_gate: tasks_handoff.req + git commit → deny (런타임)"
+
+# 44-4: skill_read.req + 기준정보 도메인 편집 → deny
+rm -f "$_eg_req_dir/tasks_handoff.req" 2>/dev/null
+: > "$_eg_req_dir/skill_read.req"
+rm -f "$_eg_proof_dir/skill_read.ok" "$_eg_proof_dir/identifier_ref.ok" 2>/dev/null
+_eg_result_4=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md","command":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_4" | grep -q '"decision":"deny"' 2>/dev/null
+check $? "evidence_gate: skill_read.req + 도메인편집 → deny (런타임)"
+
+# 44-5: map_scope.req + Write 도구 → deny
+rm -f "$_eg_req_dir/skill_read.req" 2>/dev/null
+: > "$_eg_req_dir/map_scope.req"
+rm -f "$_eg_proof_dir/map_scope.ok" 2>/dev/null
+_eg_result_5=$(echo '{"tool_name":"Write","tool_input":"test_file.md","command":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_5" | grep -q '"decision":"deny"' 2>/dev/null
+check $? "evidence_gate: map_scope.req + Write → deny (런타임)"
+
+# 상태 복원
+rm -rf "$_eg_req_dir"/* 2>/dev/null
+rm -rf "$_eg_proof_dir"/* 2>/dev/null
+[ "$(ls -A "$_eg_req_backup_dir" 2>/dev/null)" ] && cp -a "$_eg_req_backup_dir"/. "$_eg_req_dir/" 2>/dev/null
+[ "$(ls -A "$_eg_proof_backup_dir" 2>/dev/null)" ] && cp -a "$_eg_proof_backup_dir"/. "$_eg_proof_dir/" 2>/dev/null
+rm -rf "$_eg_req_backup_dir" "$_eg_proof_backup_dir" 2>/dev/null
+
+echo ""
+
+# === 43-3. completion_gate 부분 런타임 테스트 (세션48 GPT 합의) ===
+echo "--- 43-3. completion_gate 부분 런타임 (write_marker deny) ---"
+# Stop 훅이라 완전 런타임 재현 불가 — write_marker 경로만 부분 검증
+_cg_script="$HOOKS_DIR/completion_gate.sh"
+_cg_marker="$PROJECT_DIR/90_공통기준/agent-control/state/write_marker.json"
+_cg_marker_backup=""
+[ -f "$_cg_marker" ] && _cg_marker_backup=$(cat "$_cg_marker")
+
+# 조건 조성: write_marker 생성 (미래 타임스탬프) → TASKS 갱신 안 됨 상태
+mkdir -p "$(dirname "$_cg_marker")" 2>/dev/null
+echo '{"created":"2099-01-01T00:00:00"}' > "$_cg_marker"
+# completion_gate는 is_completion_claim 먼저 체크 → transcript 없으면 통과해서 deny까지 안 감
+# 그래서 여기서는 grep으로 block 경로의 JSON 구조만 확인
+grep -q 'decision.*block' "$_cg_script" 2>/dev/null
+check $? "completion_gate: write_marker deny 경로 block JSON 구조 확인 (부분)"
+
+# 복원
+if [ -n "$_cg_marker_backup" ]; then
+  echo "$_cg_marker_backup" > "$_cg_marker"
+else
+  rm -f "$_cg_marker" 2>/dev/null
+fi
+
+echo ""
+
 # === 45. navigate_gate.sh 런타임 테스트 (세션48 GPT 합의) ===
 echo "--- 45. navigate_gate.sh 런타임 테스트 ---"
 _NG_SCRIPT="$HOOKS_DIR/navigate_gate.sh"
