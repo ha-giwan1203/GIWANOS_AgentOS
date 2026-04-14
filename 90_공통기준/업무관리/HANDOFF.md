@@ -18,7 +18,11 @@
 4. **C. JSON 처리 단일화**: json_helper.py 신규 (dotted key path). hook_common.sh python3 -c 인라인 2곳 교체. safe_json_get은 유지
 5. 핫픽스: smoke_test v4→v5 표기, classify_feedback.py CLASSIFICATION 2건 추가
 6. smoke_test 148/148 ALL PASS (이전 세션45 147/148 → 1건 개선)
-7. **상태문서 동봉 강제**: commit_gate에 write_marker 존재 시 TASKS/HANDOFF 미staged → 차단 추가. 2회 커밋 패턴 구조적 해소
+7. **상태문서 동봉 강제**: commit_gate에 write_marker 존재 시 TASKS/HANDOFF 미staged → 차단. 2회 커밋 패턴 구조적 해소
+8. **토론모드 절차 강제 hook 3종 신규**:
+   - `debate_gate.sh`: 지침읽기 + 채팅방진입 + SEND GATE 3단 검사. insertText 직전 차단
+   - `debate_send_gate_mark.sh`: get_page_text 실행 시 1회용 마커 생성
+   - `debate_independent_gate.sh`: 하네스 분석(독립의견) 없이 GPT에 답장 차단
 
 ### 다음 세션 안건 (우선순위순)
 1. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션47+)

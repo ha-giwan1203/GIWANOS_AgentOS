@@ -33,7 +33,8 @@
 - **A. commit_gate.sh local 결함 해소**: build_fingerprint() + should_suppress_incident() 2단 함수 분리
 - **B. smoke_test 3게이트 실행 테스트**: 섹션 40-42 추가 (148/148 ALL PASS)
 - **C. JSON 처리 단일화**: json_helper.py 신규 + hook_common.sh python3 인라인 2곳 교체
-- **상태문서 동봉 강제**: commit_gate에 write_marker 존재 시 TASKS/HANDOFF 미staged → 차단 로직 추가 (2회 커밋 패턴 해소)
+- **상태문서 동봉 강제**: commit_gate에 write_marker 존재 시 TASKS/HANDOFF 미staged → 차단 (2회 커밋 패턴 해소)
+- **토론모드 절차 강제 hook 3종**: debate_gate(진입+SEND GATE), debate_send_gate_mark(마커생성), debate_independent_gate(독립의견 강제)
 - 핫픽스: smoke_test v4→v5, classify_feedback 2건 추가
 
 ### [완료] 학습 루프 사각지대 해소 A1+B1+D1+C2 — 세션45 (2026-04-14)

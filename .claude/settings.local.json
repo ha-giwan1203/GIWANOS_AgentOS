@@ -51,7 +51,19 @@
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-create-pages",
       "Bash(python -c ':*)",
       "Bash(bash .claude/scripts/hook_registry.sh sync)",
-      "mcp__scheduled-tasks__list_scheduled_tasks"
+      "mcp__scheduled-tasks__list_scheduled_tasks",
+      "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
+      "Bash(python3 .claude/hooks/incident_review.py --days 7 --threshold 3)",
+      "Bash(echo \"https://chatgpt.com/c/69ddbd0e-1e48-83e8-9c5a-8e61ece738ba\")",
+      "Bash(echo \"1382935380\")",
+      "Bash(rm -f \"C:/Users/User/Desktop/업무리스트/06_생산관리/기타/네임플레이트_양식정리.xlsx\")",
+      "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/공정매트릭스\")",
+      "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/네임플레이트\")",
+      "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/명찰\")",
+      "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/01_인사근태/숙련도평가\")",
+      "Bash(rmdir \"C:/Users/User/Desktop/업무리스트/공정 매트릭스\")",
+      "Bash(python3 ./.claude/hooks/classify_feedback.py --validate)",
+      "Bash(awk '/^[a-zA-Z_][a-zA-Z0-9_]*\\\\s*\\\\\\(\\\\\\)/ {in_func=1; func_name=$1; print NR\": Function START: \"func_name} /^}/ && in_func {in_func=0; print NR\": Function END\"} /local / && !in_func {print NR\": ⚠ local 함수밖 => \"$0}' /c/Users/User/Desktop/업무리스트/.claude/hooks/commit_gate.sh)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -176,6 +188,24 @@
             "command": "bash .claude/hooks/instruction_read_gate.sh"
           }
         ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/debate_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/debate_independent_gate.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -212,6 +242,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/evidence_mark_read.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__Claude_in_Chrome__get_page_text",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/debate_send_gate_mark.sh"
           }
         ]
       },
