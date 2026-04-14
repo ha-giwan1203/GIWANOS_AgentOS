@@ -22,10 +22,26 @@
 8. GPT 조건부통과 대응: 문자 깨짐 + log_path 연동 + 주석 정정
 9. smoke_test 140/140 + E2E 10/10 ALL PASS
 
-### 다음 세션 참고
-- **pre_commit_check normal_flow 분리**: commit_gate.sh에서 정상 중간차단에 플래그 부여 → incident_review 필터 (다음 세션)
-- **evidence_gate 워밍업 grace**: 보류 (보안 게이트 신중 검토 필요)
-- 모델 믹싱/Worktree 병렬은 별도 안건 (보류 유지)
+### 다음 세션 안건 (우선순위순)
+
+1. **[높] weekly-self-audit에 incident_review 연동**
+   - self-audit 실행 시 `incident_review.py --days 7 --threshold 3` 자동 포함
+   - 임계치 초과 → 사용자 보고 + 안건 자동 등록
+   - 이것만 붙이면 학습 루프 완성 (수집→탐지→제안→반영 전체 자동)
+
+2. **[중] pre_commit_check normal_flow 분리**
+   - commit_gate.sh: 정상 중간차단에 `normal_flow=true` 플래그
+   - incident_review: `--include-normal-flow` 옵션으로 기본 집계에서 제외
+   - 142건/30일 중 대부분 정상 발화 → 진단 왜곡
+
+3. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
+
+### 세션40 리서치 메모
+- 업계 용어: "Self-Improving Agent + Feedback Loop"
+- 우리 시스템은 Addy Osmani 글 구조의 80% 수준
+- "구멍이 많다"가 아니라 "측정 시작으로 비로소 보이는 것"
+- 남은 갭: 자동 반영 (현재는 수동 반영) + 진단 노이즈 제거
+- 참고: Addy Osmani, Arize Closing the Loop, Rootly MTTR 40% 감소
 
 ---
 

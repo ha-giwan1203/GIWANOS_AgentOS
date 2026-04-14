@@ -16,13 +16,26 @@
 
 ## 다음 세션 안건
 
-**[중] pre_commit_check normal_flow 분리 (commit_gate.sh 수정)**
-- commit_gate에서 TASKS/HANDOFF 미갱신 등 정상 중간차단은 `normal_flow=true` 플래그 부여
-- incident_review 기본 집계에서 정상 플로우 제외 (--include-normal-flow 옵션)
+### 학습 루프 마무리 — 진단 품질 개선 + self-audit 연동
+
+**[높] weekly-self-audit에 incident_review 연동**
+- self-audit 실행 시 `incident_review.py --days 7 --threshold 3` 자동 포함
+- 임계치 초과 항목 있으면 사용자 보고 + 다음 세션 안건 자동 등록
+- 이것만 붙이면 학습 루프 사실상 완성 (수집→탐지→제안→반영 전체 자동)
+
+**[중] pre_commit_check normal_flow 분리**
+- commit_gate.sh에서 TASKS/HANDOFF 미갱신 등 정상 중간차단은 `normal_flow=true` 플래그 부여
+- incident_review 기본 집계에서 정상 플로우 제외 (`--include-normal-flow` 옵션)
+- 현재 30일 142건 중 대부분이 정상 안전장치 발화 → 진단 왜곡 원인
 
 **[낮] evidence_gate 워밍업 incident 기록 grace (보류)**
 - 차단은 유지, incident 기록만 req_age < 90초이면 생략
-- 보안 게이트라서 신중하게 검토 필요
+- 보안 게이트라서 GPT 토론 후 결정
+
+### 참고 자료 (세션40 리서치)
+- [Addy Osmani — Self-Improving Coding Agents](https://addyosmani.com/blog/self-improving-agents/) — 우리 구조와 가장 유사
+- [Arize — Closing the Loop](https://arize.com/blog/closing-the-loop-coding-agents-telemetry-and-the-path-to-self-improving-software/) — 텔레메트리→패턴→행동개선 루프
+- [Rootly — AI Incident Automation](https://rootly.com/sre/2025-devops-trend-ai-incident-automation-cuts-mttr-40) — incident 빈도 분석 → 자동 remediation
 
 ---
 
