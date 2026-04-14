@@ -46,26 +46,46 @@ deny() {
   local req_name="$2"  # optional: 해결 방법 안내용 req 이름
   hook_log "PreToolUse/evidence_gate" "BLOCK: $reason"
 
-  # 중복 incident 억제: 동일 hook+reason+detail 직전 연속 3회 초과 시 기록 생략
-  # GPT 보류→수정: grep -qF(고정문자열)이므로 sed 이스케이프 제거, 원문 그대로 비교
-  local _dup_count=0
-  local _reason_prefix
-  _reason_prefix=$(printf '%s' "$reason" | head -c 80)
-  if [ -f "$INCIDENT_LEDGER" ]; then
-    # 직전 연속 카운트: 마지막 줄부터 역순으로 동일 패턴이 몇 줄 연속인지
-    _dup_count=$(tail -20 "$INCIDENT_LEDGER" 2>/dev/null | tac 2>/dev/null | while IFS= read -r _line; do
-      if echo "$_line" | grep -q '"hook":"evidence_gate".*"classification_reason":"evidence_missing"' && \
-         echo "$_line" | grep -qF "$_reason_prefix"; then
-        echo "match"
-      else
-        break
-      fi
-    done | wc -l)
-  fi
-  if [ "$_dup_count" -lt 3 ]; then
-    hook_incident "gate_reject" "evidence_gate" "" "$reason" '"classification_reason":"evidence_missing"' 2>/dev/null || true
+  # fingerprint 기반 incident suppress (GPT+Claude 합의 세션43):
+  # fingerprint = hash(reason_prefix|command_prefix) — 사건 동일성 판별
+  # 동일 fingerprint가 GRACE_WINDOW초 이내에 이미 기록된 경우 → 기록 생략 (차단은 유지)
+  local GRACE_WINDOW=30
+  local _fp_raw
+  _fp_raw="${reason:0:80}|${COMMAND:0:50}"
+  local _fingerprint
+  if command -v sha1sum >/dev/null 2>&1; then
+    _fingerprint=$(printf '%s' "$_fp_raw" | sha1sum | cut -c1-16)
+  elif command -v md5sum >/dev/null 2>&1; then
+    _fingerprint=$(printf '%s' "$_fp_raw" | md5sum | cut -c1-16)
   else
-    hook_log "PreToolUse/evidence_gate" "incident 중복 억제: 직전 연속 ${_dup_count}회 (3회 초과, detail일치)" 2>/dev/null
+    _fingerprint=$(printf '%s' "$_fp_raw" | cksum | awk '{print $1}' | cut -c1-16)
+  fi
+
+  local _should_record=true
+  if [ -f "$INCIDENT_LEDGER" ]; then
+    local _now _cutoff
+    _now=$(date +%s 2>/dev/null || echo 0)
+    _cutoff=$((_now - GRACE_WINDOW))
+    while IFS= read -r _line; do
+      local _fp_in_line _ts_in_line _epoch
+      _fp_in_line=$(printf '%s' "$_line" | safe_json_get "fingerprint" 2>/dev/null)
+      if [ "$_fp_in_line" = "$_fingerprint" ]; then
+        _ts_in_line=$(printf '%s' "$_line" | safe_json_get "ts" 2>/dev/null)
+        _epoch=$(date -d "$_ts_in_line" +%s 2>/dev/null || \
+                 date -jf "%Y-%m-%dT%H:%M:%SZ" "$_ts_in_line" +%s 2>/dev/null || echo 0)
+        if [ "$_epoch" -gt "$_cutoff" ] 2>/dev/null; then
+          _should_record=false
+          break
+        fi
+      fi
+    done < <(tail -30 "$INCIDENT_LEDGER")
+  fi
+
+  if [ "$_should_record" = "true" ]; then
+    hook_incident "gate_reject" "evidence_gate" "" "$reason" \
+      "\"classification_reason\":\"evidence_missing\",\"fingerprint\":\"$_fingerprint\"" 2>/dev/null || true
+  else
+    hook_log "PreToolUse/evidence_gate" "incident suppress (fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s)" 2>/dev/null
   fi
 
   # 해결 방법 안내 포함 (사용자가 탈출 경로를 알 수 있도록)

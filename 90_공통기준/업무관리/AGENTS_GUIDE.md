@@ -55,7 +55,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 자동/반자동 품질 검증 체계.
 
-### Hooks (.claude/hooks/) — 21개 활성 (settings.local.json 기준)
+### Hooks (.claude/hooks/) — 23개 활성 (settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 
@@ -69,14 +69,17 @@ Claude-GPT 공동작업 + 운영 원칙.
 | 차단 | date_scope_guard.sh | Bash | ZDM 일요일·일괄범위 차단 |
 | 차단 | evidence_gate.sh | Bash\|Write\|Edit\|MultiEdit | req 있고 ok 없으면 deny |
 | 차단 | protect_files.sh | Write\|Edit\|MultiEdit | 원본 파일 수정 차단 |
-| 차단 | send_gate.sh | mcp__Chrome__javascript_tool | 토론모드 전송 전 점검 |
 | 차단 | state_rebind_check.sh | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
+| 차단 | mcp_send_gate.sh | mcp__Claude_in_Chrome__form_input | Chrome form_input 전 점검 |
+| 차단 | harness_gate.sh | Bash | 하네스 규칙 준수 검사 |
+| 차단 | instruction_read_gate.sh | Bash | 지시문 읽기 강제 |
 | 추적 | auto_compile.sh | Write\|Edit | 파일 수정 후 자동 컴파일 |
 | 추적 | write_marker.sh | Write\|Edit | 변경 마커 생성 |
 | 추적 | evidence_mark_read.sh | Read\|Grep\|Glob\|Bash\|Write\|Edit\|MultiEdit | 증거 마커 적립 |
-| 추적 | gpt_followup_post.sh | Chrome\|Bash\|Edit\|Write | GPT 후속작업 감지 |
+| 추적 | gpt_followup_post.sh | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 후속작업 감지 |
 | 추적 | handoff_archive.sh | Write\|Edit | HANDOFF 갱신 시 아카이브 |
 | 알림 | notify_slack.sh | Notification | Slack 채널 알림 |
+| 알림 | post_commit_notify.sh | Bash (async) | 커밋 완료 후 알림 |
 | 종료 | stop_guard.sh | Stop | 금지 문구 포함 시 차단 |
 | 종료 | gpt_followup_stop.sh | Stop | GPT pending flag 시 차단 |
 | 종료 | completion_gate.sh | Stop | TASKS/HANDOFF 미갱신 시 차단 |
@@ -108,11 +111,22 @@ Claude-GPT 공동작업 + 운영 원칙.
 |------|------|
 | line-batch-management | ERP 라인배치 입력 |
 | line-batch-mainsub | 메인서브 품번 배치 |
+| line-batch-outer-main | 외주/메인 라인배치 |
+| line-mapping-validator | 라인배치 검증 |
 | assembly-cost-settlement | 조립비 정산 |
 | zdm-daily-inspection | ZDM 일상점검 |
 | production-result-upload | MES 생산실적 업로드 |
-| xlsx/docx/pdf/pptx | 파일 형식별 처리 |
+| daily-routine | 매일 반복 업무 통합 실행 |
+| night-scan-compare | 야간 스캔실적 비교 |
+| auto-fix | incident 자동 분석/수정 |
+| pptx-generator | PPTX 파일 생성 |
 | youtube-analysis | YouTube 영상 분석 |
+| flow-chat-analysis | 업무 플로우 채팅 분석 |
+| production-report | 생산실적 보고서 생성 |
+| sp3-production-plan | SP3 생산계획 처리 |
+| chomul-module-partno | 초물 모듈 품번 처리 |
+| supanova-deploy | [분류: 확인 필요] 배포 자동화 |
+| skill-creator-merged | [분류: 확인 필요] 스킬 생성 도구 |
 
 ### 스킬 메타데이터 표준 (향후 업데이트 시 적용)
 

@@ -10,18 +10,23 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션42 보완 (gpt-send 1-B 생략 방지 NEVER 규칙 추가)
+최종 업데이트: 2026-04-14 — 세션43 (AGENTS_GUIDE 갱신 + evidence_gate fingerprint grace + pre_commit_check 분해)
 
 ---
 
 ## 다음 세션 안건
 
-### evidence_gate 노이즈 대응 — GPT 토론 후 결정
+**[중] commit_gate 연속 중복 suppress 검토**
+- pre_commit_check 174건/7일 중 146건(84%)이 연속 중복 — fingerprint grace 적용 여부 GPT 토론
+- evidence_gate와 동일 방식으로 commit_gate에도 suppress 로직 추가 가능
 
-**[낮] evidence_gate 워밍업 incident 기록 grace (보류)**
-- 차단은 유지, incident 기록만 req_age < 90초이면 생략
-- 보안 게이트라서 GPT 토론 후 결정
-- evidence_missing 177건/30일로 최다 — normal_flow 분리 이후에도 가장 큰 노이즈
+**[낮] AGENTS_GUIDE 자동생성화 (세션44+ 안건)**
+- settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
+- GPT+Claude 합의 세션43: 방향 확정, 구현은 다음 세션
+
+**[낮] supanova-deploy·skill-creator-merged 카테고리 확정**
+- AGENTS_GUIDE에 [분류: 확인 필요]로 임시 등재됨
+- 실운영/실험/도구 분류 사용자 확인 후 확정 필요
 
 ### 학습 루프 후속
 

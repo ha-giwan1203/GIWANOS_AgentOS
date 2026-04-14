@@ -4,26 +4,25 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-14 KST — 세션 42 보완 (gpt-send 1-B 생략 방지 NEVER 규칙 추가)
+최종 업데이트: 2026-04-14 KST — 세션43 (AGENTS_GUIDE 갱신 + evidence_gate fingerprint grace + pre_commit_check 분해)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-14 세션 42)
+## 0. 최신 세션 (2026-04-14 세션43)
 
 ### 이번 세션 완료
-1. **MES Playwright/CDP 제거**: requests OAuth 직접 HTTP로 전환. Chrome 미실행 시 수분 지연 → 5초로 해결
-2. **OAuth 플로우**: SSO ssoUrl 파싱 → /oauth/authorize → POST /login → SESSION 쿠키 → X-XSRF-TOKEN 헤더
-3. **자격증명**: run.py에 `0109/samsong1234` 하드코딩 (초기 분석 시 SQLite 확인, 런타임은 하드코딩)
-4. **누락 확인 범위**: 이번달 1일 → 최근 7일(어제 기준)로 변경
-5. **공백 검사 강화**: COL1~COL22 전체 검사 (COL13 품질,설비비가동 제외), 공백 시 업로드 금지+행번호 보고
-6. **2026-04-07 COL16 공백 처리**: 감지→사용자 수동 수정→강제 재업로드(덮어쓰기) 완료
-7. **gpt-send 1-B 생략 방지**: `[NEVER]` 규칙 추가 — 탭 URL 확인만으로 navigate+재탐지 스킵 금지 (실수 재발 방지)
+1. **주간 self-audit 자동 실행**: weekly-self-audit 스케줄 실행 → P1×2, P2×2 발견
+2. **AGENTS_GUIDE.md hook 표 갱신**: 21개→23개, send_gate.sh 제거, mcp_send_gate/harness_gate/instruction_read_gate/post_commit_notify 추가, gpt_followup_post matcher 정정
+3. **AGENTS_GUIDE.md 스킬 표 갱신**: 6→18개 등재 (12개 추가), supanova-deploy·skill-creator-merged는 [분류: 확인 필요]로 임시 등재
+4. **evidence_gate fingerprint grace 구현**: deny() 함수 교체 — 연속카운트 방식 → fingerprint hash + 30초 time window suppress
+5. **pre_commit_check 174건 분해**: fast FAIL 159건/full FAIL 15건, 연속 중복 146건(84%) — 완화 불필요, commit_gate fingerprint suppress 검토 안건으로 격상
 
 ### 다음 세션 안건 (우선순위순)
-
-1. **[낮] evidence_gate 워밍업 grace** (보류 — GPT 토론 후 결정)
+1. **[중] commit_gate 연속 중복 suppress** — 174건 중 146건 duplicate, fingerprint grace 적용 GPT 토론
 2. **[중] 학습 루프 GPT 토론 검증** — 세션41 결과 공유, 완성도 재평가
+3. **[낮] AGENTS_GUIDE 자동생성화** — settings + 스킬 폴더 메타데이터 기반 (세션44+)
+4. **[낮] supanova-deploy·skill-creator-merged 카테고리 확정** — 사용자 확인 후
 
 ---
 
