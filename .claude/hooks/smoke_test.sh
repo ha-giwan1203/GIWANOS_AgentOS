@@ -650,11 +650,34 @@ check $? "incident_repair.py: harness_missing 매핑 존재"
 
 echo ""
 
+# === 38. task_runner.sh (세션40 태스크 실행 래퍼) ===
+echo "--- 38. task_runner.sh ---"
+test -f "$PROJECT_DIR/.claude/scripts/task_runner.sh"
+check $? "task_runner.sh 존재"
+
+grep -q 'hook_task_result' "$PROJECT_DIR/.claude/scripts/task_runner.sh"
+check $? "task_runner.sh: hook_task_result 호출"
+
+grep -q 'hook_common.sh' "$PROJECT_DIR/.claude/scripts/task_runner.sh"
+check $? "task_runner.sh: hook_common.sh source"
+
+echo ""
+
+# === 39. incident_repair.py backfill (세션40) ===
+echo "--- 39. incident_repair.py backfill ---"
+grep -q 'backfill_classification' "$HOOKS_DIR/incident_repair.py"
+check $? "incident_repair.py: backfill_classification 함수 존재"
+
+grep -q 'backfill-classification' "$HOOKS_DIR/incident_repair.py"
+check $? "incident_repair.py: --backfill-classification CLI 옵션"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""

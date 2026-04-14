@@ -36,6 +36,10 @@ status: active
 ## 실행 방법
 
 ```bash
+# 스케줄 태스크 (task_runner 경유 — 실행 로그 + 연속 실패 감지)
+bash .claude/scripts/task_runner.sh daily-routine python3 "C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py"
+
+# 수동 실행 (직접 호출)
 python3 "C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py"
 ```
 

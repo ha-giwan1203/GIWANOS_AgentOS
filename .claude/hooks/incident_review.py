@@ -63,6 +63,7 @@ RECOMMENDATION_MAP: dict[str, str] = {
     "stop_guard_block": "자동화불가",
     # 기타
     "meta_drift": "절차항목",
+    "structural_intermediate": "절차항목",
 }
 
 CATEGORY_DETAIL: dict[str, str] = {
@@ -88,6 +89,7 @@ SUGGESTED_TARGETS: dict[str, str] = {
     "dangerous_cmd": "위험 명령 인식 유지 (이미 자동 차단됨)",
     "stop_guard_block": "독립 견해 포함 습관 유지",
     "meta_drift": "세션 종료 시 상태 문서 동기화 절차 보강",
+    "structural_intermediate": "완료 루틴에서 TASKS/HANDOFF 갱신 순서 보강",
 }
 
 

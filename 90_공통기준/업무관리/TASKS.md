@@ -10,27 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-14 — 세션40 (학습 루프 규칙 승격기 도입)
+최종 업데이트: 2026-04-14 — 세션40 (학습 루프 규칙 승격기 + 확장 점검)
 
 ---
 
 ## 다음 세션 안건
 
-(미정 — 세션40 완료 후 도출)
+**[중] pre_commit_check normal_flow 분리 (commit_gate.sh 수정)**
+- commit_gate에서 TASKS/HANDOFF 미갱신 등 정상 중간차단은 `normal_flow=true` 플래그 부여
+- incident_review 기본 집계에서 정상 플로우 제외 (--include-normal-flow 옵션)
+
+**[낮] evidence_gate 워밍업 incident 기록 grace (보류)**
+- 차단은 유지, incident 기록만 req_age < 90초이면 생략
+- 보안 게이트라서 신중하게 검토 필요
 
 ---
 
 ## 최근 완료
 
-### [완료] 학습 루프 완성 — 규칙 승격기 도입 — 세션40 (2026-04-14)
-- **GPT 토론 1턴**: 설계 3건 검토. **채택 5건 / 보류 3건 / 버림 0건**
-  - 채택: (empty)→분류누락 별도 버킷, per_task threshold override, 기계판정 3문항 분류 기준, 얇은 래퍼 도입, enum 정규화
-  - 보류: send_block 분리, enforcement_proof, proposal_confidence
-- **안건1 incident_review.py 신규**: 빈도 집계 → 5갈래 제안 (규칙보강/문서보강/절차항목/자동화불가/분류누락)
-- **안건2 task 로그 분리**: hook_common.sh에 hook_task_result() + fail_streak 캐싱 + escalation 자동 승격. hook_config.json에 task_escalation 섹션 (기본3, daily-routine 2)
-- **안건3 MEMORY feedback 3분류**: classify_feedback.py로 33개 파일 태깅 완료 (hookable 8 / promptable 22 / human_only 3)
-- **enum 정규화**: hook_common.sh 주석 + incident_repair.py에 harness_missing/meta_drift/test_fail/task_consecutive_fail 매핑 추가
-- smoke_test 135/135 + E2E 10/10 ALL PASS
+### [완료] 학습 루프 규칙 승격기 + 확장 점검 — 세션40 (2026-04-14)
+- **GPT 토론 1턴 (규칙 승격기 설계)**: 채택 5건 / 보류 3건
+- **GPT 토론 2턴 (확장 점검)**: 채택 4건 / 보류 1건
+- **안건1 incident_review.py**: 빈도 집계 → 5갈래 제안 + structural_intermediate 매핑 추가
+- **안건2 task 로그 분리**: hook_task_result() + fail_streak + task_runner.sh 래퍼 + daily-routine 연동
+- **안건3 feedback 3분류**: 33개 태깅 (hookable 8 / promptable 22 / human_only 3)
+- **레거시 backfill**: 빈 classification_reason 230건 소급 태깅 → 분류누락 0건 달성
+- **enum 정규화**: hook_common.sh + incident_repair.py 매핑 확장
+- smoke_test 140/140 + E2E 10/10 ALL PASS
 
 ---
 

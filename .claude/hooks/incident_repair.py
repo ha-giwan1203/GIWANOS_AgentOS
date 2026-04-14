@@ -363,6 +363,67 @@ def parse_test_output(output: str) -> list[dict[str, Any]]:
     return incidents
 
 
+def backfill_classification(ledger_path: Path, dry_run: bool = False) -> int:
+    """빈 classification_reason을 hook 필드 기반으로 소급 태깅.
+
+    세션40 GPT 토론 합의: resolved로 덮지 말고 분류만 채운다.
+    ts/detail/file/resolved 보존, classification_reason만 추가.
+    """
+    HOOK_TO_REASON: dict[str, str] = {
+        "commit_gate": "pre_commit_check",
+        "evidence_gate": "evidence_missing",
+        "evidence_stop_guard": "evidence_missing",
+        "date_scope_guard": "scope_violation",
+        "block_dangerous": "dangerous_cmd",
+        "stop_guard": "stop_guard_block",
+        "send_gate": "send_block",
+        "harness_gate": "harness_missing",
+    }
+    entries = load_jsonl(ledger_path)
+    count = 0
+    for entry in entries:
+        reason = (entry.get("classification_reason") or "").strip()
+        if reason:
+            continue
+        hook = entry.get("hook", "")
+        detail = entry.get("detail", "")
+        # hook 기반 매핑
+        if hook in HOOK_TO_REASON:
+            entry["classification_reason"] = HOOK_TO_REASON[hook]
+            count += 1
+        elif hook == "completion_gate":
+            fp = entry.get("false_positive")
+            if fp:
+                entry["classification_reason"] = "structural_intermediate"
+            elif "Git" in detail or "commit" in detail or "push" in detail:
+                entry["classification_reason"] = "completion_before_git"
+            elif "TASKS" in detail or "HANDOFF" in detail:
+                entry["classification_reason"] = "completion_before_state_sync"
+            else:
+                entry["classification_reason"] = "legacy_unclassified"
+            count += 1
+        elif hook == "instruction_not_read":
+            entry["classification_reason"] = "evidence_missing"
+            count += 1
+        else:
+            entry["classification_reason"] = "legacy_unclassified"
+            count += 1
+    if not dry_run and count > 0:
+        fd, tmp_path = tempfile.mkstemp(dir=str(ledger_path.parent), suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                for entry in entries:
+                    fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            os.replace(tmp_path, str(ledger_path))
+        except Exception:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+    return count
+
+
 def archive_resolved(ledger_path: Path, days: int = 30, dry_run: bool = False) -> int:
     """resolved=true이고 days일 경과한 항목을 아카이브 파일로 이동.
 
@@ -464,6 +525,11 @@ def main() -> int:
         metavar="FILE",
         help="smoke/e2e test output file to parse for FAIL incidents",
     )
+    parser.add_argument(
+        "--backfill-classification",
+        action="store_true",
+        help="빈 classification_reason을 hook 기반으로 소급 태깅",
+    )
     args = parser.parse_args()
 
     # Phase 3-1: smoke/e2e FAIL 파싱
@@ -492,6 +558,12 @@ def main() -> int:
         count = archive_resolved(Path(args.ledger), days=args.archive_days, dry_run=args.dry_run)
         mode = "dry-run" if args.dry_run else "archived"
         print(f"archive: {count}건 {mode}")
+        return 0
+
+    if args.backfill_classification:
+        count = backfill_classification(Path(args.ledger), dry_run=args.dry_run)
+        mode = "dry-run" if args.dry_run else "backfilled"
+        print(f"backfill: {count}건 {mode}")
         return 0
 
     if args.auto_resolve:
