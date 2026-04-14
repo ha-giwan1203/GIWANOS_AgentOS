@@ -3,12 +3,13 @@
 > 이 파일은 토론모드 하위 도메인의 재개 위치와 운영 메모만 관리한다.
 > 저장소 전체 상태 원본은 `90_공통기준/업무관리/TASKS.md`이며, 전역 판정은 업무관리 문서 우선순위를 따른다.
 
-최종 업데이트: 2026-04-13 — 세션36 GPT 전송 스킬 실사용 PASS + 토론 2턴 정상 완료
+최종 업데이트: 2026-04-15 — 세션48 debate-mode 브라우저 조작 근본 분리 + deny-path 런타임 확장
 
-## 현재 상태: 운영 중 (v2.8)
+## 현재 상태: 운영 중 (v2.9)
 
-- CLAUDE.md: 코어 규칙 정리 완료 (selector/하네스/금지사항)
-- SKILL.md: v2.6 — Step 4a(종료판정)/4b(critic-reviewer) 분리
+- CLAUDE.md: 실행 루프 gpt-send/gpt-read 위임 구조로 변경 (세션48)
+- SKILL.md: v2.9 — Step 1 Chrome MCP 직접 조작 제거, gpt-send/gpt-read 전면 위임 (세션48)
+- ENTRY.md: NEVER 11 추가 — debate-mode 안 Chrome MCP 직접 호출 금지 (세션48)
 - REFERENCE.md: 기술 상세 분리 완료 (JS 코드, fallback 체인, 오류 대응)
 - Selector smoke test: idle composer 상태(`composer-speech-button`) 허용, 전송 직전 submit button 재확인
 - REFERENCE.md 통합 JS: `[data-testid="send-button"], #composer-submit-button` fallback으로 실전 selector와 일치
@@ -39,3 +40,5 @@
 - 2026-04-10: `debate_room_detect.py` 신규 (이후 세션32에서 CDP 폐기, JS URL 추출로 대체)
 - 2026-04-13: 세션32 CDP 전체 폐기 → Chrome MCP 단일화. javascript_tool + insertText 확정
 - 2026-04-13: 세션34 /gpt-send, /gpt-read 명령 추가. 토론모드 문서 4개 입력방식 일괄 수정
+- 2026-04-15: 세션47 navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신
+- 2026-04-15: 세션48 debate-mode 브라우저 조작 근본 분리 (SKILL.md/ENTRY.md/CLAUDE.md). navigate_gate smoke_test 6건 + evidence_gate 런타임 deny 3건 + completion_gate 부분 런타임 1건. smoke_test 162/162 ALL PASS. GPT 재평가 9.4점

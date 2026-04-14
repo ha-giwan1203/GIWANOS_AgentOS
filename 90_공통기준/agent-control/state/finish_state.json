@@ -1,9 +1,9 @@
 {
   "terminal_state": "in_progress",
-  "committed_pushed": true,
-  "gpt_shared": true,
-  "gpt_judgment": "부분반영 → 수정 후 해소",
-  "user_reported": true,
+  "committed_pushed": false,
+  "gpt_shared": false,
+  "gpt_judgment": null,
+  "user_reported": false,
   "followup_checked": false,
   "exception_reason": null
 }
