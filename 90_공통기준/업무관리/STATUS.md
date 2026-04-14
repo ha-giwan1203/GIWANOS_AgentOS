@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-14 — 세션46 (GPT 합의 코드 품질 개선 + 토론모드 hook 강제 + 세션 드리프트 감지)
+최종 업데이트: 2026-04-15 — 세션47 (navigate_gate 훅 + 미등록 스킬 12개 등록 + 토론모드 지침 갱신)
 
 ---
 
@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 26개 등록 + `json_helper.py` + `incident_repair.py` + `incident_review.py` + `record_incident.py` 보조. 세션46: commit_gate 함수화(build_fingerprint/should_suppress_incident), 상태문서 동봉 강제, 토론모드 절차 강제 hook 3종(debate_gate/debate_send_gate_mark/debate_independent_gate), deny-path 테스트 확대, final_check 세션번호 비교. smoke_test 152/152 ALL PASS. GPT 평가 8.1→9.1 |
+| hooks 체계 | 27개 등록(navigate_gate 추가) + 스킬 26개(commands 12개 신규 등록). 세션47: navigate_gate(ChatGPT 진입 시 CLAUDE.md 읽기 강제), risk_profile_prompt systemMessage 주입, debate-mode 스킬 필수 진입 명시, 토론모드 지침 갱신(gpt-send/gpt-read 위임). GPT 평가 9.2 유지 |
 
 ---
 
