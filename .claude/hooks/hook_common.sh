@@ -281,7 +281,19 @@ hook_incident() {
 # incident_ledger와 분리하여 1회 실패 노이즈 방지.
 # 연속 실패 시에만 incident로 승격.
 
-TASK_RESULTS_LOG="$PROJECT_ROOT/.claude/logs/task_results.jsonl"
+# task_results 로그 경로: hook_config.json > 기본값
+_task_log_path=""
+if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
+  _task_log_path=$(python3 -c "
+import json
+try:
+  c=json.load(open('$PROJECT_ROOT/.claude/hook_config.json'))
+  print(c.get('task_escalation',{}).get('log_path',''))
+except: pass
+" 2>/dev/null)
+fi
+TASK_RESULTS_LOG="${_task_log_path:+$PROJECT_ROOT/$_task_log_path}"
+TASK_RESULTS_LOG="${TASK_RESULTS_LOG:-$PROJECT_ROOT/.claude/logs/task_results.jsonl}"
 
 # hook_task_result "task_id" "success|fail|partial" "detail" [duration_ms]
 hook_task_result() {

@@ -110,7 +110,7 @@ def aggregate_frequency(
     min_count: int = 5,
     include_resolved: bool = False,
 ) -> list[dict[str, Any]]:
-    """N일간 incident 빈도 집계. classification_reason 기준, 없으면 hook fallback."""
+    """N일간 incident 빈도 집계. classification_reason 기준, 없으면 분류누락 버킷으로 집계."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     freq: dict[str, dict] = defaultdict(lambda: {"count": 0, "hooks": set(), "first_ts": None, "last_ts": None})
 
@@ -179,7 +179,7 @@ def format_report(
             combined.append({**c, "hooks": c["hooks"], **r})
         return json.dumps(combined, ensure_ascii=False, indent=2)
 
-    lines = [f"=== Incident Review (최��� {days}일, 임계치 {threshold}건) ===", ""]
+    lines = [f"=== Incident Review (최근 {days}일, 임계치 {threshold}건) ===", ""]
     if not clusters:
         lines.append("임계치 초과 항목 없음.")
         return "\n".join(lines)
