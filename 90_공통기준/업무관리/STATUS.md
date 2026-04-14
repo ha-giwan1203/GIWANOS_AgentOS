@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-15 — 세션48 (debate-mode 브라우저 조작 근본 분리 + navigate_gate/evidence_gate 런타임 테스트 확장)
+최종 업데이트: 2026-04-15 — 세션49 (self-audit GPT 교차검증: README 4게이트 추가 + req clear 규칙 구현 + harness_gate 키워드 정렬)
 
 ---
 
