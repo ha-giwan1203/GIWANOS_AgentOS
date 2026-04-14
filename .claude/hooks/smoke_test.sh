@@ -525,8 +525,8 @@ echo ""
 
 # === 30. README 훅 개수 정합성 ===
 echo "--- 30. README 훅 개수 ---"
-grep -q '23개' "$HOOKS_DIR/README.md"
-check $? "README: 23개 훅 표기 (self-audit P2 드리프트 수정 반영)"
+grep -q '27개' "$HOOKS_DIR/README.md"
+check $? "README: 27개 훅 표기 (세션49 4게이트 추가 반영)"
 
 grep -q '실패 계약' "$HOOKS_DIR/README.md"
 check $? "README: 실패 계약 (Failure Contract) 표 존재"

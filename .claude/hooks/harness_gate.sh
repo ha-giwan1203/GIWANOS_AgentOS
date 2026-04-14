@@ -92,7 +92,7 @@ if echo "$RECENT" | grep -qE '(보류:|버림:)'; then
   HAS_HOLD_OR_DISCARD="YES"
 fi
 
-if echo "$RECENT" | grep -qE '(반론|대안|내 판단|환경상|독립 대조|독립 의견|이견|내 입장)'; then
+if echo "$RECENT" | grep -qE '(반론|대안|내 판단|환경상|독립 대조|독립 의견|독립 견해|이견|내 입장)'; then
   HAS_INDEPENDENT="YES"
 fi
 

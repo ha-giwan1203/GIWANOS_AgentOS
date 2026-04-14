@@ -27,6 +27,12 @@ REQS=""
 
 touch_req() {
   local name="$1"
+  # GPT 합의 세션49 req clear 규칙 2: 대응 ok 존재 시 req 재발행 억제
+  # 동일 핑거프린트 반복 차단(bb52c08) 근본 해결
+  if [ -f "$PROOF_DIR/$name.ok" ] && [ "$PROOF_DIR/$name.ok" -nt "$START_FILE" ]; then
+    hook_log "UserPromptSubmit" "req_suppress=$name (fresh ok exists)"
+    return 0
+  fi
   : > "$REQ_DIR/$name.req"
   REQS="${REQS}${REQS:+,}$name"
 }
