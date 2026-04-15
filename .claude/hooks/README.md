@@ -3,7 +3,7 @@
 > 2026-04-15 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (27개 스크립트, settings.local.json 등록)
+## 활성 Hook (28개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 
@@ -35,7 +35,7 @@
 | ⑥ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
 | ⑦ | `mcp_send_gate.sh` | mcp__Claude_in_Chrome__form_input | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
 | ⑧ | `harness_gate.sh` | Bash | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
-| ⑨ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 (deny+exit 2) |
+| ⑨ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 |
 | ⑩ | `debate_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
 | ⑪ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
 | ⑫ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
@@ -84,9 +84,9 @@
 | `date_scope_guard.sh` | fail-open | deny JSON | 날짜 파싱 실패 시 통과 |
 | `evidence_gate.sh` | fail-open | deny JSON | req 없으면 전체 통과 |
 | `protect_files.sh` | fail-open | deny JSON | 파싱 실패 시 통과 |
-| `mcp_send_gate.sh` | fail-open | block JSON | debate_preflight 없으면 통과 |
-| `harness_gate.sh` | fail-closed | block JSON | transcript 미확인 시 안전 차단 |
-| `instruction_read_gate.sh` | fail-closed | deny JSON | 마커 없으면 GPT 전송 차단 |
+| `mcp_send_gate.sh` | fail-open | deny JSON | debate_preflight 없으면 통과 |
+| `harness_gate.sh` | fail-closed | deny JSON | transcript 미확인 시 안전 차단 |
+| `instruction_read_gate.sh` | fail-closed | deny JSON | 마커 없으면 GPT 전송 차단 (decision:deny+exit 0) |
 | `state_rebind_check.sh` | detect-only | 없음 | 불일치 로깅만 |
 | `auto_compile.sh` | fail-open | message JSON | 컴파일 실패만 보고 |
 | `write_marker.sh` | fail-open | 없음 | 마커 생성 실패해도 통과 |
@@ -95,10 +95,10 @@
 | `handoff_archive.sh` | fail-open | 없음 | 아카이브 실패해도 통과 |
 | `notify_slack.sh` | fail-open | 없음 | 알림 실패해도 통과 |
 | `post_commit_notify.sh` | fail-open | 없음 | push 알림 실패해도 통과 (async) |
-| `stop_guard.sh` | fail-open | block JSON | 트랜스크립트 미존재 시 통과 |
-| `gpt_followup_stop.sh` | fail-open | block JSON | 플래그 미존재 시 통과 |
-| `completion_gate.sh` | fail-open | block JSON | 마커 미존재 시 통과 |
-| `evidence_stop_guard.sh` | fail-open | block JSON | req 미존재 시 통과 |
+| `stop_guard.sh` | fail-open | deny JSON | 트랜스크립트 미존재 시 통과 |
+| `gpt_followup_stop.sh` | fail-open | deny JSON | 플래그 미존재 시 통과 |
+| `completion_gate.sh` | fail-open | deny JSON | 마커 미존재 시 통과 |
+| `evidence_stop_guard.sh` | fail-open | deny JSON | req 미존재 시 통과 |
 | `debate_gate.sh` | fail-closed | deny JSON | 마커 미존재·파싱 실패 시 안전 차단 |
 | `debate_independent_gate.sh` | fail-closed | deny JSON | 독립견해 마커 미존재 시 전송 차단 |
 | `navigate_gate.sh` | conditional fail-closed | deny JSON | debate_mode 활성 시 fail-closed, 그 외 fail-open |

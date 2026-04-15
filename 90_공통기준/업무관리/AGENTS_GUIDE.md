@@ -75,7 +75,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 | `state_rebind_check.sh` | 상태 바인딩 정합성 검사 |
 | `mcp_send_gate.sh` | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
 | `harness_gate.sh` | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
-| `instruction_read_gate.sh` | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 (deny+exit 2) |
+| `instruction_read_gate.sh` | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 |
 | `debate_gate.sh` | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
 | `debate_independent_gate.sh` | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
 | `navigate_gate.sh` | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
