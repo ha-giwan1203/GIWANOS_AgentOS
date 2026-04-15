@@ -41,18 +41,21 @@ while IFS='|' read -r _ layer script matcher role _; do
     echo "| $layer | $script | $matcher | $role |" >> /tmp/hooks_table.tmp
 done < <(sed -n '/^## 활성 Hook/,/^## /p' "$README" | grep '^\|' | grep -v '^\|.*층.*\|.*스크립트' | grep -v '^\|.*---')
 
-# 더 단순한 접근: README에서 직접 활성 훅 표 추출
+# README에서 활성 훅 행 추출: .sh 포함 행에서 스크립트명+역할 추출
 HOOKS_ROWS=""
 IN_SECTION=0
 while IFS= read -r line; do
-  if echo "$line" | grep -q "^### 이벤트층"; then IN_SECTION=1; continue; fi
+  if echo "$line" | grep -qE "^### (이벤트층|프롬프트층|차단층|추적층|알림층|종료층)"; then IN_SECTION=1; continue; fi
   if [ "$IN_SECTION" -eq 1 ]; then
-    if echo "$line" | grep -qE '^\| .+\.sh'; then
-      HOOKS_ROWS="${HOOKS_ROWS}${line}
+    if echo "$line" | grep -qE '`[a-z_]+\.sh`'; then
+      # 테이블 행에서 스크립트명과 역할 추출
+      SCRIPT_NAME=$(echo "$line" | grep -oE '`[a-z_]+\.sh`' | head -1)
+      ROLE=$(echo "$line" | awk -F'|' '{print $NF}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      [ -z "$ROLE" ] && ROLE=$(echo "$line" | awk -F'|' '{print $(NF-1)}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      [ -n "$SCRIPT_NAME" ] && HOOKS_ROWS="${HOOKS_ROWS}| ${SCRIPT_NAME} | ${ROLE} |
 "
     fi
-    # 참조/보조 섹션 도달 시 중단
-    if echo "$line" | grep -q "^## 보조 스크립트\|^## req clear\|^## 훅별 실패\|^## 참조"; then
+    if echo "$line" | grep -qE "^## (보조 스크립트|req clear|훅별 실패|참조)"; then
       IN_SECTION=0
     fi
   fi
@@ -60,11 +63,15 @@ done < "$README"
 
 rm -f /tmp/hooks_table.tmp
 
-# README 표에서 층 정보가 없으므로 간단하게 스크립트+역할만 추출
+# README의 각 층별 표에서 .sh 행 추출 + 층 라벨 부착
 HOOKS_BLOCK="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.local.json 기준)
 
 > 상세: \`.claude/hooks/README.md\` 참조. 아카이브: \`.claude/hooks/_archive/\`
-> 이 섹션은 \`generate_agents_guide.sh\`가 자동 갱신. 수동 편집 시 덮어쓰기됨."
+> 이 섹션은 \`generate_agents_guide.sh\`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
+
+| 스크립트 | 역할 |
+|---------|------|
+${HOOKS_ROWS}"
 
 # --- skills 목록 생성 ---
 SKILL_ROWS=""

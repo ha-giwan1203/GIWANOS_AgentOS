@@ -39,6 +39,7 @@
 | ⑩ | `debate_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
 | ⑪ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
 | ⑫ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
+| ⑬ | `skill_instruction_gate.sh` | Bash | 인라인 python MES/ZDM 접근 시 SKILL.md 읽기 강제 |
 
 ### 추적층 (PostToolUse)
 

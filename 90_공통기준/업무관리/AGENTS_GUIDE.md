@@ -62,6 +62,38 @@ Claude-GPT 공동작업 + 운영 원칙.
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
 
+| 스크립트 | 역할 |
+|---------|------|
+| `session_start_restore.sh` | 세션 시작 시 이전 상태 복원 (compact 저장 → 복원) |
+| `precompact_save.sh` | 컨텍스트 압축 직전 핵심 상태 저장 |
+| `risk_profile_prompt.sh` | 프롬프트 위험 키워드 감지 → .req 파일 생성 |
+| `block_dangerous.sh` | 극단 파괴 명령 + 보호 경로 삭제/이동 차단 |
+| `commit_gate.sh` | git commit/push 전 final_check 강제 (--fast/--full 자동 판정) |
+| `date_scope_guard.sh` | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
+| `evidence_gate.sh` | req있고 ok없으면 위험 실행 deny |
+| `protect_files.sh` | 원본 엑셀/아카이브/기준정보 수정 차단 |
+| `state_rebind_check.sh` | 상태 바인딩 정합성 검사 |
+| `mcp_send_gate.sh` | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
+| `harness_gate.sh` | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
+| `instruction_read_gate.sh` | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 (deny+exit 2) |
+| `debate_gate.sh` | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
+| `debate_independent_gate.sh` | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
+| `navigate_gate.sh` | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
+| `skill_instruction_gate.sh` | 인라인 python MES/ZDM 접근 시 SKILL.md 읽기 강제 |
+| `auto_compile.sh` | 파일 수정 후 자동 컴파일/변환 |
+| `write_marker.sh` | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
+| `evidence_mark_read.sh` | 문서 읽기/갱신 → .ok 증거 마커 적립 |
+| `gpt_followup_post.sh` | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
+| `handoff_archive.sh` | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |
+| `debate_send_gate_mark.sh` | 토론모드 활성 시 GPT 응답 읽기 후 send_gate 마커 갱신 |
+| `notify_slack.sh` | Slack 채널 알림 발송 |
+| `post_commit_notify.sh` | git push 성공 시 Slack 자동 알림 발송 |
+| `stop_guard.sh` | 금지 문구 포함 시 Stop 차단 |
+| `gpt_followup_stop.sh` | GPT pending flag 존재 시 Stop 차단 |
+| `completion_gate.sh` | TASKS/HANDOFF 미갱신 시 Stop 차단 |
+| `evidence_stop_guard.sh` | 증거 없는 실패/완료 결론 차단 |
+
+
 <!-- AUTO_HOOKS_END -->
 
 ### Commands (.claude/commands/)
