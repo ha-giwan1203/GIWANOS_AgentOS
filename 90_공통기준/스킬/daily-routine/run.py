@@ -305,9 +305,19 @@ def run_mes(today):
                 continue
 
             bi_qty = sum(int(r["COL15"]) for r in items if r.get("COL15", "").isdigit())
-            v = mes_upload_and_verify(s, items, t)
+            v = None
+            for attempt in range(1, 4):
+                v = mes_upload_and_verify(s, items, t)
+                if v is not None:
+                    break
+                print(f"    {t}: 시도 {attempt}/3 실패 — 재로그인 후 재시도")
+                time.sleep(2)
+                s = mes_login()
+                if not s:
+                    print(f"  {t}: FAIL 재로그인 실패")
+                    break
             if v is None:
-                print(f"  {t}: FAIL 업로드 실패")
+                print(f"  {t}: FAIL 업로드 3회 실패")
                 has_fail = True
                 continue
 

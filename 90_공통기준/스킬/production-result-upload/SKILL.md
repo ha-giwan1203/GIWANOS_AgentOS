@@ -7,7 +7,7 @@ description: >
   BI 엑셀 파일에서 지정 날짜 데이터를 추출하여 MES SaveExcelData.do API로 직접 POST한다.
   기존 수동 업로드(엑셀 다운 → MES 팝업 → 파일 선택 → 저장) 프로세스를 완전 자동화.
 grade: A
-last_updated: 2026-04-13
+last_updated: 2026-04-15
 note: 통합 스킬 daily-routine/run.py에 포함됨. 단독 실행도 가능 (run.py)
 ---
 
@@ -26,9 +26,8 @@ BI 엑셀 파일에서 데이터를 읽어 MES API로 직접 POST하므로,
 - **최대 처리 범위**: 한 달치 (31일)
 
 ## 실행 전 확인사항
-- CDP 브라우저(`--remote-debugging-port=9222`, 프로필 `.flow-chrome-debug`)가 실행 중이거나 자동 실행 가능해야 함
-- MES 세션 만료 시 자동 로그인 절차(아래 참조) 수행
 - Z드라이브(`Z:\★ 라인별 생산실적\`)에 접근 가능해야 함
+- MES OAuth 로그인 가능해야 함 (직접 HTTP 방식, CDP/Playwright 불필요)
 
 ## MES 자동 로그인 (세션 만료 시)
 
@@ -129,9 +128,10 @@ else:
 - 이미 최신이면 스킵
 
 ## 네트워크 제약사항
-- CDP 브라우저의 MES 세션을 활용하여 iframe jQuery로 API 호출
-- Playwright `connect_over_cdp('http://localhost:9222')` → `page.evaluate()` 방식
-- **운영 표준: iframe 내부 jQuery $.ajax 사용** (fetch/requests 직접 호출은 500 에러 발생 — 실증 확인됨)
+- **운영 표준: 직접 HTTP OAuth 로그인 + requests.post()** (세션46 확정, CDP/Playwright 폐기)
+- OAuth SSO → auth-dev 로그인 → XSRF-TOKEN 헤더 설정 → SaveExcelData.do POST
+- 간헐 500 발생 시 최대 3회 재시도 (새 세션으로 재로그인)
+- ~~iframe jQuery 방식~~: 폐기됨 (CDP 브라우저 의존성 제거)
 
 ## 안전 원칙
 - **기존 데이터 절대 수정/삭제 안 함** — 신규 날짜만 INSERT

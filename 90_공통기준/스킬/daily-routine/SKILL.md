@@ -6,7 +6,7 @@ description: >
 grade: A
 version: 1.0
 author: 하지완
-last_updated: 2026-04-13
+last_updated: 2026-04-15
 status: active
 ---
 
@@ -31,7 +31,7 @@ status: active
 | 순서 | 업무 | 방식 | 시스템 |
 |------|------|------|--------|
 | 1 | ZDM 일상점검 | API 직호출 (requests) | ax.samsong.com:34010 |
-| 2 | MES 생산실적 업로드 | CDP iframe jQuery | mes-dev.samsong.com:19200 |
+| 2 | MES 생산실적 업로드 | 직접 HTTP OAuth + 3회 재시도 | mes-dev.samsong.com:19200 |
 
 ## 실행 방법
 
@@ -57,12 +57,10 @@ python3 "C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-rout
 
 ### 2단계: MES 생산실적 업로드
 1. BI 파일 갱신 (Z드라이브 -> 로컬)
-2. CDP 브라우저 연결 (미실행 시 자동 시작)
-3. MES 로그인 확인 (auth-dev면 pyautogui 자동 로그인)
-4. iframe 로드 + jQuery 확인
-5. MES 기등록 날짜 조회 -> 누락일 산출 (일요일 제외)
-6. 누락일별: BI 추출 -> 품질검증 -> 업로드 -> 건수+합계 검증
-7. CDP 브라우저 종료
+2. 직접 HTTP OAuth 로그인 (CDP/Playwright 불필요)
+3. MES 기등록 날짜 조회 -> 누락일 산출 (일요일 제외)
+4. 누락일별: BI 추출 -> 품질검증 -> 업로드 -> 건수+합계 검증
+5. 업로드 실패 시 최대 3회 재시도 (새 세션 재로그인)
 
 ## 입력
 - 없음 (자동 실행, 날짜 자동 계산)
@@ -106,9 +104,9 @@ python3 "C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-rout
 | MES 수동 삭제 | MES 화면에서 직접 삭제 |
 
 ## 의존성
-- Python: requests, openpyxl, playwright, pyautogui
-- CDP 브라우저: Chrome `--remote-debugging-port=9222`
+- Python: requests, openpyxl
 - 네트워크: ZDM 서버, MES 서버, Z드라이브
+- ~~playwright, pyautogui, CDP 브라우저~~: 폐기됨 (직접 HTTP 전환)
 
 ## 관련 스킬 (개별)
 - `zdm-daily-inspection/` - ZDM 단독 실행 시
