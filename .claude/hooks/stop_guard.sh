@@ -35,7 +35,7 @@ for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
   if echo "$LAST_TEXT" | grep -q "$pattern"; then
     hook_log "Stop/stop_guard" "BLOCK: forbidden_phrase | $pattern" 2>/dev/null
     hook_incident "hook_block" "stop_guard" "" "금지 문구: $pattern" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
-    echo '{"decision":"block","reason":"[Stop Guard] 금지 문구 감지: '"$pattern"'. 사용자에게 중간 승인을 요청하지 마라. 합의 후 바로 실행하고 결과만 보고해라."}'
+    echo '{"decision":"deny","reason":"[Stop Guard] 금지 문구 감지: '"$pattern"'. 사용자에게 중간 승인을 요청하지 마라. 합의 후 바로 실행하고 결과만 보고해라."}'
     exit 2
   fi
 done
@@ -52,7 +52,7 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
   if [ "$HAS_DISCARD" -eq 0 ]; then
     hook_log "Stop/stop_guard" "BLOCK: missing_bucket | 보류+버림 0건" 2>/dev/null
     hook_incident "hook_block" "stop_guard" "" "토론모드 보류+버림 0건" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
-    echo '{"decision":"block","reason":"[Stop Guard] 토론모드에서 보류/버림이 0건. GPT 프레임을 그대로 수용한 것으로 판단. 주장 분해 → 라벨링 → 채택/보류/버림을 다시 수행하라."}'
+    echo '{"decision":"deny","reason":"[Stop Guard] 토론모드에서 보류/버림이 0건. GPT 프레임을 그대로 수용한 것으로 판단. 주장 분해 → 라벨링 → 채택/보류/버림을 다시 수행하라."}'
     exit 2
   fi
 fi
@@ -66,7 +66,7 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
     if ! echo "$LAST_TEXT" | grep -qE '(커밋|푸시|SHA|diff|PASS|FAIL|검증 결과|판정 요청|수정 완료)'; then
       hook_log "Stop/stop_guard" "BLOCK: debate_quality_backstop | 독립 견해 0건" 2>/dev/null
       hook_incident "hook_block" "stop_guard" "" "백스톱: 독립 견해 0건" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
-      echo '{"decision":"block","reason":"[Stop Guard 백스톱] 토론 응답에 독립 견해(반론/대안/내 판단)가 없습니다. GPT 프레임에 끌려가지 말고 독립 판단을 포함하세요."}'
+      echo '{"decision":"deny","reason":"[Stop Guard 백스톱] 토론 응답에 독립 견해(반론/대안/내 판단)가 없습니다. GPT 프레임에 끌려가지 말고 독립 판단을 포함하세요."}'
       exit 2
     fi
   fi

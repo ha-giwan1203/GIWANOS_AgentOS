@@ -837,9 +837,9 @@ _cg_marker_backup=""
 mkdir -p "$(dirname "$_cg_marker")" 2>/dev/null
 echo '{"created":"2099-01-01T00:00:00"}' > "$_cg_marker"
 # completion_gate는 is_completion_claim 먼저 체크 → transcript 없으면 통과해서 deny까지 안 감
-# 그래서 여기서는 grep으로 block 경로의 JSON 구조만 확인
-grep -q 'decision.*block' "$_cg_script" 2>/dev/null
-check $? "completion_gate: write_marker deny 경로 block JSON 구조 확인 (부분)"
+# 그래서 여기서는 grep으로 deny 경로의 JSON 구조만 확인
+grep -q 'decision.*deny' "$_cg_script" 2>/dev/null
+check $? "completion_gate: write_marker deny 경로 deny JSON 구조 확인 (부분)"
 
 # 복원
 if [ -n "$_cg_marker_backup" ]; then
@@ -870,42 +870,77 @@ _ng_exit=$?
 [ "$_ng_exit" = "0" ] && ! echo "$_ng_result" | grep -q '"decision":"deny"' 2>/dev/null
 check $? "navigate_gate: 비-chatgpt URL → 통과"
 
-# 45-4: chatgpt URL + debate 도메인 활성 + 마커 없음 → deny (핵심 런타임 테스트)
+# 45-4: chatgpt URL + 마커 없음 → deny (도메인 무관 — 세션51 수정)
 # 상태 백업
-_ng_domain_req="$PROJECT_DIR/.claude/state/active_domain.req"
 _ng_marker_dir="$PROJECT_DIR/.claude/state/instruction_reads"
 _ng_marker="$_ng_marker_dir/debate_claude_read.ok"
-_ng_domain_backup=""
 _ng_marker_backup=""
-[ -f "$_ng_domain_req" ] && _ng_domain_backup=$(cat "$_ng_domain_req")
 [ -f "$_ng_marker" ] && _ng_marker_backup=$(cat "$_ng_marker")
 
-# 조건 조성: debate 도메인 활성 + 마커 제거
-mkdir -p "$(dirname "$_ng_domain_req")" 2>/dev/null
-echo "domain_id=debate_mode" > "$_ng_domain_req"
+# 조건 조성: 마커 제거
 rm -f "$_ng_marker" 2>/dev/null
 
 _ng_deny_result=$(echo '{"tool_input":{"url":"https://chatgpt.com/g/g-p-test/project"}}' | bash "$_NG_SCRIPT" 2>/dev/null)
 echo "$_ng_deny_result" | grep -q '"decision":"deny"' 2>/dev/null
-check $? "navigate_gate: chatgpt+debate+마커없음 → deny"
+check $? "navigate_gate: chatgpt+마커없음 → deny (도메인 무관)"
 
-# 45-5: chatgpt URL + debate 도메인 비활성 → exit 0 (통과)
-echo "domain_id=other" > "$_ng_domain_req"
+# 45-5: chatgpt URL + 마커 있음 → 통과
+mkdir -p "$_ng_marker_dir" 2>/dev/null
+: > "$_ng_marker"
 _ng_pass_result=$(echo '{"tool_input":{"url":"https://chatgpt.com/g/g-p-test/project"}}' | bash "$_NG_SCRIPT" 2>/dev/null)
 _ng_pass_exit=$?
 [ "$_ng_pass_exit" = "0" ] && ! echo "$_ng_pass_result" | grep -q '"decision":"deny"' 2>/dev/null
-check $? "navigate_gate: chatgpt+debate비활성 → 통과"
+check $? "navigate_gate: chatgpt+마커있음 → 통과"
 
 # 상태 복원
-if [ -n "$_ng_domain_backup" ]; then
-  echo "$_ng_domain_backup" > "$_ng_domain_req"
-else
-  rm -f "$_ng_domain_req" 2>/dev/null
-fi
 if [ -n "$_ng_marker_backup" ]; then
   mkdir -p "$_ng_marker_dir" 2>/dev/null
   echo "$_ng_marker_backup" > "$_ng_marker"
+else
+  rm -f "$_ng_marker" 2>/dev/null
 fi
+
+echo ""
+
+# === 46. 세션51 합의 런타임 테스트 (deny 포맷 통일 + 셀렉터 검증) ===
+echo "--- 46. 세션51 합의 런타임 테스트 ---"
+
+# 46-1: skill_instruction_gate — MES 접근 + 마커 없음 → deny (stdout JSON, exit 0)
+_sig_script="$HOOKS_DIR/skill_instruction_gate.sh"
+_sig_sk=$(source "$HOOKS_DIR/hook_common.sh" 2>/dev/null; session_key)
+_sig_proof_dir="$PROJECT_DIR/.claude/state/evidence/$_sig_sk/proofs"
+_sig_marker_1="$_sig_proof_dir/skill_read__daily-routine.ok"
+_sig_marker_2="$_sig_proof_dir/skill_read__production-result-upload.ok"
+_sig_backup_1=""
+_sig_backup_2=""
+[ -f "$_sig_marker_1" ] && _sig_backup_1="1" && mv "$_sig_marker_1" "$_sig_marker_1.bak" 2>/dev/null
+[ -f "$_sig_marker_2" ] && _sig_backup_2="1" && mv "$_sig_marker_2" "$_sig_marker_2.bak" 2>/dev/null
+
+_sig_result=$(echo '{"command":"python3 -c \"import requests; requests.get('"'"'https://mes-dev.samsong.com'"'"')\""}' | bash "$_sig_script" 2>/dev/null)
+_sig_exit=$?
+[ "$_sig_exit" = "0" ] && echo "$_sig_result" | grep -q '"decision":"deny"' 2>/dev/null
+check $? "skill_instruction_gate: MES+마커없음 → deny (표준 포맷, stdout, exit 0)"
+
+# 복원
+[ -n "$_sig_backup_1" ] && mv "$_sig_marker_1.bak" "$_sig_marker_1" 2>/dev/null
+[ -n "$_sig_backup_2" ] && mv "$_sig_marker_2.bak" "$_sig_marker_2" 2>/dev/null
+
+# 46-2: completion_gate — deny 포맷이 decision:deny인지 확인 (grep, 이스케이프 따옴표 대응)
+grep -q 'decision.*deny' "$HOOKS_DIR/completion_gate.sh" 2>/dev/null
+check $? "completion_gate: deny 포맷 통일 확인 (block→deny)"
+
+# 46-3: 전체 훅 deny 포맷 일관성 — hookSpecificOutput 잔재 없음 (smoke_test 자기자신 제외)
+! grep -rl 'hookSpecificOutput' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v 'smoke_test' | grep -v '.bak' | grep -q .
+check $? "전체 훅: hookSpecificOutput 잔재 없음 (표준 포맷 통일)"
+
+# 46-4: 전체 훅 block 잔재 없음 (smoke_test 자기자신 제외)
+! grep -l '"decision":"block"' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v 'smoke_test' | grep -q .
+check $? "전체 훅: decision:block 잔재 없음 (deny 통일)"
+
+# 46-5: gpt-send 셀렉터 — 프로젝트 slug 기반 필터 확인
+_gs_cmd="$PROJECT_DIR/.claude/commands/gpt-send.md"
+grep -q 'split' "$_gs_cmd" 2>/dev/null && grep -q 'base' "$_gs_cmd" 2>/dev/null
+check $? "gpt-send: 프로젝트 slug 기반 셀렉터 확인 (사이드바 오탐 방지)"
 
 echo ""
 
@@ -913,7 +948,7 @@ echo ""
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""
