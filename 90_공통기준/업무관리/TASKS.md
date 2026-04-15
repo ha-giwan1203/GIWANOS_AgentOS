@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션50 (MES 500오류 진단+보정, skill_instruction_gate 훅 신규)
+최종 업데이트: 2026-04-15 — 세션51 (GPT 토론 평가개선: deny 포맷 통일, navigate_gate 우회 수정, smoke_test 런타임 4건)
 
 ---
 
@@ -34,13 +34,21 @@
 - AGENTS_GUIDE에 [분류: 확인 필요]로 임시 등재됨
 - 실운영/실험/도구 분류 사용자 확인 후 확정 필요
 
-**[낮] deny-path 런타임 검증 2차 확장**
-- completion_gate/evidence_gate 실제 조건 조성 후 런타임 deny 테스트 추가
-- safe_json_get 잔존 범위 축소 + 매직넘버 설정화 (장기)
+**[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
+- 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
+- incident_ledger에서 safe_json_get 관련 실패 발생 시 3순위로 승격
 
 ---
 
 ## 최근 완료
+
+### [완료] GPT 토론 평가개선: deny 포맷 통일 + navigate_gate 우회 수정 — 세션51 (2026-04-15)
+- **gpt-send 셀렉터 오탐 수정**: `a[href*="/c/"]` → 프로젝트 slug 기반 필터. 사이드바 일반 채팅 오진입 방지 (29708920)
+- **navigate_gate 도메인 우회 수정**: active_domain.req 없어도 ChatGPT navigate 시 CLAUDE.md 읽기 강제 (e5bef5ef)
+- **훅 deny 포맷 통일**: 7개 훅 — hookSpecificOutput+stderr+exit2 → decision:deny+stdout+exit0, block→deny 용어 통일 (186b42fd)
+- **smoke_test 섹션46 런타임 테스트 5건 추가**: skill_instruction_gate stdin→deny, 전체 훅 잔재 검증, gpt-send 셀렉터 검증
+- **smoke_test 167/167 ALL PASS** (이전 162→+5)
+- GPT 토론 2턴 합의 → 실물 반영 → GPT 정합 판정
 
 ### [완료] MES 500오류 진단·보정 + skill_instruction_gate 훅 신규 — 세션50 (2026-04-15)
 - **MES 스케줄 실행 500 오류 진단**: daily-routine 스케줄 실행 시 4/14 업로드 서버 500 → 수동 재업로드 성공

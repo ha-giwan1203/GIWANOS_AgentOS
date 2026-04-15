@@ -4,25 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-15 KST — 세션50 (MES 500오류 진단+보정, skill_instruction_gate 훅 신규)
+최종 업데이트: 2026-04-15 KST — 세션51 (GPT 토론 평가개선: deny 포맷 통일, navigate_gate 우회 수정, smoke_test 런타임 4건)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-15 세션50)
+## 0. 최신 세션 (2026-04-15 세션51)
 
 ### 이번 세션 완료
-1. **daily-routine 스케줄 실행**: ZDM PASS, MES 4/14 서버 500 FAIL
-2. **MES 4/14 수동 재업로드**: requests.post() 직접 호출로 성공 (간헐적 500 — SKILL.md 기재된 iframe jQuery 방식과 차이)
-3. **SKILL.md 미읽기 지적**: 지침 안 읽고 ad-hoc 진단 → 기등록 확인 누락, MES 필드명 오류
-4. **최근 7일 전수 검증**: 4/13 누락 14건 발견 → 보정 업로드 → 6일 전체 ALL PASS
-5. **skill_instruction_gate.sh 신규**: 인라인 python MES/ZDM 접근 시 SKILL.md 강제 + 업로드 작업순서 검증
-6. **evidence_mark_read.sh 보강**: 스킬별 개별 마커 추가
+1. **gpt-send 셀렉터 오탐 수정**: `a[href*="/c/"]` → 프로젝트 slug 기반 필터로 사이드바 일반 채팅 오진입 방지
+2. **navigate_gate 도메인 우회 수정**: active_domain.req 조건 제거 → ChatGPT navigate 시 항상 CLAUDE.md 읽기 강제
+3. **GPT 토론 2턴**: 평가(8.7/10) 기반 개선 우선순위 합의 — deny 포맷 통일 + fail-closed 재점검 + smoke_test 런타임 + safe_json_get 보류
+4. **훅 deny 포맷 통일**: 7개 훅(skill_instruction_gate, instruction_read_gate, completion_gate, mcp_send_gate, harness_gate, gpt_followup_stop, stop_guard)
+5. **smoke_test 섹션46 신규**: 런타임 테스트 5건 추가, 기존 45 업데이트 → 167/167 ALL PASS
 
 ### 다음 AI 액션
 - req clear 규칙 3개 risk_profile_prompt.sh 구현 (TASKS.md 중간 안건)
 - status_sync.sh 신규 설계 및 구현 (TASKS.md 중간 안건)
-- MES requests.post() 간헐 500 원인 추적 — SKILL.md 기재 iframe jQuery 방식과 직접 HTTP 방식 안정성 비교 필요
+- safe_json_get 파서 교체 — incident 발생 시 승격 (현재 보류)
+
+## 이전 세션 (2026-04-15 세션50)
+
+### 세션50 완료
+1. **daily-routine 스케줄 실행**: ZDM PASS, MES 4/14 서버 500 FAIL
+2. **MES 4/14 수동 재업로드**: requests.post() 직접 호출로 성공
+3. **최근 7일 전수 검증**: 4/13 누락 14건 발견 → 보정 업로드 → 6일 전체 ALL PASS
+4. **skill_instruction_gate.sh 신규**: 인라인 python MES/ZDM 접근 시 SKILL.md 강제
 
 ## 이전 세션 (2026-04-15 세션49)
 
