@@ -168,6 +168,28 @@ else
 fi
 echo ""
 
+# 3.5. AGENTS_GUIDE 인벤토리 드리프트 확인 (세션52 GPT 합의)
+echo "--- 3.5. AGENTS_GUIDE 드리프트 ---"
+GUIDE_FILE="$PROJECT_DIR/90_공통기준/업무관리/AGENTS_GUIDE.md"
+GEN_SCRIPT="$PROJECT_DIR/90_공통기준/업무관리/generate_agents_guide.sh"
+if [ -f "$GUIDE_FILE" ] && [ -f "$GEN_SCRIPT" ]; then
+  GUIDE_HOOK_COUNT=$(grep -oE '[0-9]+개 활성' "$GUIDE_FILE" | head -1 | grep -oE '[0-9]+')
+  GUIDE_SKILL_COUNT=$(grep -oE '[0-9]+개 등록' "$GUIDE_FILE" | head -1 | grep -oE '[0-9]+')
+  if [ -n "$SETTINGS_HOOKS" ] && [ -n "$GUIDE_HOOK_COUNT" ] && [ "$GUIDE_HOOK_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
+    if $FIX_MODE; then
+      echo "  [FIX] generate_agents_guide.sh 실행..."
+      bash "$GEN_SCRIPT" 2>&1 | sed 's/^/    /'
+    else
+      warn "AGENTS_GUIDE hooks($GUIDE_HOOK_COUNT) ≠ settings($SETTINGS_HOOKS) — generate_agents_guide.sh 실행 필요"
+    fi
+  else
+    echo "  [OK] AGENTS_GUIDE hooks 개수 일치 (${GUIDE_HOOK_COUNT:-?}개)"
+  fi
+else
+  echo "  [INFO] AGENTS_GUIDE 또는 generate 스크립트 미존재 — 건너뜀"
+fi
+echo ""
+
 # 4. HANDOFF 계획 vs 실물 교차확인
 echo "--- 4. HANDOFF 계획 vs 실물 교차확인 ---"
 if grep -q 'cp' "$HOOKS_DIR/block_dangerous.sh" 2>/dev/null; then
