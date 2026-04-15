@@ -19,14 +19,10 @@ description: 데이터 처리, 파일 정리, 삭제 금지 대상 규칙
 - 수정 범위 국소적 (한 시트/함수/블록), 구조 불변 (시트명/컬럼/경로/참조체계)
 - 업무 규칙 불변 (산식/단가/판정 로직), 실패 영향 낮음
 
-**Full Lane** (하나라도 해당 시 → candidate 브랜치):
+**Full Lane** (하나라도 해당 시 → 사용자 확인 후 main 커밋):
 - 시트 간 참조/수식 체계/스크립트 로직/컬럼 구조 변경
 - 업로드 양식/외부 인터페이스 영향, 실무 파일의 값/구조/양식 영향
-
-## Candidate 브랜치 규칙
-- Full Lane 작업은 `candidate/{YYYYMMDD}-{주제}` 브랜치에서 작업
-- candidate → main 머지는 GPT 리뷰 또는 사용자 확인 후 수행
-- 자동 강제 없음 — 사용자가 Full Lane 선언 시 Claude가 candidate 브랜치 생성 → 작업 → PR 생성까지 수행
+- 사용자가 명시적으로 브랜치 분리를 요청한 경우에만 별도 브랜치 사용
 
 ## 삭제 금지 대상
 `CLAUDE.md` / `README.md` / `STATUS.md` / `RUNBOOK.md` / `AGENTS_GUIDE.md` /
