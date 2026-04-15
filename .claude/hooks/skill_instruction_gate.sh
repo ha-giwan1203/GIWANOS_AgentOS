@@ -37,8 +37,8 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
     hook_log "skill_instruction_gate" "DENY mes_access_no_skillmd"
     hook_incident "gate_reject" "skill_instruction_gate" "" "MES access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
-    printf '{"hookSpecificOutput":{"permissionDecision":"deny"},"systemMessage":"%s"}' "$MSG" >&2
-    exit 2
+    echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+    exit 0
   fi
 
   # MES 업로드 작업순서: SaveExcelData.do 호출 시 기등록 확인 포함 강제
@@ -48,8 +48,8 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
       hook_log "skill_instruction_gate" "DENY mes_upload_no_precheck"
       hook_incident "gate_reject" "skill_instruction_gate" "" "MES upload without pre-check (selectPrdtRsltByLine.do missing)" \
         "\"classification_reason\":\"evidence_missing\""
-      printf '{"hookSpecificOutput":{"permissionDecision":"deny"},"systemMessage":"%s"}' "$MSG" >&2
-      exit 2
+      echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+      exit 0
     fi
   fi
 fi
@@ -61,8 +61,8 @@ if echo "$COMMAND" | grep -qF 'ax.samsong.com'; then
     hook_log "skill_instruction_gate" "DENY zdm_access_no_skillmd"
     hook_incident "gate_reject" "skill_instruction_gate" "" "ZDM access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
-    printf '{"hookSpecificOutput":{"permissionDecision":"deny"},"systemMessage":"%s"}' "$MSG" >&2
-    exit 2
+    echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+    exit 0
   fi
 fi
 

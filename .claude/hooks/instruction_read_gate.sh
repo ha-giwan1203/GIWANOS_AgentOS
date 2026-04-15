@@ -2,7 +2,7 @@
 # PreToolUse(Bash) — GPT 전송 직전 지침 읽기 강제 게이트
 # share-result / finish 실행 전
 # ENTRY.md + 토론모드 CLAUDE.md 읽기 여부 확인
-# 미읽기 시 deny+exit 2
+# 미읽기 시 deny (표준 포맷: stdout + exit 0)
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 
@@ -71,8 +71,8 @@ if [ -n "$MISSING" ]; then
   MSG="[instruction_read_gate] GPT 전송 차단: 필수 지시문 미읽기.${MISSING_ESCAPED}\\n\\n먼저 위 파일을 Read/Grep으로 읽은 후 다시 시도하세요."
   hook_log "instruction_read_gate" "DENY missing=$(echo "$MISSING" | tr '\n' ',')"
   hook_incident "instruction_read_gate" "instruction_not_read" "GPT 전송 전 필수 지시문 미읽기: $MISSING"
-  printf '{"hookSpecificOutput":{"permissionDecision":"deny"},"systemMessage":"%s"}' "$MSG" >&2
-  exit 2
+  echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+  exit 0
 fi
 
 hook_log "instruction_read_gate" "PASS domain=${ACTIVE_DOMAIN:-legacy} docs confirmed"

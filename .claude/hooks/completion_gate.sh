@@ -37,7 +37,7 @@ if git_has_relevant_changes; then
   _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
   printf '{"ts":"%s","result":"block","reason":"completion_before_git","source":"gate"}\n' "$_CC_TS" \
     >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
-  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
+  echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
   exit 0
 fi
 
@@ -78,7 +78,7 @@ if [ -n "$MISSING" ]; then
   _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
   printf '{"ts":"%s","result":"block","reason":"completion_before_state_sync","missing":"%s","source":"gate"}\n' "$_CC_TS" "$MISSING" \
     >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
-  echo "{\"decision\":\"block\",\"reason\":\"[COMPLETION GATE] 완료 보고 전 ${MISSING} 갱신이 필요합니다. TASKS/HANDOFF/STATUS를 모두 갱신한 뒤 종료하세요.\"}"
+  echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE] 완료 보고 전 ${MISSING} 갱신이 필요합니다. TASKS/HANDOFF/STATUS를 모두 갱신한 뒤 종료하세요.\"}"
 else
   # 정상 통과 시에도 기록
   _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')

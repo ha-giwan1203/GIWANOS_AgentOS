@@ -37,7 +37,7 @@ fi
 
 if [ -n "$MISSING" ]; then
   hook_log "PreToolUse/mcp_send_gate" "BLOCK: 토론모드 지침 미읽기 —$MISSING" 2>/dev/null
-  echo "{\"decision\":\"block\",\"reason\":\"[MCP SEND GATE] 토론모드 지침 미읽기:${MISSING}. 먼저 토론모드 ENTRY.md와 CLAUDE.md를 읽은 후 다시 시도하세요.\"}"
+  echo "{\"decision\":\"deny\",\"reason\":\"[MCP SEND GATE] 토론모드 지침 미읽기:${MISSING}. 먼저 토론모드 ENTRY.md와 CLAUDE.md를 읽은 후 다시 시도하세요.\"}"
   exit 0
 fi
 
