@@ -765,7 +765,7 @@
 - GPT PASS: 7c6798cc
 - 재검증: pathlib 패턴 미차단 발견 → 106d3d45에서 수정, 43/43 + 실동작 13건 PASS
 
-### [진행] 옵션C — bypassPermissions 제거 + 부분 우회 (2026-04-07)
+### ~~[진행] 옵션C — bypassPermissions 제거 + 부분 우회~~ → 완료됨 (2026-04-15)
 - defaultMode: "bypassPermissions" 제거
 - 위험 Bash(python, cp, mv, chmod, taskkill) allow에서 제거 → 승인 필요
 - Write/Edit는 allow 유지 (protect_files.sh hook이 보호)
