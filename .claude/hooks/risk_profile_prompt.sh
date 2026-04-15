@@ -1,6 +1,11 @@
 #!/bin/bash
 # UserPromptSubmit — 현재 사용자 프롬프트 기준 req 생성
 # 주의: 요청마다 req를 재생성한다. 이전 req 누적 금지.
+#
+# req clear 규칙 3조건 (세션49 GPT 합의, 세션52 실물검증→문서화 종결):
+#   조건1(위험 미검출): line 23 find -delete로 매 프롬프트 기존 req 전삭제 → 키워드 미매칭 시 req 미생성
+#   조건2(ok 존재 시 억제): touch_req()에서 fresh .ok 파일 존재 시 req 재발행 억제 (bb52c08 반복 차단)
+#   조건3(작업단계 전환): 매 프롬프트 재생성 구조로 흡수 — 단계 전환 시 새 프롬프트가 기존 req를 자동 교체
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
 

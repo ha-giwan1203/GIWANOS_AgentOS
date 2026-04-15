@@ -103,6 +103,16 @@
 | `navigate_gate.sh` | conditional fail-closed | deny JSON | debate_mode 활성 시 fail-closed, 그 외 fail-open |
 | `debate_send_gate_mark.sh` | fail-open + WARN | 없음 | 마커 생성 실패 시 WARN 로그 후 통과 (debate_gate가 2차 차단) |
 
+## req clear 규칙 (세션49 합의, 세션52 문서화)
+
+> risk_profile_prompt.sh의 req 생명주기 규칙. 코드는 이미 구현됨, 여기는 명시적 문서화.
+
+| 조건 | 동작 | 구현 위치 |
+|------|------|----------|
+| 위험 미검출 | 매 프롬프트마다 기존 `.req` 전삭제 후 키워드 매칭된 것만 재생성 | `find "$REQ_DIR" -delete` (line 23) |
+| ok 존재 시 억제 | `touch_req()`에서 fresh `.ok` 파일 존재 시 req 재발행 억제 | `touch_req()` ok 신선도 검사 (line 28-38) |
+| 작업단계 전환 | 매 프롬프트 재생성 구조로 흡수 — 새 프롬프트가 기존 req 자동 교체 | 전삭제+재생성 구조 자체 |
+
 ## 보조 스크립트 (settings 미등록)
 
 | 스크립트 | 용도 |

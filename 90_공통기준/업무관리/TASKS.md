@@ -10,33 +10,25 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션51 (GPT 토론 평가개선: deny 포맷 통일, navigate_gate 우회 수정, smoke_test 런타임 4건)
+최종 업데이트: 2026-04-15 — 세션52 (GPT 토론 3건 합의: req clear 문서화, status_sync 보류, AGENTS_GUIDE 자동생성)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] req clear 규칙 3개 명시화 (세션49 합의)**
-- GPT 합의: 위험 미검출 / ok 생성 / 작업단계 전환 시 req clear
-- 대상: risk_profile_prompt.sh 코드 + README/RUNBOOK 문서화
-- 동일 핑거프린트 반복 차단(bb52c08fe5cd7cd9) 근본 해결
-
-**[중] status_sync.sh 전용 스크립트 신규 (세션49 합의)**
-- GPT 합의: completion_gate/handoff_archive 혼재 금지 → 전용 스크립트
-- 구현: 전역 업무관리/STATUS.md 마커 블록(<!-- STATUS_SYNC_START -->) 자동 갱신
-- /finish 또는 final_check --fix에서 호출, 도메인 STATUS.md는 opt-in
-
-**[낮] AGENTS_GUIDE 자동생성화 (세션47+ 안건)**
-- settings.local.json + 스킬 폴더 메타데이터 기반 자동 생성 구조로 전환
-- GPT+Claude 합의 세션43: 방향 확정, 구현은 다음 세션
-
-**[낮] supanova-deploy·skill-creator-merged 카테고리 확정**
-- AGENTS_GUIDE에 [분류: 확인 필요]로 임시 등재됨
-- 실운영/실험/도구 분류 사용자 확인 후 확정 필요
-
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
 - incident_ledger에서 safe_json_get 관련 실패 발생 시 3순위로 승격
+
+---
+
+## 최근 완료
+
+### [완료] GPT 토론 3건 합의 + 실행 — 세션52 (2026-04-15)
+- **의제1 req clear 규칙 3개 명시화**: 실물 검증 → 3조건 중 2개 이미 구현, 3번째도 매 프롬프트 재생성으로 흡수 → 코드 변경 불필요, 문서화로 종결 (risk_profile_prompt.sh 주석 + README.md)
+- **의제2 status_sync.sh 전용 스크립트**: GPT 합의 보류 — final_check.sh가 이미 STATUS 드리프트 검사 중, 전용 스크립트 불필요
+- **의제3 AGENTS_GUIDE 자동생성화**: generate_agents_guide.sh 신규 — hooks 28개 + skills 18개 마커 블록 자동갱신. 아키텍처 서술은 수동 유지
+- **supanova-deploy·skill-creator 카테고리**: SKILL.md에 grade A/B 이미 부여, AGENTS_GUIDE 자동생성으로 반영 → 종결
 
 ---
 

@@ -4,24 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-15 KST — 세션51 (GPT 토론 평가개선: deny 포맷 통일, navigate_gate 우회 수정, smoke_test 런타임 4건)
+최종 업데이트: 2026-04-15 KST — 세션52 (GPT 토론 3건 합의: req clear 문서화, status_sync 보류, AGENTS_GUIDE 자동생성)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-15 세션51)
+## 0. 최신 세션 (2026-04-15 세션52)
 
 ### 이번 세션 완료
-1. **gpt-send 셀렉터 오탐 수정**: `a[href*="/c/"]` → 프로젝트 slug 기반 필터로 사이드바 일반 채팅 오진입 방지
-2. **navigate_gate 도메인 우회 수정**: active_domain.req 조건 제거 → ChatGPT navigate 시 항상 CLAUDE.md 읽기 강제
-3. **GPT 토론 2턴**: 평가(8.7/10) 기반 개선 우선순위 합의 — deny 포맷 통일 + fail-closed 재점검 + smoke_test 런타임 + safe_json_get 보류
-4. **훅 deny 포맷 통일**: 7개 훅(skill_instruction_gate, instruction_read_gate, completion_gate, mcp_send_gate, harness_gate, gpt_followup_stop, stop_guard)
-5. **smoke_test 섹션46 신규**: 런타임 테스트 5건 추가, 기존 45 업데이트 → 167/167 ALL PASS
+1. **GPT 토론 1턴 합의 3건**: 채택 3건 / 보류 0건 / 버림 0건
+2. **req clear 규칙 문서화 종결**: risk_profile_prompt.sh 주석 + README.md에 3조건 대응 관계 명시. 코드 변경 불필요 — 이미 구현됨
+3. **status_sync.sh 보류**: final_check.sh가 이미 STATUS 드리프트 검사 중. 전용 스크립트 불필요
+4. **AGENTS_GUIDE 자동생성**: generate_agents_guide.sh 신규 — hooks 28개 + skills 18개 마커 블록 자동갱신. 드리프트(23→28) 해소
+5. **supanova-deploy·skill-creator 카테고리 종결**: SKILL.md grade 이미 부여, 자동생성으로 반영
 
 ### 다음 AI 액션
-- req clear 규칙 3개 risk_profile_prompt.sh 구현 (TASKS.md 중간 안건)
-- status_sync.sh 신규 설계 및 구현 (TASKS.md 중간 안건)
 - safe_json_get 파서 교체 — incident 발생 시 승격 (현재 보류)
+- AGENTS_GUIDE generate_agents_guide.sh를 final_check 또는 /finish에서 자동 호출 연동 검토
+
+## 이전 세션 (2026-04-15 세션51)
+
+### 세션51 완료
+1. **gpt-send 셀렉터 오탐 수정**: `a[href*="/c/"]` → 프로젝트 slug 기반 필터
+2. **navigate_gate 도메인 우회 수정**: active_domain.req 조건 제거
+3. **GPT 토론 2턴**: deny 포맷 통일 + fail-closed 재점검 + smoke_test 런타임 합의
+4. **훅 deny 포맷 통일**: 7개 훅 통일
+5. **smoke_test 167/167 ALL PASS**
 
 ## 이전 세션 (2026-04-15 세션50)
 
