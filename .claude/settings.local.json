@@ -75,7 +75,8 @@
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "mcp__Claude_in_Chrome__navigate",
       "Bash(echo \"1382935546\")",
-      "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")"
+      "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
+      "Bash(python3 \"90_공통기준/업무관리/slack_notify.py\" --message \"[daily-doc-check] STATUS.md 세션 드리프트 감지: TASKS=세션50, STATUS=세션49 — STATUS.md 갱신 필요\")"
     ],
     "ask": [
       "Bash(python*:*)",
