@@ -34,10 +34,6 @@
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
 - 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
 
-**[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
-- 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
-- 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
-
 ---
 
 ## 최근 완료
