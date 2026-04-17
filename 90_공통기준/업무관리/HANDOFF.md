@@ -4,12 +4,86 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-17 KST — 세션56 (notebooklm-mcp 조립비정산 파일럿 + settlement-domain-expert 에이전트 작성)
+최종 업데이트: 2026-04-17 KST — 세션58 (라인배치 파일럿 2단계 완료 + 좀비 Chrome 근본 해결 GPT 토론 합의 + isolated 반영)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-17 세션56)
+## 0. 최신 세션 (2026-04-17 세션58)
+
+### 이번 세션 완료
+1. **라인배치 파일럿 2단계**:
+   - 통합 소스 생성: `10_라인배치/notebooklm_source_라인배치_v1.txt` (8개 문서 병합, 2,674줄·120KB)
+   - 생성 스크립트: `10_라인배치/build_notebooklm_source.py`
+   - NotebookLM 노트북 등록: `라인배치_대원테크` (ff23f265-2211-4722-b5fa-d0cdfae73928)
+   - 에이전트 작성: `.claude/agents/line-batch-domain-expert.md`
+   - `10_라인배치/CLAUDE.md` 에이전트 섹션 추가
+2. **좀비 Chrome 근본 해결 GPT 토론** (debate_20260417_230008):
+   - 옵션 A/B/C/D 중 A 선결 합의
+   - `~/.claude.json`의 notebooklm-mcp env에 `NOTEBOOK_PROFILE_STRATEGY=isolated` 반영 (세션58 실제 수정)
+   - 검증 조건: 프로세스 재기동 3세션 연속 성공 기준 확정
+3. **critic-reviewer WARN 기록**: B 옵션 배제가 하네스 라벨-판정 불일치. Step 5 진행 허용되나 B 재부상 경로 보존 필요
+
+### 미완료 / 이월
+- **3세션 검증 (세션59~61)**: Claude Code 프로세스 재기동 단위로만 가능. 이번 세션에서 실행 불가
+- **라인배치 도메인 정확성 3건 검증**: setup_auth 미수행으로 이월. 세션59(isolated 최초 인증 후) 수행
+- **라인배치 에이전트 호출 실검증**: 세션 재시작 필요. 세션59 수행
+
+### 다음 AI 액션 (세션59)
+1. `mcp__notebooklm-mcp__get_health` → `authenticated` 확인
+   - false면 `setup_auth` 실행 (isolated 신규 프로필 최초 인증 — 1회 허용)
+2. `ask_question` 1세트 수행 → 성공 여부 + exitCode 확인
+3. **세션60 검증 준비**: 세션 종료 시점 기록 (Chrome 프로세스 잔존 수 체크)
+4. 세션60 시작 시: `get_health` → `ask_question` 재인증 없이 성공하는지 확인
+5. 3세션 연속 PASS 시: 합의안 구현 완료 커밋 + GPT 최종 보고
+6. 실패 시: TASKS.md "실패 분기" 표대로 분기 (①→②→③ 순 대응)
+
+### 재접속 체크리스트 (세션59 첫 작업)
+- [ ] `mcp__notebooklm-mcp__get_health` → `authenticated=true` 확인
+- [ ] false면 `setup_auth` 1회 (isolated 최초 인증, 세션59만 허용)
+- [ ] `ask_question` 1건 성공 + `exitCode=21` 미발생 확인
+- [ ] Chrome 프로세스 카운트 기록 (비교용): `powershell -c "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe' AND CommandLine LIKE '%notebooklm-mcp%'\" | Measure-Object | Select -ExpandProperty Count"`
+- [ ] 세션 종료 전에도 카운트 기록 (격리 프로필 종료 정리 여부 확인)
+
+### B 옵션 재부상 경로 (WARN 메모)
+세션58 토론에서 Claude의 R4(병렬 Claude 세션 없는 환경에서 B의 "세션 끊기 위험" 과평가 가능성)가 하네스에 버림으로 기록되지 않고 부분 인정(채택)으로 처리됨. 세션59~61 검증 실패 유형별 분기:
+- ① exitCode=21 재발만 → B(SessionStart hook taskkill) 재평가 우선
+- 후보 명령: `powershell "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe' AND CommandLine LIKE '%notebooklm-mcp%'\" | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }"`
+- 위치 후보: `.claude/settings.json` SessionStart hook
+
+---
+
+## 1. 이전 세션 (2026-04-17 세션57)
+
+### 이번 세션 완료
+1. **파일럿 검증 4/4 PASS**:
+   - ① Agent 호출 PASS (settlement-domain-expert 2회 진입)
+   - ② ask_question MCP 위임 PASS (메인 27.7초, 에이전트 내부 session_id 발급)
+   - ③ 꼬리 문구 필터 PASS (원본 `EXTREMELY IMPORTANT:` 포함 → 에이전트 `[응답]`에서 제거)
+   - ④ 저장소 교차확인 PASS (STATUS.md L81/L84 실제 라인 인용 일치)
+2. **좀비 Chrome Known Issue 해소**: 세션56 setup_auth 후 MCP Chrome 3개(PID 10880/2832/23008) 미정리 상태 발견
+   - 증상: `ask_question` 즉시 실패 `exitCode=21` (lockfile 점유)
+   - 복구: taskkill /F → cleanup_data(preserve_library=true) → setup_auth (157.53초, 쿠키 자동 복구로 사용자 로그인 불필요)
+3. **사용자 질문 해명**: "브라우저 로그인 안 됐는데?" — Chrome 창 미표시는 사실이지만 기존 세션 쿠키 자동 복구로 실제 인증 성공 (library.json 보존 + auth 상태 유지)
+
+### 미완료 / 이월
+- 라인배치 NotebookLM 노트북 파일럿 2단계 (세션58로 이월)
+
+### 다음 AI 액션
+1. **세션 종료 시 MCP Chrome 좀비 정리 루틴 검토** (stop hook 후보):
+   - 후보 명령: `powershell "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { \$_.CommandLine -like '*notebooklm-mcp*' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }"`
+   - 위험: 정상 MCP 세션이 종료 훅으로 끊길 수 있음 → 종료 훅이 아닌 시작 훅에서 확인하는 방향도 고려
+2. **라인배치 파일럿 시작** (세션58):
+   - 10_라인배치/ 하위 CLAUDE.md/STATUS.md/RUNBOOK.md 등 병합
+   - NotebookLM 노트북 생성·업로드 → `add_notebook`
+   - `line-batch-domain-expert` 에이전트 작성 (settlement-domain-expert 템플릿 기반)
+
+### 재접속 체크리스트
+- [ ] `mcp__notebooklm-mcp__get_health` → `authenticated=true`
+- [ ] false 또는 `ask_question` 실패 시: `powershell -c "Get-CimInstance Win32_Process -Filter ""Name='chrome.exe'"" | Where-Object { $_.CommandLine -like '*notebooklm-mcp*' } | Select ProcessId"`로 좀비 식별 → taskkill → setup_auth
+- [ ] 조립비정산 노트북 URL 유효성 (`list_notebooks`)
+
+## 이전 세션 (2026-04-17 세션56)
 
 ### 이번 세션 완료
 1. **notebooklm-mcp 인증**: `setup_auth` 127초 성공

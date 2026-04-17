@@ -1,0 +1,79 @@
+{
+  "session_id": "debate_20260417_230008",
+  "topic": "notebooklm-mcp 좀비 Chrome 근본 해결안 결정",
+  "chat_url": "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e202a2-2c98-83e8-96d4-85e9fe5fd425",
+  "turn_number": 2,
+  "last_reply_hash": "",
+  "turns": [
+    {
+      "turn": 1,
+      "claude": "A/B/C/D 4개 옵션 + 4개 쟁점 제시, 선결 1개 + 검증 조건 1개 요청",
+      "gpt": "선결 A. 조건부 통과. B는 세션 끊기 위험, D는 비용 과다, CLONE_PROFILE 기본값 유지. 검증: 새 세션 3회 연속 성공, exitCode=21 0회",
+      "harness": {
+        "summary_counts": {"채택": 6, "보류": 0, "버림": 0},
+        "채택": [
+          {"item": "A 선택 근거 (공식 설계 축)", "label": "실증됨", "evidence": "NOTEBOOK_PROFILE_STRATEGY isolated는 공식 설계", "ref": "PleasePrompto/notebooklm-mcp/docs/configuration.md"},
+          {"item": "B 배제 (살아있는 세션 끊기 위험)", "label": "일반론", "evidence": "원 의제 쟁점과 동일", "ref": null},
+          {"item": "D 배제 (교체 비용 과다)", "label": "일반론", "evidence": "원 의제 쟁점과 동일", "ref": null},
+          {"item": "CLONE_PROFILE 기본값 유지", "label": "실증됨", "evidence": "이번 의제는 잠금 재발 중단, 쿠키 최적화는 후순위", "ref": null},
+          {"item": "검증 조건 구체화", "label": "실증됨", "evidence": "3세션 연속, exitCode=21 0회", "ref": null},
+          {"item": "C 과잉설계 (A 우선, 실패 시 보완)", "label": "실증됨", "evidence": "GPT: 깨질 때만 B/CLONE_PROFILE 보완", "ref": null}
+        ],
+        "보류": [],
+        "버림": []
+      }
+    },
+    {
+      "turn": 2,
+      "claude": "R1~R4 4개 보강 쟁점 (세션 정의 / setup_auth 허용 / 실패 분기 3갈래 / B 리스크 재검토)",
+      "gpt": "R1 프로세스 재기동 3회, R2 1세션 인증 1회 허용 2·3세션 재인증 없음, R3 3갈래 분기 + ③순서 조정 (CLONE→B→폐기), R4 B는 운영 우회 A 우선",
+      "harness": {
+        "summary_counts": {"채택": 4, "보류": 0, "버림": 0},
+        "채택": [
+          {"item": "R1 세션 정의 = 프로세스 재기동 3회", "label": "실증됨", "evidence": "lockfile은 재기동 경계 이슈", "ref": null},
+          {"item": "R2 1세션 인증 1회 허용 + 2·3세션 재인증 없음", "label": "실증됨", "evidence": "신규 isolated 프로필 최초 인증 불가피", "ref": null},
+          {"item": "R3 3갈래 분기 (③순서 조정: CLONE→B→폐기)", "label": "실증됨", "evidence": "덜 파괴적 옵션부터 적용", "ref": null},
+          {"item": "R4 B는 운영 우회 (부분 인정)", "label": "실증됨", "evidence": "A가 근본 해결, B는 후순위", "ref": null}
+        ],
+        "보류": [],
+        "버림": []
+      }
+    }
+  ],
+  "result": {
+    "summary_counts": {"채택": 10, "보류": 0, "버림": 0},
+    "합의안": {
+      "선결_옵션": "A (NOTEBOOK_PROFILE_STRATEGY=isolated)",
+      "세션_정의": "Claude Code 프로세스 완전 종료·재기동 3회",
+      "통과_기준": [
+        "1세션 setup_auth 1회 허용",
+        "2·3세션 재인증 없이 get_health + ask_question 성공",
+        "exitCode=21 0회"
+      ],
+      "실패_분기": {
+        "①_exitCode=21_재발": "B(SessionStart hook taskkill) 또는 NOTEBOOK_CLEANUP_ON_SHUTDOWN 재검증",
+        "②_재인증_반복": "NOTEBOOK_CLONE_PROFILE=true",
+        "③_둘_다": "CLONE_PROFILE → B → A 폐기 순"
+      }
+    },
+    "미합의_쟁점": [],
+    "즉시_실행안": [
+      "~/.claude.json env에 NOTEBOOK_PROFILE_STRATEGY=isolated 추가",
+      "TASKS·HANDOFF에 세션59~61 검증 조건·분기 등재",
+      "git commit + push → SHA 공유",
+      "GPT 최종 검증 요청",
+      "3세션 검증은 세션59부터 순차 수행"
+    ]
+  },
+  "critic_review": {
+    "판정": "WARN",
+    "사유": "B 배제가 일반론 라벨임에도 채택 처리 — 라벨-판정 불일치. R4(B 위험 재검토) 결과가 하네스에 버림으로 기록되지 않고 부분 인정(채택) 처리. Claude 독립 논거가 세부 확정(R1~R3)에 한정되어 핵심 옵션 선택 프레임은 GPT 턴1 초안에서 변동 없음",
+    "4축": {
+      "독립성": "WARN",
+      "하네스": "WARN",
+      "0건감사": "WARN",
+      "일방성": "WARN"
+    },
+    "Step5_진행조건": "B 옵션 재검토 근거를 TASKS/HANDOFF에 별도 메모로 남겨 세션59 검증 실패 시 B 재부상 경로 보존"
+  }
+}

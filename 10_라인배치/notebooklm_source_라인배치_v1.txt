@@ -1,0 +1,2674 @@
+# NotebookLM 업로드용 통합 소스 — 라인배치 도메인
+
+생성일: 2026-04-17
+원본: 업무리스트 저장소 10_라인배치/ + 90_공통기준/스킬/ 하위 8개 문서
+목적: NotebookLM 단일 소스로 라인 매핑·ERP 셀렉터·재개 규칙 전체 검색 가능하게 함
+
+========================================
+# [1/8] 운영 규칙
+원본경로: 10_라인배치/CLAUDE.md
+========================================
+
+# 라인배치 작업 규칙
+
+## 기본 원칙
+- 기준 파일이 마스터다
+- 접두어 유지 (임의 제거 금지)
+- 컬러코드 비교는 2단계로 수행한다: 1) 직접 일치 비교 2) 모품번 확장 비교
+- 컬러코드 분리 규칙이 불명확하면 사용자 확인 후 적용
+- 애매한 경우 확정하지 않고 판정유보 처리
+
+## ERP 연동 규칙
+- 셀렉터 우선순위: data-* → id → CSS+위치 → 텍스트
+- 셀렉터 실패 시 스크린샷 찍어 사용자 확인
+- 대기 조건은 구체적 완료 조건 + 타임아웃 + 실패 시 행동으로 명시
+- 중단 작업은 마지막 처리 위치를 기록하고 재개
+
+## 대상 라인
+SD9A01(아우터), SP3M3(메인), ANAAS04(앵커), DRAAS11(디링), HASMS02(홀더센스), HCAMS02(홀더CLR), WAMAS01(웨빙ASSY), WABAS01(웨빙스토퍼), WASAS01(웨빙스토퍼2), ISAMS03(이너센스)
+
+## 관련 스킬
+- line-batch-management: 라인배치 입력 자동화
+- line-batch-mainsub: 메인서브 라인배치
+- line-mapping-validator: 라인배정 정합성 검증
+
+## 빈번 조회 데이터
+
+| 항목 | 값 |
+|------|-----|
+| ERP URL | http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do |
+| 라인 수 | 10개 (SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03) |
+| OUTER row0 기본값 | SD9A01 |
+| OUTER 주요 매핑 | WEBBING CUTTING→WABAS01, WEBBING ASSY→WAMAS01, D-RING→DRAAS11, ANCHOR ASSY→ANAAS04, SNAP-ON→ANAAS04, LASER MARKING→LTAAS01 |
+| SUB LINE 없는 품목 | INNER BALL GUIDE ASSY, BASE LOCK ASSY, LOCKING ASSY, VEHICLE SENSOR ASSY, INNER SENSOR ASSY |
+| 동기화 금지 구간 | 매시 x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53 |
+
+## 진행 현황
+세부 재개 위치, 동기화 금지 시간대, 최근 실패 이력은 STATUS.md 참조
+
+========================================
+# [2/8] 진행 상태
+원본경로: 10_라인배치/STATUS.md
+========================================
+
+# 라인배치 진행 현황 (2026-03-31 최신화)
+
+## OUTER 라인 배치
+- 스킬: line-batch-management v9
+- 작업 대상: OUTER 라인, 674행
+- 진행: idx 119~294 완료 (176건)
+- 다음 재개: ~~runOuterLine(295)~~ → **사용자 취소 (2026-03-31)**
+- ERP URL: http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do
+- 탭 ID: 세션별 재확인 필요 (기존 1382924186은 구 세션값, 재접속 시 JS 함수 재주입 필수)
+
+## 동기화 금지 구간
+매시 x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53
+
+## 제어 명령
+- 중지: window._haltAll=true; window._outerInstId=9999;
+- 상태 확인: window.outerStatus()
+- 세션 리셋 시 JS 함수 재주입 필요
+
+## 스킬 패키지 (2026-03-28) — 검증 완료
+- v7→v9 기준 전환 완료 (SNAP-ON 추가, LASER MARKING 키워드 단축)
+- line-batch-management.skill 생성: 90_공통기준/스킬/ (commit a030ac11)
+- v7.md → 98_아카이브/라인배치_스킬문서_v7_archived_20260328.md
+- ZIP 구조: line-batch-management/SKILL.md 확인
+- OUTER_RULES 6건 / 스모크 테스트 5건 ALL PASS
+- ~~다음 재개: runOuterLine(295)~~ — **사용자 취소 (2026-03-31)**
+
+========================================
+# [3/8] 도메인 개요
+원본경로: 10_라인배치/README.md
+========================================
+
+# 10_라인배치
+
+이 폴더는 라인배치 원본, 검증 결과, 운영 규칙을 관리하는 도메인 루트다.
+
+## 현재 내용
+
+- 라인배치 원본 파일
+- 검증 엑셀
+- `CLAUDE.md`
+- `STATUS.md`
+
+## 운영 포인트
+
+- ERP/브라우저 세션 의존 작업이 포함돼 있다.
+- 원본 라인배정 파일과 검증 파일을 함께 봐야 한다.
+
+## 참조
+
+- 운영 규칙: `CLAUDE.md`
+- 현재 상태: `STATUS.md`
+
+========================================
+# [4/8] 라인 매핑 기준 v9
+원본경로: 10_라인배치/라인배치_스킬문서_v9.md
+========================================
+
+---
+name: line-batch-management
+description: >
+  ERP 라인배치 관리 자동화 스킬. 사용자가 "라인배치", "라인배치 입력", "라인배치 관리",
+  "SUB ASSY 배치", "배치 설정", "ERP 배치", "품번 배치", "라인배치 작업", "배치 자동화" 등을
+  언급하면 반드시 이 스킬을 사용할 것. SAMSONG G-ERP 라인배치 관리 화면에서 SP3메인서브
+  생산지시서의 품번을 순차 검색하고, 하단 SUB ASSY 그리드에 품명 규칙에 따라 조립라인을
+  자동 입력 후 저장하는 반복 업무 전체를 자동화한다. 시작 행/진행 위치를 사용자에게
+  확인받고 이어서 처리한다.
+---
+
+# ERP 라인배치 관리 자동화
+
+## 개요
+
+SAMSONG G-ERP 라인배치 관리 화면에서 SP3 생산지시서의 품번을 순차 처리한다.
+각 품번 검색 → 상단 그리드 행 순차 클릭 → 하단 SUB ASSY 품명별 조립라인 입력 → 저장.
+
+**작업 유형:**
+- **메인서브 라인** → `searchAndProcess` / `runQueue` (품번 검색 기반)
+- **OUTER 라인** → `runOuterLine` (리스트업 기반, 검색 없이 상단 그리드 행 순서대로 처리)
+
+---
+
+## 사전 준비
+
+### 필수 정보
+- **ERP URL**: `http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do`
+- **품번 파일**: `/sessions/intelligent-cool-mayer/mnt/업무리스트/SP3메인서브 생산지시서 (2025.03.20).xlsx`
+  - 시트: `SP3 LINE 기준 정보` / C열 = 품번(모품번)
+  - 기준정보 목록은 스킬에 내장되어 있음 (302개, 2026-03-20 기준)
+  - ⚠️ 기준정보 파일 변경 시 "품번 목록 갱신" 절차 실행 후 스킬 재배포
+
+### 시작 위치 확인
+작업 시작 전 사용자에게 반드시 확인:
+- 마지막으로 처리 완료한 품번 / 행번호
+- 이어서 시작할 품번
+
+### 동기화 제한 시간 ⚠️
+**매시 아래 구간에는 ERP 품번 검색 및 저장 절대 금지:**
+
+| 금지 구간 |
+|-----------|
+| x0:10 ~ x0:13 |
+| x0:20 ~ x0:23 |
+| x0:30 ~ x0:33 |
+| x0:40 ~ x0:43 |
+| x0:50 ~ x0:53 |
+
+검색 및 저장 직전 항상 시간 확인 후, 제한 구간이면 x0:14 / x0:24 / x0:34 / x0:44 / x0:54까지 대기.
+`waitSyncClear()` 함수가 자동으로 처리함.
+
+---
+
+## 품명 → 조립라인 매핑 규칙
+
+### 메인서브 라인 (LINE_RULES)
+
+| 품명 포함 문구 | 선택값 |
+|---|---|
+| HOLDER,CLR ASSY | HCAMS02 |
+| INNER BALL GUIDE ASSY | SUB LINE 無 |
+| BASE LOCK ASSY | SUB LINE 無 |
+| LOCKING ASSY | SUB LINE 無 |
+| INNER SENSOR ASSY | SUB LINE 無 |
+| WEBBING CUTTING | WABAS01 |
+| WEBBING ASSY | WAMAS01 |
+
+> WEBBING CUTTING은 WEBBING ASSY보다 먼저 체크
+> HOLDER,CLR ASSY → HCAMS02
+
+### OUTER 라인 전용 (OUTER_RULES)
+
+| 품명 포함 문구 | 선택값 | 비고 |
+|---|---|---|
+| WEBBING CUTTING | WABAS01 | WEBBING ASSY보다 먼저 체크 |
+| WEBBING ASSY | WAMAS01 | |
+| D-RING | DRAAS11 | D-RING ASSY / D-RING DRL 등 모든 패턴 포함 |
+| ANCHOR ASSY | ANAAS04 | |
+| SNAP-ON | ANAAS04 | ANCHOR ASSY와 동일 매핑 |
+| LASER MARKING | LTAAS01 | SIDE TONGUE 조건 제거 |
+
+> **이너볼가이드(INNER BALL GUIDE ASSY), 베이스락(BASE LOCK ASSY), 락킹(LOCKING ASSY), 비클센서(VEHICLE SENSOR ASSY) → SUB LINE 無 (건드리지 않음, 규칙 적용 제외)**
+
+---
+
+## 하단 그리드 행별 처리 규칙
+
+### 메인서브 라인
+
+| 행 인덱스 | 처리 규칙 |
+|---|---|
+| row0 (1번행) | 상단 OUTER_LINE_CD 입력. 공란이면 최빈값 fallback. 항상 처리, 생략 금지 |
+| row1 (2번행) | 항상 SP3M3 (기준정보 전체 SP3M3 전용) |
+| row2 이상 | MBOM_PART_NM 필드로 LINE_RULES 매핑. 해당 없으면 건너뜀 |
+
+### OUTER 라인
+
+| 행 인덱스 | 처리 규칙 |
+|---|---|
+| row0 (1번행) | 항상 SD9A01 고정 |
+| row1 이상 | MBOM_PART_NM으로 OUTER_RULES 매핑. 해당 없으면 건너뜀 |
+
+---
+
+## 자동화 절차
+
+### STEP 1: 메인서브 라인 JS 함수 등록
+
+ERP 탭에서 아래 JS를 실행한다. 기준정보 품번 302개가 자동 내장된다.
+
+```javascript
+// =============================================
+// 기준정보 품번 목록 (302개, 2026-03-20 기준)
+// 파일 변경 시 스킬 갱신 필요
+// =============================================
+window._refProdNos = new Set(['89870AT000','89880AT000','89870AT200','89880AT200','89870AT500','89880AT500','89870S1100','89880S1100','89870P4500','89880P4500','89870P2200','89880P2200','7460137000','7460137010','7460137500','7460139000','7460139010','7460139500','7460141000','7460141010','7460142500','7460141510','7460237000','7460237010','7460237500','7460239000','7460239010','7460239500','7460241000','7460241010','7460242500','7460241510','7460137100','7460141100','7460237100','7460241100','7460137600','7460237600','7560137000','7560141000','7560141010','7560141020','7560141030','7560237000','7560241000','7560241010','7560241020','7460141500','7460241500','7560144000','7560244000','88810K2000','88820K2000','88810K2100','88820K2100','89870K2100','89880K2100','89870K2000','89880K2000','88810K2300','88820K2300','898216D100','898226D300','898226D100','898216D300','89870CV500','89870XG500','89880CV500','89880XG500','88820G8001','88820G8201','88810T1000','88810JI000','88820T1000','88820JI000','88820T1100','88820T1200','88820JI100','88820JI200','88810T1500','88810JI500','88820T1500','88820JI500','88810T1100','88810T1200','88810JI100','88810JI200','88810T6000','88810T6100','88810T6300','88820T6000','88820T6100','88810T6500','88820T6300','88820T6500','89870T6000','89880T6000','89870T6100','89880T6100','89870T6500','89880T6500','89870T6600','89880T6600','89870T6700','89880T6700','88810AR000','88810AR100','88820AR100','88820AR000','88810AR500','88820AR500','88810AR300','88820AR300','89880AR000','89870AR000','89880AR100','89870AR100','89870AR500','89880AR500','89870AA000','89870AA010','89880AA000','89880AA010','89870AA600','89870AA610','89880AA600','89880AA610','89870AA500','89870AA510','89870T6400','89870T6800','89880T6400','89880T6800','88810CU100','88810CU300','88820CU100','88820CU300','89870CU000','89880CU000','89870CU100','89880CU100','88810DO000','88810DO300','88820DO000','88810DO200','88820DO200','88820DO300','88810DO500','88810XA500','88820DO500','88820XA500','89870DO000','89880DO000','89870DO200','89880DO200','89870DO500','89880DO500','89870XA500','89880XA500','89870XA510','89870DO510','89880XA510','89880DO510','89870P6000','89880P6000','89870P6100','89880P6100','89870P6500','89880P6500','88810R6000','88820R6000','89870R6000','89880R6000','88810GO000','88810GO200','88820GO000','88810GO300','88820GO200','88810GO500','88820GO300','89870GO000','89880GO000','89870GO200','89880GO200','88810TD000','88820TD000','88820GO500','89870GO500','89870TD000','89880GO500','89880TD000','MO89870R6000','MO89880R6000','88810BQ000','88810BQ100','88820BQ000','88820BQ100','89870XH000','89880XH000','89870XH100','89880XH100','89870XH500','89880XH500','88810SZ000','88810SZ100','88820SZ000','88820SZ100','88810P8000','88820P8000','88810P8500','88820P8500','89870P8500','89880P8500','89873P8500','89883P8500','89870SW000','89880SW000','89870SW200','89880SW200','88810X9500','88820X9500','89870X9200','89880X9200','88810BM000','88820BM000','88820BM200','88810BM100','88820BM100','89870BS000','W89870BS000','89880BS000','W89880BS000','89870BS200','89870DE200','W89870BS200','W89870DE200','89880BS200','89880DE200','W89880BS200','W89880DE200','89870BS500','W89870BS500','89880BS500','W89880BS500','89870DN000','89870DN500','89880DN000','89880DN500','89870P8200','89880P8200','89873P8200','89883P8200','89870AT050','89880AT050','89870AT150','89880AT150','88820GG500','88810GG000','88810GG100','88820GG000','88820GG100','89870GG010','89880GG010','89870GG020','89880GG020','88810NT300','88810NT400','88820NT300','88820NT400','89870NT000','89880NT000','88810NV000','89870NV000','89880NV000','88810BT000','88810BT100','88810BT200','88810BT300','88820BT000','88820BT100','88820BT200','88820BT300','89870BT000','89880BT000','88810BN200','88810BN300','88820BN200','88820BN300','89870BN100','89880BN100','89870XV000','89880XV000','89870XV500','89880XV500','89870GJ000','89880GJ000','89870BP000','89880BP000','88810BP000','88820BP000','89870BP100','89880BP100']);
+
+// =============================================
+// prefix 매칭 함수 (ERP 품번에 접미사 포함 대응)
+// =============================================
+window._isRefProd = function(prodNo) {
+  if (!prodNo) return false;
+  if (window._refProdNos.has(prodNo)) return true;
+  for (const ref of window._refProdNos) {
+    if (prodNo.startsWith(ref)) return true;
+  }
+  return false;
+};
+
+// =============================================
+// 품명 → 조립라인 매핑 규칙 (메인서브)
+// =============================================
+window.LINE_RULES = [
+  {keyword: 'HOLDER,CLR ASSY',       value: 'HCAMS02'},
+  {keyword: 'INNER BALL GUIDE ASSY', value: 'SUB LINE 無'},
+  {keyword: 'BASE LOCK ASSY',        value: 'SUB LINE 無'},
+  {keyword: 'LOCKING ASSY',          value: 'SUB LINE 無'},
+  {keyword: 'INNER SENSOR ASSY',     value: 'SUB LINE 無'},
+  {keyword: 'WEBBING CUTTING',       value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',          value: 'WAMAS01'},
+];
+
+window.getLineValue = function(partNm) {
+  if (!partNm) return null;
+  for (const rule of window.LINE_RULES) {
+    if (partNm.toUpperCase().includes(rule.keyword.toUpperCase())) return rule.value;
+  }
+  return null;
+};
+
+window.setCellValue = function(rowIndx, val, fallbackVal) {
+  const $sub = jQuery('#sub_grid_body');
+  $sub.pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+  const sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+  if (!sel || sel.tagName !== 'SELECT') return {ok: false, reason: 'no SELECT'};
+  sel.value = val;
+  if (!sel.value && fallbackVal) sel.value = fallbackVal;
+  const actualVal = sel.value;
+  sel.dispatchEvent(new Event('change', {bubbles: true}));
+  jQuery(sel).trigger('blur');
+  return {ok: true, val: actualVal, tried: val};
+};
+
+// =============================================
+// 동기화 구간 체크 및 대기
+// =============================================
+window.checkSyncBlock = function() {
+  const min = new Date().getMinutes();
+  const blocked = [10,11,12,13,20,21,22,23,30,31,32,33,40,41,42,43,50,51,52,53];
+  return {blocked: blocked.includes(min), minute: min};
+};
+
+window.waitSyncClear = async function(label) {
+  const chk = window.checkSyncBlock();
+  if (!chk.blocked) return;
+  const allowMins = [4,14,24,34,44,54];
+  const now = new Date();
+  const curMin = now.getMinutes();
+  const nextAllow = allowMins.find(m => m > curMin) || (allowMins[0] + 60);
+  const waitMs = ((nextAllow - curMin) * 60 - now.getSeconds()) * 1000 + 1000;
+  window._processLog = window._processLog || [];
+  window._processLog.push('⏸ 동기화대기(' + (label||'') + ') ' + curMin + '분→' + nextAllow + '분 (' + Math.round(waitMs/1000) + '초)');
+  await new Promise(r => setTimeout(r, waitMs));
+};
+
+// =============================================
+// 저장 함수 (메인서브)
+// =============================================
+window.saveSubGrid = function() {
+  return new Promise(resolve => {
+    document.getElementById('btnSubBundleApply').click();
+    let confirmClicked = false;
+    const iv = setInterval(() => {
+      const dlgs = Array.from(document.querySelectorAll('.ui-dialog'))
+        .filter(d => d.offsetParent !== null);
+      for (const dlg of dlgs) {
+        const txt = dlg.innerText || '';
+        const okBtn = Array.from(dlg.querySelectorAll('button'))
+          .find(b => b.textContent.trim() === 'OK' || b.textContent.trim() === '확인');
+        if (!okBtn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmClicked) {
+          okBtn.click(); confirmClicked = true; break;
+        }
+        if (txt.includes('정상처리')) {
+          okBtn.click(); clearInterval(iv); resolve('saved'); return;
+        }
+        if (txt.includes('변경된 내용이 없습니다')) {
+          okBtn.click(); clearInterval(iv); resolve('no-change'); return;
+        }
+        if (confirmClicked) {
+          okBtn.click(); clearInterval(iv); resolve('saved'); return;
+        }
+      }
+    }, 150);
+    setTimeout(() => { clearInterval(iv); resolve('timeout'); }, 10000);
+  });
+};
+
+// =============================================
+// 상단 그리드 전체 행 처리 (메인서브)
+// =============================================
+window.processAllRows = async function(startTopRowIndx) {
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  const log = [];
+  window._processErrors = window._processErrors || [];
+
+  for (let topIdx = startTopRowIndx; topIdx < topData.length; topIdx++) {
+    if (window._haltAll || window._stopProcess) { log.push('--- 중지 ---'); break; }
+
+    const topRow = topData[topIdx];
+    const prodNo = (topRow.PROD_NO || '').trim();
+    const outerLine = topRow.OUTER_LINE_CD || window._fallbackLine || 'SP2A02';
+
+    if (!window._isRefProd(prodNo)) {
+      log.push('[' + topIdx + '] SKIP(기준정보없음): ' + prodNo);
+      window._processLog = window._processLog || [];
+      window._processLog.push('[' + topIdx + '] SKIP(기준정보없음): ' + prodNo);
+      continue;
+    }
+
+    let rowEl = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      jQuery('#grid_body').pqGrid('scrollRow', {rowIndx: topIdx});
+      await new Promise(r => setTimeout(r, 700 + attempt * 300));
+      rowEl = document.getElementById('pq-body-row-u2-' + topIdx + '-right') ||
+              document.getElementById('pq-body-row-u2-' + topIdx + '-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) {
+      log.push('[' + topIdx + '] !! DOM없음: ' + prodNo);
+      window._processErrors.push(prodNo + ':DOM없음');
+      continue;
+    }
+
+    const cells = rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length > 1) cells[1].click(); else if (cells[0]) cells[0].click();
+    await new Promise(r => setTimeout(r, 2000));
+
+    const subData = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!subData || subData.length === 0) {
+      log.push('[' + topIdx + '] !! 하단0행: ' + prodNo);
+      window._processErrors.push(prodNo + ':하단0행');
+      continue;
+    }
+
+    window.setCellValue(0, outerLine, window._fallbackLine);
+    window._processLog = window._processLog || [];
+    window._processLog.push('  [' + topIdx + '] ' + prodNo + ' OUTER=' + outerLine);
+    log.push('  [' + topIdx + '] row0=' + outerLine);
+
+    if (subData.length > 1) window.setCellValue(1, 'SP3M3', null);
+
+    for (let si = 2; si < subData.length; si++) {
+      const nm = subData[si].MBOM_PART_NM || '';
+      const val = window.getLineValue(nm);
+      if (val) {
+        window.setCellValue(si, val, null);
+        window._processLog.push('  row' + si + '[' + nm.substring(0,30) + ']->' + val);
+        log.push('  row' + si + '[' + nm.substring(0,30) + ']->' + val);
+      }
+    }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      await window.waitSyncClear('저장');
+      if (window._haltAll) { log.push('--- 중지 ---'); break; }
+      const saveResult = await window.saveSubGrid();
+      log.push('  저장=' + saveResult);
+      window._processLog.push('  저장=' + saveResult);
+    } else {
+      log.push('  변경없음');
+      window._processLog.push('  변경없음');
+    }
+
+    await new Promise(r => setTimeout(r, 500));
+    const subAfter = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    const row0After = subAfter && subAfter[0] ? (subAfter[0].ASSY_LINE_NM || subAfter[0].ASSY_LINE_CD || '') : '';
+    window._processLog.push('  검증OK row0=' + row0After);
+    log.push('  검증OK row0=' + row0After);
+  }
+
+  log.push('===== 완료 =====');
+  log.push('SKIP: ' + log.filter(l => l.includes('SKIP')).length + '건');
+  log.push('오류: ' + (window._processErrors||[]).length + '건');
+  return log;
+};
+
+window.searchAndProcess = async function(prodNo) {
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  await window.waitSyncClear('검색:' + prodNo);
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const inp = document.getElementById('searchProdNo');
+  if (!inp) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'INPUT없음'};
+  inp.focus(); inp.value = ''; inp.value = prodNo;
+  inp.dispatchEvent(new Event('input', {bubbles: true}));
+  const searchBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === '검색');
+  if (!searchBtn) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색버튼없음'};
+  searchBtn.click();
+  await new Promise(r => setTimeout(r, 2500));
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  if (!topData || topData.length === 0) {
+    window._processLog = window._processLog || [];
+    window._processLog.push('[' + prodNo + '] 검색없음');
+    return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색없음'};
+  }
+  const freq = {};
+  topData.forEach(r => { if (r.OUTER_LINE_CD) freq[r.OUTER_LINE_CD] = (freq[r.OUTER_LINE_CD]||0)+1; });
+  window._fallbackLine = Object.entries(freq).sort((a,b) => b[1]-a[1])[0]?.[0] || 'SP2A02';
+  window._processLog = window._processLog || [];
+  window._processLog.push('[' + prodNo + '] ' + topData.length + '행 OUTER=' + window._fallbackLine);
+  const logArr = await window.processAllRows(0);
+  const saved    = logArr.filter(l => l.includes('저장=saved')).length;
+  const noChange = logArr.filter(l => l.includes('변경없음')).length;
+  const skip     = logArr.filter(l => l.includes('SKIP')).length;
+  const err      = (window._processErrors||[]).length;
+  return {prod: prodNo, rows: topData.length, saved, noChange, skip, err};
+};
+
+window.runQueue = async function() {
+  if (window._runningQueue) { return ['이미 실행중']; }
+  window._runningQueue = true;
+  window._stopProcess = false;
+  window._queueSummary = window._queueSummary || [];
+  window._lastQueueResult = null;
+  for (const prod of window._prodQueue) {
+    if (window._stopProcess || window._haltAll) break;
+    const r = await window.searchAndProcess(prod);
+    window._queueSummary.push(r);
+    window._lastQueueResult = r;
+  }
+  window._runningQueue = false;
+  window._queueDone = true;
+  return window._queueSummary;
+};
+
+'함수 등록 완료 v7 — 메인서브 기준정보 302개 내장';
+```
+
+---
+
+### STEP 1-B: OUTER 라인 전용 JS 함수 등록
+
+리스트업 방식 (검색 없이 상단 그리드 행 순서대로 처리). ERP 화면에서 라인구분=OUTER 필터 적용 후 실행.
+
+```javascript
+// =============================================
+// OUTER 라인 매핑 규칙
+// D-RING은 'D-RING ASSY' / 'D-RING DRL' 등 모든 패턴 커버
+// 이너볼가이드/베이스락/락킹/비클센서 → 건드리지 않음(SUB LINE 無)
+// =============================================
+window.OUTER_RULES = [
+  {keyword: 'WEBBING CUTTING',            value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',               value: 'WAMAS01'},
+  {keyword: 'D-RING',                     value: 'DRAAS11'},
+  {keyword: 'ANCHOR ASSY',   value: 'ANAAS04'},
+  {keyword: 'SNAP-ON',       value: 'ANAAS04'},
+  {keyword: 'LASER MARKING', value: 'LTAAS01'},
+];
+
+// =============================================
+// setOuterCell: async, scrollColumn+350ms+Enter커밋
+// ⚠️ 핵심: scrollColumn 후 반드시 350ms 대기 후 editCell 호출
+//    Enter 키로 commit해야 isDirty=true 보장
+// =============================================
+window.setOuterCell = async function(rowIndx, val) {
+  var sub = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+  if (sub && sub[rowIndx] && sub[rowIndx].ASSY_LINE_NM === val) {
+    return true; // 이미 동일값 → skip
+  }
+  try {
+    document.querySelectorAll('#sub_grid_body .pq-editor').forEach(function(el){
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    // 수직+수평 스크롤 후 렌더 대기 (생략 시 .focus() 에러)
+    jQuery('#sub_grid_body').pqGrid('scrollRow',    {rowIndx: rowIndx});
+    jQuery('#sub_grid_body').pqGrid('scrollColumn', {dataIndx: 'ASSY_LINE_NM'});
+    await new Promise(function(r){ setTimeout(r, 350); });
+
+    jQuery('#sub_grid_body').pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+    var sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+    if (!sel || sel.tagName !== 'SELECT') return false;
+
+    sel.value = val;
+    var actual = sel.value;
+    sel.dispatchEvent(new Event('change', {bubbles: true}));
+
+    // Enter 키로 pqGrid commit (blur/removeChild 방식은 isDirty=false 문제 발생)
+    sel.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', keyCode:13, bubbles:true}));
+    sel.dispatchEvent(new KeyboardEvent('keyup',   {key:'Enter', keyCode:13, bubbles:true}));
+
+    await new Promise(function(r){ setTimeout(r, 150); });
+    return actual === val;
+  } catch(e) {
+    console.warn('[setOuterCell] row='+rowIndx+' val='+val+' err='+e.message);
+    return false;
+  }
+};
+
+// =============================================
+// outerSave: 쿨다운(600ms) 방식 저장
+// =============================================
+window.outerSave = function() {
+  return new Promise(function(resolve) {
+    document.getElementById('btnSubBundleApply').click();
+    var confirmed=false, finished=false, resolved=false, lastClick=0, COOL=600;
+    var iv = setInterval(function() {
+      if (resolved) { clearInterval(iv); return; }
+      var now = Date.now();
+      if (now - lastClick < COOL) return;
+      var dlgs = Array.from(document.querySelectorAll('.ui-dialog')).filter(function(d){ return d.offsetParent!==null; });
+      for (var i=0; i<dlgs.length; i++) {
+        var dlg=dlgs[i], txt=dlg.innerText||'';
+        var btn=Array.from(dlg.querySelectorAll('button')).find(function(b){ var t=b.textContent.trim(); return (t==='OK'||t==='확인')&&!b.disabled; });
+        if (!btn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmed) { btn.click(); confirmed=true; lastClick=now; break; }
+        if (txt.includes('정상처리') && !finished)          { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+        if (txt.includes('변경된 내용이 없습니다') && !finished) { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('no-change'); return; }
+        if (confirmed && !finished)                         { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+      }
+    }, 200);
+    setTimeout(function() {
+      clearInterval(iv); if (resolved) return;
+      var dlg=Array.from(document.querySelectorAll('.ui-dialog')).find(function(d){return d.offsetParent!==null;});
+      if (dlg) { var btn=Array.from(dlg.querySelectorAll('button')).find(function(b){return (b.textContent.trim()==='OK'||b.textContent.trim()==='확인')&&!b.disabled;}); if(btn){btn.click();resolve('saved(late)');return;} }
+      resolve('timeout');
+    }, 30000);
+  });
+};
+
+// =============================================
+// runOuterLine: 리스트업 방식 메인 처리
+// startIdx: 0-based 인덱스 (120번 = idx119)
+// =============================================
+window._outerInstId = 0;
+window.runOuterLine = async function(startIdx) {
+  var myId = ++window._outerInstId;
+  var topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  window._outerLog=[]; window._outerErrors=[]; window._outerDone=0;
+  window._outerTotal=topData.length-startIdx; window._outerRunning=true; window._haltAll=false;
+  window._outerLog.push('▶ id='+myId+' idx='+startIdx+' 총='+window._outerTotal);
+
+  for (var i=startIdx; i<topData.length; i++) {
+    if (window._outerInstId!==myId || window._haltAll) { window._outerLog.push('⛔ 중지'); window._outerRunning=false; return; }
+    var prodNo=(topData[i].PROD_NO||topData[i].ITEM_NO||'').trim();
+    window._currentProd=prodNo;
+
+    // 상단 행 DOM 클릭 (5회 재시도)
+    var rowEl=null;
+    for (var t=0; t<5; t++) {
+      try { jQuery('#grid_body').pqGrid('scrollRow',{rowIndx:i}); } catch(e){}
+      await new Promise(function(r){setTimeout(r,1000+t*400);});
+      rowEl=document.getElementById('pq-body-row-u2-'+i+'-right')||document.getElementById('pq-body-row-u2-'+i+'-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) { window._outerLog.push('['+i+'] DOM없음: '+prodNo); window._outerErrors.push(i+':'+prodNo); window._outerDone++; continue; }
+
+    var cells=rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length>1) cells[1].click(); else if(cells[0]) cells[0].click();
+    await new Promise(function(r){setTimeout(r,1800);});
+
+    var sub=jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!sub||sub.length===0) { window._outerLog.push('['+i+'] 하단0행: '+prodNo); window._outerDone++; continue; }
+
+    try {
+      // row0: 항상 SD9A01
+      await window.setOuterCell(0,'SD9A01');
+      window._outerLog.push('['+i+'] '+prodNo+' row0=SD9A01');
+
+      // row1+: OUTER_RULES 매핑
+      for (var si=1; si<sub.length; si++) {
+        var nm=(sub[si].MBOM_PART_NM||'').toUpperCase();
+        for (var ri=0; ri<window.OUTER_RULES.length; ri++) {
+          if (nm.includes(window.OUTER_RULES[ri].keyword.toUpperCase())) {
+            var ok = await window.setOuterCell(si, window.OUTER_RULES[ri].value);
+            window._outerLog.push('  row'+si+' ['+nm.substring(0,22)+'] → '+window.OUTER_RULES[ri].value+(ok?'':' ⚠️'));
+            break;
+          }
+        }
+      }
+    } catch(e) {
+      window._outerLog.push('['+i+'] 셀입력 예외: '+e.message);
+    }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      var res=await window.outerSave();
+      window._outerLog.push('  저장='+res);
+    } else { window._outerLog.push('  변경없음'); }
+    window._outerDone++;
+  }
+  window._outerRunning=false;
+  window._outerLog.push('🏁 완료 id='+myId+': '+window._outerDone+'/'+window._outerTotal);
+};
+
+// 상태 확인
+window.outerStatus = function() {
+  return new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0')+':'+String(new Date().getSeconds()).padStart(2,'0')+
+    ' / done:'+window._outerDone+'/'+window._outerTotal+' / prod:'+window._currentProd+
+    '\n에디터:'+document.querySelectorAll('#sub_grid_body .pq-editor').length+'개'+
+    '\n'+(window._outerLog||[]).slice(-5).join('\n');
+};
+
+'✅ OUTER 라인 함수 등록 완료 v9';
+```
+
+---
+
+### STEP 2: 메인서브 큐 설정 및 실행
+
+```javascript
+// 전체 302개 처리 (처음부터)
+var all = Array.from(window._refProdNos).sort();
+window._prodQueue = all;
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+```javascript
+// 특정 품번부터 이어서 처리
+var all = Array.from(window._refProdNos).sort();
+var idx = all.indexOf('89870T6400'); // 시작 품번
+window._prodQueue = all.slice(idx);
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+### STEP 2-B: OUTER 라인 실행
+
+```javascript
+// 1번(idx0)부터 전체 처리
+window._haltAll = false;
+window.runOuterLine(0);
+
+// N번부터 처리 (예: 120번 = idx119)
+window._haltAll = false;
+window.runOuterLine(119);
+```
+
+---
+
+### STEP 3: 진행 상황 확인
+
+```javascript
+// 메인서브 진행 확인
+var s = window._queueSummary||[];
+JSON.stringify({
+  done: s.length + '/' + window._prodQueue.length,
+  totalSaved: s.reduce((a,r) => a+(r.saved||0), 0),
+  last: window._lastQueueResult,
+  running: window._runningQueue,
+  time: new Date().toLocaleTimeString()
+})
+
+// OUTER 라인 진행 확인
+window.outerStatus();
+```
+
+### STEP 4: 중지 / 재개
+
+```javascript
+// 즉시 중지 (메인서브/OUTER 공통)
+window._haltAll = true;
+window._outerInstId = 9999; // OUTER 전용 강제 종료
+
+// 메인서브 재개
+var done = new Set((window._queueSummary||[]).map(r => r.prod));
+window._prodQueue = window._prodQueue.filter(p => !done.has(p));
+window._queueSummary = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+
+// OUTER 라인 재개 (중지된 idx 확인 후)
+window._haltAll = false;
+window.runOuterLine(/* 재개할 idx */);
+```
+
+---
+
+## 기준정보 품번 목록 갱신 방법
+
+기준정보 파일 변경 시에만 실행. 평상시 불필요.
+
+```python
+import openpyxl
+path = "/sessions/intelligent-cool-mayer/mnt/업무리스트/SP3메인서브 생산지시서 (2025.03.20).xlsx"
+wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+ws = wb['SP3 LINE 기준 정보']
+prod_nos = []
+for row in ws.iter_rows(min_col=3, max_col=3, values_only=True):
+    val = row[0]
+    if val:
+        v = str(val).strip()
+        if len(v) >= 8 and any(c.isdigit() for c in v):
+            prod_nos.append(v)
+wb.close()
+seen = set()
+unique = [x for x in prod_nos if not (x in seen or seen.add(x))]
+print(f"총 {len(unique)}개")
+print("'" + "','".join(unique) + "'")
+```
+
+결과를 STEP 1 JS의 `window._refProdNos = new Set([...])` 배열에 교체 후 스킬 재배포.
+
+---
+
+## 기술 환경
+
+| 항목 | 값 |
+|---|---|
+| 그리드 라이브러리 | PQ Grid (jQuery 기반) |
+| 상단 그리드 ID | grid_body |
+| 하단 그리드 ID | sub_grid_body |
+| 저장 버튼 ID | btnSubBundleApply (ID로만 찾을 것) |
+| 상단 행 DOM ID | pq-body-row-u2-{rowIndx}-right (없으면 -left fallback) |
+| 하단 행 DOM ID | pq-body-row-u9-{rowIndx}-right (없으면 -left fallback) |
+| 하단 품명 필드 | MBOM_PART_NM |
+| Viewport | 2133x954 CSS px |
+
+---
+
+## 핵심 주의사항
+
+### 공통
+1. 동기화 구간(x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53)에는 검색·저장 모두 금지
+2. 저장 버튼은 `btnSubBundleApply` ID로만 — class로 찾으면 검색 버튼이 잡힘
+3. `_haltAll` 플래그로 즉시 강제 중단 가능
+
+### 메인서브 라인
+4. `waitSyncClear()` — 검색 직전·저장 직전 양쪽에서 자동 호출됨
+5. ERP 품번은 접미사 포함(예: 89870T64002BL) — prefix 매핑 `_isRefProd()` 사용
+6. row0: OUTER_LINE_CD / row1: SP3M3 고정 / row2+: LINE_RULES 매핑
+7. HOLDER,CLR ASSY → **HCAMS02**
+8. 하단 그리드 로드 대기 2000ms
+
+### OUTER 라인
+9. **setOuterCell은 반드시 async/await로 호출** — 내부에 350ms 딜레이 포함
+10. **scrollColumn 후 350ms 대기 필수** — 생략 시 `.focus()` 에러 (수평 가상 스크롤 렌더 타이밍 문제)
+11. **Enter 키 커밋 필수** — blur/removeChild 방식은 `isDirty=false`로 저장 안 됨
+12. D-RING 키워드는 `'D-RING'` (D-RING ASSY, D-RING DRL 등 모든 패턴 매칭)
+13. 이너볼가이드/베이스락/락킹/비클센서 → 건드리지 않음 (SUB LINE 無)
+14. row0: SD9A01 고정
+15. 상단 행 DOM 5회 재시도 (가상 스크롤 대응)
+16. `_outerInstId` 인스턴스 ID로 중복 실행 방지
+
+---
+
+## 변경 이력
+
+| 일자 | 버전 | 변경 내용 |
+|---|---|---|
+| 2026-03-28 | v9 | SNAP-ON→ANAAS04 추가, LASER MARKING 키워드 단축(SIDE TONGUE 조건 제거), VEHICLE SENSOR ASSY SUB LINE 無 명시 |
+| 2026-03-21 | v7 | OUTER 라인 전용 섹션 신규 추가. OUTER_RULES(D-RING→'D-RING'확장, ANCHOR ASSY, SIDE TONGUE LASER MARKING 추가). setOuterCell async+scrollColumn+350ms+Enter커밋 방식. outerSave 쿨다운 방식. runOuterLine 리스트업 방식. 이너볼가이드/베이스락/락킹/비클센서 SUB LINE 無 명시 |
+| 2026-03-20 | v6 | HCAMS03→HCAMS02, DOM -right 우선, prefix 매칭(_isRefProd), MBOM_PART_NM 필드 명시, 동기화 구간 검색도 금지(waitSyncClear), saveSubGrid 다이얼로그 개선, searchAndProcess/runQueue 함수 추가, 중지/재개 절차 추가 |
+| 2026-03-20 | v5 | 기준정보 302개 스킬 내장 — 매 세션 Python 추출 불필요 |
+| 2026-03-20 | v4 | 기준정보 검증 로직 추가, HCAMS02->HCAMS03, row1 SP3M3 고정, 전체 C열 탐색, scrollRow 3회 재시도, row0 사후검증 |
+| 최초 | v1 | 초기 작성 |
+
+========================================
+# [5/8] 스킬: line-batch-management (OUTER 메인 자동화)
+원본경로: 90_공통기준/스킬/line-batch-management/SKILL.md
+========================================
+
+---
+name: line-batch-management
+description: >
+  ERP 라인배치 관리 자동화 스킬. 사용자가 "라인배치", "라인배치 입력", "라인배치 관리",
+  "SUB ASSY 배치", "배치 설정", "ERP 배치", "품번 배치", "라인배치 작업", "배치 자동화" 등을
+  언급하면 반드시 이 스킬을 사용할 것. SAMSONG G-ERP 라인배치 관리 화면에서 SP3메인서브
+  생산지시서의 품번을 순차 검색하고, 하단 SUB ASSY 그리드에 품명 규칙에 따라 조립라인을
+  자동 입력 후 저장하는 반복 업무 전체를 자동화한다. 시작 행/진행 위치를 사용자에게
+  확인받고 이어서 처리한다.
+grade: A
+---
+
+# ERP 라인배치 관리 자동화
+
+## 개요
+
+SAMSONG G-ERP 라인배치 관리 화면에서 SP3 생산지시서의 품번을 순차 처리한다.
+각 품번 검색 → 상단 그리드 행 순차 클릭 → 하단 SUB ASSY 품명별 조립라인 입력 → 저장.
+
+**작업 유형:**
+- **메인서브 라인** → `searchAndProcess` / `runQueue` (품번 검색 기반)
+- **OUTER 라인** → `runOuterLine` (리스트업 기반, 검색 없이 상단 그리드 행 순서대로 처리)
+
+---
+
+## 사전 준비
+
+### 필수 정보
+- **ERP URL**: `http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do`
+- **품번 파일**: `/sessions/intelligent-cool-mayer/mnt/업무리스트/SP3메인서브 생산지시서 (2025.03.20).xlsx`
+  - 시트: `SP3 LINE 기준 정보` / C열 = 품번(모품번)
+  - 기준정보 목록은 스킬에 내장되어 있음 (302개, 2026-03-20 기준)
+  - ⚠️ 기준정보 파일 변경 시 "품번 목록 갱신" 절차 실행 후 스킬 재배포
+
+### 시작 위치 확인
+작업 시작 전 사용자에게 반드시 확인:
+- 마지막으로 처리 완료한 품번 / 행번호
+- 이어서 시작할 품번
+
+### 동기화 제한 시간 ⚠️
+**매시 아래 구간에는 ERP 품번 검색 및 저장 절대 금지:**
+
+| 금지 구간 |
+|-----------|
+| x0:10 ~ x0:13 |
+| x0:20 ~ x0:23 |
+| x0:30 ~ x0:33 |
+| x0:40 ~ x0:43 |
+| x0:50 ~ x0:53 |
+
+검색 및 저장 직전 항상 시간 확인 후, 제한 구간이면 x0:14 / x0:24 / x0:34 / x0:44 / x0:54까지 대기.
+`waitSyncClear()` 함수가 자동으로 처리함.
+
+---
+
+## 품명 → 조립라인 매핑 규칙
+
+### 메인서브 라인 (LINE_RULES)
+
+| 품명 포함 문구 | 선택값 |
+|---|---|
+| HOLDER,CLR ASSY | HCAMS02 |
+| INNER BALL GUIDE ASSY | SUB LINE 無 |
+| BASE LOCK ASSY | SUB LINE 無 |
+| LOCKING ASSY | SUB LINE 無 |
+| INNER SENSOR ASSY | SUB LINE 無 |
+| WEBBING CUTTING | WABAS01 |
+| WEBBING ASSY | WAMAS01 |
+
+> WEBBING CUTTING은 WEBBING ASSY보다 먼저 체크
+> HOLDER,CLR ASSY → HCAMS02
+
+### OUTER 라인 전용 (OUTER_RULES)
+
+| 품명 포함 문구 | 선택값 | 비고 |
+|---|---|---|
+| WEBBING CUTTING | WABAS01 | WEBBING ASSY보다 먼저 체크 |
+| WEBBING ASSY | WAMAS01 | |
+| D-RING | DRAAS11 | D-RING ASSY / D-RING DRL 등 모든 패턴 포함 |
+| ANCHOR ASSY | ANAAS04 | |
+| SNAP-ON | ANAAS04 | ANCHOR ASSY와 동일 매핑 |
+| LASER MARKING | LTAAS01 | SIDE TONGUE 조건 제거 |
+
+> **이너볼가이드(INNER BALL GUIDE ASSY), 베이스락(BASE LOCK ASSY), 락킹(LOCKING ASSY), 비클센서(VEHICLE SENSOR ASSY) → SUB LINE 無 (건드리지 않음, 규칙 적용 제외)**
+
+---
+
+## 하단 그리드 행별 처리 규칙
+
+### 메인서브 라인
+
+| 행 인덱스 | 처리 규칙 |
+|---|---|
+| row0 (1번행) | 상단 OUTER_LINE_CD 입력. 공란이면 최빈값 fallback. 항상 처리, 생략 금지 |
+| row1 (2번행) | 항상 SP3M3 (기준정보 전체 SP3M3 전용) |
+| row2 이상 | MBOM_PART_NM 필드로 LINE_RULES 매핑. 해당 없으면 건너뜀 |
+
+### OUTER 라인
+
+| 행 인덱스 | 처리 규칙 |
+|---|---|
+| row0 (1번행) | 항상 SD9A01 고정 |
+| row1 이상 | MBOM_PART_NM으로 OUTER_RULES 매핑. 해당 없으면 건너뜀 |
+
+---
+
+## 자동화 절차
+
+### STEP 1: 메인서브 라인 JS 함수 등록
+
+ERP 탭에서 아래 JS를 실행한다. 기준정보 품번 302개가 자동 내장된다.
+
+```javascript
+// =============================================
+// 기준정보 품번 목록 (302개, 2026-03-20 기준)
+// 파일 변경 시 스킬 갱신 필요
+// =============================================
+window._refProdNos = new Set(['89870AT000','89880AT000','89870AT200','89880AT200','89870AT500','89880AT500','89870S1100','89880S1100','89870P4500','89880P4500','89870P2200','89880P2200','7460137000','7460137010','7460137500','7460139000','7460139010','7460139500','7460141000','7460141010','7460142500','7460141510','7460237000','7460237010','7460237500','7460239000','7460239010','7460239500','7460241000','7460241010','7460242500','7460241510','7460137100','7460141100','7460237100','7460241100','7460137600','7460237600','7560137000','7560141000','7560141010','7560141020','7560141030','7560237000','7560241000','7560241010','7560241020','7460141500','7460241500','7560144000','7560244000','88810K2000','88820K2000','88810K2100','88820K2100','89870K2100','89880K2100','89870K2000','89880K2000','88810K2300','88820K2300','898216D100','898226D300','898226D100','898216D300','89870CV500','89870XG500','89880CV500','89880XG500','88820G8001','88820G8201','88810T1000','88810JI000','88820T1000','88820JI000','88820T1100','88820T1200','88820JI100','88820JI200','88810T1500','88810JI500','88820T1500','88820JI500','88810T1100','88810T1200','88810JI100','88810JI200','88810T6000','88810T6100','88810T6300','88820T6000','88820T6100','88810T6500','88820T6300','88820T6500','89870T6000','89880T6000','89870T6100','89880T6100','89870T6500','89880T6500','89870T6600','89880T6600','89870T6700','89880T6700','88810AR000','88810AR100','88820AR100','88820AR000','88810AR500','88820AR500','88810AR300','88820AR300','89880AR000','89870AR000','89880AR100','89870AR100','89870AR500','89880AR500','89870AA000','89870AA010','89880AA000','89880AA010','89870AA600','89870AA610','89880AA600','89880AA610','89870AA500','89870AA510','89870T6400','89870T6800','89880T6400','89880T6800','88810CU100','88810CU300','88820CU100','88820CU300','89870CU000','89880CU000','89870CU100','89880CU100','88810DO000','88810DO300','88820DO000','88810DO200','88820DO200','88820DO300','88810DO500','88810XA500','88820DO500','88820XA500','89870DO000','89880DO000','89870DO200','89880DO200','89870DO500','89880DO500','89870XA500','89880XA500','89870XA510','89870DO510','89880XA510','89880DO510','89870P6000','89880P6000','89870P6100','89880P6100','89870P6500','89880P6500','88810R6000','88820R6000','89870R6000','89880R6000','88810GO000','88810GO200','88820GO000','88810GO300','88820GO200','88810GO500','88820GO300','89870GO000','89880GO000','89870GO200','89880GO200','88810TD000','88820TD000','88820GO500','89870GO500','89870TD000','89880GO500','89880TD000','MO89870R6000','MO89880R6000','88810BQ000','88810BQ100','88820BQ000','88820BQ100','89870XH000','89880XH000','89870XH100','89880XH100','89870XH500','89880XH500','88810SZ000','88810SZ100','88820SZ000','88820SZ100','88810P8000','88820P8000','88810P8500','88820P8500','89870P8500','89880P8500','89873P8500','89883P8500','89870SW000','89880SW000','89870SW200','89880SW200','88810X9500','88820X9500','89870X9200','89880X9200','88810BM000','88820BM000','88820BM200','88810BM100','88820BM100','89870BS000','W89870BS000','89880BS000','W89880BS000','89870BS200','89870DE200','W89870BS200','W89870DE200','89880BS200','89880DE200','W89880BS200','W89880DE200','89870BS500','W89870BS500','89880BS500','W89880BS500','89870DN000','89870DN500','89880DN000','89880DN500','89870P8200','89880P8200','89873P8200','89883P8200','89870AT050','89880AT050','89870AT150','89880AT150','88820GG500','88810GG000','88810GG100','88820GG000','88820GG100','89870GG010','89880GG010','89870GG020','89880GG020','88810NT300','88810NT400','88820NT300','88820NT400','89870NT000','89880NT000','88810NV000','89870NV000','89880NV000','88810BT000','88810BT100','88810BT200','88810BT300','88820BT000','88820BT100','88820BT200','88820BT300','89870BT000','89880BT000','88810BN200','88810BN300','88820BN200','88820BN300','89870BN100','89880BN100','89870XV000','89880XV000','89870XV500','89880XV500','89870GJ000','89880GJ000','89870BP000','89880BP000','88810BP000','88820BP000','89870BP100','89880BP100']);
+
+// =============================================
+// prefix 매칭 함수 (ERP 품번에 접미사 포함 대응)
+// =============================================
+window._isRefProd = function(prodNo) {
+  if (!prodNo) return false;
+  if (window._refProdNos.has(prodNo)) return true;
+  for (const ref of window._refProdNos) {
+    if (prodNo.startsWith(ref)) return true;
+  }
+  return false;
+};
+
+// =============================================
+// 품명 → 조립라인 매핑 규칙 (메인서브)
+// =============================================
+window.LINE_RULES = [
+  {keyword: 'HOLDER,CLR ASSY',       value: 'HCAMS02'},
+  {keyword: 'INNER BALL GUIDE ASSY', value: 'SUB LINE 無'},
+  {keyword: 'BASE LOCK ASSY',        value: 'SUB LINE 無'},
+  {keyword: 'LOCKING ASSY',          value: 'SUB LINE 無'},
+  {keyword: 'INNER SENSOR ASSY',     value: 'SUB LINE 無'},
+  {keyword: 'WEBBING CUTTING',       value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',          value: 'WAMAS01'},
+];
+
+window.getLineValue = function(partNm) {
+  if (!partNm) return null;
+  for (const rule of window.LINE_RULES) {
+    if (partNm.toUpperCase().includes(rule.keyword.toUpperCase())) return rule.value;
+  }
+  return null;
+};
+
+window.setCellValue = function(rowIndx, val, fallbackVal) {
+  const $sub = jQuery('#sub_grid_body');
+  $sub.pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+  const sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+  if (!sel || sel.tagName !== 'SELECT') return {ok: false, reason: 'no SELECT'};
+  sel.value = val;
+  if (!sel.value && fallbackVal) sel.value = fallbackVal;
+  const actualVal = sel.value;
+  sel.dispatchEvent(new Event('change', {bubbles: true}));
+  jQuery(sel).trigger('blur');
+  return {ok: true, val: actualVal, tried: val};
+};
+
+// =============================================
+// 동기화 구간 체크 및 대기
+// =============================================
+window.checkSyncBlock = function() {
+  const min = new Date().getMinutes();
+  const blocked = [10,11,12,13,20,21,22,23,30,31,32,33,40,41,42,43,50,51,52,53];
+  return {blocked: blocked.includes(min), minute: min};
+};
+
+window.waitSyncClear = async function(label) {
+  const chk = window.checkSyncBlock();
+  if (!chk.blocked) return;
+  const allowMins = [4,14,24,34,44,54];
+  const now = new Date();
+  const curMin = now.getMinutes();
+  const nextAllow = allowMins.find(m => m > curMin) || (allowMins[0] + 60);
+  const waitMs = ((nextAllow - curMin) * 60 - now.getSeconds()) * 1000 + 1000;
+  window._processLog = window._processLog || [];
+  window._processLog.push('⏸ 동기화대기(' + (label||'') + ') ' + curMin + '분→' + nextAllow + '분 (' + Math.round(waitMs/1000) + '초)');
+  await new Promise(r => setTimeout(r, waitMs));
+};
+
+// =============================================
+// 저장 함수 (메인서브)
+// =============================================
+window.saveSubGrid = function() {
+  return new Promise(resolve => {
+    document.getElementById('btnSubBundleApply').click();
+    let confirmClicked = false;
+    const iv = setInterval(() => {
+      const dlgs = Array.from(document.querySelectorAll('.ui-dialog'))
+        .filter(d => d.offsetParent !== null);
+      for (const dlg of dlgs) {
+        const txt = dlg.innerText || '';
+        const okBtn = Array.from(dlg.querySelectorAll('button'))
+          .find(b => b.textContent.trim() === 'OK' || b.textContent.trim() === '확인');
+        if (!okBtn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmClicked) {
+          okBtn.click(); confirmClicked = true; break;
+        }
+        if (txt.includes('정상처리')) {
+          okBtn.click(); clearInterval(iv); resolve('saved'); return;
+        }
+        if (txt.includes('변경된 내용이 없습니다')) {
+          okBtn.click(); clearInterval(iv); resolve('no-change'); return;
+        }
+        if (confirmClicked) {
+          okBtn.click(); clearInterval(iv); resolve('saved'); return;
+        }
+      }
+    }, 150);
+    setTimeout(() => { clearInterval(iv); resolve('timeout'); }, 10000);
+  });
+};
+
+// =============================================
+// 상단 그리드 전체 행 처리 (메인서브)
+// =============================================
+window.processAllRows = async function(startTopRowIndx) {
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  const log = [];
+  window._processErrors = window._processErrors || [];
+
+  for (let topIdx = startTopRowIndx; topIdx < topData.length; topIdx++) {
+    if (window._haltAll || window._stopProcess) { log.push('--- 중지 ---'); break; }
+
+    const topRow = topData[topIdx];
+    const prodNo = (topRow.PROD_NO || '').trim();
+    const outerLine = topRow.OUTER_LINE_CD || window._fallbackLine || 'SP2A02';
+
+    if (!window._isRefProd(prodNo)) {
+      log.push('[' + topIdx + '] SKIP(기준정보없음): ' + prodNo);
+      window._processLog = window._processLog || [];
+      window._processLog.push('[' + topIdx + '] SKIP(기준정보없음): ' + prodNo);
+      continue;
+    }
+
+    let rowEl = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      jQuery('#grid_body').pqGrid('scrollRow', {rowIndx: topIdx});
+      await new Promise(r => setTimeout(r, 700 + attempt * 300));
+      rowEl = document.getElementById('pq-body-row-u2-' + topIdx + '-right') ||
+              document.getElementById('pq-body-row-u2-' + topIdx + '-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) {
+      log.push('[' + topIdx + '] !! DOM없음: ' + prodNo);
+      window._processErrors.push(prodNo + ':DOM없음');
+      continue;
+    }
+
+    const cells = rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length > 1) cells[1].click(); else if (cells[0]) cells[0].click();
+    await new Promise(r => setTimeout(r, 2000));
+
+    const subData = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!subData || subData.length === 0) {
+      log.push('[' + topIdx + '] !! 하단0행: ' + prodNo);
+      window._processErrors.push(prodNo + ':하단0행');
+      continue;
+    }
+
+    window.setCellValue(0, outerLine, window._fallbackLine);
+    window._processLog = window._processLog || [];
+    window._processLog.push('  [' + topIdx + '] ' + prodNo + ' OUTER=' + outerLine);
+    log.push('  [' + topIdx + '] row0=' + outerLine);
+
+    if (subData.length > 1) window.setCellValue(1, 'SP3M3', null);
+
+    for (let si = 2; si < subData.length; si++) {
+      const nm = subData[si].MBOM_PART_NM || '';
+      const val = window.getLineValue(nm);
+      if (val) {
+        window.setCellValue(si, val, null);
+        window._processLog.push('  row' + si + '[' + nm.substring(0,30) + ']->' + val);
+        log.push('  row' + si + '[' + nm.substring(0,30) + ']->' + val);
+      }
+    }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      await window.waitSyncClear('저장');
+      if (window._haltAll) { log.push('--- 중지 ---'); break; }
+      const saveResult = await window.saveSubGrid();
+      log.push('  저장=' + saveResult);
+      window._processLog.push('  저장=' + saveResult);
+    } else {
+      log.push('  변경없음');
+      window._processLog.push('  변경없음');
+    }
+
+    await new Promise(r => setTimeout(r, 500));
+    const subAfter = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    const row0After = subAfter && subAfter[0] ? (subAfter[0].ASSY_LINE_NM || subAfter[0].ASSY_LINE_CD || '') : '';
+    window._processLog.push('  검증OK row0=' + row0After);
+    log.push('  검증OK row0=' + row0After);
+  }
+
+  log.push('===== 완료 =====');
+  log.push('SKIP: ' + log.filter(l => l.includes('SKIP')).length + '건');
+  log.push('오류: ' + (window._processErrors||[]).length + '건');
+  return log;
+};
+
+window.searchAndProcess = async function(prodNo) {
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  await window.waitSyncClear('검색:' + prodNo);
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const inp = document.getElementById('searchProdNo');
+  if (!inp) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'INPUT없음'};
+  inp.focus(); inp.value = ''; inp.value = prodNo;
+  inp.dispatchEvent(new Event('input', {bubbles: true}));
+  const searchBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === '검색');
+  if (!searchBtn) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색버튼없음'};
+  searchBtn.click();
+  await new Promise(r => setTimeout(r, 2500));
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  if (!topData || topData.length === 0) {
+    window._processLog = window._processLog || [];
+    window._processLog.push('[' + prodNo + '] 검색없음');
+    return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색없음'};
+  }
+  const freq = {};
+  topData.forEach(r => { if (r.OUTER_LINE_CD) freq[r.OUTER_LINE_CD] = (freq[r.OUTER_LINE_CD]||0)+1; });
+  window._fallbackLine = Object.entries(freq).sort((a,b) => b[1]-a[1])[0]?.[0] || 'SP2A02';
+  window._processLog = window._processLog || [];
+  window._processLog.push('[' + prodNo + '] ' + topData.length + '행 OUTER=' + window._fallbackLine);
+  const logArr = await window.processAllRows(0);
+  const saved    = logArr.filter(l => l.includes('저장=saved')).length;
+  const noChange = logArr.filter(l => l.includes('변경없음')).length;
+  const skip     = logArr.filter(l => l.includes('SKIP')).length;
+  const err      = (window._processErrors||[]).length;
+  return {prod: prodNo, rows: topData.length, saved, noChange, skip, err};
+};
+
+window.runQueue = async function() {
+  if (window._runningQueue) { return ['이미 실행중']; }
+  window._runningQueue = true;
+  window._stopProcess = false;
+  window._queueSummary = window._queueSummary || [];
+  window._lastQueueResult = null;
+  for (const prod of window._prodQueue) {
+    if (window._stopProcess || window._haltAll) break;
+    const r = await window.searchAndProcess(prod);
+    window._queueSummary.push(r);
+    window._lastQueueResult = r;
+  }
+  window._runningQueue = false;
+  window._queueDone = true;
+  return window._queueSummary;
+};
+
+'함수 등록 완료 v7 — 메인서브 기준정보 302개 내장';
+```
+
+---
+
+### STEP 1-B: OUTER 라인 전용 JS 함수 등록
+
+리스트업 방식 (검색 없이 상단 그리드 행 순서대로 처리). ERP 화면에서 라인구분=OUTER 필터 적용 후 실행.
+
+```javascript
+// =============================================
+// OUTER 라인 매핑 규칙
+// D-RING은 'D-RING ASSY' / 'D-RING DRL' 등 모든 패턴 커버
+// 이너볼가이드/베이스락/락킹/비클센서 → 건드리지 않음(SUB LINE 無)
+// =============================================
+window.OUTER_RULES = [
+  {keyword: 'WEBBING CUTTING',            value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',               value: 'WAMAS01'},
+  {keyword: 'D-RING',                     value: 'DRAAS11'},
+  {keyword: 'ANCHOR ASSY',   value: 'ANAAS04'},
+  {keyword: 'SNAP-ON',       value: 'ANAAS04'},
+  {keyword: 'LASER MARKING', value: 'LTAAS01'},
+];
+
+// =============================================
+// setOuterCell: async, scrollColumn+350ms+Enter커밋
+// ⚠️ 핵심: scrollColumn 후 반드시 350ms 대기 후 editCell 호출
+//    Enter 키로 commit해야 isDirty=true 보장
+// =============================================
+window.setOuterCell = async function(rowIndx, val) {
+  var sub = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+  if (sub && sub[rowIndx] && sub[rowIndx].ASSY_LINE_NM === val) {
+    return true; // 이미 동일값 → skip
+  }
+  try {
+    document.querySelectorAll('#sub_grid_body .pq-editor').forEach(function(el){
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    // 수직+수평 스크롤 후 렌더 대기 (생략 시 .focus() 에러)
+    jQuery('#sub_grid_body').pqGrid('scrollRow',    {rowIndx: rowIndx});
+    jQuery('#sub_grid_body').pqGrid('scrollColumn', {dataIndx: 'ASSY_LINE_NM'});
+    await new Promise(function(r){ setTimeout(r, 350); });
+
+    jQuery('#sub_grid_body').pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+    var sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+    if (!sel || sel.tagName !== 'SELECT') return false;
+
+    sel.value = val;
+    var actual = sel.value;
+    sel.dispatchEvent(new Event('change', {bubbles: true}));
+
+    // Enter 키로 pqGrid commit (blur/removeChild 방식은 isDirty=false 문제 발생)
+    sel.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', keyCode:13, bubbles:true}));
+    sel.dispatchEvent(new KeyboardEvent('keyup',   {key:'Enter', keyCode:13, bubbles:true}));
+
+    await new Promise(function(r){ setTimeout(r, 150); });
+    return actual === val;
+  } catch(e) {
+    console.warn('[setOuterCell] row='+rowIndx+' val='+val+' err='+e.message);
+    return false;
+  }
+};
+
+// =============================================
+// outerSave: 쿨다운(600ms) 방식 저장
+// =============================================
+window.outerSave = function() {
+  return new Promise(function(resolve) {
+    document.getElementById('btnSubBundleApply').click();
+    var confirmed=false, finished=false, resolved=false, lastClick=0, COOL=600;
+    var iv = setInterval(function() {
+      if (resolved) { clearInterval(iv); return; }
+      var now = Date.now();
+      if (now - lastClick < COOL) return;
+      var dlgs = Array.from(document.querySelectorAll('.ui-dialog')).filter(function(d){ return d.offsetParent!==null; });
+      for (var i=0; i<dlgs.length; i++) {
+        var dlg=dlgs[i], txt=dlg.innerText||'';
+        var btn=Array.from(dlg.querySelectorAll('button')).find(function(b){ var t=b.textContent.trim(); return (t==='OK'||t==='확인')&&!b.disabled; });
+        if (!btn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmed) { btn.click(); confirmed=true; lastClick=now; break; }
+        if (txt.includes('정상처리') && !finished)          { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+        if (txt.includes('변경된 내용이 없습니다') && !finished) { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('no-change'); return; }
+        if (confirmed && !finished)                         { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+      }
+    }, 200);
+    setTimeout(function() {
+      clearInterval(iv); if (resolved) return;
+      var dlg=Array.from(document.querySelectorAll('.ui-dialog')).find(function(d){return d.offsetParent!==null;});
+      if (dlg) { var btn=Array.from(dlg.querySelectorAll('button')).find(function(b){return (b.textContent.trim()==='OK'||b.textContent.trim()==='확인')&&!b.disabled;}); if(btn){btn.click();resolve('saved(late)');return;} }
+      resolve('timeout');
+    }, 30000);
+  });
+};
+
+// =============================================
+// runOuterLine: 리스트업 방식 메인 처리
+// startIdx: 0-based 인덱스 (120번 = idx119)
+// =============================================
+window._outerInstId = 0;
+window.runOuterLine = async function(startIdx) {
+  var myId = ++window._outerInstId;
+  var topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  window._outerLog=[]; window._outerErrors=[]; window._outerDone=0;
+  window._outerTotal=topData.length-startIdx; window._outerRunning=true; window._haltAll=false;
+  window._outerLog.push('▶ id='+myId+' idx='+startIdx+' 총='+window._outerTotal);
+
+  for (var i=startIdx; i<topData.length; i++) {
+    if (window._outerInstId!==myId || window._haltAll) { window._outerLog.push('⛔ 중지'); window._outerRunning=false; return; }
+    var prodNo=(topData[i].PROD_NO||topData[i].ITEM_NO||'').trim();
+    window._currentProd=prodNo;
+
+    // 상단 행 DOM 클릭 (5회 재시도)
+    var rowEl=null;
+    for (var t=0; t<5; t++) {
+      try { jQuery('#grid_body').pqGrid('scrollRow',{rowIndx:i}); } catch(e){}
+      await new Promise(function(r){setTimeout(r,1000+t*400);});
+      rowEl=document.getElementById('pq-body-row-u2-'+i+'-right')||document.getElementById('pq-body-row-u2-'+i+'-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) { window._outerLog.push('['+i+'] DOM없음: '+prodNo); window._outerErrors.push(i+':'+prodNo); window._outerDone++; continue; }
+
+    var cells=rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length>1) cells[1].click(); else if(cells[0]) cells[0].click();
+    await new Promise(function(r){setTimeout(r,1800);});
+
+    var sub=jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!sub||sub.length===0) { window._outerLog.push('['+i+'] 하단0행: '+prodNo); window._outerDone++; continue; }
+
+    try {
+      // row0: 항상 SD9A01
+      await window.setOuterCell(0,'SD9A01');
+      window._outerLog.push('['+i+'] '+prodNo+' row0=SD9A01');
+
+      // row1+: OUTER_RULES 매핑
+      for (var si=1; si<sub.length; si++) {
+        var nm=(sub[si].MBOM_PART_NM||'').toUpperCase();
+        for (var ri=0; ri<window.OUTER_RULES.length; ri++) {
+          if (nm.includes(window.OUTER_RULES[ri].keyword.toUpperCase())) {
+            var ok = await window.setOuterCell(si, window.OUTER_RULES[ri].value);
+            window._outerLog.push('  row'+si+' ['+nm.substring(0,22)+'] → '+window.OUTER_RULES[ri].value+(ok?'':' ⚠️'));
+            break;
+          }
+        }
+      }
+    } catch(e) {
+      window._outerLog.push('['+i+'] 셀입력 예외: '+e.message);
+    }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      var res=await window.outerSave();
+      window._outerLog.push('  저장='+res);
+    } else { window._outerLog.push('  변경없음'); }
+    window._outerDone++;
+  }
+  window._outerRunning=false;
+  window._outerLog.push('🏁 완료 id='+myId+': '+window._outerDone+'/'+window._outerTotal);
+};
+
+// 상태 확인
+window.outerStatus = function() {
+  return new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0')+':'+String(new Date().getSeconds()).padStart(2,'0')+
+    ' / done:'+window._outerDone+'/'+window._outerTotal+' / prod:'+window._currentProd+
+    '\n에디터:'+document.querySelectorAll('#sub_grid_body .pq-editor').length+'개'+
+    '\n'+(window._outerLog||[]).slice(-5).join('\n');
+};
+
+'✅ OUTER 라인 함수 등록 완료 v9';
+```
+
+---
+
+### STEP 2: 메인서브 큐 설정 및 실행
+
+```javascript
+// 전체 302개 처리 (처음부터)
+var all = Array.from(window._refProdNos).sort();
+window._prodQueue = all;
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+```javascript
+// 특정 품번부터 이어서 처리
+var all = Array.from(window._refProdNos).sort();
+var idx = all.indexOf('89870T6400'); // 시작 품번
+window._prodQueue = all.slice(idx);
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+### STEP 2-B: OUTER 라인 실행
+
+```javascript
+// 1번(idx0)부터 전체 처리
+window._haltAll = false;
+window.runOuterLine(0);
+
+// N번부터 처리 (예: 120번 = idx119)
+window._haltAll = false;
+window.runOuterLine(119);
+```
+
+---
+
+### STEP 3: 진행 상황 확인
+
+```javascript
+// 메인서브 진행 확인
+var s = window._queueSummary||[];
+JSON.stringify({
+  done: s.length + '/' + window._prodQueue.length,
+  totalSaved: s.reduce((a,r) => a+(r.saved||0), 0),
+  last: window._lastQueueResult,
+  running: window._runningQueue,
+  time: new Date().toLocaleTimeString()
+})
+
+// OUTER 라인 진행 확인
+window.outerStatus();
+```
+
+### STEP 4: 중지 / 재개
+
+```javascript
+// 즉시 중지 (메인서브/OUTER 공통)
+window._haltAll = true;
+window._outerInstId = 9999; // OUTER 전용 강제 종료
+
+// 메인서브 재개
+var done = new Set((window._queueSummary||[]).map(r => r.prod));
+window._prodQueue = window._prodQueue.filter(p => !done.has(p));
+window._queueSummary = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+
+// OUTER 라인 재개 (중지된 idx 확인 후)
+window._haltAll = false;
+window.runOuterLine(/* 재개할 idx */);
+```
+
+---
+
+## 기준정보 품번 목록 갱신 방법
+
+기준정보 파일 변경 시에만 실행. 평상시 불필요.
+
+```python
+import openpyxl
+path = "/sessions/intelligent-cool-mayer/mnt/업무리스트/SP3메인서브 생산지시서 (2025.03.20).xlsx"
+wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+ws = wb['SP3 LINE 기준 정보']
+prod_nos = []
+for row in ws.iter_rows(min_col=3, max_col=3, values_only=True):
+    val = row[0]
+    if val:
+        v = str(val).strip()
+        if len(v) >= 8 and any(c.isdigit() for c in v):
+            prod_nos.append(v)
+wb.close()
+seen = set()
+unique = [x for x in prod_nos if not (x in seen or seen.add(x))]
+print(f"총 {len(unique)}개")
+print("'" + "','".join(unique) + "'")
+```
+
+결과를 STEP 1 JS의 `window._refProdNos = new Set([...])` 배열에 교체 후 스킬 재배포.
+
+---
+
+## 기술 환경
+
+| 항목 | 값 |
+|---|---|
+| 그리드 라이브러리 | PQ Grid (jQuery 기반) |
+| 상단 그리드 ID | grid_body |
+| 하단 그리드 ID | sub_grid_body |
+| 저장 버튼 ID | btnSubBundleApply (ID로만 찾을 것) |
+| 상단 행 DOM ID | pq-body-row-u2-{rowIndx}-right (없으면 -left fallback) |
+| 하단 행 DOM ID | pq-body-row-u9-{rowIndx}-right (없으면 -left fallback) |
+| 하단 품명 필드 | MBOM_PART_NM |
+| Viewport | 2133x954 CSS px |
+
+---
+
+## 핵심 주의사항
+
+### 공통
+1. 동기화 구간(x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53)에는 검색·저장 모두 금지
+2. 저장 버튼은 `btnSubBundleApply` ID로만 — class로 찾으면 검색 버튼이 잡힘
+3. `_haltAll` 플래그로 즉시 강제 중단 가능
+
+### 메인서브 라인
+4. `waitSyncClear()` — 검색 직전·저장 직전 양쪽에서 자동 호출됨
+5. ERP 품번은 접미사 포함(예: 89870T64002BL) — prefix 매핑 `_isRefProd()` 사용
+6. row0: OUTER_LINE_CD / row1: SP3M3 고정 / row2+: LINE_RULES 매핑
+7. HOLDER,CLR ASSY → **HCAMS02**
+8. 하단 그리드 로드 대기 2000ms
+
+### OUTER 라인
+9. **setOuterCell은 반드시 async/await로 호출** — 내부에 350ms 딜레이 포함
+10. **scrollColumn 후 350ms 대기 필수** — 생략 시 `.focus()` 에러 (수평 가상 스크롤 렌더 타이밍 문제)
+11. **Enter 키 커밋 필수** — blur/removeChild 방식은 `isDirty=false`로 저장 안 됨
+12. D-RING 키워드는 `'D-RING'` (D-RING ASSY, D-RING DRL 등 모든 패턴 매칭)
+13. 이너볼가이드/베이스락/락킹/비클센서 → 건드리지 않음 (SUB LINE 無)
+14. row0: SD9A01 고정
+15. 상단 행 DOM 5회 재시도 (가상 스크롤 대응)
+16. `_outerInstId` 인스턴스 ID로 중복 실행 방지
+
+---
+
+## 실패 조건
+- ERP 라인배치 관리 화면 미접속 (URL 로드 실패 또는 세션 만료)
+- 품번 검색 결과 0건 (상단 그리드 빈 상태)
+- 하단 SUB ASSY 그리드 로드 실패 (`sub_grid_body` DOM 미생성, 2000ms 대기 후)
+- SELECT 엘리먼트 미존재 — 조립라인 드롭다운 생성 실패
+- 저장 후 ERP 에러 다이얼로그 발생
+
+## 중단 기준
+- 동기화 제한 구간(x0:10~13 등) 진입 시 즉시 중단 → `waitSyncClear()` 자동 대기
+- `window._haltAll = true` 설정 시 즉시 강제 중단
+- 상단 행 DOM 5회 재시도 실패 시 중단 (가상 스크롤 렌더 불가)
+- 기준정보 파일 버전 불일치 감지 시 중단 → 품번 목록 갱신 후 재시작
+
+## 검증 항목
+- 처리 건수 = 대상 품번 수 (건너뛴 품번 없음)
+- 각 품번별 row0(OUTER/SD9A01) + row1(SP3M3) + row2+(LINE_RULES 매핑) 정상 입력
+- 저장 성공 확인 (에러 다이얼로그 미발생)
+- 동기화 구간 위반 0건 (로그 확인)
+
+## 되돌리기 방법
+- ERP 라인배치는 품번별 독립 저장이므로 개별 품번 재처리 가능
+- 잘못 입력된 품번: ERP에서 해당 품번 검색 → 하단 그리드 수동 수정 → 저장
+- 전체 재실행: 시작 행/품번을 지정하여 `runQueue`로 이어서 처리
+- `_haltAll` 후 재개: 마지막 처리 품번 확인 → 다음 품번부터 재시작
+
+## 변경 이력
+
+| 일자 | 버전 | 변경 내용 |
+|---|---|---|
+| 2026-03-28 | v9 | SNAP-ON→ANAAS04 추가, LASER MARKING 키워드 단축(SIDE TONGUE 조건 제거), VEHICLE SENSOR ASSY SUB LINE 無 명시 |
+| 2026-03-21 | v7 | OUTER 라인 전용 섹션 신규 추가. OUTER_RULES(D-RING→'D-RING'확장, ANCHOR ASSY, SIDE TONGUE LASER MARKING 추가). setOuterCell async+scrollColumn+350ms+Enter커밋 방식. outerSave 쿨다운 방식. runOuterLine 리스트업 방식. 이너볼가이드/베이스락/락킹/비클센서 SUB LINE 無 명시 |
+| 2026-03-20 | v6 | HCAMS03→HCAMS02, DOM -right 우선, prefix 매칭(_isRefProd), MBOM_PART_NM 필드 명시, 동기화 구간 검색도 금지(waitSyncClear), saveSubGrid 다이얼로그 개선, searchAndProcess/runQueue 함수 추가, 중지/재개 절차 추가 |
+| 2026-03-20 | v5 | 기준정보 302개 스킬 내장 — 매 세션 Python 추출 불필요 |
+| 2026-03-20 | v4 | 기준정보 검증 로직 추가, HCAMS02->HCAMS03, row1 SP3M3 고정, 전체 C열 탐색, scrollRow 3회 재시도, row0 사후검증 |
+| 최초 | v1 | 초기 작성 |
+
+========================================
+# [6/8] 스킬: line-batch-outer-main (OUTER/MAIN 통합)
+원본경로: 90_공통기준/스킬/line-batch-outer-main/SKILL.md
+========================================
+
+---
+name: line-batch-outer-main
+description: >
+  ERP OUTER/MAIN 라인배치 자동화 스킬. "OUTER 라인배치", "MAIN 라인배치", "아우터 배치",
+  "메인 라인 배치", "SP3M3 라인배치", "리스트업 배치" 등을 언급하면 이 스킬을 사용할 것.
+  검색 없이 현재 화면 리스트 순서대로 처리하는 리스트업 방식.
+  OUTER: runOuterLine / MAIN: runMainLine
+grade: A
+---
+
+# ERP OUTER/MAIN 라인배치 자동화
+
+## 개요
+
+검색 없이 상단 그리드 행 순서대로 처리하는 **리스트업 방식**.
+
+| 작업 | 함수 | ERP 화면 조건 |
+|---|---|---|
+| OUTER 라인 | `runOuterLine(startIdx)` | 라인구분=OUTER, 제품군=RETRACTOR |
+| MAIN 라인 | `runMainLine(startIdx)` | 라인구분=MAIN, 조립라인=[SP3M3]SP3 MAIN, 페이지당 10000건 |
+
+- **ERP URL**: `http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do`
+
+---
+
+## 동기화 제한 시간 ⚠️
+
+| 금지 구간 |
+|-----------|
+| x0:10 ~ x0:13 |
+| x0:20 ~ x0:23 |
+| x0:30 ~ x0:33 |
+| x0:40 ~ x0:43 |
+| x0:50 ~ x0:53 |
+
+---
+
+## 입력 규칙
+
+### OUTER 라인 (OUTER_RULES) — v9
+
+| 품명 포함 문구 | 입력값 | 비고 |
+|---|---|---|
+| WEBBING CUTTING | WABAS01 | WEBBING ASSY보다 먼저 체크 |
+| WEBBING ASSY | WAMAS01 | |
+| D-RING | DRAAS11 | D-RING ASSY / D-RING DRL 등 모든 패턴 |
+| ANCHOR | ANAAS04 | ANCHOR ASSY / ANCHOR BRACKET 등 모든 패턴 |
+| SNAP ON | ANAAS04 | 실제 품명 띄어쓰기 |
+| LASER MARKING | LTAAS01 | SIDE TONGUE 포함 여부 무관 |
+| INNER BALL GUIDE ASSY | SUB LINE 無 | |
+| BASE LOCK ASSY | SUB LINE 無 | |
+| LOCKING ASSY | SUB LINE 無 | |
+| VEHICLE SENSOR ASSY | SUB LINE 無 | |
+| INNER SENSOR ASSY | SUB LINE 無 | |
+| TORSION ASSY | SUB LINE 無 | |
+
+> row0 = **SD9A01 고정** / row1+ = OUTER_RULES 매핑
+
+### MAIN 라인 (MAIN_RULES) — v10 신규
+
+> 품명이 아닌 **PART_TYPE_NM** 값 기준. LINE_DIV_NM1='MAIN' 행만 적용.
+
+| PART_TYPE_NM | 입력값 |
+|---|---|
+| 공정품_SUB | SWAMSMA |
+| SUB | SUB LINE 無 |
+
+> row0/row1(OUTER행)은 건드리지 않음
+
+---
+
+## STEP 1: JS 함수 등록
+
+```javascript
+// =============================================
+// OUTER_RULES (v9)
+// =============================================
+window.OUTER_RULES = [
+  {keyword: 'WEBBING CUTTING',       value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',          value: 'WAMAS01'},
+  {keyword: 'D-RING',                value: 'DRAAS11'},
+  {keyword: 'ANCHOR',                value: 'ANAAS04'},
+  {keyword: 'SNAP ON',               value: 'ANAAS04'},
+  {keyword: 'LASER MARKING',         value: 'LTAAS01'},
+  {keyword: 'INNER BALL GUIDE ASSY', value: 'SUB LINE 無'},
+  {keyword: 'BASE LOCK ASSY',        value: 'SUB LINE 無'},
+  {keyword: 'LOCKING ASSY',          value: 'SUB LINE 無'},
+  {keyword: 'VEHICLE SENSOR ASSY',   value: 'SUB LINE 無'},
+  {keyword: 'INNER SENSOR ASSY',     value: 'SUB LINE 無'},
+  {keyword: 'TORSION ASSY',          value: 'SUB LINE 無'},
+];
+
+// =============================================
+// MAIN_RULES (v10)
+// =============================================
+window.MAIN_RULES = function(partTypeNm) {
+  if (!partTypeNm) return null;
+  var t = partTypeNm.trim();
+  if (t === '공정품_SUB') return 'SWAMSMA';
+  if (t === 'SUB')        return 'SUB LINE 無';
+  return null;
+};
+
+// =============================================
+// 공통 셀 입력 함수 (scrollColumn+350ms+Enter커밋)
+// =============================================
+window.setLineCell = async function(rowIndx, val) {
+  var sub = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+  if (sub && sub[rowIndx] && sub[rowIndx].ASSY_LINE_NM === val) return true;
+  try {
+    document.querySelectorAll('#sub_grid_body .pq-editor').forEach(function(el){
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+    jQuery('#sub_grid_body').pqGrid('scrollRow',    {rowIndx: rowIndx});
+    jQuery('#sub_grid_body').pqGrid('scrollColumn', {dataIndx: 'ASSY_LINE_NM'});
+    await new Promise(function(r){ setTimeout(r, 350); });
+    jQuery('#sub_grid_body').pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+    var sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+    if (!sel || sel.tagName !== 'SELECT') return false;
+    sel.value = val;
+    var actual = sel.value;
+    sel.dispatchEvent(new Event('change', {bubbles: true}));
+    sel.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', keyCode:13, bubbles:true}));
+    sel.dispatchEvent(new KeyboardEvent('keyup',   {key:'Enter', keyCode:13, bubbles:true}));
+    await new Promise(function(r){ setTimeout(r, 150); });
+    return actual === val;
+  } catch(e) {
+    console.warn('[setLineCell] row='+rowIndx+' val='+val+' err='+e.message);
+    return false;
+  }
+};
+
+// =============================================
+// 공통 저장 함수 (쿨다운 600ms)
+// =============================================
+window.lineSave = function() {
+  return new Promise(function(resolve) {
+    document.getElementById('btnSubBundleApply').click();
+    var confirmed=false, finished=false, resolved=false, lastClick=0, COOL=600;
+    var iv = setInterval(function() {
+      if (resolved) { clearInterval(iv); return; }
+      var now = Date.now();
+      if (now - lastClick < COOL) return;
+      var dlgs = Array.from(document.querySelectorAll('.ui-dialog')).filter(function(d){ return d.offsetParent!==null; });
+      for (var i=0; i<dlgs.length; i++) {
+        var dlg=dlgs[i], txt=dlg.innerText||'';
+        var btn=Array.from(dlg.querySelectorAll('button')).find(function(b){ var t=b.textContent.trim(); return (t==='OK'||t==='확인')&&!b.disabled; });
+        if (!btn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmed) { btn.click(); confirmed=true; lastClick=now; break; }
+        if (txt.includes('정상처리') && !finished)          { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+        if (txt.includes('변경된 내용이 없습니다') && !finished) { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('no-change'); return; }
+        if (confirmed && !finished)                         { btn.click(); finished=true; lastClick=now; clearInterval(iv); resolved=true; resolve('saved'); return; }
+      }
+    }, 200);
+    setTimeout(function() { clearInterval(iv); if (resolved) return; resolve('timeout'); }, 30000);
+  });
+};
+
+// =============================================
+// 동기화 대기
+// =============================================
+window.waitSync = async function() {
+  var blocked=[10,11,12,13,20,21,22,23,30,31,32,33,40,41,42,43,50,51,52,53];
+  var min=new Date().getMinutes();
+  if (!blocked.includes(min)) return;
+  var allow=[14,24,34,44,54];
+  var next=allow.find(function(m){return m>min;})||74;
+  var waitMs=((next-min)*60-new Date().getSeconds())*1000+1000;
+  window._lineLog = window._lineLog || [];
+  window._lineLog.push('⏸ 동기화대기 '+min+'분→'+next+'분');
+  await new Promise(function(r){setTimeout(r,waitMs);});
+};
+
+// =============================================
+// runOuterLine: OUTER 라인 리스트업 처리
+// startIdx: 0-based (예: 151번=idx150)
+// =============================================
+window._haltLine = false;
+window._lineLog = [];
+window._lineErrors = [];
+window._lineDone = 0;
+
+window.lineStatus = function() {
+  var total = (jQuery('#grid_body').pqGrid('option','dataModel').data||[]).length;
+  return new Date().getHours()+':'+String(new Date().getMinutes()).padStart(2,'0')+':'+String(new Date().getSeconds()).padStart(2,'0')+
+    ' / done:'+window._lineDone+'/'+total+
+    '\n'+(window._lineLog||[]).slice(-6).join('\n');
+};
+
+window.runOuterLine = async function(startIdx, endIdx) {
+  var topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  if (!topData) { window._lineLog.push('topData없음'); return; }
+  var stopAt = (endIdx !== undefined) ? Math.min(endIdx+1, topData.length) : topData.length;
+  window._haltLine = false;
+  window._lineDone = startIdx;
+  window._lineLog.push('▶ OUTER startIdx='+startIdx+' stopAt='+stopAt);
+
+  for (var i=startIdx; i<stopAt; i++) {
+    if (window._haltLine) { window._lineLog.push('⛔ 중지'); break; }
+    await window.waitSync();
+    if (window._haltLine) break;
+
+    var rowEl=null;
+    for (var t=0; t<5; t++) {
+      try { jQuery('#grid_body').pqGrid('scrollRow',{rowIndx:i}); } catch(e){}
+      await new Promise(function(r){setTimeout(r,1000+t*400);});
+      rowEl=document.getElementById('pq-body-row-u2-'+i+'-right')||document.getElementById('pq-body-row-u2-'+i+'-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) { window._lineLog.push('['+i+'] DOM없음'); window._lineErrors.push(i+':DOM없음'); window._lineDone=i+1; continue; }
+
+    var cells=rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length>1) cells[1].click(); else if(cells[0]) cells[0].click();
+    await new Promise(function(r){setTimeout(r,1800);});
+
+    var sub=jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!sub||sub.length===0) { window._lineLog.push('['+i+'] 하단0행'); window._lineDone=i+1; continue; }
+
+    try {
+      await window.setLineCell(0, 'SD9A01');
+      window._lineLog.push('['+i+'] row0=SD9A01');
+      for (var si=1; si<sub.length; si++) {
+        var nm=(sub[si].MBOM_PART_NM||'').toUpperCase();
+        for (var ri=0; ri<window.OUTER_RULES.length; ri++) {
+          if (nm.includes(window.OUTER_RULES[ri].keyword.toUpperCase())) {
+            var ok=await window.setLineCell(si, window.OUTER_RULES[ri].value);
+            window._lineLog.push('  row'+si+' ['+nm.substring(0,20)+']→'+window.OUTER_RULES[ri].value+(ok?'':' ⚠️'));
+            break;
+          }
+        }
+      }
+    } catch(e) { window._lineLog.push('['+i+'] 예외: '+e.message); }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      await window.waitSync();
+      if (window._haltLine) break;
+      var res=await window.lineSave();
+      window._lineLog.push('  저장='+res);
+    } else { window._lineLog.push('  ['+i+'] 변경없음'); }
+    window._lineDone=i+1;
+    await new Promise(function(r){setTimeout(r,400);});
+  }
+  window._lineLog.push('🏁 OUTER완료: done='+window._lineDone);
+};
+
+// =============================================
+// runMainLine: MAIN 라인 리스트업 처리
+// startIdx: 0-based (예: 151번=idx150)
+// =============================================
+window.runMainLine = async function(startIdx, endIdx) {
+  var topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  if (!topData) { window._lineLog.push('topData없음'); return; }
+  var stopAt = (endIdx !== undefined) ? Math.min(endIdx+1, topData.length) : topData.length;
+  window._haltLine = false;
+  window._lineDone = startIdx;
+  window._lineLog.push('▶ MAIN startIdx='+startIdx+' stopAt='+stopAt);
+
+  for (var i=startIdx; i<stopAt; i++) {
+    if (window._haltLine) { window._lineLog.push('⛔ 중지'); break; }
+    await window.waitSync();
+    if (window._haltLine) break;
+
+    var rowEl=null;
+    for (var t=0; t<5; t++) {
+      try { jQuery('#grid_body').pqGrid('scrollRow',{rowIndx:i}); } catch(e){}
+      await new Promise(function(r){setTimeout(r,800+t*300);});
+      rowEl=document.getElementById('pq-body-row-u2-'+i+'-right')||document.getElementById('pq-body-row-u2-'+i+'-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) { window._lineLog.push('['+i+'] DOM없음'); window._lineErrors.push(i+':DOM없음'); window._lineDone=i+1; continue; }
+
+    var cells=rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length>1) cells[1].click(); else if(cells[0]) cells[0].click();
+    await new Promise(function(r){setTimeout(r,1800);});
+
+    var sub=jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!sub||sub.length===0) { window._lineLog.push('['+i+'] 하단0행'); window._lineDone=i+1; continue; }
+
+    try {
+      for (var si=0; si<sub.length; si++) {
+        if ((sub[si].LINE_DIV_NM1||'').trim() !== 'MAIN') continue;
+        var val=window.MAIN_RULES(sub[si].PART_TYPE_NM);
+        if (!val) continue;
+        var ok=await window.setLineCell(si, val);
+        window._lineLog.push('  ['+i+'] row'+si+' '+sub[si].PART_TYPE_NM+'→'+val+(ok?'':' ⚠️'));
+      }
+    } catch(e) { window._lineLog.push('['+i+'] 예외: '+e.message); }
+
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      await window.waitSync();
+      if (window._haltLine) break;
+      var res=await window.lineSave();
+      window._lineLog.push('  저장='+res);
+    } else { window._lineLog.push('  ['+i+'] 변경없음'); }
+    window._lineDone=i+1;
+    await new Promise(function(r){setTimeout(r,400);});
+  }
+  window._lineLog.push('🏁 MAIN완료: done='+window._lineDone);
+};
+
+'✅ OUTER/MAIN 함수 등록 완료 v10';
+```
+
+---
+
+## STEP 2: 실행
+
+```javascript
+// OUTER 라인 — 1번(idx0)부터
+window._haltLine = false;
+window.runOuterLine(0);
+
+// OUTER 라인 — N번부터 (예: 120번=idx119)
+window._haltLine = false;
+window.runOuterLine(119);
+
+// MAIN 라인 — 151번(idx150)부터
+window._haltLine = false;
+window.runMainLine(150);
+
+// MAIN 라인 — N번부터
+window._haltLine = false;
+window.runMainLine(/* idx */);
+```
+
+## STEP 3: 진행 확인 / 중지 / 재개
+
+```javascript
+// 진행 확인
+window.lineStatus();
+
+// 중지
+window._haltLine = true;
+
+// 재개 (현재 위치 확인 후)
+window._haltLine = false;
+window.runOuterLine(/* 재개 idx */);
+// 또는
+window.runMainLine(/* 재개 idx */);
+```
+
+---
+
+## 핵심 주의사항
+
+**OUTER 공통:**
+1. `setLineCell` — scrollColumn 후 **350ms 대기 필수**
+2. Enter 키 커밋 필수 — blur 방식은 isDirty=false
+3. row0 = SD9A01 고정
+4. 상단 행 DOM 5회 재시도
+
+**MAIN 전용:**
+5. LINE_DIV_NM1='MAIN' 행만 처리
+6. PART_TYPE_NM 기준 판단 (품명 아님)
+7. row0/row1(OUTER행) 건드리지 않음
+8. 페이지당 10000건 설정 후 실행
+
+---
+
+## 실패 조건
+
+다음 중 하나라도 해당하면 **실행 실패**로 판정한다:
+
+| 조건 | 판정 |
+|------|------|
+| DOM 미발견 (5회 재시도 후) | 해당 행 FAIL → `_lineErrors` 기록 |
+| `setLineCell` 실패 (SELECT 미출현 또는 값 불일치) | 해당 행 FAIL (⚠️ 로그) |
+| 저장 timeout (30초 초과) | 해당 행 FAIL |
+| `_lineErrors` 배열에 1건 이상 존재 | 전체 결과 **부분 실패** |
+| ERP 페이지 로딩 실패 / 세션 만료 | 전체 FAIL |
+| topData 미존재 (그리드 데이터 없음) | 전체 FAIL |
+
+## 중단 기준
+
+다음 상황에서는 **즉시 중단** (`_haltLine = true`):
+
+1. ERP 세션 만료 — 상단 그리드 데이터 소실
+2. 연속 5행 이상 `DOM없음` 에러 — 페이지 구조 이상
+3. 동기화 금지 구간에서 예외 발생
+4. `#sub_grid_body` 그리드 미존재 — 화면 이탈
+5. 사용자 수동 중지 (`_haltLine = true`)
+
+## 검증 항목
+
+실행 완료 후 반드시 확인:
+
+- [ ] `lineStatus()` → done = total (전체 행 처리 완료)
+- [ ] `_lineErrors` 빈 배열 확인
+- [ ] 무작위 3행 ERP에서 직접 확인 — 조립라인 값 정상
+
+**OUTER 전용:**
+- [ ] row0 = `SD9A01` 고정 확인
+- [ ] row1+ OUTER_RULES 매핑 일치
+
+**MAIN 전용:**
+- [ ] `LINE_DIV_NM1='MAIN'` 행만 처리됐는지 확인
+- [ ] row0/row1(OUTER행) 미변경 확인
+- [ ] 공정품_SUB → `SWAMSMA` / SUB → `SUB LINE 無` 매핑 일치
+
+## 되돌리기 방법
+
+| 범위 | 방법 |
+|------|------|
+| 특정 행 | ERP에서 해당 행 클릭 → SUB ASSY 조립라인을 공란으로 변경 → 저장 |
+| 변경 행 추적 | `_lineLog`에서 `저장=saved` 행 인덱스 추출 가능 |
+| 전체 롤백 | **이전 값 미보존** — ERP 변경 이력 조회 필요 |
+
+> 주의: ERP 저장은 비가역적. `_lineLog`를 반드시 보존하여 변경 범위 추적 가능하게 유지할 것.
+
+---
+
+## 변경 이력
+
+| 일자 | 버전 | 내용 |
+|---|---|---|
+| 2026-03-21 | v10 | 스킬 분리 — OUTER+MAIN 전용으로 독립. MAIN 라인 신규(MAIN_RULES: 공정품_SUB→SWAMSMA, SUB→SUB LINE 無). setLineCell/lineSave/waitSync 공통화 |
+| 2026-03-21 | v9 | OUTER_RULES: ANCHOR 확장, SNAP ON, LASER MARKING, TORSION ASSY 추가, runOuterLine 검증/재시도 |
+
+========================================
+# [7/8] 스킬: line-batch-mainsub (메인서브 자동화)
+원본경로: 90_공통기준/스킬/line-batch-mainsub/SKILL.md
+========================================
+
+---
+name: line-batch-mainsub
+description: >
+  ERP 메인서브 라인배치 자동화 스킬. "메인서브 라인배치", "메인서브 배치", "SP3 품번 배치",
+  "품번 검색 배치", "메인서브 자동화" 등을 언급하면 이 스킬을 사용할 것.
+  SP3메인서브 생산지시서 품번을 검색하고, 하단 SUB ASSY 그리드에 조립라인을 자동 입력 후 저장.
+  품번 검색 기반 처리 (searchAndProcess / runQueue).
+grade: A
+---
+
+# ERP 메인서브 라인배치 자동화
+
+## 개요
+
+SP3메인서브 생산지시서 품번을 ERP에서 순차 검색 → 상단 그리드 행 클릭 → 하단 SUB ASSY 조립라인 입력 → 저장.
+
+- **처리 방식**: 품번 검색 기반 (`searchAndProcess` / `runQueue`)
+- **ERP URL**: `http://erp-dev.samsong.com:19100/partLineBatchMng/viewPartLineBatchMng.do`
+- **기준정보**: 302개 내장 (2026-03-20 기준)
+
+---
+
+## 동기화 제한 시간 ⚠️
+
+**매시 아래 구간에는 검색·저장 절대 금지:**
+
+| 금지 구간 |
+|-----------|
+| x0:10 ~ x0:13 |
+| x0:20 ~ x0:23 |
+| x0:30 ~ x0:33 |
+| x0:40 ~ x0:43 |
+| x0:50 ~ x0:53 |
+
+`waitSyncClear()` 함수가 자동 처리.
+
+---
+
+## 품명 → 조립라인 매핑 규칙 (LINE_RULES)
+
+**PART_TYPE_NM 우선 체크 (품명보다 먼저):**
+
+| PART_TYPE_NM | 선택값 |
+|---|---|
+| 공정품_SUB | SWAMS04 |
+
+**품명(MBOM_PART_NM) 매핑 (PART_TYPE_NM 해당 없을 때):**
+
+| 품명 포함 문구 | 선택값 | 비고 |
+|---|---|---|
+| HOLDER,CLR ASSY | HCAMS02 | 반드시 먼저 체크 |
+| HOLDER ALR SENSOR ASSY | HASMS02 | |
+| RETRACTION SPRING | SUB LINE 無 | |
+| INNER BALL GUIDE ASSY | SUB LINE 無 | |
+| BASE LOCK ASSY | SUB LINE 無 | |
+| LOCKING ASSY | SUB LINE 無 | |
+| VEHICLE SENSOR ASSY | SUB LINE 無 | |
+| INNER SENSOR ASSY | SUB LINE 無 | |
+| WEBBING CUTTING | WABAS01 | WEBBING ASSY보다 먼저 체크 |
+| WEBBING ASSY | WAMAS01 | |
+
+## 행별 처리 규칙
+
+| 행 | 처리 |
+|---|---|
+| row0 | OUTER_LINE_CD 입력 (공란이면 최빈값 fallback) |
+| row1 | SP3M3 고정 |
+| row2+ | LINE_RULES 매핑, 해당 없으면 건너뜀 |
+
+---
+
+## STEP 1: JS 함수 등록
+
+```javascript
+window._refProdNos = new Set(['89870AT000','89880AT000','89870AT200','89880AT200','89870AT500','89880AT500','89870S1100','89880S1100','89870P4500','89880P4500','89870P2200','89880P2200','7460137000','7460137010','7460137500','7460139000','7460139010','7460139500','7460141000','7460141010','7460142500','7460141510','7460237000','7460237010','7460237500','7460239000','7460239010','7460239500','7460241000','7460241010','7460242500','7460241510','7460137100','7460141100','7460237100','7460241100','7460137600','7460237600','7560137000','7560141000','7560141010','7560141020','7560141030','7560237000','7560241000','7560241010','7560241020','7460141500','7460241500','7560144000','7560244000','88810K2000','88820K2000','88810K2100','88820K2100','89870K2100','89880K2100','89870K2000','89880K2000','88810K2300','88820K2300','898216D100','898226D300','898226D100','898216D300','89870CV500','89870XG500','89880CV500','89880XG500','88820G8001','88820G8201','88810T1000','88810JI000','88820T1000','88820JI000','88820T1100','88820T1200','88820JI100','88820JI200','88810T1500','88810JI500','88820T1500','88820JI500','88810T1100','88810T1200','88810JI100','88810JI200','88810T6000','88810T6100','88810T6300','88820T6000','88820T6100','88810T6500','88820T6300','88820T6500','89870T6000','89880T6000','89870T6100','89880T6100','89870T6500','89880T6500','89870T6600','89880T6600','89870T6700','89880T6700','88810AR000','88810AR100','88820AR100','88820AR000','88810AR500','88820AR500','88810AR300','88820AR300','89880AR000','89870AR000','89880AR100','89870AR100','89870AR500','89880AR500','89870AA000','89870AA010','89880AA000','89880AA010','89870AA600','89870AA610','89880AA600','89880AA610','89870AA500','89870AA510','89870T6400','89870T6800','89880T6400','89880T6800','88810CU100','88810CU300','88820CU100','88820CU300','89870CU000','89880CU000','89870CU100','89880CU100','88810DO000','88810DO300','88820DO000','88810DO200','88820DO200','88820DO300','88810DO500','88810XA500','88820DO500','88820XA500','89870DO000','89880DO000','89870DO200','89880DO200','89870DO500','89880DO500','89870XA500','89880XA500','89870XA510','89870DO510','89880XA510','89880DO510','89870P6000','89880P6000','89870P6100','89880P6100','89870P6500','89880P6500','88810R6000','88820R6000','89870R6000','89880R6000','88810GO000','88810GO200','88820GO000','88810GO300','88820GO200','88810GO500','88820GO300','89870GO000','89880GO000','89870GO200','89880GO200','88810TD000','88820TD000','88820GO500','89870GO500','89870TD000','89880GO500','89880TD000','MO89870R6000','MO89880R6000','88810BQ000','88810BQ100','88820BQ000','88820BQ100','89870XH000','89880XH000','89870XH100','89880XH100','89870XH500','89880XH500','88810SZ000','88810SZ100','88820SZ000','88820SZ100','88810P8000','88820P8000','88810P8500','88820P8500','89870P8500','89880P8500','89873P8500','89883P8500','89870SW000','89880SW000','89870SW200','89880SW200','88810X9500','88820X9500','89870X9200','89880X9200','88810BM000','88820BM000','88820BM200','88810BM100','88820BM100','89870BS000','W89870BS000','89880BS000','W89880BS000','89870BS200','89870DE200','W89870BS200','W89870DE200','89880BS200','89880DE200','W89880BS200','W89880DE200','89870BS500','W89870BS500','89880BS500','W89880BS500','89870DN000','89870DN500','89880DN000','89880DN500','89870P8200','89880P8200','89873P8200','89883P8200','89870AT050','89880AT050','89870AT150','89880AT150','88820GG500','88810GG000','88810GG100','88820GG000','88820GG100','89870GG010','89880GG010','89870GG020','89880GG020','88810NT300','88810NT400','88820NT300','88820NT400','89870NT000','89880NT000','88810NV000','89870NV000','89880NV000','88810BT000','88810BT100','88810BT200','88810BT300','88820BT000','88820BT100','88820BT200','88820BT300','89870BT000','89880BT000','88810BN200','88810BN300','88820BN200','88820BN300','89870BN100','89880BN100','89870XV000','89880XV000','89870XV500','89880XV500','89870GJ000','89880GJ000','89870BP000','89880BP000','88810BP000','88820BP000','89870BP100','89880BP100']);
+
+window._isRefProd = function(prodNo) {
+  if (!prodNo) return false;
+  if (window._refProdNos.has(prodNo)) return true;
+  for (const ref of window._refProdNos) { if (prodNo.startsWith(ref)) return true; }
+  return false;
+};
+
+window.LINE_RULES = [
+  {keyword: 'HOLDER,CLR ASSY',       value: 'HCAMS02'},
+  {keyword: 'HOLDER ALR SENSOR ASSY',value: 'HASMS02'},
+  {keyword: 'RETRACTION SPRING',     value: 'SUB LINE 無'},
+  {keyword: 'INNER BALL GUIDE ASSY', value: 'SUB LINE 無'},
+  {keyword: 'BASE LOCK ASSY',        value: 'SUB LINE 無'},
+  {keyword: 'LOCKING ASSY',          value: 'SUB LINE 無'},
+  {keyword: 'VEHICLE SENSOR ASSY',   value: 'SUB LINE 無'},
+  {keyword: 'INNER SENSOR ASSY',     value: 'SUB LINE 無'},
+  {keyword: 'WEBBING CUTTING',       value: 'WABAS01'},
+  {keyword: 'WEBBING ASSY',          value: 'WAMAS01'},
+];
+
+window.getLineValue = function(partNm) {
+  if (!partNm) return null;
+  for (const rule of window.LINE_RULES) {
+    if (partNm.toUpperCase().includes(rule.keyword.toUpperCase())) return rule.value;
+  }
+  return null;
+};
+
+window.setCellValue = function(rowIndx, val, fallbackVal) {
+  const $sub = jQuery('#sub_grid_body');
+  $sub.pqGrid('editCell', {rowIndx: rowIndx, dataIndx: 'ASSY_LINE_NM'});
+  const sel = document.querySelector('#sub_grid_body .pq-editor-focus');
+  if (!sel || sel.tagName !== 'SELECT') return {ok: false, reason: 'no SELECT'};
+  sel.value = val;
+  if (!sel.value && fallbackVal) sel.value = fallbackVal;
+  const actualVal = sel.value;
+  sel.dispatchEvent(new Event('change', {bubbles: true}));
+  jQuery(sel).trigger('blur');
+  return {ok: true, val: actualVal, tried: val};
+};
+
+window.checkSyncBlock = function() {
+  const min = new Date().getMinutes();
+  const blocked = [10,11,12,13,20,21,22,23,30,31,32,33,40,41,42,43,50,51,52,53];
+  return {blocked: blocked.includes(min), minute: min};
+};
+
+window.waitSyncClear = async function(label) {
+  const chk = window.checkSyncBlock();
+  if (!chk.blocked) return;
+  const allowMins = [4,14,24,34,44,54];
+  const now = new Date();
+  const curMin = now.getMinutes();
+  const nextAllow = allowMins.find(m => m > curMin) || (allowMins[0] + 60);
+  const waitMs = ((nextAllow - curMin) * 60 - now.getSeconds()) * 1000 + 1000;
+  window._processLog = window._processLog || [];
+  window._processLog.push('⏸ 동기화대기(' + (label||'') + ') ' + curMin + '분→' + nextAllow + '분');
+  await new Promise(r => setTimeout(r, waitMs));
+};
+
+window.saveSubGrid = function() {
+  return new Promise(resolve => {
+    document.getElementById('btnSubBundleApply').click();
+    let confirmClicked = false;
+    const iv = setInterval(() => {
+      const dlgs = Array.from(document.querySelectorAll('.ui-dialog')).filter(d => d.offsetParent !== null);
+      for (const dlg of dlgs) {
+        const txt = dlg.innerText || '';
+        const okBtn = Array.from(dlg.querySelectorAll('button')).find(b => b.textContent.trim() === 'OK' || b.textContent.trim() === '확인');
+        if (!okBtn) continue;
+        if (txt.includes('저장하시겠습니까') && !confirmClicked) { okBtn.click(); confirmClicked = true; break; }
+        if (txt.includes('정상처리')) { okBtn.click(); clearInterval(iv); resolve('saved'); return; }
+        if (txt.includes('변경된 내용이 없습니다')) { okBtn.click(); clearInterval(iv); resolve('no-change'); return; }
+        if (confirmClicked) { okBtn.click(); clearInterval(iv); resolve('saved'); return; }
+      }
+    }, 150);
+    setTimeout(() => { clearInterval(iv); resolve('timeout'); }, 10000);
+  });
+};
+
+window.processAllRows = async function(startTopRowIndx) {
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  const log = [];
+  window._processErrors = window._processErrors || [];
+  for (let topIdx = startTopRowIndx; topIdx < topData.length; topIdx++) {
+    if (window._haltAll || window._stopProcess) { log.push('--- 중지 ---'); break; }
+    const topRow = topData[topIdx];
+    const prodNo = (topRow.PROD_NO || '').trim();
+    const outerLine = topRow.OUTER_LINE_CD || window._fallbackLine || 'SP2A02';
+    if (!window._isRefProd(prodNo)) {
+      log.push('[' + topIdx + '] SKIP: ' + prodNo);
+      window._processLog = window._processLog || [];
+      window._processLog.push('[' + topIdx + '] SKIP: ' + prodNo);
+      continue;
+    }
+    let rowEl = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      jQuery('#grid_body').pqGrid('scrollRow', {rowIndx: topIdx});
+      await new Promise(r => setTimeout(r, 700 + attempt * 300));
+      rowEl = document.getElementById('pq-body-row-u2-' + topIdx + '-right') || document.getElementById('pq-body-row-u2-' + topIdx + '-left');
+      if (rowEl) break;
+    }
+    if (!rowEl) { log.push('[' + topIdx + '] DOM없음: ' + prodNo); window._processErrors.push(prodNo + ':DOM없음'); continue; }
+    const cells = rowEl.querySelectorAll('.pq-grid-cell');
+    if (cells.length > 1) cells[1].click(); else if (cells[0]) cells[0].click();
+    await new Promise(r => setTimeout(r, 2000));
+    const subData = jQuery('#sub_grid_body').pqGrid('option','dataModel').data;
+    if (!subData || subData.length === 0) { log.push('[' + topIdx + '] 하단0행: ' + prodNo); window._processErrors.push(prodNo + ':하단0행'); continue; }
+    window.setCellValue(0, outerLine, window._fallbackLine);
+    window._processLog = window._processLog || [];
+    window._processLog.push('  [' + topIdx + '] ' + prodNo + ' OUTER=' + outerLine);
+    if (subData.length > 1) window.setCellValue(1, 'SP3M3', null);
+    for (let si = 2; si < subData.length; si++) {
+      const nm = subData[si].MBOM_PART_NM || '';
+      const pt = (subData[si].PART_TYPE_NM || '').trim();
+      let val = null;
+      if (pt === '공정품_SUB') val = 'SWAMS04';
+      else val = window.getLineValue(nm);
+      if (val) { window.setCellValue(si, val, null); window._processLog.push('  row' + si + '[' + nm.substring(0,30) + '|' + pt + ']->' + val); log.push('  row' + si + '->' + val); }
+    }
+    if (jQuery('#sub_grid_body').pqGrid('isDirty')) {
+      await window.waitSyncClear('저장');
+      if (window._haltAll) { log.push('--- 중지 ---'); break; }
+      const saveResult = await window.saveSubGrid();
+      log.push('  저장=' + saveResult);
+      window._processLog.push('  저장=' + saveResult);
+    } else { log.push('  변경없음'); window._processLog.push('  변경없음'); }
+  }
+  return log;
+};
+
+window.searchAndProcess = async function(prodNo) {
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  await window.waitSyncClear('검색:' + prodNo);
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const inp = document.getElementById('searchProdNo');
+  if (!inp) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'INPUT없음'};
+  inp.focus(); inp.value = ''; inp.value = prodNo;
+  inp.dispatchEvent(new Event('input', {bubbles: true}));
+  const searchBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === '검색');
+  if (!searchBtn) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색버튼없음'};
+  searchBtn.click();
+  await new Promise(r => setTimeout(r, 2500));
+  if (window._haltAll) return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: 'HALTED'};
+  const topData = jQuery('#grid_body').pqGrid('option','dataModel').data;
+  if (!topData || topData.length === 0) { window._processLog = window._processLog || []; window._processLog.push('[' + prodNo + '] 검색없음'); return {prod: prodNo, rows: 0, saved: 0, noChange: 0, skip: 0, err: 0, note: '검색없음'}; }
+  const freq = {};
+  topData.forEach(r => { if (r.OUTER_LINE_CD) freq[r.OUTER_LINE_CD] = (freq[r.OUTER_LINE_CD]||0)+1; });
+  window._fallbackLine = Object.entries(freq).sort((a,b) => b[1]-a[1])[0]?.[0] || 'SP2A02';
+  window._processLog = window._processLog || [];
+  window._processLog.push('[' + prodNo + '] ' + topData.length + '행 OUTER=' + window._fallbackLine);
+  const logArr = await window.processAllRows(0);
+  const saved    = logArr.filter(l => l.includes('저장=saved')).length;
+  const noChange = logArr.filter(l => l.includes('변경없음')).length;
+  const skip     = logArr.filter(l => l.includes('SKIP')).length;
+  const err      = (window._processErrors||[]).length;
+  return {prod: prodNo, rows: topData.length, saved, noChange, skip, err};
+};
+
+window.runQueue = async function() {
+  if (window._runningQueue) { return ['이미 실행중']; }
+  window._runningQueue = true;
+  window._stopProcess = false;
+  window._queueSummary = window._queueSummary || [];
+  window._lastQueueResult = null;
+  for (const prod of window._prodQueue) {
+    if (window._stopProcess || window._haltAll) break;
+    const r = await window.searchAndProcess(prod);
+    window._queueSummary.push(r);
+    window._lastQueueResult = r;
+  }
+  window._runningQueue = false;
+  window._queueDone = true;
+  return window._queueSummary;
+};
+
+'✅ 메인서브 함수 등록 완료 v10';
+```
+
+---
+
+## STEP 2: 실행
+
+```javascript
+// 전체 302개 처음부터
+var all = Array.from(window._refProdNos).sort();
+window._prodQueue = all;
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+```javascript
+// 특정 품번부터 이어서
+var all = Array.from(window._refProdNos).sort();
+var idx = all.indexOf('89870T6400'); // 시작 품번
+window._prodQueue = all.slice(idx);
+window._queueSummary = [];
+window._processLog = [];
+window._processErrors = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+## STEP 3: 진행 확인 / 중지 / 재개
+
+```javascript
+// 진행 확인
+var s = window._queueSummary||[];
+JSON.stringify({done: s.length+'/'+window._prodQueue.length, last: window._lastQueueResult, running: window._runningQueue, time: new Date().toLocaleTimeString()});
+
+// 중지
+window._haltAll = true;
+window._stopProcess = true;
+
+// 재개
+var done = new Set((window._queueSummary||[]).map(r => r.prod));
+window._prodQueue = window._prodQueue.filter(p => !done.has(p));
+window._queueSummary = [];
+window._haltAll = false;
+window._stopProcess = false;
+window._runningQueue = false;
+window.runQueue();
+```
+
+---
+
+## 핵심 주의사항
+
+1. 동기화 구간 검색·저장 금지 — `waitSyncClear()` 자동 처리
+2. 저장 버튼은 `btnSubBundleApply` ID로만
+3. row0: OUTER_LINE_CD / row1: SP3M3 고정 / row2+: LINE_RULES 매핑
+4. HOLDER,CLR ASSY → HCAMS02 (LINE_RULES 최우선)
+5. ERP 품번 접미사 포함 → `_isRefProd()` prefix 매핑
+
+---
+
+## 실패 조건
+
+다음 중 하나라도 해당하면 **실행 실패**로 판정한다:
+
+| 조건 | 판정 |
+|------|------|
+| 검색 결과 0건 (품번 미존재) | 해당 품번 SKIP (전체 FAIL 아님) |
+| DOM 미발견 (3회 재시도 후) | 해당 행 FAIL → `_processErrors` 기록 |
+| SELECT 요소 미출현 (셀 편집 실패) | 해당 행 FAIL |
+| 저장 timeout (10초 초과) | 해당 행 FAIL |
+| `_processErrors` 배열에 1건 이상 존재 | 전체 결과 **부분 실패** |
+| ERP 페이지 로딩 실패 / 세션 만료 | 전체 FAIL |
+
+## 중단 기준
+
+다음 상황에서는 **즉시 중단** (`_haltAll = true`):
+
+1. ERP 세션 만료 또는 로그아웃 감지 (검색 버튼 미존재 등)
+2. 연속 3품번 이상 `DOM없음` 에러 — 페이지 구조 이상 의심
+3. 동기화 금지 구간에서 예외 발생
+4. `searchProdNo` 입력 필드 미존재 — 화면 이탈
+5. 사용자 수동 중지 (`_haltAll = true` / `_stopProcess = true`)
+
+## 검증 항목
+
+실행 완료 후 반드시 확인:
+
+- [ ] `_queueSummary` 전체 → `err` 합계 = 0
+- [ ] 처리 완료 품번수 = 대상 품번수 (`_prodQueue.length`)
+- [ ] `_processErrors` 빈 배열 확인
+- [ ] 무작위 3개 품번 ERP에서 직접 확인 — `ASSY_LINE_NM` 값 정상
+- [ ] row0: OUTER_LINE_CD / row1: SP3M3 / row2+: LINE_RULES 매핑 일치
+
+## 되돌리기 방법
+
+| 범위 | 방법 |
+|------|------|
+| 특정 품번 | ERP에서 해당 품번 검색 → SUB ASSY 조립라인을 공란으로 변경 → 저장 |
+| 부분 롤백 | `_processErrors` 기록 품번만 수동 확인/수정 |
+| 전체 롤백 | **이전 값 미보존** — ERP 변경 이력 조회 필요 |
+| 변경 행 추적 | `_processLog`에서 저장=saved 행 목록 추출 가능 |
+
+> 주의: ERP 저장은 비가역적 — 이전 값을 자동 복원하는 기능 없음. 대량 롤백 시 ERP 관리자 지원 필요.
+
+---
+
+## 변경 이력
+
+| 일자 | 버전 | 내용 |
+|---|---|---|
+| 2026-03-21 | v10 | 스킬 분리 — 메인서브 전용으로 독립 |
+| 2026-03-20 | v6 | HCAMS03→HCAMS02, prefix 매핑, 동기화 구간 처리 등 |
+
+========================================
+# [8/8] 스킬: line-mapping-validator (정합성 검증)
+원본경로: 90_공통기준/스킬/line-mapping-validator/SKILL.md
+========================================
+
+---
+name: line-mapping-validator
+description: >
+  품번-라인배정 정합성 검증 스킬. 기준 품번 파일과 라인배정(ERP/GERP) 파일을 비교하여
+  누락·오기입·컬러코드 차이·라인 미배정을 판정하고 보고용 형식으로 정리한다.
+  사용자가 "품번 검증", "라인배정 검증", "정합성 검증", "품번 비교", "누락 확인",
+  "라인 누락", "배정 확인", "품번 대조", "매핑 검증", "라인매핑", "기준 대비 확인",
+  "GERP 품번 비교", "배정 누락 체크", "ENDPART 확인", "품번 매칭" 등을 언급하면
+  반드시 이 스킬을 사용할 것. 라인배치 작업(line-batch-management) 후 결과 검증이
+  필요할 때도 이 스킬을 사용한다.
+grade: B
+---
+
+# 품번-라인배정 정합성 검증
+
+## 개요
+
+기준 품번 파일(마스터)과 라인배정 파일(검증 대상)을 비교하여,
+품번 단위로 정합성을 판정하고 실무자가 바로 검토할 수 있는 보고서를 만든다.
+
+이 스킬의 핵심 가치:
+- 수동 대조 시 2~3시간 걸리는 품번 검증을 10분 이내로 줄인다
+- "누락인지 오기입인지 컬러확장인지"를 사람 대신 1차 판정해준다
+- 판정 근거를 제시해서 실무자가 최종 확인만 하면 된다
+
+---
+
+## 입력 자료
+
+### 필수
+| 항목 | 설명 | 예시 |
+|------|------|------|
+| 기준 파일 | 마스터 품번 목록 (xlsx/csv) | SP3M3_품번리스트.xlsx (302건) |
+| 라인배정 파일 | 검증 대상 (xlsx/csv) | ENDPART라인배정.xlsx (1,476건) |
+
+### 선택 (미제공 시 자동 탐색 후 사용자 확인)
+| 항목 | 설명 | 기본 동작 |
+|------|------|-----------|
+| 시트명 | 대상 시트 | 자동 탐색: 데이터가 가장 많은 시트 선택 |
+| 품번 컬럼 | 품번이 들어있는 컬럼 | 헤더에서 "품번", "제품번호", "PART" 등 탐색 |
+| 라인코드 컬럼 | 라인코드 컬럼 | "조립라인", "라인", "LINE" 등 탐색 |
+| 비교 대상 라인 | 특정 라인만 볼 때 | 전체 |
+| 컬러코드 규칙 | 품번에서 컬러코드 분리법 | 뒤 2~3자리, 사용자 확인 후 적용 |
+
+### 파일 구조 주의사항
+
+이 업무에서 다루는 엑셀 파일들은 대부분 아래 특성이 있다:
+- **2행 헤더**: 1행이 상위 카테고리, 2행이 실제 컬럼명인 경우가 많다
+- **병합셀**: 헤더에 병합셀이 있어서 openpyxl로 읽을 때 None이 나올 수 있다
+- **시트명이 공백이거나 특수문자**: `ws = wb.worksheets[0]`처럼 인덱스로 접근이 안전하다
+- **빈 행 섞임**: 중간에 빈 행이 있을 수 있으므로 None 체크 필수
+
+---
+
+## 품번 비교 원칙
+
+GPT가 설계한 핵심 원칙을 그대로 채택하되, 실행 방법을 구체화한다.
+
+### 1. 기준 파일이 마스터다
+기준 파일의 품번을 정답 목록으로 본다. 라인배정 파일은 확인 대상이다.
+라인배정에만 있고 기준에 없는 품번은 별도 "기준 미등록" 목록으로 분리한다.
+
+### 2. 접두어는 건드리지 않는다
+접두어(예: SP3M3-)는 품번의 일부다. 접두어가 다르면 다른 품번이다.
+"접두어 빼면 맞을 것 같은데" 싶어도 임의로 제거하지 않는다.
+
+### 3. 컬러코드는 2단계로 비교한다
+자동차 부품 품번은 보통 [모품번]+[컬러코드] 구조다.
+기준 파일은 모품번만, 라인배정 파일은 컬러코드까지 붙어있는 경우가 많다.
+
+```
+1차: 전체 품번 직접 비교 → 완전 일치 먼저 잡기
+2차: 모품번 기준 확장 비교 → 기준 모품번이 라인배정 품번의 앞부분과 일치하는지
+```
+
+컬러코드 분리 규칙이 불명확하면 **임의로 잘라내지 말고** 사용자에게 확인:
+"뒤 2자리를 컬러코드로 보고 분리했습니다. 맞습니까?"
+
+### 4. 품번이 있어도 라인이 없으면 문제다
+품번 자체는 존재하지만 해당 라인코드가 배정되지 않은 경우 →
+"완전누락"이 아니라 "라인누락"으로 분리. 실무적으로 조치가 다르다.
+
+### 5. 애매하면 확정하지 않는다
+아래 경우는 바로 누락 확정하지 않는다:
+- 유사 품번이 존재 (숫자 1~2자리 차이)
+- 모품번은 같은데 컬러코드만 다름
+- 품번 표기 규칙(하이픈, 공백, 대소문자)만 다름
+
+→ "판정유보" 또는 "기준오기입의심"으로 분리하고 사유를 적는다.
+실무자가 최종 판단할 수 있도록 근거를 제공하는 게 이 스킬의 역할이다.
+
+---
+
+## 판정 코드
+
+| 코드 | 판정 | 의미 | 실무 조치 |
+|------|------|------|-----------|
+| A | 일치 | 품번·라인코드 모두 일치 | 없음 |
+| B | 컬러확장일치 | 모품번 일치 + 컬러코드 확장 존재 + 라인 일치 | 없음 (정상) |
+| C | 라인누락 | 품번/모품번은 존재하나 대상 라인코드 없음 | 라인배정 추가 필요 |
+| D | 기준오기입의심 | 유사품번 존재, 오타/자릿수 차이 추정 | 기준파일 확인 필요 |
+| E | 완전누락 | 직접·모품번·유사 모두 불일치 | 라인배정 신규 등록 필요 |
+| F | 판정유보 | 자료 부족/컬럼 불명확/규칙 모호 | 추가 확인 필요 |
+
+---
+
+## 실행 절차
+
+### Step 1. 파일 구조 파악
+
+openpyxl로 두 파일을 열어 구조를 확인한다.
+
+```python
+import openpyxl
+
+def scan_file(path):
+    wb = openpyxl.load_workbook(path, data_only=True)
+    for i, name in enumerate(wb.sheetnames):
+        ws = wb.worksheets[i]
+        print(f"시트 [{i}] '{name}': {ws.max_row}행 x {ws.max_column}열")
+        # 첫 3행 출력 (헤더 파악)
+        for row in ws.iter_rows(min_row=1, max_row=3, values_only=True):
+            print([str(v)[:20] if v else '(빈칸)' for v in row])
+```
+
+**사용자에게 확인받을 것:**
+- "기준 파일의 품번 컬럼은 B열('품번'), 라인배정 파일의 품번은 D열('제품번호'), 라인코드는 G열('조립라인')로 보입니다. 맞습니까?"
+- 확인 없이 진행하지 않는다.
+
+### Step 2. 품번 정규화
+
+```python
+def normalize(part_no):
+    """품번 정규화: 공백제거, 대문자, 접두어 유지"""
+    if part_no is None:
+        return ""
+    s = str(part_no).strip().upper()
+    s = " ".join(s.split())  # 연속 공백 → 단일 공백
+    return s
+
+def extract_base(part_no, color_len=0):
+    """모품번 추출. color_len=0이면 전체 반환 (컬러코드 규칙 미확정)"""
+    if color_len > 0 and len(part_no) > color_len:
+        return part_no[:-color_len]
+    return part_no
+```
+
+**주의**: `extract_base`의 `color_len`은 사용자가 확인한 후에만 0이 아닌 값을 사용한다.
+
+### Step 3. 1차 직접 비교
+
+기준 품번 전체를 라인배정 품번과 정규화 후 직접 비교한다.
+
+```python
+# 기준 품번 set
+ref_parts = {normalize(row[품번열]) for row in 기준시트 if row[품번열]}
+
+# 라인배정 품번 → {품번: [라인코드 목록]}
+assign_map = {}
+for row in 배정시트:
+    pn = normalize(row[품번열])
+    line = normalize(row[라인열])
+    if pn:
+        assign_map.setdefault(pn, set()).add(line)
+
+# 1차 판정
+for ref_pn in ref_parts:
+    if ref_pn in assign_map:
+        if 대상라인 in assign_map[ref_pn]:
+            판정 = "A"  # 일치
+        else:
+            판정 = "C"  # 라인누락
+    else:
+        # 2차 비교로 넘긴다
+        pass
+```
+
+### Step 4. 2차 모품번 비교
+
+1차에서 불일치한 품번에 대해 모품번 기준으로 재비교.
+
+```python
+# 라인배정 품번의 모품번 → {모품번: [전체품번 목록]}
+base_map = {}
+for pn in assign_map:
+    base = extract_base(pn, color_len)
+    base_map.setdefault(base, []).append(pn)
+
+for ref_pn in 불일치목록:
+    ref_base = extract_base(ref_pn, color_len)
+    if ref_base in base_map:
+        # 컬러확장 존재
+        expanded = base_map[ref_base]
+        lines = set()
+        for epn in expanded:
+            lines.update(assign_map.get(epn, set()))
+        if 대상라인 in lines:
+            판정 = "B"  # 컬러확장일치
+        else:
+            판정 = "C"  # 라인누락
+    else:
+        # 3차(유사품번)로 넘긴다
+        pass
+```
+
+### Step 5. 유사품번 탐색
+
+2차까지 불일치한 품번에 대해 유사도를 계산한다.
+
+```python
+from difflib import SequenceMatcher
+
+def find_similar(target, candidates, threshold=0.85):
+    """유사품번 찾기. threshold 이상이면 후보로 반환"""
+    results = []
+    for c in candidates:
+        ratio = SequenceMatcher(None, target, c).ratio()
+        if ratio >= threshold:
+            results.append((c, ratio))
+    return sorted(results, key=lambda x: -x[1])
+
+for ref_pn in 여전히_불일치:
+    similar = find_similar(ref_pn, assign_map.keys())
+    if similar:
+        판정 = "D"  # 기준오기입의심
+        사유 = f"유사품번 발견: {similar[0][0]} (유사도 {similar[0][1]:.0%})"
+    else:
+        판정 = "E"  # 완전누락
+```
+
+### Step 6. 판정 확정 및 결과 정리
+
+모든 기준 품번에 A~F 판정을 확정하고, 출력 형식에 따라 결과를 정리한다.
+
+---
+
+## 출력 형식
+
+반드시 아래 순서로 정리한다.
+
+### 1. 요약
+
+```
+■ 검증 결과 요약
+- 기준 품번 수: XXX건
+- A. 일치: XXX건 (XX.X%)
+- B. 컬러확장일치: XXX건 (XX.X%)
+- C. 라인누락: XXX건 (XX.X%) ← 라인배정 추가 필요
+- D. 기준오기입의심: XXX건 (XX.X%) ← 기준파일 확인 필요
+- E. 완전누락: XXX건 (XX.X%) ← 신규 등록 필요
+- F. 판정유보: XXX건 (XX.X%) ← 추가 확인 필요
+```
+
+### 2. 상세표
+
+문제가 있는 항목(C, D, E, F)만 상세표로 정리한다. 일치(A, B)는 건수만 요약.
+
+| 기준품번 | 모품번 | 라인배정품번 | 라인배정모품번 | 대상라인 | 확인라인 | 판정 | 판정사유 | 조치의견 |
+|----------|--------|-------------|---------------|----------|----------|------|----------|----------|
+
+### 3. 개선안
+
+- 기준파일 수정이 필요한 항목
+- 라인배정 추가가 필요한 항목
+- 비교 규칙 보완이 필요한 항목
+
+### 4. 3줄 인사이트
+
+핵심만 3줄로 정리한다.
+
+### 5. 엑셀 보고서 (선택)
+
+사용자가 요청하면 상세 결과를 xlsx로 출력한다.
+시트 구성: 요약 / 상세(C·D·E·F) / 전체목록 / 판정기준
+
+---
+
+## 검증 기준
+
+아래를 모두 만족해야 완료로 본다:
+- 기준 파일 품번 총 건수가 명시되어 있다
+- 판정별 건수 합계 = 기준 품번 총 건수 (빠짐 없이 전수 처리)
+- 모든 C·D·E·F 항목에 판정사유와 조치의견이 있다
+- 접두어를 임의로 제거하지 않았다
+- 컬러코드를 사용자 확인 없이 제거하지 않았다
+- 사용자가 확인하지 않은 가정은 "⚠️ 가정" 표시가 되어 있다
+
+---
+
+## 오류 대응
+
+| 상황 | 증상 | 대응 |
+|------|------|------|
+| 파일 열기 실패 | openpyxl 에러 | 파일 형식/경로 확인 안내. xlsm/xls인 경우 xlsx 변환 제안 |
+| 헤더 인식 실패 | 품번/라인 컬럼을 못 찾음 | 첫 5행 출력 후 사용자에게 컬럼 지정 요청 |
+| 병합셀 문제 | 헤더에 None 다수 | `ws.merged_cells.ranges` 확인 후 병합 해제 처리 |
+| 빈 행 대량 | 데이터가 끊김 | max_row 대신 실제 데이터가 있는 마지막 행 탐색 |
+| 품번 0건 일치 | A+B = 0 | 정규화 규칙/컬럼 선택 오류 가능성 알림, 원본 데이터 샘플 제시 |
+
+---
+
+## 금지 사항
+
+- 접두어 임의 제거
+- 컬러코드 사용자 확인 없이 제거
+- 기준 파일보다 라인배정 파일을 마스터로 삼는 것
+- 유사품번 존재 시 즉시 "완전누락" 확정
+- 판정사유 없는 결과표
+- 원본 파일 직접 수정
+- 컬럼을 사용자 확인 없이 임의 결정
+
+---
+
+## 기존 스킬/파일 연동
+
+### line-batch-management와의 업무 흐름
+1. `line-batch-management` 스킬로 ERP 라인배치 입력 작업 수행
+2. `line-mapping-validator` 스킬로 입력 결과의 정합성 검증
+3. 검증에서 발견된 누락 품번을 `line-batch-management`로 추가 배치
+
+### 관련 파일 위치 (업무리스트 폴더)
+- `02_생산관리/생산_SP3M3_품번리스트.xlsx` → 기준 품번 302건
+- `03_라인배치/라인배치_ENDPART라인배정.xlsx` → 검증 대상 1,476건
+- `03_라인배치/라인배치_정합성검증.xlsx` → 이전 검증 결과 (참고용)
+- `02_생산관리/실적_GERP_실적현황.xlsx` → 실적 기반 라인매핑 10,871건
+
+## 실패 조건
+- 기준 파일 또는 라인배정 파일을 openpyxl로 열 수 없음
+- 헤더 인식 실패 — 품번/라인 컬럼을 첫 5행에서 찾지 못함
+- 판정 A+B(일치+컬러확장일치) = 0건 — 정규화/컬럼 선택 오류 가능성
+- 판정별 건수 합계 ≠ 기준 품번 총 건수 (전수 처리 미달)
+
+## 중단 기준
+- 기준 파일 경로 미존재 시 즉시 중단
+- 병합셀로 인해 헤더 None이 과반이면 중단 → 병합 해제 처리 후 재시도
+- 컬럼 사용자 확인 없이 임의 결정 시 중단 (금지 사항)
+- 컬러코드 분리 등 구조 변경이 필요하면 사용자 확인 전까지 중단
+
+## 검증 항목
+- 기준 파일 품번 총 건수가 결과표에 명시
+- 판정별 건수 합계 = 기준 품번 총 건수 (빠짐 없이 전수 처리)
+- 모든 C·D·E·F 항목에 판정사유와 조치의견 존재
+- 접두어 미제거 확인, 컬러코드 보존 확인
+- 사용자 미확인 가정에 "⚠️ 가정" 표시 부착
+
+## 되돌리기 방법
+- 읽기 전용 분석 작업이므로 원본 파일 변경 없음
+- 결과 엑셀(`라인배치_정합성검증.xlsx`) 재생성으로 복구
+- 원본 파일은 절대 수정하지 않으므로 되돌리기 불필요
+

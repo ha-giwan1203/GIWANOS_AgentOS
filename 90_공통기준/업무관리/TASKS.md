@@ -10,21 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-17 — 세션56 (notebooklm-mcp 조립비정산 파일럿 + settlement-domain-expert 에이전트 작성)
+최종 업데이트: 2026-04-17 — 세션58 (라인배치 파일럿 2단계 완료 + 좀비 Chrome 근본 해결 GPT 토론 합의 + NOTEBOOK_PROFILE_STRATEGY=isolated 반영)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] notebooklm-mcp 파일럿 검증 + 확장 (세션56 후속)**
-- **세션 재시작 필수** — 신규 에이전트 `settlement-domain-expert` 현재 세션에서 미인식 확인됨
-- 재시작 후 4개 검증:
-  1. `Agent(subagent_type="settlement-domain-expert", prompt=...)` 호출 가능
-  2. 에이전트 내부에서 `mcp__notebooklm-mcp__ask_question` 정상 위임
-  3. 꼬리 문구 `EXTREMELY IMPORTANT: Is that ALL...` 실제 필터 작동
-  4. 저장소 교차확인(CLAUDE.md/STATUS.md L{line} 인용) 정확성
-- **②라인배치 파일럿**: 통합 소스 생성 → NotebookLM 노트북 생성·업로드 → add_notebook → line-batch-domain-expert 에이전트 작성
-- 되돌리기: settings.json MCP 항목 제거 + 에이전트 .md 삭제
+**[중] notebooklm-mcp 좀비 Chrome 해결 3세션 검증 (세션59~61)**
+- **선결 완료 (세션58)**: `~/.claude.json`의 notebooklm-mcp `env`에 `NOTEBOOK_PROFILE_STRATEGY=isolated` 반영
+- **검증 조건** (GPT 합의 debate_20260417_230008):
+  - 세션 정의: Claude Code 프로세스 완전 종료·재기동 3회
+  - 세션59: setup_auth 1회 허용 (신규 isolated 프로필 최초 인증)
+  - 세션60·61: 재인증 없이 `get_health` → `ask_question` 성공
+  - `exitCode=21` 0회
+- **실패 분기**:
+  - ① exitCode=21 재발 → B(SessionStart hook taskkill) 또는 NOTEBOOK_CLEANUP_ON_SHUTDOWN 재검증
+  - ② 재인증 반복 → NOTEBOOK_CLONE_PROFILE=true
+  - ③ 둘 다 → CLONE_PROFILE → B → A 폐기 순
+- **WARN 메모 (critic-reviewer)**: 세션58 토론에서 B 옵션 배제가 하네스 라벨-판정 불일치로 분류. R4(병렬 Claude 세션 없는 환경에서 B 리스크 과평가 가능성)가 합의안에 미반영 — 세션59 검증 실패 시 B 재부상 경로 보존
+- 되돌리기: `~/.claude.json` env 항목에서 NOTEBOOK_PROFILE_STRATEGY 제거
+
+**[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
+- 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
+- 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
 
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
@@ -33,6 +41,29 @@
 ---
 
 ## 최근 완료
+
+### [완료] 라인배치 파일럿 2단계 + 좀비 Chrome 근본 해결 GPT 토론 — 세션58 (2026-04-17)
+- **라인배치 통합 소스 생성**: `10_라인배치/notebooklm_source_라인배치_v1.txt` (2,674줄·120KB, 8개 문서 병합)
+  - 병합 스크립트: `10_라인배치/build_notebooklm_source.py` (재현 가능)
+  - 병합 대상: CLAUDE.md / STATUS.md / README.md / 라인배치_스킬문서_v9.md / 스킬 4종(line-batch-management, line-batch-outer-main, line-batch-mainsub, line-mapping-validator)
+- **NotebookLM 노트북 등록**: `라인배치_대원테크` (https://notebooklm.google.com/notebook/ff23f265-2211-4722-b5fa-d0cdfae73928)
+- **에이전트 작성**: `.claude/agents/line-batch-domain-expert.md` (settlement-domain-expert 템플릿 기반, 교차확인 경로 10_라인배치/ 로 교체)
+- **10_라인배치/CLAUDE.md 갱신**: 관련 에이전트 섹션 추가 (line-batch-domain-expert vs line-mapping-validator 역할 분리표)
+- **GPT 토론 debate_20260417_230008**: 좀비 Chrome 근본 해결 — 채택 10건 / 보류 0 / 버림 0
+  - 선결 옵션 A: `NOTEBOOK_PROFILE_STRATEGY=isolated` → `~/.claude.json` 반영
+  - 검증 조건: 프로세스 재기동 3세션 연속 성공 + exitCode=21 0회 + 재인증 없음
+  - critic-reviewer WARN: B 옵션 재검토 경로 보존 (상기 안건 참조)
+- **도메인 정확성 3건 검증은 세션59로 이월** (setup_auth 미수행 — isolated 반영 후 첫 세션에서 수행)
+
+### [완료] notebooklm-mcp 파일럿 검증 4/4 PASS — 세션57 (2026-04-17)
+- **검증 대상**: 세션56에서 보류된 4개 항목
+- **① Agent 호출 가능**: PASS — `subagent_type="settlement-domain-expert"` 2회 진입 성공
+- **② ask_question MCP 위임**: PASS — 메인 27.7초·에이전트 내부 session_id `d650c035` 각각 반환, 근거 인덱스 [1][2][3][4] 정상
+- **③ 꼬리 필터 작동**: PASS — 원본 응답에 `EXTREMELY IMPORTANT: Is that ALL you need to know?...` 존재 확인 → 에이전트 `[응답]` 블록에서 제거 확인
+- **④ 저장소 교차확인 정확성**: PASS — STATUS.md L81(RSP3SC0291~0294 837/1,391/934/3,300개), L84(-24원) 실제 라인 일치
+- **좀비 Chrome 이슈 발견·해소**: 세션56 `setup_auth` 후 MCP Chrome 3개(PID 10880/2832/23008, 메인+crashpad+GPU) 미정리 → 프로필 `lockfile` 점유 → 후속 `ask_question` persistent context 즉시 close(`exitCode=21`)
+- **복구 절차**: `taskkill /F /PID ... → cleanup_data(preserve_library=true) → setup_auth` (157.53초), library.json은 보존됨
+- **Known Issue 등록**: `05_생산실적/조립비정산/STATUS.md` "MCP 좀비 Chrome" 섹션 (아래 참조)
 
 ### [완료] notebooklm-mcp 조립비정산 파일럿 + 도메인 에이전트 작성 — 세션56 (2026-04-17)
 - **MCP 인증**: `setup_auth` 127초 성공, `authenticated=true`
