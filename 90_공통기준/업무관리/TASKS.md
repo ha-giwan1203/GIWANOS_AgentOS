@@ -10,11 +10,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-17 — 세션54 (GPT 토론 P0 수정: smoke_test 27→28 drift + harness_gate block→deny 잔재 정리)
+최종 업데이트: 2026-04-17 — 세션55 (YouTube 영상분석: notebooklm-mcp + 서브에이전트+스킬 설계 패턴)
 
 ---
 
 ## 다음 세션 안건
+
+**[중] notebooklm-mcp 설치 + 도메인 에이전트 등록 (세션55 영상분석 B등급)**
+- npm install notebooklm-mcp → nlm login OAuth → .claude/settings.local.json MCP 등록
+- 설치 후 정산/라인배치 도메인 NotebookLM 노트북 생성 → .claude/agents/ 파일 등록
+- 되돌리기: settings.json 항목 제거로 가능
 
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
@@ -23,6 +28,15 @@
 ---
 
 ## 최근 완료
+
+### [완료] YouTube 영상분석 — 세션55 (2026-04-17)
+- **영상**: 제미나이 노트북LM 채팅을 소스로 만들고 MCP 연결로 클로드 코드 서브 에이전트와 스킬 만들기 (yBfyanZMyV4)
+- **분석 방식**: --force-download 12프레임 + 자막 447세그먼트 통합 분석
+- **판정**: A0 / B2 / C3
+- **B등급**: ①notebooklm-mcp 설치+인증 ②도메인 에이전트 등록
+- **C등급**: skill-creator(이미 보유), .claude/agents/ 구조(이미 보유), GPT 채팅→소스(노트북 없음)
+- **핵심 인사이트**: 에이전트=직원(도메인 지식), 스킬=레시피(절차) 분리 설계. MCP로 외부 지식베이스 에이전트화
+- **Notion**: 콘텐츠 분석 이력 DB 저장 완료 (345fee67)
 
 ### [완료] GPT 토론 P0 수정 — 세션54 (2026-04-17)
 - **의제**: 클로드코드 정밀분석 (GPT 지적 7건 중 P0 2건 + P1 1건 분류)
