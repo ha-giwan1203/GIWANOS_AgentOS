@@ -16,9 +16,9 @@
 
 ## 다음 세션 안건
 
-**[중] notebooklm-mcp 설치 + 도메인 에이전트 등록 (세션55 영상분석 B등급)**
+**[중] notebooklm-mcp 설치 + 도메인 에이전트 등록 (세션55 영상분석 B등급 + GPT 합의)**
 - npm install notebooklm-mcp → nlm login OAuth → .claude/settings.local.json MCP 등록
-- 설치 후 정산/라인배치 도메인 NotebookLM 노트북 생성 → .claude/agents/ 파일 등록
+- 파일럿 도메인 순서 (GPT 합의): ①조립비정산 먼저 (문서·규칙·검증 질의 多, NotebookLM 강점 일치) → ②라인배치 (실시간성·예외처리 비중 높아 후순위)
 - 되돌리기: settings.json 항목 제거로 가능
 
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
