@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-15 — 세션52 (GPT 토론 3건 합의: req clear 문서화 종결, status_sync 보류, AGENTS_GUIDE 자동생성)
+최종 업데이트: 2026-04-15 — 세션53 (학습루프 점검: 메모리 41→33개, 중복 8건 통합, rules 충돌 해소, user 메모리 추가)
 
 ---
 
@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 28개 등록 + 스킬 18개. 세션52: req clear 3조건 문서화 종결, status_sync.sh 보류, AGENTS_GUIDE 자동생성(generate_agents_guide.sh), README 드리프트 3건 수정(개수·exit2·block→deny). GPT 통과 |
+| hooks 체계 | 28개 등록 + 스킬 18개. 세션53: 메모리 41→33개(중복 8건 통합), rules 충돌 해소(data-and-files.md), user 메모리 신규(user_role_manufacturing.md). 세션52: req clear 문서화, status_sync 보류, AGENTS_GUIDE 자동생성. GPT 통과 |
 
 ---
 
