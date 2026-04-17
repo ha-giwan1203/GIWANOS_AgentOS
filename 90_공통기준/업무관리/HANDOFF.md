@@ -4,12 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-17 KST — 세션58 (라인배치 파일럿 2단계 완료 + 좀비 Chrome 근본 해결 GPT 토론 합의 + isolated 반영)
+최종 업데이트: 2026-04-18 KST — 세션59 (notebooklm-mcp 1차 검증 + ask_question/preserve_library 별건 2건 분리)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-17 세션58)
+## 0. 최신 세션 (2026-04-18 세션59)
+
+### 이번 세션 완료
+1. **notebooklm-mcp 1차 검증 실행 (3세션 중 1/3)**:
+   - 최초 `setup_auth` 2회 실패 → `cleanup_data(preserve_library=true)` 41MB 정리 → `setup_auth` 103.74초 성공
+   - `get_health` authenticated=true, `list_notebooks` 정상
+   - 노트북 2개 재등록 (library.json 소실로 복구 필요했음)
+   - `ask_question` 실패: "Could not find NotebookLM chat input"
+   - `exitCode=21` 0회 관측
+2. **GPT 토론 debate_20260417_235521**: 조건부 통과 (채택 4 / 보류 0 / 버림 0)
+3. **critic-reviewer WARN**: Q3 라벨 `실증됨`→`일반론` 재기록. "조건부 통과" 문구 명확화 반영
+4. **TASKS 별건 분리 신설 2건**:
+   - 이슈 #1: `ask_question` chat input 탐지 실패 추적
+   - 이슈 #2: `cleanup_data` preserve_library 보호 누락
+
+### 다음 AI 액션 (세션60)
+1. 세션 진입 시 `get_health` 확인 — authenticated=true 유지되어야 함 (재인증 없음 검증)
+2. `exitCode=21` 발생 여부 관측 기록
+3. 이슈 #1 조치 ①④ 우선 수행:
+   - `show_browser=true` + `ask_question` 호출 → 실제 페이지 DOM/스크린샷 실물 확보
+   - 다른 노트북 URL(공용 테스트)로 교차 테스트
+4. 결과에 따라 ②GitHub 이슈 → ③1.2.0 롤백 단계 진입
+
+### 미완료 / 이월
+- **세션60·61 재인증 없음 검증**: 프로세스 재기동 후에만 확인 가능
+- **라인배치·조립비정산 도메인 정확성 3건 검증**: `ask_question` 해소 후 수행
+
+---
+
+## 1. 이전 세션 (2026-04-17 세션58)
 
 ### 이번 세션 완료
 1. **라인배치 파일럿 2단계**:

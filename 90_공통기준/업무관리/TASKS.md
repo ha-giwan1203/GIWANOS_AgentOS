@@ -10,18 +10,19 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-17 — 세션58 (라인배치 파일럿 2단계 완료 + 좀비 Chrome 근본 해결 GPT 토론 합의 + NOTEBOOK_PROFILE_STRATEGY=isolated 반영)
+최종 업데이트: 2026-04-18 — 세션59 (notebooklm-mcp 1차 검증 — ask_question 미완료·3세션 검증 계속 중 + 2건 별건 신설)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] notebooklm-mcp 좀비 Chrome 해결 3세션 검증 (세션59~61)**
+**[중] notebooklm-mcp 좀비 Chrome 해결 3세션 검증 — ask_question 미완료·검증 계속 중 (세션60~61)**
 - **선결 완료 (세션58)**: `~/.claude.json`의 notebooklm-mcp `env`에 `NOTEBOOK_PROFILE_STRATEGY=isolated` 반영
+- **세션59 1차 결과** (debate_20260417_235521): isolated+cleanup 후 `setup_auth`(103.74초)·`get_health`(authenticated=true)·`list_notebooks`·`add_notebook` 성공. `exitCode=21` 미관측. **ask_question은 본검증 미통과(별건 이슈 #1로 분리)**. cleanup 1회 개입 발생 — isolated 단독 효과 완전 입증 미달
 - **검증 조건** (GPT 합의 debate_20260417_230008):
   - 세션 정의: Claude Code 프로세스 완전 종료·재기동 3회
-  - 세션59: setup_auth 1회 허용 (신규 isolated 프로필 최초 인증)
-  - 세션60·61: 재인증 없이 `get_health` → `ask_question` 성공
+  - ~~세션59: setup_auth 1회 허용~~ (완료 — 103.74초)
+  - 세션60·61: 재인증 없이 `get_health` → `ask_question` 성공 (ask_question은 별건 이슈 #1 해소 후)
   - `exitCode=21` 0회
 - **실패 분기**:
   - ① exitCode=21 재발 → B(SessionStart hook taskkill) 또는 NOTEBOOK_CLEANUP_ON_SHUTDOWN 재검증
@@ -30,6 +31,24 @@
 - **WARN 메모 (critic-reviewer)**: 세션58 토론에서 B 옵션 배제가 하네스 라벨-판정 불일치로 분류. R4(병렬 Claude 세션 없는 환경에서 B 리스크 과평가 가능성)가 합의안에 미반영 — 세션59 검증 실패 시 B 재부상 경로 보존
 - 되돌리기: `~/.claude.json` env 항목에서 NOTEBOOK_PROFILE_STRATEGY 제거
 
+**[중] notebooklm-mcp ask_question chat input 탐지 실패 별건 추적 (이슈 #1)**
+- **증상**: `ask_question` 호출 시 `"Could not find NotebookLM chat input. Please ensure the notebook page has loaded correctly."` 오류
+- **재현 조건** (세션59): notebooklm-mcp 1.2.1, isolated 프로필, authenticated=true, timeout_ms 60000, show_browser=true, 단순 질문 모두 동일 실패
+- **반례 (정상 동작)**: `list_notebooks`·`add_notebook`·`setup_auth`·`get_health`는 전부 성공 → MCP 통신·인증은 정상. 실패 지점은 notebook 페이지 로드 또는 UI 셀렉터 매칭 단계
+- **조치 순서** (debate_20260417_235521 GPT Q3):
+  - ① `show_browser=true` 상태에서 페이지 DOM/스크린샷 실물 확보
+  - ④ 다른 노트북 URL(공용 테스트 노트북)로 교차 테스트 — 범위가 특정 노트북인지 범용인지 분리
+  - ② 실물 증거 확보 후 notebooklm-mcp GitHub 이슈 트래커 검색·리포트
+  - ③ 마지막 수단: 1.2.0 버전 롤백 테스트 (비용 크므로 최후)
+- 세션60 진입 전 ①④ 우선 수행
+
+**[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
+- **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
+- **세션59 실적**: 2개 노트북(`조립비정산_대원테크`, `라인배치_대원테크`) 수동 재등록으로 복구
+- **조치 방향**:
+  - 업스트림 이슈 리포트 (문서와 실동작 불일치)
+  - 로컬 백업 루틴 검토 — cleanup 전 `library.json` 스냅샷
+
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
 - 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
@@ -37,6 +56,21 @@
 ---
 
 ## 최근 완료
+
+### [진행] notebooklm-mcp 1차 검증(세션59/3) + ask_question/preserve_library 별건 분리 — 세션59 (2026-04-18)
+- **세션59 1차 실행 결과**:
+  - isolated 프로필 반영 상태에서 최초 `setup_auth` 2회 실패(브라우저 미기동) → `cleanup_data(preserve_library=true)`(41MB 삭제) → `setup_auth` 재시도 103.74초 성공(authenticated=true)
+  - `get_health`·`list_notebooks` 정상. 노트북 2개 재등록 완료(library.json 소실)
+  - `ask_question` 실패: "Could not find NotebookLM chat input" — timeout·show_browser·단순 질문 모두 동일
+  - `exitCode=21` 관측 0회
+  - notebooklm-mcp 1.2.1 = npm 최신
+- **GPT 토론 debate_20260417_235521**: 조건부 통과. 채택 4건 / 보류 0 / 버림 0
+  - Q1 판정: 조건부 통과(isolated+cleanup 인증·라이브러리 회복 / ask_question 본검증 미완료)
+  - Q2 별건 분리: list_notebooks 성공이 MCP 통신·인증 정상 증거 → 신규 안건 2건 분리
+  - Q3 액션 순서: ①DOM 실물 확보 → ④다른 노트북 교차 → ②GitHub 이슈 → ③1.2.0 롤백(마지막) [일반론 라벨]
+  - Q4 preserve_library 별도 안건화 — cleanup 보호 범위와 실동작 불일치
+- **critic-reviewer WARN**: Q3 라벨 `실증됨`→`일반론` 재기록. "조건부 통과" 표현이 세션60·61 재사용 시 오독 위험 → TASKS 문구 "ask_question 미완료·3세션 검증 계속 중"으로 명확화
+- **TASKS 분리 신설**: 이슈 #1(ask_question), 이슈 #2(preserve_library 보호 누락)
 
 ### [완료] 라인배치 파일럿 2단계 + 좀비 Chrome 근본 해결 GPT 토론 — 세션58 (2026-04-17)
 - **라인배치 통합 소스 생성**: `10_라인배치/notebooklm_source_라인배치_v1.txt` (2,674줄·120KB, 8개 문서 병합)

@@ -1,0 +1,49 @@
+{
+  "session_id": "debate_20260417_235521",
+  "chat_url": "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e202a2-2c98-83e8-96d4-85e9fe5fd425",
+  "turn_number": 1,
+  "last_reply_hash": "sess59_turn1",
+  "turns": [
+    {
+      "turn": 1,
+      "claude": "세션59 notebooklm-mcp 검증 결과 의제: isolated+cleanup 후 setup_auth/get_health/list_notebooks/add_notebook 성공, ask_question만 chat input 셀렉터 실패. Q1 판정, Q2 별건 분리, Q3 액션 순서, Q4 preserve_library 안건화 의견 요청.",
+      "gpt": "조건부 통과. Q1: 조건부 통과(ask_question 미통과로 본검증 미완료). Q2: 별건 분리 맞음(list_notebooks 성공이 통신·인증 정상 증거). Q3: ①DOM 실물 확보 → ④다른 노트북 교차 → ②GitHub 이슈 검색 → ③1.2.0 롤백 마지막. Q4: 별도 안건화 필요(cleanup 보호 범위와 실동작 불일치). 실무 구분: TASKS 3건 분리(좀비 Chrome 검증 계속 / ask_question 별건 / preserve_library 별건).",
+      "harness": {
+        "summary_counts": {"채택": 4, "보류": 0, "버림": 0},
+        "채택": [
+          {"item": "Q1 조건부 통과 판정", "label": "실증됨", "evidence": "합의안 기준에 ask_question 성공 포함, 본건 미통과 사실", "ref": "TASKS.md L17-31"},
+          {"item": "Q2 별건 분리", "label": "실증됨", "evidence": "list_notebooks/add_notebook 성공은 MCP 통신·인증 정상 증거", "ref": "세션59 실행 결과"},
+          {"item": "Q3 ①→④→②→③ 순서", "label": "일반론", "evidence": "관찰→범위분리→업스트림→버전비교 비용 논리 타당 (정성적 추천, 실증 근거 없음)", "ref": "debate_20260417_235521"},
+          {"item": "Q4 preserve_library 별도 안건", "label": "실증됨", "evidence": "cleanup preview와 실 deletedPaths 일치(Legacy 포함), 문서와 실동작 불일치", "ref": "cleanup_data 결과"}
+        ],
+        "보류": [],
+        "버림": []
+      }
+    }
+  ],
+  "result": {
+    "summary_counts": {"채택": 4, "보류": 0, "버림": 0},
+    "채택": [
+      {"item": "세션59 판정: 조건부 통과", "label": "실증됨", "evidence": "isolated+cleanup 후 인증·라이브러리 회복, ask_question 별건 실패로 본검증 미완료", "ref": "debate_20260417_235521"},
+      {"item": "TASKS 분리 등록 3건", "label": "실증됨", "evidence": "좀비 Chrome 검증(세션60·61) + ask_question 별건 + preserve_library 별건", "ref": "GPT 응답 turn1"},
+      {"item": "다음 액션 순서", "label": "일반론", "evidence": "① show_browser DOM 실물 확보 → ④ 다른 노트북 교차 테스트 → ② GitHub 이슈 검색/리포트 → ③ 1.2.0 롤백 마지막 (정성적 추천, 실증 근거 없음)", "ref": "GPT 응답 turn1"},
+      {"item": "조기 합의 판정", "label": "실증됨", "evidence": "Claude CLAIM A~D와 GPT 응답 전부 일치, 이견 없음으로 1턴 종료", "ref": "debate.json turns[0]"}
+    ],
+    "보류": [],
+    "버림": []
+  },
+  "critic_review": {
+    "verdict": "WARN",
+    "axes": {
+      "independence": "PASS — Claude CLAIM A~D 사전 독립 제시",
+      "harness_rigor": "WARN — Q3 액션 순서 라벨 '실증됨'이 실제 '일반론'이어야 함",
+      "zero_audit": "PASS — 세션58 실패 분기 ①②③ 미해당, 별건 분리 정당",
+      "one_sided": "WARN — '조건부 통과' 표현이 세션60·61 재사용 시 오독 위험"
+    },
+    "corrections_applied": [
+      "Q3 label 실증됨 → 일반론 재기록",
+      "TASKS 문구 'ask_question 미완료·3세션 검증 계속 중'으로 명확화"
+    ]
+  },
+  "agenda": "세션59 notebooklm-mcp 검증 — 좀비 Chrome 해결(isolated PASS) / ask_question 셀렉터 실패 분리 대응"
+}
