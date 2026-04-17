@@ -4,12 +4,39 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션60 (ask_question 원인 C 확정 + NOTEBOOK_CLONE_PROFILE=true 반영)
+최종 업데이트: 2026-04-18 KST — 세션61 (ask_question PASS + 좀비 Chrome 근본 해결 3세션 검증 전체 PASS)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션60)
+## 0. 최신 세션 (2026-04-18 세션61)
+
+### 이번 세션 완료
+1. **세션58 합의 "재인증 없음" 2/2 최종 통과**: Claude Code 재시작 후 `get_health` authenticated=true 유지, `list_notebooks` 2개 유지, `active_sessions`=0
+2. **원인 C 해소 확정**: `NOTEBOOK_CLONE_PROFILE=true` 반영 상태에서 `ask_question` 정상 응답 수신 (조립비정산 노트북, session_id `175b71b4`, 18.5초)
+3. **exitCode=21 관측 0회** — 3세션 연속(59/60/61) 0회 달성
+4. **도메인 정확성 3건 PASS**:
+   - [조립비정산] 야간계산식: 기준단가×0.3 + 100% 기본 + 30% 가산 = 130% 정산, 주간=정상-추가, GERP 100%+30% vs 구ERP 30%만 → STATUS.md L12-14/L75-76/L90 일치
+   - [라인배치] OUTER 셀렉터: 리스트업 방식, row0=SD9A01 고정, 금지 시간대 로직 → v9.md/CLAUDE.md 일치
+   - [라인배치] MAIN/SUB 순서: row0 최빈값 fallback, row1=SP3M3 고정, row2~ LINE_RULES 매핑, 재개 `runOuterLine(idx)`, 강제 중단 `window._haltAll=true` → v9.md/STATUS.md 일치
+5. **좀비 Chrome 근본 해결 전체 PASS** (세션58 debate_20260417_230008 합의 검증 조건 전부 충족):
+   - 프로세스 재기동 3세션 연속 성공 (세션59 1차/세션60 부분/세션61 완전)
+   - exitCode=21 0회
+   - 재인증 없음 (세션60·61)
+   - ask_question 정상 동작 (세션61)
+
+### 다음 AI 액션 (세션62+)
+1. **이슈 #1 종결 처리**: CLONE_PROFILE=true 로 원인 C 해소 확정. notebooklm-mcp 업스트림에 "isolated + CLONE_PROFILE 조합 이슈" 문서화 권고(선택) 또는 내부 메모만으로 종결
+2. **이슈 #2 (preserve_library 보호 누락)**: 후순위 유지, 로컬 백업 루틴 검토
+3. 다른 생산관리 / 정산 / 라인배치 안건 진입
+
+### 미완료 / 이월
+- 이슈 #2 (preserve_library 보호 누락): 후순위
+- safe_json_get 파서 교체: 승격 조건 대기 (incident 누적 미도달)
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션60)
 
 ### 이번 세션 완료
 1. **세션58 합의 "재인증 없음" 1차 통과**: Claude Code 재시작 후 `get_health` authenticated=true 유지, `list_notebooks` 2개 유지, `active_sessions` 0

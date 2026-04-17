@@ -10,47 +10,11 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션60 (ask_question 원인 C 확정 — NOTEBOOK_CLONE_PROFILE=true 반영, 세션61에서 재검증)
+최종 업데이트: 2026-04-18 — 세션61 (ask_question PASS + 좀비 Chrome 근본 해결 3세션 검증 전체 PASS)
 
 ---
 
 ## 다음 세션 안건
-
-**[중] notebooklm-mcp 좀비 Chrome 해결 3세션 검증 — ask_question 미완료·검증 계속 중 (세션60~61)**
-- **선결 완료 (세션58)**: `~/.claude.json`의 notebooklm-mcp `env`에 `NOTEBOOK_PROFILE_STRATEGY=isolated` 반영
-- **세션59 1차 결과** (debate_20260417_235521): isolated+cleanup 후 `setup_auth`(103.74초)·`get_health`(authenticated=true)·`list_notebooks`·`add_notebook` 성공. `exitCode=21` 미관측. **ask_question은 본검증 미통과(별건 이슈 #1로 분리)**. cleanup 1회 개입 발생 — isolated 단독 효과 완전 입증 미달
-- **검증 조건** (GPT 합의 debate_20260417_230008):
-  - 세션 정의: Claude Code 프로세스 완전 종료·재기동 3회
-  - ~~세션59: setup_auth 1회 허용~~ (완료 — 103.74초)
-  - 세션60·61: 재인증 없이 `get_health` → `ask_question` 성공 (ask_question은 별건 이슈 #1 해소 후)
-  - `exitCode=21` 0회
-- **실패 분기**:
-  - ① exitCode=21 재발 → B(SessionStart hook taskkill) 또는 NOTEBOOK_CLEANUP_ON_SHUTDOWN 재검증
-  - ② 재인증 반복 → NOTEBOOK_CLONE_PROFILE=true
-  - ③ 둘 다 → CLONE_PROFILE → B → A 폐기 순
-- **WARN 메모 (critic-reviewer)**: 세션58 토론에서 B 옵션 배제가 하네스 라벨-판정 불일치로 분류. R4(병렬 Claude 세션 없는 환경에서 B 리스크 과평가 가능성)가 합의안에 미반영 — 세션59 검증 실패 시 B 재부상 경로 보존
-- 되돌리기: `~/.claude.json` env 항목에서 NOTEBOOK_PROFILE_STRATEGY 제거
-
-**[중] notebooklm-mcp ask_question chat input 탐지 실패 별건 추적 (이슈 #1)**
-- **증상**: `ask_question` 호출 시 `"Could not find NotebookLM chat input. Please ensure the notebook page has loaded correctly."` 오류
-- **재현 조건** (세션59): notebooklm-mcp 1.2.1, isolated 프로필, authenticated=true, timeout_ms 60000, show_browser=true, 단순 질문 모두 동일 실패
-- **반례 (정상 동작)**: `list_notebooks`·`add_notebook`·`setup_auth`·`get_health`는 전부 성공 → MCP 통신·인증은 정상. 실패 지점은 notebook 페이지 로드 또는 UI 셀렉터 매칭 단계
-- **세션59 추가 조사 (이슈 #1 조치 ①④ 선행)**:
-  - 사용자 Chrome에서 같은 노트북 URL 로드 → `document.querySelectorAll('textarea.query-box-input').length === 1` 확인, aria-label="쿼리 상자"(한국어)
-  - 즉 MCP 1.2.1 PRIMARY 셀렉터(`textarea.query-box-input`)는 **현재 UI와 일치** — 셀렉터 구조 변경 가설 기각
-- **세션60 검증 결과 (2026-04-18)**:
-  - ① 재시작 직후 `get_health` authenticated=true, active_sessions=0, `list_notebooks` 2개 유지 → 세션58 합의 "재인증 없음" 1/2 통과
-  - ② `exitCode=21` 0회 유지
-  - ③ **원인 A (10초 타임아웃) 기각** — `browser-session.js` L139 `timeout: 10000 → 30000` 패치 반영 확인됐음에도 동일 실패
-  - ④ `show_browser:true + headless:false` 재시도에서 브라우저 창은 실제로 떴으나 **로그인 화면**이 보임 → 인증 쿠키가 isolated 인스턴스 프로필에 복원 안 됨
-  - ⑤ storageState 파일(`browser_state/state.json`) 검사: `notebooklm.google.com` 3개, `accounts.google.com` 7개, `.google.com` 13개 등 쿠키 **저장은 정상** — 복원 단계가 실패
-  - ⑥ **원인 C 확정** — `dist/config.js:65` `cloneProfileOnIsolated: false` (기본값). isolated 모드에서 매 세션 빈 프로필 인스턴스 기동 → 로그인 쿠키 없음 → 로그인 리다이렉트
-- **세션60 조치**: `~/.claude.json`의 notebooklm-mcp env에 `NOTEBOOK_CLONE_PROFILE=true` 추가. 세션58 debate_20260417_230008 "실패 분기 ②"(재인증 반복 → CLONE_PROFILE) 경로가 실제로 필요했음이 확인됨. 임시 30초 타임아웃 패치는 원복
-- **세션61 검증 순서**:
-  - ① Claude Code 재시작 → `get_health` authenticated=true 유지
-  - ② `ask_question` 재시도 → 성공 시 원인 C + CLONE_PROFILE 반영 PASS
-  - ③ 성공 시 도메인 정확성 3건 검증(settlement-domain-expert / line-batch-domain-expert)까지 이어서 수행
-  - ④ 여전히 실패 시 원인 D 탐색(MCP 쿠키 복원 로직 자체 버그) + GitHub 이슈 리포트
 
 **[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
 - **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
@@ -67,7 +31,24 @@
 
 ## 최근 완료
 
-### [진행] notebooklm-mcp 1차 검증(세션59/3) + ask_question/preserve_library 별건 분리 — 세션59 (2026-04-18)
+### [완료] notebooklm-mcp 좀비 Chrome 근본 해결 — 3세션 검증 전체 PASS — 세션61 (2026-04-18)
+- **세션58 debate_20260417_230008 검증 조건 전부 충족**:
+  - Claude Code 프로세스 완전 종료·재기동 3세션 연속(59/60/61) 성공
+  - `exitCode=21` 관측 0회 (3세션 누적)
+  - 재인증 없음 (세션60·61 공통 — `get_health` authenticated=true 유지, `list_notebooks` 2개 유지)
+  - `ask_question` 정상 동작 (세션61 — session_id `175b71b4`, 18.5초 응답)
+- **원인 C 해소 확정**: `NOTEBOOK_CLONE_PROFILE=true` 적용 후 isolated 인스턴스에 쿠키 복원 성공 → 로그인 리다이렉트 해소
+- **최종 env 구성** (`~/.claude.json`):
+  - `NOTEBOOK_PROFILE_STRATEGY=isolated` (세션58 반영)
+  - `NOTEBOOK_CLONE_PROFILE=true` (세션60 반영)
+- **세션61 도메인 정확성 3건 PASS**:
+  - [조립비정산] 야간계산식 — `기준단가×0.3×수량` + 100% 기본 + 30% 가산 = 130% 정산, 주간=정상-추가, GERP 100%+30% vs 구ERP 30%만. STATUS.md L12-14/L75-76/L90 일치
+  - [라인배치] OUTER 셀렉터 — 리스트업 방식, row0=SD9A01 고정, 금지 시간대 로직. v9.md/CLAUDE.md 일치
+  - [라인배치] MAIN/SUB 순서 — row0 최빈값 fallback, row1=SP3M3 고정, row2~ LINE_RULES 매핑, 재개 `runOuterLine(idx)`, 강제 중단 `window._haltAll=true`. v9.md/STATUS.md 일치
+- **폐기 경로**: 실패 분기 ① B(SessionStart hook taskkill) 및 NOTEBOOK_CLEANUP_ON_SHUTDOWN 재검증 불필요 — exitCode=21 0회로 근본 해소
+- **이슈 #1 (ask_question chat input 탐지 실패) 종결**: 세션59 증상 원인이 "입력창 탐지"가 아닌 "isolated 프로필 쿠키 미복원으로 인한 로그인 화면 리다이렉트"였음이 세션60 show_browser 관측 + storageState 대조로 확정. CLONE_PROFILE=true 로 해소
+
+### [진행→종결] notebooklm-mcp 1차 검증(세션59/3) + ask_question/preserve_library 별건 분리 — 세션59 (2026-04-18)
 - **세션59 1차 실행 결과**:
   - isolated 프로필 반영 상태에서 최초 `setup_auth` 2회 실패(브라우저 미기동) → `cleanup_data(preserve_library=true)`(41MB 삭제) → `setup_auth` 재시도 103.74초 성공(authenticated=true)
   - `get_health`·`list_notebooks` 정상. 노트북 2개 재등록 완료(library.json 소실)
