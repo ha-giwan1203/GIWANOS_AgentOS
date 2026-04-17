@@ -4,12 +4,36 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션59 (notebooklm-mcp 1차 검증 + ask_question/preserve_library 별건 2건 분리)
+최종 업데이트: 2026-04-18 KST — 세션60 (ask_question 원인 C 확정 + NOTEBOOK_CLONE_PROFILE=true 반영)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션59)
+## 0. 최신 세션 (2026-04-18 세션60)
+
+### 이번 세션 완료
+1. **세션58 합의 "재인증 없음" 1차 통과**: Claude Code 재시작 후 `get_health` authenticated=true 유지, `list_notebooks` 2개 유지, `active_sessions` 0
+2. **exitCode=21 관측 0회**
+3. **원인 A (10초 타임아웃) 기각**: 세션59 임시 패치 30초 반영 확인됐음에도 동일 실패 → 타임아웃 문제 아님. 패치 원복
+4. **원인 C 확정**:
+   - `show_browser:true` 관측: 브라우저 창은 떴으나 **로그인 화면** 표시
+   - storageState 쿠키 저장 정상(notebooklm.google.com 3개 등 33개)
+   - `dist/config.js:65` `cloneProfileOnIsolated: false` 기본값 → isolated 모드 + CLONE_PROFILE=false 조합에서 매 세션 빈 프로필 기동 → 쿠키 없음
+5. **조치**: `~/.claude.json`에 `NOTEBOOK_CLONE_PROFILE=true` 추가. 세션58 debate_20260417_230008 "실패 분기 ②" 경로 활성화. 백업 파일 `.claude.json.bak_sess60`
+
+### 다음 AI 액션 (세션61)
+1. Claude Code 재시작 직후 `get_health` → authenticated=true 확인 (세션58 합의 "재인증 없음" 2/2 최종)
+2. `ask_question` 재시도 → 성공 시 **원인 C 해소 확정 + 세션58 좀비 Chrome 근본 해결 전체 PASS**
+3. 성공 시 이어서 도메인 정확성 3건 검증(settlement-domain-expert / line-batch-domain-expert) 수행
+4. 여전히 실패 시 원인 D 탐색 + notebooklm-mcp GitHub 이슈 리포트
+
+### 미완료 / 이월
+- 이슈 #2 (preserve_library 보호 누락): 후순위, 로컬 백업 루틴 또는 업스트림 리포트
+- 라인배치·조립비정산 도메인 정확성 3건 검증: 세션61 ask_question 성공 전제
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션59)
 
 ### 이번 세션 완료
 1. **notebooklm-mcp 1차 검증 실행 (3세션 중 1/3)**:

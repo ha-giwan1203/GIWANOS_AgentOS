@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션59 (notebooklm-mcp 1차 검증 — ask_question 미완료·3세션 검증 계속 중 + 2건 별건 신설)
+최종 업데이트: 2026-04-18 — 세션60 (ask_question 원인 C 확정 — NOTEBOOK_CLONE_PROFILE=true 반영, 세션61에서 재검증)
 
 ---
 
@@ -38,14 +38,19 @@
 - **세션59 추가 조사 (이슈 #1 조치 ①④ 선행)**:
   - 사용자 Chrome에서 같은 노트북 URL 로드 → `document.querySelectorAll('textarea.query-box-input').length === 1` 확인, aria-label="쿼리 상자"(한국어)
   - 즉 MCP 1.2.1 PRIMARY 셀렉터(`textarea.query-box-input`)는 **현재 UI와 일치** — 셀렉터 구조 변경 가설 기각
-  - MCP 소스 `dist/session/browser-session.js` L138-141: `waitForSelector("textarea.query-box-input", { timeout: 10000, state: "visible" })` — **10초 하드코딩**. 환경변수 `BROWSER_TIMEOUT`은 `page.goto`만 영향, `waitForSelector`는 미적용
-  - 남은 원인 후보: A) 10초 타임아웃 부족, B) headless 렌더링 지연, C) isolated 프로필 쿠키 복원 누락
-- **세션59 임시 패치 (재설치 시 소실)**: `browser-session.js` L139 `timeout: 10000` → `30000`으로 직접 수정. 주석에 debate_20260417_235521 이슈 #1 표기. Claude Code 재시작 후 효과 검증 가능
-- **세션60 검증 순서**:
-  - ① Claude Code 재시작 직후 `get_health`로 authenticated=true 유지 여부 관측 (세션58 합의 재인증 없음 검증)
-  - ② `ask_question` 재시도 → 30초 대기로 성공 시 원인 A 확정, 실패 시 B/C 추적
-  - ③ 원인 A 확정 시 notebooklm-mcp GitHub에 업스트림 PR 또는 이슈 제기(하드코딩 10초 → 환경변수화)
-  - ④ 원인 A 아니면 `show_browser=true` 관찰 또는 1.2.0 롤백
+- **세션60 검증 결과 (2026-04-18)**:
+  - ① 재시작 직후 `get_health` authenticated=true, active_sessions=0, `list_notebooks` 2개 유지 → 세션58 합의 "재인증 없음" 1/2 통과
+  - ② `exitCode=21` 0회 유지
+  - ③ **원인 A (10초 타임아웃) 기각** — `browser-session.js` L139 `timeout: 10000 → 30000` 패치 반영 확인됐음에도 동일 실패
+  - ④ `show_browser:true + headless:false` 재시도에서 브라우저 창은 실제로 떴으나 **로그인 화면**이 보임 → 인증 쿠키가 isolated 인스턴스 프로필에 복원 안 됨
+  - ⑤ storageState 파일(`browser_state/state.json`) 검사: `notebooklm.google.com` 3개, `accounts.google.com` 7개, `.google.com` 13개 등 쿠키 **저장은 정상** — 복원 단계가 실패
+  - ⑥ **원인 C 확정** — `dist/config.js:65` `cloneProfileOnIsolated: false` (기본값). isolated 모드에서 매 세션 빈 프로필 인스턴스 기동 → 로그인 쿠키 없음 → 로그인 리다이렉트
+- **세션60 조치**: `~/.claude.json`의 notebooklm-mcp env에 `NOTEBOOK_CLONE_PROFILE=true` 추가. 세션58 debate_20260417_230008 "실패 분기 ②"(재인증 반복 → CLONE_PROFILE) 경로가 실제로 필요했음이 확인됨. 임시 30초 타임아웃 패치는 원복
+- **세션61 검증 순서**:
+  - ① Claude Code 재시작 → `get_health` authenticated=true 유지
+  - ② `ask_question` 재시도 → 성공 시 원인 C + CLONE_PROFILE 반영 PASS
+  - ③ 성공 시 도메인 정확성 3건 검증(settlement-domain-expert / line-batch-domain-expert)까지 이어서 수행
+  - ④ 여전히 실패 시 원인 D 탐색(MCP 쿠키 복원 로직 자체 버그) + GitHub 이슈 리포트
 
 **[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
 - **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
