@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-15 — 세션53 (학습루프 점검: 메모리 41→33개, 중복 8건 통합, rules 충돌 해소, user 메모리 추가)
+최종 업데이트: 2026-04-17 — 세션54 (GPT 토론 P0 수정: smoke_test 27→28 drift + harness_gate block→deny 잔재 정리)
 
 ---
 
@@ -18,11 +18,20 @@
 
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
-- incident_ledger에서 safe_json_get 관련 실패 발생 시 3순위로 승격
+- 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
 
 ---
 
 ## 최근 완료
+
+### [완료] GPT 토론 P0 수정 — 세션54 (2026-04-17)
+- **의제**: 클로드코드 정밀분석 (GPT 지적 7건 중 P0 2건 + P1 1건 분류)
+- **채택 3건 실물 검증 후 채택**: smoke_test drift / harness_gate block 잔재 / safe_json_get 실파서(기등록)
+- **보류 3건**: final_check grep/sed, harness_gate 키워드 매칭, completion_gate mtime(설계 의도)
+- **P0-1 smoke_test.sh:528**: `'27개'` → `'28개'` (커밋 b2f47806 불완전 마감 보정)
+- **P0-2 harness_gate.sh:118**: `"decision":"block"` → `"decision":"deny"` (파일 내부 포맷 통일)
+- **smoke_test 167/167 PASS 확인**
+- safe_json_get 승격 조건 세션 안건에 명시화
 
 ### [완료] 학습루프 점검 + 메모리 정비 — 세션53 (2026-04-15)
 - **인덱스 누락 수정**: feedback_gpt_input_inserttext.md MEMORY.md 등록

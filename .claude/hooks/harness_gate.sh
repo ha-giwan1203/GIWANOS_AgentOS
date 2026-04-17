@@ -115,5 +115,5 @@ MISSING=""
 hook_log "PreToolUse/harness_gate" "BLOCK: 하네스 미수행 → 누락:${MISSING}" 2>/dev/null
 hook_incident "hook_block" "harness_gate" "" "하네스 분석 미수행. 누락:${MISSING}" '"classification_reason":"harness_missing"' 2>/dev/null || true
 
-echo "{\"decision\":\"block\",\"reason\":\"[하네스 게이트] GPT 응답에 대한 하네스 분석이 부족합니다. 누락 항목:${MISSING}. 채택:/보류:/버림: + 독립 견해 + 실물 근거를 포함한 하네스 분석을 수행한 후 다시 시도하세요.\"}"
+echo "{\"decision\":\"deny\",\"reason\":\"[하네스 게이트] GPT 응답에 대한 하네스 분석이 부족합니다. 누락 항목:${MISSING}. 채택:/보류:/버림: + 독립 견해 + 실물 근거를 포함한 하네스 분석을 수행한 후 다시 시도하세요.\"}"
 exit 0
