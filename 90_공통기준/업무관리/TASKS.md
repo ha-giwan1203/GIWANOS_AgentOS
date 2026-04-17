@@ -10,16 +10,21 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-17 — 세션55 (YouTube 영상분석: notebooklm-mcp + 서브에이전트+스킬 설계 패턴)
+최종 업데이트: 2026-04-17 — 세션56 (notebooklm-mcp 조립비정산 파일럿 + settlement-domain-expert 에이전트 작성)
 
 ---
 
 ## 다음 세션 안건
 
-**[중] notebooklm-mcp 설치 + 도메인 에이전트 등록 (세션55 영상분석 B등급 + GPT 합의)**
-- npm install notebooklm-mcp → nlm login OAuth → .claude/settings.local.json MCP 등록
-- 파일럿 도메인 순서 (GPT 합의): ①조립비정산 먼저 (문서·규칙·검증 질의 多, NotebookLM 강점 일치) → ②라인배치 (실시간성·예외처리 비중 높아 후순위)
-- 되돌리기: settings.json 항목 제거로 가능
+**[중] notebooklm-mcp 파일럿 검증 + 확장 (세션56 후속)**
+- **세션 재시작 필수** — 신규 에이전트 `settlement-domain-expert` 현재 세션에서 미인식 확인됨
+- 재시작 후 4개 검증:
+  1. `Agent(subagent_type="settlement-domain-expert", prompt=...)` 호출 가능
+  2. 에이전트 내부에서 `mcp__notebooklm-mcp__ask_question` 정상 위임
+  3. 꼬리 문구 `EXTREMELY IMPORTANT: Is that ALL...` 실제 필터 작동
+  4. 저장소 교차확인(CLAUDE.md/STATUS.md L{line} 인용) 정확성
+- **②라인배치 파일럿**: 통합 소스 생성 → NotebookLM 노트북 생성·업로드 → add_notebook → line-batch-domain-expert 에이전트 작성
+- 되돌리기: settings.json MCP 항목 제거 + 에이전트 .md 삭제
 
 **[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
 - 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
@@ -28,6 +33,17 @@
 ---
 
 ## 최근 완료
+
+### [완료] notebooklm-mcp 조립비정산 파일럿 + 도메인 에이전트 작성 — 세션56 (2026-04-17)
+- **MCP 인증**: `setup_auth` 127초 성공, `authenticated=true`
+- **ad-hoc 질의 검증**: 외부 테스트 노트북으로 26초 응답·세션 연속성 PASS
+- **조립비정산 노트북 등록**: https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c (`조립비정산_대원테크`)
+- **통합 소스 생성**: `05_생산실적/조립비정산/06_스킬문서/notebooklm_source_조립비정산_v1.txt` (2,164줄·88KB, 9개 .md 병합: ENTRY/CLAUDE/STATUS/RUNBOOK/pipeline_contract/README/AGENTS_GUIDE/데이터사전/스킬)
+- **도메인 정확성 3건 PASS**: 야간계산식·SP3M3 구ERP 주간·Known Exception 모두 STATUS.md 대조 일치 (숫자·건수·원인)
+- **에이전트 작성**: `.claude/agents/settlement-domain-expert.md` — NotebookLM 질의 + 꼬리 문구 필터 + 저장소 교차확인(권위=저장소)
+- **도메인 CLAUDE.md 에이전트 섹션 추가**: `05_생산실적/조립비정산/CLAUDE.md` — settlement-validator(실물 검증) vs settlement-domain-expert(도메인 지식) 역할 분리표
+- **Chrome MCP 자동 업로드 실패**: 현재 Chrome 창 탭 그룹핑 미지원 → 사용자 드래그앤드롭으로 우회 (단일 통합 .txt로 수작업 1단계 압축)
+- **미완료**: Agent 호출 실검증 (세션 재시작 필요), 라인배치 파일럿 2단계
 
 ### [완료] YouTube 영상분석 — 세션55 (2026-04-17)
 - **영상**: 제미나이 노트북LM 채팅을 소스로 만들고 MCP 연결로 클로드 코드 서브 에이전트와 스킬 만들기 (yBfyanZMyV4)

@@ -140,3 +140,20 @@
 - step8_오류리스트.py: 오류리스트 자동 생성 (파이프라인 통합)
 - `/settlement MM`: 슬래시 명령 원스텝 실행
 - SKILL.md: assembly-cost-settlement 스킬 문서
+
+## NotebookLM 도메인 지식 연결 (2026-04-17 세션56)
+
+| 항목 | 값 |
+|------|-----|
+| 노트북 URL | https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c |
+| 노트북명 | 조립비정산_대원테크 |
+| 소스 파일 | [notebooklm_source_조립비정산_v1.txt](06_스킬문서/notebooklm_source_조립비정산_v1.txt) — 9개 .md 병합본 (2,164줄) |
+| 질의 에이전트 | `settlement-domain-expert` ([.claude/agents/settlement-domain-expert.md](../../.claude/agents/settlement-domain-expert.md)) |
+| 권위 서열 | 저장소 원본 > NotebookLM 응답 (불일치 시 저장소 우선) |
+| 파일럿 정확성 | 세션56 도메인 테스트 3건 PASS (야간계산식·SP3M3 주간수량·Known Exception 7건) |
+| 역할 분리 | settlement-validator=실물검증(xlsx 대조) / settlement-domain-expert=도메인지식(NotebookLM 질의) |
+
+### 재접속 절차
+1. 세션 재시작 후 `mcp__notebooklm-mcp__get_health` → `authenticated=true` 확인
+2. 만료 시 `setup_auth` 재실행 (최초 127초)
+3. 사용: `Agent(subagent_type="settlement-domain-expert", prompt="{도메인 질문}")`

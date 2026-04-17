@@ -108,6 +108,16 @@ SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, IS
 ## 관련 스킬
 - assembly-cost-settlement: 정산 자동화 (`/settlement MM`으로 실행)
 
+## 관련 에이전트 (도메인 지식 vs 실물 검증)
+
+| 에이전트 | 역할 | 호출 조건 |
+|---------|------|---------|
+| `settlement-domain-expert` | 도메인 지식 질의 (NotebookLM 조립비정산_대원테크) | 규칙·공식·Known Exception·파이프라인 계약·용어 질문 |
+| `settlement-validator` | 실물 데이터 검증 (정산결과 xlsx 대조) | `run_settlement_pipeline.py` 실행 후 결과 검증, `/settlement-validate` |
+
+- 역할 분리 원칙 (세션55 영상분석 패턴): **에이전트=도메인 지식, 스킬=실행 레시피**
+- NotebookLM 응답은 저장소 원본이 권위. 불일치 시 저장소 우선
+
 ## 월별 정산 실행 절차
 
 ### 원스텝 실행
