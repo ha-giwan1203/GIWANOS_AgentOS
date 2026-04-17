@@ -35,12 +35,17 @@
 - **증상**: `ask_question` 호출 시 `"Could not find NotebookLM chat input. Please ensure the notebook page has loaded correctly."` 오류
 - **재현 조건** (세션59): notebooklm-mcp 1.2.1, isolated 프로필, authenticated=true, timeout_ms 60000, show_browser=true, 단순 질문 모두 동일 실패
 - **반례 (정상 동작)**: `list_notebooks`·`add_notebook`·`setup_auth`·`get_health`는 전부 성공 → MCP 통신·인증은 정상. 실패 지점은 notebook 페이지 로드 또는 UI 셀렉터 매칭 단계
-- **조치 순서** (debate_20260417_235521 GPT Q3):
-  - ① `show_browser=true` 상태에서 페이지 DOM/스크린샷 실물 확보
-  - ④ 다른 노트북 URL(공용 테스트 노트북)로 교차 테스트 — 범위가 특정 노트북인지 범용인지 분리
-  - ② 실물 증거 확보 후 notebooklm-mcp GitHub 이슈 트래커 검색·리포트
-  - ③ 마지막 수단: 1.2.0 버전 롤백 테스트 (비용 크므로 최후)
-- 세션60 진입 전 ①④ 우선 수행
+- **세션59 추가 조사 (이슈 #1 조치 ①④ 선행)**:
+  - 사용자 Chrome에서 같은 노트북 URL 로드 → `document.querySelectorAll('textarea.query-box-input').length === 1` 확인, aria-label="쿼리 상자"(한국어)
+  - 즉 MCP 1.2.1 PRIMARY 셀렉터(`textarea.query-box-input`)는 **현재 UI와 일치** — 셀렉터 구조 변경 가설 기각
+  - MCP 소스 `dist/session/browser-session.js` L138-141: `waitForSelector("textarea.query-box-input", { timeout: 10000, state: "visible" })` — **10초 하드코딩**. 환경변수 `BROWSER_TIMEOUT`은 `page.goto`만 영향, `waitForSelector`는 미적용
+  - 남은 원인 후보: A) 10초 타임아웃 부족, B) headless 렌더링 지연, C) isolated 프로필 쿠키 복원 누락
+- **세션59 임시 패치 (재설치 시 소실)**: `browser-session.js` L139 `timeout: 10000` → `30000`으로 직접 수정. 주석에 debate_20260417_235521 이슈 #1 표기. Claude Code 재시작 후 효과 검증 가능
+- **세션60 검증 순서**:
+  - ① Claude Code 재시작 직후 `get_health`로 authenticated=true 유지 여부 관측 (세션58 합의 재인증 없음 검증)
+  - ② `ask_question` 재시도 → 30초 대기로 성공 시 원인 A 확정, 실패 시 B/C 추적
+  - ③ 원인 A 확정 시 notebooklm-mcp GitHub에 업스트림 PR 또는 이슈 제기(하드코딩 10초 → 환경변수화)
+  - ④ 원인 A 아니면 `show_browser=true` 관찰 또는 1.2.0 롤백
 
 **[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
 - **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실

@@ -25,12 +25,14 @@
    - 이슈 #2: `cleanup_data` preserve_library 보호 누락
 
 ### 다음 AI 액션 (세션60)
-1. 세션 진입 시 `get_health` 확인 — authenticated=true 유지되어야 함 (재인증 없음 검증)
+1. **세션 진입 직후 `get_health`** — authenticated=true 유지 여부 확인 (세션58 합의 재인증 없음 검증)
 2. `exitCode=21` 발생 여부 관측 기록
-3. 이슈 #1 조치 ①④ 우선 수행:
-   - `show_browser=true` + `ask_question` 호출 → 실제 페이지 DOM/스크린샷 실물 확보
-   - 다른 노트북 URL(공용 테스트)로 교차 테스트
-4. 결과에 따라 ②GitHub 이슈 → ③1.2.0 롤백 단계 진입
+3. **이슈 #1 임시 패치 효과 검증**:
+   - 세션59에서 `dist/session/browser-session.js` L139의 `timeout: 10000` → `30000` 수정 완료
+   - `ask_question` 재시도 → 성공 시 원인 A(10초 타임아웃 부족) 확정
+   - 실패 시 `show_browser=true` 관찰 / 로그인 리다이렉트 확인 → 원인 B/C 추적
+4. 원인 A 확정 시 notebooklm-mcp 업스트림 GitHub에 이슈/PR 제기 (하드코딩 10초 → 환경변수화 권고)
+5. 세션59 이슈 #1 조치 ①은 이미 수행 완료(셀렉터 기각, 임시 패치 적용). ④ 다른 노트북 교차 테스트는 세션60에서 패치 검증 결과 본 뒤 필요 시 수행
 
 ### 미완료 / 이월
 - **세션60·61 재인증 없음 검증**: 프로세스 재기동 후에만 확인 가능
