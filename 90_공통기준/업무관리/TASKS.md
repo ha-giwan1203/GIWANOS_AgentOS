@@ -10,22 +10,27 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션64 (self-audit P1 해소 + 근본 원인 3건 구현: map_scope 과탐지 완화·STATUS 자동 갱신·finish untracked 체크)
+최종 업데이트: 2026-04-18 — 세션65 (evidence_missing 집계 스크립트 + 1차 측정 98% 감소 확인, 5조건 보류 판정)
 
 ---
 
 ## 다음 세션 안건
 
-**[낮] evidence_missing ok 마커 조건부 자동 발급 개선 (세션64 GPT 합의)**
-- **증상**: evidence_missing 177건/7일 — req 생성은 정상, ok 마커 취득 누락 반복
-- **합의 방향**: fail-closed 전환 불가 / ok 마커 조건부 자동 발급으로 건수 감소
-- **자동 발급 5조건** (세션64 GPT 제시):
+**[낮] evidence_missing 7일 후 재측정 (세션65 GPT 합의)**
+- **1차 측정 결과** (2026-04-18 12:19 KST, 배포 기준시각 2026-04-18T02:13:00Z):
+  - 배포 전 7일: 101건 (map_scope 33, skill_read 41, tasks_handoff 20, auth_diag 4, date_check 2, skill_instr 1)
+  - 배포 후 ~10시간: 2건 (map_scope 1, skill_read 1)
+  - 감소율: 98% (TASKS 목표 50건 이하 대비 초과 달성)
+  - **판정: 5조건 보류** (POST ≤ 50)
+- **7일 후 재측정 필요** (2026-04-25 이후): 배포 후 7일 데이터로 최종 확정
+  - 스크립트: `.claude/scripts/evidence_missing_stats.sh 2026-04-18T02:13:00Z`
+  - 71건 이상 또는 감소율 60% 미만 시 5조건 즉시 구현
+- **5조건 구현 보류 상태** (기존 TASKS 안건 유지, 조건부 승격):
   1. req가 실제 생성돼 있어야 함
   2. 같은 세션에서 해당 문서/스킬 읽기 흔적 있어야 함
   3. 해당 스킬이 정상 종료해야 함
   4. 정상 종료 직후에만 대응 ok 자동 발급
   5. 중간 실패·재시도 중·부분 실행 시 발급 금지
-- **목표**: 177건 → 50건 이하
 
 **[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
 - **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
