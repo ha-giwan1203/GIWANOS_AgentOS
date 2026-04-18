@@ -16,6 +16,17 @@
 
 ## 다음 세션 안건
 
+**[낮] evidence_missing ok 마커 조건부 자동 발급 개선 (세션64 GPT 합의)**
+- **증상**: evidence_missing 177건/7일 — req 생성은 정상, ok 마커 취득 누락 반복
+- **합의 방향**: fail-closed 전환 불가 / ok 마커 조건부 자동 발급으로 건수 감소
+- **자동 발급 5조건** (세션64 GPT 제시):
+  1. req가 실제 생성돼 있어야 함
+  2. 같은 세션에서 해당 문서/스킬 읽기 흔적 있어야 함
+  3. 해당 스킬이 정상 종료해야 함
+  4. 정상 종료 직후에만 대응 ok 자동 발급
+  5. 중간 실패·재시도 중·부분 실행 시 발급 금지
+- **목표**: 177건 → 50건 이하
+
 **[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
 - **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
 - **세션59 실적**: 2개 노트북(`조립비정산_대원테크`, `라인배치_대원테크`) 수동 재등록으로 복구
