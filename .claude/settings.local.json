@@ -117,10 +117,6 @@
       "Bash(taskkill:*)"
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "bash .claude/hooks/statusline.sh"
-  },
   "hooks": {
     "PreCompact": [
       {
