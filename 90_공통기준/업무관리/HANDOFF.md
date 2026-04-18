@@ -4,12 +4,55 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션63 (Gemini 웹 UI 스킬 구축: gemini-send / gemini-read)
+최종 업데이트: 2026-04-18 KST — 세션64 (self-audit 진단 + P1 해소 + 커맨드 4개 등록 + evidence_missing 안건 등재)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션63)
+## 0. 최신 세션 (2026-04-18 세션64)
+
+### 이번 세션 완료
+1. **/self-audit 진단 실행 (scheduled-task weekly-self-audit)**:
+   - P1 2건: STATUS.md 드리프트(3일·10세션), 커맨드 4개 untracked
+   - P2 3건: evidence_missing 177건/7일, README "28개" WARN, 생산계획자동화/ 스킬 폴더
+   - 인시던트 빈도: evidence_missing 177 / pre_commit_check 144 / meta_drift 14
+
+2. **GPT 토론 2턴 합의** (chat: 69e202a2, 합의안 3개):
+   - 실행 순서: STATUS.md 갱신 → 커맨드 4개 이분화 → Grounding 파일럿
+   - 커맨드 이분화 기준: 스킬 진입점 별칭이면 유지
+   - evidence_missing: fail-open 유지 + ok 마커 조건부 자동 발급 5조건 (다음 세션)
+   - critic-reviewer: WARN (필수 2축 경미 문제, Step 5 진행)
+
+3. **P1 해소 실물 조치**:
+   - STATUS.md(업무관리) 세션53→세션64 갱신 (3일 드리프트 해소)
+   - .claude/commands/ 4개 커밋(스킬 진입점 별칭): doc-check / memory-audit / review-claude-md / task-status-sync
+   - 각 파일에 skill-alias 주석 추가 (GPT 조건부 지적 해소)
+
+4. **TASKS.md 다음 세션 안건 등재**:
+   - evidence_missing ok 마커 조건부 자동 발급 5조건 상세 기재
+   - 목표: 177건 → 50건 이하
+
+### 다음 AI 액션 (세션65+)
+1. **evidence_missing ok 마커 조건부 자동 발급 설계/구현** (세션64 GPT 합의)
+2. **Gemini Grounding 파일럿** — API 방식 실시간 웹 검색 기능 테스트
+3. **이슈 #2 (notebooklm-mcp preserve_library 보호 누락)**: 후순위 유지
+
+### 미완료 / 이월
+- evidence_missing 177건 감소 설계: 다음 세션
+- Gemini Grounding 파일럿: 이월
+- 이슈 #2 (preserve_library): 후순위
+- safe_json_get 파서 교체: 승격 조건 대기
+
+### 완료 판정
+- self-audit P1 2건 해소: **통과** (GPT 최종 판정: 통과 — 커밋 069bfbcb)
+
+### 관련 커밋
+- `64b64872` — 세션64 self-audit P1 해소 + 커맨드 4개 등록 + evidence_missing 안건 등재
+- `069bfbcb` — 커맨드 4개 스킬 별칭 명시 + 토론 로그 critic_review WARN 기록
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션63)
 
 ### 이번 세션 완료
 1. **Gemini 웹 UI 스킬 구축**:
