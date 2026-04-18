@@ -118,8 +118,23 @@ else
   POST_END=$(date -u -d "$CUTOFF + 7 days" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || \
              python3 -c "from datetime import datetime, timedelta, timezone; c=datetime.fromisoformat('$CUTOFF'.replace('Z','+00:00')); print((c + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%SZ'))")
 
+  # 배포 후 경과 시간 계산 (provisional 표시용)
+  NOW_EPOCH=$(date -u +%s)
+  CUTOFF_EPOCH=$(date -u -d "$CUTOFF" +%s 2>/dev/null || \
+                 python3 -c "from datetime import datetime, timezone; print(int(datetime.fromisoformat('$CUTOFF'.replace('Z','+00:00')).timestamp()))")
+  ELAPSED_SEC=$((NOW_EPOCH - CUTOFF_EPOCH))
+  ELAPSED_HOURS=$((ELAPSED_SEC / 3600))
+  FULL_WINDOW=$((7 * 24))
+  IS_PROVISIONAL=false
+  if [ "$ELAPSED_HOURS" -lt "$FULL_WINDOW" ] 2>/dev/null; then
+    IS_PROVISIONAL=true
+    POST_LABEL="배포 후 경과 구간 (${ELAPSED_HOURS}h / 168h — provisional)"
+  else
+    POST_LABEL="배포 후 7일"
+  fi
+
   PRE_OUT=$(print_bucket_table "배포 전 7일" "$PRE_START" "$CUTOFF")
-  POST_OUT=$(print_bucket_table "배포 후 7일" "$CUTOFF" "$POST_END")
+  POST_OUT=$(print_bucket_table "$POST_LABEL" "$CUTOFF" "$POST_END")
   echo "$PRE_OUT"
   echo "$POST_OUT"
 
@@ -129,18 +144,28 @@ else
   echo ""
   echo "=== 판정 (GPT 세션65 합의) ==="
   echo "배포 전 7일: $PRE_TOTAL 건"
-  echo "배포 후 7일: $POST_TOTAL 건"
+  echo "$POST_LABEL: $POST_TOTAL 건"
+
+  RATE=""
   if [ "$PRE_TOTAL" -gt 0 ] 2>/dev/null; then
     RATE=$(awk -v pre="$PRE_TOTAL" -v post="$POST_TOTAL" 'BEGIN{printf "%.1f", (pre-post)*100/pre}')
     echo "감소율: ${RATE}%"
   fi
 
-  if [ "$POST_TOTAL" -le 50 ] 2>/dev/null; then
-    echo "판정: 5조건 보류 (POST ≤ 50)"
-  elif [ "$POST_TOTAL" -le 70 ] 2>/dev/null; then
-    echo "판정: 1주 연장 관찰 (51 ≤ POST ≤ 70)"
+  if [ "$IS_PROVISIONAL" = "true" ]; then
+    echo "판정: provisional — 7일 경과 후 최종 판정 (현재 ${ELAPSED_HOURS}h 경과)"
+    echo "  조기신호: POST=$POST_TOTAL, RATE=${RATE:-N/A}%"
   else
-    echo "판정: 5조건 즉시 구현 (POST ≥ 71)"
+    # 7일 경과 완료 — GPT 임계값 적용
+    # 감소율<60% 분기 포함 (세션65 GPT 5-0 지적 반영)
+    RATE_NUM=$(awk -v r="${RATE:-0}" 'BEGIN{printf "%d", r}')
+    if [ "$POST_TOTAL" -ge 71 ] 2>/dev/null || [ "$RATE_NUM" -lt 60 ] 2>/dev/null; then
+      echo "판정: 5조건 즉시 구현 (POST ≥ 71 또는 감소율 < 60%)"
+    elif [ "$POST_TOTAL" -le 50 ] 2>/dev/null; then
+      echo "판정: 5조건 보류 (POST ≤ 50)"
+    else
+      echo "판정: 1주 연장 관찰 (51 ≤ POST ≤ 70)"
+    fi
   fi
 fi
 
