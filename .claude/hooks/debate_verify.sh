@@ -1,0 +1,150 @@
+#!/bin/bash
+# debate_verify — 3자 토론(3way) 산출물 커밋 시 3자 서명 기계적 강제 검증
+# 세션68 Claude 오케스트레이션 누락 사고 재발 방지
+# 2026-04-18 3자 토론 Round 2 (Claude 설계 주체)
+#
+# Phase 1: 경고만 (stderr + exit 0) — 1주 운영 후 incident 0건이면 Phase 2 전환
+# Phase 2: 차단 (exit 2) — 세션69 이후 전환 예정
+# Phase 3: step5_final_verification.md 자동 생성 헬퍼
+
+set -u
+
+source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+
+# Claude Code PreToolUse hook: stdin으로 JSON 전달 (tool_input 포함)
+INPUT=$(cat)
+
+# Bash 매처에만 반응
+TOOL_NAME=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
+if [ "$TOOL_NAME" != "Bash" ]; then
+  exit 0
+fi
+
+COMMAND=$(printf '%s' "$INPUT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null)
+
+# git commit 명령만 대상
+case "$COMMAND" in
+  *"git commit"*|*"git -C"*"commit"*) ;;
+  *) exit 0 ;;
+esac
+
+# WIP 예외: [WIP 3way] 접두사 시 스킵
+if echo "$COMMAND" | grep -qE '\[WIP 3way\]'; then
+  exit 0
+fi
+
+# 3way 감지: 커밋 메시지 또는 git diff 경로
+IS_3WAY=0
+if echo "$COMMAND" | grep -qE '\[3way\]|3way|debate_[0-9]{8}_[0-9]{6}_3way|3-way|3자[[:space:]]*토론'; then
+  IS_3WAY=1
+fi
+
+# 보조 감지: staged diff에 debate_*_3way/ 경로 있는지
+if [ "$IS_3WAY" -eq 0 ]; then
+  STAGED=$(git -C "${PROJECT_ROOT:-.}" diff --cached --name-only 2>/dev/null || true)
+  if echo "$STAGED" | grep -qE 'debate_[0-9]{8}_[0-9]{6}_3way/'; then
+    IS_3WAY=1
+  fi
+fi
+
+# 3way 아니면 통과
+if [ "$IS_3WAY" -eq 0 ]; then
+  exit 0
+fi
+
+ERRORS=()
+
+# 최신 3way 로그 디렉토리 탐색
+LOG_BASE="${PROJECT_ROOT:-.}/90_공통기준/토론모드/logs"
+LATEST_3WAY=$(ls -dt "$LOG_BASE"/debate_*_3way 2>/dev/null | head -1)
+
+if [ -z "$LATEST_3WAY" ]; then
+  ERRORS+=("3way 로그 디렉토리 없음 — $LOG_BASE/debate_*_3way")
+else
+  RESULT="$LATEST_3WAY/result.json"
+  STEP5="$LATEST_3WAY/step5_final_verification.md"
+
+  # 1. result.json 존재 + JSON 유효
+  if [ ! -f "$RESULT" ]; then
+    ERRORS+=("result.json 누락: $RESULT")
+  else
+    VALIDATE=$(python3 <<PY 2>&1
+import json, sys
+try:
+    with open(r"$RESULT", encoding="utf-8") as f:
+        d = json.load(f)
+except Exception as e:
+    print(f"JSON_ERROR:{e}"); sys.exit(1)
+
+issues = []
+turns = d.get("turns", [])
+if not turns:
+    issues.append("turns[] 비어있음")
+
+req_keys = ["gpt_verifies_gemini", "gemini_verifies_gpt", "gpt_verifies_claude", "gemini_verifies_claude"]
+enum_verdicts = {"동의", "이의", "검증 필요"}
+
+for i, t in enumerate(turns):
+    cv = t.get("cross_verification")
+    if not cv:
+        issues.append(f"turn[{i}] cross_verification 누락")
+        continue
+    for k in req_keys:
+        v = cv.get(k)
+        if not v:
+            issues.append(f"turn[{i}].{k} 누락")
+            continue
+        verdict = v.get("verdict", "")
+        reason = v.get("reason", "")
+        if verdict not in enum_verdicts:
+            issues.append(f"turn[{i}].{k}.verdict 비enum: '{verdict}'")
+        if not reason.strip():
+            issues.append(f"turn[{i}].{k}.reason 비어있음")
+    pr = cv.get("pass_ratio_numeric", 0)
+    if i == len(turns) - 1 and pr < 0.67:
+        issues.append(f"최종 라운드 pass_ratio={pr} < 0.67")
+
+for x in issues:
+    print(f"FIELD:{x}")
+PY
+)
+    if echo "$VALIDATE" | grep -q "^JSON_ERROR:"; then
+      ERRORS+=("result.json 파싱 실패: $(echo "$VALIDATE" | sed 's/^JSON_ERROR://')")
+    fi
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      ERRORS+=("${line#FIELD:}")
+    done < <(echo "$VALIDATE" | grep "^FIELD:")
+  fi
+
+  # 2. step5_final_verification.md 존재 + 양측 판정 섹션
+  if [ ! -f "$STEP5" ]; then
+    ERRORS+=("step5_final_verification.md 누락 — 3way Step 5 기록 필수")
+  else
+    if ! grep -qE '^##[[:space:]]+GPT[[:space:]]+최종[[:space:]]+판정' "$STEP5"; then
+      ERRORS+=("step5에 'GPT 최종 판정' 섹션 누락")
+    fi
+    if ! grep -qE '^##[[:space:]]+Gemini[[:space:]]+최종[[:space:]]+판정' "$STEP5"; then
+      ERRORS+=("step5에 'Gemini 최종 판정' 섹션 누락 — SKILL.md 5-3 위반")
+    fi
+    # 양측 판정 키워드 존재
+    if ! grep -qE '\*\*(통과|조건부 통과|실패|통과 승격)\*\*' "$STEP5"; then
+      ERRORS+=("step5에 판정 키워드(**통과/조건부 통과/실패/통과 승격**) 없음")
+    fi
+  fi
+fi
+
+# 결과 출력
+if [ ${#ERRORS[@]} -eq 0 ]; then
+  exit 0
+fi
+
+# Phase 1: 경고만
+echo "[debate_verify] ⚠️ 3way 합의 서명 검증 실패 (${#ERRORS[@]}건) — Phase 1 경고 모드" >&2
+for e in "${ERRORS[@]}"; do
+  echo "  - $e" >&2
+done
+echo "[debate_verify] Phase 2 전환 시 커밋 차단됨. 현재는 경고만." >&2
+
+# Phase 1: 경고만, 차단 없음
+exit 0

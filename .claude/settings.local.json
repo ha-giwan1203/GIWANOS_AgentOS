@@ -172,6 +172,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash .claude/hooks/debate_verify.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash .claude/hooks/date_scope_guard.sh"
           }
         ]
