@@ -4,12 +4,95 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션61 (ask_question PASS + 좀비 Chrome 근본 해결 3세션 검증 전체 PASS)
+최종 업데이트: 2026-04-18 KST — 세션63 (Gemini 웹 UI 스킬 구축: gemini-send / gemini-read)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션61)
+## 0. 최신 세션 (2026-04-18 세션63)
+
+### 이번 세션 완료
+1. **Gemini 웹 UI 스킬 구축**:
+   - 방향: 웹 UI 우선(Chrome MCP), API는 Grounding 등 예외 시만
+   - Chrome MCP로 셀렉터 실탐지 후 스킬 확정
+   - 셀렉터: 입력창=`.ql-editor`, 전송버튼=`[aria-label="메시지 보내기"]`, 응답=`model-response`
+   - 완료 감지: 전송버튼 `aria-disabled="false"`
+2. **생성 파일**:
+   - `.claude/commands/gemini-send.md`
+   - `.claude/commands/gemini-read.md`
+   - `.claude/state/gemini_gem_url` / `.claude/state/gemini_chat_url`
+   - `90_공통기준/토론모드/gemini/SKILL.md` (웹 UI 우선으로 전면 재작성)
+
+### 다음 AI 액션 (세션64+)
+1. **gemini-send 실동작 검증** — 실제 메시지 전송 테스트
+2. **Gemini Grounding 파일럿** — API 방식으로 실시간 웹 검색 기능 테스트
+3. **이슈 #2 (preserve_library 보호 누락)**: 후순위 유지
+4. **notebooklm-mcp 이슈 #2**: 여전히 미착수
+
+### 미완료 / 이월
+- Gemini Grounding 파일럿: 다음 세션
+- Gemini 이미지 분석 파일럿: 현장 사진 있을 때
+- 이슈 #2 (preserve_library 보호 누락): 후순위
+- safe_json_get 파서 교체: 승격 조건 대기
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션62)
+
+### 이번 세션 완료
+1. **Gemini API 연결**:
+   - `~/.gemini/api_key.env` 생성, `GEMINI_API_KEY` 등록
+   - aistudio.google.com/spend → Default Gemini Project 스펜드 캡 ₩0 → ₩10,000 조정
+   - 사용 가능 모델 확인: `gemini-2.5-flash` (주력)
+
+2. **영상 분석 A/B 비교** (영상: 2rzKCZ7XvQU, Claude Code 한국어 완벽 가이드 ~39분):
+   - Gemini 2.5-flash: 699,196 입력 토큰, 영상 프레임 네이티브 처리, 타임스탬프 전체 추출 성공
+   - Claude /video: 자막 875세그먼트 파싱, 동등한 분석 품질, 비용 1/60 수준
+   - 결론: **자막 있는 영상 → 동등. 자막 없는 영상·화면 중심 → Gemini 우위**
+
+3. **Claude-Gemini 토론파트너 Gem 생성** (`gemini.google.com`):
+   - Gem ID: `3333ff7eb4ba`
+   - URL: `https://gemini.google.com/gem/3333ff7eb4ba`
+   - 채팅방: `https://gemini.google.com/gem/3333ff7eb4ba/c85e9f4e264e0c0f`
+   - 시스템 프롬프트: 한국어 전문 토론파트너 (동의·반박 구분, 300자 이내, 핵심 반박 1줄)
+
+4. **3라운드 토론 완료** (주제: Claude /video 스킬 vs Gemini API):
+   - R1: Gemini → 200만 토큰, 네이티브 멀티모달 주장. 판정: 환경미스매치(버림)
+   - R2: Gemini → 오디오 네이티브, RAG 1,000시간. 판정: 둘 다 우리 환경 비적용(버림)
+   - R3: Gemini → **소규모·자막 환경 Claude 우위 전적 인정** + 시스템 통합 한계 주장. 판정: 버림(Claude Code는 이미 API 파이프라인)
+   - **최종 판정: Claude /video 유지, Gemini = 자막 없는 영상 전용 보조**
+
+5. **Gemini 활용 방향 정리** (웹 검색 기반):
+   - Grounding(실시간 웹 검색): 단가 시세, 부품 가격, 업계 뉴스
+   - 대용량 문서(1M 토큰): 대형 엑셀·PDF 전체 처리
+   - 멀티모달: 자막 없는 영상, 현장 사진·불량 이미지 판독
+   - Google Workspace 통합: Sheets·Drive 네이티브 연동
+   - 대량 분류·요약(저비용): Gemini Flash-Lite 활용
+
+6. **생성 파일**:
+   - `90_공통기준/토론모드/gemini/gemini_debate.py`
+   - `90_공통기준/토론모드/gemini/SKILL.md`
+   - 커밋: `c4842579`
+
+### 다음 AI 액션 (세션63+)
+1. **Gemini Grounding 파일럿** — 실시간 웹 검색 기능 테스트:
+   ```bash
+   source ~/.gemini/api_key.env
+   # "googleSearch" 도구 포함 API 호출로 실시간 데이터 조회
+   ```
+2. **Gemini 이미지 분석 파일럿** — 현장 사진·불량 이미지 판독 테스트 (이미지 있을 때)
+3. **이슈 #2 (preserve_library 보호 누락)**: 후순위 유지
+4. **다음 토론 의제** — Gem 채팅방 (`c85e9f4e264e0c0f`) 에서 이어서 진행 가능
+
+### 미완료 / 이월
+- Gemini Grounding 파일럿: 다음 세션
+- Gemini 이미지 분석 파일럿: 현장 사진 있을 때
+- 이슈 #2 (preserve_library 보호 누락): 후순위
+- safe_json_get 파서 교체: 승격 조건 대기
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션61)
 
 ### 이번 세션 완료
 1. **세션58 합의 "재인증 없음" 2/2 최종 통과**: Claude Code 재시작 후 `get_health` authenticated=true 유지, `list_notebooks` 2개 유지, `active_sessions`=0

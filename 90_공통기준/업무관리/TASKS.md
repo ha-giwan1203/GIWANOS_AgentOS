@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션62 (Gemini 연결 + Claude-Gemini 토론파트너 Gem 생성 + 3라운드 토론 완료)
+최종 업데이트: 2026-04-18 — 세션63 (Gemini 웹 UI 스킬 구축: gemini-send / gemini-read)
 
 ---
 
@@ -30,6 +30,18 @@
 ---
 
 ## 최근 완료
+
+### [완료] Gemini 웹 UI 스킬 구축 (gemini-send / gemini-read) — 세션63 (2026-04-18)
+- **방향**: Gemini 웹 UI 우선 사용, API는 Grounding 등 웹 불가 시 예외
+- **Chrome MCP 셀렉터 실탐지**:
+  - 입력창: `.ql-editor` (contenteditable DIV), `execCommand('insertText')` 확인
+  - 전송버튼: `[aria-label="메시지 보내기"]`, 완료 감지: `aria-disabled="false"`
+  - 응답 노드: `model-response`
+- **생성 파일**:
+  - `.claude/commands/gemini-send.md` (웹 UI 전송 스킬)
+  - `.claude/commands/gemini-read.md` (응답 읽기 스킬)
+  - `.claude/state/gemini_gem_url`, `.claude/state/gemini_chat_url`
+  - `90_공통기준/토론모드/gemini/SKILL.md` (웹 UI 우선으로 재작성)
 
 ### [완료] Gemini API 연결 + Claude-Gemini 토론파트너 Gem 생성 + 3라운드 토론 — 세션62 (2026-04-18)
 - **Gemini API 연결**: `~/.gemini/api_key.env` 생성, `GEMINI_API_KEY` 등록
