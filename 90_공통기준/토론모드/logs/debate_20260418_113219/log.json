@@ -34,7 +34,12 @@
       "2. 11:13 기준 전/후 7일 비교 (현재는 전만 측정 가능, 후는 7일 경과 필요)",
       "3. 조건부 5조건 구현 or 보류",
       "4. Grounding 파일럿 별도 레인 병행"
-    ]
+    ],
+    "final_verdict": {
+      "gpt_step5_initial": "조건부 통과 — RATE<60% 분기 누락 + provisional 라벨 누락 지적",
+      "step5_0_fix_commit": "7899a2b1",
+      "gpt_step5_final": "통과 — 코드-문서 정합 해소, 세션65 마감 가능, 2026-04-25 이후 재측정 예정"
+    }
   },
   "critic_review": {
     "verdict": "WARN",
