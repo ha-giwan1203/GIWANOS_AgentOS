@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션65 (evidence_missing 집계 스크립트 + 1차 측정 98% 감소 확인, 5조건 보류 판정)
+최종 업데이트: 2026-04-18 — 세션66 (3-tool 합의 5라운드 + /ask-gemini 스킬 신설 + WebFetch fallback PoC)
 
 ---
 
@@ -45,7 +45,38 @@
 
 ---
 
+## 다음 세션 안건 (추가)
+
+**[낮] Composio Gemini MCP 통합 검토 (조건부)**
+- **조건**: `/ask-gemini` 호출 빈도 ≥ 주 5회 시 승격
+- **검토 항목**: Composio 계정/API 키 비용, 자체 호스팅 대안 (RaiAnsar/RLabs 오픈소스 MCP), 본 환경 검증
+- **현 상태**: `/ask-gemini` (CLI minion) 1순위 운용. MCP는 빈도 누적 후 결정
+
+---
+
 ## 최근 완료
+
+### [완료] 3-tool 워크플로우 5라운드 합의 + /ask-gemini 스킬 신설 — 세션66 (2026-04-18)
+- **5라운드 토론** (Claude × GPT × Gemini, chat: 69e2db36 / gem 830c7f2c910759eb):
+  - Round 1~4: GPT/Gemini 역할 정의 + 자가신고 강점 5+약점 (도메인 무제한)
+  - Round 5: Claude를 워크플로우 설계 주체로 격상 → 양측 동의 + Gemini 무결성 검증 조건 추가
+- **사용자 방향 5단계 진화 모두 반영**: Gemini 우선 → 최대 활용 → 각자 강점 → 도메인 무제한 → Claude 설계 주체
+- **외부 실증 검색**: Triple Stack 5x (Netalith), Composio Gemini MCP, "Gemini as minion" 패턴 (ykdojo)
+- **`/ask-gemini` 스킬 신설**: `.claude/commands/ask-gemini.md`
+  - Gemini CLI 0.38.2 헤드리스 (`gemini -p`) 호출
+  - 사용 시점: WebFetch fallback / 대용량 분석 / 멀티모달 / 외부 검증 / 빠른 가설
+  - Windows libuv "Assertion failed" 노이즈 grep 필터링
+- **PoC 2건 검증**: 단순 질의 응답 ✅, WebFetch Reddit fallback ✅
+- **변경 파일**:
+  - `.claude/settings.local.json` — gemini Bash 권한 3개 추가
+  - `CLAUDE.md` — "외부 모델 호출 (3-tool 합의안)" 섹션 신설
+  - `.claude/commands/ask-gemini.md` — 신규 스킬
+  - 메모리: `project_three_tool_workflow.md` + MEMORY.md 인덱스
+  - 토론 로그: `90_공통기준/토론모드/logs/debate_20260418_124356_3way/` (5개 파일)
+- **합의안 핵심**:
+  - Claude Code = 워크플로우 설계 + 실행 + 무결성 검증 (단일 설계 주체)
+  - GPT = 추론·창의·토론 입력 (자가신고 강점 5개)
+  - Gemini = 거시적 분석·통합·멀티모달 입력 (자가신고 강점 5개)
 
 ### [완료] Gemini 웹 UI 스킬 구축 (gemini-send / gemini-read) — 세션63 (2026-04-18)
 - **방향**: Gemini 웹 UI 우선 사용, API는 Grounding 등 웹 불가 시 예외

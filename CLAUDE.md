@@ -40,6 +40,22 @@
 ## 종료 시 갱신
 1. TASKS.md → 2. 도메인 STATUS.md → 3. HANDOFF.md → 4. Notion (필요 시)
 
+## 외부 모델 호출 (3-tool 합의안, 2026-04-18)
+
+워크플로우 설계 주체는 항상 Claude. GPT/Gemini는 입력 제공자로만 호출.
+
+| 도구 | 호출 경로 | 사용 시점 |
+|------|----------|----------|
+| GPT (웹) | `/gpt-send`, `/gpt-read` | 토론, 추론·창의·아이디어 다변화, 반대논리 검증 |
+| Gemini (웹) | `/gemini-send`, `/gemini-read` | 토론, 멀티턴 대화 |
+| Gemini (CLI minion) | `/ask-gemini` | 빠른 단발 질의, WebFetch fallback, 대용량/멀티모달 |
+
+**원칙**:
+- Claude가 호출 시점·입력·검증 절차를 설계
+- GPT/Gemini 응답은 무결성 검증 후 채택 (실물 파일/Git/실증 데이터 대조)
+- 도메인 한정 발상 금지 — 강점 기반 분담
+- 자세한 합의안: 메모리 `project_three_tool_workflow.md`
+
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
 - 장시간 세션 방치 금지 — 도메인/의제 전환 시 세션 재시작 권장

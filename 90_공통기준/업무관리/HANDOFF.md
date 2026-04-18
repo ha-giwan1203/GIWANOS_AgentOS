@@ -4,12 +4,47 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션65 (evidence_missing 집계 스크립트 + 1차 측정 98% 감소 + 5조건 보류 판정)
+최종 업데이트: 2026-04-18 KST — 세션66 (3-tool 합의 5라운드 + /ask-gemini 스킬 신설)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션65)
+## 0. 최신 세션 (2026-04-18 세션66)
+
+### 이번 세션 완료
+1. **3-tool 워크플로우 5라운드 합의** (Claude × GPT × Gemini):
+   - GPT chat 69e2db36 + Gemini gem 830c7f2c910759eb
+   - 사용자 방향 5단계 진화 모두 반영 (Gemini 우선 → 도메인 무제한 → Claude 설계 주체)
+   - GPT 동의 + Gemini 동의(+ 무결성 검증 조건 추가)
+   - 외부 실증 검색 4건 (Triple Stack, Composio MCP, ykdojo minion 패턴 등)
+
+2. **`/ask-gemini` 스킬 신설**:
+   - `.claude/commands/ask-gemini.md`
+   - Gemini CLI 0.38.2 헤드리스 (`gemini -p`) 호출
+   - WebFetch fallback / 대용량 분석 / 멀티모달 / 외부 검증 / 빠른 가설 자동 호출
+   - PoC 2건 검증 (단순 질의 + Reddit fallback)
+
+3. **운영 통합**:
+   - `.claude/settings.local.json`: gemini Bash 권한 3개
+   - `CLAUDE.md`: "외부 모델 호출 (3-tool 합의안)" 섹션
+   - 메모리: `project_three_tool_workflow.md` 신규 + MEMORY.md 인덱스
+
+### 다음 AI 액션 (세션67+)
+1. **세션 재시작** (settings.local.json 변경 → 권한 캐시 갱신)
+2. **`/ask-gemini` 실사용 빈도 추적** (주 5회 ≥ → MCP 통합 검토 승격)
+3. **세션65 안건 계속**: evidence_missing 7일 후 재측정 (2026-04-25 이후)
+
+### 미완료 / 이월
+- Composio Gemini MCP 통합: 호출 빈도 누적 후 검토
+- evidence_missing 7일 후 재측정 (세션65 이월)
+- 이슈 #2 / safe_json_get: 후순위 유지
+
+### 관련 커밋
+- (이번 커밋): 3-tool 합의 + /ask-gemini 스킬 + CLAUDE.md/TASKS.md/HANDOFF.md 갱신
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션65)
 
 ### 이번 세션 완료
 1. **evidence_missing 원인별 집계 스크립트**: `.claude/scripts/evidence_missing_stats.sh`
