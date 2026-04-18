@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.9 — 3자 토론 모드 Step 3-W 구현)
+최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.10 — 3자 토론 단일 멀티턴 통일 + 5회 제한)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -12,25 +12,36 @@
 ## 0. 최신 세션 (2026-04-18 세션67)
 
 ### 이번 세션 완료
-1. **debate-mode v2.9 스킬 격상** — 세션66 "문서만 완료" 상태 해소:
+1. **debate-mode v2.9 스킬 격상 (1차)** — 세션66 "문서만 완료" 상태 해소:
    - 세션66 상호 감시 프로토콜이 CLAUDE.md 문서에만 있고 `/debate-mode` 실행 루프는 2자 구조 그대로였음 → 실제 스킬에 3자 루프 내장
-   - 트리거 2자/3자 분리 (3자: "3자 토론", "Gemini도 포함", "상호 감시" 등)
-   - **Step 3-W 신설** — 라운드 6단계 루프 (GPT답 → Gemini 1줄 검증 → Gemini답 → GPT 1줄 검증 → Claude 종합 → 양측 검증)
+   - 트리거 2자/3자 분리, Step 3-W 신설 (라운드 6단계)
    - 하네스 스키마에 `mode` / `gemini` / `cross_verification` / `pass_ratio` 필드 추가
-   - 종료 판정: 3way 모드 `pass_ratio ≥ 2/3` 미달 시 재라운드 또는 "합의 실패" 기록
-   - 3자 로그: `logs/debate_YYYYMMDD_HHMMSS_3way/round{N}_*.md`
+
+2. **3자 공유 → 조건부 통과 판정 2건 수신**:
+   - GPT: 조건부 통과 (3가지 지적: 검증 1줄 payload 첨부 강제, 자동 게이트, 재라운드 최대 횟수 수치)
+   - Gemini: 조건부 통과 (이원화는 과잉설계 — 단일 멀티턴 권장, 3회 제한 동의)
+   - (c) 쟁점 충돌 → 사용자 결정: **단일 멀티턴 채택** + **재라운드 5회**
+
+3. **debate-mode v2.9 → v2.10 격상**:
+   - 3자 토론 내 `/ask-gemini` 사용 금지, 웹 UI 멀티턴만 사용
+   - 검증 1줄 payload 첨부 강제 (원문 전체 동봉)
+   - 자동 게이트 규정 명시 (`verdict` enum + `pass_ratio_numeric` 재계산)
+   - `max_rounds=5` + `consensus_failure.md` 기록 규정
+   - `cross_verification` 객체 구조화 (`{verdict, reason}`)
 
 ### 다음 AI 액션 (세션68+)
-1. **3자 토론 실사용** 시 Step 3-W 루프 준수 + `cross_verification` 필드 누락 금지
-2. 세션66 이월 안건 계속: evidence_missing 7일 후 재측정 (2026-04-25 이후)
+1. **v2.10 재검증 공유** (GPT + Gemini) → PASS 또는 재라운드
+2. 3자 토론 실사용 2회 누적 후 "3way cross_verification 자동 게이트 스크립트" 별건 착수
+3. 세션66 이월 안건 계속: evidence_missing 7일 후 재측정 (2026-04-25 이후)
 
 ### 미완료 / 이월
-- Composio Gemini MCP 통합: `/ask-gemini` 주 5회 이상 누적 후 검토
+- 3way 자동 게이트 스크립트 실구현 (조건부 착수)
+- Composio Gemini MCP 통합 검토
 - evidence_missing 7일 후 재측정 (2026-04-25 이후)
-- 이슈 #2 (preserve_library) / safe_json_get 파서 교체: 후순위 유지
+- 이슈 #2 (preserve_library) / safe_json_get 파서 교체: 후순위
 
-### 관련 커밋
-- (이번 커밋): debate-mode SKILL.md v2.9 + REFERENCE.md 이력 + TASKS/HANDOFF 갱신
+### 관련 커밋 (세션67)
+- d3c7dd19 (v2.9 신설) → (이번 커밋) v2.10 격상
 
 ---
 

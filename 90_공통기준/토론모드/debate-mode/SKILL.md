@@ -1,6 +1,6 @@
 ---
 name: debate-mode
-version: v2.9
+version: v2.10
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
@@ -9,7 +9,7 @@ description: >
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v2.9
+# 토론모드 (debate-mode) 스킬 v2.10
 
 > 기술 상세(JS 코드, 완료 감지, 오류 대응, 변경 이력)는 `REFERENCE.md` 참조.
 
@@ -118,34 +118,53 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - 단일 모델 동의만으로 합의 종결 금지
 - 최소 2/3 검증 통과 시만 채택
 - Claude 단독 설계 결정 금지 — GPT/Gemini 양측 검증 필수
+- **3자 토론 맥락에서 `/ask-gemini` (CLI 단발) 사용 금지** — 맥락 단절 방지 (세션67 사용자 결정·Gemini 의견 채택)
+- **재라운드 최대 5회** — 동일 의제 5회 내 `pass_ratio ≥ 2/3` 미달 시 "합의 실패" 기록 후 종료 (세션67 사용자 결정)
 
-#### 라운드 루프
-1. **GPT 답 수령** (`Skill(skill="gpt-send", args=의제)` → `gpt-read`)
-2. **Gemini 1줄 검증 호출**: `Skill(skill="ask-gemini", args="다음 GPT 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함. GPT 답변: [GPT 원문]")`
-3. **Gemini 답(본론) 수령** (`Skill(skill="gemini-send", args=의제)` → `gemini-read`) — 멀티턴 필요 시. 단발 검증이면 2단계로 대체
-4. **GPT 1줄 검증 요청**: `Skill(skill="gpt-send", args="다음 Gemini 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함. Gemini 답변: [Gemini 원문]")` → `gpt-read`
-5. **Claude 종합·설계안 작성** → 양측(GPT + Gemini)에 1줄 검증 요청
-6. 검증 결과 집계 → 2/3 통과 시 채택, 미달 시 재라운드
+#### 도구 통일 (세션67)
+3자 토론 내 모델 호출은 전부 **웹 UI 멀티턴**으로만 수행한다:
+- GPT: `Skill(skill="gpt-send")` + `Skill(skill="gpt-read")`
+- Gemini: `Skill(skill="gemini-send")` + `Skill(skill="gemini-read")`
 
-#### 스킬 선택 기준
-| 용도 | 도구 |
-|------|------|
-| Gemini 빠른 1줄 검증 | `/ask-gemini` (CLI minion, 헤드리스) |
-| Gemini 멀티턴 토론 본론 | `/gemini-send` + `/gemini-read` (웹 UI) |
-| GPT 토론·검증 | `/gpt-send` + `/gpt-read` |
+> `/ask-gemini` (CLI 헤드리스 단발)는 3자 토론 안에서 사용 금지. 용도: WebFetch fallback · 대용량 · 멀티모달 · 토론 외 일반 질의 (본 스킬 밖).
 
-#### 검증 누락 감지
-- 라운드 종료 전 `cross_verification` 필드에 GPT 검증 + Gemini 검증 모두 채워졌는지 확인
-- 하나라도 누락이면 **즉시 중단 → 사용자 보고 → 해당 라운드 재실행**
-- 누락 상태로 다음 라운드 진행 금지
+#### 라운드 루프 (매 라운드 6단계)
+
+1. **GPT 답 수령** — `/gpt-send` + `/gpt-read` (토론 맥락 누적되는 동일 채팅방)
+2. **GPT 답 → Gemini 1줄 검증**: GPT 원문 전체를 payload로 `/gemini-send`에 동봉 + "다음 GPT 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함" 요청 → `/gemini-read`
+3. **Gemini 본론 수령** — `/gemini-send`에 의제 본론 요청 (같은 Gem 채팅방, 맥락 유지) → `/gemini-read`
+4. **Gemini 답 → GPT 1줄 검증**: Gemini 원문 전체를 payload로 `/gpt-send`에 동봉 + 동일 1줄 답 요청 → `/gpt-read`
+5. **Claude 종합·설계안 작성** → 양측(GPT + Gemini) 채팅방에 설계안 원문 전체 동봉 1줄 검증 요청 → 양측 응답 수신
+6. **검증 결과 집계** → `pass_ratio` 계산 (채택 수 / 3) → 2/3 이상 시 채택, 미달 시 재라운드 (단, 누적 5회 초과 금지)
+
+#### 검증 1줄 payload 첨부 강제 (NEVER 생략 — GPT 지적 반영)
+
+교차 검증 요청 시 **검증 대상 원문 전체를 다음 메시지 payload에 반드시 포함한다**:
+- "다음 X 답변에 대해 ..." 헤더 + `[X 원문 전체 인용]` + "응답 형식: 동의 / 이의 / 검증 필요 — 근거 1문장"
+- 원문 요약·발췌·생략 금지. 모델이 요약본만 보고 검증하면 맥락 손실 발생
+- 원문이 너무 긴 경우에도 절삭 금지 — 길이 제한 초과 시 라운드 재설계 (의제 분할)
+
+#### 자동 게이트 (3way 필수 — GPT 지적 반영)
+
+라운드 종료 시 다음을 자동 검사한다:
+1. `cross_verification` JSON에 필수 4키 존재: `gpt_verifies_gemini` / `gemini_verifies_gpt` / `gpt_verifies_claude` / `gemini_verifies_claude`
+2. 각 값은 enum `{"동의", "이의", "검증 필요"}` + 근거 1문장
+3. `pass_ratio` 수치 계산: 채택 수(동의 개수) / 3 (소수점 2자리) — 수동 입력 금지, Claude가 항상 재계산
+4. 하나라도 누락/형식 불일치면 **즉시 중단 → 사용자 보고 → 해당 라운드 재실행** (누적 5회 카운트에 포함)
+
+> 자동 게이트 스크립트 구현은 별건 안건: TASKS "3way cross_verification 자동 게이트 스크립트" 참조.
 
 #### 로그 파일 구조
 - 3자 토론 로그: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS_3way/`
 - 라운드별 파일: `round{N}_gpt.md`, `round{N}_gemini.md`, `round{N}_cross_verify.md`, `round{N}_claude_synthesis.md`
+- 누적 5회 도달 시 `consensus_failure.md` 기록 (주제·시도 요약·각 라운드 pass_ratio)
 
 ### Step 4a. 종료 판정
 - 설정 턴 수 도달 / "합의" 감지 / 동일 주장 2회 반복 시 종료
-- **3way 모드**: 최종 합의안도 `cross_verification.pass_ratio ≥ 2/3` 조건 충족해야 채택. 미달 시 재라운드 또는 "합의 실패" 기록
+- **3way 모드**:
+  - 최종 합의안도 `cross_verification.pass_ratio ≥ 2/3` 조건 충족해야 채택
+  - 미달 시 재라운드 — 단, **동일 의제 누적 5회 초과 금지**
+  - 5회 도달 시 "합의 실패" 판정 → `consensus_failure.md` 작성 후 종료 → 사용자에게 실패 사유·각 라운드 pass_ratio 보고
 - 합의안 + 미합의 쟁점 + 즉시 실행안 3개 도출
 - 임시 로그 저장 (.md + .json)
 
@@ -213,11 +232,13 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
     "버림": []
   },
   "cross_verification": {
-    "gpt_verifies_gemini": "동의|이의|검증 필요 — 근거 1줄",
-    "gemini_verifies_gpt": "동의|이의|검증 필요 — 근거 1줄",
-    "gpt_verifies_claude": "동의|이의|검증 필요 — 근거 1줄",
-    "gemini_verifies_claude": "동의|이의|검증 필요 — 근거 1줄",
-    "pass_ratio": "2/3 또는 3/3 — 채택 가능 여부"
+    "gpt_verifies_gemini": {"verdict": "동의|이의|검증 필요", "reason": "근거 1문장"},
+    "gemini_verifies_gpt": {"verdict": "동의|이의|검증 필요", "reason": "근거 1문장"},
+    "gpt_verifies_claude": {"verdict": "동의|이의|검증 필요", "reason": "근거 1문장"},
+    "gemini_verifies_claude": {"verdict": "동의|이의|검증 필요", "reason": "근거 1문장"},
+    "pass_ratio_numeric": 0.67,
+    "round_count": 1,
+    "max_rounds": 5
   }
 }
 ```
@@ -227,8 +248,11 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 - `label`: 실증됨 / 일반론 / 환경미스매치 / 과잉설계 중 1개
 - `evidence`: 판정 근거 1줄
 - `ref`: 파일경로:행번호, 커밋SHA, 로그파일명 중 하나 (없으면 null)
-- `cross_verification`: **3way 필수**. 누락된 필드 있으면 라운드 재실행 (Step 3-W "검증 누락 감지" 참조). 2way는 섹션 자체 생략 가능
-- `pass_ratio`: 2/3 이상 시 채택, 1/3 이하 시 재라운드
+- `cross_verification`: **3way 필수**. 4개 검증 필드 각각 `verdict` + `reason` 객체. 2way는 섹션 자체 생략 가능
+- `verdict` enum: `"동의" | "이의" | "검증 필요"` 중 하나 — Step 3-W "자동 게이트"에서 검증
+- `pass_ratio_numeric`: `"동의" 개수 / 3` (소수 2자리). 0.67 이상 시 채택, 미만 시 재라운드 (단 `round_count < max_rounds`)
+- `round_count`: 동일 의제 누적 라운드 수 (1부터 시작)
+- `max_rounds`: 기본 5. `round_count >= max_rounds` 도달 시 "합의 실패" 판정
 - `result` 섹션도 동일 스키마 적용
 
 오류 대응, JS 코드 상세, 변경 이력 → `REFERENCE.md`

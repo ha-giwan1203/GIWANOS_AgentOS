@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션67 (debate-mode v2.9 — 3자 토론 모드 Step 3-W 구현)
+최종 업데이트: 2026-04-18 — 세션67 (debate-mode v2.10 — 3자 토론 단일 멀티턴 통일 + 5회 제한)
 
 ---
 
@@ -50,7 +50,17 @@
 **[낮] Composio Gemini MCP 통합 검토 (조건부)**
 - **조건**: `/ask-gemini` 호출 빈도 ≥ 주 5회 시 승격
 - **검토 항목**: Composio 계정/API 키 비용, 자체 호스팅 대안 (RaiAnsar/RLabs 오픈소스 MCP), 본 환경 검증
-- **현 상태**: `/ask-gemini` (CLI minion) 1순위 운용. MCP는 빈도 누적 후 결정
+- **현 상태**: `/ask-gemini` (CLI minion) 1순위 운용. MCP는 빈도 누적 후 결정 (단, 3자 토론 내 사용 금지 — 세션67)
+
+**[중] 3way cross_verification 자동 게이트 스크립트 (세션67)**
+- **배경**: SKILL.md v2.10 "자동 게이트" 규정은 명시되었으나 실제 강제 스크립트/훅 미구현. 현재는 Claude 운영 규칙 수준
+- **구현 범위**:
+  - 3자 토론 로그 디렉터리(`logs/debate_*_3way/`) 내 JSON 스키마 검사
+  - `cross_verification` 4개 필수 키 존재, `verdict` enum(`동의`/`이의`/`검증 필요`), `pass_ratio_numeric` 재계산 일치
+  - `round_count ≤ max_rounds(=5)` 검사
+  - 실패 시 라운드 재실행 신호 또는 `consensus_failure.md` 생성
+- **위치 후보**: `.claude/scripts/verify_cross_verification.py` + PostToolUse hook 또는 critic-reviewer 승격
+- **조건**: 3자 토론 실사용 2회 누적 후 착수 (과잉설계 방지)
 
 ~~**[중] 토론 검증 프로토콜 보완 (세션66 사용자 지적)**~~ → **세션66 종결 시 즉시 구현 완료** (아래 "최근 완료" 항목 참조)
 
@@ -58,12 +68,28 @@
 
 ## 최근 완료
 
+### [완료] debate-mode v2.10 — 3자 토론 단일 멀티턴 통일 + 5회 제한 — 세션67 (2026-04-18)
+- **v2.9 신설 후 3자 공유 → 조건부 통과 판정 2건** (GPT·Gemini). 지적 대응 반영하여 v2.10 격상
+- **사용자 결정**:
+  - (c) /ask-gemini vs /gemini-send 이원화 쟁점 → **단일 멀티턴 통일** (Gemini 의견 채택, 맥락 단절 방지)
+  - (d) 재라운드 최대 횟수 → **5회** (GPT·Gemini 3회 제안 대비 상향)
+- **SKILL.md v2.9 → v2.10 주요 변경**:
+  - 3자 토론 내 `/ask-gemini` 사용 금지 — GPT/Gemini 모두 웹 UI 멀티턴만 사용 (`/gpt-send`+`/gemini-send`)
+  - 검증 1줄 payload 첨부 강제: 원문 전체 동봉(요약·발췌·생략 금지) — GPT 지적 반영
+  - 자동 게이트 규정: 4개 필수 키 존재, `verdict` enum 검증, `pass_ratio_numeric` 재계산 — 스크립트 구현은 별건(아래 TASKS)
+  - 재라운드 최대 5회: `round_count >= max_rounds` 도달 시 `consensus_failure.md` 기록 후 종료
+  - 하네스 스키마 구조화: `cross_verification` 각 필드 `{verdict, reason}` 객체 + `pass_ratio_numeric` 수치 + `round_count` + `max_rounds`
+- **변경 파일**:
+  - `90_공통기준/토론모드/debate-mode/SKILL.md` (v2.9 → v2.10)
+  - `90_공통기준/토론모드/debate-mode/REFERENCE.md` (v2.10 이력)
+- **신규 별건 안건**: "3way cross_verification 자동 게이트 스크립트" (상단 안건 섹션 참조)
+
 ### [완료] debate-mode v2.9 — 3자 토론 모드 스킬 구현 — 세션67 (2026-04-18)
 - **배경**: 세션66에서 상호 감시 프로토콜 **문서만** 완성. `/debate-mode` 실행 루프는 여전히 2자(Claude×GPT) 구조 → 3자 토론 시 수동 호출 필요. 스킬 구현으로 격상.
 - **반영 내용** (SKILL.md v2.8 → v2.9):
   - 트리거 분리: 2자 토론(기본) / 3자 토론("3자 토론", "Gemini도 포함", "Claude×GPT×Gemini", "상호 감시", "교차 검증 토론")
   - **Step 3-W 신설** (3자 토론 모드): 라운드 6단계 (GPT답 → Gemini 1줄 검증 → Gemini답 → GPT 1줄 검증 → Claude 종합 → 양측 검증)
-  - 스킬 선택 기준: 빠른 1줄 검증은 `/ask-gemini` CLI, 멀티턴 본론은 `/gemini-send`+`/gemini-read`
+  - 초기안에서는 /ask-gemini(CLI) + /gemini-send(웹) 이원화 → v2.10에서 단일 멀티턴으로 통합
   - 검증 누락 감지: `cross_verification` 필드 미완 시 즉시 중단 + 재라운드
   - 로그 구조: `logs/debate_YYYYMMDD_HHMMSS_3way/round{N}_*.md` 분리
   - 하네스 스키마 확장: `mode` / `gemini` / `cross_verification` / `pass_ratio` 필드 추가
