@@ -4,12 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션66 (3-tool 합의 5라운드 + /ask-gemini 스킬 신설)
+최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.9 — 3자 토론 모드 Step 3-W 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션66)
+## 0. 최신 세션 (2026-04-18 세션67)
+
+### 이번 세션 완료
+1. **debate-mode v2.9 스킬 격상** — 세션66 "문서만 완료" 상태 해소:
+   - 세션66 상호 감시 프로토콜이 CLAUDE.md 문서에만 있고 `/debate-mode` 실행 루프는 2자 구조 그대로였음 → 실제 스킬에 3자 루프 내장
+   - 트리거 2자/3자 분리 (3자: "3자 토론", "Gemini도 포함", "상호 감시" 등)
+   - **Step 3-W 신설** — 라운드 6단계 루프 (GPT답 → Gemini 1줄 검증 → Gemini답 → GPT 1줄 검증 → Claude 종합 → 양측 검증)
+   - 하네스 스키마에 `mode` / `gemini` / `cross_verification` / `pass_ratio` 필드 추가
+   - 종료 판정: 3way 모드 `pass_ratio ≥ 2/3` 미달 시 재라운드 또는 "합의 실패" 기록
+   - 3자 로그: `logs/debate_YYYYMMDD_HHMMSS_3way/round{N}_*.md`
+
+### 다음 AI 액션 (세션68+)
+1. **3자 토론 실사용** 시 Step 3-W 루프 준수 + `cross_verification` 필드 누락 금지
+2. 세션66 이월 안건 계속: evidence_missing 7일 후 재측정 (2026-04-25 이후)
+
+### 미완료 / 이월
+- Composio Gemini MCP 통합: `/ask-gemini` 주 5회 이상 누적 후 검토
+- evidence_missing 7일 후 재측정 (2026-04-25 이후)
+- 이슈 #2 (preserve_library) / safe_json_get 파서 교체: 후순위 유지
+
+### 관련 커밋
+- (이번 커밋): debate-mode SKILL.md v2.9 + REFERENCE.md 이력 + TASKS/HANDOFF 갱신
+
+---
+
+## 1. 이전 세션 (2026-04-18 세션66)
 
 ### 이번 세션 완료
 1. **3-tool 워크플로우 5라운드 합의** (Claude × GPT × Gemini):
@@ -29,22 +54,12 @@
    - `CLAUDE.md`: "외부 모델 호출 (3-tool 합의안)" 섹션
    - 메모리: `project_three_tool_workflow.md` 신규 + MEMORY.md 인덱스
 
-### 다음 AI 액션 (세션67+)
-1. **세션 재시작** (settings.local.json 변경 → 권한 캐시 갱신)
-2. **`/ask-gemini` 실사용 빈도 추적** (주 5회 ≥ → MCP 통합 검토 승격)
-3. **세션65 안건 계속**: evidence_missing 7일 후 재측정 (2026-04-25 이후)
-
-### 미완료 / 이월
-- Composio Gemini MCP 통합: 호출 빈도 누적 후 검토
-- evidence_missing 7일 후 재측정 (세션65 이월)
-- 이슈 #2 / safe_json_get: 후순위 유지
-
-### 관련 커밋
-- (이번 커밋): 3-tool 합의 + /ask-gemini 스킬 + CLAUDE.md/TASKS.md/HANDOFF.md 갱신
+### 관련 커밋 (세션66)
+- 8d04ebdf · ce6c8c54 · e57a50a9
 
 ---
 
-## 1. 이전 세션 (2026-04-18 세션65)
+## 2. 이전 세션 (2026-04-18 세션65)
 
 ### 이번 세션 완료
 1. **evidence_missing 원인별 집계 스크립트**: `.claude/scripts/evidence_missing_stats.sh`

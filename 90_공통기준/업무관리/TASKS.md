@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션66 (3-tool 합의 5라운드 + /ask-gemini 스킬 신설 + WebFetch fallback PoC)
+최종 업데이트: 2026-04-18 — 세션67 (debate-mode v2.9 — 3자 토론 모드 Step 3-W 구현)
 
 ---
 
@@ -57,6 +57,20 @@
 ---
 
 ## 최근 완료
+
+### [완료] debate-mode v2.9 — 3자 토론 모드 스킬 구현 — 세션67 (2026-04-18)
+- **배경**: 세션66에서 상호 감시 프로토콜 **문서만** 완성. `/debate-mode` 실행 루프는 여전히 2자(Claude×GPT) 구조 → 3자 토론 시 수동 호출 필요. 스킬 구현으로 격상.
+- **반영 내용** (SKILL.md v2.8 → v2.9):
+  - 트리거 분리: 2자 토론(기본) / 3자 토론("3자 토론", "Gemini도 포함", "Claude×GPT×Gemini", "상호 감시", "교차 검증 토론")
+  - **Step 3-W 신설** (3자 토론 모드): 라운드 6단계 (GPT답 → Gemini 1줄 검증 → Gemini답 → GPT 1줄 검증 → Claude 종합 → 양측 검증)
+  - 스킬 선택 기준: 빠른 1줄 검증은 `/ask-gemini` CLI, 멀티턴 본론은 `/gemini-send`+`/gemini-read`
+  - 검증 누락 감지: `cross_verification` 필드 미완 시 즉시 중단 + 재라운드
+  - 로그 구조: `logs/debate_YYYYMMDD_HHMMSS_3way/round{N}_*.md` 분리
+  - 하네스 스키마 확장: `mode` / `gemini` / `cross_verification` / `pass_ratio` 필드 추가
+  - 종료 판정: 3way 모드 최종 합의안도 `pass_ratio ≥ 2/3` 충족 필수
+- **변경 파일**:
+  - `90_공통기준/토론모드/debate-mode/SKILL.md` (v2.8 → v2.9, Step 3-W 섹션 + 하네스 스키마 확장)
+  - `90_공통기준/토론모드/debate-mode/REFERENCE.md` (변경 이력 v2.9 추가)
 
 ### [완료] 3자 상호 감시 프로토콜 신설 — 세션66 종결 시 (2026-04-18)
 - **사용자 지적**: 본 세션 5라운드 토론 중 검증 절차 붕괴. Claude 단독 검증자 구조의 결함

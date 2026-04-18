@@ -1,14 +1,15 @@
 ---
 name: debate-mode
-version: v2.8
+version: v2.9
 description: >
   Claude가 브라우저로 ChatGPT 화면을 직접 읽고 반박/질문을 생성하여 반자동 AI 대 AI 토론을 진행하는 스킬.
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
   "토론 시작", "GPT랑 싸워봐", "GPT한테 물어보고 반박해", "AI끼리 토론", "gpt한테 물어봐", "gpt한테 알려줘" 등을 언급하면 반드시 이 스킬을 사용할 것.
+  "3자 토론", "Gemini도 포함", "Claude×GPT×Gemini", "3-party" 언급 시 3자 토론 모드로 전환.
   API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
 ---
 
-# 토론모드 (debate-mode) 스킬 v2.8
+# 토론모드 (debate-mode) 스킬 v2.9
 
 > 기술 상세(JS 코드, 완료 감지, 오류 대응, 변경 이력)는 `REFERENCE.md` 참조.
 
@@ -26,9 +27,17 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 ## 트리거
 
+### 2자 토론 (Claude × GPT) — 기본
 - "토론모드", "AI 토론", "GPT랑 토론", "debate-mode"
 - "GPT 의견 들어봐", "GPT한테 물어봐", "GPT한테 알려줘"
 - "ChatGPT에게 반박해", "토론 시작"
+
+### 3자 토론 (Claude × GPT × Gemini) — 상호 감시
+- "3자 토론", "3-party", "3-way", "삼자 토론"
+- "Gemini도 포함", "Gemini도 넣어", "Claude×GPT×Gemini"
+- "상호 감시", "교차 검증 토론"
+
+> 3자 토론 트리거 감지 시 아래 "3자 토론 모드" 섹션의 루프를 따른다. 기본 절차는 2자 토론과 동일하며, 각 라운드마다 교차 검증 단계가 추가된다.
 
 ---
 
@@ -100,8 +109,43 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 2. 반박 포인트 2~3개 도출 (근거 + 대안)
 3. Step 1.5 재확인 → **승인 없이** 전송 → 반복
 
+### Step 3-W. 3자 토론 모드 (3-way — 상호 감시 프로토콜)
+
+> 트리거가 3자 토론일 때만 적용. 2자 토론은 Step 3까지로 종료 판정으로 진행.
+> 상위 규칙: `../CLAUDE.md` "상호 감시 프로토콜" 섹션.
+
+#### 원칙 (NEVER 생략)
+- 단일 모델 동의만으로 합의 종결 금지
+- 최소 2/3 검증 통과 시만 채택
+- Claude 단독 설계 결정 금지 — GPT/Gemini 양측 검증 필수
+
+#### 라운드 루프
+1. **GPT 답 수령** (`Skill(skill="gpt-send", args=의제)` → `gpt-read`)
+2. **Gemini 1줄 검증 호출**: `Skill(skill="ask-gemini", args="다음 GPT 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함. GPT 답변: [GPT 원문]")`
+3. **Gemini 답(본론) 수령** (`Skill(skill="gemini-send", args=의제)` → `gemini-read`) — 멀티턴 필요 시. 단발 검증이면 2단계로 대체
+4. **GPT 1줄 검증 요청**: `Skill(skill="gpt-send", args="다음 Gemini 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함. Gemini 답변: [Gemini 원문]")` → `gpt-read`
+5. **Claude 종합·설계안 작성** → 양측(GPT + Gemini)에 1줄 검증 요청
+6. 검증 결과 집계 → 2/3 통과 시 채택, 미달 시 재라운드
+
+#### 스킬 선택 기준
+| 용도 | 도구 |
+|------|------|
+| Gemini 빠른 1줄 검증 | `/ask-gemini` (CLI minion, 헤드리스) |
+| Gemini 멀티턴 토론 본론 | `/gemini-send` + `/gemini-read` (웹 UI) |
+| GPT 토론·검증 | `/gpt-send` + `/gpt-read` |
+
+#### 검증 누락 감지
+- 라운드 종료 전 `cross_verification` 필드에 GPT 검증 + Gemini 검증 모두 채워졌는지 확인
+- 하나라도 누락이면 **즉시 중단 → 사용자 보고 → 해당 라운드 재실행**
+- 누락 상태로 다음 라운드 진행 금지
+
+#### 로그 파일 구조
+- 3자 토론 로그: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS_3way/`
+- 라운드별 파일: `round{N}_gpt.md`, `round{N}_gemini.md`, `round{N}_cross_verify.md`, `round{N}_claude_synthesis.md`
+
 ### Step 4a. 종료 판정
 - 설정 턴 수 도달 / "합의" 감지 / 동일 주장 2회 반복 시 종료
+- **3way 모드**: 최종 합의안도 `cross_verification.pass_ratio ≥ 2/3` 조건 충족해야 채택. 미달 시 재라운드 또는 "합의 실패" 기록
 - 합의안 + 미합의 쟁점 + 즉시 실행안 3개 도출
 - 임시 로그 저장 (.md + .json)
 
@@ -152,12 +196,14 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, `turns[]`, `result`, `critic_review`
 
-### 턴별 harness 스키마 (세션15 합의)
+### 턴별 harness 스키마 (세션15 합의, 세션66 3자 필드 추가)
 ```json
 {
   "turn": 1,
+  "mode": "2way|3way",
   "claude": "의제 요약",
   "gpt": "응답 요약",
+  "gemini": "응답 요약 (3way일 때만)",
   "harness": {
     "summary_counts": {"채택": 2, "보류": 1, "버림": 0},
     "채택": [
@@ -165,14 +211,24 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
     ],
     "보류": [],
     "버림": []
+  },
+  "cross_verification": {
+    "gpt_verifies_gemini": "동의|이의|검증 필요 — 근거 1줄",
+    "gemini_verifies_gpt": "동의|이의|검증 필요 — 근거 1줄",
+    "gpt_verifies_claude": "동의|이의|검증 필요 — 근거 1줄",
+    "gemini_verifies_claude": "동의|이의|검증 필요 — 근거 1줄",
+    "pass_ratio": "2/3 또는 3/3 — 채택 가능 여부"
   }
 }
 ```
 
+- `mode`: `2way` 기본, `3way` 는 3자 토론 트리거 감지 시
 - `summary_counts`: 빠른 스캔용 숫자 요약 (필수)
 - `label`: 실증됨 / 일반론 / 환경미스매치 / 과잉설계 중 1개
 - `evidence`: 판정 근거 1줄
 - `ref`: 파일경로:행번호, 커밋SHA, 로그파일명 중 하나 (없으면 null)
+- `cross_verification`: **3way 필수**. 누락된 필드 있으면 라운드 재실행 (Step 3-W "검증 누락 감지" 참조). 2way는 섹션 자체 생략 가능
+- `pass_ratio`: 2/3 이상 시 채택, 1/3 이하 시 재라운드
 - `result` 섹션도 동일 스키마 적용
 
 오류 대응, JS 코드 상세, 변경 이력 → `REFERENCE.md`
