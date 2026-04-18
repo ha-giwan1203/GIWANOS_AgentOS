@@ -10,7 +10,28 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션67 (debate-mode v2.11 — max_rounds 3회로 확정)
+최종 업데이트: 2026-04-18 — 세션68 (Claude Code 영상 분석 기반 3자 토론 → 4건 즉시 적용 완료)
+
+---
+
+## 세션68 즉시 적용 (2026-04-18, 3자 토론 합의)
+
+**[완료] Claude Code 명령어 매뉴얼 영상(2rzKCZ7XvQU) 분석 기반 개선 4건**
+1. ✅ `/rewind` 한계 CLAUDE.md 명시 — bash 삭제 복구 불가, Git 대체재 아님
+2. ✅ context7 우선 규칙 CLAUDE.md 명시 — 라이브러리 문서 조회 시 WebSearch보다 우선
+3. ✅ `doctor_lite.sh` 경량 진단 스크립트 + session_start hook 연동 — settings JSON·필수 hook·핵심 문서·git 체크
+4. ✅ `statusline.sh` 설정 + `settings.local.json` statusLine 등록 — 모델·경로·브랜치·비용 상시 표시
+
+**[검증 후 적용 대기 — 세션69 이후]**
+- `/schedule` 이관 — 작업 분류 매트릭스(로컬/사내망/GitHub-only/커넥터) 수립 후 GitHub 문서 리포트형만 클라우드화
+- `skill-creator` 경로화 — 신규 스킬만 스킬 경로 우선. 기존 `.claude/commands/*.md` 점진 이관
+- `/debate-verify` hook (Gemini 제안) — completion_gate·final_check에 3-tool 2/3 합의 서명 파싱 검증 로직 설계
+- 토큰 임계치 경고 스킬 (Gemini 제안) — TASKS/STATUS 비대 시 컨텍스트 압축·세션 재시작 권고
+
+**[폐기]**
+- `/batch` — main 직행 아키텍처와 상충 (워크트리 실험 레인 규정 선결 시 재검토)
+- `/insights` — ERP 자동화 본선 기여도 낮음, `/self-audit`와 중복
+- `--bare` — hook/gate 중심 안전장치 스킵은 리스크
 
 ---
 

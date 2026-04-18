@@ -64,6 +64,16 @@
 - 파일 변경 후 TASKS/HANDOFF 갱신을 커밋 직전에 함께 수행 (completion_gate 반복 방지)
 - Windows PowerShell 세션에서는 `bash`가 PATH에 없을 수 있다. Bash가 필요하면 `.claude/scripts/run_git_bash.ps1 '<command>'` 또는 `C:\Program Files\Git\bin\bash.exe -lc '<command>'`를 사용한다.
 
+## /rewind 한계 (2026-04-18 3자 토론 합의)
+- `/rewind`(Esc×2)는 **Claude가 만든 코드 변경만** 되돌린다. Git 대체재가 아니다.
+- bash 명령으로 수행한 변경(`rm`, `mv`, `cp`, 외부 스크립트 실행, ERP/MES 업로드)은 **추적·복구 불가**.
+- 저장소는 Bash 훅·외부 스크립트·G-ERP 연동이 많으므로, 중요한 변경은 반드시 `git commit` 후 작업한다.
+
+## 문서 조회 우선순위 (2026-04-18 3자 토론 합의)
+- **라이브러리/SDK/API 문서 조회**: `context7` MCP 우선 사용 (`mcp__context7__query-docs`, `resolve-library-id`). WebSearch는 fallback.
+- **일반 리서치·최신 뉴스·사례 조사**: WebSearch 우선.
+- 이유: context7은 공식 저장소에서 최신 버전별 문서를 가져와 학습 데이터 오래됨 문제를 해소한다.
+
 ## 금지
 - 원본 xlsx/docx/pdf 직접 수정
 - 승인 없는 파일명/시트명/컬럼명 변경

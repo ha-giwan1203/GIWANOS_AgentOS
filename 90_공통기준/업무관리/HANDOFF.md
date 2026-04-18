@@ -4,12 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.11 — max_rounds 3회 확정)
+최종 업데이트: 2026-04-18 KST — 세션68 (Claude Code 영상 분석 기반 3자 토론 → 4건 즉시 적용 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션67)
+## 0. 최신 세션 (2026-04-18 세션68)
+
+### 이번 세션 완료
+1. **Claude Code 명령어 매뉴얼 영상(`2rzKCZ7XvQU`, 39분) 분석**:
+   - 9개 개선 후보 도출 (insights/doctor/rewind/schedule/batch/--bare/statusline/context7/skill-creator)
+
+2. **3자 토론 Round 1 합의 달성** (`90_공통기준/토론모드/logs/debate_20260418_151300_3way/`):
+   - Round 본론 교차: 양측 이의 (대립 항목 1·6·7)
+   - Claude 종합 설계안: GPT·Gemini 양측 '동의' → pass_ratio 1.00
+   - Round 1에서 종결 (재라운드 불필요)
+
+3. **즉시 적용 4건 구현**:
+   - `CLAUDE.md` — `/rewind` 한계 + context7 우선 규칙 섹션 추가
+   - `.claude/hooks/doctor_lite.sh` 신규 — 경량 설정 드리프트 진단 (settings JSON·필수 hook·핵심 문서·git)
+   - `session_start_restore.sh` — smoke_fast 뒤에 doctor_lite 호출 추가
+   - `.claude/hooks/statusline.sh` 신규 + `settings.local.json` statusLine 등록 (모델·경로·브랜치·비용)
+
+### 다음 세션 첫 액션
+- `/statusline` 1주 운영 후 피로도 재평가 (Gemini 우려 반영)
+- `/schedule` 작업 분류 매트릭스 수립 (로컬/사내망/GitHub-only/커넥터 4칸)
+- `/debate-verify` hook 설계 착수 (3-tool 2/3 합의 서명 파싱)
+
+### 검증 결과
+- `smoke_fast` 9/9 PASS
+- `doctor_lite` OK
+- `settings.local.json` JSON 유효
+
+---
+
+## 0-prev. 세션67 (2026-04-18)
 
 ### 이번 세션 완료
 1. **debate-mode v2.9 스킬 격상 (1차)** — 세션66 "문서만 완료" 상태 해소:

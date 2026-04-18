@@ -1,0 +1,36 @@
+#!/bin/bash
+# statusline — Claude Code 상태 표시줄
+# 입력: JSON (stdin) — {model:{display_name,id}, workspace:{current_dir,project_dir}, cost:{total_cost_usd}}
+# 출력: 첫 줄만 표시됨
+# 2026-04-18 3자 토론 합의안 (우선순위 4)
+
+input=$(cat)
+
+# Python으로 JSON 파싱 (jq 없는 환경 대비)
+parsed=$(python3 <<PY 2>/dev/null
+import json, sys, os
+try:
+    d = json.loads('''$input''')
+    model = d.get('model', {}).get('display_name', 'claude')
+    cwd = d.get('workspace', {}).get('current_dir', os.getcwd())
+    cwd_short = os.path.basename(cwd.rstrip('/').rstrip('\\\\'))
+    cost = d.get('cost', {}).get('total_cost_usd', 0)
+    print(f"{model}|{cwd_short}|{cost:.2f}")
+except Exception:
+    print("claude|?|0.00")
+PY
+)
+
+IFS='|' read -r MODEL CWD COST <<< "$parsed"
+
+# Git 브랜치
+BRANCH=$(git branch --show-current 2>/dev/null || echo "-")
+
+# 컬러 ANSI (터미널이 지원하는 경우)
+C_RESET=$'\033[0m'
+C_CYAN=$'\033[36m'
+C_GREEN=$'\033[32m'
+C_YELLOW=$'\033[33m'
+C_DIM=$'\033[2m'
+
+echo "${C_CYAN}${MODEL}${C_RESET} ${C_DIM}|${C_RESET} ${C_GREEN}${CWD}${C_RESET} ${C_DIM}(${BRANCH})${C_RESET} ${C_DIM}|${C_RESET} ${C_YELLOW}\$${COST}${C_RESET}"

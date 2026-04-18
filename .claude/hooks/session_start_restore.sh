@@ -138,6 +138,13 @@ if [ -x "$FAST_SMOKE" ]; then
   hook_log "session_start_restore" "fast_smoke: $FAST_RESULT"
 fi
 
+# doctor_lite — 경량 설정 드리프트 진단 (3자 토론 2026-04-18 합의)
+DOCTOR_LITE="$(dirname "$0")/doctor_lite.sh"
+if [ -x "$DOCTOR_LITE" ]; then
+  DOCTOR_RESULT=$("$DOCTOR_LITE" 2>&1)
+  echo "$DOCTOR_RESULT"
+fi
+
 # 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교 (hook_config.json drift_check 연동)
 DRIFT_PATTERN="최종 업데이트"
 if [ -f "$CONFIG_FILE" ]; then

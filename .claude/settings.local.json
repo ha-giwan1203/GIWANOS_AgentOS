@@ -96,7 +96,15 @@
       "Bash(PYTHONIOENCODING=utf-8 python3 \"90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(sed -i 's/^최종 업데이트: 2026-04-18 — 세션64.*/최종 업데이트: 2026-04-10 — 세션50 \\(테스트용 강제 드리프트\\)/' \"90_공통기준/업무관리/STATUS.md\")",
       "Bash(awk -F'\"ts\":\"' '{print $2}')",
-      "Bash(awk -F'\"' '{print $1}')"
+      "Bash(awk -F'\"' '{print $1}')",
+      "Bash(echo \"https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e30bac-9790-83e8-8012-c67298dd0b6a\")",
+      "Bash(echo \"1382937438\")",
+      "Bash(echo \"1382937448\")",
+      "Bash(echo \"https://gemini.google.com/gem/3333ff7eb4ba/40f17e464b22e594\")",
+      "Bash(echo \"1382937450\")",
+      "Bash(bash .claude/hooks/doctor_lite.sh)",
+      "Bash(bash .claude/hooks/statusline.sh)",
+      "Bash(python3 -c \"import json*:*)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -108,6 +116,10 @@
       "Bash(powershell:*)",
       "Bash(taskkill:*)"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash .claude/hooks/statusline.sh"
   },
   "hooks": {
     "PreCompact": [
@@ -370,5 +382,9 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash .claude/hooks/statusline.sh"
   }
 }

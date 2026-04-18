@@ -1,0 +1,49 @@
+{
+  "session_id": "debate_20260418_151300_3way",
+  "topic": "영상 2rzKCZ7XvQU 분석 기반 9개 개선안 우선순위 확정",
+  "mode": "3way",
+  "rounds": 1,
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "9개 개선 후보 분류 + 적용 순서 요청",
+      "gpt": "즉시 1·2·3·7·8 / 검증 4·9 / 보류 5 / 버림 6",
+      "gemini": "즉시 2·3·6·8 / 검증 4·7·9 / 보류 5 / 1 분류 누락. 추가: /debate-verify + 토큰 경고",
+      "harness": {
+        "summary_counts": {"채택": 7, "보류": 3, "버림": 1},
+        "채택": [
+          {"item": "3 /rewind 명시", "label": "실증됨", "evidence": "양측 즉시 적용 합의"},
+          {"item": "8 context7 우선", "label": "실증됨", "evidence": "양측 즉시 적용 합의"},
+          {"item": "2 /doctor hook", "label": "실증됨", "evidence": "양측 즉시 적용 + 경량화 합의"},
+          {"item": "7 /statusline", "label": "실증됨", "evidence": "GPT 즉시+Gemini 조건부 → 1주 재평가 보완"},
+          {"item": "4 /schedule (검증 후)", "label": "환경미스매치", "evidence": "사내망 의존 작업 분리 필요"},
+          {"item": "9 skill-creator 점진", "label": "실증됨", "evidence": "신규만 승격"},
+          {"item": "신규 /debate-verify + 토큰 경고", "label": "실증됨", "evidence": "Gemini 제안, Claude 채택"}
+        ],
+        "보류": [
+          {"item": "5 /batch", "label": "환경미스매치", "evidence": "main 직행 아키텍처 상충"},
+          {"item": "1 /insights", "label": "과잉설계", "evidence": "/self-audit 중복, ERP 기여도 낮음"}
+        ],
+        "버림": [
+          {"item": "6 --bare", "label": "환경미스매치", "evidence": "hook/gate 중심 운영과 충돌"}
+        ]
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "이의", "reason": "6번 근거 누락하고 버림 결론 논리 비약 + 1번 ERP 기여도 낮음"},
+        "gemini_verifies_gpt": {"verdict": "이의", "reason": "1번 분류 누락 + 6번 즉시 적용이 hook/gate 운영 원칙과 충돌"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "1번 누락과 6번 오판 바로잡음 + hook/gate 원칙과 정합"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "6번 폐기 근거 + 7번 보완책 타당 + 추가 제안 수용"},
+        "pass_ratio_numeric": 1.00,
+        "round_count": 1,
+        "max_rounds": 3
+      }
+    }
+  ],
+  "result": {
+    "status": "합의 달성",
+    "즉시_적용_확정": ["3 /rewind 명시", "8 context7 우선", "2 /doctor hook", "7 /statusline"],
+    "검증_후_적용": ["4 /schedule 분류 매트릭스", "9 skill-creator 신규부터", "신규 /debate-verify hook", "신규 토큰 임계치 경고"],
+    "보류_폐기": ["5 /batch (워크트리 레인 선결)", "1 /insights (중복)", "6 --bare (폐기)"]
+  }
+}
