@@ -68,12 +68,14 @@ fi
 # GPT 합의 2026-04-12: 단순 언급이 아니라 변경 의도 키워드와 AND 조건
 # GPT 합의 세션64 (2026-04-18): 단순 "hook/gate/settings" 키워드로는 트리거 금지
 #   이전 조건: HAS_TARGET="hook|gate|settings|마이그레이션" — 일상 대화도 298건/7일 과탐지
-#   현재 조건: 구체적 파일 경로 패턴 또는 실질적 변경 문맥
+#   현재 조건: 구체적 파일 경로 패턴 + 추상적 고위험 표현 (AND 의도 키워드)
 HAS_HOOK_FILE=$(echo "$TEXT" | grep -ciE '(hook.*파일|hooks/[a-z_]+\.sh|gate\.sh|hook\.sh|hook.*구현|hook.*신설|새 훅|새 hook)')
 HAS_SETTINGS=$(echo "$TEXT" | grep -ciE '(settings\.(local\.)?json|\.claude/settings)')
 HAS_MIGRATION=$(echo "$TEXT" | grep -ciE '(마이그레이션|migration)')
-HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|추가|교체|이동|전수|일괄|구현|신설)')
-if { [ "$HAS_HOOK_FILE" -gt 0 ] || [ "$HAS_SETTINGS" -gt 0 ] || [ "$HAS_MIGRATION" -gt 0 ]; } && [ "$HAS_INTENT" -gt 0 ]; then
+# 추상 표현 (GPT 세션64 2차 보완): "공통 훅 수정", "운영 게이트 손본다" 같은 경로 없는 고위험 요청
+HAS_HOOK_ABSTRACT=$(echo "$TEXT" | grep -ciE '(공통 ?훅|공통 ?hook|운영 ?게이트|운영 ?gate|전역 ?훅|전역 ?hook|훅 ?전반|hook ?전반|gate ?전반|훅 ?체계|gate ?체계|훅 ?일괄|hook ?일괄)')
+HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|추가|교체|이동|전수|일괄|구현|신설|손본|개편)')
+if { [ "$HAS_HOOK_FILE" -gt 0 ] || [ "$HAS_SETTINGS" -gt 0 ] || [ "$HAS_MIGRATION" -gt 0 ] || [ "$HAS_HOOK_ABSTRACT" -gt 0 ]; } && [ "$HAS_INTENT" -gt 0 ]; then
   touch_req "map_scope"
 fi
 
