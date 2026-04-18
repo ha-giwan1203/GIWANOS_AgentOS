@@ -8,19 +8,50 @@ Gemini 웹 UI (gemini.google.com)에 메시지를 입력하고 전송한 뒤 응
 
 ## 실행 순서
 
-### 1. 탭 확인 (재사용 우선)
+### 1. 채팅방 진입 (탭 재사용 우선 + 매 세션 최상단 대화방 재탐지)
 
+> gpt-send 1-B와 동일 철학: 탭 상태 무관하게 **매 세션 Gem 최상단(최신) 대화방을 자동 재탐지**한다. 이전 세션의 `gemini_chat_url`을 검증 없이 재사용 금지.
+
+**Gem URL 원본**: `.claude/state/gemini_gem_url` (고정값, 변경 시 이 파일만 수정)
+
+#### 1-A. 기존 탭 복원 시도 (새 탭 생성 전 필수)
 1. `tabs_context_mcp(createIfEmpty=true)` → MCP 그룹 탭 목록 확인
-2. `gemini.google.com` URL 포함 탭 있으면 → 해당 탭 재사용
-3. 없으면 `.claude/state/gemini_chat_url` 읽기 → 새 탭(`tabs_create_mcp`) 생성 후 navigate
+2. MCP 그룹 탭 중 `gemini.google.com` URL 포함 탭이 있으면 → 해당 탭 재사용 (1-B로)
+3. 없으면 → `.claude/state/gemini_tab_id` 파일 읽기
+   - 파일 존재 + 저장된 tabId가 MCP 그룹 탭 목록에 있음 → 해당 탭 재사용 (1-B로)
+   - 파일 없음 or tabId가 목록에 없음 → **이때만** 새 탭 생성 (`tabs_create_mcp`)
+4. 사용할 탭 ID 확정
 
-### 2. 채팅방 확인
+#### 1-B. 대화방 진입 (매 세션 최상단 재탐지)
 
-- 현재 탭 URL이 `gemini.google.com/gem/` 포함 확인
-- 포함되면 → 그대로 사용, `.claude/state/gemini_chat_url` 갱신
-- 미포함이면 → `.claude/state/gemini_gem_url` 읽기 → navigate → 3초 대기
+1. `.claude/state/gemini_gem_url` 읽기 → 해당 URL로 navigate → 3초 대기
+2. `javascript_tool`로 이 Gem의 **최상단 최근 대화방 href** 추출:
+```javascript
+// recent-chat-list-item = 이 Gem 전용 최근 대화 (최대 3개)
+const recentItems = Array.from(document.querySelectorAll('recent-chat-list-item'));
+const topTitle = recentItems.length > 0
+  ? (recentItems[0].innerText || '').split('\n').map(s => s.trim()).filter(Boolean).pop()
+  : null;
+// sidebar all-conversations에서 동일 title 매칭 → href (/app/{conv_id}) 반환
+let href = null;
+if (topTitle) {
+  const match = Array.from(document.querySelectorAll('a[data-test-id="conversation"]'))
+    .find(a => (a.innerText || '').trim().includes(topTitle));
+  href = match ? match.getAttribute('href') : null;
+}
+JSON.stringify({topTitle, href});
+```
+3. `href`가 `/app/{conv_id}` 형태면 → `https://gemini.google.com${href}` 로 navigate → 3초 대기
+4. 진입 성공 시 (URL이 `/app/` 또는 `/gem/{gem_id}/{conv_id}` 형태 확인 후):
+   - `.claude/state/gemini_chat_url` 갱신 (최종 current URL)
+   - `.claude/state/gemini_tab_id`에 현재 tabId 저장 (다음 세션 재사용용)
+5. `recent-chat-list-item`이 0개인 경우 (이 Gem에 기존 대화 없음) → Gem 기본 URL(`/gem/{gem_id}`)에 머물고 새 대화 시작 상태로 진행. `gemini_chat_url`은 current URL로 갱신
 
-### 3. SEND GATE (생략 금지)
+- **[NEVER]** 이전 세션의 `gemini_chat_url` 값을 검증 없이 재사용 금지
+- **[NEVER]** 탭 URL이 `/gem/` 또는 `/app/`으로 보여도 1-B 생략 금지 — 매 세션 Gem URL navigate + 최상단 재탐지 필수
+- 같은 세션 2회차 이후 호출에서만 `gemini_chat_url` 캐시 허용
+
+### 2. SEND GATE (생략 금지)
 
 ```javascript
 // 전송 버튼 상태 확인 — aria-disabled=true 이면 아직 생성 중
@@ -31,7 +62,7 @@ btn ? btn.getAttribute('aria-disabled') : 'not_found';
 - `"true"` → 현재 응답 생성 중 → `/gemini-read`로 먼저 완료 대기
 - `"false"` → 전송 가능
 
-### 4. 텍스트 입력 + 전송
+### 3. 텍스트 입력 + 전송
 
 ```javascript
 const ta = document.querySelector('.ql-editor');
@@ -49,7 +80,7 @@ setTimeout(() => {
 - fallback: `find`(query="메시지 보내기 버튼") → `computer`(left_click)
 - `type` / `form_input` / CDP 금지
 
-### 5. 응답 완료 대기
+### 4. 응답 완료 대기
 
 ```javascript
 // 전송 버튼 aria-disabled가 false로 돌아오면 완료
@@ -64,7 +95,7 @@ btn ? btn.getAttribute('aria-disabled') : 'not_found';
   - 최대 300초
 - `aria-disabled="false"` 반환 시 완료
 
-### 6. 응답 읽기
+### 5. 응답 읽기
 
 ```javascript
 const blocks = document.querySelectorAll('model-response');
@@ -75,16 +106,19 @@ last ? last.innerText : '';
 - 응답 텍스트를 호출자에게 반환
 
 ## 에러 처리
-- 탭 소실: `tabs_context_mcp(createIfEmpty=true)` → `.claude/state/gemini_chat_url`로 재진입
+- 탭 소실: `tabs_context_mcp(createIfEmpty=true)` → 새 탭 생성 후 1-B 재실행
+- 최상단 대화 탐지 실패 (recent-chat-list-item 0개): Gem 기본 URL 머물고 새 대화로 진행
+- 제목 매칭 실패 (recent title과 sidebar anchor가 일치 안 함): Gem 기본 URL 유지 + 사용자 보고
 - `.ql-editor` 없음: 3초 대기 후 1회 재시도 → 실패 시 "Gemini 입력창 없음" 보고
 - 전송 버튼 미발견: 1초 대기 후 1회 재시도
 - 300초 타임아웃: "Gemini 응답 타임아웃" 보고 후 중단
 
 ## 주의사항
 - [NEVER] Gemini API 호출 금지 — 웹 UI만 사용
-- [NEVER] 새 Gem 생성 또는 새 채팅 개설 금지 — 기존 채팅방 재사용
+- [NEVER] 새 Gem 생성 또는 임의 새 채팅 개설 금지 — 매 세션 최상단(최신) 대화방 자동 진입
+- [NEVER] 이전 세션의 `gemini_chat_url`을 검증 없이 재사용 금지 (탭 URL 상태와 무관하게 1-B 재실행)
 - [MUST] 전송 본문 자연어는 한국어만
-- [MUST] 탭 URL이 `gemini.google.com/gem/` 포함인지 매번 확인
+- [MUST] 1-B 실행 결과 최종 URL로 `gemini_chat_url` 갱신
 
 ## 고정 셀렉터 참조
 ```
