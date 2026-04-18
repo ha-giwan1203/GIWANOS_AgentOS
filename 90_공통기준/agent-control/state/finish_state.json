@@ -1,10 +1,12 @@
 {
-  "terminal_state": "in_progress",
-  "committed_pushed": false,
-  "gpt_shared": false,
-  "gpt_judgment": null,
-  "user_reported": false,
-  "followup_checked": false,
+  "terminal_state": "done",
+  "committed_pushed": true,
+  "gpt_shared": true,
+  "gpt_judgment": "통과",
+  "user_reported": true,
+  "followup_checked": true,
   "exception_reason": null,
-  "session": "세션67"
+  "session": "세션67",
+  "final_commit": "53921a6c",
+  "closed_at": "2026-04-18T15:30:00+09:00"
 }
