@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션61 (ask_question PASS + 좀비 Chrome 근본 해결 3세션 검증 전체 PASS)
+최종 업데이트: 2026-04-18 — 세션62 (Gemini 연결 + Claude-Gemini 토론파트너 Gem 생성 + 3라운드 토론 완료)
 
 ---
 
@@ -30,6 +30,25 @@
 ---
 
 ## 최근 완료
+
+### [완료] Gemini API 연결 + Claude-Gemini 토론파트너 Gem 생성 + 3라운드 토론 — 세션62 (2026-04-18)
+- **Gemini API 연결**: `~/.gemini/api_key.env` 생성, `GEMINI_API_KEY` 등록
+- **스펜드 캡 설정**: aistudio.google.com/spend → Default Gemini Project ₩0→₩10,000 조정
+- **영상 분석 A/B 비교** (영상: 2rzKCZ7XvQU, Claude Code 한국어 완벽 가이드):
+  - Gemini 2.5-flash: 699,196 입력 토큰, 영상 프레임 네이티브 처리, 타임스탬프 전체 추출
+  - Claude /video: 자막 875세그먼트 파싱, 동등한 핵심 내용 추출, 비용 1/60 수준
+  - **결론**: 자막 있는 영상 → 동등, Gemini 우위 조건 = 자막 없는/화면 중심 영상
+- **Claude-Gemini 토론파트너 Gem 생성**:
+  - URL: `https://gemini.google.com/gem/3333ff7eb4ba`
+  - 시스템 프롬프트: 한국어 전문 토론파트너 (동의·반박 구분, 300자 이내, 핵심 반박 1줄)
+- **3라운드 토론 결과** (주제: Claude /video 스킬 vs Gemini API):
+  - Round 1: Gemini — 200만 토큰 컨텍스트, 네이티브 멀티모달 주장 → Claude: 환경미스매치(소규모·자막 완비)로 버림
+  - Round 2: Gemini — 오디오 네이티브, RAG 1,000시간 → Claude: 둘 다 우리 환경 비적용
+  - Round 3: Gemini — **소규모·자막 환경 Claude 우위 전적 인정** + 시스템 통합 한계 주장 → Claude: 버림(Claude Code는 이미 API 기반 파이프라인 통합)
+  - **최종 판정**: Claude /video 스킬 유지, Gemini는 자막 없는 영상 전용 보조
+- **생성 파일**:
+  - `90_공통기준/토론모드/gemini/gemini_debate.py` (API 멀티턴 클라이언트)
+  - `90_공통기준/토론모드/gemini/SKILL.md`
 
 ### [완료] notebooklm-mcp 좀비 Chrome 근본 해결 — 3세션 검증 전체 PASS — 세션61 (2026-04-18)
 - **세션58 debate_20260417_230008 검증 조건 전부 충족**:
