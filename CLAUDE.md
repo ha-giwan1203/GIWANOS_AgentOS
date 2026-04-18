@@ -54,6 +54,7 @@
 - Claude가 호출 시점·입력·검증 절차를 설계
 - GPT/Gemini 응답은 무결성 검증 후 채택 (실물 파일/Git/실증 데이터 대조)
 - 도메인 한정 발상 금지 — 강점 기반 분담
+- **상호 감시**: 3자 토론 시 단일 모델 단독 통과 금지 — GPT 답은 Gemini 검증, Gemini 답은 GPT 검증, Claude 설계는 양측 검증 (`90_공통기준/토론모드/CLAUDE.md` "상호 감시 프로토콜")
 - 자세한 합의안: 메모리 `project_three_tool_workflow.md`
 
 ## 운영 안정성
