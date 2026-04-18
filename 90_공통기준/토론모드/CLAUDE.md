@@ -10,6 +10,8 @@
 
 ## 진입점
 **[MUST] 토론/공동작업/공유 관련 요청 시 반드시 `/debate-mode` 스킬로 진입한다.**
+- 2자 토론 트리거: "토론", "토론모드", "GPT와 토론", "debate-mode", "공동작업", "공유"
+- **3자 토론 트리거**: "3자 토론", "삼자 토론", "3-way", "3-party", "Claude×GPT×Gemini", "Gemini도 포함", "상호 감시", "교차 검증 토론"
 - `Skill(skill="debate-mode")` 호출 — 수동 navigate/gpt-send 사용 금지
 - navigate_gate 훅이 CLAUDE.md 미읽기 시 ChatGPT 진입을 차단한다
 
