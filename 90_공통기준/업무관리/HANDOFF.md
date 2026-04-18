@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션68 (Claude Code 영상 분석 기반 3자 토론 → 4건 즉시 적용 완료)
+최종 업데이트: 2026-04-18 KST — 세션68 (3자 토론 Round 1·2 완료 + /debate-verify Phase 1 + SKILL.md Step5 패치)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -26,15 +26,28 @@
    - `session_start_restore.sh` — smoke_fast 뒤에 doctor_lite 호출 추가
    - `.claude/hooks/statusline.sh` 신규 + `settings.local.json` statusLine 등록 (모델·경로·브랜치·비용)
 
+### 이번 세션 추가 완료 (Round 2)
+4. **SKILL.md Step 5 지침 버그 패치** (883be0b1) — 사용자 지적으로 발견
+   - 기존 "GPT 최종 검증 요청"만 명시 → 3way에서도 Gemini 누락 반복 발생
+   - 수정: 5-3 3way 양측 동시 전송 [MUST] / 5-4 3way 종결 분기 / 5-5 Gemini 판정 필드 필수
+
+5. **/debate-verify hook Phase 1 구현** (a8fcaa00 → b323d50b)
+   - `.claude/hooks/debate_verify.sh` — 3way 산출물 커밋 시 3자 서명 검증
+   - `.claude/commands/debate-verify.md` — 수동 --dry-run 스킬
+   - Round 2 양측 합의 4개 이의 중 3개 즉시 반영, 1개(실행 순서) 보류
+   - CP949 인코딩 버그 실물 재현 → PYTHONUTF8=1 강제로 수정
+
 ### 다음 세션 첫 액션
-- `/statusline` 1주 운영 후 피로도 재평가 (Gemini 우려 반영)
+- `/statusline` 1주 운영 후 피로도 재평가
 - `/schedule` 작업 분류 매트릭스 수립 (로컬/사내망/GitHub-only/커넥터 4칸)
-- `/debate-verify` hook 설계 착수 (3-tool 2/3 합의 서명 파싱)
+- 토큰 임계치 경고 스킬 구현 (Gemini 제안)
+- `/debate-verify` Phase 2 전환 검토 (1주 운영 후 incident 0건 확인)
 
 ### 검증 결과
 - `smoke_fast` 9/9 PASS
 - `doctor_lite` OK
-- `settings.local.json` JSON 유효
+- `debate_verify` 통합 테스트 PASS (정상 3way/round_count 초과/일반 커밋/WIP 모든 케이스)
+- GPT·Gemini Round 2 최종 판정: 양측 **통과**
 
 ---
 
