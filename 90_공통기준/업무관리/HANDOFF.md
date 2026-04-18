@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.10 — 3자 토론 단일 멀티턴 통일 + 5회 제한)
+최종 업데이트: 2026-04-18 KST — 세션67 (debate-mode v2.11 — max_rounds 3회 확정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -40,8 +40,15 @@
 - evidence_missing 7일 후 재측정 (2026-04-25 이후)
 - 이슈 #2 (preserve_library) / safe_json_get 파서 교체: 후순위
 
+4. **v2.10 재공유 → 조건부 통과 2건 재수신**:
+   - GPT: max_rounds=5 허용, 단 자동 게이트 실구현은 PASS 필수
+   - Gemini: max_rounds=5 반대 (3회 원복 권장, Fast Fail 원칙)
+   - 사용자 결정: **Gemini 의견 채택 → v2.11에서 3회로 원복**
+
+5. **v2.11 격상**: `max_rounds` 5 → 3 전수 수정 (SKILL.md/REFERENCE.md)
+
 ### 관련 커밋 (세션67)
-- d3c7dd19 (v2.9 신설) → (이번 커밋) v2.10 격상
+- d3c7dd19 (v2.9) → f0c9d5c1 (v2.10) → (이번 커밋) v2.11
 
 ---
 

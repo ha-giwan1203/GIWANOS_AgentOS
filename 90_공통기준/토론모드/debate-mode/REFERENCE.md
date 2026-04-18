@@ -123,3 +123,4 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
 | v2.8 | 2026-04-10 | `cdp_chat_send.py`에 최신 답변 기대값 확인 옵션 추가, helper가 최신 답변 불일치까지 직접 차단 |
 | v2.9 | 2026-04-18 | 3자 토론 모드(Claude×GPT×Gemini) Step 3-W 신설 + 상호 감시 프로토콜 반영 + 하네스 `cross_verification` 필드 추가 + 종료 판정에 `pass_ratio ≥ 2/3` 조건 추가 |
 | v2.10 | 2026-04-18 | 세션67 3자 공유 조건부 통과 대응: ①3자 맥락에서 `/ask-gemini` 사용 금지(웹 UI 멀티턴 단일화) ②검증 1줄 payload 첨부 강제(원문 전체 동봉) ③자동 게이트(enum 검증 + `pass_ratio_numeric` 계산) ④재라운드 최대 5회(`max_rounds`) + 합의 실패 시 `consensus_failure.md` ⑤하네스 `cross_verification` 구조 객체화(`verdict`+`reason`) |
+| v2.11 | 2026-04-18 | 세션67 v2.10 재검증 Gemini 반박 수용: `max_rounds` 5 → 3 (토큰 낭비·논점 이탈·억지 타협 우려, 사용자 결정). 자동 게이트 규정·payload 첨부·단일 멀티턴은 v2.10 유지 |
