@@ -52,5 +52,18 @@
       "evidence_missing ok 마커 자동 발급 조건 TASKS.md 등재"
     ]
   },
-  "critic_review": null
+  "critic_review": {
+    "verdict": "WARN",
+    "axes": {
+      "독립성": "WARN — Turn 2에서 GPT ok 마커 5조건 전부 즉시 채택, 조건별 독립 검토 흔적 없음",
+      "하네스_엄밀성": "WARN — 라벨(실증됨/일반론 등) 기재됐으나 GPT 주장 매핑 불명확",
+      "0건감사": "WARN — 버림 0건 2연속, evidence_missing 일반론 채택",
+      "결론_일방성": "WARN — 2턴 속성 합의, 최종 조건 5개 GPT안 그대로 수용"
+    },
+    "gpt_conditional": {
+      "item1": "커맨드 4개 스킬 별칭 경로 1줄 문서화 요구 → 각 파일에 skill-alias 주석 추가로 해소",
+      "item2": "session.json critic_review null → WARN 기록으로 해소"
+    },
+    "resolved_at": "64b64872+보정커밋"
+  }
 }

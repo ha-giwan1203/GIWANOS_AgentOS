@@ -1,3 +1,5 @@
+> 슬래시 커맨드 `/task-status-sync` 및 `Skill(skill="task-status-sync")` 공통 지시문
+
 # TASKS-STATUS 충돌 탐지
 
 TASKS.md와 모든 STATUS.md 파일 간의 상태 충돌을 자동 탐지하세요.

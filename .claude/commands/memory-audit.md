@@ -1,6 +1,7 @@
 ---
 description: MEMORY.md 비대화/충돌/구식 항목 점검
 allowed-tools: Read, Grep, Glob
+skill-alias: memory-audit (Skill(skill="memory-audit") 공통 지시문)
 ---
 
 # memory-audit

@@ -1,3 +1,5 @@
+> 슬래시 커맨드 `/review-claude-md` 및 `Skill(skill="review-claude-md")` 공통 지시문
+
 # CLAUDE.md 리뷰
 
 프로젝트의 모든 CLAUDE.md 파일을 검토하고 문제를 보고하세요.
