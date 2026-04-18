@@ -52,6 +52,16 @@
 - **검토 항목**: Composio 계정/API 키 비용, 자체 호스팅 대안 (RaiAnsar/RLabs 오픈소스 MCP), 본 환경 검증
 - **현 상태**: `/ask-gemini` (CLI minion) 1순위 운용. MCP는 빈도 누적 후 결정
 
+**[중] 토론 검증 프로토콜 보완 (세션66 사용자 지적)**
+- **문제**: 본 세션 5라운드 토론에서 GPT/Gemini/Claude 모두 검증 절차 무너짐
+- **원인 5건**: 모델 동의 편향 / 대화 컨텍스트 열화 / Claude 프레임 책임(단답·합의 우선) / 의견 영역 토론 / cowork-rules.md 미적용
+- **보완 방향** (메모리 `project_three_tool_workflow.md` "검증 프로토콜" 섹션 참조):
+  - 각 라운드 메시지에 검증 명시 강제 ("주장 X → 증거 명시, 없으면 '추측' 라벨")
+  - "동의/반박 단답" 프레임 검증 필요 주제에선 금지
+  - Claude 시작 메시지에 cowork-rules.md 검증 원칙 인용
+  - GPT/Gemini가 직접 접근 불가 시 Claude에게 증거 요구 의무화
+- **반영 대상**: `.claude/commands/debate-mode.md` 또는 `90_공통기준/토론모드/CLAUDE.md` 검증 섹션 신설
+
 ---
 
 ## 최근 완료
