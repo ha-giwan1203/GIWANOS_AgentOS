@@ -1,0 +1,53 @@
+{
+  "session_id": "debate_20260418_170000_3way",
+  "topic": "의제3 skill-creator 경로화 범위 결정",
+  "mode": "3way",
+  "rounds": 1,
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "두 경로 병존 + 저장소 원본 + .claude/commands 래퍼 + 자동 동기화 초안",
+      "gpt": "래퍼 방식 찬성, 공식 인식 .claude/commands만 표준. 3단계 점진 이관(즉시/7일 내/유지). skill-creator 내부 동기화. plugin:skill 공식 근거 없음.",
+      "gemini": "래퍼 방식 찬성, 도메인 의존성 최우선 기준 추가. 중복 15개 즉시 전부 이관. skill-creator + 커밋 관문 이중 배치. 공식 플러그인 규격 정합.",
+      "harness": {
+        "summary_counts": {"채택": 5, "보류": 1, "버림": 1},
+        "채택": [
+          {"item": "래퍼 방식 (저장소 원본 → .claude/commands 자동 생성)", "label": "실증됨", "evidence": "양측 동의"},
+          {"item": "skill-creator 내부 + 커밋 관문 이중 동기화 배치", "label": "실증됨", "evidence": "Gemini 이중 배치 + GPT Write hook 반대 타협"},
+          {"item": "도메인 의존성 최우선 우선순위 기준 추가", "label": "실증됨", "evidence": "Gemini 제안, GPT 복잡도 기준과 공존 가능"},
+          {"item": "공식 정합성은 .claude/commands/ 래퍼로만 확보", "label": "실증됨", "evidence": "GPT 지적 수용, plugin:skill 자동 인식 근거 부족"},
+          {"item": "3단계 이관 로드맵 (즉시 debate-mode/settlement/line-batch-*/daily + 7일 내 중간 복잡도 + 유지 단발)", "label": "실증됨", "evidence": "GPT 3단계 + Gemini 즉시 전부 절충"}
+        ],
+        "보류": [
+          {"item": "이관 시기 대립 (GPT 3단계 vs Gemini 즉시 전부)", "label": "일반론", "evidence": "Claude 타협안으로 절충, 실행 단계에서 재평가"}
+        ],
+        "버림": [
+          {"item": "플러그인 규격 정합 주장 (Gemini)", "label": "환경미스매치", "evidence": "공식 문서 확인 범위에서 SKILL.md/plugin:skill 자동 인식 근거 없음"}
+        ]
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "이의", "reason": "래퍼 방식·동기화 방향은 타당하지만 15개 즉시 전부 이관은 위험하고 공식 플러그인 규격 정합 주장도 과장"},
+        "gemini_verifies_gpt": {"verdict": "이의", "reason": "점진 이관·유지 남기면 문맥 혼란 근본 문제 방치, 커밋 관문 무결성 검증 누락 리스크"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "저장소 SKILL.md 원본 + .claude/commands 래퍼 + 복잡도·도메인 높은 것부터 단계적 이관이 공식 커스텀 슬래시 명령 구조와 저장소 운영에 가장 덜 충돌"},
+        "gemini_verifies_claude": {"verdict": "미수령", "reason": "Chrome background throttling으로 DOM 응답 생성 실패. gpt-read/gemini-read 스킬 패치 후 다음 세션 재개"},
+        "pass_ratio_numeric": 0.50,
+        "round_count": 1,
+        "max_rounds": 3
+      }
+    }
+  ],
+  "result": {
+    "status": "부분합의 (GPT 확정, Gemini synthesis 검증 미수령)",
+    "합의_채택_사항": [
+      "래퍼 방식 (90_공통기준/스킬/<name>/SKILL.md = 원본, .claude/commands/<name>.md = 자동 생성 래퍼)",
+      "skill-creator 내부 + 커밋 관문 이중 동기화",
+      "우선순위: 도메인 의존성 + 변경빈도 + 복잡도 + 인자구조 + 참조 주체 + 호출빈도",
+      "3단계 이관 로드맵 (즉시 4종 / 7일 내 7종 / 유지 6종)",
+      "공식 정합성은 .claude/commands/ 래퍼로만"
+    ],
+    "미완료": "Gemini synthesis 검증 (탭 background throttling) → 다음 세션 재확인",
+    "pass_ratio_final": 0.50,
+    "블로커": "Chrome 백그라운드 탭 throttling + 기존 gpt-read/gemini-read 스킬 placeholder 미스킵 버그. 본 세션에서 두 스킬 패치 완료 → 다음 세션부터 자동 재시도 작동"
+  }
+}

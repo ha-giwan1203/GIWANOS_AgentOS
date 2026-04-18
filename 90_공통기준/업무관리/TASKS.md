@@ -10,7 +10,45 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션68 (Claude Code 영상 분석 3자 토론 → 즉시 적용 4건 + /debate-verify Phase 1 + SKILL.md Step5 버그 패치)
+최종 업데이트: 2026-04-18 — 세션69 (3자 토론 의제1·2 합의, 의제3 부분합의, gpt-read/gemini-read 근본 버그 수정)
+
+---
+
+## 세션69 반영 (2026-04-18, 3자 토론 세션)
+
+**[완료] 의제1 /schedule 작업 분류 매트릭스 (pass_ratio 1.00)**
+로그: `90_공통기준/토론모드/logs/debate_20260418_161959_3way/`
+- Tier 1 실행 모드 게이트: Cloud / Desktop / /loop
+- Tier 2 Cloud 4칸: GitHub-only(+env 2차검증) / 커넥터(Phase 2) / 로컬실물(Desktop) / 사내망(로컬)
+- Phase 1 이관 후보 읽기전용 3종: `/self-audit`, `/doc-check`, `/review-claude-md`
+- 하이브리드 작업: 축 신설 안함. [로컬 Desktop 수집 → Git commit → Cloud 가공] 분리
+
+**[완료] 의제2 토큰 임계치 경고 스킬 `token-threshold-warn` (pass_ratio 1.00)**
+로그: `90_공통기준/토론모드/logs/debate_20260418_164115_3way/`
+- 임계치: TASKS 400/800, HANDOFF 500/800, MEMORY 인덱스 120/200, 개별메모리 60/100, incident 1MB/3MB
+- SessionStart hook 경고 + Stop hook 증가량 기록 (차단 없음)
+- 자동 아카이브 이동 금지, 토큰 근사치 계산 금지
+
+**[부분합의] 의제3 skill-creator 경로화 (pass_ratio 0.50, Gemini synthesis 미수령)**
+로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
+- 채택: 래퍼 방식, skill-creator+커밋관문 이중 동기화, 도메인 의존성 우선순위, 3단계 이관(즉시 4종/7일 7종/유지)
+- 미수령: Gemini synthesis 검증 (Chrome 백그라운드 throttling → 다음 세션 재확인)
+
+**[완료] 즉시 조치 4건 (사용자 지적)**
+1. `.claude/commands/debate-mode.md` — Gemini/3자 토론 진입 지침 추가 (기존엔 GPT만 언급)
+2. `settings.local.json permissions.allow` — `Bash(echo:*)`/`Bash(cat:*)` 포괄 패턴 추가 (반복 팝업 해소)
+3. `.claude/commands/gpt-read.md` 근본 버그 수정 — placeholder 스킵 역순 스캔, 2회 안정성 판정, visibilitychange 트리거, 3단계 재시도(sleep→navigate reload→수동 요청)
+4. `.claude/commands/gemini-read.md` 근본 버그 수정 — 메타 텍스트 스킵, 전송버튼 fallback 3중, `not_found` 5회 재시도, 동일 복구 체인
+
+---
+
+## 세션69 이월 (다음 세션에서 재개)
+
+**[이월] 의제3 Gemini synthesis 검증 재확인** — 수정된 gemini-read 로직으로 자동 완료 기대
+**[이월] 의제4 `/debate-verify` 실행 순서 재평가** — Phase 2 실측 기반
+**[이월] 의제5 hook vs permissions 중복 감사** — 사용자 제기
+**[이월] 의제6 진입 단계 Gemini 강제 hook 신설** — 사용자 진단
+**[이월] 의제7 3자 토론 탭 throttling 자동 회복** — 사용자 지적, 이번 세션 gpt-read/gemini-read 패치가 부분 해결, 본격 설계는 다음 세션
 
 ---
 

@@ -9,20 +9,58 @@ GPT 프로젝트방의 최신 응답을 읽어오는 단일 명령.
 - `tabs_context_mcp` → 기존 ChatGPT 탭 확인
 - ChatGPT 탭이 없으면: `.claude/state/debate_chat_url` 읽기 → navigate
 
-### 2. 응답 완료 확인
+### 2. 응답 완료 + 안정성 확인 (세션69 개선)
+
+2-a. **stop-button 감지**:
 ```javascript
 document.querySelector('[data-testid="stop-button"]') !== null
 ```
-- true면 아직 생성 중 → 적응형 polling 대기 (3/5/8초, 최대 300초)
-- false면 완료
+- true면 아직 생성 중 → 적응형 polling (3/5/8초, 최대 300초)
+- false면 2-b로
 
-### 3. 최신 응답 읽기
+2-b. **마지막 유효 블록 안정성 확인** (placeholder 스킵 + 2회 연속 동일 여부):
 ```javascript
-const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
-const last = blocks[blocks.length - 1];
-last ? last.innerText : '';
+(() => {
+  const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
+  // 뒤에서 역순 스캔해서 len>=30 인 첫 블록 반환 (placeholder 스킵)
+  for (let i = blocks.length - 1; i >= 0; i--) {
+    const t = (blocks[i].innerText || '').trim();
+    if (t.length >= 30) return JSON.stringify({idx: i, len: t.length, lastSlice: t.slice(-100)});
+  }
+  return JSON.stringify({idx: -1, len: 0, lastSlice: ''});
+})();
 ```
-- 응답 텍스트를 반환
+- 2초 간격으로 2회 측정, `len`·`lastSlice` 동일하면 안정 판정 → 3으로
+- 변화 중이면 stop-button 다시 확인
+
+### 3. 최신 응답 읽기 (placeholder 스킵 버전)
+
+```javascript
+(() => {
+  const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
+  for (let i = blocks.length - 1; i >= 0; i--) {
+    const t = (blocks[i].innerText || '').trim();
+    if (t.length >= 30) return blocks[i].innerText;
+  }
+  return '';
+})();
+```
+
+### 3-prep. 백그라운드 throttling 대응 (선택)
+
+응답 읽기 전 하이든 상태이면 visibility 이벤트 강제 트리거로 DOM 갱신 유도:
+```javascript
+if (document.visibilityState === 'hidden') {
+  document.dispatchEvent(new Event('visibilitychange'));
+}
+```
+
+### 3-retry. 읽기 실패 시 재시도
+
+반환 텍스트가 비었거나 `len<30`이면:
+1. `sleep 3` 후 3단계 재시도 (최대 3회)
+2. 여전히 실패면 `navigate` 재호출로 페이지 reload → 10초 대기 → 재시도
+3. 그래도 실패면 "GPT 응답 감지 실패 — 탭 수동 활성화 필요" 보고
 
 ### 4. 판정 키워드 추출 (optional)
 응답에서 판정 키워드를 자동 감지한다. **우선순위 높은 것부터 먼저 매칭** — 첫 매칭 승리:
@@ -59,5 +97,12 @@ python3 .claude/hooks/record_incident.py \
 
 ## 에러 처리
 - 탭 소실: `tabs_context_mcp`(createIfEmpty=true) 후 재진입
-- assistant 블록 없음: "GPT 응답 없음" 보고
+- assistant 블록 없음 or 전부 len<30: 3-retry 절차 수행
 - 300초 타임아웃: "GPT 응답 타임아웃" 보고 후 중단
+
+## 변경 이력
+- 세션69 (2026-04-18): 근본 버그 수정
+  - 마지막 블록 len=0 placeholder 스킵 (역순 len>=30 스캔)
+  - 2회 연속 동일 측정 안정성 판정
+  - 백그라운드 throttling 대응 (visibilitychange 트리거)
+  - 읽기 실패 시 자동 재시도 (sleep → navigate reload → 수동 요청)

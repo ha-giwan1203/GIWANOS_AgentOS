@@ -104,7 +104,12 @@
       "Bash(echo \"1382937450\")",
       "Bash(bash .claude/hooks/doctor_lite.sh)",
       "Bash(bash .claude/hooks/statusline.sh)",
-      "Bash(python3 -c \"import json*:*)"
+      "Bash(python3 -c \"import json*:*)",
+      "Bash(echo \"1382937451\")",
+      "Bash(echo \"1382937453\")",
+      "Bash(echo:*)",
+      "Bash(cat:*)",
+      "Bash(cat .claude/state/*:*)"
     ],
     "ask": [
       "Bash(python*:*)",

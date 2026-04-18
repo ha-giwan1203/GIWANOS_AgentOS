@@ -4,12 +4,54 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션68 (3자 토론 Round 1·2 완료 + /debate-verify Phase 1 + SKILL.md Step5 패치)
+최종 업데이트: 2026-04-18 KST — 세션69 (3자 토론 의제1·2 합의, 의제3 부분, gpt-read/gemini-read 근본 버그 수정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션68)
+## 0. 최신 세션 (2026-04-18 세션69)
+
+### 이번 세션 완료
+1. **의제1 `/schedule` 분류 매트릭스 합의** (`debate_20260418_161959_3way/`, pass_ratio 1.00):
+   - Tier 1 실행 모드 게이트 + Tier 2 Cloud 4칸 + Phase 1 읽기전용 3종
+2. **의제2 `token-threshold-warn` 스킬 합의** (`debate_20260418_164115_3way/`, pass_ratio 1.00):
+   - 임계치·경고 전용·자동 아카이브 금지
+3. **의제3 skill-creator 경로화 부분합의** (`debate_20260418_170000_3way/`, pass_ratio 0.50):
+   - 채택: 래퍼 방식 + 이중 동기화 + 3단계 이관
+   - 미수령: Gemini synthesis 검증 (Chrome 백그라운드 throttling)
+
+### 즉시 조치 4건 (사용자 지적 기반)
+4. `.claude/commands/debate-mode.md` — Gemini/3자 토론 진입 지침 추가
+5. `settings.local.json` — `Bash(echo:*)`/`Bash(cat:*)` 포괄 허용 패턴
+6. `.claude/commands/gpt-read.md` 근본 버그 수정:
+   - 마지막 placeholder 블록 스킵 (역순 len>=30 스캔)
+   - 2회 연속 안정성 판정
+   - visibilitychange 트리거
+   - 3단계 재시도(sleep→navigate reload→수동 요청)
+7. `.claude/commands/gemini-read.md` 근본 버그 수정:
+   - 메타 텍스트 정규식 스킵
+   - 전송버튼 fallback 3중
+   - `not_found` 5회 재시도 → navigate reload 자동 전환
+
+### 블로커 기록
+- **Chrome 백그라운드 탭 throttling**: Gemini synthesis 검증 응답이 DOM에 도착 안 함. 탭 수동 활성화 외 해결 불가
+- **Ctrl+Tab 단축키 오판**: `computer` action=key는 web content에만 전달되므로 Chrome 탭 전환 단축키로 사용 불가 확인
+
+### 다음 세션 첫 액션
+1. 의제3 Gemini synthesis 재확인 (패치된 gemini-read 로직으로 자동 완료 기대)
+2. 의제4 `/debate-verify` 실행 순서 재평가
+3. 의제5 hook vs permissions 중복 감사
+4. 의제6 진입 단계 Gemini 강제 hook 신설
+5. 의제7 3자 토론 탭 throttling 자동 회복 (본격 설계)
+
+### 검증 결과
+- 의제1·2 합의 pass_ratio 1.00
+- 의제3 부분합의 pass_ratio 0.50 (GPT 완료, Gemini 미수령)
+- gpt-read/gemini-read 패치는 다음 세션부터 작동 (현 세션에는 반영 불가)
+
+---
+
+## 0-prev. 세션68 (2026-04-18)
 
 ### 이번 세션 완료
 1. **Claude Code 명령어 매뉴얼 영상(`2rzKCZ7XvQU`, 39분) 분석**:

@@ -1,0 +1,61 @@
+{
+  "session_id": "debate_20260418_161959_3way",
+  "topic": "의제1 /schedule 작업 분류 매트릭스 수립 (로컬/사내망/GitHub-only/커넥터)",
+  "mode": "3way",
+  "rounds": 1,
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "4칸 매트릭스 + Phase 1 3건 초안 (self-audit/memory-audit/doc-check)",
+      "gpt": "매트릭스 반쯤 맞음. 1차 실행 모드 게이트(Cloud/Desktop/loop) 추가 필요. Phase 1 보수화(self-audit/doc-check/review-claude-md). 커넥터 Phase 2. 자동 수정·반영류 제외. 하이브리드 5축 신설 반대.",
+      "gemini": "4칸 정확. GitHub-only 내부 로컬 env·비밀키 의존성 2차 검증 추가. Phase 1 3건 적절. 커넥터 Phase 2. 하이브리드 5번째 축 필요(야간스캔 등).",
+      "harness": {
+        "summary_counts": {"채택": 5, "보류": 1, "버림": 0},
+        "채택": [
+          {"item": "Tier 1 실행 모드 게이트 (Cloud/Desktop/loop)", "label": "실증됨", "evidence": "GPT 제안, Gemini 교차검증 동의 (하이브리드 대체 아키텍처)", "ref": "round1_gpt.md, round1_cross_verify.md"},
+          {"item": "Tier 2 4칸 분류 유지 + 제목 '원격 Cloud /schedule 분류표'", "label": "실증됨", "evidence": "양측 동의", "ref": "round1_claude_synthesis.md"},
+          {"item": "GitHub-only 내부 로컬 env·비밀키 2차 검증", "label": "실증됨", "evidence": "Gemini 제안, GPT 이의 없음", "ref": "round1_gemini.md"},
+          {"item": "커넥터 Phase 2 이월", "label": "실증됨", "evidence": "양측 합의, 토큰 주입 파이프라인 선결", "ref": "round1_gpt.md, round1_gemini.md"},
+          {"item": "Phase 1 읽기 전용 3종 (self-audit/doc-check/review-claude-md)", "label": "실증됨", "evidence": "GPT 보수화 + Gemini 3건 적절 수용, memory-audit·task-status-sync·map-scope 제외", "ref": "round1_claude_synthesis.md"}
+        ],
+        "보류": [
+          {"item": "하이브리드 5번째 축 신설", "label": "과잉설계", "evidence": "Gemini 자체 교차검증에서 GPT 실행 모드 게이트 방식 우위 인정, 분리 구조로 대체 가능", "ref": "round1_cross_verify.md"}
+        ],
+        "버림": []
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "이의", "reason": "Phase 1 3건 무조건 적절·하이브리드 5축 필수 단정은 Cloud/Desktop/loop 실행 모드 게이트를 먼저 두는 방식이 더 정확"},
+        "gemini_verifies_gpt": {"verdict": "동의", "reason": "GPT의 클라우드/데스크톱 실행 모드 사전 분리 게이트는 로컬 env 의존성과 하이브리드 작업 한계를 아키텍처 수준에서 해결하는 타당한 접근"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "Cloud/Desktop/loop 1차 게이트 + fresh clone·claude/ 접두 브랜치 제약 전제 + 읽기 전용 GitHub-only 3종만 Phase 1에 올린 구조가 공식 /schedule 실행 제약과 가장 정합"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "로컬 환경변수 의존성 필터링과 하이브리드 단계적 분리 처리가 설계안에 정확히 수용되어 실행 모드 사전 분류 게이트와 결합, 안전하고 논리적인 Cloud 이관 아키텍처 완성"},
+        "pass_ratio_numeric": 1.00,
+        "round_count": 1,
+        "max_rounds": 3
+      }
+    }
+  ],
+  "result": {
+    "status": "합의 달성 (Round 1 종결)",
+    "합의_최종_설계": {
+      "tier_1_실행_모드_게이트": ["Cloud", "Desktop", "/loop"],
+      "tier_2_Cloud_4칸": {
+        "제목": "원격 Cloud /schedule 분류표",
+        "GitHub-only": "Git/파일/파이썬/쉘 + 로컬 env·비밀키 의존성 2차 검증",
+        "커넥터": "Phase 2 이월 (토큰 주입 파이프라인 선결)",
+        "로컬_실물": "Desktop 축 편입",
+        "사내망": "로컬 Desktop만"
+      },
+      "phase_1_후보_3종": ["/self-audit", "/doc-check", "/review-claude-md"],
+      "phase_1_제외": ["/memory-audit (수정 가능성)", "/task-status-sync (main 직행 상충)", "/map-scope (스케줄 부적합)"],
+      "하이브리드_처리": "5축 신설 안함. [로컬 Desktop] 사내망 수집 → Git commit → [Cloud] 분석·문서화 분리 구조",
+      "phase_로드맵": {
+        "phase_1": "3종 읽기 전용 주 1회 Cloud 스케줄 (claude/audit-YYYYMMDD 브랜치 PR)",
+        "phase_2_조건": "Phase 1 실패율 10% 미만 시 진입",
+        "phase_2_내용": "커넥터 실증 (NotebookLM POC + 토큰 파이프라인)",
+        "phase_3": "NotebookLM 원격 편입 + Notion/Slack 리포트"
+      }
+    },
+    "pass_ratio_final": 1.00
+  }
+}

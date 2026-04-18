@@ -1,0 +1,71 @@
+{
+  "session_id": "debate_20260418_164115_3way",
+  "topic": "의제2 토큰 임계치 경고 스킬 (token-threshold-warn) 설계",
+  "mode": "3way",
+  "rounds": 1,
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "저장소 문서 비대화 감시, 경고 전용, 자동 아카이브 반대, 차단 반대 초안",
+      "gpt": "내장 /cost와 보완 관계. 임계치 상향 구체 수치 제안. 차단 반대. 라인수+바이트. 자동 아카이브 보류.",
+      "gemini": "내장과 역할 완전히 다름(건강 검진기). HANDOFF 500줄 상향. 차단 절대 반대(제조업 리스크). 라인수/바이트. 자동 아카이브 반대.",
+      "harness": {
+        "summary_counts": {"채택": 5, "보류": 1, "버림": 1},
+        "채택": [
+          {"item": "저장소 문서 비대화 사전 감시기로 스킬 정의 (내장 /cost와 역할 분리)", "label": "실증됨", "evidence": "양측 동의", "ref": "round1_gpt.md, round1_gemini.md"},
+          {"item": "임계치 상향 합의 (TASKS 400/800, HANDOFF 500/800, MEMORY 120/200, 60/100, 1MB/3MB)", "label": "실증됨", "evidence": "양측 수치 접근 일치", "ref": "round1_claude_synthesis.md"},
+          {"item": "차단 기능 배제, 경고만", "label": "실증됨", "evidence": "양측 제조업 운영 리스크 사유 공감", "ref": "round1_gemini.md"},
+          {"item": "측정: 라인수+바이트, 토큰 근사 배제", "label": "실증됨", "evidence": "양측 오버헤드 판단 일치", "ref": "round1_gpt.md"},
+          {"item": "자동 아카이브 배제, 권고 문구만", "label": "실증됨", "evidence": "양측 컨텍스트 유실 리스크 공감", "ref": "round1_gemini.md"}
+        ],
+        "보류": [
+          {"item": "/context 공식 내장 명령 존재 확인", "label": "검증필요", "evidence": "GPT 지적으로 재확인 필요, Phase 3 구현 시 context7 MCP 조회", "ref": "round1_cross_verify.md"}
+        ],
+        "버림": [
+          {"item": "토큰 근사치 측정", "label": "과잉설계", "evidence": "SessionStart 속도 저하, 결정성 부족", "ref": "round1_gpt.md"}
+        ]
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "검증 필요", "reason": "/cost 공식 확인되지만 /context를 내장 명령으로 단정한 부분 불확실. 나머지 정책 판단은 타당"},
+        "gemini_verifies_gpt": {"verdict": "동의", "reason": "HANDOFF 임계치 500줄 상향과 세션 시작 속도 저하·운영 리스크 막기 위해 차단·자동 아카이브 배제한 실용적 설계 판단 전적 동의"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "token-threshold-warn을 /cost와 분리된 저장소 문서 비대화 감시기로, SessionStart 빠르게 유지하는 경고 전용·라인수/바이트 설계, /context 보류 구성이 공식 훅·비용 문서와 정합"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "제조업 운영 리스크 막기 위한 차단 금지·자동 아카이브 배제 원칙과 현실적 임계치 상향(HANDOFF 500줄) 정확하게 반영"},
+        "pass_ratio_numeric": 1.00,
+        "round_count": 1,
+        "max_rounds": 3
+      }
+    }
+  ],
+  "result": {
+    "status": "합의 달성 (Round 1 종결)",
+    "합의_최종_설계": {
+      "스킬명": "token-threshold-warn",
+      "역할": "저장소 문서 비대화 사전 감시기 (내장 /cost·context window와 보완)",
+      "임계치": {
+        "TASKS.md": "400/800줄",
+        "HANDOFF.md": "500/800줄",
+        "MEMORY.md_인덱스": "120/200줄",
+        "개별_메모리_파일": "60/100개",
+        "incident_ledger.jsonl": "1MB/3MB"
+      },
+      "실행_지점": {
+        "SessionStart_hook": "빠른 측정 + 경고 stderr 출력 (차단 없음)",
+        "Stop_hook": "동일 측정 + 증가량 incident_ledger 기록"
+      },
+      "정책": {
+        "MUST": "경고만, 차단 금지(제조업 운영 리스크), 라인수/바이트 측정",
+        "NEVER": "자동 아카이브 이동, 토큰 근사치 계산",
+        "SHOULD": "강경고 시 수동 정리 스킬 권고, 3회 연속 강경고 시 incident 기록"
+      },
+      "구현_단계": {
+        "Phase_1": "SessionStart hook (경고)",
+        "Phase_2": "Stop hook 증가량 기록 (1주 후)",
+        "Phase_3": "/context 공식 확인 후 통합 리포트 (선택)"
+      },
+      "보류": ["/context 내장 명령 존재 확인 (context7 MCP)", "임계치 1개월 운영 후 튜닝"]
+    },
+    "pass_ratio_final": 1.00,
+    "비고": "Gemini synthesis 검증 1차 읽기 실패 (Chrome background throttling + 페이지 로드 실패) → navigate 재호출 + 재질문으로 회복"
+  }
+}
