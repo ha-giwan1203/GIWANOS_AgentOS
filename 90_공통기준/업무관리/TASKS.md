@@ -10,7 +10,25 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션69 (3자 토론 의제1·2 합의, 의제3 부분합의, gpt-read/gemini-read 근본 버그 수정)
+최종 업데이트: 2026-04-18 — 세션70 (의제3 Gemini synthesis 재수령 → 합의 승격, 의제5 감사 리포트 작성)
+
+---
+
+## 세션70 반영 (2026-04-18, 이월 의제 재개 세션)
+
+**[완료] 의제3 Gemini synthesis 재수령 → 합의 승격 (pass_ratio 0.50 → 0.67)**
+로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
+- `gemini_verifies_claude`: 미수령 → 동의 (근거: pre-commit 훅 이중 배치 + 도메인 의존성 3단계 이관 절충안 합리성)
+- `result.json` status: 부분합의 → 합의 (양측 동의)
+- `step5_final_verification.md` 신규 — GPT/Gemini 양측 **통과** 판정
+- 블로커 해소: 세션69 gpt-read/gemini-read 패치 + 세션70 기존 Gem 대화방 직접 진입
+- 실물 이행(Phase A 즉시 이관 4종)은 세션71+로 분리
+
+**[완료] 의제5 hook vs permissions 감사 리포트 작성 (토론 입력용 read-only)**
+- 산출물: `90_공통기준/토론모드/의제5_hook_permissions_감사리포트.md`
+- 총 hook: 35 .sh + 5 .py / 실행 지점 29개 / permissions.allow 109 항목
+- 정리 후보: 18건 (1회용 16 + 완전 중복 2)
+- 쟁점 A~F 정리 → 세션71 3자 토론 입력으로 사용
 
 ---
 
@@ -29,10 +47,11 @@
 - SessionStart hook 경고 + Stop hook 증가량 기록 (차단 없음)
 - 자동 아카이브 이동 금지, 토큰 근사치 계산 금지
 
-**[부분합의] 의제3 skill-creator 경로화 (pass_ratio 0.50, Gemini synthesis 미수령)**
+**[합의 (세션70 승격)] 의제3 skill-creator 경로화 (pass_ratio 0.50 → 0.67)**
 로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
 - 채택: 래퍼 방식, skill-creator+커밋관문 이중 동기화, 도메인 의존성 우선순위, 3단계 이관(즉시 4종/7일 7종/유지)
-- 미수령: Gemini synthesis 검증 (Chrome 백그라운드 throttling → 다음 세션 재확인)
+- 세션69 상태: Gemini synthesis 미수령(Chrome throttling)
+- 세션70: 재진입으로 Gemini 동의 수령 → 합의 완료. 실물 이행(Phase A 4종 즉시 이관)은 세션71+ 분리
 
 **[완료] 즉시 조치 4건 (사용자 지적)**
 1. `.claude/commands/debate-mode.md` — Gemini/3자 토론 진입 지침 추가 (기존엔 GPT만 언급)
@@ -42,13 +61,15 @@
 
 ---
 
-## 세션69 이월 (다음 세션에서 재개)
+## 세션70 이월 (다음 세션에서 재개)
 
-**[이월] 의제3 Gemini synthesis 검증 재확인** — 수정된 gemini-read 로직으로 자동 완료 기대
-**[이월] 의제4 `/debate-verify` 실행 순서 재평가** — Phase 2 실측 기반
-**[이월] 의제5 hook vs permissions 중복 감사** — 사용자 제기
+**[완료·세션70] 의제3 Gemini synthesis 검증 재확인** — 합의 승격 완료
+**[완료·세션70] 의제5 감사 리포트 작성** — 토론은 세션71에서
+**[이월] 의제3 Phase A 실물 이관 4종** — debate-mode, settlement, line-batch-* 4종, daily → 래퍼 자동 생성 + skill_drift_check.sh pre-commit hook 신규
+**[이월] 의제4 `/debate-verify` 실행 순서 재평가** — Phase 2 실측 기반 (의제5 쟁점 D와 연계)
+**[이월] 의제5 3자 토론** — 감사 리포트(`의제5_hook_permissions_감사리포트.md`) 입력으로 진입
 **[이월] 의제6 진입 단계 Gemini 강제 hook 신설** — 사용자 진단
-**[이월] 의제7 3자 토론 탭 throttling 자동 회복** — 사용자 지적, 이번 세션 gpt-read/gemini-read 패치가 부분 해결, 본격 설계는 다음 세션
+**[이월] 의제7 3자 토론 탭 throttling 자동 회복** — 세션70 수동 재진입 성공이 해결 패턴 제시, 본격 자동화 설계는 다음 세션
 
 ---
 

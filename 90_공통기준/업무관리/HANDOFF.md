@@ -4,12 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션69 (3자 토론 의제1·2 합의, 의제3 부분, gpt-read/gemini-read 근본 버그 수정)
+최종 업데이트: 2026-04-18 KST — 세션70 (의제3 Gemini synthesis 재수령·합의 승격, 의제5 감사 리포트 작성)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션69)
+## 0. 최신 세션 (2026-04-18 세션70)
+
+### 이번 세션 완료
+1. **의제3 Gemini synthesis 재수령 → 합의 승격** (`debate_20260418_170000_3way/`, pass_ratio 0.50 → 0.67):
+   - 기존 Gem 대화방(`/gem/3333ff7eb4ba/40f17e464b22e594`) 직접 진입 + synthesis 원문 전체 재전송
+   - `gemini_verifies_claude`: 미수령 → **동의** (근거: pre-commit 훅 이중 배치 + 도메인 의존성 3단계 이관 절충안 합리성)
+   - `result.json` status: 부분합의 → 합의, `step5_final_verification.md` 신규 (GPT/Gemini 양측 **통과**)
+   - 세션69 블로커(Chrome 백그라운드 탭 throttling) 해소 — 수동 재진입이 회피 경로
+2. **의제5 hook vs permissions 감사 리포트 작성** (`90_공통기준/토론모드/의제5_hook_permissions_감사리포트.md`):
+   - hook 실물: 35 .sh + 5 .py / 실행 지점 29개
+   - permissions.allow 109 항목 / 정리 후보 18건 (1회용 16 + 완전 중복 2) / dedicated 중첩 10건
+   - 쟁점 A~F 정리 완료 → 세션71 3자 토론 입력
+
+### 블로커 기록
+- Chrome 그룹 탭 자동 리다이렉트: `tabs_context_mcp` 직후 탭이 ERP 사내망으로 이동하는 현상 1회 발생 → 새 탭 생성 + 직접 navigate로 우회 성공
+
+### 다음 세션 첫 액션
+1. **세션71**: 의제5 3자 토론(감사 리포트 기반) + 의제3 Phase A 실물 이관 4종(debate-mode/settlement/line-batch-*/daily 래퍼 생성)
+2. **세션72**: 의제4 `/debate-verify` 실행 순서 재평가 — 의제5 쟁점 D와 연계
+3. **세션73**: 의제6 Gemini 진입 강제 hook 신설
+4. **세션74**: 의제7 탭 throttling 자동 회복 설계
+
+### 검증 결과
+- `result.json` JSON 유효성 + cross_verification 4키 enum 정상
+- `bash .claude/hooks/debate_verify.sh` 수동 dry-run → exit 0 (모든 검증 통과)
+- pass_ratio_numeric = 0.67 (채택 조건 ≥ 0.67 충족)
+
+---
+
+## 0-prev. 세션69 (2026-04-18)
 
 ### 이번 세션 완료
 1. **의제1 `/schedule` 분류 매트릭스 합의** (`debate_20260418_161959_3way/`, pass_ratio 1.00):
