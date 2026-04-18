@@ -68,7 +68,7 @@ else
   if [ ! -f "$RESULT" ]; then
     ERRORS+=("result.json 누락: $RESULT")
   else
-    VALIDATE=$(python3 <<PY 2>&1
+    VALIDATE=$(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<PY 2>&1
 import json, sys
 try:
     with open(r"$RESULT", encoding="utf-8") as f:
@@ -103,6 +103,13 @@ for i, t in enumerate(turns):
     pr = cv.get("pass_ratio_numeric", 0)
     if i == len(turns) - 1 and pr < 0.67:
         issues.append(f"최종 라운드 pass_ratio={pr} < 0.67")
+    # round_count/max_rounds 일관성 (Round 2 양측 합의)
+    rc = cv.get("round_count", 0)
+    mr = cv.get("max_rounds", 3)
+    if rc > mr:
+        issues.append(f"turn[{i}] round_count={rc} > max_rounds={mr} — 합의 실패 판정 누락")
+    if i == len(turns) - 1 and rc == mr and pr < 0.67:
+        issues.append(f"turn[{i}] 최종 라운드(max_rounds 도달) + pass_ratio 미달 → consensus_failure.md 필요")
 
 for x in issues:
     print(f"FIELD:{x}")
@@ -145,6 +152,14 @@ for e in "${ERRORS[@]}"; do
   echo "  - $e" >&2
 done
 echo "[debate_verify] Phase 2 전환 시 커밋 차단됨. 현재는 경고만." >&2
+
+# JSONL 로그 기록 (Round 2 양측 합의 — Phase 2 전환 기준 계측)
+LEDGER="${PROJECT_ROOT:-.}/.claude/incident_ledger.jsonl"
+if [ -w "$(dirname "$LEDGER")" ]; then
+  TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
+  ISSUES_JSON=$(printf '%s\n' "${ERRORS[@]}" | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()], ensure_ascii=False))" 2>/dev/null || echo "[]")
+  echo "{\"ts\":\"$TS\",\"tag\":\"debate_verify\",\"phase\":1,\"count\":${#ERRORS[@]},\"issues\":$ISSUES_JSON,\"resolved\":false}" >> "$LEDGER"
+fi
 
 # Phase 1: 경고만, 차단 없음
 exit 0
