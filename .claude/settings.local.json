@@ -57,27 +57,20 @@
       "mcp__scheduled-tasks__list_scheduled_tasks",
       "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(python3 .claude/hooks/incident_review.py --days 7 --threshold 3)",
-      "Bash(echo \"https://chatgpt.com/c/69ddbd0e-1e48-83e8-9c5a-8e61ece738ba\")",
-      "Bash(echo \"1382935380\")",
-      "Bash(rm -f \"C:/Users/User/Desktop/업무리스트/06_생산관리/기타/네임플레이트_양식정리.xlsx\")",
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/공정매트릭스\")",
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/네임플레이트\")",
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/06_생산관리/명찰\")",
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/01_인사근태/숙련도평가\")",
-      "Bash(rmdir \"C:/Users/User/Desktop/업무리스트/공정 매트릭스\")",
       "Bash(python3 ./.claude/hooks/classify_feedback.py --validate)",
       "Bash(awk '/^[a-zA-Z_][a-zA-Z0-9_]*\\\\s*\\\\\\(\\\\\\)/ {in_func=1; func_name=$1; print NR\": Function START: \"func_name} /^}/ && in_func {in_func=0; print NR\": Function END\"} /local / && !in_func {print NR\": ⚠ local 함수밖 => \"$0}' /c/Users/User/Desktop/업무리스트/.claude/hooks/commit_gate.sh)",
       "Bash(mkdir -p \"C:/Users/User/Desktop/업무리스트/.claude/state\")",
       "Bash(date -u '+%Y-%m-%dT%H:%M:%SZ')",
-      "Bash(rm -f .claude/state/active_domain.req)",
-      "Bash(rm -f .claude/state/instruction_reads/debate_claude_read.ok)",
       "Bash(echo 'https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69de2ef6-c75c-83e8-92f4-76fe7f4d136e')",
       "Bash(echo '1382935544')",
       "Bash(git -C \"C:/Users/User/Desktop/업무리스트\" rev-parse HEAD)",
       "Bash(python3 \"C:/Users/User/Desktop/업무리스트/.claude/hooks/incident_review.py\" --days 7 --threshold 3)",
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "mcp__Claude_in_Chrome__navigate",
-      "Bash(echo \"1382935546\")",
       "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(python3 \"90_공통기준/업무관리/slack_notify.py\" --message \"[daily-doc-check] STATUS.md 세션 드리프트 감지: TASKS=세션50, STATUS=세션49 — STATUS.md 갱신 필요\")",
       "mcp__Claude_in_Chrome__javascript_tool",
@@ -94,22 +87,18 @@
       "Bash(wmic process *)",
       "Bash(python3 -c ' *)",
       "Bash(PYTHONIOENCODING=utf-8 python3 \"90_공통기준/스킬/daily-routine/run.py\")",
-      "Bash(sed -i 's/^최종 업데이트: 2026-04-18 — 세션64.*/최종 업데이트: 2026-04-10 — 세션50 \\(테스트용 강제 드리프트\\)/' \"90_공통기준/업무관리/STATUS.md\")",
       "Bash(awk -F'\"ts\":\"' '{print $2}')",
       "Bash(awk -F'\"' '{print $1}')",
-      "Bash(echo \"https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e30bac-9790-83e8-8012-c67298dd0b6a\")",
-      "Bash(echo \"1382937438\")",
-      "Bash(echo \"1382937448\")",
-      "Bash(echo \"https://gemini.google.com/gem/3333ff7eb4ba/40f17e464b22e594\")",
-      "Bash(echo \"1382937450\")",
       "Bash(bash .claude/hooks/doctor_lite.sh)",
       "Bash(bash .claude/hooks/statusline.sh)",
       "Bash(python3 -c \"import json*:*)",
-      "Bash(echo \"1382937451\")",
-      "Bash(echo \"1382937453\")",
-      "Bash(echo:*)",
-      "Bash(cat:*)",
-      "Bash(cat .claude/state/*:*)"
+      "Bash(cat .claude/state/*:*)",
+      "mcp__Claude_in_Chrome__tabs_create_mcp",
+      "Bash(PYTHONUTF8=1 python3)",
+      "Bash(PYTHONUTF8=1 python3 -c \"import json; d=json.load\\(open\\('.claude/settings.local.json', encoding='utf-8'\\)\\); print\\('Parsed OK. allow:', len\\(d['permissions']['allow']\\)\\)\")",
+      "Bash(bash .claude/hooks/permissions_sanity.sh)",
+      "Bash(bash -c 'source .claude/hooks/hook_common.sh && START=$\\(hook_timing_start\\) && sleep 0.1 && hook_timing_end \"test_hook\" \"$START\" \"test\" && echo \"timing OK\"')",
+      "Bash(bash .claude/hooks/skill_drift_check.sh)"
     ],
     "ask": [
       "Bash(python*:*)",
@@ -169,6 +158,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/commit_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/skill_drift_check.sh"
           }
         ]
       },
@@ -250,6 +248,15 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/skill_instruction_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/permissions_sanity.sh"
           }
         ]
       },

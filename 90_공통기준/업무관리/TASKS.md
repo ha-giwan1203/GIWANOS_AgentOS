@@ -10,7 +10,46 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-18 — 세션70 (의제3 Gemini synthesis 재수령 → 합의 승격, 의제5 감사 리포트 작성)
+최종 업데이트: 2026-04-19 — 세션71 (의제5 3자 토론 합의 → Phase 2-A 근본해결 + 의제3 Phase A skill_drift_check 신설)
+
+---
+
+## 세션71 반영 (2026-04-19, 의제5 토론 + 근본해결 실물 이행 세션)
+
+**[완료] 의제5 3자 토론 Round 1 합의** (`debate_20260418_190429_3way/`, pass_ratio 1.33)
+- 로그: GPT 동의, Gemini 동의, 양측 Claude 종합 설계안 동의 (4/3 = 1.33, 채택 조건 ≥0.67 초과)
+- critic-reviewer WARN 반영 — 실물 훅(debate_verify·commit_gate) exit code 분기 Read 확인 후 진행
+- 합의 8개 쟁점 채택 (A~F + 신규 G·H)
+
+**[완료] 의제5 Phase 2-A 실물 이행 (근본해결)**
+1. `.claude/settings.local.json` permissions 20건 정리 (114→94): 1회용 18건 + 완전 중복 2건 제거
+2. `.claude/hooks/permissions_sanity.sh` 신설 — advisory 등급, stderr 경고, 60분 캐시, 차단 없음
+3. `CLAUDE.md` 루트 신규 섹션 3개:
+   - "hook vs permissions 역할 경계" — 5단계 의사결정 트리 (GPT 제안 1단계 선행 질문 포함)
+   - "settings 계층 분리 가이드" — 쟁점 G 선제조건 명시
+   - "훅 등급 + 에러 전파 정책" — advisory/gate/measurement 3종 + exit code 표준
+4. `.claude/hooks/hook_common.sh` — `hook_timing_start/end` + `hook_advisory/hook_gate/hook_measure` 공통 래퍼 함수 (호출부 전환은 Phase 2-B)
+5. `.claude/hooks/README.md` — Stop hook 책임 매트릭스 + 훅 등급 분류 테이블 (30개 훅 현재 실코드 상태 기록)
+6. `90_공통기준/토론모드/settings_inventory_20260419.md` — 쟁점 G 재분류 인벤토리 (실물 이동은 세션72 이월)
+7. `permissions_sanity.sh` PreToolUse Bash 매처 9번째 등록 (advisory)
+
+**[완료] 의제3 Phase A skill_drift_check 신설**
+- `.claude/hooks/skill_drift_check.sh` 신설 — advisory, git commit 시점에만 실행, 5종 래퍼/실물 SKILL.md 정합성 감지
+- 대상 5종 정합성 확인: debate-mode, settlement, line-batch-management, line-batch-outer-main, daily 모두 OK
+- PreToolUse Bash 매처 3번째(commit_gate 뒤, debate_verify 앞) 등록
+
+**[검증]**
+- `smoke_fast.sh` 9/9 PASS
+- `doctor_lite.sh` OK
+- `debate_verify.sh` exit 0
+- `permissions_sanity.sh` 경고 0건
+
+**[이월]**
+- Phase 2-B: `completion_gate.sh` 소프트 블록 (1회용 패턴 3회 누적 사용자 확인) + 기존 훅 전수 등급 재분류 → 공통 래퍼 호출 전환
+- 의제4: 세션72, hook_timing.jsonl 1주일 수집 후 통합 평가
+- 쟁점 G: settings 계층 분리 실물 이행 (settings.json 이동)
+- 의제6: Gemini 진입 강제 hook 신설
+- 의제7: 탭 throttling 자동 회복 설계
 
 ---
 

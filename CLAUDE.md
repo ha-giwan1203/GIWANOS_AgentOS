@@ -74,6 +74,52 @@
 - **일반 리서치·최신 뉴스·사례 조사**: WebSearch 우선.
 - 이유: context7은 공식 저장소에서 최신 버전별 문서를 가져와 학습 데이터 오래됨 문제를 해소한다.
 
+## hook vs permissions 역할 경계 (2026-04-19 의제5 3자 토론 합의)
+
+> 배경: `.claude/settings.local.json` permissions.allow가 110개까지 누적되며 1회용 16건 + 완전 중복 2건이 섞여 들어온 문제를 근본 해결. 상세 로그: `90_공통기준/토론모드/logs/debate_20260418_190429_3way/`.
+
+### 경계 원칙
+- **permissions = 도구 호출 허용 on/off 게이트** — "이 Bash/Write/MCP 호출 자체를 허용할지"
+- **hook = 호출 시점 맥락 검증 (조건부 게이트)** — "호출 시점의 지시문/상태/커밋 기준 등 맥락이 맞는지"
+- **기능 직교**: 동일 보안 목적이라도 permissions와 hook 중 하나만 씀. 중복 금지
+- **포괄 Bash 허용 vs dedicated tool**: 포괄 `Bash(cat:*)`·`Bash(grep:*)` 등은 fallback. **우선순위는 Read/Grep/Glob** 전용 도구
+
+### 신규 추가 5단계 의사결정 트리
+permissions나 hook을 추가할 때 위에서 아래로 순서대로 묻는다.
+
+1. **전역 규칙인가 일회성 예외인가?** — 1회용(PID·URL·특정 경로 하드코딩)이면 **등록하지 않는다**. 포괄 패턴(`Bash(echo:*)` 등)이 이미 있으면 그걸 쓴다. 포괄이 없으면 포괄 등록을 고려한다.
+2. **도구 호출 허용 문제인가?** — 호출 자체를 막거나 풀어주는 문제면 `permissions`.
+3. **호출 시점 맥락 문제인가?** — 호출 조건(지시문 읽음·커밋 기준 갱신 등)에 따라 허가가 달라지면 `hook`.
+4. **둘 다 필요한가?** — 허용은 permissions로, 조건은 hook으로 분리. 한 곳에 섞지 않는다.
+5. **기록/만료 정책이 필요한가?** — 일시적 허용이면 `.claude/state/` 또는 `hook_log.jsonl`에 기록하고 만료 조건을 문서화.
+
+### settings 계층 분리 가이드 (쟁점 G — 선제조건 검토만, 실물 이동은 세션72 이월)
+- **팀 공용 정책** (전역 허용·전역 hook): `.claude/settings.json` 또는 기준 문서 (Git 커밋)
+- **개인·세션성 예외**: `.claude/settings.local.json` (gitignore 또는 최소 범위)
+- 재분류 인벤토리: `90_공통기준/운영검증/settings_inventory_20260419.md`
+
+### 재발 방지 훅
+- `.claude/hooks/permissions_sanity.sh` (advisory): 1회용 패턴·완전 중복 자동 탐지 → stderr 경고 + `hook_log.jsonl` 기록. 차단 없음. 60분 캐시.
+- Phase 2-B(세션71 후속 또는 세션72): `completion_gate.sh` 소프트 블록 — 동일 1회용 패턴 3회 누적 탐지 시 사용자 명시적 확인 프롬프트. **하드페일 사용 안 함** (제조업 급한 세션 중단 리스크 회피)
+
+## 훅 등급 + 에러 전파 정책 (2026-04-19 의제5 Gemini 제안·GPT 승격)
+
+> 36개 `.sh` 훅이 맞물린 상태에서 특정 훅 exit 1 전파 정책이 제각각이던 문제를 표준화. hook_common.sh 공통 래퍼 + .claude/hooks/README.md 등급 분류 테이블 참조.
+
+### 훅 등급 3종
+- **advisory (경고성)**: 실패해도 세션 계속. `exit 0` 강제. stderr 로그만. `|| true` 허용 명시. 예: `permissions_sanity.sh`, `auto_compile.sh`, `notify_slack.sh`
+- **gate (차단성)**: 실패 시 상위 도구 호출 차단. `exit 2` 또는 JSON `decision=deny` 전파. `|| true` 금지. 예: `block_dangerous.sh`(JSON deny), `commit_gate.sh`(설계상 gate, 현 실코드 advisory — Phase 2-B 전환 예정), `debate_verify.sh`(동일)
+- **measurement (계측)**: 실패 영향 없음. `exit 0` 강제. timing·통계만 기록. `trap ERR` 무시. 예: timing 래퍼, `hook_log`
+
+### 공통 래퍼 함수 (hook_common.sh 정의)
+- `hook_advisory <hook_path>` — 실패 시 stderr 로그 + exit 0
+- `hook_gate <hook_path>` — 실패 시 exit 2 전파
+- `hook_measure <hook_path>` — trap ERR 예외 무시, timing만
+
+### 현재 실코드 상태 (Phase 2-A 문서화, 전환은 Phase 2-B)
+- `debate_verify.sh`·`commit_gate.sh` 등 "설계상 gate"인 훅도 현재는 `set -u + || true + exit 0` 패턴으로 **실질 advisory 성격**. Phase 2-B에서 gate 전환 시 영향 범위 평가 후 적용.
+- 확장 여지: 복구(cleanup/teardown) 등급 — 실패 시 후처리 담당. 세션72 이후 평가 (Gemini 제안).
+
 ## 금지
 - 원본 xlsx/docx/pdf 직접 수정
 - 승인 없는 파일명/시트명/컬럼명 변경

@@ -1,0 +1,29 @@
+{
+  "session_id": "debate_20260418_190429_3way",
+  "topic": "의제5 hook vs permissions 중복 감사 + 근본 해결 설계",
+  "mode": "3way",
+  "chat_url": "",
+  "gem_url": "",
+  "turn_number": 0,
+  "last_reply_hash": "",
+  "turns": [],
+  "input_report": "90_공통기준/토론모드/의제5_hook_permissions_감사리포트.md",
+  "쟁점": {
+    "A": "1회용 permissions 16건 정리",
+    "B": "완전 동일 중복 2건 제거",
+    "C": "dedicated tool 중첩 10건 유지여부",
+    "D": "PreToolUse Bash 매처 7개 순차 실행 비용",
+    "E": "Stop hook 4개 순차 실행",
+    "F": "hook vs permissions 역할 경계 명문화"
+  },
+  "claude_pre_design": {
+    "A": "제거 + permissions_sanity.sh 신설 재등록 경고 + 포괄 패턴 흡수",
+    "B": "제거 + sanity hook 중복 검출 로직",
+    "C": "유지 + CLAUDE.md fallback 정책 명문화",
+    "D": "1주일 timing 수집 후 통합 후보 평가 (의제4 연계)",
+    "E": "유지 + README.md 책임 매트릭스",
+    "F": "CLAUDE.md 역할 경계 섹션 + 의사결정 트리"
+  },
+  "result": null,
+  "critic_review": null
+}

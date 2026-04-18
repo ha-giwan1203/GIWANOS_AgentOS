@@ -361,3 +361,108 @@ hook_task_result() {
     hook_log "task_escalation" "Task '$task_id' escalated after $streak consecutive failures"
   fi
 }
+
+# ============================================================================
+# 의제5 3자 토론 합의 (2026-04-19 debate_20260418_190429_3way) — Phase 2-A
+# 훅 등급 3종 공통 래퍼 + timing 계측
+# ============================================================================
+# 등급:
+#   advisory    — 실패해도 세션 계속. exit 0 강제. stderr 로그만. || true 허용 명시
+#   gate        — 실패 시 상위 도구 호출 차단. exit 2 전파. || true 금지
+#   measurement — 실패 영향 없음. exit 0 강제. timing만 기록
+#
+# 세션71 Phase 2-A: 래퍼 함수만 정의. 기존 훅 호출부 전환은 Phase 2-B (의도적 범위 제한 — GPT 보강 수용)
+# 확장 여지: cleanup/teardown 등급 (Gemini 제안, 세션72+)
+# ============================================================================
+
+HOOK_TIMING_LOG="$PROJECT_ROOT/.claude/hooks/hook_timing.jsonl"
+
+# 현재 시각을 밀리초 단위 정수로 반환 (Windows Git Bash 호환)
+_hook_ts_ms() {
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import time; print(int(time.time()*1000))' 2>/dev/null
+  else
+    # fallback: 초 단위
+    date +%s 2>/dev/null
+  fi
+}
+
+# timing 기록: hook_timing_start / hook_timing_end
+# 사용법:
+#   START=$(hook_timing_start)
+#   ... hook 본문 ...
+#   hook_timing_end "hook_name" "$START" "<status>"
+hook_timing_start() {
+  _hook_ts_ms
+}
+
+hook_timing_end() {
+  local hook_name="$1"
+  local start_ms="$2"
+  local status="${3:-ok}"
+  local end_ms
+  end_ms=$(_hook_ts_ms)
+  local duration_ms=$((end_ms - start_ms)) 2>/dev/null || duration_ms=0
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  hook_name="${hook_name//\\/\\\\}"
+  hook_name="${hook_name//\"/\\\"}"
+  status="${status//\"/\\\"}"
+  echo "{\"ts\":\"$ts\",\"hook\":\"$hook_name\",\"duration_ms\":$duration_ms,\"status\":\"$status\"}" >> "$HOOK_TIMING_LOG" 2>/dev/null || true
+  _rotate_file "$HOOK_TIMING_LOG"
+}
+
+# advisory 래퍼 — 실패 시 stderr + hook_log + exit 0
+# 사용법: hook_advisory <hook_name> <cmd_to_run>
+# 예:    hook_advisory "permissions_sanity" bash .claude/hooks/permissions_sanity.sh
+hook_advisory() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  if "$@" 2>&1; then
+    hook_timing_end "$hook_name" "$start" "ok"
+    return 0
+  else
+    local rc=$?
+    echo "[advisory] $hook_name failed (exit $rc) — session continues" >&2
+    hook_log "advisory_fail" "$hook_name exit $rc" 2>/dev/null || true
+    hook_timing_end "$hook_name" "$start" "advisory_fail"
+    return 0
+  fi
+}
+
+# gate 래퍼 — 실패 시 exit 2 전파 (상위 도구 호출 차단)
+# 사용법: hook_gate <hook_name> <cmd_to_run>
+# 실패 시 호출자(Claude Code)가 차단 시그널로 인식
+hook_gate() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  if "$@"; then
+    hook_timing_end "$hook_name" "$start" "ok"
+    return 0
+  else
+    local rc=$?
+    echo "[gate] $hook_name BLOCKED (exit $rc)" >&2
+    hook_log "gate_block" "$hook_name exit $rc" 2>/dev/null || true
+    hook_incident "hook_block" "$hook_name" "" "gate hook failed with exit $rc" \
+      "\"classification_reason\":\"pre_commit_check\"" 2>/dev/null || true
+    hook_timing_end "$hook_name" "$start" "gate_block"
+    exit 2
+  fi
+}
+
+# measurement 래퍼 — 실패 영향 없음, timing만 기록, trap ERR 무시
+# 사용법: hook_measure <hook_name> <cmd_to_run>
+hook_measure() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  "$@" >/dev/null 2>&1
+  local rc=$?
+  hook_timing_end "$hook_name" "$start" "measure_rc_$rc"
+  return 0
+}

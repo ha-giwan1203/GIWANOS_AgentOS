@@ -4,12 +4,51 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-18 KST — 세션70 (의제3 Gemini synthesis 재수령·합의 승격, 의제5 감사 리포트 작성)
+최종 업데이트: 2026-04-19 KST — 세션71 (의제5 3자 토론 합의 → Phase 2-A 근본해결 + 의제3 Phase A skill_drift_check)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-18 세션70)
+## 0. 최신 세션 (2026-04-19 세션71)
+
+### 이번 세션 완료
+1. **의제5 3자 토론 Round 1 합의** (`debate_20260418_190429_3way/`, pass_ratio 1.33):
+   - GPT → Gemini 동의, Gemini → GPT 동의, 양측 → Claude 종합 설계안 동의 (4/3)
+   - 쟁점 A~F + 신규 G(settings.local.json 공용화 구조) + 신규 H(훅 에러 전파 고립 정책) 합의
+   - critic-reviewer WARN 판정: 하네스 "실증됨" 라벨 실증 근거 부족 지적 → Phase 2-A 실행 전 기존 훅 exit code 실물 Read로 확인 (debate_verify·commit_gate 모두 `set -u + || true + exit 0` 실질 advisory 확인)
+2. **Phase 2-A 실물 이행 (근본해결)**:
+   - permissions 20건 제거 (`settings.local.json` 114→94): PID echo 8·URL echo 3·rm 3·rmdir 1·sed 1 + 중복 2
+   - `.claude/hooks/permissions_sanity.sh` 신설 (advisory, 60분 캐시, 경고만)
+   - `CLAUDE.md` 3개 섹션 신설: 역할 경계 5단계 트리 / settings 계층 가이드 / 훅 등급 정책
+   - `.claude/hooks/hook_common.sh` 등급 3종 래퍼 + timing 래퍼 함수 (호출부 전환은 2-B)
+   - `.claude/hooks/README.md` Stop 책임 매트릭스 + 훅 등급 분류 테이블 (30개 현재 실코드 상태)
+   - `90_공통기준/토론모드/settings_inventory_20260419.md` 쟁점 G 재분류 인벤토리 (이동은 세션72)
+   - `permissions_sanity.sh` PreToolUse Bash 매처 9번째 등록
+3. **의제3 Phase A `skill_drift_check.sh` 신설**:
+   - 5종 래퍼(debate-mode/settlement/line-batch-management/line-batch-outer-main/daily) ↔ 실물 SKILL.md 정합성 advisory 검증
+   - git commit 시점에만 실행 (성능 보호)
+   - PreToolUse Bash 매처 3번째(commit_gate 뒤, debate_verify 앞) 등록
+   - 5종 모두 정합성 OK 확인
+
+### 블로커 기록
+- Gemini 전송 재현 실패 1건: 첫 insertText 후 빠른 재호출 시 Quill 에디터 state clear 현상. createTextNode 방식으로 해결. 첫 전송은 정상 완료된 상태였음 (Gemini가 "본문 누락" 지적)
+
+### 검증 결과
+- `smoke_fast.sh` 9/9 PASS
+- `doctor_lite.sh` OK
+- `debate_verify.sh` exit 0
+- `permissions_sanity.sh` 경고 0건
+- JSON 유효성 OK (allow 95 → 세션 중 자동 추가로 97)
+
+### 다음 세션 첫 액션
+1. **세션72**: Phase 2-B (completion_gate 소프트 블록 + 기존 훅 전수 등급 전환) + 의제4 timing 기반 통합 평가
+2. **세션73**: 쟁점 G settings 계층 실물 분리 (settings.json 이동)
+3. **세션74**: 의제6 Gemini 진입 강제 hook
+4. **세션75**: 의제7 탭 throttling 자동 회복
+
+---
+
+## 0-prev. 세션70 (2026-04-18)
 
 ### 이번 세션 완료
 1. **의제3 Gemini synthesis 재수령 → 합의 승격** (`debate_20260418_170000_3way/`, pass_ratio 0.50 → 0.67):
