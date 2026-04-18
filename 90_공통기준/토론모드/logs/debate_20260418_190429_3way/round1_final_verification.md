@@ -43,7 +43,7 @@
    - 훅 등급 3종 분류 (advisory/gate/measurement) + **현재 상태 테이블**
    - debate_verify 등 "설계상 gate이나 실코드 advisory 유지 — 2-B 전환 전까지" 명시
    - 복구 등급(cleanup/teardown) 확장 여지 각주 (Gemini 제안 보강)
-6. **쟁점 G "재분류 인벤토리"** 작성 (실제 이동 없음): `90_공통기준/운영검증/settings_inventory_20260418.md` — settings.json(3개) vs settings.local.json(92개 정리 후) 각 항목의 소속 제안. 실제 파일 이동은 세션72 별건.
+6. **쟁점 G "재분류 인벤토리"** 작성 (실제 이동 없음): `90_공통기준/토론모드/settings_inventory_20260419.md` — settings.json(3개) vs settings.local.json(정리 후 95개) 각 항목의 소속 제안. 실제 파일 이동은 세션72 별건.
 
 ### 세션71 후속 또는 세션72 분리 (Phase 2-B)
 - `completion_gate.sh` 소프트 블록 (A 재발 방지 — 1회용 패턴 3회 누적 시 사용자 확인)

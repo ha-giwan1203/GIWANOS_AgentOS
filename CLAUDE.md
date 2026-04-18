@@ -96,7 +96,7 @@ permissions나 hook을 추가할 때 위에서 아래로 순서대로 묻는다.
 ### settings 계층 분리 가이드 (쟁점 G — 선제조건 검토만, 실물 이동은 세션72 이월)
 - **팀 공용 정책** (전역 허용·전역 hook): `.claude/settings.json` 또는 기준 문서 (Git 커밋)
 - **개인·세션성 예외**: `.claude/settings.local.json` (gitignore 또는 최소 범위)
-- 재분류 인벤토리: `90_공통기준/운영검증/settings_inventory_20260419.md`
+- 재분류 인벤토리: `90_공통기준/토론모드/settings_inventory_20260419.md`
 
 ### 재발 방지 훅
 - `.claude/hooks/permissions_sanity.sh` (advisory): 1회용 패턴·완전 중복 자동 탐지 → stderr 경고 + `hook_log.jsonl` 기록. 차단 없음. 60분 캐시.
