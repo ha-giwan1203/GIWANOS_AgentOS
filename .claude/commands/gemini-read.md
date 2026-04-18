@@ -54,23 +54,32 @@ Gemini 웹 UI의 최신 응답을 읽어오는 단일 명령.
 })();
 ```
 
-### 3-prep. 백그라운드 throttling 대응
+### 3-prep. 백그라운드 throttling 대응 (세션70 실증 — 필수)
 
-응답 읽기 전 hidden 상태이면 visibility 이벤트 강제 트리거:
+**먼저** 대상 Gemini 탭을 foreground로 강제 전환한다. visibility/focus dispatchEvent만으로는 Chrome throttling을 풀 수 없다(세션69 synthesis 미수령 원인). 진짜 회피는 `navigate` 재호출이다.
+
+```
+navigate(url=gemini_chat_url, tabId=gemini_tab_id)  # 동일 URL 재호출 → 탭 foreground 전환
+```
+
+- Chrome MCP는 activate API 미제공. navigate 재호출이 유일 회피 경로.
+- 동일 URL navigate는 페이지 상태를 재로드 없이 보존하면서 탭 포커스만 전환.
+- 보조: 여전히 hidden 이면 visibility/focus 트리거:
 ```javascript
 if (document.visibilityState === 'hidden') {
   document.dispatchEvent(new Event('visibilitychange'));
-  // Gemini SPA는 Angular change detection 기반이라 별도 트리거 필요
-  window.dispatchEvent(new Event('focus'));
+  window.dispatchEvent(new Event('focus'));  // Angular change detection 트리거
 }
 ```
+- 상세: `90_공통기준/토론모드/CLAUDE.md` "백그라운드 탭 Throttling 대응" 참조
 
 ### 3-retry. 읽기 실패 시 재시도
 
 반환 텍스트가 비었거나 `len<30`이면:
 1. `sleep 3` 후 3단계 재시도 (최대 3회)
-2. 여전히 실패면 `navigate` 재호출로 페이지 reload → 10초 대기 → 재시도 1회
-3. 그래도 실패면 "Gemini 응답 감지 실패 — 탭 수동 활성화 필요" 보고 (사용자에게 Gemini 탭 클릭 요청)
+2. 여전히 실패면 `navigate` 재호출(동일 URL) → 탭 포커스 전환 → 5초 대기 → 재시도
+3. 그래도 실패면 `navigate` reload(실제 페이지 새로고침) → 10초 대기 → 재시도
+4. 최종 실패 시 "Gemini 응답 감지 실패 — 탭 수동 활성화 필요" 보고 (사용자에게 Gemini 탭 클릭 요청)
 
 ### 4. 판정 키워드 추출 (optional)
 

@@ -16,6 +16,15 @@
 
 ## 세션70 반영 (2026-04-18, 이월 의제 재개 세션)
 
+**[완료] 백그라운드 탭 Throttling 대응 지침 전파 (세션70 실증 반영)**
+- 토론모드 CLAUDE.md "백그라운드 탭 Throttling 대응" 섹션 신규
+- gpt-send / gemini-send: Step 1-C "대상 탭 activate navigate" 추가
+- gpt-read / gemini-read: 3-prep "navigate 재호출로 탭 foreground 전환" 강화 (기존 visibilityChange만으로는 해결 안 됨 실증)
+- debate-mode.md: 3자 토론 직렬 실행 원칙 추가
+- debate-mode/SKILL.md: NEVER 생략 주의 추가
+- 근거: Chrome MCP는 tab activate API 미제공 → `navigate(동일URL)` 재호출이 유일 회피 경로
+
+
 **[완료] 의제3 Gemini synthesis 재수령 → 합의 승격 (pass_ratio 0.50 → 0.67)**
 로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
 - `gemini_verifies_claude`: 미수령 → 동의 (근거: pre-commit 훅 이중 배치 + 도메인 의존성 3단계 이관 절충안 합리성)

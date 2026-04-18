@@ -46,21 +46,31 @@ document.querySelector('[data-testid="stop-button"]') !== null
 })();
 ```
 
-### 3-prep. 백그라운드 throttling 대응 (선택)
+### 3-prep. 백그라운드 throttling 대응 (세션70 실증 — 필수)
 
-응답 읽기 전 하이든 상태이면 visibility 이벤트 강제 트리거로 DOM 갱신 유도:
+**먼저** 대상 탭을 foreground로 강제 전환한다. visibility 이벤트 dispatchEvent만으로는 실제 Chrome throttling을 풀지 못한다(세션69 실패 사례). 진짜 회피는 `navigate` 재호출이다.
+
+```
+navigate(url=debate_chat_url, tabId=gpt_tab_id)  # 동일 URL 재호출 → 탭 foreground 전환
+```
+
+- Chrome MCP는 activate API 미제공. navigate 재호출이 유일 회피 경로.
+- navigate는 동일 URL이라도 탭 포커스를 전환하며 페이지 상태는 보존.
+- 보조: 그래도 hidden 감지되면 visibility 이벤트 트리거:
 ```javascript
 if (document.visibilityState === 'hidden') {
   document.dispatchEvent(new Event('visibilitychange'));
 }
 ```
+- 상세: `90_공통기준/토론모드/CLAUDE.md` "백그라운드 탭 Throttling 대응" 참조
 
 ### 3-retry. 읽기 실패 시 재시도
 
 반환 텍스트가 비었거나 `len<30`이면:
 1. `sleep 3` 후 3단계 재시도 (최대 3회)
-2. 여전히 실패면 `navigate` 재호출로 페이지 reload → 10초 대기 → 재시도
-3. 그래도 실패면 "GPT 응답 감지 실패 — 탭 수동 활성화 필요" 보고
+2. 여전히 실패면 `navigate` 재호출(동일 URL)로 탭 포커스 전환 → 5초 대기 → 재시도
+3. 그래도 실패면 `navigate` reload(실제 페이지 새로고침) → 10초 대기 → 재시도
+4. 최종 실패 시 "GPT 응답 감지 실패 — 탭 수동 활성화 필요" 보고
 
 ### 4. 판정 키워드 추출 (optional)
 응답에서 판정 키워드를 자동 감지한다. **우선순위 높은 것부터 먼저 매칭** — 첫 매칭 승리:

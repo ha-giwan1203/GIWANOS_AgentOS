@@ -21,6 +21,14 @@
    - hook 실물: 35 .sh + 5 .py / 실행 지점 29개
    - permissions.allow 109 항목 / 정리 후보 18건 (1회용 16 + 완전 중복 2) / dedicated 중첩 10건
    - 쟁점 A~F 정리 완료 → 세션71 3자 토론 입력
+3. **Step 5-3 3way 최종 검증 양측 통과** (pass_ratio_final 1.0):
+   - GPT: 통과 (의제3 설계안 변경 없음, 의제5 read-only 분리 인지)
+   - Gemini: 동의 (이전 승인 반영 + 의제5 안전 분리)
+   - finish_state.json terminal_state=done, commits=[03b46671] 마감
+4. **백그라운드 탭 Throttling 대응 지침 전파** (사용자 요청):
+   - 토론모드 CLAUDE.md 공통 섹션 신규 + 4 스킬(gpt-send/gpt-read/gemini-send/gemini-read) + debate-mode.md + SKILL.md 동기화
+   - 핵심: `navigate(동일URL, 대상_tabId)` 재호출로 탭 foreground 전환 (Chrome MCP tab activate API 부재)
+   - 3자 토론 직렬 실행 원칙(GPT→Gemini activate→Gemini) 명시
 
 ### 블로커 기록
 - Chrome 그룹 탭 자동 리다이렉트: `tabs_context_mcp` 직후 탭이 ERP 사내망으로 이동하는 현상 1회 발생 → 새 탭 생성 + 직접 navigate로 우회 성공

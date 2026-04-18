@@ -96,6 +96,12 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 > 브라우저 조작은 전부 gpt-send/gpt-read 스킬이 내부에서 처리한다.
 > 탭 준비, 채팅방 진입, 셀렉터 확인, SEND GATE 모두 gpt-send/gpt-read 책임이다.
 
+> **[NEVER] 백그라운드 탭 throttling 대응 생략 금지 (세션70 실증)**
+> gpt-send/gpt-read/gemini-send/gemini-read 내부 Step 1-C 또는 3-prep에
+> `navigate(url=대상URL, tabId=대상_tabId)` 탭 활성화 단계 반드시 포함.
+> 3자 토론은 GPT·Gemini 중 한쪽이 항상 백그라운드 → 매 전송/읽기 전 대상 탭 activate.
+> 상세: `../CLAUDE.md` "백그라운드 탭 Throttling 대응" 섹션
+
 ### Step 2. 메시지 전송 + 응답 읽기
 
 **[MUST] 모든 브라우저 상호작용은 전용 스킬로만:**

@@ -38,6 +38,19 @@ links.length > 0 ? links[0].href : null;
 - **[NEVER]** 탭 URL이 올바르게 보여도 1-B 생략 금지 — 탭 상태와 무관하게 매 세션 navigate + 재탐지 필수
 - 같은 세션 내 2회차 이후 호출에서만 debate_chat_url 캐시 허용
 
+### 1-C. 대상 탭 활성화 (세션70 실증 — 백그라운드 throttling 대응, 생략 금지)
+
+Chrome 백그라운드 탭 JS/네트워크 throttling으로 전송 후 응답 DOM이 생성되지 않는 실증 사례(세션69) 있음. 전송 직전 대상 탭을 foreground로 강제 전환한다.
+
+```
+navigate(url=debate_chat_url, tabId=gpt_tab_id)  # 동일 URL 재호출 → 탭 foreground 전환
+```
+
+- Chrome MCP는 별도 activate API 없음. `navigate` 재호출이 유일 회피 경로.
+- 같은 URL이어도 반드시 재호출. 페이지 상태는 보존됨.
+- 3자 토론에서 GPT→Gemini 또는 Gemini→GPT 전환 시 특히 필수.
+- 상세: `90_공통기준/토론모드/CLAUDE.md` "백그라운드 탭 Throttling 대응" 참조
+
 ### 2. SEND GATE (생략 금지)
 - `get_page_text`로 현재 대화 상태 읽기
 - `[data-message-author-role="assistant"]` 마지막 블록 확인 → 미확인 응답 있으면 먼저 읽기
