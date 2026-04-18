@@ -40,7 +40,7 @@
 - **생성 파일**:
   - `.claude/commands/gemini-send.md` (웹 UI 전송 스킬)
   - `.claude/commands/gemini-read.md` (응답 읽기 스킬)
-  - `.claude/state/gemini_gem_url`, `.claude/state/gemini_chat_url`
+  - `.claude/state/gemini_gem_url`, `.claude/state/gemini_chat_url` (gitignore — 로컬 상태만)
   - `90_공통기준/토론모드/gemini/SKILL.md` (웹 UI 우선으로 재작성)
 
 ### [완료] Gemini API 연결 + Claude-Gemini 토론파트너 Gem 생성 + 3라운드 토론 — 세션62 (2026-04-18)
