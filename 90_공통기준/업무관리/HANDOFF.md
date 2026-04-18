@@ -32,23 +32,31 @@
    - evidence_missing ok 마커 조건부 자동 발급 5조건 상세 기재
    - 목표: 177건 → 50건 이하
 
+5. **근본 원인 3건 실물 구현** (사용자 지적 "증상 해소만 했다" 대응):
+   - **map_scope.req 과탐지 완화** (`risk_profile_prompt.sh`): 단순 `hook|gate|settings` → 구체적 파일 패턴(`hooks/*.sh`, `settings.local.json`)로 한정. evidence_missing 298건/7일 중 80%가 이 원인
+   - **STATUS.md 자동 갱신 구현** (`final_check.sh --fix`): drift 감지 시 TASKS 날짜·세션번호로 자동 갱신. commit_gate FAIL 144건/7일의 연쇄 원인 제거
+   - **untracked 체크 단계 추가** (`.claude/commands/finish.md` 3.7단계): git commit 전 신규 파일 분류(stage/ignore/skip). 세션63 커맨드 4개 휘발 사례 재발 방지
+
 ### 다음 AI 액션 (세션65+)
-1. **evidence_missing ok 마커 조건부 자동 발급 설계/구현** (세션64 GPT 합의)
+1. **근본 원인 3건 실동작 검증** — evidence_missing 감소 추세 관찰 (목표: 177→50 이하)
 2. **Gemini Grounding 파일럿** — API 방식 실시간 웹 검색 기능 테스트
 3. **이슈 #2 (notebooklm-mcp preserve_library 보호 누락)**: 후순위 유지
 
 ### 미완료 / 이월
-- evidence_missing 177건 감소 설계: 다음 세션
+- 근본 원인 3건 실측 검증: 7일 경과 후 재측정 필요
 - Gemini Grounding 파일럿: 이월
 - 이슈 #2 (preserve_library): 후순위
 - safe_json_get 파서 교체: 승격 조건 대기
 
 ### 완료 판정
 - self-audit P1 2건 해소: **통과** (GPT 최종 판정: 통과 — 커밋 069bfbcb)
+- 근본 원인 3건 구현: **실동작 검증 완료** (final_check --fix 드리프트 자동 갱신 확인)
 
 ### 관련 커밋
 - `64b64872` — 세션64 self-audit P1 해소 + 커맨드 4개 등록 + evidence_missing 안건 등재
 - `069bfbcb` — 커맨드 4개 스킬 별칭 명시 + 토론 로그 critic_review WARN 기록
+- `e538e456` — HANDOFF 세션64 갱신
+- (신규) — 근본 원인 3건 구현 (map_scope 과탐지 완화·STATUS 자동 갱신·finish untracked 체크)
 
 ---
 

@@ -246,8 +246,21 @@ echo "  TASKS: $TASKS_DATE / HANDOFF: $HANDOFF_DATE / STATUS: $STATUS_DATE"
 
 if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
   if [[ "$STATUS_DATE" < "$TASKS_DATE" ]]; then
-    fail "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트"
-    hook_incident "gate_reject" "final_check" "STATUS.md" "meta_drift: STATUS($STATUS_DATE) < TASKS($TASKS_DATE)" '"classification_reason":"meta_drift"'
+    if $FIX_MODE; then
+      # STATUS.md 최종 업데이트 행을 TASKS 날짜·세션으로 자동 갱신 (GPT 합의 세션64)
+      STATUS_TASKS_SESSION=$(grep -oE '세션[0-9]+' "$TASKS" 2>/dev/null | head -1 | grep -oE '[0-9]+')
+      if [ -n "$STATUS_TASKS_SESSION" ]; then
+        # macOS/Linux sed 호환: 임시 파일 경유
+        _tmp_status=$(mktemp)
+        sed "s/^최종 업데이트: [0-9-]* — 세션[0-9]\+.*/최종 업데이트: $TASKS_DATE — 세션$STATUS_TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
+        echo "  [FIX] STATUS.md 자동 갱신: $STATUS_DATE → $TASKS_DATE (세션$STATUS_TASKS_SESSION)"
+      else
+        fail "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — TASKS 세션 번호 추출 실패로 자동 갱신 불가"
+      fi
+    else
+      fail "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — STATUS.md 드리프트 (--fix로 자동 교정 가능)"
+      hook_incident "gate_reject" "final_check" "STATUS.md" "meta_drift: STATUS($STATUS_DATE) < TASKS($TASKS_DATE)" '"classification_reason":"meta_drift"'
+    fi
   else
     echo "  [OK] STATUS 날짜 >= TASKS 날짜"
   fi

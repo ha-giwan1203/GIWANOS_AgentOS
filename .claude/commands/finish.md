@@ -38,7 +38,16 @@
 - MCP `notion-update-page` 도구 사용
 - 실패 시 예외 처리하되 다음 단계 진행 (Notion은 보조 채널)
 
+### 3.7단계: untracked 파일 체크 (GPT 합의 세션64)
+- `git status --short | grep '^??'` 실행으로 untracked 파일 감지
+- 감지된 각 파일에 대해 3분류:
+  - **stage**: 현재 작업 산출물 → `git add`
+  - **ignore**: `.gitignore` 또는 `.state`/일시 파일 → 무시 (사용자에게 1줄 보고)
+  - **skip**: 판단 불가 → 사용자에게 목록 제시 후 판정 요청
+- 목적: 파일이 작성만 되고 커밋 안 되어 세션 간 휘발되는 것 방지 (세션63 커맨드 4개 사례 재발 방지)
+
 ### 4단계: 커밋+푸시
+- `bash .claude/hooks/final_check.sh --full --fix` 선행 (STATUS 드리프트 시 자동 갱신)
 - `git add` → `git commit` → `git push`
 - finish_state.json에 `committed_pushed: true` 기록
 

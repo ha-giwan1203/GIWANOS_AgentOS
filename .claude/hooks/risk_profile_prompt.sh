@@ -66,10 +66,14 @@ fi
 # 고위험 수정 (hard req): 자동화/운영 구조 변경만 차단 대상
 # GPT 합의 2026-04-11: 규칙/리팩터/파이프라인 제거, 스키마/컬럼/시트는 lightweight 분리
 # GPT 합의 2026-04-12: 단순 언급이 아니라 변경 의도 키워드와 AND 조건
-# 이전: hook|gate|settings 단독 → 일상 대화에서도 40건+ 반복 차단 발생
-HAS_TARGET=$(echo "$TEXT" | grep -ciE '(hook|gate|settings|마이그레이션)')
-HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|추가|교체|이동|전수|일괄)')
-if [ "$HAS_TARGET" -gt 0 ] && [ "$HAS_INTENT" -gt 0 ]; then
+# GPT 합의 세션64 (2026-04-18): 단순 "hook/gate/settings" 키워드로는 트리거 금지
+#   이전 조건: HAS_TARGET="hook|gate|settings|마이그레이션" — 일상 대화도 298건/7일 과탐지
+#   현재 조건: 구체적 파일 경로 패턴 또는 실질적 변경 문맥
+HAS_HOOK_FILE=$(echo "$TEXT" | grep -ciE '(hook.*파일|hooks/[a-z_]+\.sh|gate\.sh|hook\.sh|hook.*구현|hook.*신설|새 훅|새 hook)')
+HAS_SETTINGS=$(echo "$TEXT" | grep -ciE '(settings\.(local\.)?json|\.claude/settings)')
+HAS_MIGRATION=$(echo "$TEXT" | grep -ciE '(마이그레이션|migration)')
+HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|추가|교체|이동|전수|일괄|구현|신설)')
+if { [ "$HAS_HOOK_FILE" -gt 0 ] || [ "$HAS_SETTINGS" -gt 0 ] || [ "$HAS_MIGRATION" -gt 0 ]; } && [ "$HAS_INTENT" -gt 0 ]; then
   touch_req "map_scope"
 fi
 
