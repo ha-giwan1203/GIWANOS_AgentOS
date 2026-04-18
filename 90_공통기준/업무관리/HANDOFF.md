@@ -24,16 +24,20 @@
    - `90_공통기준/토론모드/gemini/SKILL.md` (웹 UI 우선으로 전면 재작성)
 
 ### 다음 AI 액션 (세션64+)
-1. **gemini-send 실동작 검증** — 실제 메시지 전송 테스트
-2. **Gemini Grounding 파일럿** — API 방식으로 실시간 웹 검색 기능 테스트
-3. **이슈 #2 (preserve_library 보호 누락)**: 후순위 유지
-4. **notebooklm-mcp 이슈 #2**: 여전히 미착수
+1. **Gemini Grounding 파일럿** — API 방식으로 실시간 웹 검색 기능 테스트
+2. **이슈 #2 (preserve_library 보호 누락)**: 후순위 유지
+3. **notebooklm-mcp 이슈 #2**: 여전히 미착수
+
+> 참고: gemini-send 실동작 검증은 세션63에서 execCommand('insertText') 테스트 성공으로 완료 처리
 
 ### 미완료 / 이월
 - Gemini Grounding 파일럿: 다음 세션
 - Gemini 이미지 분석 파일럿: 현장 사진 있을 때
 - 이슈 #2 (preserve_library 보호 누락): 후순위
 - safe_json_get 파서 교체: 승격 조건 대기
+
+### 완료 판정
+- gemini-send / gemini-read 스킬: **운영 통과** (GPT 통과 + 사용자 확정)
 
 ---
 
