@@ -57,7 +57,7 @@
 - **구현 범위**:
   - 3자 토론 로그 디렉터리(`logs/debate_*_3way/`) 내 JSON 스키마 검사
   - `cross_verification` 4개 필수 키 존재, `verdict` enum(`동의`/`이의`/`검증 필요`), `pass_ratio_numeric` 재계산 일치
-  - `round_count ≤ max_rounds(=5)` 검사
+  - `round_count ≤ max_rounds(=3)` 검사 (세션67 v2.11로 3회 원복)
   - 실패 시 라운드 재실행 신호 또는 `consensus_failure.md` 생성
 - **위치 후보**: `.claude/scripts/verify_cross_verification.py` + PostToolUse hook 또는 critic-reviewer 승격
 - **조건**: 3자 토론 실사용 2회 누적 후 착수 (과잉설계 방지)
