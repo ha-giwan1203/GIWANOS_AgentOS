@@ -10,7 +10,45 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션74 (쟁점 G settings 계층 실물 분리)
+최종 업데이트: 2026-04-19 — 세션75 (3자 토론 "클로드코드 정밀 분석" Round 1 채택)
+
+---
+
+## 세션75 반영 (2026-04-19, 3자 토론 Round 1 — 클로드코드 정밀 분석)
+
+**[완료] 3자 토론 Round 1 채택 (pass_ratio 1.00)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260419_215501_3way/`
+- 의제: 클로드코드(Claude Code) 운영 정밀 분석
+- GPT 방: `c/69e4c33c-0884-83e8-9393-467475149632`
+- Gemini 방 (신규): `gem/3333ff7eb4ba/aecf2ecbf3d5bb44`
+- 상호 감시 프로토콜 실증: **GPT 주장 3 "60분 캐시" 훅 혼동 → Claude·Gemini 2:1 이의 → GPT 자진 철회** (단일 모델 오류 차단 성공)
+
+**[Step C 실물 검증 결과]**
+- C-1: commit_gate.sh 60분 캐시 **부재** 확정 (permissions_sanity.sh의 CACHE_TTL=3600과 혼동)
+- C-2: hook_common.sh L79-106 sed JSON 파싱 4곳 존재 but 설계자 자각 주석 + incident 장애 0건
+- C-3: incident 1027건 breakdown — evidence_gate 474(46.2%) + commit_gate 259(25.2%) 상위 2종이 71.4%. true_positive 라벨 12건(1.2%) vs structural/missing 66.8% → **Policy-Workflow Mismatch 실증**
+
+**[3자 합의 결과]**
+- 채택: 주장 1·2·7, 권 a, 권 c(조건부)
+- 버림: 주장 3(훅 혼동), 권 b(--fix 자동 동기화, 단 파생 문서 preview 절충)
+- 보류: 주장 4 hook_common fragility, 주장 5 python3 portable (Round 2 제외)
+- **신규 의제 승격**: Policy-Workflow Mismatch (Gemini 제안 + GPT 세련화 + Claude 실증)
+
+**[세션75+ 이월 — 즉시 실행 엄격 시퀀스]**
+1. **Step 1-a 측정 프로토콜 확정** (GPT 제안) — true_positive / FP 의심 / 정상중간과정 라벨링 규칙 고정
+2. **Step 1-b evidence_gate Policy 하위 분해** (GPT 제안) — tasks_handoff / skill_read / map_scope / auth_diag 정책별 분해
+3. **Step 1-c evidence_gate Policy 재정의** — "기준 재정의" 관점 (게이트 완화 아님)
+4. **Step 2 (Step 1 통과 후에만) incident_ledger 반복 5종 정리** (Gemini 순서 강제) — 상위 5종 903건(88%)
+5. **Step 3 문서 드리프트 자동 --fix 금지 + 파생 문서 preview** (병렬 가능)
+
+**[Round 2 의제 (별도 토론 예정)]**
+- Policy-Workflow Mismatch 종합 감사 (제조업 G-ERP 워크플로우 vs 게이트 Policy 맵핑)
+- debate_verify 체인 점검 (Gemini 포함 주장 채택 — Round 2 메타 신뢰성 확보)
+
+**[검증]**
+- pass_ratio 1.00 / 3 (≥ 0.67 초과 달성)
+- 교차 검증 4키 전체 수집: gemini_verifies_gpt(검증필요→실물확정), gpt_verifies_gemini(동의), gpt_verifies_claude(동의), gemini_verifies_claude(동의)
+- 합의 실패 없음 (consensus_failure.md 미작성)
 
 ---
 

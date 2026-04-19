@@ -4,12 +4,60 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션74 (쟁점 G settings 계층 실물 분리)
+최종 업데이트: 2026-04-19 KST — 세션75 (3자 토론 Round 1 — 클로드코드 정밀 분석 채택)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션74 — 쟁점 G 실물 분리)
+## 0. 최신 세션 (2026-04-19 세션75 — 3자 토론 Round 1 채택)
+
+### 이번 세션 계획
+세션74 마감 후 사용자 요청: "토론모드 진행 — 클로드코드 정밀 분석 주제로 3자 토론"
+- Round 1: GPT 단독 분석 → Gemini 독립 검증 → Claude 실물 검증(Step C) → 종합 설계안 → 양측 최종 검증
+
+### 완료 — Round 1 pass_ratio 1.00 채택
+
+**로그**: `90_공통기준/토론모드/logs/debate_20260419_215501_3way/`
+- round1_gpt.md (원문 + 최종 검증)
+- round1_gemini.md (원문 + 최종 검증)
+- round1_reality_check.md (Claude Step C 실물 검증)
+- round1_cross_verify.md (교차 검증 4키 집계)
+- round1_claude_synthesis.md (양측 수정 제안 통합 최종 설계안)
+- round1_final_verification.md (양측 동의 확정)
+- result.json (harness 스키마)
+
+**3자 합의 핵심**:
+- 🔥 **주장 3 "commit_gate 60분 캐시" 3자 버림** (GPT 훅 혼동 자진 철회 — 상호 감시 프로토콜 실제 작동 실증)
+- 🔥 **권 b "--fix 자동 동기화" 3자 버림** (데이터 유실 위험, 단 파생 문서 preview 절충)
+- 🆕 **"Policy-Workflow Mismatch" 신규 의제 승격** (true_positive 1.2% 실증 — Round 2)
+- ⚠️ hook_common fragility·python3 portable → Round 2 제외 (양측 합의)
+
+**실행 이월 (세션76+)** — 엄격 시퀀스 강제:
+1. Step 1-a 측정 프로토콜 확정 (true_positive / FP 의심 / 정상중간과정 라벨링 규칙)
+2. Step 1-b evidence_gate Policy 하위 분해 (tasks_handoff / skill_read / map_scope / auth_diag)
+3. Step 1-c evidence_gate Policy 재정의 ("기준 재정의" 관점)
+4. Step 2 (Step 1 통과 후) incident_ledger 반복 5종 정리 (903건 88%)
+5. Step 3 문서 드리프트 자동 --fix 금지 + 파생 문서 preview 절충 (병렬 가능)
+
+**Round 2 의제 (별도 토론)**:
+- Policy-Workflow Mismatch 종합 감사
+- debate_verify 체인 점검 (메타 신뢰성 확보)
+
+### 다음 세션 첫 액션 (세션76)
+1. **Step 1-a 측정 프로토콜 확정** 착수 — `.claude/docs/incident_labeling_protocol.md` 신설
+2. evidence_gate 100건 샘플 수동 분류 (true_positive / FP_suspect / normal_intermediate)
+3. 분류 결과 기반 Step 1-b evidence_gate 하위 정책 분해 진입
+4. Round 2 토론은 Step 1-c 완료 후 개시 판단
+
+### 상태 정보
+- GPT 방: `c/69e4c33c-0884-83e8-9393-467475149632`
+- Gemini 방 (신규): `gem/3333ff7eb4ba/aecf2ecbf3d5bb44`
+- 양측 탭 모두 살아있음 (tabId: GPT 1382937605, Gemini 1382937607)
+- debate_chat_url, gemini_chat_url state 갱신 완료
+
+---
+
+## 0-prev. 세션74 (2026-04-19 — 쟁점 G 실물 분리)
 
 ### 이번 세션 계획
 세션73 이월 1건:
