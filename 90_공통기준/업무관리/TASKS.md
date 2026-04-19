@@ -40,8 +40,16 @@
 - `debate_verify.sh`는 incident 18건 잔존 → Phase 2 승격 보류 유지
 - 검증: smoke_fast 9/9, doctor_lite OK, final_check 167/167 PASS (0 FAIL)
 
-**[진행중] Step 3 — 쟁점 G 사전작업 문서 (세션74 실물 분리 대비)**
-- `90_공통기준/토론모드/session73_review19_decisions.md` 신규: REVIEW 19건 TEAM/PERSONAL 분류 결정 + gate 9 승격 기준선
+**[완료] Step 3 — 쟁점 G 사전작업 문서 (세션74 실물 분리 대비)**
+- `90_공통기준/토론모드/session73_review19_decisions.md` 신설
+- **Permissions 100건 재분류 결정**:
+  - TEAM 80건 (→ settings.json): 기본 도구 + git/gh + Bash fallback + 프로젝트 hook/스킬 + MCP + REVIEW 승격 14건
+  - PERSONAL 4건 (→ settings.local.json 유지): Windows OS 도구(powershell/tasklist/schtasks/start)
+  - PERSONAL + 개인경로 11건: `C:/Users/User/...` 절대경로 — 세션74에서 상대경로 대체 또는 제거 권장
+  - DELETE 3건: 1회용 잔재 (single-quote echo URL/PID + specific python inline)
+- **부수 발견**: `permissions_sanity.sh` regex가 single-quote 미탐지 버그 (`^Bash\(echo "\d{10,}"\)$`는 single-quote 변형 놓침) — 세션74 수정 검토
+- **gate 9개 exit 2 승격 기준선 문서화**: 1주 `hook_timing.jsonl` 수집 후 승격 판단 절차 3단계
+- **세션74 실물 분리 절차 6단계** + 롤백 전략 명문화
 
 **[이월]**
 - 세션74: 쟁점 G 실물 분리 (단일 원자 커밋 + 세션 재시작 필수)
