@@ -36,6 +36,8 @@
 !.claude/scripts/cdp/cdp_chat_send.py
 !.claude/rules/
 !.claude/rules/**
+!.claude/docs/
+!.claude/docs/**
 !.claude/settings.json
 .claude/settings.local.json
 .claude/settings.local.json.bak_20260401
