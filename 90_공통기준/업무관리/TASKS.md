@@ -37,11 +37,29 @@ Step 5 양측 검증: GPT "동의" + Gemini "동의" → pass_ratio 1.0
 
 **STATUS.md 관련**: GPT가 원래 드리프트로 지적했으나 Gemini "도메인과 시스템 범위 혼동. 조립비정산 STATUS는 세션78 무관" 근거로 3자 버림. GPT Step 4에서 자기 철회. **건드리지 않음 확정**.
 
-**[최종 공유 판정] GPT PASS** (2ccc8589 실물 확인): "Step 5 설계안 반영 정합 PASS. evidence_gate·smoke_test·TASKS/HANDOFF 모두 설계안 그대로 반영."
+**[최종 공유 판정] 양측 PASS** (2ccc8589 실물 확인):
+- GPT: "Step 5 설계안 반영 정합 PASS. evidence_gate·smoke_test·TASKS/HANDOFF 모두 설계안 그대로 반영."
+- Gemini: "3자 합의가 누락 없이 실물에 정합하게 반영. push-only 면제 + 44-10/11/12 smoke 엣지 안전망 완벽 확보."
 
 **[세션79 후속 — A 분류 기록]**
 - smoke_test 전수 실행 로그 첨부 (이번 세션에서 사용자 요청으로 생략됨, bash -n 구문 검사만 완료)
 - 세션79 첫 액션 시 `SMOKE_TEST_FORCE=1 bash .claude/hooks/smoke_test.sh` 1회 실행 후 결과 아카이브
+
+---
+
+## 세션78 Round 1 보완 (2026-04-20, 3way 공유 양측 필수 규칙 신설)
+
+**[완료] share-result 0단계 신설 — [3way] 태그 커밋은 GPT·Gemini 양측 공유 필수**
+- **배경**: 2ccc8589 공유 시 Claude가 GPT에만 보내고 Gemini 생략 → 사용자 "반쪽 패치, 토론모드 실행 안 된 것 같다" 지적
+- **원인**: share-result SKILL이 2자 전용 설계. 토론모드 CLAUDE.md Step 5-3 "양쪽 모두 전송" 규정이 공유 루프에 미반영
+- **수정 파일**:
+  1. `.claude/commands/share-result.md` 0단계 신설: [3way] 태그 / 이번 세션 debate-mode 호출 / 직전 5커밋 [3way] 미종결 중 하나라도 해당하면 양측 공유 강제
+  2. memory `feedback_threeway_share_both_required.md` + MEMORY.md 인덱스 업데이트
+- **보완 후 즉시 Gemini 공유 수행 → PASS 수신**
+
+---
+
+## 세션78 후속 반영 (2026-04-20, 공유→3자 자동 승격 규칙)
 
 ---
 

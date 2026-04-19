@@ -9,7 +9,24 @@
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션78 Round 1 — 3자 토론 합의 → 구현)
+## 0. 최신 세션 (2026-04-20 세션78 Round 1 보완 — 3way 공유 양측 필수 규칙 신설)
+
+### 직전 실수 (사용자 지적)
+
+2ccc8589 [3way] 커밋의 최종 공유를 share-result 2자 경로로 수행 → Gemini 공유 생략 → 사용자 "제미나이 빼먹었다 반쪽 패치" 지적. 토론모드 CLAUDE.md Step 5-3 "양쪽 모두 전송" 규정이 share-result SKILL에 미반영되어 있던 구조 허점.
+
+### 보완 완료
+
+1. `.claude/commands/share-result.md` 0단계 신설: [3way] 태그 / 이번 세션 debate-mode 호출 / 직전 5커밋 [3way] 미종결 감지 시 양측 공유 강제
+2. memory `feedback_threeway_share_both_required.md` + MEMORY.md 인덱스 업데이트
+3. Gemini에 2ccc8589 즉시 공유 → PASS 수신 (round1_final_verify.md)
+
+### Round 1 양측 최종 판정
+
+- GPT PASS: "Step 5 설계안 반영 정합 PASS"
+- Gemini PASS: "3자 합의가 누락 없이 실물에 정합하게 반영"
+
+3way 종결 조건 충족. 세션78 Round 1 완결.
 
 ### Round 1 결과 (Claude×GPT×Gemini)
 
