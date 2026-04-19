@@ -16,6 +16,12 @@
 
 ## 세션73 반영 (2026-04-19, 이월 3건 처리 세션)
 
+**[GPT 판정: PASS]** 845e2e93 — 3커밋 모두 실물 검증 통과
+- 세션72 HANDOFF "다음 세션 첫 액션 3건"(쟁점 G + Phase 2-C + GPT 지적 A) 모두 충분히 처리
+- 스코프 확장 5→12훅 타당 근거 인정 (smoke_test 46-3 구식 가정 + 누락 7개)
+- 쟁점 G 사전작업이 세션74 단일 원자 커밋 실행 전제로 충분 — 실행만 남음
+- 세션74/75 후속은 미처리가 아닌 의도적 계획된 후속 단계로 평가
+
 **[완료] Step 1 — PreToolUse JSON 필드 `hookSpecificOutput` 스키마 마이그레이션**
 - context7 공식 Claude Code hook-development SKILL 기준으로 PreToolUse **12개 훅 20개 JSON 출력**을 `{"decision":"deny","reason":...}` → `{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":...}}` 교체
 - 스코프 확장: 초기 5개 훅 계획 → 탐색 중 `smoke_test.sh` 46-3 검사가 "hookSpecificOutput 잔재 없음"으로 구식 가정 + PreToolUse gate 7개 누락 추가 발견 → 일관성 회복 위해 12개 일괄 처리

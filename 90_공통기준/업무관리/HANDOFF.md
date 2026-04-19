@@ -32,6 +32,12 @@
 - gate exit 2 승격은 1주 수집 후 판단 — 커밋 C 문서에 기준선 기록
 - 검증: smoke_fast 9/9, doctor_lite OK, final_check 167/167 PASS
 
+### GPT 판정 PASS (845e2e93) — 세션73 마감
+- 3커밋 모두 실물 검증 통과. 세션72 HANDOFF 3건 전부 충분히 처리됨 판정
+- 스코프 확장 5→12훅 타당 (smoke_test 46-3 구식 가정 + 누락 7개 발견)
+- 쟁점 G 사전작업 세션74 실행 전제 충분
+- 하네스 분석: 채택 4건 / 보류 0건 / 버림 0건
+
 ### Step 3 완료 — 쟁점 G 사전작업 문서
 - `90_공통기준/토론모드/session73_review19_decisions.md` 신설
 - Permissions 100건 재분류: TEAM 80 / PERSONAL 4 / 개인경로 11 / DELETE 3
