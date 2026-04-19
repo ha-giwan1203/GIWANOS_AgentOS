@@ -4,12 +4,73 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션77 (Step 1 Test Pruning Phase 1 — 격리 후보 7개 선별)
+최종 업데이트: 2026-04-19 KST — 세션77 (Silent Failure 자동화 + Pruning 관찰 + evidence_gate 5정책 분해)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션77 — Step 1 Phase 1 완료)
+## 0. 최신 세션 (2026-04-19 세션77 후반 — Silent Failure 방지 + evidence_gate 분해 완료)
+
+### 이번 세션 추가 완료 (Step 1 Phase 1 이후)
+
+**Silent Failure 자동화** (Gemini 최우선 안전망)
+- `.claude/hooks/nightly_capability_check.sh` — smoke_test 전수 강제 실행 + 결과 로그 + FAIL 시 incident
+- Windows schtasks 일일 배치 등록 예시 주석
+
+**Pruning Phase 2 관찰 스크립트**
+- `.claude/hooks/pruning_observe.sh` — nightly 로그 + incident_ledger 집계 리포트
+- cygpath 적용 (Windows Git Bash 경로 이슈 해결)
+
+**Step 3 섹션별 해시 캐시 — 보류 판정**
+- ROI 낮음: commit 이미 0.57s, full은 전체 hash 캐시로 90% 효과
+- 섹션별 추가 캐시 공수 과대, 세션85+ Phase 3 후 재평가
+
+**Round 1 Step 1-b 완료 — evidence_gate 486건 5정책 분해**
+- **map_scope.req 347건 (71.4%) 압도적 점유** (Round 1 추정 46.2%보다 큰 비중)
+- skill_read + tasks_handoff 132건 (27.2%) 전부 미해결 (0% resolved) = 사용자 포기 상태
+- resolved 102건 중 101건이 map_scope → 이 정책만 "해결 가능한" 구조
+
+### 다음 세션 첫 액션 (세션78)
+
+**3자 토론 Round 3 개시**
+- 의제: Policy-Workflow Mismatch 종합 감사 (map_scope Policy 재정의 초안 + 3자 검증)
+- 준비물: `.claude/docs/evidence_gate_policy_breakdown.md` (71.4% 실증 수치)
+- 재정의 옵션:
+  - A: "고위험" 기준 축소 (data-and-files.md Full Lane 차용)
+  - B: map_scope.ok 자동 생성 (Claude가 3줄 선언 작성 후 사용자 승인)
+  - C: 완전 폐지 (위험, 기각)
+- Claude 권장: A + B 조합
+
+**Pruning 관찰 병행**
+- Windows schtasks에 nightly_capability_check 등록 (사용자 수동 1회)
+- Phase 2 관찰 1주 시작
+
+### 상태 정보
+
+- 세션77 확장 커밋으로 evidence_gate 실증 + Silent Failure 대응 + Phase 2 준비 완료
+- map_scope.req 단일 정책 재정의가 Round 3 최대 leverage point
+- 양측 토론방 대기 상태
+
+---
+
+## 0-prev-1. 세션77 전반 (2026-04-19 — Step 1 Phase 1 격리 후보 선별)
+
+### 이번 세션 완료
+
+**Step 1 Test Pruning Phase 1 착수**
+- smoke_test 47섹션/167 check 전수 인벤토리 구축
+- 격리 후보 7섹션 선별 (12% 감축 잠재)
+  - 24b, 33, 34, 36, 37, 38, 39 (전부 capability + 외부 훅 비의존)
+- 산출: `.claude/docs/smoke_test_sections_inventory.json`, `smoke_test_pruning_candidates.md/.json`
+- **코드 변경 없음** (Phase 1은 문서화까지) — GPT "격리 후 1주 관찰" 원칙 준수
+
+**Silent Failure 경고 (Gemini 체질 개선 지적)**
+- 격리 후보 7섹션 중 파이썬 도구 5섹션 (incident_review/classify_feedback/incident_repair 관련)
+- Phase 3 실제 삭제 이전 `nightly_capability_check.sh` 일일 배치 구현 필수
+
+---
+
+## 0-prev. 세션76 (2026-04-19 — Round 2 smoke_test 92% 단축)
 
 ### 이번 세션 완료
 

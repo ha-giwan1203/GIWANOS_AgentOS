@@ -10,7 +10,55 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션77 (Step 1 Test Pruning Phase 1 — 섹션 인벤토리 + 격리 후보 7개 선별)
+최종 업데이트: 2026-04-19 — 세션77 (Silent Failure 방지 + Pruning 관찰 + evidence_gate 486건 5정책 분해)
+
+---
+
+## 세션77 추가 반영 (2026-04-19, Silent Failure 자동화 + 관찰 스크립트 + evidence_gate 전수 분해)
+
+**[완료] nightly_capability_check.sh 신설 — Silent Failure 방지 (Gemini 최우선 안전망)**
+- `.claude/hooks/nightly_capability_check.sh` 신설
+- SMOKE_TEST_FORCE=1로 캐시 무시 강제 실행 → smoke_test 167 전수 검증
+- 결과를 `.claude/state/nightly_capability_log.jsonl`에 append
+- FAIL 감지 시 incident_ledger에 `silent_failure` 분류로 기록 + exit 2
+- Windows schtasks 등록 예시 주석 포함 (수동 1회: `schtasks /Create /TN claude_nightly_capability /TR ... /SC DAILY /ST 02:00 /F`)
+- **Phase 3 실제 격리 삭제 전제조건** — Gemini Round 2 경고 반영
+
+**[완료] pruning_observe.sh 신설 — Phase 2 관찰 리포트**
+- `.claude/hooks/pruning_observe.sh` 신설 (measurement 등급, read-only)
+- 격리 후보 7섹션 모니터링:
+  - nightly_capability_log.jsonl 실행 이력 집계
+  - incident_ledger에서 관련 hook 실패 집계 (최근 N일)
+  - Phase 3 진입 조건 판정 (nightly 7회 이상 + FAIL 0 + incident 증가 없음)
+- cygpath 적용으로 Windows Git Bash MSYS 경로 이슈 해결
+- PYTHONIOENCODING=utf-8 + LC_ALL 설정
+- 초기 실행 확인: 격리 후보 7섹션 식별 OK, Phase 3 HOLD (관찰 전)
+
+**[보류] Step 3 섹션별/의존파일별 해시 캐시 — ROI 낮음으로 판정**
+- 공수 큼: smoke_test.sh 990라인 선형 구조에 각 섹션 skip 블록 추가 필요
+- 효과 제한: commit 경로는 이미 fast 모드(0.57s), full 모드는 전체 hash 캐시(TTL 30분)로 이미 90% 효과 달성
+- 판정: **marginal gain 대비 공수 과대**, 세션85+ Phase 3 삭제 후 재평가
+
+**[완료] Step 1-b — evidence_gate 486건 5정책 분해 (충격 결과)**
+- `.claude/docs/evidence_gate_policy_breakdown.md` + `.json` 신설
+- **map_scope.req 단일 정책이 347건(71.4%) 압도적 점유** (Round 1 추정 46.2%보다 훨씬 큼)
+- 정책별 분포:
+  - map_scope.req: 347 (71.4%) — unresolved 246 / resolved 101
+  - skill_read.req: 67 (13.8%) — 전부 unresolved (resolved 0%)
+  - tasks_handoff.req: 65 (13.4%) — 전부 unresolved
+  - auth_diag.req: 4 (0.8%)
+  - date_check.req: 3 (0.6%)
+- 핵심 인사이트:
+  - **map_scope 단일 재정의만으로 incident 70% 감소 가능**
+  - skill_read + tasks_handoff 132건 전부 미해결 = 사용자 정책 준수 시도 포기 상태 = Gemini "Policy-Workflow Mismatch" 정확히 실증
+  - resolved 102건 중 101건이 map_scope → 이 정책만 해결 가능한 구조
+- Step 1-c 재정의 우선순위: map_scope (최우선) → skill_read → tasks_handoff
+
+**[세션78 이월 — 3자 토론 Round 3 준비]**
+- 의제: Policy-Workflow Mismatch 종합 감사 (map_scope Policy 재정의 초안 + 3자 검증)
+- 옵션 A: "고위험" 기준 축소 (data-and-files.md Full Lane 기준 차용)
+- 옵션 B: map_scope.ok 자동 생성 (Claude가 3줄 선언 자동 작성 후 사용자 승인)
+- 옵션 A+B 조합 권장, 옵션 C(완전 폐지) 위험
 
 ---
 

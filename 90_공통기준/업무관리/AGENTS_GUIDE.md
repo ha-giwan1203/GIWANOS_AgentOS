@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 28개 활성 (settings.local.json 기준)
+### Hooks (.claude/hooks/) — 32개 활성 (settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
@@ -92,6 +92,42 @@ Claude-GPT 공동작업 + 운영 원칙.
 | `gpt_followup_stop.sh` | GPT pending flag 존재 시 Stop 차단 |
 | `completion_gate.sh` | TASKS/HANDOFF 미갱신 시 Stop 차단 |
 | `evidence_stop_guard.sh` | 증거 없는 실패/완료 결론 차단 |
+| `stop_guard.sh` | 다른 훅이 내용 감지 안 함 |
+| `gpt_followup_stop.sh` | 외부 모델 대기 중 세션 종료 |
+| `completion_gate.sh` | 상태 원본과 세션 결론 괴리 |
+| `evidence_stop_guard.sh` | 검증 없는 완료 선언 |
+| `hook_common.sh` | > Phase 2-A (세션71): 등급 분류 + `hook_common.sh` 래퍼 정의. |
+| `completion_gate.sh` | **소프트 블록 추가** — 1회용 3회 누적 7일 내 감지 시 deny 1회 (60초 쿨다운) |
+| `commit_gate.sh` | **exit 2 전환** + timing 배선 — final_check FAIL/write_marker 위반 시 exit 2 |
+| `debate_verify.sh` | **timing 배선만** — Phase 2 승격은 incident 18건 잔존으로 보류, Phase 2-C 재평가 |
+| `block_dangerous.sh` | **exit 2 전환** + timing 배선 |
+| `date_scope_guard.sh` | **exit 2 전환** + timing 배선 |
+| `protect_files.sh` | **exit 2 전환** + timing 배선 |
+| `evidence_stop_guard.sh` | timing 배선만 |
+| `stop_guard.sh` | timing 배선만 |
+| `evidence_gate.sh` | exit 2 전환 검토 |
+| `state_rebind_check.sh` | 유지 |
+| `mcp_send_gate.sh` | exit 2 전환 검토 |
+| `harness_gate.sh` | exit 2 전환 검토 |
+| `instruction_read_gate.sh` | exit 2 전환 검토 |
+| `skill_instruction_gate.sh` | exit 2 전환 검토 |
+| `debate_gate.sh` | exit 2 전환 검토 |
+| `debate_independent_gate.sh` | exit 2 전환 검토 |
+| `navigate_gate.sh` | exit 2 전환 검토 |
+| `permissions_sanity.sh` | 유지 |
+| `auto_compile.sh` | 유지 |
+| `write_marker.sh` | timing 배선 |
+| `handoff_archive.sh` | timing 배선 |
+| `evidence_mark_read.sh` | timing 배선 |
+| `debate_send_gate_mark.sh` | timing 배선 |
+| `gpt_followup_post.sh` | timing 배선 |
+| `post_commit_notify.sh` | timing 배선 |
+| `notify_slack.sh` | timing 배선 |
+| `gpt_followup_stop.sh` | exit 2 전환 검토 |
+| `session_start_restore.sh` | timing 배선 |
+| `precompact_save.sh` | timing 배선 |
+| `risk_profile_prompt.sh` | timing 배선 |
+| `skill_drift_check.sh` | 유지 |
 
 
 <!-- AUTO_HOOKS_END -->

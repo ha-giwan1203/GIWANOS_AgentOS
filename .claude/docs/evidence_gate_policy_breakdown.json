@@ -1,0 +1,28 @@
+{
+  "total": 486,
+  "policy_distribution": {
+    "other": 3,
+    "map_scope.req": 347,
+    "skill_read.req": 67,
+    "tasks_handoff.req": 65,
+    "auth_diag.req": 4
+  },
+  "policy_unresolved": {
+    "map_scope.req": 246,
+    "skill_read.req": 67,
+    "tasks_handoff.req": 65,
+    "other": 2,
+    "auth_diag.req": 4
+  },
+  "policy_resolved": {
+    "other": 1,
+    "map_scope.req": 101
+  },
+  "detail_top10": {
+    "map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고": 347,
+    "skill_read.req / identifier_ref.req 존재. SKILL.md 또는 기준정보 대조 ": 67,
+    "tasks_handoff.req 존재. TASKS/HANDOFF 갱신 없이 commit/push 금지.": 65,
+    "auth_diag.req 존재. auth_diag.ok 없이 MES/OAuth 관련 실행 금지.": 4,
+    "date_check.req 존재. date_check.ok 없이 날짜 관련 실행 금지.": 3
+  }
+}
