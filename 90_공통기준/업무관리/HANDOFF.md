@@ -4,12 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션72 (의제5 Phase 2-B 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록)
+최종 업데이트: 2026-04-19 KST — 세션73 (이월 3건 처리)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션72)
+## 0. 최신 세션 (2026-04-19 세션73 — 진행 중)
+
+### 이번 세션 계획
+세션72 이월 3건:
+1. GPT 지적 A — PreToolUse JSON 필드 `hookSpecificOutput` 스키마 마이그레이션
+2. Phase 2-C timing 배선 (25개 훅)
+3. 쟁점 G settings 계층 실물 분리 **사전작업** (실물 분리는 세션74)
+
+### Step 1 완료 — PreToolUse JSON 스키마 마이그레이션 (스코프 확장)
+- context7(/anthropics/claude-code) hook-development SKILL 기준으로 PreToolUse **12개 훅 20개 JSON 출력** 스키마 교체
+- 스코프 확장 사유: 초기 5개 계획 → `smoke_test.sh` 46-3 검사가 구식 가정(`hookSpecificOutput 잔재 없음`) + PreToolUse gate 7개 누락 추가 발견 → 일관성 유지 위해 일괄 처리
+- Phase 2-B 완료(exit 2 유지) 5개: `block_dangerous`(6) · `commit_gate`(2) · `date_scope_guard`(1) · `protect_files`(2) · `harness_gate`(2)
+- 추가 PreToolUse gate 7개: `evidence_gate`(1) · `mcp_send_gate`(1) · `instruction_read_gate`(1) · `skill_instruction_gate`(3) · `debate_gate`(1) · `debate_independent_gate`(1) · `navigate_gate`(1)
+- `smoke_test.sh`·`e2e_test.sh` 갱신: grep 패턴 양식 병행 허용(10건) + 46-3 assertion 뒤집기
+- Stop 이벤트 훅(`stop_guard`, `gpt_followup_stop`, `completion_gate`, `evidence_stop_guard`)은 legacy 형식 유지
+- 20/20 JSON 파싱 유효 + smoke_fast 9/9 PASS + doctor_lite OK + final_check `FAIL 0` 달성
+
+### Step 2 진행 중 — Phase 2-C timing 배선 (25개 훅)
+### Step 3 진행 중 — 쟁점 G 사전작업 문서
+
+### 다음 세션 첫 액션
+- 세션74: 쟁점 G 실물 분리 (단일 원자 커밋 + 세션 재시작 필수)
+
+---
+
+## 0-prev. 세션72 (2026-04-19)
 
 ### 이번 세션 완료
 1. **Phase 2-B Step 1 — `completion_gate.sh` 소프트 블록 추가**:

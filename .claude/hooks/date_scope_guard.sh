@@ -22,7 +22,9 @@ deny() {
   local reason="$1"
   hook_log "PreToolUse/date_scope_guard" "BLOCK: $reason | $COMMAND"
   hook_incident "gate_reject" "date_scope_guard" "" "$reason" '"classification_reason":"scope_violation"' 2>/dev/null || true
-  echo "{\"decision\":\"deny\",\"reason\":\"[date_scope_guard] $reason\"}"
+  local safe_reason
+  safe_reason=$(json_escape "[date_scope_guard] $reason")
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$safe_reason\"}}"
   hook_timing_end "date_scope_guard" "$_DSG_START" "block"
   exit 2
 }

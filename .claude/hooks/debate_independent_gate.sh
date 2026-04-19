@@ -33,7 +33,7 @@ fi
 REVIEW_MARKER="$STATE_DIR/debate_independent_review.ok"
 if [ ! -f "$REVIEW_MARKER" ] 2>/dev/null; then
   hook_log "PreToolUse/debate_independent_gate" "BLOCK: 독립 의견 미수행 — GPT 응답에 대한 하네스 분석을 먼저 사용자에게 보고하세요" 2>/dev/null
-  echo "{\"decision\":\"deny\",\"reason\":\"[DEBATE INDEPENDENT GATE] GPT 응답에 대한 독립 의견을 먼저 사용자에게 보고하세요.\\n\\n1. GPT 응답 주장 분해 (2~4개)\\n2. 라벨링 (실증됨/일반론/환경미스매치/과잉설계)\\n3. 채택/보류/버림 판정\\n4. 사용자 보고 후 전송 진행\\n\\n하네스 분석 없이 GPT에 바로 답장할 수 없습니다.\"}"
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[DEBATE INDEPENDENT GATE] GPT 응답에 대한 독립 의견을 먼저 사용자에게 보고하세요.\\n\\n1. GPT 응답 주장 분해 (2~4개)\\n2. 라벨링 (실증됨/일반론/환경미스매치/과잉설계)\\n3. 채택/보류/버림 판정\\n4. 사용자 보고 후 전송 진행\\n\\n하네스 분석 없이 GPT에 바로 답장할 수 없습니다.\"}}"
   exit 0
 fi
 

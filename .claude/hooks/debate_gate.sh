@@ -56,7 +56,7 @@ fi
 
 if [ -n "$MISSING" ]; then
   hook_log "PreToolUse/debate_gate" "BLOCK: 토론모드 절차 미완료 —$MISSING" 2>/dev/null
-  echo "{\"decision\":\"deny\",\"reason\":\"[DEBATE GATE] 토론모드 전송 절차 미완료:\\n$MISSING\\n\\n전송 전에 반드시:\\n1. 토론모드 CLAUDE.md 읽기\\n2. 채팅방 진입 + URL 갱신\\n3. get_page_text로 현재 대화 상태 확인 (SEND GATE)\\n을 완료하세요.\"}"
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[DEBATE GATE] 토론모드 전송 절차 미완료:\\n$MISSING\\n\\n전송 전에 반드시:\\n1. 토론모드 CLAUDE.md 읽기\\n2. 채팅방 진입 + URL 갱신\\n3. get_page_text로 현재 대화 상태 확인 (SEND GATE)\\n을 완료하세요.\"}}"
   exit 0
 fi
 

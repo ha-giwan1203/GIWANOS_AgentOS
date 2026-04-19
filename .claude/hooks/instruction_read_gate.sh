@@ -71,7 +71,7 @@ if [ -n "$MISSING" ]; then
   MSG="[instruction_read_gate] GPT 전송 차단: 필수 지시문 미읽기.${MISSING_ESCAPED}\\n\\n먼저 위 파일을 Read/Grep으로 읽은 후 다시 시도하세요."
   hook_log "instruction_read_gate" "DENY missing=$(echo "$MISSING" | tr '\n' ',')"
   hook_incident "instruction_read_gate" "instruction_not_read" "GPT 전송 전 필수 지시문 미읽기: $MISSING"
-  echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
   exit 0
 fi
 

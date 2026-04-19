@@ -30,13 +30,13 @@ fi
 
 # Layer 1: 즉시 차단 (deny) — config 기반
 if echo "$FILE_PATH" | grep -qiE "$DENY_EXT_PATTERN"; then
-  echo '{"decision":"deny","reason":"원본 파일 직접 수정 금지. 복사본에서 작업하세요."}'
+  echo '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"원본 파일 직접 수정 금지. 복사본에서 작업하세요."}}'
   hook_timing_end "protect_files" "$_PF_START" "block_ext"
   exit 2
 fi
 
 if echo "$FILE_PATH" | grep -qiE "$DENY_PATH_PATTERN"; then
-  echo '{"decision":"deny","reason":"보호 경로 직접 수정 금지. 사용자 확인 후 진행하세요."}'
+  echo '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"보호 경로 직접 수정 금지. 사용자 확인 후 진행하세요."}}'
   hook_timing_end "protect_files" "$_PF_START" "block_path"
   exit 2
 fi

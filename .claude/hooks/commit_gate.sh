@@ -5,7 +5,7 @@
 # GPT+Claude 합의 2026-04-07
 #
 # 훅 등급: gate (의제5 Phase 2-B 전환 2026-04-19 세션72)
-#   - 차단 메커니즘: JSON `{"decision":"deny",...}` (PreToolUse 네이티브) + exit 2 (belt-and-suspenders)
+#   - 차단 메커니즘: JSON `{"hookSpecificOutput":{"permissionDecision":"deny",...}}` (PreToolUse 최신 스펙) + exit 2 (belt-and-suspenders)
 #   - timing 계측: hook_timing_start/end 호출부 배선 완료
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
@@ -91,7 +91,7 @@ if [ -f "$_MARKER" ] && echo "$COMMAND" | grep -q 'git commit'; then
   if [ "$_has_tasks" -eq 0 ] && [ "$_has_handoff" -eq 0 ]; then
     # staged에 TASKS/HANDOFF 변경 파일이 이미 있으면 통과 (docs 전용 커밋)
     # 둘 다 없으면 차단
-    echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] write_marker 존재 — TASKS.md 또는 HANDOFF.md를 함께 staged하세요.\\n상태문서 갱신 없이는 커밋할 수 없습니다.\"}"
+    echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[COMMIT GATE] write_marker 존재 — TASKS.md 또는 HANDOFF.md를 함께 staged하세요.\\n상태문서 갱신 없이는 커밋할 수 없습니다.\"}}"
     hook_log "PreToolUse/Bash" "commit_gate BLOCK: 상태문서 미동봉 (write_marker 존재, TASKS/HANDOFF 미staged)" 2>/dev/null
     hook_timing_end "commit_gate" "$_CG_START" "block_marker"
     exit 2
@@ -145,7 +145,7 @@ if [ "$EXIT_CODE" -ne 0 ]; then
   else
     hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"mode\":\"$MODE\",\"promoted_to_full\":$PROMOTED,\"normal_flow\":$NORMAL_FLOW,\"fail_keywords\":\"$FAIL_KEYWORDS\",\"warn_keywords\":\"$WARN_KEYWORDS\",\"fingerprint\":\"$_fingerprint\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
   fi
-  echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] final_check $MODE 실패 — 자체검증 통과 후 커밋하세요.\\n$FAILS\"}"
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[COMMIT GATE] final_check $MODE 실패 — 자체검증 통과 후 커밋하세요.\\n$FAILS\"}}"
   hook_timing_end "commit_gate" "$_CG_START" "block_final_check"
   exit 2
 fi

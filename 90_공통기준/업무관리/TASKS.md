@@ -10,7 +10,38 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션72 (의제5 Phase 2-B 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록)
+최종 업데이트: 2026-04-19 — 세션73 Step 1 (PreToolUse JSON 스키마 마이그레이션)
+
+---
+
+## 세션73 반영 (2026-04-19, 이월 3건 처리 세션)
+
+**[완료] Step 1 — PreToolUse JSON 필드 `hookSpecificOutput` 스키마 마이그레이션**
+- context7 공식 Claude Code hook-development SKILL 기준으로 PreToolUse **12개 훅 20개 JSON 출력**을 `{"decision":"deny","reason":...}` → `{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":...}}` 교체
+- 스코프 확장: 초기 5개 훅 계획 → 탐색 중 `smoke_test.sh` 46-3 검사가 "hookSpecificOutput 잔재 없음"으로 구식 가정 + PreToolUse gate 7개 누락 추가 발견 → 일관성 회복 위해 12개 일괄 처리
+- **Phase 2-B 완료 5개(exit 2 유지)**: `block_dangerous.sh`(6) · `commit_gate.sh`(2) · `date_scope_guard.sh`(1, `json_escape` 적용) · `protect_files.sh`(2) · `harness_gate.sh`(2)
+- **PreToolUse gate 7개 추가**: `evidence_gate.sh`(1, `json_escape`) · `mcp_send_gate.sh`(1) · `instruction_read_gate.sh`(1) · `skill_instruction_gate.sh`(3) · `debate_gate.sh`(1) · `debate_independent_gate.sh`(1) · `navigate_gate.sh`(1)
+- **smoke_test.sh·e2e_test.sh 갱신**: grep 패턴 `"decision":"deny"` → `"decision":"deny"|"permissionDecision":"deny"` 양식 병행 허용 (10건), 46-3 assertion 뒤집어 "PreToolUse 12 훅 hookSpecificOutput 적용 확인"으로 전환
+- 건드리지 않음(Stop legacy 정상): `stop_guard.sh`, `gpt_followup_stop.sh`, `completion_gate.sh`, `evidence_stop_guard.sh`
+- 머리말 주석 2건(block_dangerous/commit_gate) 스펙 설명도 최신 스키마로 치환
+
+**[검증]**
+- JSON 파싱 유효성: 13/13 OK (python3 json.loads)
+- `smoke_fast.sh` 9/9 ALL PASS
+- `doctor_lite.sh` OK
+
+**[진행중] Step 2 — Phase 2-C timing 배선 (25개 훅)**
+- advisory 5 · gate 9 · measurement 11 훅 `hook_timing_start`/`hook_timing_end` 배선
+- gate 9개 `exit 2` 승격은 이번 세션 보류 (1주 `hook_timing.jsonl` 수집 후 판단)
+- `debate_verify.sh`는 incident 18건 잔존 → Phase 2 승격 보류 유지
+
+**[진행중] Step 3 — 쟁점 G 사전작업 문서 (세션74 실물 분리 대비)**
+- `90_공통기준/토론모드/session73_review19_decisions.md` 신규: REVIEW 19건 TEAM/PERSONAL 분류 결정 + gate 9 승격 기준선
+
+**[이월]**
+- 세션74: 쟁점 G 실물 분리 (단일 원자 커밋 + 세션 재시작 필수)
+- Phase 2-C 이월 분석: `hook_timing.jsonl` 1주 수집 후 gate 9개 exit 2 승격 판단
+- `debate_verify.sh` Phase 2 승격: 7일 연속 `debate_verify` incident 0건 달성 시
 
 ---
 

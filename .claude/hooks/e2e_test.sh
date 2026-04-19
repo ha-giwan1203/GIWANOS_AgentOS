@@ -28,26 +28,26 @@ echo ""
 # --- 1. block_dangerous: deny ---
 echo "--- E2E-1. block_dangerous: rm -rf / → deny ---"
 RESULT=$(echo '{"command":"rm -rf /"}' | bash "$HOOKS_DIR/block_dangerous.sh" 2>/dev/null)
-echo "$RESULT" | grep -q '"decision":"deny"'
+echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "block_dangerous: rm -rf / → deny"
 
 # --- 2. block_dangerous: safe command → no deny ---
 echo "--- E2E-2. block_dangerous: ls → pass ---"
 RESULT=$(echo '{"command":"ls -la"}' | bash "$HOOKS_DIR/block_dangerous.sh" 2>/dev/null)
 # 안전한 명령은 출력 없이 exit 0
-test -z "$RESULT" || ! echo "$RESULT" | grep -q '"decision":"deny"'
+test -z "$RESULT" || ! echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "block_dangerous: ls → no deny"
 
 # --- 3. protect_files: xlsx → deny ---
 echo "--- E2E-3. protect_files: test.xlsx → deny ---"
 RESULT=$(echo '{"file_path":"test.xlsx"}' | bash "$HOOKS_DIR/protect_files.sh" 2>/dev/null)
-echo "$RESULT" | grep -q '"decision":"deny"'
+echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "protect_files: xlsx → deny"
 
 # --- 4. protect_files: .sh → pass ---
 echo "--- E2E-4. protect_files: test.sh → pass ---"
 RESULT=$(echo '{"file_path":"test.sh"}' | bash "$HOOKS_DIR/protect_files.sh" 2>/dev/null)
-test -z "$RESULT" || ! echo "$RESULT" | grep -q '"decision":"deny"'
+test -z "$RESULT" || ! echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "protect_files: .sh → no deny"
 
 # --- 5. session_start_restore: fresh kernel ---
@@ -113,21 +113,21 @@ sleep 1
 # --- 8. evidence_gate: no-req → 완전 통과 ---
 echo "--- E2E-8. evidence_gate: no-req → pass ---"
 RESULT=$(CLAUDE_TRANSCRIPT_PATH="$E2E_TRANSCRIPT" bash "$HOOKS_DIR/evidence_gate.sh" <<< '{"command":"ls"}' 2>/dev/null)
-test -z "$RESULT" || ! echo "$RESULT" | grep -q '"decision":"deny"'
+test -z "$RESULT" || ! echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "evidence_gate: no-req → pass"
 
 # --- 9. evidence_gate: map_scope.req + Write → deny ---
 echo "--- E2E-9. evidence_gate: map_scope.req + Write → deny ---"
 touch "$E2E_REQ_DIR/map_scope.req"
 RESULT=$(CLAUDE_TRANSCRIPT_PATH="$E2E_TRANSCRIPT" bash "$HOOKS_DIR/evidence_gate.sh" <<< '{"command":"","tool_name":"Write","tool_input":"some file"}' 2>/dev/null)
-echo "$RESULT" | grep -q '"decision":"deny"'
+echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "evidence_gate: map_scope + Write → deny"
 
 # --- 10. evidence_gate: tasks_handoff.req + git commit → deny ---
 echo "--- E2E-10. evidence_gate: tasks_handoff.req + git commit → deny ---"
 touch "$E2E_REQ_DIR/tasks_handoff.req"
 RESULT=$(CLAUDE_TRANSCRIPT_PATH="$E2E_TRANSCRIPT" bash "$HOOKS_DIR/evidence_gate.sh" <<< '{"command":"git commit -m test"}' 2>/dev/null)
-echo "$RESULT" | grep -q '"decision":"deny"'
+echo "$RESULT" | grep -qE '"decision":"deny"|"permissionDecision":"deny"'
 check $? "evidence_gate: tasks_handoff + git commit → deny"
 
 # 임시 evidence 정리

@@ -98,7 +98,9 @@ deny() {
     resolve_hint=" 해결: TASKS.md와 HANDOFF.md를 갱신하면 ok 마커가 생성됩니다."
   fi
 
-  echo "{\"decision\":\"deny\",\"reason\":\"[evidence_gate] ${reason}${resolve_hint}\"}"
+  local _safe_msg
+  _safe_msg=$(json_escape "[evidence_gate] ${reason}${resolve_hint}")
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$_safe_msg\"}}"
   exit 0
 }
 

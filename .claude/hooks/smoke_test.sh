@@ -762,8 +762,9 @@ echo ""
 echo "--- 44. evidence_gate deny-path ---"
 # 44-1: deny 함수가 JSON deny 출력을 생성하는지 확인
 # evidence_gate의 deny()는 evidence_init 의존이라 직접 실행 어려움
-# 대신 deny 함수 내부에서 decision:deny JSON을 출력하는지 grep으로 확인
-grep -q 'decision.*deny' "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
+# 대신 deny 함수 내부에서 permissionDecision/decision:deny JSON을 출력하는지 grep으로 확인
+# 세션73: hookSpecificOutput 스키마 마이그레이션 후 permissionDecision 키 확인
+grep -qE 'permissionDecision.*deny|decision.*deny' "$HOOKS_DIR/evidence_gate.sh" 2>/dev/null
 check $? "evidence_gate: deny 함수가 deny JSON 출력 생성"
 
 # 44-2: skill_read deny 경로 존재 확인
@@ -797,7 +798,7 @@ touch -t 202601010000 "$_eg_start_file" 2>/dev/null
 : > "$_eg_req_dir/tasks_handoff.req"
 rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
 _eg_result_3=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
-echo "$_eg_result_3" | grep -q '"decision":"deny"' 2>/dev/null
+echo "$_eg_result_3" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: tasks_handoff.req + git commit → deny (런타임)"
 
 # 44-4: skill_read.req + 기준정보 도메인 편집 → deny
@@ -805,7 +806,7 @@ rm -f "$_eg_req_dir/tasks_handoff.req" 2>/dev/null
 : > "$_eg_req_dir/skill_read.req"
 rm -f "$_eg_proof_dir/skill_read.ok" "$_eg_proof_dir/identifier_ref.ok" 2>/dev/null
 _eg_result_4=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md","command":""}' | bash "$_eg_script" 2>/dev/null)
-echo "$_eg_result_4" | grep -q '"decision":"deny"' 2>/dev/null
+echo "$_eg_result_4" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: skill_read.req + 도메인편집 → deny (런타임)"
 
 # 44-5: map_scope.req + Write 도구 → deny
@@ -813,7 +814,7 @@ rm -f "$_eg_req_dir/skill_read.req" 2>/dev/null
 : > "$_eg_req_dir/map_scope.req"
 rm -f "$_eg_proof_dir/map_scope.ok" 2>/dev/null
 _eg_result_5=$(echo '{"tool_name":"Write","tool_input":"test_file.md","command":""}' | bash "$_eg_script" 2>/dev/null)
-echo "$_eg_result_5" | grep -q '"decision":"deny"' 2>/dev/null
+echo "$_eg_result_5" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: map_scope.req + Write → deny (런타임)"
 
 # 상태 복원
@@ -867,7 +868,7 @@ check $? "navigate_gate: settings.local.json 등록 확인"
 # 45-3: 비-chatgpt URL → exit 0 (통과)
 _ng_result=$(echo '{"tool_input":{"url":"https://google.com"}}' | bash "$_NG_SCRIPT" 2>/dev/null)
 _ng_exit=$?
-[ "$_ng_exit" = "0" ] && ! echo "$_ng_result" | grep -q '"decision":"deny"' 2>/dev/null
+[ "$_ng_exit" = "0" ] && ! echo "$_ng_result" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "navigate_gate: 비-chatgpt URL → 통과"
 
 # 45-4: chatgpt URL + 마커 없음 → deny (도메인 무관 — 세션51 수정)
@@ -881,7 +882,7 @@ _ng_marker_backup=""
 rm -f "$_ng_marker" 2>/dev/null
 
 _ng_deny_result=$(echo '{"tool_input":{"url":"https://chatgpt.com/g/g-p-test/project"}}' | bash "$_NG_SCRIPT" 2>/dev/null)
-echo "$_ng_deny_result" | grep -q '"decision":"deny"' 2>/dev/null
+echo "$_ng_deny_result" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "navigate_gate: chatgpt+마커없음 → deny (도메인 무관)"
 
 # 45-5: chatgpt URL + 마커 있음 → 통과
@@ -889,7 +890,7 @@ mkdir -p "$_ng_marker_dir" 2>/dev/null
 : > "$_ng_marker"
 _ng_pass_result=$(echo '{"tool_input":{"url":"https://chatgpt.com/g/g-p-test/project"}}' | bash "$_NG_SCRIPT" 2>/dev/null)
 _ng_pass_exit=$?
-[ "$_ng_pass_exit" = "0" ] && ! echo "$_ng_pass_result" | grep -q '"decision":"deny"' 2>/dev/null
+[ "$_ng_pass_exit" = "0" ] && ! echo "$_ng_pass_result" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "navigate_gate: chatgpt+마커있음 → 통과"
 
 # 상태 복원
@@ -918,7 +919,7 @@ _sig_backup_2=""
 
 _sig_result=$(echo '{"command":"python3 -c \"import requests; requests.get('"'"'https://mes-dev.samsong.com'"'"')\""}' | bash "$_sig_script" 2>/dev/null)
 _sig_exit=$?
-[ "$_sig_exit" = "0" ] && echo "$_sig_result" | grep -q '"decision":"deny"' 2>/dev/null
+[ "$_sig_exit" = "0" ] && echo "$_sig_result" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "skill_instruction_gate: MES+마커없음 → deny (표준 포맷, stdout, exit 0)"
 
 # 복원
@@ -929,9 +930,18 @@ check $? "skill_instruction_gate: MES+마커없음 → deny (표준 포맷, stdo
 grep -q 'decision.*deny' "$HOOKS_DIR/completion_gate.sh" 2>/dev/null
 check $? "completion_gate: deny 포맷 통일 확인 (block→deny)"
 
-# 46-3: 전체 훅 deny 포맷 일관성 — hookSpecificOutput 잔재 없음 (smoke_test 자기자신 제외)
-! grep -rl 'hookSpecificOutput' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v 'smoke_test' | grep -v '.bak' | grep -q .
-check $? "전체 훅: hookSpecificOutput 잔재 없음 (표준 포맷 통일)"
+# 46-3: PreToolUse 훅 hookSpecificOutput 스키마 적용 확인 (세션73 마이그레이션)
+# context7 공식 스펙: PreToolUse는 {"hookSpecificOutput":{"permissionDecision":"deny|allow|ask",...}} 구조
+# Stop hook은 legacy {"decision":"deny|block",...} 유지 (이 리스트에서 제외)
+_PRETOOLUSE_HOOKS="block_dangerous commit_gate date_scope_guard protect_files harness_gate evidence_gate mcp_send_gate instruction_read_gate skill_instruction_gate debate_gate debate_independent_gate navigate_gate"
+_missing_migration=""
+for h in $_PRETOOLUSE_HOOKS; do
+  if ! grep -q 'hookSpecificOutput' "$HOOKS_DIR/$h.sh" 2>/dev/null; then
+    _missing_migration="$_missing_migration $h"
+  fi
+done
+[ -z "$_missing_migration" ]
+check $? "PreToolUse 훅 hookSpecificOutput 스키마 적용 (12개, 최신 spec 통일)${_missing_migration:+ | 미마이그레이션:$_missing_migration}"
 
 # 46-4: 전체 훅 block 잔재 없음 (smoke_test 자기자신 제외)
 ! grep -l '"decision":"block"' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v 'smoke_test' | grep -q .

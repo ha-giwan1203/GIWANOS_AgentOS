@@ -33,7 +33,7 @@ CLAUDE_OK="$INSTRUCTION_DIR/debate_claude_read.ok"
 if [ ! -f "$CLAUDE_OK" ]; then
   hook_log "PreToolUse/navigate_gate" "DENY: 토론모드 CLAUDE.md 미읽기 — URL=$URL"
   hook_incident "gate_reject" "navigate_gate" "" "ChatGPT 진입 차단: 토론모드 CLAUDE.md 미읽기" '"classification_reason":"send_block"'
-  echo "{\"decision\":\"deny\",\"reason\":\"[NAVIGATE GATE] 토론모드 CLAUDE.md를 먼저 읽으세요.\\n\\nChatGPT 진입 전 필수:\\n1. Read 90_공통기준/토론모드/CLAUDE.md\\n2. debate-mode 또는 gpt-send 스킬 사용\\n\\n지침 미읽기 상태에서는 ChatGPT navigate가 차단됩니다.\"}"
+  echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[NAVIGATE GATE] 토론모드 CLAUDE.md를 먼저 읽으세요.\\n\\nChatGPT 진입 전 필수:\\n1. Read 90_공통기준/토론모드/CLAUDE.md\\n2. debate-mode 또는 gpt-send 스킬 사용\\n\\n지침 미읽기 상태에서는 ChatGPT navigate가 차단됩니다.\"}}"
   exit 0
 fi
 

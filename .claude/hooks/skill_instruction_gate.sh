@@ -37,7 +37,7 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
     hook_log "skill_instruction_gate" "DENY mes_access_no_skillmd"
     hook_incident "gate_reject" "skill_instruction_gate" "" "MES access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
-    echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+    echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
     exit 0
   fi
 
@@ -48,7 +48,7 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
       hook_log "skill_instruction_gate" "DENY mes_upload_no_precheck"
       hook_incident "gate_reject" "skill_instruction_gate" "" "MES upload without pre-check (selectPrdtRsltByLine.do missing)" \
         "\"classification_reason\":\"evidence_missing\""
-      echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+      echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
       exit 0
     fi
   fi
@@ -61,7 +61,7 @@ if echo "$COMMAND" | grep -qF 'ax.samsong.com'; then
     hook_log "skill_instruction_gate" "DENY zdm_access_no_skillmd"
     hook_incident "gate_reject" "skill_instruction_gate" "" "ZDM access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
-    echo "{\"decision\":\"deny\",\"reason\":\"$MSG\"}"
+    echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
     exit 0
   fi
 fi
