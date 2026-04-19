@@ -841,7 +841,8 @@ mkdir -p "$_eg_req_dir" "$_eg_proof_dir" 2>/dev/null
 # start_file을 과거로 설정해서 fresh_req가 동작하도록
 touch -t 202601010000 "$_eg_start_file" 2>/dev/null
 
-# 44-3: tasks_handoff.req + git commit → deny
+# 44-3: tasks_handoff.req + git commit → deny (세션78 재정의 후에도 기능 호환)
+# 세션78: req 유무와 무관하게 commit은 검증되지만, req 존재 시에도 여전히 deny되어야 함
 : > "$_eg_req_dir/tasks_handoff.req"
 rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
 _eg_result_3=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
@@ -849,9 +850,11 @@ echo "$_eg_result_3" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 
 check $? "evidence_gate: tasks_handoff.req + git commit → deny (런타임)"
 
 # 44-4: skill_read.req + 기준정보 도메인 편집 → deny
+# 세션78: 스킬별 마커 skill_read__*.ok도 정리해야 면제 조건 회피 (glob 면제 로직 추가됨)
 rm -f "$_eg_req_dir/tasks_handoff.req" 2>/dev/null
 : > "$_eg_req_dir/skill_read.req"
 rm -f "$_eg_proof_dir/skill_read.ok" "$_eg_proof_dir/identifier_ref.ok" 2>/dev/null
+rm -f "$_eg_proof_dir"/skill_read__*.ok 2>/dev/null
 _eg_result_4=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md","command":""}' | bash "$_eg_script" 2>/dev/null)
 echo "$_eg_result_4" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: skill_read.req + 도메인편집 → deny (런타임)"
@@ -872,6 +875,32 @@ if echo "$_eg_result_6" | grep -qE '"decision":"deny"|"permissionDecision":"deny
 else
   check 0 "evidence_gate: map_scope.req + Write on .md → pass (세션77 재정의)"
 fi
+
+# 44-7 (세션78 P2 재정의 신규): skill_read.req + 스킬별 마커 존재 → pass (도메인 편집 허용)
+rm -f "$_eg_req_dir/map_scope.req" 2>/dev/null
+: > "$_eg_req_dir/skill_read.req"
+rm -f "$_eg_proof_dir/skill_read.ok" "$_eg_proof_dir/identifier_ref.ok" 2>/dev/null
+: > "$_eg_proof_dir/skill_read__smoke_test.ok"
+# 마커 mtime을 start_file보다 newer로 설정 (fresh_file 조건)
+touch "$_eg_proof_dir/skill_read__smoke_test.ok" 2>/dev/null
+_eg_result_7=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md","command":""}' | bash "$_eg_script" 2>/dev/null)
+if echo "$_eg_result_7" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null; then
+  check 1 "evidence_gate: skill_read.req + skill_read__*.ok 존재 → pass (세션78 재정의)"
+else
+  check 0 "evidence_gate: skill_read.req + skill_read__*.ok 존재 → pass (세션78 재정의)"
+fi
+
+# 44-8 (세션78 P2 재정의 신규): risk_profile_prompt에 tasks_handoff 조기 트리거 제거 확인 (정적)
+! grep -qE '^[^#]*touch_req[[:space:]]+"tasks_handoff"' "$HOOKS_DIR/risk_profile_prompt.sh" 2>/dev/null
+check $? "risk_profile_prompt: tasks_handoff 조기 트리거 제거됨 (세션78)"
+
+# 44-9 (세션78 P2 재정의 신규): req 전무 상태에서 git commit → deny (has_any_req 우회 방지)
+# 세션78: tasks_handoff.req 조기 발행이 제거되었으므로, 일반 세션에서는 req가 없어도 commit/push은 검증돼야 함
+rm -f "$_eg_req_dir"/*.req 2>/dev/null
+rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
+_eg_result_9=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_9" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
+check $? "evidence_gate: req 없이도 git commit → deny (세션78 has_any_req 우회 방지)"
 
 # 상태 복원
 rm -rf "$_eg_req_dir"/* 2>/dev/null

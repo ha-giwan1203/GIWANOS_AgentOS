@@ -15,11 +15,9 @@ has_any_req() {
   find "$REQ_DIR" -maxdepth 1 -type f -name '*.req' -newer "$START_FILE" | grep -q .
 }
 
-# req 없으면 완전 통과 — 일상 작업 마찰 방지
-if ! has_any_req; then
-  hook_timing_end "evidence_gate" "$_EVG_START" "skip_noreq"
-  exit 0
-fi
+# 세션78 P2 재정의: has_any_req early-exit은 deny() 정의 이후로 이동됨
+#   이유: commit/push 검증을 req 유무와 무관하게 우선 수행하기 위함
+#   (tasks_handoff.req 조기 발행 제거로 인한 has_any_req 우회 방지)
 
 # safe_json_get 사용 (sed 직접 파싱 대체, 세션14 GPT 합의)
 COMMAND="$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)"
@@ -108,6 +106,22 @@ deny() {
   exit 0
 }
 
+# 세션78 P2 재정의: commit/push은 req 유무와 무관하게 TASKS/HANDOFF 갱신 증거 필수
+#   기존(~세션77): risk_profile_prompt에서 "완료/갱신/커밋" 등 키워드로 tasks_handoff.req 조기 발행 → L155-160에서 is_commit_or_push 시점에 검증 → 시간차로 맥락 상실
+#   변경(세션78): req 발행 제거, commit/push 감지 시 즉석 독립 검증 → 시간차 0, UX 맥락 유지
+#   has_any_req 우회 방지: early-exit을 이 블록 뒤로 이동시켰으므로 req 없는 세션에서도 commit/push 검증 동작
+if is_commit_or_push; then
+  if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
+    deny "commit/push 차단. 이번 세션에 TASKS.md/HANDOFF.md 갱신 흔적이 없습니다." "tasks_handoff"
+  fi
+fi
+
+# req 없으면 완전 통과 — 일상 작업 마찰 방지 (세션78: commit/push 검증 이후로 이동)
+if ! has_any_req; then
+  hook_timing_end "evidence_gate" "$_EVG_START" "skip_noreq"
+  exit 0
+fi
+
 # 1) 날짜 검증 선행
 if fresh_req "date_check" && is_bash_risky_date; then
   if ! fresh_ok "date_check"; then
@@ -126,8 +140,23 @@ if fresh_req "auth_diag" && is_bash_risky_auth; then
 fi
 
 # 3) 식별자/기준 문서 선행
+# 세션78 P2 재정의: 스킬별 마커 skill_read__*.ok도 면제 대상에 포함
+#   기존: fresh_ok "skill_read" || fresh_ok "identifier_ref"만 검사 → evidence_mark_read.sh가 생성하는 skill_read__${SKILL_ID}.ok 무시되는 모순
+#   변경: 스킬별 마커가 세션에 하나라도 존재하면 통과 (재진입 사용자 흐름 존중)
 if (fresh_req "skill_read" || fresh_req "identifier_ref") && is_identifier_domain_edit; then
-  if ! fresh_ok "skill_read" && ! fresh_ok "identifier_ref"; then
+  _has_skill_marker=false
+  if fresh_ok "skill_read" || fresh_ok "identifier_ref"; then
+    _has_skill_marker=true
+  else
+    for _m in "$PROOF_DIR"/skill_read__*.ok; do
+      [ -e "$_m" ] || continue
+      if [ "$_m" -nt "$START_FILE" ]; then
+        _has_skill_marker=true
+        break
+      fi
+    done
+  fi
+  if [ "$_has_skill_marker" = "false" ]; then
     deny "skill_read.req / identifier_ref.req 존재. SKILL.md 또는 기준정보 대조 없이 관련 도메인 수정 금지." "skill_read"
   fi
 fi
@@ -152,12 +181,9 @@ if fresh_req "map_scope"; then
   fi
 fi
 
-# 5) 종료 문서 갱신 선행 — commit/push 전만 체크
-if fresh_req "tasks_handoff" && is_commit_or_push; then
-  if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
-    deny "tasks_handoff.req 존재. TASKS/HANDOFF 갱신 없이 commit/push 금지." "tasks_handoff"
-  fi
-fi
+# 5) 종료 문서 갱신 선행 — 세션78 P2 재정의로 상단 commit/push 우선 검증 블록으로 이동
+#   기존 조건 (fresh_req "tasks_handoff" && is_commit_or_push)은 req 조기 발행에 의존 → resolved 0% 초래
+#   새 구조: deny() 정의 직후 블록에서 req 유무 무관 commit/push 단독 검증
 
 hook_timing_end "evidence_gate" "$_EVG_START" "pass"
 exit 0

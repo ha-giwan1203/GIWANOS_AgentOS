@@ -10,7 +10,48 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션77 (Step 1-c map_scope Policy 재정의 구현 + 단위 검증 9/9)
+최종 업데이트: 2026-04-20 — 세션78 (P2 skill_read/tasks_handoff Policy 재정의 + smoke_test 171/171 PASS)
+
+---
+
+## 세션78 최종 반영 (2026-04-20, P2 skill_read / tasks_handoff Policy 재정의)
+
+**[완료] 세션78 P2 — skill_read / tasks_handoff Policy 재정의 (evidence_gate 27.2% 추가 대응)**
+- **목적**: evidence_gate 486건 중 skill_read 67건(13.8%) + tasks_handoff 65건(13.4%) = 132건(27.2%) 완전 미해결(resolved 0%) 정책 해소
+- **접근**: map_scope 세션77 재정의 패턴 확장 (트리거 축소 + 면제 조건 확장 + 검증 시점 이동) — Round 3 정식 토론 skip (Round 1/2에서 Policy-Workflow Mismatch 의제 승격 완료)
+- **수정 파일 3개**:
+
+1. **`.claude/hooks/risk_profile_prompt.sh`**
+   - L58 skill_read 트리거 키워드 9→7개로 축소 ("식별자", "기준정보" 제거 — 일상 대화 빈도 높음)
+   - L64-66 tasks_handoff 조기 트리거 블록 완전 삭제 (commit/push 시점만 검증하는 구조로 전환)
+
+2. **`.claude/hooks/evidence_gate.sh`**
+   - has_any_req early-exit을 deny() 정의 이후로 이동 (세션78: L18-22 → L119-123)
+   - deny() 직후 commit/push 우선 검증 블록 삽입 (req 유무 무관, has_any_req 우회 방지)
+   - L129-133 skill_read 면제 조건 확장: `skill_read__*.ok` glob 면제 추가 (evidence_mark_read.sh 스킬별 마커 활용)
+   - L155-160 기존 tasks_handoff 블록 삭제 (상단 우선 검증으로 흡수)
+
+3. **`.claude/hooks/smoke_test.sh`** (44-3/44-4 주석 수정 + 44-7/8/9 신규 3건)
+   - 44-3: tasks_handoff.req + commit → deny (기능 호환성 유지 확인)
+   - 44-4: skill_read__*.ok 선정리 추가 (면제 회피)
+   - 44-7 신규: skill_read.req + skill_read__*.ok 존재 → pass (세션78 재정의 검증)
+   - 44-8 신규: risk_profile_prompt.sh에 tasks_handoff 조기 트리거 부재 정적 확인
+   - 44-9 신규: req 전무 상태 commit → deny (has_any_req 우회 방지 확인)
+
+**[단위 검증 171/171 PASS]** — 전체 smoke_test 섹션 1~46 + 44-5/44-6 세션77 map_scope 회귀 없음
+
+**[예상 효과]**
+- skill_read 67건 → 일상 대화 "식별자/기준정보" 트리거 면제로 50% 이하 감소 추정
+- tasks_handoff 65건 조기 발행 → 0건 (commit/push 시점만), 검증 타이밍 시간차 0
+- resolved 전환율 향상: skill_read는 스킬별 마커로 도메인 편집 자연 흐름, tasks_handoff는 즉시 맥락으로 `/finish` 기동 유도
+
+**[1주 관찰 (2026-04-20 ~ 2026-04-27)]**
+- 지표: `.claude/incident_ledger.jsonl` gate_reject + skill_read/tasks_handoff fingerprint 발동 건수
+- 목표: skill_read 세션77 평균 대비 50% 이하, tasks_handoff resolved ≥ 80%
+- 롤백 조건: 정당한 commit 2회 이상 오차단 시 has_any_req early-exit 원복
+
+**[이월 — Step 2 incident_ledger 반복 5종 정리]**
+- 세션85+ 1주 관찰 완료 후 진행 (Gemini 순서 강제 규칙)
 
 ---
 
