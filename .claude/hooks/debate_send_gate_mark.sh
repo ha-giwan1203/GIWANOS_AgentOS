@@ -9,6 +9,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_DSG_MARK_START=$(hook_timing_start)
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 STATE_DIR="$PROJECT_DIR/.claude/state"
@@ -22,6 +24,9 @@ if echo "$RESULT_TEXT" | grep -q 'chatgpt.com' 2>/dev/null; then
   mkdir -p "$STATE_DIR" 2>/dev/null
   date -u '+%Y-%m-%dT%H:%M:%SZ' > "$STATE_DIR/debate_send_gate.ok" 2>/dev/null
   hook_log "PostToolUse/debate_send_gate_mark" "SEND GATE 마커 생성" 2>/dev/null
+  hook_timing_end "debate_send_gate_mark" "$_DSG_MARK_START" "marked"
+else
+  hook_timing_end "debate_send_gate_mark" "$_DSG_MARK_START" "skip"
 fi
 
 exit 0

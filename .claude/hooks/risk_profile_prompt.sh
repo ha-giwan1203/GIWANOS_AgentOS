@@ -8,6 +8,8 @@
 #   조건3(작업단계 전환): 매 프롬프트 재생성 구조로 흡수 — 단계 전환 시 새 프롬프트가 기존 req를 자동 교체
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_RPP_START=$(hook_timing_start)
 
 INPUT="$(cat)"
 
@@ -175,7 +177,9 @@ hook_log "UserPromptSubmit" "risk_profile_prompt reqs=${REQS:-none}"
 # 수동 브라우저 조작·gpt-send 우회 방지
 if [ -f "$REQ_DIR/debate_preflight.req" ]; then
   echo '{"systemMessage":"[토론 절차 안내] 토론/공동작업 관련 요청입니다. 반드시 debate-mode 스킬을 사용하세요.\n- Skill 도구로 debate-mode 호출\n- 수동 navigate/gpt-send 사용 금지\n- debate-mode가 지침 읽기 → 탭 준비 → 전송 절차를 자동 처리합니다."}'
+  hook_timing_end "risk_profile_prompt" "$_RPP_START" "debate_inject"
   exit 0
 fi
 
+hook_timing_end "risk_profile_prompt" "$_RPP_START" "ok"
 exit 0

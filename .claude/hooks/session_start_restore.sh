@@ -4,6 +4,8 @@
 # → 파일에 출력 후 경로 안내 방식으로 동작
 
 source "$(dirname "$0")/hook_common.sh"
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_SSR_START=$(hook_timing_start)
 
 INPUT=$(cat)
 SOURCE=$(printf '%s' "$INPUT" | safe_json_get "source" 2>/dev/null || echo "unknown")
@@ -182,4 +184,5 @@ if [ -f "$INCIDENT_LEDGER" ]; then
   fi
 fi
 
+hook_timing_end "session_start_restore" "$_SSR_START" "$KERNEL_STATE"
 exit 0

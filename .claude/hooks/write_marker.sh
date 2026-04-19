@@ -5,6 +5,8 @@
 #   source_class: code|doc|runtime 분류 → completion_gate 오탐 감소
 #   after_state_sync: 상태문서 갱신 후 true → 즉시 통과 가능
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_WM_START=$(hook_timing_start)
 INPUT=$(cat)
 
 # safe_json_get 사용 (sed 단독 파싱 대체)
@@ -32,21 +34,25 @@ if echo "$FILE_PATH" | grep -qiE '(TASKS\.md|HANDOFF\.md|STATUS\.md)'; then
     printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":true,"session_key":"%s"}\n' \
       "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER.tmp" 2>/dev/null && mv -f "$MARKER.tmp" "$MARKER" 2>/dev/null
   fi
+  hook_timing_end "write_marker" "$_WM_START" "state_sync"
   exit 0
 fi
 
 # 로그·플래그·CLAUDE.md 등 운영 파일은 마킹 불필요
 if echo "$FILE_PATH" | grep -qiE '(CLAUDE\.md|hook_log|\.flag|\.json$)' && echo "$FILE_PATH" | grep -qiE '(hook_log|write_marker|\.flag)'; then
+  hook_timing_end "write_marker" "$_WM_START" "skip_runtime"
   exit 0
 fi
 # CLAUDE.md는 마킹 불필요
 if echo "$FILE_PATH" | grep -qiE 'CLAUDE\.md$'; then
+  hook_timing_end "write_marker" "$_WM_START" "skip_claudemd"
   exit 0
 fi
 
 # 세션성 .claude/ 하위 경로는 마킹 불필요 (메모리, plans, settings, state 등)
 # 단, .claude/hooks/ .claude/rules/ .claude/commands/ 는 핵심 운영 변경이므로 제외하지 않음
 if echo "$FILE_PATH" | grep -qE '\.claude/(memory|plans|state|settings)'; then
+  hook_timing_end "write_marker" "$_WM_START" "skip_session"
   exit 0
 fi
 
@@ -63,3 +69,4 @@ local_ts=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null)
 FILE_PATH_SAFE="$(json_escape "$FILE_PATH")"
 printf '{"source_file":"%s","source_class":"%s","created_at":"%s","after_state_sync":false,"session_key":"%s"}\n' \
   "$FILE_PATH_SAFE" "$SOURCE_CLASS" "$local_ts" "$(session_key)" > "$MARKER.tmp" 2>/dev/null && mv -f "$MARKER.tmp" "$MARKER" 2>/dev/null
+hook_timing_end "write_marker" "$_WM_START" "marked_$SOURCE_CLASS"

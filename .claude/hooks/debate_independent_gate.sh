@@ -16,6 +16,8 @@
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_DIG_START=$(hook_timing_start)
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 STATE_DIR="$PROJECT_DIR/.claude/state"
@@ -23,9 +25,11 @@ STATE_DIR="$PROJECT_DIR/.claude/state"
 # insertText + prompt-textarea 조합만 대상
 TEXT_CONTENT=$(echo "$INPUT" | safe_json_get "input" 2>/dev/null)
 if ! echo "$TEXT_CONTENT" | grep -q 'insertText' 2>/dev/null; then
+  hook_timing_end "debate_independent_gate" "$_DIG_START" "skip_noninsert"
   exit 0
 fi
 if ! echo "$TEXT_CONTENT" | grep -q 'prompt-textarea' 2>/dev/null; then
+  hook_timing_end "debate_independent_gate" "$_DIG_START" "skip_nontextarea"
   exit 0
 fi
 
@@ -34,10 +38,12 @@ REVIEW_MARKER="$STATE_DIR/debate_independent_review.ok"
 if [ ! -f "$REVIEW_MARKER" ] 2>/dev/null; then
   hook_log "PreToolUse/debate_independent_gate" "BLOCK: 독립 의견 미수행 — GPT 응답에 대한 하네스 분석을 먼저 사용자에게 보고하세요" 2>/dev/null
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[DEBATE INDEPENDENT GATE] GPT 응답에 대한 독립 의견을 먼저 사용자에게 보고하세요.\\n\\n1. GPT 응답 주장 분해 (2~4개)\\n2. 라벨링 (실증됨/일반론/환경미스매치/과잉설계)\\n3. 채택/보류/버림 판정\\n4. 사용자 보고 후 전송 진행\\n\\n하네스 분석 없이 GPT에 바로 답장할 수 없습니다.\"}}"
+  hook_timing_end "debate_independent_gate" "$_DIG_START" "block_missing"
   exit 0
 fi
 
 # 마커 1회용 소비
 rm -f "$REVIEW_MARKER" 2>/dev/null
 hook_log "PreToolUse/debate_independent_gate" "PASS: 독립 의견 확인됨" 2>/dev/null
+hook_timing_end "debate_independent_gate" "$_DIG_START" "pass"
 exit 0

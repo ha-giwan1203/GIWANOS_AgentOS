@@ -4,6 +4,8 @@
 # v2: 활성 도메인 규칙 + progress.json 스냅샷 추가 (하네스 강화 Phase 1)
 
 source "$(dirname "$0")/hook_common.sh"
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_PCS_START=$(hook_timing_start)
 
 TIMESTAMP=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M KST' 2>/dev/null || date '+%Y-%m-%d %H:%M')
 STATE_DIR="$PROJECT_ROOT/.claude/state"
@@ -117,9 +119,11 @@ if [ -s "$KERNEL_TMP" ]; then
 else
   rm -f "$KERNEL_TMP"
   hook_log "precompact_save" "WARN: kernel tmp 비어있음 — 저장 스킵"
+  hook_timing_end "precompact_save" "$_PCS_START" "skip_empty"
   exit 0
 fi
 
 hook_log "precompact_save" "session_kernel 저장 완료: $TIMESTAMP domain=${ACTIVE_DOMAIN:-none}"
 echo "[precompact_save] session_kernel.md 저장 완료 ($TIMESTAMP)" >&2
+hook_timing_end "precompact_save" "$_PCS_START" "saved"
 exit 0

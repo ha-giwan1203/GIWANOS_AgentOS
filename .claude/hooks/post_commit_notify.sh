@@ -3,24 +3,29 @@
 # GPT+Claude 합의 2026-04-13 세션34
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_PCN_START=$(hook_timing_start)
 
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)
 
 # git push 성공 시에만 동작
 if ! echo "$COMMAND" | grep -q 'git push'; then
+  hook_timing_end "post_commit_notify" "$_PCN_START" "skip_nonpush"
   exit 0
 fi
 
 # exit_code 확인 — 0(성공)이 아니면 무시
 EXIT_CODE=$(echo "$INPUT" | safe_json_get "exit_code" 2>/dev/null)
 if [ "$EXIT_CODE" != "0" ] && [ -n "$EXIT_CODE" ]; then
+  hook_timing_end "post_commit_notify" "$_PCN_START" "skip_pushfail"
   exit 0
 fi
 
 # 최신 커밋 SHA + 메시지 수집
 SHA=$(git -C "$PROJECT_ROOT" log --oneline -1 2>/dev/null | head -1)
 if [ -z "$SHA" ]; then
+  hook_timing_end "post_commit_notify" "$_PCN_START" "skip_nosha"
   exit 0
 fi
 
@@ -39,4 +44,5 @@ if [ -n "$PY_CMD" ]; then
 fi
 
 hook_log "PostToolUse/Bash" "post_commit_notify: $MSG" 2>/dev/null
+hook_timing_end "post_commit_notify" "$_PCN_START" "notified"
 exit 0

@@ -2,6 +2,8 @@
 # handoff_archive.sh — HANDOFF.md 자동 아카이브 (PostToolUse Write|Edit)
 # GPT+Claude 토론 합의 세션7: HANDOFF 400줄 초과 시 최신 2세션 유지, 나머지 아카이브
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_HA_START=$(hook_timing_start)
 
 HANDOFF="$PATH_HANDOFF"
 ARCHIVE_DIR="$PROJECT_ROOT/98_아카이브"
@@ -12,17 +14,20 @@ COOLDOWN=300  # 5분
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | safe_json_get "file_path" 2>/dev/null || echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 if ! echo "$FILE_PATH" | grep -qi "HANDOFF"; then
+  hook_timing_end "handoff_archive" "$_HA_START" "skip_nonhandoff"
   exit 0
 fi
 
 # 파일 존재 확인
 if [ ! -f "$HANDOFF" ]; then
+  hook_timing_end "handoff_archive" "$_HA_START" "skip_nofile"
   exit 0
 fi
 
 # 줄 수 확인 — 400줄 이하면 아카이브 불필요
 LINE_COUNT=$(wc -l < "$HANDOFF" 2>/dev/null || echo 0)
 if [ "$LINE_COUNT" -le 400 ]; then
+  hook_timing_end "handoff_archive" "$_HA_START" "skip_under400"
   exit 0
 fi
 
@@ -32,6 +37,7 @@ if [ -f "$LOCK_FILE" ]; then
   NOW_EPOCH=$(date '+%s' 2>/dev/null || echo 999999999)
   ELAPSED=$(( NOW_EPOCH - LOCK_EPOCH ))
   if [ "$ELAPSED" -lt "$COOLDOWN" ]; then
+    hook_timing_end "handoff_archive" "$_HA_START" "skip_cooldown"
     exit 0
   fi
 fi
@@ -57,6 +63,7 @@ done < <(grep -n '^## ' "$HANDOFF" | cut -d: -f1)
 # 세션 헤더가 3개 미만이면 아카이브할 내용 없음
 if [ -z "$THIRD_HEADER_LINE" ]; then
   rm -f "$LOCK_FILE" 2>/dev/null
+  hook_timing_end "handoff_archive" "$_HA_START" "skip_noheaders"
   exit 0
 fi
 
@@ -100,4 +107,5 @@ printf '%s\n\n%s\n' "$KEPT_CONTENT" "$ARCHIVE_REF" > "$HANDOFF"
 NEW_LINE_COUNT=$(wc -l < "$HANDOFF" 2>/dev/null || echo 0)
 hook_log "handoff_archive" "done: ${LINE_COUNT}→${NEW_LINE_COUNT} lines, archive=$(basename "$ARCHIVE_FILE")" 2>/dev/null || true
 
+hook_timing_end "handoff_archive" "$_HA_START" "archived"
 exit 0

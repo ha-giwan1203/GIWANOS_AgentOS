@@ -10,6 +10,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_NG_START=$(hook_timing_start)
 
 INPUT=$(cat)
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
@@ -21,6 +23,7 @@ URL=$(echo "$INPUT" | safe_json_get "tool_input.url" 2>/dev/null)
 
 # chatgpt.com이 아니면 통과
 if ! echo "$URL" | grep -qi 'chatgpt\.com' 2>/dev/null; then
+  hook_timing_end "navigate_gate" "$_NG_START" "skip_nonchatgpt"
   exit 0
 fi
 
@@ -34,8 +37,10 @@ if [ ! -f "$CLAUDE_OK" ]; then
   hook_log "PreToolUse/navigate_gate" "DENY: 토론모드 CLAUDE.md 미읽기 — URL=$URL"
   hook_incident "gate_reject" "navigate_gate" "" "ChatGPT 진입 차단: 토론모드 CLAUDE.md 미읽기" '"classification_reason":"send_block"'
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[NAVIGATE GATE] 토론모드 CLAUDE.md를 먼저 읽으세요.\\n\\nChatGPT 진입 전 필수:\\n1. Read 90_공통기준/토론모드/CLAUDE.md\\n2. debate-mode 또는 gpt-send 스킬 사용\\n\\n지침 미읽기 상태에서는 ChatGPT navigate가 차단됩니다.\"}}"
+  hook_timing_end "navigate_gate" "$_NG_START" "block_missing"
   exit 0
 fi
 
 hook_log "PreToolUse/navigate_gate" "PASS: CLAUDE.md 읽기 확인 — URL=$URL"
+hook_timing_end "navigate_gate" "$_NG_START" "pass"
 exit 0

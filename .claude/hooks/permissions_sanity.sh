@@ -11,6 +11,8 @@
 
 set -u
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+# 훅 등급: advisory (Phase 2-A 신설, Phase 2-C timing 배선)
+_PS_START=$(hook_timing_start)
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 SETTINGS="$PROJECT_ROOT/.claude/settings.local.json"
@@ -23,12 +25,14 @@ if [ -f "$CACHE_FILE" ]; then
   now=$(date +%s 2>/dev/null || echo 0)
   elapsed=$((now - last_ts))
   if [ "$elapsed" -lt "$CACHE_TTL" ] 2>/dev/null; then
+    hook_timing_end "permissions_sanity" "$_PS_START" "skip_cache"
     exit 0
   fi
 fi
 
 # JSON 파싱 + 탐지 (Python 1회 실행)
 if [ ! -f "$SETTINGS" ]; then
+  hook_timing_end "permissions_sanity" "$_PS_START" "skip_nosettings"
   exit 0
 fi
 
@@ -82,10 +86,14 @@ PYEOF
 if [ -n "$WARNINGS" ]; then
   echo "$WARNINGS" >&2
   hook_log "PreToolUse/Bash" "permissions_sanity 경고: $(echo "$WARNINGS" | head -1)" 2>/dev/null || true
+  _ps_status="warn"
+else
+  _ps_status="clean"
 fi
 
 # 캐시 갱신
 mkdir -p "$(dirname "$CACHE_FILE")" 2>/dev/null || true
 date +%s > "$CACHE_FILE" 2>/dev/null || true
 
+hook_timing_end "permissions_sanity" "$_PS_START" "$_ps_status"
 exit 0

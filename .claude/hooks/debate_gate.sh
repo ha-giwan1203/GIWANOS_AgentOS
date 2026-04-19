@@ -14,6 +14,8 @@
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_DBG_START=$(hook_timing_start)
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 STATE_DIR="$PROJECT_DIR/.claude/state"
@@ -21,11 +23,13 @@ STATE_DIR="$PROJECT_DIR/.claude/state"
 # insertText가 포함된 호출인지 확인 — 아니면 통과
 TEXT_CONTENT=$(echo "$INPUT" | safe_json_get "input" 2>/dev/null)
 if ! echo "$TEXT_CONTENT" | grep -q 'insertText' 2>/dev/null; then
+  hook_timing_end "debate_gate" "$_DBG_START" "skip_noninsert"
   exit 0
 fi
 
 # ChatGPT 대상인지 확인 — tabId로는 판단 어려우므로 insertText + prompt-textarea 조합으로 판단
 if ! echo "$TEXT_CONTENT" | grep -q 'prompt-textarea' 2>/dev/null; then
+  hook_timing_end "debate_gate" "$_DBG_START" "skip_nontextarea"
   exit 0
 fi
 
@@ -57,8 +61,10 @@ fi
 if [ -n "$MISSING" ]; then
   hook_log "PreToolUse/debate_gate" "BLOCK: 토론모드 절차 미완료 —$MISSING" 2>/dev/null
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[DEBATE GATE] 토론모드 전송 절차 미완료:\\n$MISSING\\n\\n전송 전에 반드시:\\n1. 토론모드 CLAUDE.md 읽기\\n2. 채팅방 진입 + URL 갱신\\n3. get_page_text로 현재 대화 상태 확인 (SEND GATE)\\n을 완료하세요.\"}}"
+  hook_timing_end "debate_gate" "$_DBG_START" "block_missing"
   exit 0
 fi
 
 hook_log "PreToolUse/debate_gate" "PASS: 토론모드 전체 절차 확인됨" 2>/dev/null
+hook_timing_end "debate_gate" "$_DBG_START" "pass"
 exit 0

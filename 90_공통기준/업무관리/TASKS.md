@@ -30,10 +30,15 @@
 - `smoke_fast.sh` 9/9 ALL PASS
 - `doctor_lite.sh` OK
 
-**[진행중] Step 2 — Phase 2-C timing 배선 (25개 훅)**
-- advisory 5 · gate 9 · measurement 11 훅 `hook_timing_start`/`hook_timing_end` 배선
-- gate 9개 `exit 2` 승격은 이번 세션 보류 (1주 `hook_timing.jsonl` 수집 후 판단)
+**[완료] Step 2 — Phase 2-C timing 배선 (25개 훅)**
+- advisory 5 · gate 9 · measurement 11 훅 `hook_timing_start`/`hook_timing_end` 배선 완료
+- measurement 11: `write_marker`·`handoff_archive`·`evidence_mark_read`·`debate_send_gate_mark`·`gpt_followup_post`·`post_commit_notify`·`notify_slack`·`session_start_restore`·`precompact_save`·`risk_profile_prompt`·`completion_gate`
+- advisory 5: `state_rebind_check`·`permissions_sanity`·`auto_compile`·`skill_drift_check` + `debate_verify`(기존 유지)
+- gate 9: `harness_gate`·`evidence_gate`·`mcp_send_gate`·`instruction_read_gate`·`skill_instruction_gate`·`debate_gate`·`debate_independent_gate`·`navigate_gate`·`gpt_followup_stop`
+- 각 종료 경로 status 태그 세분화 (pass/skip_*/block_*/warn/compile_ok 등)
+- gate 9개 `exit 2` 승격은 이번 세션 보류 (1주 `hook_timing.jsonl` 수집 후 판단 — 기준선은 커밋 C 문서에)
 - `debate_verify.sh`는 incident 18건 잔존 → Phase 2 승격 보류 유지
+- 검증: smoke_fast 9/9, doctor_lite OK, final_check 167/167 PASS (0 FAIL)
 
 **[진행중] Step 3 — 쟁점 G 사전작업 문서 (세션74 실물 분리 대비)**
 - `90_공통기준/토론모드/session73_review19_decisions.md` 신규: REVIEW 19건 TEAM/PERSONAL 분류 결정 + gate 9 승격 기준선

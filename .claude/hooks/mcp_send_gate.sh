@@ -11,6 +11,8 @@
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_MSG_START=$(hook_timing_start)
 
 # 토론모드 활성 확인 — debate_preflight.req 존재 시에만 동작
 SESSION_KEY="$(session_key 2>/dev/null || echo '')"
@@ -19,6 +21,7 @@ REQ_FILE="$SESSION_DIR/requires/debate_preflight.req"
 
 if [ ! -f "$REQ_FILE" ] 2>/dev/null; then
   # 토론 도메인이 아니면 무조건 통과
+  hook_timing_end "mcp_send_gate" "$_MSG_START" "skip_nondebate"
   exit 0
 fi
 
@@ -38,8 +41,10 @@ fi
 if [ -n "$MISSING" ]; then
   hook_log "PreToolUse/mcp_send_gate" "BLOCK: 토론모드 지침 미읽기 —$MISSING" 2>/dev/null
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[MCP SEND GATE] 토론모드 지침 미읽기:${MISSING}. 먼저 토론모드 ENTRY.md와 CLAUDE.md를 읽은 후 다시 시도하세요.\"}}"
+  hook_timing_end "mcp_send_gate" "$_MSG_START" "block_missing"
   exit 0
 fi
 
 hook_log "PreToolUse/mcp_send_gate" "PASS: 토론모드 지침 읽기 확인됨" 2>/dev/null
+hook_timing_end "mcp_send_gate" "$_MSG_START" "pass"
 exit 0

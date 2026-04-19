@@ -3,6 +3,8 @@
 # gpt_followup_guard.sh에서 분리 (v2, 2026-04-06 GPT 합의)
 # v3: python3→bash 전환 (#34457 Windows hooks 멈춤 대응)
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_GFP_START=$(hook_timing_start)
 
 INPUT=$(cat)
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
@@ -16,6 +18,7 @@ fi
 
 if [ -z "$TOOL_NAME" ]; then
   hook_log "PostToolUse/gpt_followup_post" "WARN: tool_name 파싱 실패 — skip" 2>/dev/null
+  hook_timing_end "gpt_followup_post" "$_GFP_START" "skip_noparse"
   exit 0
 fi
 
@@ -31,10 +34,12 @@ if echo "$TNAME_LOWER" | grep -q "javascript"; then
     # GPT 피드백: send-button 문자열 단독 매칭은 읽기용 JS에서 오탐 (2026-04-07)
     if echo "$TOOL_INPUT" | grep -qiE '(send-button.*\.click|execCommand.*insertText)'; then
       rm -f "$PENDING" 2>/dev/null
+      hook_timing_end "gpt_followup_post" "$_GFP_START" "clear_send"
       exit 0
     fi
     printf '{"event":"gpt_response_read","session_key":"%s","created_at":"%s"}\n' \
       "$(session_key 2>/dev/null || echo unknown)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PENDING"
+    hook_timing_end "gpt_followup_post" "$_GFP_START" "set_pending_js"
     exit 0
   fi
 fi
@@ -42,6 +47,7 @@ fi
 if echo "$TNAME_LOWER" | grep -qiE '(get_page_text|read_page)'; then
   printf '{"event":"gpt_response_read","session_key":"%s","created_at":"%s"}\n' \
     "$(session_key 2>/dev/null || echo unknown)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PENDING"
+  hook_timing_end "gpt_followup_post" "$_GFP_START" "set_pending_read"
   exit 0
 fi
 
@@ -49,6 +55,7 @@ fi
 if echo "$TNAME_LOWER" | grep -q "javascript"; then
   if echo "$TOOL_INPUT" | grep -qiE '(send-button.*\.click|execCommand.*insertText|prompt-textarea.*execCommand)'; then
     rm -f "$PENDING" 2>/dev/null
+    hook_timing_end "gpt_followup_post" "$_GFP_START" "clear_js_send"
     exit 0
   fi
 fi
@@ -65,3 +72,5 @@ case "$TOOL_NAME" in
     fi
     ;;
 esac
+
+hook_timing_end "gpt_followup_post" "$_GFP_START" "done"

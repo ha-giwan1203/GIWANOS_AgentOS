@@ -5,6 +5,8 @@
 # 미읽기 시 deny (표준 포맷: stdout + exit 0)
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_IRG_START=$(hook_timing_start)
 
 INPUT="$(cat)"
 COMMAND="$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)"
@@ -16,6 +18,7 @@ is_gpt_send() {
 }
 
 if ! is_gpt_send; then
+  hook_timing_end "instruction_read_gate" "$_IRG_START" "skip_nongpt"
   exit 0
 fi
 
@@ -72,8 +75,10 @@ if [ -n "$MISSING" ]; then
   hook_log "instruction_read_gate" "DENY missing=$(echo "$MISSING" | tr '\n' ',')"
   hook_incident "instruction_read_gate" "instruction_not_read" "GPT 전송 전 필수 지시문 미읽기: $MISSING"
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
+  hook_timing_end "instruction_read_gate" "$_IRG_START" "block_missing"
   exit 0
 fi
 
 hook_log "instruction_read_gate" "PASS domain=${ACTIVE_DOMAIN:-legacy} docs confirmed"
+hook_timing_end "instruction_read_gate" "$_IRG_START" "pass"
 exit 0

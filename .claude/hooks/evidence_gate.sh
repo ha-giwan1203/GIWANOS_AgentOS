@@ -3,6 +3,8 @@
 # req 파일이 있을 때만 활성. 증거 없는 위험 실행 차단.
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_EVG_START=$(hook_timing_start)
 
 INPUT="$(cat)"
 
@@ -15,6 +17,7 @@ has_any_req() {
 
 # req 없으면 완전 통과 — 일상 작업 마찰 방지
 if ! has_any_req; then
+  hook_timing_end "evidence_gate" "$_EVG_START" "skip_noreq"
   exit 0
 fi
 
@@ -101,6 +104,7 @@ deny() {
   local _safe_msg
   _safe_msg=$(json_escape "[evidence_gate] ${reason}${resolve_hint}")
   echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$_safe_msg\"}}"
+  hook_timing_end "evidence_gate" "$_EVG_START" "block_${req_name:-unknown}"
   exit 0
 }
 
@@ -146,4 +150,5 @@ if fresh_req "tasks_handoff" && is_commit_or_push; then
   fi
 fi
 
+hook_timing_end "evidence_gate" "$_EVG_START" "pass"
 exit 0

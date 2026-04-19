@@ -26,7 +26,12 @@
 - Stop 이벤트 훅(`stop_guard`, `gpt_followup_stop`, `completion_gate`, `evidence_stop_guard`)은 legacy 형식 유지
 - 20/20 JSON 파싱 유효 + smoke_fast 9/9 PASS + doctor_lite OK + final_check `FAIL 0` 달성
 
-### Step 2 진행 중 — Phase 2-C timing 배선 (25개 훅)
+### Step 2 완료 — Phase 2-C timing 배선 (25개 훅)
+- measurement 11 + advisory 5 + gate 9 훅 `hook_timing_start`/`hook_timing_end` 배선
+- status 태그 세분화 (pass/skip_*/block_*/warn/compile_ok 등)
+- gate exit 2 승격은 1주 수집 후 판단 — 커밋 C 문서에 기준선 기록
+- 검증: smoke_fast 9/9, doctor_lite OK, final_check 167/167 PASS
+
 ### Step 3 진행 중 — 쟁점 G 사전작업 문서
 
 ### 다음 세션 첫 액션

@@ -3,6 +3,8 @@
 # v7 대비: is_completion_claim 패턴 축소(과감지 86.5% 해소), 약한 패턴 로그만
 # GPT+Claude 토론 합의 2026-04-11 세션12
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선 — 소프트 블록 포함이지만 하드페일 없음)
+_CMG_START=$(hook_timing_start)
 hook_log "Stop" "completion_gate v8" 2>/dev/null || true
 
 MARKER="$STATE_AGENT_CONTROL/write_marker.json"
@@ -27,6 +29,7 @@ if ! is_completion_claim "$LAST_TEXT"; then
   if [ -n "$WEAK_MATCH" ]; then
     hook_log "Stop" "completion_gate: weak_only pattern='$WEAK_MATCH' — skip" 2>/dev/null
   fi
+  hook_timing_end "completion_gate" "$_CMG_START" "skip_noclaim"
   exit 0
 fi
 
@@ -38,11 +41,13 @@ if git_has_relevant_changes; then
   printf '{"ts":"%s","result":"block","reason":"completion_before_git","source":"gate"}\n' "$_CC_TS" \
     >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
   echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE] Git 실물 변경이 아직 남아 있습니다: ${CHANGES}. 커밋/정리 후 완료로 보고하세요.\"}"
+  hook_timing_end "completion_gate" "$_CMG_START" "block_git"
   exit 0
 fi
 
 # write_marker 없으면 TASKS/HANDOFF 갱신 gate는 통과
 if [ ! -f "$MARKER" ]; then
+  hook_timing_end "completion_gate" "$_CMG_START" "skip_nomarker"
   exit 0
 fi
 
@@ -53,6 +58,7 @@ if [ "$AFTER_SYNC" = "true" ]; then
   MARKER_CLASS=$(echo "$MARKER_CONTENT" | safe_json_get "source_class" 2>/dev/null || echo "unknown")
   hook_log "Stop" "completion_gate PASS: after_state_sync=true (class=$MARKER_CLASS)" 2>/dev/null
   rm -f "$MARKER" 2>/dev/null
+  hook_timing_end "completion_gate" "$_CMG_START" "pass_synced"
   exit 0
 fi
 
@@ -79,6 +85,7 @@ if [ -n "$MISSING" ]; then
   printf '{"ts":"%s","result":"block","reason":"completion_before_state_sync","missing":"%s","source":"gate"}\n' "$_CC_TS" "$MISSING" \
     >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
   echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE] 완료 보고 전 ${MISSING} 갱신이 필요합니다. TASKS/HANDOFF/STATUS를 모두 갱신한 뒤 종료하세요.\"}"
+  hook_timing_end "completion_gate" "$_CMG_START" "block_sync"
   exit 0
 fi
 
@@ -101,6 +108,7 @@ if [ -f "$PSCOUNT_CACHE" ]; then
 fi
 # 동일 세션에서 이미 경고 후 재시도한 경우는 통과 (60초 이내 재호출 = 사용자 의도적 재시도)
 if [ $((_P2B_NOW - _P2B_LAST)) -lt 60 ] 2>/dev/null; then
+  hook_timing_end "completion_gate" "$_CMG_START" "pass_cooldown"
   exit 0
 fi
 
@@ -153,8 +161,10 @@ PYEOF
       >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
     echo "$_P2B_NOW" > "$PSCOUNT_CACHE" 2>/dev/null || true
     echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE · Phase 2-B 소프트 블록] 최근 7일간 permissions 1회용 패턴이 반복 등록되고 있습니다: ${REPEATED}. CLAUDE.md 5단계 의사결정 트리를 재검토하거나 포괄 Bash(echo:*) 패턴을 활용하세요. 의도적인 진행이라면 재보고 시 통과됩니다(60초 쿨다운).\"}"
+    hook_timing_end "completion_gate" "$_CMG_START" "soft_block"
     exit 0
   fi
 fi
 
+hook_timing_end "completion_gate" "$_CMG_START" "pass"
 exit 0

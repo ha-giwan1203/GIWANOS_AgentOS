@@ -8,12 +8,15 @@
 # 인라인 스크립트만 게이트 — 진단/수동 작업 시 지침 무시 방지
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_SIG_START=$(hook_timing_start)
 
 INPUT="$(cat)"
 COMMAND="$(echo "$INPUT" | safe_json_get "command" 2>/dev/null)"
 
 # 정식 스킬 run.py 실행은 통과 (내부에 작업순서 내장)
 if echo "$COMMAND" | grep -qE '스킬/[^/]+/run\.py'; then
+  hook_timing_end "skill_instruction_gate" "$_SIG_START" "skip_runpy"
   exit 0
 fi
 
@@ -24,6 +27,7 @@ is_inline_python() {
 }
 
 if ! is_inline_python; then
+  hook_timing_end "skill_instruction_gate" "$_SIG_START" "skip_nonpy"
   exit 0
 fi
 
@@ -38,6 +42,7 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
     hook_incident "gate_reject" "skill_instruction_gate" "" "MES access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
     echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
+    hook_timing_end "skill_instruction_gate" "$_SIG_START" "block_mes_skill"
     exit 0
   fi
 
@@ -49,6 +54,7 @@ if echo "$COMMAND" | grep -qF 'mes-dev.samsong.com'; then
       hook_incident "gate_reject" "skill_instruction_gate" "" "MES upload without pre-check (selectPrdtRsltByLine.do missing)" \
         "\"classification_reason\":\"evidence_missing\""
       echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
+      hook_timing_end "skill_instruction_gate" "$_SIG_START" "block_mes_upload"
       exit 0
     fi
   fi
@@ -62,9 +68,11 @@ if echo "$COMMAND" | grep -qF 'ax.samsong.com'; then
     hook_incident "gate_reject" "skill_instruction_gate" "" "ZDM access without SKILL.md read" \
       "\"classification_reason\":\"evidence_missing\""
     echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$MSG\"}}"
+    hook_timing_end "skill_instruction_gate" "$_SIG_START" "block_zdm_skill"
     exit 0
   fi
 fi
 
 hook_log "skill_instruction_gate" "PASS"
+hook_timing_end "skill_instruction_gate" "$_SIG_START" "pass"
 exit 0

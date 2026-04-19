@@ -7,12 +7,15 @@
 
 set -u
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+# 훅 등급: advisory (Phase A 신설, Phase 2-C 2026-04-19 세션73 timing 배선)
+_SDC_START=$(hook_timing_start)
 
 INPUT=$(cat 2>/dev/null || echo '')
 COMMAND=$(echo "$INPUT" | safe_json_get "command" 2>/dev/null || echo '')
 
 # git commit 명령이 아니면 스킵 (advisory — 성능 보호)
 if [ -z "$COMMAND" ] || ! echo "$COMMAND" | grep -qE '\bgit commit\b'; then
+  hook_timing_end "skill_drift_check" "$_SDC_START" "skip_noncommit"
   exit 0
 fi
 
@@ -20,6 +23,7 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
 COMMANDS_DIR="$PROJECT_ROOT/.claude/commands"
 
 if [ ! -d "$COMMANDS_DIR" ]; then
+  hook_timing_end "skill_drift_check" "$_SDC_START" "skip_nodir"
   exit 0
 fi
 
@@ -74,6 +78,9 @@ PYEOF
 if [ -n "$WARNINGS" ]; then
   echo "$WARNINGS" >&2
   hook_log "PreToolUse/Bash" "skill_drift_check 경고 (git commit 시점)" 2>/dev/null || true
+  hook_timing_end "skill_drift_check" "$_SDC_START" "warn"
+else
+  hook_timing_end "skill_drift_check" "$_SDC_START" "clean"
 fi
 
 exit 0

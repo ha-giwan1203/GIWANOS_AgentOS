@@ -3,6 +3,8 @@
 # 읽기/검증/문서갱신 증거 마커 적립
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+# 훅 등급: measurement (Phase 2-C 2026-04-19 세션73 timing 배선)
+_EMR_START=$(hook_timing_start)
 
 INPUT="$(cat)"
 
@@ -102,4 +104,5 @@ echo "$TEXT" | grep -qE 'identifier_ref_check(\.sh)?|기준정보 대조|identif
 echo "$TEXT" | grep -qE 'TASKS\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "tasks_updated"
 echo "$TEXT" | grep -qE 'HANDOFF\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "handoff_updated"
 
+hook_timing_end "evidence_mark_read" "$_EMR_START" "ok"
 exit 0

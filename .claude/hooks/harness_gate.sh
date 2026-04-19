@@ -16,6 +16,8 @@
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/hook_common.sh" 2>/dev/null || true
+# 훅 등급: gate (Phase 2-C 2026-04-19 세션73 timing 배선, exit 2 승격은 1주 수집 후)
+_HG_START=$(hook_timing_start)
 
 # --- debate_preflight.req 존재 확인 ---
 SESSION_KEY="$(session_key)"
@@ -25,6 +27,7 @@ REQ_FILE="$REQ_DIR/debate_preflight.req"
 
 if [ ! -f "$REQ_FILE" ]; then
   # 토론 도메인이 아니면 무조건 통과
+  hook_timing_end "harness_gate" "$_HG_START" "skip_nondebate"
   exit 0
 fi
 
@@ -39,6 +42,7 @@ fi
 
 # Bash 도구만 검사 (commit/push/share 경로)
 if [[ "$TOOL_NAME" != *"Bash"* ]]; then
+  hook_timing_end "harness_gate" "$_HG_START" "skip_nonbash"
   exit 0
 fi
 
@@ -58,6 +62,7 @@ if echo "$TOOL_INPUT" | grep -qiE '(git commit|git push|share.result|finish)'; t
 fi
 
 if [[ "$IS_ACTION" != "YES" ]]; then
+  hook_timing_end "harness_gate" "$_HG_START" "skip_nonaction"
   exit 0
 fi
 
@@ -72,6 +77,7 @@ fi
 if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
   hook_log "PreToolUse/harness_gate" "BLOCK: transcript_path 미확인 + debate_preflight 활성 → fail-closed" 2>/dev/null
   echo '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"[하네스 게이트] 토론 모드 활성 상태에서 트랜스크립트를 읽을 수 없습니다. 하네스 분석(채택/보류/버림 + 독립 견해 + 실물 근거)을 수행한 후 다시 시도하세요."}}'
+  hook_timing_end "harness_gate" "$_HG_START" "block_notranscript"
   exit 0
 fi
 
@@ -102,6 +108,7 @@ fi
 
 if [[ "$HAS_ADOPT" == "YES" && "$HAS_HOLD_OR_DISCARD" == "YES" && "$HAS_INDEPENDENT" == "YES" && "$HAS_EVIDENCE" == "YES" ]]; then
   hook_log "PreToolUse/harness_gate" "PASS: 하네스 분석 복합 조건 충족 (adopt=$HAS_ADOPT hold/discard=$HAS_HOLD_OR_DISCARD independent=$HAS_INDEPENDENT evidence=$HAS_EVIDENCE)" 2>/dev/null
+  hook_timing_end "harness_gate" "$_HG_START" "pass"
   exit 0
 fi
 
@@ -116,4 +123,5 @@ hook_log "PreToolUse/harness_gate" "BLOCK: 하네스 미수행 → 누락:${MISS
 hook_incident "hook_block" "harness_gate" "" "하네스 분석 미수행. 누락:${MISSING}" '"classification_reason":"harness_missing"' 2>/dev/null || true
 
 echo "{\"hookSpecificOutput\":{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"[하네스 게이트] GPT 응답에 대한 하네스 분석이 부족합니다. 누락 항목:${MISSING}. 채택:/보류:/버림: + 독립 견해 + 실물 근거를 포함한 하네스 분석을 수행한 후 다시 시도하세요.\"}}"
+hook_timing_end "harness_gate" "$_HG_START" "block_incomplete"
 exit 0
