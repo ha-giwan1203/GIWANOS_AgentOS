@@ -4,12 +4,48 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션76 (Round 2 smoke_test 최적화 + Step 1-a + commit_gate)
+최종 업데이트: 2026-04-19 KST — 세션77 (Step 1 Test Pruning Phase 1 — 격리 후보 7개 선별)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션76 — Round 2 + Step 2 즉시 효과 92% 단축)
+## 0. 최신 세션 (2026-04-19 세션77 — Step 1 Phase 1 완료)
+
+### 이번 세션 완료
+
+**Step 1 Test Pruning Phase 1 착수**
+- smoke_test 47섹션/167 check 전수 인벤토리 구축
+- 격리 후보 7섹션 선별 (12% 감축 잠재)
+  - 24b, 33, 34, 36, 37, 38, 39 (전부 capability + 외부 훅 비의존)
+- 산출: `.claude/docs/smoke_test_sections_inventory.json`, `smoke_test_pruning_candidates.md/.json`
+- **코드 변경 없음** (Phase 1은 문서화까지) — GPT "격리 후 1주 관찰" 원칙 준수
+
+**Silent Failure 경고 (Gemini 체질 개선 지적)**
+- 격리 후보 7섹션 중 파이썬 도구 5섹션 (incident_review/classify_feedback/incident_repair 관련)
+- Phase 3 실제 삭제 이전 `nightly_capability_check.sh` 일일 배치 구현 필수
+
+### 다음 세션 첫 액션 (세션78)
+
+**선택 옵션** (사용자 방향 결정 필요):
+1. **Silent Failure 자동화 구현** — Gemini 최우선 안전망. Windows schtasks + nightly_capability_check.sh 신설
+2. **Round 1 Step 1-b 진입** — evidence_gate 전수 474건을 map_scope/tasks_handoff/skill_read/identifier_ref/auth_diag 5정책별 분해
+3. **smoke_test Step 3 섹션별 해시 캐시** — 세션77에 아직 구현 안 함
+4. **Pruning Phase 2 관찰 시작** — hook_log·incident_ledger 모니터링 스크립트 준비
+
+Claude 권장: **1 → 4 → 2** 순
+- Silent Failure 구현 먼저 (Phase 3 삭제 전제)
+- Pruning Phase 2 병렬 관찰 (자동 로그 분석)
+- Round 1 Step 1-b는 evidence_gate 더 큰 작업이라 준비 충분 후
+
+### 상태 정보
+
+- smoke_test 격리 후보 7섹션 선별 완료 (실제 코드는 그대로)
+- `SMOKE_LEVEL=fast` 기본값 유지 (commit 0.57s)
+- 양측 토론방 대기 상태 (다음 Round 재개 시점에 사용)
+
+---
+
+## 0-prev. 세션76 (2026-04-19 — Round 2 smoke_test 92% 단축)
 
 ### 이번 세션 완료 (종합)
 

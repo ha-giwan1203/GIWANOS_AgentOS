@@ -10,7 +10,49 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션76 (Round 2 smoke_test 최적화 + Step 1-a + commit_gate 근본 해결)
+최종 업데이트: 2026-04-19 — 세션77 (Step 1 Test Pruning Phase 1 — 섹션 인벤토리 + 격리 후보 7개 선별)
+
+---
+
+## 세션77 반영 (2026-04-19, Step 1 Test Pruning Phase 1 — 격리 후보 선별)
+
+**[완료] smoke_test 섹션 인벤토리 구축**
+- `.claude/docs/smoke_test_sections_inventory.json` 신설
+- 총 47 섹션 / 167 check 호출
+- REGRESSION 27섹션 (1-21, 25-30) / CAPABILITY 19섹션 (22-24, 31-46)
+- 각 섹션의 의존 hook / check_count / 시작-종료 라인 기록
+
+**[완료] Step 1 Phase 1 — Pruning 후보 7섹션 선별**
+- `.claude/docs/smoke_test_pruning_candidates.md` + `.json` 신설
+- 선별 기준 (3자 합의 반영):
+  - 공용 의존성(hook_common/evidence_gate/commit_gate/completion_gate) 있으면 보호
+  - check_count ≥ 4는 보호
+  - capability + 외부 훅 비의존 or 단일 hook + check ≤ 3 → 격리 후보
+- **격리 후보 7섹션 / 20 check (12.0% 감축 잠재)**:
+  - 24b(json_escape payload), 33(incident_review.py), 34(classify_feedback.py), 36(hook_config.json), 37(incident_repair.py 매핑), 38(task_runner.sh), 39(incident_repair.py backfill)
+- protect 13섹션: 공용 의존 or high_checks
+- **원칙**: 격리 ≠ 삭제. Phase 1에선 코드 변경 없이 문서화만
+
+**[Phase 2 이월 — 세션77~세션84 관찰]**
+- 관찰 지표:
+  - `SMOKE_LEVEL=full` 실행 횟수
+  - 격리 후보 7섹션 FAIL 발생 여부
+  - incident_ledger 관련 hook 실패 기록
+- 수집 위치: hook_log.jsonl + incident_ledger.jsonl
+
+**[Phase 3 이월 — 세션85 또는 1주 후]**
+- 조건 A 충족 시 smoke_test.sh에서 해당 블록 실제 삭제 + 아카이브
+- 조건 B(FAIL 발생)는 보호 환원
+- 조건 C(데이터 부족)는 관찰 연장
+
+**[Silent Failure 대응 필수 선행 — Gemini 경고 반영]**
+- 격리 후보 7섹션 중 파이썬 도구 관련 5섹션 (`incident_review.py`, `classify_feedback.py`, `incident_repair.py` 등)
+- 이들이 `SMOKE_LEVEL=full`에서만 돌고 평소 조용히 고장날 위험
+- **Phase 3 이전 `nightly_capability_check.sh` 반드시 구현** (Windows schtasks 일일 배치)
+
+**[이월 지속]**
+- Round 1: evidence_gate 전수 474건 하위 정책 분해 (Step 1-b) + Policy 재정의 (Step 1-c) + incident 반복 5종 정리 (Step 2)
+- Round 2: Step 3 섹션별/의존파일별 해시 캐시 + Step 4 grep/sed 중복 통합 + Step 2 Silent Failure 자동화
 
 ---
 

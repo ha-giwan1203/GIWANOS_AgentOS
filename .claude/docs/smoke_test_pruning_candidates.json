@@ -1,0 +1,194 @@
+[
+  {
+    "num": "22",
+    "title": "토론모드 selector 문서 정합성",
+    "check_count": 5,
+    "hooks": [],
+    "status": "protect",
+    "reason": "high_checks(5)"
+  },
+  {
+    "num": "23",
+    "title": "토론모드 Chrome MCP 단일화 확인",
+    "check_count": 7,
+    "hooks": [
+      "mcp_send_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "high_checks(7)"
+  },
+  {
+    "num": "24",
+    "title": "safe_json_get escape 회귀 (placeholder 방식)",
+    "check_count": 2,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['hook_common.sh'])"
+  },
+  {
+    "num": "24b",
+    "title": "json_escape payload 검증",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "31",
+    "title": "circuit_breaker_tripped",
+    "check_count": 3,
+    "hooks": [
+      "commit_gate.sh",
+      "hook_common.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['commit_gate.sh', 'hook_common.sh'])"
+  },
+  {
+    "num": "32",
+    "title": "instruction_read_gate",
+    "check_count": 10,
+    "hooks": [
+      "evidence_mark_read.sh",
+      "instruction_read_gate.sh",
+      "session_start_restore.sh"
+    ],
+    "status": "protect",
+    "reason": "high_checks(10)"
+  },
+  {
+    "num": "33",
+    "title": "incident_review.py",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "34",
+    "title": "classify_feedback.py",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "35",
+    "title": "hook_common.sh task_result",
+    "check_count": 3,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['hook_common.sh'])"
+  },
+  {
+    "num": "36",
+    "title": "hook_config.json task_escalation",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "37",
+    "title": "incident_repair.py 세션40 매핑",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "38",
+    "title": "task_runner.sh",
+    "check_count": 3,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "39",
+    "title": "incident_repair.py backfill",
+    "check_count": 2,
+    "hooks": [],
+    "status": "quarantine_1",
+    "reason": "no_external_hook_dep + low_checks"
+  },
+  {
+    "num": "40",
+    "title": "commit_gate.sh 실행 테스트",
+    "check_count": 4,
+    "hooks": [
+      "commit_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['commit_gate.sh'])"
+  },
+  {
+    "num": "41",
+    "title": "completion_gate.sh 실행 테스트",
+    "check_count": 2,
+    "hooks": [
+      "completion_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['completion_gate.sh'])"
+  },
+  {
+    "num": "42",
+    "title": "evidence_gate.sh 실행 테스트",
+    "check_count": 2,
+    "hooks": [
+      "evidence_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['evidence_gate.sh'])"
+  },
+  {
+    "num": "43",
+    "title": "completion_gate deny-path",
+    "check_count": 2,
+    "hooks": [
+      "completion_gate.sh",
+      "hook_common.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['completion_gate.sh', 'hook_common.sh'])"
+  },
+  {
+    "num": "44",
+    "title": "evidence_gate deny-path",
+    "check_count": 6,
+    "hooks": [
+      "completion_gate.sh",
+      "evidence_gate.sh",
+      "hook_common.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['completion_gate.sh', 'evidence_gate.sh', 'hook_common.sh'])"
+  },
+  {
+    "num": "45",
+    "title": "navigate_gate.sh 런타임 테스트",
+    "check_count": 6,
+    "hooks": [
+      "navigate_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "high_checks(6)"
+  },
+  {
+    "num": "46",
+    "title": "세션51 합의 런타임 테스트",
+    "check_count": 5,
+    "hooks": [
+      "completion_gate.sh",
+      "hook_common.sh",
+      "skill_instruction_gate.sh"
+    ],
+    "status": "protect",
+    "reason": "common_dep(['completion_gate.sh', 'hook_common.sh'])"
+  }
+]

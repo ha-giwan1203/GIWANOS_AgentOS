@@ -1,0 +1,513 @@
+[
+  {
+    "num": "1",
+    "title": "hook_common.sh (공통 로깅)",
+    "start_line": 76,
+    "end_line": 94,
+    "block_size": 19,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "check_count": 5
+  },
+  {
+    "num": "2",
+    "title": "block_dangerous.sh",
+    "start_line": 95,
+    "end_line": 107,
+    "block_size": 13,
+    "hooks": [
+      "block_dangerous.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "3",
+    "title": "protect_files.sh",
+    "start_line": 108,
+    "end_line": 117,
+    "block_size": 10,
+    "hooks": [
+      "protect_files.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "4",
+    "title": "send_gate.sh 폐기 확인",
+    "start_line": 118,
+    "end_line": 130,
+    "block_size": 13,
+    "hooks": [
+      "send_gate.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "5",
+    "title": "auto_compile.sh",
+    "start_line": 131,
+    "end_line": 143,
+    "block_size": 13,
+    "hooks": [
+      "auto_compile.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "6",
+    "title": "write_marker.sh",
+    "start_line": 144,
+    "end_line": 162,
+    "block_size": 19,
+    "hooks": [
+      "write_marker.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "7",
+    "title": "gpt_followup_post.sh",
+    "start_line": 163,
+    "end_line": 169,
+    "block_size": 7,
+    "hooks": [
+      "gpt_followup_post.sh"
+    ],
+    "check_count": 1
+  },
+  {
+    "num": "8",
+    "title": "stop_guard.sh",
+    "start_line": 170,
+    "end_line": 179,
+    "block_size": 10,
+    "hooks": [
+      "stop_guard.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "9",
+    "title": "gpt_followup_stop.sh",
+    "start_line": 180,
+    "end_line": 186,
+    "block_size": 7,
+    "hooks": [
+      "gpt_followup_stop.sh"
+    ],
+    "check_count": 1
+  },
+  {
+    "num": "10",
+    "title": "completion_gate.sh",
+    "start_line": 187,
+    "end_line": 205,
+    "block_size": 19,
+    "hooks": [
+      "completion_gate.sh"
+    ],
+    "check_count": 5
+  },
+  {
+    "num": "11",
+    "title": "commit_gate.sh",
+    "start_line": 206,
+    "end_line": 218,
+    "block_size": 13,
+    "hooks": [
+      "commit_gate.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "12",
+    "title": "notify_slack.sh",
+    "start_line": 219,
+    "end_line": 225,
+    "block_size": 7,
+    "hooks": [
+      "notify_slack.sh"
+    ],
+    "check_count": 1
+  },
+  {
+    "num": "13",
+    "title": "incident_ledger 검증",
+    "start_line": 226,
+    "end_line": 245,
+    "block_size": 20,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "14",
+    "title": "safe_json_get 엣지케이스",
+    "start_line": 246,
+    "end_line": 310,
+    "block_size": 65,
+    "hooks": [
+      "block_dangerous.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 12
+  },
+  {
+    "num": "15",
+    "title": "퇴행 방지 (hook_log.txt 직접 참조)",
+    "start_line": 311,
+    "end_line": 319,
+    "block_size": 9,
+    "hooks": [],
+    "check_count": 1
+  },
+  {
+    "num": "16",
+    "title": "구 훅 부재 확인",
+    "start_line": 320,
+    "end_line": 331,
+    "block_size": 12,
+    "hooks": [
+      "gpt_followup_guard.sh",
+      "pre_finish_guard.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "17",
+    "title": "evidence_gate.sh (증거 없는 위험실행 차단)",
+    "start_line": 332,
+    "end_line": 347,
+    "block_size": 16,
+    "hooks": [
+      "evidence_gate.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "18",
+    "title": "evidence_stop_guard.sh (근거 없는 결론 차단)",
+    "start_line": 348,
+    "end_line": 363,
+    "block_size": 16,
+    "hooks": [
+      "evidence_stop_guard.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "19",
+    "title": "evidence_mark_read.sh (증거 마커 적립)",
+    "start_line": 364,
+    "end_line": 379,
+    "block_size": 16,
+    "hooks": [
+      "evidence_mark_read.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "20",
+    "title": "risk_profile_prompt.sh (위험 프롬프트 req 생성)",
+    "start_line": 380,
+    "end_line": 395,
+    "block_size": 16,
+    "hooks": [
+      "risk_profile_prompt.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "21",
+    "title": "date_scope_guard.sh (위험 날짜 차단)",
+    "start_line": 396,
+    "end_line": 411,
+    "block_size": 16,
+    "hooks": [
+      "date_scope_guard.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "22",
+    "title": "토론모드 selector 문서 정합성",
+    "start_line": 412,
+    "end_line": 434,
+    "block_size": 23,
+    "hooks": [],
+    "check_count": 5
+  },
+  {
+    "num": "23",
+    "title": "토론모드 Chrome MCP 단일화 확인",
+    "start_line": 435,
+    "end_line": 463,
+    "block_size": 29,
+    "hooks": [
+      "mcp_send_gate.sh"
+    ],
+    "check_count": 7
+  },
+  {
+    "num": "24",
+    "title": "safe_json_get escape 회귀 (placeholder 방식)",
+    "start_line": 464,
+    "end_line": 477,
+    "block_size": 14,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "24b",
+    "title": "json_escape payload 검증",
+    "start_line": 478,
+    "end_line": 502,
+    "block_size": 25,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "25",
+    "title": "stop_guard.sh sed 파싱 제거 회귀",
+    "start_line": 503,
+    "end_line": 512,
+    "block_size": 10,
+    "hooks": [
+      "stop_guard.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "26",
+    "title": "commit_gate.sh fail-closed 봉합",
+    "start_line": 513,
+    "end_line": 522,
+    "block_size": 10,
+    "hooks": [
+      "commit_gate.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "27",
+    "title": "evidence_init 중복 제거",
+    "start_line": 523,
+    "end_line": 538,
+    "block_size": 16,
+    "hooks": [
+      "evidence_gate.sh",
+      "evidence_stop_guard.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "28",
+    "title": "write_marker JSON 메타데이터",
+    "start_line": 539,
+    "end_line": 551,
+    "block_size": 13,
+    "hooks": [
+      "write_marker.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "29",
+    "title": "completion_gate v7 JSON 마커",
+    "start_line": 552,
+    "end_line": 573,
+    "block_size": 22,
+    "hooks": [
+      "completion_gate.sh",
+      "evidence_gate.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 6
+  },
+  {
+    "num": "30",
+    "title": "README 훅 개수",
+    "start_line": 574,
+    "end_line": 586,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "31",
+    "title": "circuit_breaker_tripped",
+    "start_line": 587,
+    "end_line": 600,
+    "block_size": 14,
+    "hooks": [
+      "commit_gate.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "32",
+    "title": "instruction_read_gate",
+    "start_line": 601,
+    "end_line": 635,
+    "block_size": 35,
+    "hooks": [
+      "evidence_mark_read.sh",
+      "instruction_read_gate.sh",
+      "session_start_restore.sh"
+    ],
+    "check_count": 10
+  },
+  {
+    "num": "33",
+    "title": "incident_review.py",
+    "start_line": 636,
+    "end_line": 648,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "34",
+    "title": "classify_feedback.py",
+    "start_line": 649,
+    "end_line": 661,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "35",
+    "title": "hook_common.sh task_result",
+    "start_line": 662,
+    "end_line": 674,
+    "block_size": 13,
+    "hooks": [
+      "hook_common.sh"
+    ],
+    "check_count": 3
+  },
+  {
+    "num": "36",
+    "title": "hook_config.json task_escalation",
+    "start_line": 675,
+    "end_line": 687,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "37",
+    "title": "incident_repair.py 세션40 매핑",
+    "start_line": 688,
+    "end_line": 700,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "38",
+    "title": "task_runner.sh",
+    "start_line": 701,
+    "end_line": 713,
+    "block_size": 13,
+    "hooks": [],
+    "check_count": 3
+  },
+  {
+    "num": "39",
+    "title": "incident_repair.py backfill",
+    "start_line": 714,
+    "end_line": 723,
+    "block_size": 10,
+    "hooks": [],
+    "check_count": 2
+  },
+  {
+    "num": "40",
+    "title": "commit_gate.sh 실행 테스트",
+    "start_line": 724,
+    "end_line": 749,
+    "block_size": 26,
+    "hooks": [
+      "commit_gate.sh"
+    ],
+    "check_count": 4
+  },
+  {
+    "num": "41",
+    "title": "completion_gate.sh 실행 테스트",
+    "start_line": 750,
+    "end_line": 763,
+    "block_size": 14,
+    "hooks": [
+      "completion_gate.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "42",
+    "title": "evidence_gate.sh 실행 테스트",
+    "start_line": 764,
+    "end_line": 777,
+    "block_size": 14,
+    "hooks": [
+      "evidence_gate.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "43",
+    "title": "completion_gate deny-path",
+    "start_line": 778,
+    "end_line": 808,
+    "block_size": 31,
+    "hooks": [
+      "completion_gate.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 2
+  },
+  {
+    "num": "44",
+    "title": "evidence_gate deny-path",
+    "start_line": 809,
+    "end_line": 901,
+    "block_size": 93,
+    "hooks": [
+      "completion_gate.sh",
+      "evidence_gate.sh",
+      "hook_common.sh"
+    ],
+    "check_count": 6
+  },
+  {
+    "num": "45",
+    "title": "navigate_gate.sh 런타임 테스트",
+    "start_line": 902,
+    "end_line": 953,
+    "block_size": 52,
+    "hooks": [
+      "navigate_gate.sh"
+    ],
+    "check_count": 6
+  },
+  {
+    "num": "46",
+    "title": "세션51 합의 런타임 테스트",
+    "start_line": 954,
+    "end_line": 1043,
+    "block_size": 90,
+    "hooks": [
+      "completion_gate.sh",
+      "hook_common.sh",
+      "skill_instruction_gate.sh"
+    ],
+    "check_count": 5
+  }
+]
