@@ -4,12 +4,44 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션78 (P2 skill_read/tasks_handoff Policy 재정의 + smoke_test 171/171 PASS)
+최종 업데이트: 2026-04-20 KST — 세션78 후속 (공유→3자 자동 승격 규칙 신설)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션78 최종 — P2 skill_read/tasks_handoff Policy 재정의)
+## 0. 최신 세션 (2026-04-20 세션78 후속 — 공유→3자 자동 승격 규칙 신설)
+
+### 배경 (사용자 지적)
+
+세션78 `/share-result`로 P2 결과 공유 → GPT FAIL(evidence_gate `has_any_req` 재배치 + push-only 분기 + smoke 커버리지 부족) 수령. Claude가 Gemini 교차 없이 즉시 수정 착수 → 사용자 "토론모드 작동 안 한 거지?" 지적. 상호 감시 프로토콜이 3자 토론 명시 트리거에만 적용되고 공유 경로에 미적용이었던 구조 허점.
+
+### 이번 세션 완료
+
+**공유 루프 자동 승격 규칙 신설**
+- `.claude/commands/share-result.md` 5단계: 지적 성격 A/B 분류 + B(구조 변경) 시 `Skill(skill="debate-mode")` 자동 호출
+- `90_공통기준/토론모드/CLAUDE.md` "자동 승격 트리거" 섹션 신설 (상호 감시 프로토콜 확장)
+- memory `feedback_structural_change_auto_three_way.md` 저장 + MEMORY.md 인덱스 업데이트
+- 분류 기준:
+  - **A (즉시 반영)**: 문서 오타·값 조정·단순 버그·smoke 케이스 단순 추가·도메인 데이터
+  - **B (3자 승격)**: hook/settings 구조, 게이트/정책 재배치, commit/push 흐름 분기, Policy 재정의, 외부 인터페이스 영향
+  - 모호 시 기본 B (안전측)
+
+### 다음 세션 첫 액션
+
+**세션78 P2 GPT FAIL 3건 3자 토론 본로 진입** (새 규칙 최초 적용)
+1. GPT 원문은 이미 수령 (f31b8f22 공유 응답): `has_any_req` 재배치가 세션76 commit_gate push 스킵과 충돌 / smoke 44-7/8/9 커버리지 부족(push-only pass, partial proof, stale skill marker) / STATUS.md 드리프트
+2. Gemini 본론 + Gemini→GPT 교차 1줄 검증 + GPT→Gemini 교차 1줄 검증
+3. Claude 종합 → 양측 검증 → `pass_ratio ≥ 2/3` 합의안만 반영
+4. 라운드 최대 3회 한도 준수
+
+### 상태 정보
+
+- f31b8f22 커밋은 **미철회** (evidence_gate/smoke_test 수정은 실물 반영됨). 3자 토론 결과에 따라 추가 수정 또는 부분 롤백 결정.
+- 세션77 map_scope + 세션78 P2 skill_read/tasks_handoff 재정의는 관찰 중 (2026-04-20 ~ 04-27)
+
+---
+
+## 0-prev-0. 세션78 P2 최종 (2026-04-20 — skill_read/tasks_handoff Policy 재정의)
 
 ### 이번 세션 최종 완료
 
