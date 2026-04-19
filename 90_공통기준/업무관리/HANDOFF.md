@@ -36,9 +36,16 @@
 - `doctor_lite.sh` OK
 - `permissions_sanity.sh` 경고 0건 (캐시 제거 후 재실행)
 - `hook_timing.jsonl` 다중 훅 status 태그 정상 기록
+- **GPT 판정 PASS** (fb58b9b2) — 3쟁점 타당성 확인 완료. hook_gate 미사용/60초 쿨다운/7일 0건 조건 모두 PASS. 후속 과제 2건(JSON 필드 마이그레이션·소프트블록 로그 보강)은 FAIL 사유 아님.
+
+### 하네스 분석 (GPT 판정 응답)
+- 채택 2건: 지적 A(JSON 필드 deprecated→hookSpecificOutput 표준화), 지적 B(소프트블록 확인 흔적 보강 후속 제안)
+- 보류 1건: debate_verify 대체 조건 "10회 연속 clean" — 현 시점 변경 불필요, Phase 2-C 진입 시 재평가
+- 버림 0건
+- 독립 견해: JSON 필드 마이그레이션은 context7로 최신 spec 확인 선행. 소프트블록 로그 보강은 실제 3회 누적 발생 후 설계 (예방적 과잉설계 회피).
 
 ### 다음 세션 첫 액션
-1. **세션73**: 쟁점 G settings 계층 실물 분리 (settings.json 이동) + Phase 2-C 나머지 훅 일괄 배선
+1. **세션73**: 쟁점 G settings 계층 실물 분리 (settings.json 이동) + Phase 2-C 나머지 훅 일괄 배선 + GPT 지적 A(JSON 필드 표준화) context7 조사
 2. **세션74**: 의제6 Gemini 진입 강제 hook 신설
 3. **세션75**: 의제7 탭 throttling 자동 회복
 4. **조건부**: `debate_verify` 태그 7일 0건 시 Phase 2 exit 2 승격

@@ -56,6 +56,10 @@
 - 쟁점 G: settings 계층 실물 이행 (세션73)
 - 의제4: hook_timing.jsonl 1주 수집 후 통합 평가
 
+**[GPT 판정: PASS] fb58b9b2 — 후속 과제 2건 (세션73+ 이월)**
+- **GPT 지적 A**: PreToolUse JSON 출력 필드가 `decision/reason` (deprecated) — Anthropic 공식 권장은 `hookSpecificOutput.permissionDecision` + `permissionDecisionReason`. 기존 필드도 아직 작동하므로 PASS 판정. 후속 안건으로 context7 MCP로 최신 hook spec 확인 후 일괄 마이그레이션.
+- **GPT 지적 B**: `completion_gate` 소프트 블록 "확인 흔적 보강" 권장. 현재 `hook_incident` + `completion_claim.jsonl`에 soft_block 기록 중이나 사용자 측 가시성이 부족. 실제 3회 누적 발생 시 로그 확인 후 필요성 재평가(예방적 과잉설계 회피 — Claude 독립 견해).
+
 ---
 
 ## 세션71 반영 (2026-04-19, 의제5 토론 + 근본해결 실물 이행 세션)

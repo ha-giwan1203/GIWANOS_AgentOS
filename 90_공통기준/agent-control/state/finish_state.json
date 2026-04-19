@@ -2,26 +2,33 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "동의",
-  "gemini_judgment": "동의",
+  "gpt_judgment": "PASS",
+  "gemini_judgment": null,
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "세션71",
-  "summary": "의제5 3자 토론 Round 1 합의(pass_ratio 1.33) + Phase 2-A 근본해결 실물 이행(permissions 20건 정리 + sanity hook + CLAUDE.md 역할 경계 5단계 트리 + hook_common 등급 래퍼 + README 등급 분류 + settings 계층 인벤토리) + 의제3 Phase A skill_drift_check 신설 + Step 5-3 양측 통과(경로 정정 1건 반영)",
-  "commits": ["39b64ec6", "45d0fd1f"],
-  "closed_at": "2026-04-19T09:00:00+09:00",
-  "verification_3way": {
-    "gpt_final": "동의 — 45d0fd1f에서 재분류 인벤토리 경로 정정으로 직전 판정의 유일한 문서 정합성 이슈 해소",
-    "gemini_final": "동의 — 복구 등급 확장 여지와 소프트 블록 문서화가 Phase 2-A 배포 안전 제약 조건 내에서 완벽하게 실물 커밋 반영되었으며 정상 작동 검증까지 마침",
-    "pass_ratio_final": 1.33,
-    "critic_verdict": "WARN (하네스 실증됨 라벨 엄밀성 지적 → Phase 2-A 실행 전 기존 훅 exit code 실물 Read로 확인 수행)"
+  "session": "세션72",
+  "summary": "의제5 Phase 2-B 실물 이행 — completion_gate 소프트 블록(7일 1회용 3회 누적 → deny, 60초 쿨다운) + 핵심 훅 6종 exit 2 전환(commit_gate/block_dangerous/date_scope_guard/protect_files/evidence_stop_guard/stop_guard) + debate_verify timing 배선(Phase 2 승격 보류, 18건 잔존) + 문서 갱신(README 등급 테이블 재배치·CLAUDE.md 실코드 상태 치환·TASKS/HANDOFF/STATUS 세션72 기록). commit_gate exit 2 실차단 재현 확인.",
+  "commits": ["fb58b9b2"],
+  "closed_at": "2026-04-19T10:15:00+09:00",
+  "harness_analysis": {
+    "adopted": 2,
+    "held": 1,
+    "discarded": 0,
+    "gpt_pass_reasoning": "3쟁점 모두 타당성 확인 — hook_gate 미사용 선택 + 60초 쿨다운 정책 + 7일 0건 조건",
+    "followup_notes": [
+      "지적 A: JSON 필드 decision/reason은 deprecated, hookSpecificOutput.permissionDecision 마이그레이션 후속 안건 — context7로 최신 hook spec 확인 선행",
+      "지적 B: 소프트 블록 확인 흔적 보강 후속 제안 — 현재 hook_incident + completion_claim.jsonl 기록 중, 실제 3회 누적 발생 시 가시성 재평가"
+    ]
   },
   "carried_over": [
-    "Phase 2-B: completion_gate 소프트 블록 + 기존 훅 등급 공통 래퍼 호출 전환",
-    "의제4: hook_timing.jsonl 1주일 수집 후 통합 평가",
-    "쟁점 G: settings.json 실물 분리 (settings.local.json→settings.json 이동)",
+    "Phase 2-C: 나머지 ~18개 훅 일괄 등급 주석 + timing 배선 + JSON deny gate exit 2 전환 검토",
+    "Phase 2-C: debate_verify.sh 7일 incident 0건 달성 시 exit 2 승격",
+    "쟁점 G: settings.local.json → settings.json 계층 실물 분리 (세션73)",
+    "의제4: hook_timing.jsonl 1주 수집 후 통합 평가",
     "의제6: Gemini 진입 강제 hook 신설",
-    "의제7: 탭 throttling 자동 회복 설계"
+    "의제7: 탭 throttling 자동 회복 설계",
+    "GPT 후속 A: JSON 필드 hookSpecificOutput 마이그레이션 (context7 선행)",
+    "GPT 후속 B: 소프트 블록 확인 흔적 가시성 보강 (실제 발생 후)"
   ]
 }
