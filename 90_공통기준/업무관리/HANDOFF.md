@@ -33,11 +33,20 @@
 - smoke_test 47번 5/5 PASS (전체 178/179, 나머지 1건 classify_feedback.py FAIL은 선행 실패로 본건 무관)
 - settings.json JSON 유효성 OK
 
-### 다음 AI 액션
-1. 커밋 (권장 메시지: `feat(session79): token-threshold-warn Phase 1 실물 구현 — 세션68 영상분석 드리프트 보정`)
-2. GPT 공유 (B 분류 아님 — 이미 3자 합의된 스펙의 실물화이므로 승격 불필요, 2자 share-result로 충분)
-3. Phase 2(Stop hook 증가량) 구현 대기 — 1주 운영 경고 빈도 확인 후
-4. TASKS.md 1981줄 감축 작업 — 별도 커밋으로 분리 (세션79 이월 태스크)
+### 다음 AI 액션 (완료 상태)
+1. ✅ 커밋 b5daa2f8 main push 완료
+2. ✅ GPT 공유 완료 (2자 경로) — **GPT PASS 판정** (3개 질문 모두)
+3. Phase 2 진입 판정 지표 4종 (GPT 제안 추가분 반영, TASKS.md 이월 블록 참조)
+4. TASKS.md 감축 작업 — 별도 커밋 이월
+
+### GPT 판정 요약 (2026-04-20 수령)
+- 합의 스펙 대비 구현 정합성: **PASS**. Phase 1 범위 정확 실물화, 임계치 5종·차단 금지·doc_drift incident·Phase 2/3 보류 구조 일치. `wc -c` vs `du -b` 예시 차이는 바이트 측정 목적 동일해 FAIL 사유 아님
+- 재사용 vs 신규 경계: 깔끔. "복붙 수준 아님". 경미 중복 1건 — 임계치 숫자가 shell 스크립트+SKILL.md 이중 기재. Phase 2 `token_threshold_delta.sh` 생길 때 단일 원본화 이월
+- Phase 2 진입 지표 추가 3건: SessionStart p95 ≤ 300ms / 경고 상위 대상 안정성 / 증가량 추적 실효성(주간 순증가 ≥ 10% 또는 반복 강경고+정리 부재)
+- 4종 미충족 시: **TASKS 감축이 Phase 2보다 우선**
+
+### 선행 FAIL 기록 (본건 무관)
+- smoke_test 25번 `classify_feedback.py --validate ALL OK` 실패. 세션46(ac549431) 이후 잔존 가능성. 이번 변경과 무관하나 추후 원인 추적 필요.
 
 ### 선행 FAIL 기록 (본건 무관)
 - smoke_test 25번 `classify_feedback.py --validate ALL OK` 실패. 세션46(ac549431) 이후 잔존 가능성. 이번 변경과 무관하나 추후 원인 추적 필요.
