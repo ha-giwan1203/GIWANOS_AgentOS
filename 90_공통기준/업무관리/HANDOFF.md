@@ -27,7 +27,7 @@
 - `90_공통기준/업무관리/STATUS.md` 세션74로 갱신
 
 **검증**:
-- smoke_fast 9/9 PASS · doctor_lite OK · permissions_sanity 경고 0건
+- smoke_fast 10/10 PASS · doctor_lite OK · permissions_sanity 경고 0건
 - hooks 구조 원본 vs 신설 diff 완전 동일
 - PreToolUse 16매처 순서 100% 보존 (block_dangerous 첫째)
 - JSON 파싱 양쪽 유효 (settings.json allow=76 · settings.local.json allow=8)
@@ -41,7 +41,7 @@
 1. **Claude Code CLI 종료 → 재실행** (settings 캐싱 특성상 재시작 없이 새 설정 미반영)
 2. 재시작 후 새 세션에서 순서대로 검증:
    - `bash .claude/hooks/doctor_lite.sh` → OK
-   - `bash .claude/hooks/smoke_fast.sh` → 9/9 PASS
+   - `bash .claude/hooks/smoke_fast.sh` → 10/10 PASS
    - `bash .claude/hooks/permissions_sanity.sh` → 경고 0건
    - 임의 Bash 호출 시 `block_dangerous` trigger 확인 (PreToolUse 첫 매처 동작)
 3. 이상 시 롤백 절차: `C:\Users\User\.claude\plans\cryptic-tinkering-ladybug.md` Case B/C 참조

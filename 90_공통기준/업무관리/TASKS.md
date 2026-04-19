@@ -47,7 +47,7 @@
 **[검증]**
 - `.claude/settings.json` JSON 유효 · allow 76 · PreToolUse 16매처 (block_dangerous 첫째)
 - `.claude/settings.local.json` JSON 유효 · allow 8 · ask 8 · hooks/statusLine 부재
-- `bash .claude/hooks/smoke_fast.sh` 9/9 PASS
+- `bash .claude/hooks/smoke_fast.sh` 10/10 PASS (세션74 team+local union 수정으로 +1)
 - `bash .claude/hooks/doctor_lite.sh` OK
 - `bash .claude/hooks/permissions_sanity.sh` 경고 0건
 - hooks 원본 vs 신설 파일 diff 완전 동일 (31매처, PreToolUse 16 순서 일치)
