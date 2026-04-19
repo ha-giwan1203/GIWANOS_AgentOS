@@ -34,6 +34,41 @@ check() {
   fi
 }
 
+# === 캐시 체크 (세션76 최적화) ===
+# hook 파일 + settings + smoke_test 자신의 해시 기반. TTL 30분.
+# SMOKE_TEST_FORCE=1 로 강제 재실행 가능.
+CACHE_FILE="$PROJECT_DIR/.claude/state/smoke_test_cache.json"
+CACHE_TTL=1800  # 30분
+
+compute_hooks_hash() {
+  # *.sh + settings(team+local) 내용 해시. find+sha1sum으로 Windows Git Bash 호환.
+  {
+    find "$HOOKS_DIR" -maxdepth 1 -name '*.sh' -type f 2>/dev/null | sort | while read f; do
+      sha1sum "$f" 2>/dev/null
+    done
+    [ -f "$SETTINGS_TEAM" ] && sha1sum "$SETTINGS_TEAM" 2>/dev/null
+    [ -f "$SETTINGS_LOCAL" ] && sha1sum "$SETTINGS_LOCAL" 2>/dev/null
+  } | sha1sum 2>/dev/null | cut -c1-16
+}
+
+CURRENT_HASH=$(compute_hooks_hash)
+
+# 캐시 hit 판정
+if [ "${SMOKE_TEST_FORCE:-0}" != "1" ] && [ -f "$CACHE_FILE" ] && [ -n "$CURRENT_HASH" ]; then
+  CACHED_HASH=$(grep -oE '"hash":[[:space:]]*"[^"]*"' "$CACHE_FILE" 2>/dev/null | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+  CACHED_EPOCH=$(grep -oE '"completed_at_epoch":[[:space:]]*[0-9]+' "$CACHE_FILE" 2>/dev/null | head -1 | grep -oE '[0-9]+')
+  NOW_EPOCH=$(date +%s 2>/dev/null)
+  if [ "$CACHED_HASH" = "$CURRENT_HASH" ] && [ -n "$CACHED_EPOCH" ] && [ -n "$NOW_EPOCH" ]; then
+    ELAPSED=$((NOW_EPOCH - CACHED_EPOCH))
+    if [ "$ELAPSED" -lt "$CACHE_TTL" ] 2>/dev/null; then
+      MINS_AGO=$((ELAPSED / 60))
+      echo "=== smoke_test CACHED PASS (hash=$CURRENT_HASH, ${MINS_AGO}분 전, TTL 30분) ==="
+      echo "ALL PASS."
+      exit 0
+    fi
+  fi
+fi
+
 echo "=== Hooks Smoke Test v5 ==="
 echo ""
 
@@ -981,6 +1016,24 @@ echo "  capability (신규): 섹션 $CAPABILITY_SECTIONS + 24b"
 # === 결과 ===
 echo ""
 echo "=== 결과: $PASS/$TOTAL PASS, $FAIL FAIL ==="
+
+# === 캐시 저장 (PASS 시만) ===
+if [ "$FAIL" -eq 0 ] && [ -n "$CURRENT_HASH" ]; then
+  mkdir -p "$(dirname "$CACHE_FILE")" 2>/dev/null || true
+  _now_iso=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
+  _now_epoch=$(date +%s 2>/dev/null || echo 0)
+  cat > "$CACHE_FILE" <<EOF
+{
+  "hash": "$CURRENT_HASH",
+  "pass_total": $PASS,
+  "fail_total": $FAIL,
+  "completed_at": "$_now_iso",
+  "completed_at_epoch": $_now_epoch,
+  "ttl_sec": $CACHE_TTL
+}
+EOF
+fi
+
 if [ "$FAIL" -gt 0 ]; then
   echo "WARNING: $FAIL개 실패. hooks 수정 확인 필요."
   exit 1

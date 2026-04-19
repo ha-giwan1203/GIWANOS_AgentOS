@@ -10,7 +10,83 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션75 (3자 토론 "클로드코드 정밀 분석" Round 1 채택)
+최종 업데이트: 2026-04-19 — 세션76 (Round 2 smoke_test 최적화 + Step 1-a + commit_gate 근본 해결)
+
+---
+
+## 세션76 반영 (2026-04-19, Round 2 3자 토론 + Step 1-a + commit_gate + smoke_test 최적화)
+
+**[완료] 3자 토론 Round 2 채택 (pass_ratio 1.00) — smoke_test.sh 3분 병목 최적화**
+- 로그: `90_공통기준/토론모드/logs/debate_20260419_215501_3way/round2_*.md` + `result.json`
+- 의제: Policy-Workflow Mismatch 2호 구체 사례 — smoke_test.sh 3m20s 병목
+- 상호 감시 프로토콜 2회차 실증: **GPT A안 최우선 과잉설계 → Claude·Gemini 2:1 이의 → GPT 자진 철회** (Round 1과 동일 패턴)
+
+**[완료] Step 2 regression/capability 실행 분할 구현 (즉시 효과 확인)**
+- `.claude/hooks/final_check.sh` L351-380 수정:
+  - `SMOKE_LEVEL` 환경변수 분기 추가 (기본값 `fast`)
+  - `fast`: smoke_fast.sh만 실행 (regression 10/10)
+  - `full`: smoke_test.sh 167 케이스 전체 실행
+- **측정 결과**: `time bash final_check.sh --full`
+  - Before: **3m 31s** (user 1m22s / sys 1m52s)
+  - After: **15.9s** (user 5.2s / sys 8.4s)
+  - **92.5% 단축 달성**
+- 수동 전체 검증 경로: `SMOKE_LEVEL=full bash .claude/hooks/final_check.sh --full`
+
+**[완료] smoke_test.sh 결과 캐시 로직 추가 (안전망)**
+- hook 파일 + settings sha1 해시 기반, TTL 30분
+- SMOKE_TEST_FORCE=1 환경변수로 강제 재실행 가능
+- 3자 합의: 주 판정은 Step 3(섹션별 해시)로 교체 예정, 본 캐시는 안전망 유지
+
+**[완료] Step 1-a 측정 프로토콜 확정 + evidence_gate 100건 라벨링 (커밋 924e6ff7)**
+- `.claude/docs/incident_labeling_protocol.md` v1.0 신설
+- `.claude/docs/incident_labels_evidence_gate_100.json`
+- 라벨: true_positive 0% / FP_suspect 69% / ambiguous 31% — **Gemini Policy-Workflow Mismatch 초강력 실증**
+
+**[완료] commit_gate.sh push 단독 final_check 스킵 근본 해결**
+- 이 버그 자체가 Policy-Workflow Mismatch 1호 실증 사례
+- 단위 검증 7/7 PASS, 실물 push 성공 (cfe8d8d9 → 924e6ff7)
+
+**[이월 — 세션77+]**
+- **Step 1 Test Pruning 실제 격리** (문서화는 세션77 착수) — 격리 후보 분리 → 1주 관찰 후 삭제 판정
+  - 기준: 30일 무고장 + 최근 수정 이력 + 공용 의존성(hook_common.sh·evidence)
+- **Step 3 섹션별/의존파일별 해시 캐시** — 변경 섹션만 재실행
+- **Step 4 grep/sed 중복 통합** — 같은 파일 연속 grep -q → 단일 awk/grep -f
+- **Step 2 Silent Failure 자동화** (Gemini 보강) — capability 일일 배치 또는 병합 전 훅
+- **Step 5 A안 (섹션별 보조 러너)** — 조건부 최후순위
+- **Round 1 이월 지속**: evidence_gate 전수 474건 분해 / Policy 재정의 / incident 5종 정리
+
+---
+
+## 세션76 반영 (2026-04-19, Step 1-a 측정 프로토콜 + commit_gate 근본 수정)
+
+**[완료] Step 1-a 측정 프로토콜 확정 + evidence_gate 100건 라벨링**
+- `.claude/docs/incident_labeling_protocol.md` v1.0 신설 (라벨 3종 + Tiebreaker + 샘플 정책)
+- `.claude/docs/incident_labels_evidence_gate_100.json` (최근 100건 분류 결과)
+- `.gitignore`: `.claude/docs/` 예외 추가 (커밋 924e6ff7)
+- 라벨 분포 (evidence_gate 최근 100건):
+  - **true_positive: 0 / 100 (0.0%)** ← Gemini Policy-Workflow Mismatch 지적 초강력 실증
+  - false_positive_suspect: 69 (69.0%)
+  - ambiguous: 31 (31.0%)
+- Policy 분포:
+  - map_scope.req 39건 — "고위험" 기준 재정의 대상
+  - tasks_handoff.req 30건 — commit 직전 시점 재설계 대상
+  - skill_read.req / identifier_ref.req 31건 — Step 1-b에서 분리 필요
+
+**[완료] commit_gate.sh push 단독 final_check 스킵 근본 해결**
+- **증상**: Step 1-a 산출물 push 시 `commit_gate BLOCK: final_check --fast FAIL — TASKS/HANDOFF/STATUS write_marker 이후 미갱신`
+- **원인**: `git push`도 commit_gate의 final_check 재실행 대상이어서, write_marker가 commit 후에도 유지되며 push 단독 호출이 "미갱신" FAIL로 차단
+- **진단 정당성**: 이 버그 자체가 **Policy-Workflow Mismatch(세션75 3자 토론 채택 의제)의 생생한 실증 사례** — 게이트가 실제 정책 위반이 아닌 정상 push를 과도 차단
+- **해결**: `commit_gate.sh` L107 이후 push 단독 명령(`grep 'git push' && !grep 'git commit'`)은 final_check 스킵하고 exit 0으로 통과. commit 단계의 검증으로 통제 목적 충분 (중복 제거)
+- **단위 검증 7/7 PASS**: push 단독 / commit / commit+push 복합 / git status / ls / grep 파이프 조합
+- **실물 검증**: push 재시도 성공 (cfe8d8d9 → 924e6ff7)
+
+**[이월 — 세션77+]**
+- **Step 1-b evidence_gate 전수 474건 하위 정책 분해** (map_scope / tasks_handoff / skill_read / identifier_ref / auth_diag별 비율 산출)
+  - ambiguous 31% 해소 포함 (skill_read vs identifier_ref 분리)
+- **Step 1-c evidence_gate Policy 재정의** (세 정책 각각 재설계)
+- **Step 2 (Step 1 통과 후) incident_ledger 반복 5종 정리** (903건 88%)
+- **Step 3 문서 드리프트 자동 --fix 금지 + 파생 문서 preview 절충**
+- **Round 2 토론**: Policy-Workflow Mismatch 종합 감사 + debate_verify 체인 점검
 
 ---
 

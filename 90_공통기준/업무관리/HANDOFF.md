@@ -4,12 +4,98 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션75 (3자 토론 Round 1 — 클로드코드 정밀 분석 채택)
+최종 업데이트: 2026-04-19 KST — 세션76 (Round 2 smoke_test 최적화 + Step 1-a + commit_gate)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션75 — 3자 토론 Round 1 채택)
+## 0. 최신 세션 (2026-04-19 세션76 — Round 2 + Step 2 즉시 효과 92% 단축)
+
+### 이번 세션 완료 (종합)
+
+**Round 2 3자 토론 채택** (pass_ratio 1.00)
+- 의제: smoke_test.sh 3분 병목 최적화 (Policy-Workflow Mismatch 2호 실증)
+- 상호 감시 프로토콜 2회차 작동: GPT A안 과잉 → Gemini 이의 + Test Pruning 신규 지적 → GPT 자진 철회
+- Claude 종합 설계안 5단 (Step 1 Test Pruning → Step 2 regression/capability 분할 → Step 3 섹션별 해시 → Step 4 grep 통합 → Step 5 A안 조건부)
+
+**Step 2 즉시 구현 + 실측 효과**
+- final_check.sh SMOKE_LEVEL 분기 추가 (기본값 fast)
+- Before 3m31s → After **15.9s** (92.5% 단축)
+- SMOKE_LEVEL=full로 수동 전체 검증 가능 (capability 1주 주기 권장)
+
+**Step 1-a 측정 프로토콜** (이미 커밋 924e6ff7)
+- incident_labeling_protocol.md v1.0 + 100건 라벨링
+- true_positive 0% 충격 결과 (Policy-Workflow Mismatch 강력 실증)
+
+**commit_gate push 단독 스킵** (이미 커밋 924e6ff7)
+- Policy-Workflow Mismatch 1호 자체 교정 사례
+
+**smoke_test.sh 결과 캐시 로직 추가**
+- hook + settings sha1 해시, TTL 30분 (안전망)
+
+### 다음 세션 첫 액션 (세션77)
+
+1. **Step 1 Test Pruning 실행** — 격리 후보 식별 + 1주 관찰 시작
+   - 산출: `.claude/docs/smoke_test_pruning_candidates.md`
+   - 기준: 30일 무고장 + 수정 이력 + 공용 의존성 종합
+2. **Step 3 섹션별 해시 캐시** 착수 또는 Step 4 grep/sed 통합
+3. Round 1 이월: evidence_gate 전수 474건 분해 + Policy 재정의
+4. Round 2 이월 Silent Failure 자동화 (capability 일일 배치)
+
+### 상태 정보
+
+- final_check.sh SMOKE_LEVEL=fast 기본, commit 경로 92% 단축
+- smoke_test.sh 캐시 로직 활성 (TTL 30분)
+- commit_gate.sh push 단독 스킵 적용
+- GPT 방: `c/69e4c33c-...`, Gemini 방: `gem/3333ff7eb4ba/aecf2ecbf3d5bb44` (양 Round 맥락 유지)
+
+### 측정 근거
+
+| 항목 | Before | After | 변화 |
+|------|--------|-------|------|
+| final_check --full real | 3m 31s | 15.9s | -92.5% |
+| final_check --full sys | 1m 52s | 8.4s | -92.5% |
+| commit 체감 대기 | 3분+ | 15s | 대폭 단축 |
+
+---
+
+## 0-prev. 세션76 (2026-04-19 — Step 1-a + commit_gate 근본 수정, Round 2 이전 스냅샷)
+
+### 이번 세션 완료
+
+**Step 1-a 측정 프로토콜 확정 + evidence_gate 100건 라벨링**
+- 산출: `.claude/docs/incident_labeling_protocol.md` v1.0, `.claude/docs/incident_labels_evidence_gate_100.json`
+- 라벨 결과: **true_positive 0% / FP_suspect 69% / ambiguous 31%** — Gemini Policy-Workflow Mismatch 지적 초강력 실증
+- 정책 3분류: map_scope(39)/tasks_handoff(30)/skill_read 혼합(31)
+- 커밋 924e6ff7
+
+**commit_gate.sh 근본 수정 (Policy-Workflow Mismatch 자체 교정 1호)**
+- 증상: Step 1-a push가 `commit_gate BLOCK: TASKS/HANDOFF/STATUS 미갱신`으로 차단
+- 근본 원인: write_marker 상태가 commit 후에도 유지되며 push 단독 호출도 final_check 재검사 → 정상 push 과도 차단
+- **이 버그 자체가 Gemini 지적의 생생한 실증** — 게이트가 실제 정책 위반이 아닌 정상 push를 차단
+- 해결: commit_gate.sh에 "push 단독은 final_check 스킵" 분기 추가 (L107 이후)
+- 단위 검증 7/7 PASS, 실물 push 검증 성공
+
+### 다음 세션 첫 액션 (세션77)
+
+1. **Step 1-b evidence_gate 전수 474건 하위 정책 분해**
+   - 5개 정책(map_scope / tasks_handoff / skill_read / identifier_ref / auth_diag)별 비율 산출
+   - skill_read.req vs identifier_ref.req 분리 재분류 → ambiguous 31% 해소
+2. **Step 1-c evidence_gate Policy 재정의** (정책별 재설계 초안)
+3. **Step 2 (Step 1 통과 후) incident_ledger 반복 5종 정리** — 903건 88% 대상
+4. Step 3 병렬 가능 (파생 문서 preview 절충 구현)
+5. Round 2 토론 개시 판단은 Step 1-c 완료 후
+
+### 상태 정보
+
+- commit_gate.sh L107-L115에 push 단독 스킵 분기 추가 완료
+- `.claude/docs/` Git 추적 시작 (.gitignore 예외)
+- GPT 방: `c/69e4c33c-...` (세션75 Round 1 토론방) — 세션76 활동 공유 필요 시 후속
+- Gemini 방: `gem/3333ff7eb4ba/aecf2ecbf3d5bb44`
+
+---
+
+## 0-prev. 세션75 (2026-04-19 — 3자 토론 Round 1 채택)
 
 ### 이번 세션 계획
 세션74 마감 후 사용자 요청: "토론모드 진행 — 클로드코드 정밀 분석 주제로 3자 토론"

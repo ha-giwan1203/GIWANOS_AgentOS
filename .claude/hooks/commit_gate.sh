@@ -106,6 +106,16 @@ fi
 
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
 
+# git push 단독은 final_check 스킵 (세션76 근본 해결):
+# push는 이미 commit 완료된 상태의 원격 동기화. commit 단계에서 final_check 통과한 내용을 push에서 재검사하는 것은
+# Policy-Workflow Mismatch(세션75 3자 토론 Round 1 채택 의제)의 전형 — write_marker 상태가 commit 후에도 유지되어
+# 정상 push도 "TASKS/HANDOFF 미갱신" FAIL로 차단되는 문제 발생. commit 단계 검사만으로 통제 목적 충분하므로 중복 제거.
+if echo "$COMMAND" | grep -q 'git push' && ! echo "$COMMAND" | grep -q 'git commit'; then
+  hook_log "PreToolUse/Bash" "commit_gate PASS: git push 단독 — final_check 스킵 (commit 단계에서 이미 검증)" 2>/dev/null
+  hook_timing_end "commit_gate" "$_CG_START" "skip_push_only"
+  exit 0
+fi
+
 # hook/settings 변경이 포함된 커밋인지 확인 → --full 승격
 MODE="--fast"
 STAGED=$(cd "$PROJECT_DIR" && git diff --cached --name-only 2>/dev/null)

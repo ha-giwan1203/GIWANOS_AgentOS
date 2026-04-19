@@ -347,12 +347,26 @@ fi
 echo ""
 
 # === FULL 구간: smoke_test (--full 시에만) ===
+# 세션76 3자 토론 Round 2 채택: SMOKE_LEVEL 분기로 capability 테스트를 commit 경로에서 제외
+#   - SMOKE_LEVEL=fast (기본값, commit 경로): smoke_fast만 실행 (10/10 regression 핵심)
+#   - SMOKE_LEVEL=full (수동 전체 검증): smoke_test 167 케이스 전체 실행
+# Gemini Silent Failure 경고: capability는 1주 주기 수동 검증 권장. 자동 사후 검증은 세션77+ 이월.
+# 원복: `SMOKE_LEVEL=full bash .claude/hooks/final_check.sh --full`
 
 if [ "$MODE" = "--full" ]; then
-  echo "--- 8. smoke_test 실행 ---"
-  bash "$HOOKS_DIR/smoke_test.sh"
-  if [ $? -ne 0 ]; then
-    FAIL=$((FAIL+1))
+  if [ "${SMOKE_LEVEL:-fast}" = "fast" ]; then
+    echo "--- 8. smoke_fast 실행 (SMOKE_LEVEL=fast — regression-only) ---"
+    bash "$HOOKS_DIR/smoke_fast.sh"
+    if [ $? -ne 0 ]; then
+      FAIL=$((FAIL+1))
+    fi
+    echo "  [INFO] smoke_test 전체(capability 포함)는 스킵. 수동 전체 검증: SMOKE_LEVEL=full bash .claude/hooks/final_check.sh --full"
+  else
+    echo "--- 8. smoke_test 실행 (SMOKE_LEVEL=full — 167 케이스) ---"
+    bash "$HOOKS_DIR/smoke_test.sh"
+    if [ $? -ne 0 ]; then
+      FAIL=$((FAIL+1))
+    fi
   fi
   echo ""
 

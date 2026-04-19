@@ -61,6 +61,42 @@
     "세션번호": "세션75 이월",
     "상호_감시_프로토콜_작동_실증": "GPT 주장 3 60분 캐시 혼동 → Claude·Gemini 2:1 이의 → GPT 자진 철회"
   },
+  "round2": {
+    "topic": "smoke_test.sh 3분 병목 근본 최적화 (Policy-Workflow Mismatch 2호)",
+    "status": "채택 (합의)",
+    "round_count": 1,
+    "max_rounds": 3,
+    "pass_ratio_numeric": 1.00,
+    "세션번호": "세션76",
+    "cross_verification": {
+      "gpt_verifies_gemini": {"verdict": "동의", "reason": "A안 최우선 자진 철회 + Gemini 재배치 수용 + Test Pruning 수용"},
+      "gemini_verifies_gpt": {"verdict": "이의", "reason": "A안 전면 재작성 최우선은 디버깅 투명성 훼손 위험 + 우선순위 재배치 필요 (Gemini Low-hanging fruit)"},
+      "gpt_verifies_claude": {"verdict": "동의", "reason": "Policy 재정의 순서가 실물과 가장 잘 맞음 + Step 1(c) 격리 bias + Pruning 기준 보강"},
+      "gemini_verifies_claude": {"verdict": "동의", "reason": "3자 이견 완벽 수렴 + ROI 높은 정책 기반 최적화부터 안전 배치 + Silent Failure 자동화 보강 필요"}
+    },
+    "실행_순서": [
+      "Step 1 Test Pruning (세션77+: 격리 후보 분리 → 1주 관찰 후 삭제, 기준: 30일 무고장 + 수정 이력 + 공용 의존성)",
+      "Step 2 regression/capability 실행 분할 (세션76 완료: final_check.sh SMOKE_LEVEL 분기, 기본값 fast)",
+      "Step 3 섹션별/의존파일별 해시 캐시 (세션77+)",
+      "Step 4 grep/sed 중복 통합 (세션77+)",
+      "Step 5 A안 (부분 재구성) - 조건부 최후순위"
+    ],
+    "세션76_완료": {
+      "Step_2_구현": "final_check.sh L351-380 SMOKE_LEVEL 분기 (기본 fast)",
+      "측정_before": "real 3m31s / user 1m22s / sys 1m52s",
+      "측정_after": "real 15.9s / user 5.2s / sys 8.4s",
+      "단축율": "92.5%"
+    },
+    "세션77_이월": [
+      "Step 1 Test Pruning 실제 격리 + 1주 관찰",
+      "Step 3 섹션별 해시 캐시",
+      "Step 4 grep/sed 통합",
+      "Step 2 Silent Failure 자동화 (일일 배치, Gemini 보강)"
+    ],
+    "버림": ["병렬화 xargs -P / GNU parallel (MSYS2 안티패턴)"],
+    "상호_감시_프로토콜_작동_실증_2회차": "GPT A안 최우선 과잉설계 → Claude·Gemini 2:1 이의 → GPT 자진 철회. 두 Round 모두 단일 모델 오류 차단 성공"
+  },
   "critic_review": null,
-  "created_at": "2026-04-19T21:55:01+09:00"
+  "created_at": "2026-04-19T21:55:01+09:00",
+  "round2_created_at": "2026-04-19T22:10:00+09:00"
 }
