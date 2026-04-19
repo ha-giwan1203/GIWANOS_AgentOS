@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-19 — 세션72 (자동 갱신: final_check --fix)
+최종 업데이트: 2026-04-19 — 세션74 (쟁점 G settings 계층 실물 분리)
 
 ---
 
@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 32개 등록 + 스킬 18개. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 추가 + timing 배선. 세션53: 메모리 41→33개(중복 8건 통합), rules 충돌 해소(data-and-files.md), user 메모리 신규(user_role_manufacturing.md). 세션52: req clear 문서화, status_sync 보류, AGENTS_GUIDE 자동생성. GPT 통과 |
+| hooks 체계 | 32개 등록 + 스킬 18개. 세션74 쟁점 G 실물 분리: settings.json(TEAM) 신설 + settings.local.json(PERSONAL 8) 축소 + 검증 스크립트 5개(final_check/smoke_test/smoke_fast/doctor_lite/permissions_sanity) team+local union 지원. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 + timing 배선. 세션53: 메모리 정리·rules 충돌 해소. 세션52: AGENTS_GUIDE 자동생성. GPT 통과 |
 
 ---
 

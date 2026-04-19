@@ -9,7 +9,19 @@ FAIL=0
 TOTAL=0
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
-SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
+SETTINGS_TEAM="$PROJECT_DIR/.claude/settings.json"
+SETTINGS_LOCAL="$PROJECT_DIR/.claude/settings.local.json"
+SETTINGS="$SETTINGS_TEAM"
+[ -f "$SETTINGS" ] || SETTINGS="$SETTINGS_LOCAL"
+# 세션74: team+local union grep helper
+grep_settings_any() {
+  local needle="$1"
+  grep -q "$needle" "$SETTINGS_TEAM" 2>/dev/null || grep -q "$needle" "$SETTINGS_LOCAL" 2>/dev/null
+}
+grep_settings_none() {
+  # 양쪽 어디에도 없으면 exit 0
+  ! grep -q "$1" "$SETTINGS_TEAM" 2>/dev/null && ! grep -q "$1" "$SETTINGS_LOCAL" 2>/dev/null
+}
 
 check() {
   TOTAL=$((TOTAL+1))
@@ -75,8 +87,8 @@ check $? "send_gate.sh가 _archive에 보관됨"
 ! test -f "$HOOKS_DIR/send_gate.sh"
 check $? "send_gate.sh가 활성 hooks에 없음 (폐기됨)"
 
-! grep -q '"send_gate\.sh"' "$SETTINGS" 2>/dev/null
-check $? "settings.local.json에 send_gate.sh 미등록 (mcp_send_gate는 정상)"
+grep_settings_none '"send_gate\.sh"'
+check $? "settings에 send_gate.sh 미등록 (mcp_send_gate는 정상)"
 
 echo ""
 
@@ -400,15 +412,15 @@ check $? "share-result에 CDP 참조 없음"
 ! grep -q 'cdp_chat_send' "$FINISH_CMD"
 check $? "finish에 CDP 참조 없음"
 
-# settings allow에 CDP 스크립트 허용 없음 확인
-! grep -q 'scripts/cdp/' "$SETTINGS"
-check $? "settings.local.json에 CDP 스크립트 허용 없음"
+# settings allow에 CDP 스크립트 허용 없음 확인 (team+local)
+grep_settings_none 'scripts/cdp/'
+check $? "settings에 CDP 스크립트 허용 없음"
 
 # mcp_send_gate.sh 존재 확인 (Chrome MCP SEND GATE)
 test -f "$HOOKS_DIR/mcp_send_gate.sh"
 check $? "mcp_send_gate.sh 존재 (Chrome MCP 전송 게이트)"
 
-grep -q 'mcp_send_gate' "$SETTINGS"
+grep_settings_any 'mcp_send_gate'
 check $? "mcp_send_gate settings 등록 확인"
 
 echo ""
@@ -577,9 +589,9 @@ check $? "evidence_mark_read: debate_claude_read 마커 생성 로직"
 grep -q 'NORM_TEXT' "$HOOKS_DIR/evidence_mark_read.sh"
 check $? "evidence_mark_read: Windows 경로 정규화(NORM_TEXT) 존재"
 
-# settings.local.json 등록 확인
-grep -q 'instruction_read_gate.sh' "$PROJECT_DIR/.claude/settings.local.json"
-check $? "settings.local.json: instruction_read_gate 등록됨"
+# settings 등록 확인 (team+local)
+grep_settings_any 'instruction_read_gate.sh'
+check $? "settings: instruction_read_gate 등록됨"
 
 # session_start_restore.sh 초기화 확인
 grep -q 'instruction_reads' "$HOOKS_DIR/session_start_restore.sh"
@@ -861,9 +873,9 @@ check $? "navigate_gate: 파일 존재"
 bash -n "$_NG_SCRIPT" 2>/dev/null
 check $? "navigate_gate: bash -n 구문검사 통과"
 
-# 45-2: settings.local.json에 등록 확인
-grep -q 'navigate_gate' "$SETTINGS" 2>/dev/null
-check $? "navigate_gate: settings.local.json 등록 확인"
+# 45-2: settings(team+local) 등록 확인
+grep_settings_any 'navigate_gate'
+check $? "navigate_gate: settings 등록 확인"
 
 # 45-3: 비-chatgpt URL → exit 0 (통과)
 _ng_result=$(echo '{"tool_input":{"url":"https://google.com"}}' | bash "$_NG_SCRIPT" 2>/dev/null)

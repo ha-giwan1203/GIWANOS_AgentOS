@@ -20,7 +20,11 @@ export CLAUDE_PROJECT_DIR="$PROJECT_DIR"
 source "$HOOKS_DIR/hook_common.sh" 2>/dev/null || true
 FAIL=0
 WARN=0
-SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
+SETTINGS_TEAM="$PROJECT_DIR/.claude/settings.json"
+SETTINGS_LOCAL="$PROJECT_DIR/.claude/settings.local.json"
+# 호환성 유지용: 과거 SETTINGS 참조는 TEAM 우선, 없으면 LOCAL fallback
+SETTINGS="$SETTINGS_TEAM"
+[ -f "$SETTINGS" ] || SETTINGS="$SETTINGS_LOCAL"
 README_FILE="$HOOKS_DIR/README.md"
 STATUS_FILE="$PROJECT_DIR/90_공통기준/업무관리/STATUS.md"
 TASKS="$PROJECT_DIR/90_공통기준/업무관리/TASKS.md"
@@ -37,13 +41,19 @@ fail() {
 }
 
 registered_hook_names() {
-  local settings_file="${1:-$SETTINGS}"
-  if [ ! -f "$settings_file" ]; then
+  # 세션74: settings.json(TEAM) + settings.local.json(PERSONAL) 양쪽 union
+  local f
+  local any=0
+  for f in "$SETTINGS_TEAM" "$SETTINGS_LOCAL" "$@"; do
+    if [ -n "$f" ] && [ -f "$f" ]; then
+      grep -oE '"command"[[:space:]]*:[[:space:]]*"bash \.claude/hooks/[A-Za-z0-9_-]+\.sh"' "$f" 2>/dev/null \
+        | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/'
+      any=1
+    fi
+  done | sort -u
+  if [ "$any" = "0" ]; then
     return 1
   fi
-  grep -oE '"command"[[:space:]]*:[[:space:]]*"bash \.claude/hooks/[A-Za-z0-9_-]+\.sh"' "$settings_file" 2>/dev/null \
-    | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/' \
-    | sort -u
 }
 
 readme_active_hook_count() {
@@ -112,10 +122,10 @@ echo "--- 3. hook 개수 정합성 ---"
 REGISTERED_HOOKS=$(registered_hook_names)
 if [ -n "$REGISTERED_HOOKS" ]; then
   SETTINGS_HOOKS=$(printf '%s\n' "$REGISTERED_HOOKS" | sed '/^$/d' | wc -l | tr -d ' ')
-  echo "  settings.local 실등록: ${SETTINGS_HOOKS}개"
+  echo "  settings(team+local) 실등록: ${SETTINGS_HOOKS}개"
 else
   SETTINGS_HOOKS=""
-  warn "settings.local.json에서 활성 hook 목록을 읽지 못함"
+  warn "settings.json/settings.local.json에서 활성 hook 목록을 읽지 못함"
 fi
 
 README_COUNT=$(readme_active_hook_count 2>/dev/null || true)
@@ -129,9 +139,9 @@ if [ -n "$README_COUNT" ]; then
       bash "$PROJECT_DIR/.claude/scripts/hook_registry.sh" sync 2>&1 | sed 's/^/    /'
       echo "  [FIX] 완료. README/STATUS hook 수 자동 갱신됨"
     elif [ "$MODE" = "--full" ]; then
-      fail "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격). --fix로 자동 교정 가능"
+      fail "README($README_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격). --fix로 자동 교정 가능"
     else
-      warn "README($README_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+      warn "README($README_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트"
     fi
     # 개별 훅 이름 대조 (세션 11 lint 개선)
     README_HOOKS=$(readme_active_hook_names 2>/dev/null || true)
@@ -156,9 +166,9 @@ if [ -n "$STATUS_COUNT" ]; then
   echo "  STATUS 문서화: ${STATUS_COUNT}개"
   if [ -n "$SETTINGS_HOOKS" ] && [ "$STATUS_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
     if [ "$MODE" = "--full" ]; then
-      fail "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
+      fail "STATUS($STATUS_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격)"
     else
-      warn "STATUS($STATUS_COUNT) ≠ settings.local($SETTINGS_HOOKS) — 문서 드리프트"
+      warn "STATUS($STATUS_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트"
     fi
   else
     echo "  [OK] STATUS hook 개수 일치"
@@ -199,8 +209,8 @@ else
 fi
 echo ""
 
-# 5. settings.local 등록 hook 실존 여부
-echo "--- 5. settings.local 등록 hook 실존 여부 ---"
+# 5. settings 등록 hook 실존 여부 (team+local union)
+echo "--- 5. settings 등록 hook 실존 여부 ---"
 if [ -n "$REGISTERED_HOOKS" ]; then
   MISSING_REGISTERED=""
   while IFS= read -r hook_name; do
@@ -213,15 +223,15 @@ $REGISTERED_HOOKS
 EOF
 
   if [ -n "$MISSING_REGISTERED" ]; then
-    fail "settings.local 등록 훅 파일 누락:"
+    fail "settings 등록 훅 파일 누락:"
     printf '%s' "$MISSING_REGISTERED" | while IFS= read -r hook_name; do
       [ -n "$hook_name" ] && echo "    - $hook_name"
     done
   else
-    echo "  [OK] settings.local 등록 훅 실파일 모두 존재"
+    echo "  [OK] settings 등록 훅 실파일 모두 존재"
   fi
 else
-  warn "settings.local 등록 훅 실존 여부 검사 건너뜀"
+  warn "settings 등록 훅 실존 여부 검사 건너뜀"
 fi
 echo ""
 

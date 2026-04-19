@@ -7,13 +7,16 @@ source "$(dirname "$0")/hook_common.sh"
 
 ISSUES=()
 
-# 1. settings.local.json JSON 문법 검증
-SETTINGS="$PROJECT_ROOT/.claude/settings.local.json"
-if [ -f "$SETTINGS" ]; then
-  if ! python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS" 2>/dev/null; then
-    ISSUES+=("settings.local.json JSON 문법 오류")
+# 1. settings JSON 문법 검증 — team+local 양쪽 (세션74)
+for SETTINGS_FILE in \
+    "$PROJECT_ROOT/.claude/settings.json" \
+    "$PROJECT_ROOT/.claude/settings.local.json"; do
+  if [ -f "$SETTINGS_FILE" ]; then
+    if ! python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS_FILE" 2>/dev/null; then
+      ISSUES+=("$(basename "$SETTINGS_FILE") JSON 문법 오류")
+    fi
   fi
-fi
+done
 
 # 2. 필수 hook 파일 존재 체크
 REQ_HOOKS=(

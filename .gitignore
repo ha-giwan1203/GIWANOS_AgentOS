@@ -36,8 +36,10 @@
 !.claude/scripts/cdp/cdp_chat_send.py
 !.claude/rules/
 !.claude/rules/**
+!.claude/settings.json
 .claude/settings.local.json
 .claude/settings.local.json.bak_20260401
+.claude/settings.local.json.bak_20260419
 # .claude/incident_ledger.jsonl — 감사 로그로 Git 추적 유지 (세션15 정책 확정)
 .claude/command-audit.log
 .claude/subagent-audit.log

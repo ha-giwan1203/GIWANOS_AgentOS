@@ -15,7 +15,8 @@ source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 _PS_START=$(hook_timing_start)
 
 PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
-SETTINGS="$PROJECT_ROOT/.claude/settings.local.json"
+SETTINGS_TEAM="$PROJECT_ROOT/.claude/settings.json"
+SETTINGS_LOCAL="$PROJECT_ROOT/.claude/settings.local.json"
 CACHE_FILE="$PROJECT_ROOT/.claude/state/permissions_sanity_last.txt"
 CACHE_TTL=3600  # 60분
 
@@ -31,7 +32,7 @@ if [ -f "$CACHE_FILE" ]; then
 fi
 
 # JSON 파싱 + 탐지 (Python 1회 실행)
-if [ ! -f "$SETTINGS" ]; then
+if [ ! -f "$SETTINGS_TEAM" ] && [ ! -f "$SETTINGS_LOCAL" ]; then
   hook_timing_end "permissions_sanity" "$_PS_START" "skip_nosettings"
   exit 0
 fi
@@ -41,17 +42,20 @@ import json, re, sys
 from collections import Counter
 from pathlib import Path
 
-path = Path('.claude/settings.local.json')
-try:
-    d = json.loads(path.read_text(encoding='utf-8'))
-except Exception as e:
-    sys.exit(0)
-
-allow = d.get('permissions', {}).get('allow', [])
+# 세션74: team+local union으로 1회용/중복 탐지
+allow = []
+for p in (Path('.claude/settings.json'), Path('.claude/settings.local.json')):
+    if not p.exists():
+        continue
+    try:
+        d = json.loads(p.read_text(encoding='utf-8'))
+    except Exception:
+        continue
+    allow.extend(d.get('permissions', {}).get('allow', []))
 
 patterns = [
-    (re.compile(r'^Bash\(echo "\d{10,}"\)$'), 'PID echo 하드코딩'),
-    (re.compile(r'^Bash\(echo "https?://.*"\)$'), 'URL echo 하드코딩'),
+    (re.compile(r'^Bash\(echo ["\']\d{10,}["\']\)$'), 'PID echo 하드코딩'),
+    (re.compile(r'^Bash\(echo ["\']https?://.*["\']\)$'), 'URL echo 하드코딩'),
     (re.compile(r'^Bash\(rm -f "C:.+"\)$'), '특정 파일 rm'),
     (re.compile(r'^Bash\(rmdir "C:.+"\)$'), '특정 디렉토리 rmdir'),
     (re.compile(r'^Bash\(rm -f \.claude/state/.+\)$'), 'state 파일 rm'),

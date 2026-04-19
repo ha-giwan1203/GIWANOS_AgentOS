@@ -10,7 +10,57 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션73 Step 1 (PreToolUse JSON 스키마 마이그레이션)
+최종 업데이트: 2026-04-19 — 세션74 (쟁점 G settings 계층 실물 분리)
+
+---
+
+## 세션74 반영 (2026-04-19, 쟁점 G 실물 분리 세션)
+
+**[완료] 쟁점 G settings 계층 실물 분리 — 단일 원자 커밋**
+- `.claude/settings.json` **신설** (Git 추적): TEAM 76건 + hooks 31매처 + statusLine 이동
+- `.claude/settings.local.json` **축소**: PERSONAL 8건 + ask 8건 (hooks/statusLine 제거)
+- **제거 18건** (개인경로 11 + 1회용 잔재 7):
+  - 개인경로 11: `Bash(mkdir -p "C:/Users/User/...")` × 5, `Bash(git -C "C:/Users/User/..." rev-parse HEAD)`, `Bash(python3 "C:/Users/User/..." ...)` × 2, `Bash(PYTHONIOENCODING=utf-8 python3 "C:/Users/User/..." ...)`, `Bash(awk ... /c/Users/User/... commit_gate.sh)`, `Read(//c/Users/User/Desktop/업무리스트/**)` (포괄 `Read` 권한이 TEAM에 있어 기능 손실 없음)
+  - 1회용 잔재 7: `Bash(echo 'https://...')` × 1 + `Bash(echo "https://...")` × 1 (탭 URL), `Bash(echo '1382935544')` + `Bash(echo "1382937470")` (PID echo), `Bash(PYTHONUTF8=1 python3 -c "import json; ... settings.local.json ...")` (1회용 JSON 검증), `Bash(python3 "90_공통기준/업무관리/slack_notify.py" --message "[daily-doc-check ...]")` × 2 (하드코딩 슬랙 메시지)
+- **PERSONAL 8건 최종**: Windows 4(`powershell -Command Get-Date:*`, `tasklist:*`, `schtasks:*`, `start *:*`) + `wmic process *` + `gemini:*`·`gemini -p:*`·`echo "*" | gemini *:*`
+- **hooks 31매처 순서 100% 보존** (PreToolUse 첫 번째 `block_dangerous` 확인)
+
+**[완료] 검증 스크립트 5개 team+local union 지원 (근본 해결)**
+- **배경**: 세션71 settings 분리 정책 합의 당시 검증 스크립트들의 `settings.local.json` 하드코딩을 사전 교정하지 않아, 세션74 실물 분리 시 `final_check --full` 3 FAIL → `commit_gate` exit 2 차단 발생 (설계 누락성 버그)
+- **수정 5개**:
+  - `final_check.sh`: `SETTINGS_TEAM`/`SETTINGS_LOCAL` 분리 + `registered_hook_names()` union
+  - `smoke_test.sh`: `grep_settings_any`/`grep_settings_none` helper 신설, 5곳 전환 (send_gate·CDP·instruction_read_gate·mcp_send_gate·navigate_gate)
+  - `smoke_fast.sh`: settings.json·settings.local.json JSON 유효성 양쪽 검증
+  - `doctor_lite.sh`: settings 두 파일 루프 검증
+  - `permissions_sanity.sh`: team+local union allow 스캔 (Counter 중복 탐지 포함)
+- **결과**: final_check --full 167/167 PASS · smoke_fast 10/10 · doctor_lite OK
+
+**[완료] `permissions_sanity.sh` single-quote regex 버그 수정**
+- 세션73 탐색에서 발견한 버그: regex가 `"..."`(double-quote)만 매칭 → `'...'`(single-quote) 잔재 2건 미탐지
+- 수정: `r'^Bash\(echo "\d{10,}"\)$'` → `r'^Bash\(echo ["\']\d{10,}["\']\)$'` (URL regex 동일)
+- 6/6 단위 검증 통과 (double/single/non-match 조합)
+
+**[완료] `.gitignore` 정정**
+- `!.claude/settings.json` 예외 추가 (신설 파일 추적)
+- `.claude/settings.local.json.bak_20260419` 제외 추가 (세션74 백업 보호)
+
+**[검증]**
+- `.claude/settings.json` JSON 유효 · allow 76 · PreToolUse 16매처 (block_dangerous 첫째)
+- `.claude/settings.local.json` JSON 유효 · allow 8 · ask 8 · hooks/statusLine 부재
+- `bash .claude/hooks/smoke_fast.sh` 9/9 PASS
+- `bash .claude/hooks/doctor_lite.sh` OK
+- `bash .claude/hooks/permissions_sanity.sh` 경고 0건
+- hooks 원본 vs 신설 파일 diff 완전 동일 (31매처, PreToolUse 16 순서 일치)
+- `git check-ignore`: settings.json 추적 가능 / bak_20260419 제외 / settings.local.json은 추적 중 (기존 정책 유지)
+
+**[후속 검증 — 사용자 수행 필수]**
+- Claude Code CLI 재시작 (settings 캐싱 특성상 재시작 없이 미반영)
+- 재시작 후 `doctor_lite` + `smoke_fast` + `permissions_sanity` 재검증
+- 1주 후 permissions 팝업 빈도 측정 — 분리 효과 확인
+
+**[이월]**
+- 세션75: `hook_timing.jsonl` 1주 집계 + gate 9개 `exit 2` 승격 판단
+- 조건부: `debate_verify` 태그 incident 7일 0건 달성 시 Phase 2 승격
 
 ---
 

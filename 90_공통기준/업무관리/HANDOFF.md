@@ -4,12 +4,56 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션73 (이월 3건 처리)
+최종 업데이트: 2026-04-19 KST — 세션74 (쟁점 G settings 계층 실물 분리)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션73 — 진행 중)
+## 0. 최신 세션 (2026-04-19 세션74 — 쟁점 G 실물 분리)
+
+### 이번 세션 계획
+세션73 이월 1건:
+1. 쟁점 G settings 계층 실물 분리 (단일 원자 커밋 + 세션 재시작 필수)
+
+### 완료 — 단일 원자 커밋으로 settings 분리
+
+**변경 요약**:
+- `.claude/settings.json` 신설 (신규 Git 추적): TEAM 76 permissions + hooks 31매처 + statusLine
+- `.claude/settings.local.json` 축소: PERSONAL 8 + ask 8 (hooks/statusLine 제거)
+- 제거 18건: 개인경로 11 + 1회용 잔재 7 (탭 URL echo 2·PID echo 2·JSON 1회용 검증 1·하드코딩 슬랙 2)
+- `.claude/hooks/permissions_sanity.sh` single-quote regex 버그 수정 (6/6 단위 검증)
+- `.gitignore` 2개 라인 추가: `!.claude/settings.json` + `.claude/settings.local.json.bak_20260419`
+- **검증 스크립트 5개 team+local union 지원 (근본 해결, 커밋 도중 발견)**: `final_check.sh` SETTINGS 분리 + registered_hook_names union, `smoke_test.sh` grep helper + 5곳 전환, `smoke_fast.sh` 양쪽 JSON 검증, `doctor_lite.sh` 루프 검증, `permissions_sanity.sh` union allow 스캔. 세션71 정책 누락(검증 스크립트 하드코딩 미교정) 해소.
+- `90_공통기준/업무관리/STATUS.md` 세션74로 갱신
+
+**검증**:
+- smoke_fast 9/9 PASS · doctor_lite OK · permissions_sanity 경고 0건
+- hooks 구조 원본 vs 신설 diff 완전 동일
+- PreToolUse 16매처 순서 100% 보존 (block_dangerous 첫째)
+- JSON 파싱 양쪽 유효 (settings.json allow=76 · settings.local.json allow=8)
+
+**주의 사항**:
+- `.claude/settings.local.json`은 **이미 Git 추적 중**인 기존 정책. 본 커밋에도 변경분 포함. `.gitignore` line 39의 `.claude/settings.local.json` 제외 라인은 추적 중 파일에는 무효지만 향후 untracked 상태 대비 보험으로 유지.
+- `Read(//c/Users/User/...)` 절대경로 권한은 TEAM `Read` 기본 권한이 있으므로 DELETE 대상에 포함됨 (기능 손실 없음).
+
+### 다음 세션 첫 액션 — **사용자 수행 필수**
+
+1. **Claude Code CLI 종료 → 재실행** (settings 캐싱 특성상 재시작 없이 새 설정 미반영)
+2. 재시작 후 새 세션에서 순서대로 검증:
+   - `bash .claude/hooks/doctor_lite.sh` → OK
+   - `bash .claude/hooks/smoke_fast.sh` → 9/9 PASS
+   - `bash .claude/hooks/permissions_sanity.sh` → 경고 0건
+   - 임의 Bash 호출 시 `block_dangerous` trigger 확인 (PreToolUse 첫 매처 동작)
+3. 이상 시 롤백 절차: `C:\Users\User\.claude\plans\cryptic-tinkering-ladybug.md` Case B/C 참조
+4. 1주 후 permissions 팝업 빈도 측정 (분리 효과 확인)
+
+### 이월 (세션75+)
+- `hook_timing.jsonl` 1주 집계 + gate 9개 `exit 2` 승격 판단
+- `debate_verify` 태그 incident 7일 0건 달성 시 Phase 2 승격
+
+---
+
+## 0-prev. 세션73 (2026-04-19)
 
 ### 이번 세션 계획
 세션72 이월 3건:
