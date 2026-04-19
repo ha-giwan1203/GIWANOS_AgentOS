@@ -147,6 +147,13 @@ if [ -x "$DOCTOR_LITE" ]; then
   echo "$DOCTOR_RESULT"
 fi
 
+# token_threshold_check — 저장소 문서 비대화 감시 (세션68 3자 합의 / 세션79 실물 구현)
+TOKEN_CHK="$(dirname "$0")/token_threshold_check.sh"
+if [ -x "$TOKEN_CHK" ]; then
+  TOKEN_RESULT=$("$TOKEN_CHK" 2>&1)
+  [ -n "$TOKEN_RESULT" ] && echo "$TOKEN_RESULT"
+fi
+
 # 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교 (hook_config.json drift_check 연동)
 DRIFT_PATTERN="최종 업데이트"
 if [ -f "$CONFIG_FILE" ]; then

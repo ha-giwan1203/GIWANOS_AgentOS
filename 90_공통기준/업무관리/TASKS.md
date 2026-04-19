@@ -10,7 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션78 Round 1 (push-only 면제 + smoke 3건 3자 합의 반영)
+최종 업데이트: 2026-04-20 — 세션79 (영상분석 드리프트 보정 — token-threshold-warn Phase 1 실물 구현)
+
+---
+
+## 세션79 착수 (2026-04-20, 영상 분석 적용 점검 → 드리프트 보정)
+
+**[완료] 영상분석(2rzKCZ7XvQU) 시스템 적용 점검 — 11개 항목 중 10건 정합, 1건 드리프트 발견**
+- 즉시적용 4건: /rewind·context7·doctor_lite·statusline 모두 정합 반영
+- 보류/폐기 3건: /batch·/insights·--bare 그대로 미도입 (의도대로)
+- 검증후적용 4건 중 3건 정합: /schedule 분류표·skill-creator 경로화·/debate-verify hook
+- **드리프트 1건**: `token-threshold-warn` 스킬 TASKS.md 601행 "완료" 표기됐으나 실물 미구현
+
+**[완료] 토큰 임계치 경고 스킬 `token-threshold-warn` Phase 1 실물 구현** — 세션68 3자 합의(pass_ratio 1.00) 드리프트 보정
+- 신설 파일:
+  1. `.claude/hooks/token_threshold_check.sh` (advisory, exit 0 강제)
+  2. `90_공통기준/스킬/token-threshold-warn/SKILL.md`
+- 수정 파일:
+  1. `.claude/hooks/session_start_restore.sh` (doctor_lite 직후 배선)
+  2. `.claude/hooks/smoke_test.sh` (섹션 47 신규 5건)
+  3. `.claude/settings.json` permissions.allow 1건 추가
+- 임계치 (합의 고정): TASKS 400/800, HANDOFF 500/800, MEMORY 인덱스 120/200, 메모리 파일 60/100, incident 1MB/3MB
+- 수동 실행 검증: 현재 TASKS 1981줄 → `[STRONG] TASKS.md: 1981 / 800줄` 정상 출력
+- smoke_test 47번 5건 PASS (전체 178/179, 나머지 1건은 선행 FAIL로 본건 무관)
+
+**[이월] Phase 2 Stop hook 증가량 기록** — 1주 운영 후 경고 빈도 안정기 확인 시 `token_threshold_delta.sh` 구현
+
+**[이월] TASKS.md 감축 작업** — 현재 1981줄(강경고 2.5배 초과). 세션79 스킬 구현과 분리하여 후속 별도 커밋으로 진행. 세션블록 최근 3개만 유지하고 나머지 `98_아카이브/tasks_archive_20260420.md`로 이관 검토
 
 ---
 
@@ -598,11 +624,12 @@ Step 5 양측 검증: GPT "동의" + Gemini "동의" → pass_ratio 1.0
 - Phase 1 이관 후보 읽기전용 3종: `/self-audit`, `/doc-check`, `/review-claude-md`
 - 하이브리드 작업: 축 신설 안함. [로컬 Desktop 수집 → Git commit → Cloud 가공] 분리
 
-**[완료] 의제2 토큰 임계치 경고 스킬 `token-threshold-warn` (pass_ratio 1.00)**
+**[완료-합의 2026-04-18 / 실물 구현 2026-04-20 세션79] 의제2 토큰 임계치 경고 스킬 `token-threshold-warn` (pass_ratio 1.00)**
 로그: `90_공통기준/토론모드/logs/debate_20260418_164115_3way/`
 - 임계치: TASKS 400/800, HANDOFF 500/800, MEMORY 인덱스 120/200, 개별메모리 60/100, incident 1MB/3MB
 - SessionStart hook 경고 + Stop hook 증가량 기록 (차단 없음)
 - 자동 아카이브 이동 금지, 토큰 근사치 계산 금지
+- **세션79 실물화**: Phase 1(SessionStart 경고) 완료. Phase 2(Stop hook) 1주 후 재평가. 상세: 상단 세션79 블록 참조.
 
 **[합의 (세션70 승격)] 의제3 skill-creator 경로화 (pass_ratio 0.50 → 0.67)**
 로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`

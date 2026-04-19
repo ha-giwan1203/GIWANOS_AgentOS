@@ -4,12 +4,47 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션78 Round 1 (push-only 면제 + smoke 3건 3자 합의)
+최종 업데이트: 2026-04-20 KST — 세션79 (영상분석 드리프트 보정: token-threshold-warn Phase 1 실물 구현)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션78 Round 1 보완 — 3way 공유 양측 필수 규칙 신설)
+## 0. 최신 세션 (2026-04-20 세션79 — 영상 분석 적용 점검 및 드리프트 보정)
+
+### 사용자 지시
+"앞전 영상 분석 후 시스템에 적용하면서 진행된 거잖아 이제 의도대로 적용되었는지 점검이 필요해"
+
+### 점검 결과
+세션68(영상 2rzKCZ7XvQU) 3자 토론 도출 11개 항목 중 **10개 정합 반영, 1개 드리프트** 발견:
+- 즉시적용 4건 ✓ / 보류·폐기 3건 의도대로 미도입 ✓ / 검증후적용 3건 ✓
+- **드리프트**: `token-threshold-warn` 스킬 (의제2, pass_ratio 1.00 합의) — TASKS.md 601행 "완료" 표기됐으나 실물 미구현
+- 배경: 현재 TASKS.md 1981줄로 합의 강경고(800) 2.5배 초과. 스킬이 있었다면 매 세션 경고 중이었을 상황
+
+### 조치 (Phase 1 실물 구현)
+1. 신설 `.claude/hooks/token_threshold_check.sh` — advisory, exit 0 강제, 차단 없음
+2. 신설 `90_공통기준/스킬/token-threshold-warn/SKILL.md` — 임계치·Phase 로드맵·수동 호출·튜닝
+3. `session_start_restore.sh` doctor_lite 직후 체인 배선
+4. `smoke_test.sh` 섹션 47 신규 5건 PASS
+5. `settings.json` permissions.allow 1건 추가
+6. TASKS.md 601행 "완료" → "완료-합의 / 실물 구현 세션79" 정정 + 상단에 세션79 블록 추가
+
+### 검증
+- 수동 실행: `bash .claude/hooks/token_threshold_check.sh` → `[STRONG] TASKS.md: 1981 / 800줄` 정상 출력
+- smoke_test 47번 5/5 PASS (전체 178/179, 나머지 1건 classify_feedback.py FAIL은 선행 실패로 본건 무관)
+- settings.json JSON 유효성 OK
+
+### 다음 AI 액션
+1. 커밋 (권장 메시지: `feat(session79): token-threshold-warn Phase 1 실물 구현 — 세션68 영상분석 드리프트 보정`)
+2. GPT 공유 (B 분류 아님 — 이미 3자 합의된 스펙의 실물화이므로 승격 불필요, 2자 share-result로 충분)
+3. Phase 2(Stop hook 증가량) 구현 대기 — 1주 운영 경고 빈도 확인 후
+4. TASKS.md 1981줄 감축 작업 — 별도 커밋으로 분리 (세션79 이월 태스크)
+
+### 선행 FAIL 기록 (본건 무관)
+- smoke_test 25번 `classify_feedback.py --validate ALL OK` 실패. 세션46(ac549431) 이후 잔존 가능성. 이번 변경과 무관하나 추후 원인 추적 필요.
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션78 Round 1 보완 — 3way 공유 양측 필수 규칙 신설)
 
 ### 직전 실수 (사용자 지적)
 

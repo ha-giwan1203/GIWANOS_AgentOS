@@ -20,6 +20,11 @@
 *apikey*
 *api_key*
 *openai*
+# 예외: token-threshold-warn 스킬 (세션79 영상분석 드리프트 보정)
+# — "token"은 문서 토큰 라인수 의미, 민감정보 아님
+!90_공통기준/스킬/token-threshold-warn/
+!90_공통기준/스킬/token-threshold-warn/**
+!.claude/hooks/token_threshold_check.sh
 
 # Claude Code: 로컬 상태는 제외, 공통 규칙 파일만 선택적으로 추적
 .claude/*

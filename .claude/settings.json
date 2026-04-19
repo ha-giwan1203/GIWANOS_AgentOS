@@ -68,6 +68,7 @@
       "Bash(awk -F'\"' '{print $1}')",
       "Bash(bash .claude/hooks/doctor_lite.sh)",
       "Bash(bash .claude/hooks/statusline.sh)",
+      "Bash(bash .claude/hooks/token_threshold_check.sh)",
       "Bash(python3 -c \"import json*:*)",
       "Bash(cat .claude/state/*:*)",
       "mcp__Claude_in_Chrome__tabs_create_mcp",
