@@ -856,13 +856,22 @@ _eg_result_4=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md"
 echo "$_eg_result_4" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: skill_read.req + 도메인편집 → deny (런타임)"
 
-# 44-5: map_scope.req + Write 도구 → deny
+# 44-5: map_scope.req + Write on .claude/hooks/*.sh → deny (세션77 Policy 재정의)
+# 변경: 기존 "모든 Write/Edit 차단" → "운영 훅·settings만 차단"
 rm -f "$_eg_req_dir/skill_read.req" 2>/dev/null
 : > "$_eg_req_dir/map_scope.req"
 rm -f "$_eg_proof_dir/map_scope.ok" 2>/dev/null
-_eg_result_5=$(echo '{"tool_name":"Write","tool_input":"test_file.md","command":""}' | bash "$_eg_script" 2>/dev/null)
+_eg_result_5=$(echo '{"tool_name":"Write","tool_input":{"file_path":".claude/hooks/new_hook.sh","content":"x"},"command":""}' | bash "$_eg_script" 2>/dev/null)
 echo "$_eg_result_5" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
-check $? "evidence_gate: map_scope.req + Write → deny (런타임)"
+check $? "evidence_gate: map_scope.req + Write on .claude/hooks/*.sh → deny (런타임)"
+
+# 44-6 (세션77 Policy 재정의 신규): map_scope.req + Write on .md → pass (문서는 면제)
+_eg_result_6=$(echo '{"tool_name":"Write","tool_input":{"file_path":"docs/some.md","content":"x"},"command":""}' | bash "$_eg_script" 2>/dev/null)
+if echo "$_eg_result_6" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null; then
+  check 1 "evidence_gate: map_scope.req + Write on .md → pass (세션77 재정의)"
+else
+  check 0 "evidence_gate: map_scope.req + Write on .md → pass (세션77 재정의)"
+fi
 
 # 상태 복원
 rm -rf "$_eg_req_dir"/* 2>/dev/null

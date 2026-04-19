@@ -10,7 +10,57 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션77 (Silent Failure 방지 + Pruning 관찰 + evidence_gate 486건 5정책 분해)
+최종 업데이트: 2026-04-20 — 세션77 (Step 1-c map_scope Policy 재정의 구현 + 단위 검증 9/9)
+
+---
+
+## 세션77 최종 반영 (2026-04-20, Step 1-c map_scope Policy 재정의)
+
+**[완료] Step 1-c — map_scope Policy 재정의 (evidence_gate 71.4% 점유 대응)**
+- **목적**: evidence_gate 486건 중 map_scope.req 347건(71.4%) 과탐지 근본 해결
+- **접근**: Claude 독립 옵션 D (트리거 축소 A + 대상 파일 체크 C 조합) — Round 3 정식 토론 대신 실물 구현 + 사후 공유
+- **수정 파일 2개**:
+
+1. **`.claude/hooks/risk_profile_prompt.sh`** (트리거 조건 축소)
+   - HAS_HOOK_ABSTRACT 제거 ("공통 훅", "운영 게이트" 등 경로 없는 추상 표현 — 의도 부족 트리거)
+   - HAS_INTENT 축소: 13개 → 6개 (수정/변경/삭제/리팩터/제거/교체만 유지)
+   - 제거된 8개: 추가/구현/신설/이동/전수/일괄/개편/손본 (신규·논의 단계 포함으로 FP 과다)
+
+2. **`.claude/hooks/evidence_gate.sh`** (대상 파일 경로 체크 추가)
+   - 기존: Write/Edit/MultiEdit 모두 차단 → 문서·데이터 수정도 차단되는 과탐지
+   - 변경: 대상 파일이 `.claude/hooks/*.sh` 또는 `.claude/settings*.json`일 때만 차단
+   - `.md` / 데이터 / 업무 스프레드시트 / 일반 스크립트는 면제
+   - `safe_json_get`이 중첩키 미지원이라 raw INPUT에서 `file_path` 직접 grep
+
+**[단위 검증 9/9 PASS]**
+- Write on .md → pass ✅
+- Write on .claude/hooks/*.sh → deny ✅
+- Write on settings.local.json → deny ✅
+- Write on settings.json → deny ✅
+- Write on TASKS.md → pass ✅
+- Edit on hook_common.sh → deny ✅
+- Edit on .py → pass ✅
+- Bash ls → pass ✅
+- MultiEdit on .claude/hooks/*.sh → deny ✅
+
+**[smoke_test 44-5 수정 + 44-6 신규]**
+- 44-5: `tool_input: "test_file.md"` 구포맷 → `{"file_path":".claude/hooks/new_hook.sh"}` 신포맷. 여전히 deny 기대.
+- 44-6 신규: `{"file_path":"docs/some.md"}` → pass (세션77 재정의 검증)
+
+**[예상 효과]**
+- 기존 이월 기준: map_scope 트리거 347건/세션 → 축소 조건으로 **50건 이하** 예상
+- 일상 대화·문서 수정 마찰 해소
+- 통제 목적(운영 훅·settings 변경 보호)은 유지
+
+**[이월 — Step 2 incident_ledger 반복 5종 정리]**
+- Step 1-c 완료 후만 진행 (Gemini 순서 강제 규칙)
+- 1주 관찰 → 새 Policy 효과 실증 후 Step 2 착수
+- 예상 시점: 세션85+
+
+**[이월 — skill_read.req / tasks_handoff.req Policy 재정의]**
+- map_scope 재정의 효과 확인 후 동일 패턴 적용
+- skill_read: session 내 SKILL.md 1회 읽으면 재실행 허용 (현재 매 호출마다 재검증)
+- tasks_handoff: commit 직전 자동 trigger (현재 작업 시작 시점 trigger라 자연 흐름 어긋남)
 
 ---
 

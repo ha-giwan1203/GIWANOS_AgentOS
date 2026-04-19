@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-19 — 세션77 (Silent Failure + Pruning 관찰 + evidence_gate 486건 5정책 분해)
+최종 업데이트: 2026-04-20 — 세션77 (Step 1-c map_scope Policy 재정의 + 단위 검증 9/9)
 
 ---
 

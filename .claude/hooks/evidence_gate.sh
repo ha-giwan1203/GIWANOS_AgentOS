@@ -133,12 +133,21 @@ if (fresh_req "skill_read" || fresh_req "identifier_ref") && is_identifier_domai
 fi
 
 # 4) 사고 품질 — 고위험 수정 시 map_scope 선행
+# 세션77 Round 1 Step 1-c: 대상 파일 경로 체크 추가 (347건 71.4% 실증 기반 재정의)
+#   - 기존: 모든 Write/Edit/MultiEdit 차단 → 문서·도메인 데이터 수정도 차단되는 과탐지
+#   - 변경: Write/Edit 대상이 .claude/hooks/*.sh 또는 .claude/settings*.json일 때만 차단
+#     ( .md / 데이터 파일 / 업무 스프레드시트 / 일반 스크립트는 map_scope 면제 )
 if fresh_req "map_scope"; then
   if ! fresh_ok "map_scope"; then
-    # Write/Edit/MultiEdit만 차단 (Bash read 등은 허용)
     tool_name=$(echo "$INPUT" | safe_json_get "tool_name" 2>/dev/null || echo "")
     if echo "$tool_name" | grep -qiE '(Write|Edit|MultiEdit)'; then
-      deny "map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 고위험 수정 금지." "map_scope"
+      # 대상 파일 경로 추출 (safe_json_get은 top-level만 지원 → raw INPUT에서 직접 grep)
+      target_file=$(printf '%s' "$INPUT" | grep -oE '"file_path"[[:space:]]*:[[:space:]]*"[^"]+"' | head -1 | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      # 운영 훅(.claude/hooks/*.sh) 또는 settings json만 차단 대상
+      if echo "$target_file" | grep -qE '\.claude/hooks/[A-Za-z0-9_-]+\.sh$|\.claude/settings[A-Za-z0-9._-]*\.json$'; then
+        deny "map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 운영 훅·settings 수정 금지." "map_scope"
+      fi
+      # 기타 파일(.md, 데이터, 일반 스크립트 등)은 map_scope 면제 — 통과
     fi
   fi
 fi

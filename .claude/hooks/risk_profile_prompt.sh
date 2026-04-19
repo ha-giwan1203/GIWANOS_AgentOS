@@ -69,15 +69,17 @@ fi
 # GPT 합의 2026-04-11: 규칙/리팩터/파이프라인 제거, 스키마/컬럼/시트는 lightweight 분리
 # GPT 합의 2026-04-12: 단순 언급이 아니라 변경 의도 키워드와 AND 조건
 # GPT 합의 세션64 (2026-04-18): 단순 "hook/gate/settings" 키워드로는 트리거 금지
-#   이전 조건: HAS_TARGET="hook|gate|settings|마이그레이션" — 일상 대화도 298건/7일 과탐지
-#   현재 조건: 구체적 파일 경로 패턴 + 추상적 고위험 표현 (AND 의도 키워드)
+# 세션77 Round 1 Step 1-c: evidence_gate 347건(71.4%) 실증 기반 재정의
+#   - 기존: HAS_HOOK_ABSTRACT("공통 훅" 등 경로 없는 추상 표현)로도 트리거 → 일상 토론에서 과탐지
+#   - 변경: HAS_HOOK_ABSTRACT 제거, HAS_INTENT를 "수정/변경/삭제/리팩터/제거/교체" 6개로 축소
+#     ("추가/구현/신설/이동/전수/일괄/개편/손본"은 신규 기능·논의 단계 포함되어 FP 많음)
+#   - 보완: evidence_gate.sh에서 Write/Edit 대상 파일 경로 체크 추가 (운영 훅/settings만 차단)
 HAS_HOOK_FILE=$(echo "$TEXT" | grep -ciE '(hook.*파일|hooks/[a-z_]+\.sh|gate\.sh|hook\.sh|hook.*구현|hook.*신설|새 훅|새 hook)')
 HAS_SETTINGS=$(echo "$TEXT" | grep -ciE '(settings\.(local\.)?json|\.claude/settings)')
 HAS_MIGRATION=$(echo "$TEXT" | grep -ciE '(마이그레이션|migration)')
-# 추상 표현 (GPT 세션64 2차 보완): "공통 훅 수정", "운영 게이트 손본다" 같은 경로 없는 고위험 요청
-HAS_HOOK_ABSTRACT=$(echo "$TEXT" | grep -ciE '(공통 ?훅|공통 ?hook|운영 ?게이트|운영 ?gate|전역 ?훅|전역 ?hook|훅 ?전반|hook ?전반|gate ?전반|훅 ?체계|gate ?체계|훅 ?일괄|hook ?일괄)')
-HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|추가|교체|이동|전수|일괄|구현|신설|손본|개편)')
-if { [ "$HAS_HOOK_FILE" -gt 0 ] || [ "$HAS_SETTINGS" -gt 0 ] || [ "$HAS_MIGRATION" -gt 0 ] || [ "$HAS_HOOK_ABSTRACT" -gt 0 ]; } && [ "$HAS_INTENT" -gt 0 ]; then
+# HAS_INTENT 축소 (세션77): 기존 13개 → 6개 (기존 보존: 수정·변경·삭제·리팩터·제거·교체)
+HAS_INTENT=$(echo "$TEXT" | grep -ciE '(수정|변경|삭제|리팩터|제거|교체)')
+if { [ "$HAS_HOOK_FILE" -gt 0 ] || [ "$HAS_SETTINGS" -gt 0 ] || [ "$HAS_MIGRATION" -gt 0 ]; } && [ "$HAS_INTENT" -gt 0 ]; then
   touch_req "map_scope"
 fi
 
