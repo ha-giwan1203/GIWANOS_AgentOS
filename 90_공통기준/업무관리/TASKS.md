@@ -10,7 +10,32 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션78 후속 (구조 변경 지적 → 3자 토론 자동 승격 규칙 신설)
+최종 업데이트: 2026-04-20 — 세션78 Round 1 (push-only 면제 + smoke 3건 3자 합의 반영)
+
+---
+
+## 세션78 Round 1 반영 (2026-04-20, 3자 토론 합의 → 구현)
+
+**[완료] 세션78 P2 Round 1 — push-only 면제 + smoke 3건 확장 (3자 만장일치)**
+
+3자 토론 Round 1 집계 (Claude×GPT×Gemini):
+- 지적 1 (push-only 충돌): **3/3 채택** (만장일치)
+- 지적 2-(2) partial proof deny smoke 누락: **2/3 채택**
+- 지적 2-(3) stale skill marker smoke 누락: **안전망 채택** (정책 변경 없음)
+- 지적 3 (STATUS.md 드리프트): **3/3 버림** (GPT 자기 철회 포함)
+
+Step 5 양측 검증: GPT "동의" + Gemini "동의" → pass_ratio 1.0
+
+**구현 반영**:
+1. `.claude/hooks/evidence_gate.sh`: `is_commit_or_push` → `git commit`만 grep 변경 (push-only 면제, 세션76 push-only 스킵 최적화와 정합)
+2. `.claude/hooks/smoke_test.sh` 3건 추가:
+   - 44-10: ok 없이도 git push → pass
+   - 44-11: tasks_updated.ok만 존재 + git commit → deny (OR 조건)
+   - 44-12: stale skill_read__*.ok(past mtime) → deny (fresh_file 필터 안전망)
+
+**토론 로그**: `90_공통기준/토론모드/logs/debate_20260420_010101_3way/` (round1_gpt/gemini/cross_verify/claude_synthesis)
+
+**STATUS.md 관련**: GPT가 원래 드리프트로 지적했으나 Gemini "도메인과 시스템 범위 혼동. 조립비정산 STATUS는 세션78 무관" 근거로 3자 버림. GPT Step 4에서 자기 철회. **건드리지 않음 확정**.
 
 ---
 

@@ -106,13 +106,17 @@ deny() {
   exit 0
 }
 
-# 세션78 P2 재정의: commit/push은 req 유무와 무관하게 TASKS/HANDOFF 갱신 증거 필수
-#   기존(~세션77): risk_profile_prompt에서 "완료/갱신/커밋" 등 키워드로 tasks_handoff.req 조기 발행 → L155-160에서 is_commit_or_push 시점에 검증 → 시간차로 맥락 상실
-#   변경(세션78): req 발행 제거, commit/push 감지 시 즉석 독립 검증 → 시간차 0, UX 맥락 유지
-#   has_any_req 우회 방지: early-exit을 이 블록 뒤로 이동시켰으므로 req 없는 세션에서도 commit/push 검증 동작
-if is_commit_or_push; then
+# 세션78 P2 재정의 (Round 1 3자 합의): git commit만 검증 (push-only 면제)
+#   기존(~세션77): risk_profile_prompt에서 tasks_handoff.req 조기 발행 → is_commit_or_push 시점에 검증 → 시간차로 맥락 상실
+#   변경(세션78 초안): req 발행 제거, commit/push 감지 시 즉석 독립 검증 → 시간차 0
+#   Round 1 합의 (GPT FAIL + Gemini 동의 + Claude 합의): push-only는 면제. git commit만 grep.
+#     근거: git push는 이미 commit된 내역을 원격에 반영 — 문서 갱신 증거는 commit 시점에만 요구
+#           세션76 commit_gate.sh의 push-only 스킵 최적화(체감 0.57s)와 정합
+#           "문서=진실의 근원" 철학은 commit 단위에서 충분히 수호됨
+#   has_any_req 우회 방지: early-exit을 이 블록 뒤로 이동시켰으므로 req 없는 세션에서도 commit 검증 동작
+if echo "$COMMAND" | grep -qiE 'git commit'; then
   if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
-    deny "commit/push 차단. 이번 세션에 TASKS.md/HANDOFF.md 갱신 흔적이 없습니다." "tasks_handoff"
+    deny "commit 차단. 이번 세션에 TASKS.md/HANDOFF.md 갱신 흔적이 없습니다." "tasks_handoff"
   fi
 fi
 

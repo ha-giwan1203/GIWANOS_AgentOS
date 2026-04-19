@@ -895,12 +895,53 @@ fi
 check $? "risk_profile_prompt: tasks_handoff 조기 트리거 제거됨 (세션78)"
 
 # 44-9 (세션78 P2 재정의 신규): req 전무 상태에서 git commit → deny (has_any_req 우회 방지)
-# 세션78: tasks_handoff.req 조기 발행이 제거되었으므로, 일반 세션에서는 req가 없어도 commit/push은 검증돼야 함
+# 세션78: tasks_handoff.req 조기 발행이 제거되었으므로, 일반 세션에서는 req가 없어도 commit은 검증돼야 함
 rm -f "$_eg_req_dir"/*.req 2>/dev/null
 rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
 _eg_result_9=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
 echo "$_eg_result_9" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
 check $? "evidence_gate: req 없이도 git commit → deny (세션78 has_any_req 우회 방지)"
+
+# 44-10 (세션78 Round 1 3자 합의 신규): push-only pass
+# 세션78 초안에서는 git push도 차단됐으나 Round 1 합의로 push-only 면제
+# 근거: git push는 이미 commit된 내역을 원격 반영하는 행위, 문서 갱신 증거는 commit 단위에서만 요구 (세션76 push-only 스킵 최적화와 정합)
+rm -f "$_eg_req_dir"/*.req 2>/dev/null
+rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
+_eg_result_10=$(echo '{"command":"git push origin main","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
+if echo "$_eg_result_10" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null; then
+  check 1 "evidence_gate: ok 없이도 git push → pass (세션78 Round 1 push-only 면제)"
+else
+  check 0 "evidence_gate: ok 없이도 git push → pass (세션78 Round 1 push-only 면제)"
+fi
+
+# 44-11 (세션78 Round 1 3자 합의 신규): partial proof deny
+# tasks_updated.ok만 존재, handoff_updated.ok 없음 → OR 조건으로 deny 확인
+rm -f "$_eg_req_dir"/*.req 2>/dev/null
+rm -f "$_eg_proof_dir/tasks_updated.ok" "$_eg_proof_dir/handoff_updated.ok" 2>/dev/null
+: > "$_eg_proof_dir/tasks_updated.ok"
+touch "$_eg_proof_dir/tasks_updated.ok"
+# handoff_updated.ok는 생성 안 함
+_eg_result_11=$(echo '{"command":"git commit -m test","tool_name":"Bash","tool_input":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_11" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
+check $? "evidence_gate: tasks_updated.ok만 있음 + git commit → deny (Round 1 partial proof 확인)"
+
+# 44-12 (세션78 Round 1 3자 합의 신규): stale skill marker deny (Gemini 엣지 안전망)
+# fresh_file 함수가 START_FILE mtime 기준으로 stale 마커를 필터링함 증명
+# START_FILE을 현재로 touch → skill_read__stale.ok를 과거 mtime으로 생성 → 도메인 편집 시도
+rm -f "$_eg_req_dir"/*.req 2>/dev/null
+rm -f "$_eg_proof_dir"/*.ok 2>/dev/null
+rm -f "$_eg_proof_dir"/skill_read__*.ok 2>/dev/null
+# START_FILE을 현재 시각으로 갱신 (stale 기준선)
+touch "$_eg_start_file" 2>/dev/null
+# skill_read__stale.ok를 과거 mtime(2025-01-01 00:00)으로 생성
+: > "$_eg_proof_dir/skill_read__stale.ok"
+touch -t 202501010000 "$_eg_proof_dir/skill_read__stale.ok" 2>/dev/null
+# req 생성 + 도메인 편집 시도
+: > "$_eg_req_dir/skill_read.req"
+touch "$_eg_req_dir/skill_read.req" 2>/dev/null
+_eg_result_12=$(echo '{"tool_name":"Edit","tool_input":"10_라인배치/SKILL.md","command":""}' | bash "$_eg_script" 2>/dev/null)
+echo "$_eg_result_12" | grep -qE '"decision":"deny"|"permissionDecision":"deny"' 2>/dev/null
+check $? "evidence_gate: stale skill_read__*.ok(past mtime) → deny (Round 1 fresh_file 필터 안전망)"
 
 # 상태 복원
 rm -rf "$_eg_req_dir"/* 2>/dev/null

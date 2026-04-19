@@ -4,12 +4,48 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션78 후속 (공유→3자 자동 승격 규칙 신설)
+최종 업데이트: 2026-04-20 KST — 세션78 Round 1 (push-only 면제 + smoke 3건 3자 합의)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션78 후속 — 공유→3자 자동 승격 규칙 신설)
+## 0. 최신 세션 (2026-04-20 세션78 Round 1 — 3자 토론 합의 → 구현)
+
+### Round 1 결과 (Claude×GPT×Gemini)
+
+| 지적 | GPT | Claude | Gemini | 최종 |
+|------|-----|--------|--------|------|
+| 1. push-only 충돌 | 채택 | 채택 | 채택 | **3/3 채택** |
+| 2-(2) partial proof deny smoke 누락 | 채택 | 부분 채택 | 미언급 | **채택** |
+| 2-(3) stale skill marker smoke 누락 | 채택 | 버림(자동 필터) | 보류(조건부) | **안전망 채택** |
+| 3. STATUS.md 드리프트 | **자기 철회** | 버림 | 버림 | **3/3 버림** |
+
+Step 5 Claude 종합 설계안 검증: GPT 동의 + Gemini 동의 → pass_ratio 1.0, round_count 1/3
+
+### 구현 반영
+
+1. `.claude/hooks/evidence_gate.sh`: commit/push 우선 블록을 **git commit만 검증**으로 축소 (세션76 push-only 스킵 최적화와 정합). `is_commit_or_push` 함수 사용 중단
+2. `.claude/hooks/smoke_test.sh` 44-10/11/12 신규 3건:
+   - 44-10 push-only pass (합의 1)
+   - 44-11 partial proof deny (합의 2-2, OR 조건 확인)
+   - 44-12 stale skill marker deny (합의 2-3 안전망, fresh_file 필터 증명)
+3. STATUS.md: 3자 합의 버림 → 변경 없음
+
+### 다음 세션 첫 액션
+
+1. **관찰 지속** (2026-04-20 ~ 04-27): skill_read/tasks_handoff 발동 건수 + push-only 실제 빈도 추적
+2. **세션85+ Step 2**: incident_ledger 반복 5종 정리 (관찰 후만 진행)
+3. **새 규칙 실증**: 공유→3자 자동 승격 규칙이 세션78 Round 1에서 최초 정상 적용됨 — 다른 공유 상황에서도 분류 일관성 추적
+
+### 상태 정보
+
+- Round 1 최초 실물 적용 성공. `/share-result` 5단계 B 분기 + `debate-mode` 3자 승격 흐름 검증됨
+- 세션77 map_scope + 세션78 P2 skill_read/tasks_handoff + Round 1 push-only 면제 모두 관찰 중
+- 이번 커밋은 Round 1 최초 반영이므로 commit_gate·evidence_gate 자가 테스트도 됨
+
+---
+
+## 0-prev-0. 세션78 후속 (2026-04-20 — 공유→3자 자동 승격 규칙 신설)
 
 ### 배경 (사용자 지적)
 
