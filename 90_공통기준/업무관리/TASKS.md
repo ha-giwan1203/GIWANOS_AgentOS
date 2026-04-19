@@ -10,7 +10,51 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-19 — 세션71 (의제5 3자 토론 합의 → Phase 2-A 근본해결 + 의제3 Phase A skill_drift_check 신설)
+최종 업데이트: 2026-04-19 — 세션72 (의제5 Phase 2-B 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록)
+
+---
+
+## 세션72 반영 (2026-04-19, 의제5 Phase 2-B 핵심 훅 exit 2 전환 세션)
+
+**[완료] Phase 2-B Step 1 — `completion_gate.sh` 소프트 블록 추가**
+- 최근 7일간 `permissions_sanity` "1회용 패턴" 동일 라벨 3회 이상 누적 감지 시 JSON `decision=deny` 1회 발생
+- 60초 쿨다운 캐시 (`.claude/state/completion_gate_phase2b_last.txt`)로 재보고 시 통과 — 하드페일 없음
+- `hook_incident` + `completion_claim.jsonl`에 `soft_block` 기록
+- 상위 게이트(Git 변경/상태문서 미갱신) 통과 후에만 평가 — 기존 동작 불변
+
+**[완료] Phase 2-B Step 2a — `commit_gate.sh` timing + exit 2 전환**
+- 모든 종료 경로에 `hook_timing_end` 배선 (skip_empty/skip_nongit/block_marker/block_final_check/pass)
+- `echo {deny} → exit 0` 패턴을 `echo {deny} → exit 2` 병행으로 승격 (JSON deny + exit 2 belt-and-suspenders)
+- 등급 헤더 gate 명시화
+
+**[보류] Phase 2-B Step 2b — `debate_verify.sh` Phase 2 승격**
+- `incident_ledger` `debate_verify` 태그 18건 잔존 (result.json 파싱 실패 + step5 누락 반복) → Phase 2 승격 보류
+- Phase 2-C 조건: 7일 연속 `debate_verify` 태그 incident 0건 달성 시 exit 2 전환
+- 현 세션 조치: timing 배선만 추가 (skip_nonbash/skip_noncommit/skip_wip/skip_non3way/pass/phase1_warn)
+
+**[완료] Phase 2-B Step 3 — 핵심 훅 5종 timing + exit 2 전환**
+- `block_dangerous.sh` (호출 304회/2000) — 5개 차단 경로 모두 exit 2
+- `date_scope_guard.sh` (호출 303회/2000) — `deny()` 함수 exit 2 승격
+- `protect_files.sh` (호출 120회) — 확장자/경로 차단 exit 2
+- `evidence_stop_guard.sh` — 기존 exit 2 유지 + timing 배선
+- `stop_guard.sh` — 기존 exit 2 유지 + timing 배선 (4개 블록 경로 상태 구분)
+
+**[완료] 문서 갱신**
+- `.claude/hooks/README.md` 등급 분류 테이블을 "Phase 2-B 적용 현황" + "Phase 2-C 이월" 2단 구조로 재작성
+- `CLAUDE.md` "훅 등급 + 에러 전파 정책" 섹션의 "현재 실코드 상태" 주석을 "Phase 2-B 적용 현황"으로 치환
+
+**[검증]**
+- `smoke_fast.sh` 9/9 PASS
+- `doctor_lite.sh` OK
+- `permissions_sanity.sh` 경고 0건 (캐시 제거 후 재실행)
+- `debate_verify.sh` exit 0 (3way 미포함 커맨드)
+- `hook_timing.jsonl` 다중 훅 status 태그 정상 기록 (pass/skip_*/block_* 구분)
+
+**[이월]**
+- Phase 2-C: 나머지 ~18개 훅 일괄 등급 주석 + timing 배선 + JSON deny gate들 exit 2 전환 검토
+- Phase 2-C: `debate_verify.sh` incident 7일 0건 달성 시 exit 2 승격
+- 쟁점 G: settings 계층 실물 이행 (세션73)
+- 의제4: hook_timing.jsonl 1주 수집 후 통합 평가
 
 ---
 

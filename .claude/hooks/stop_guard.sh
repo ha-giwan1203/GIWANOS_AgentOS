@@ -2,13 +2,17 @@
 # Stop hook — 금지 문구 차단 + 토론모드 필수 형식 검사
 # Claude 응답 완료 직전에 실행. 위반 시 exit 2로 stop 차단.
 # v2: 마지막 assistant 블록 기준 판정 (GPT 합의 2026-04-01)
+#
+# 훅 등급: gate (기존부터 exit 2 사용 — Phase 2-B 2026-04-19 세션72 timing + 헤더 추가)
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+_SG_START=$(hook_timing_start)
 hook_log "Stop" "stop_guard 발화" 2>/dev/null
 
 # HOOK_LOG는 hook_common.sh의 hook_log() 함수로 통일 (hook_log.jsonl)
 TRANSCRIPT="$CLAUDE_TRANSCRIPT_PATH"
 
 if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
+  hook_timing_end "stop_guard" "$_SG_START" "skip_notranscript"
   exit 0
 fi
 
@@ -17,6 +21,7 @@ fi
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 
 if [ -z "$LAST_TEXT" ]; then
+  hook_timing_end "stop_guard" "$_SG_START" "skip_notext"
   exit 0
 fi
 
@@ -36,6 +41,7 @@ for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
     hook_log "Stop/stop_guard" "BLOCK: forbidden_phrase | $pattern" 2>/dev/null
     hook_incident "hook_block" "stop_guard" "" "금지 문구: $pattern" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
     echo '{"decision":"deny","reason":"[Stop Guard] 금지 문구 감지: '"$pattern"'. 사용자에게 중간 승인을 요청하지 마라. 합의 후 바로 실행하고 결과만 보고해라."}'
+    hook_timing_end "stop_guard" "$_SG_START" "block_phrase"
     exit 2
   fi
 done
@@ -46,6 +52,7 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
   HAS_DISCARD=$(echo "$LAST_TEXT" | grep -cE "버림:|보류:")
 
   if [ "$HAS_ADOPT" -eq 0 ] && [ "$HAS_DISCARD" -eq 0 ]; then
+    hook_timing_end "stop_guard" "$_SG_START" "skip_debatenoform"
     exit 0  # 토론 문맥이지만 형식 없으면 단순 전달 가능 → 통과
   fi
 
@@ -53,6 +60,7 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
     hook_log "Stop/stop_guard" "BLOCK: missing_bucket | 보류+버림 0건" 2>/dev/null
     hook_incident "hook_block" "stop_guard" "" "토론모드 보류+버림 0건" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
     echo '{"decision":"deny","reason":"[Stop Guard] 토론모드에서 보류/버림이 0건. GPT 프레임을 그대로 수용한 것으로 판단. 주장 분해 → 라벨링 → 채택/보류/버림을 다시 수행하라."}'
+    hook_timing_end "stop_guard" "$_SG_START" "block_missing_bucket"
     exit 2
   fi
 fi
@@ -67,9 +75,11 @@ if echo "$LAST_TEXT" | grep -qE "하네스 분석|주장 분해|채택.*버림|d
       hook_log "Stop/stop_guard" "BLOCK: debate_quality_backstop | 독립 견해 0건" 2>/dev/null
       hook_incident "hook_block" "stop_guard" "" "백스톱: 독립 견해 0건" '"classification_reason":"stop_guard_block"' 2>/dev/null || true
       echo '{"decision":"deny","reason":"[Stop Guard 백스톱] 토론 응답에 독립 견해(반론/대안/내 판단)가 없습니다. GPT 프레임에 끌려가지 말고 독립 판단을 포함하세요."}'
+      hook_timing_end "stop_guard" "$_SG_START" "block_backstop"
       exit 2
     fi
   fi
 fi
 
+hook_timing_end "stop_guard" "$_SG_START" "pass"
 exit 0

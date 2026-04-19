@@ -4,12 +4,48 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-19 KST — 세션71 (의제5 3자 토론 합의 → Phase 2-A 근본해결 + 의제3 Phase A skill_drift_check)
+최종 업데이트: 2026-04-19 KST — 세션72 (의제5 Phase 2-B 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-19 세션71)
+## 0. 최신 세션 (2026-04-19 세션72)
+
+### 이번 세션 완료
+1. **Phase 2-B Step 1 — `completion_gate.sh` 소프트 블록 추가**:
+   - 최근 7일 `permissions_sanity` 1회용 라벨 3회 이상 누적 시 deny 1회 (60초 쿨다운, 하드페일 없음)
+   - 상위 게이트 통과 후에만 평가 → 기존 동작 불변
+2. **Phase 2-B Step 2a — `commit_gate.sh` exit 2 전환**:
+   - 모든 종료 경로에 `hook_timing_end` 배선
+   - `block_marker`/`block_final_check` 경로에 `exit 2` 승격 (JSON deny + exit 2 병행)
+3. **Phase 2-B Step 2b — `debate_verify.sh` Phase 2 승격 보류**:
+   - `incident_ledger` `debate_verify` 태그 18건 잔존(result.json/step5 반복 누락) → Phase 2-C 재평가
+   - 현 세션: timing 배선만 추가
+4. **Phase 2-B Step 3 — 핵심 훅 5종 timing + exit 2 전환**:
+   - `block_dangerous.sh`/`date_scope_guard.sh`/`protect_files.sh` exit 2 승격
+   - `evidence_stop_guard.sh`/`stop_guard.sh` 기존 exit 2 유지 + timing 배선
+5. **문서 갱신**:
+   - `.claude/hooks/README.md` 등급 테이블 Phase 2-B/2-C 2단 재구성
+   - `CLAUDE.md` 훅 등급 정책 섹션 "현재 실코드 상태"를 "Phase 2-B 적용 현황"으로 치환
+
+### 블로커 기록
+- `debate_verify.sh` Phase 2 승격 — incident 18건 잔존. 승격 보류 결정. Phase 2-C 재평가 조건: 7일 연속 0건
+
+### 검증 결과
+- `smoke_fast.sh` 9/9 PASS
+- `doctor_lite.sh` OK
+- `permissions_sanity.sh` 경고 0건 (캐시 제거 후 재실행)
+- `hook_timing.jsonl` 다중 훅 status 태그 정상 기록
+
+### 다음 세션 첫 액션
+1. **세션73**: 쟁점 G settings 계층 실물 분리 (settings.json 이동) + Phase 2-C 나머지 훅 일괄 배선
+2. **세션74**: 의제6 Gemini 진입 강제 hook 신설
+3. **세션75**: 의제7 탭 throttling 자동 회복
+4. **조건부**: `debate_verify` 태그 7일 0건 시 Phase 2 exit 2 승격
+
+---
+
+## 0-prev. 세션71 (2026-04-19)
 
 ### 이번 세션 완료
 1. **의제5 3자 토론 Round 1 합의** (`debate_20260418_190429_3way/`, pass_ratio 1.33):

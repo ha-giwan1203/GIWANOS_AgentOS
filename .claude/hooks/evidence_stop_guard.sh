@@ -1,7 +1,10 @@
 #!/bin/bash
 # Stop — req 기반으로만 활성. 근거 없는 최종 결론 차단.
+#
+# 훅 등급: gate (기존부터 exit 2 사용 — Phase 2-B 2026-04-19 세션72 timing + 헤더 추가)
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null
+_ESG_START=$(hook_timing_start)
 hook_log "Stop" "evidence_stop_guard 발화" 2>/dev/null
 
 TRANSCRIPT="$CLAUDE_TRANSCRIPT_PATH"
@@ -14,16 +17,19 @@ has_any_req() {
 }
 
 if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
+  hook_timing_end "evidence_stop_guard" "$_ESG_START" "skip_notranscript"
   exit 0
 fi
 
 if ! has_any_req; then
+  hook_timing_end "evidence_stop_guard" "$_ESG_START" "skip_noreq"
   exit 0
 fi
 
 # last_assistant_text() 공용 함수 사용 (GPT 제안, 세션19 리팩토링)
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 if [ -z "$LAST_TEXT" ]; then
+  hook_timing_end "evidence_stop_guard" "$_ESG_START" "skip_notext"
   exit 0
 fi
 
@@ -32,6 +38,7 @@ block() {
   hook_log "Stop/evidence_stop_guard" "BLOCK: $reason" 2>/dev/null
   hook_incident "hook_block" "evidence_stop_guard" "" "$reason" '"classification_reason":"evidence_missing"' 2>/dev/null || true
   echo "{\"decision\":\"block\",\"reason\":\"[evidence_stop_guard] $reason\"}"
+  hook_timing_end "evidence_stop_guard" "$_ESG_START" "block"
   exit 2
 }
 
@@ -62,4 +69,5 @@ if fresh_req "tasks_handoff"; then
   fi
 fi
 
+hook_timing_end "evidence_stop_guard" "$_ESG_START" "pass"
 exit 0

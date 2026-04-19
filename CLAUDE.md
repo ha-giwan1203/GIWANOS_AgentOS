@@ -108,7 +108,7 @@ permissions나 hook을 추가할 때 위에서 아래로 순서대로 묻는다.
 
 ### 훅 등급 3종
 - **advisory (경고성)**: 실패해도 세션 계속. `exit 0` 강제. stderr 로그만. `|| true` 허용 명시. 예: `permissions_sanity.sh`, `auto_compile.sh`, `notify_slack.sh`
-- **gate (차단성)**: 실패 시 상위 도구 호출 차단. `exit 2` 또는 JSON `decision=deny` 전파. `|| true` 금지. 예: `block_dangerous.sh`(JSON deny), `commit_gate.sh`(설계상 gate, 현 실코드 advisory — Phase 2-B 전환 예정), `debate_verify.sh`(동일)
+- **gate (차단성)**: 실패 시 상위 도구 호출 차단. `exit 2` + JSON `decision=deny` 병행(belt-and-suspenders). `|| true` 금지. 예: `block_dangerous.sh`, `commit_gate.sh`, `date_scope_guard.sh`, `protect_files.sh`, `evidence_stop_guard.sh`, `stop_guard.sh` (Phase 2-B 세션72 exit 2 전환 완료). `debate_verify.sh`는 incident 18건 잔존으로 Phase 1 advisory 유지 (Phase 2-C 재평가).
 - **measurement (계측)**: 실패 영향 없음. `exit 0` 강제. timing·통계만 기록. `trap ERR` 무시. 예: timing 래퍼, `hook_log`
 
 ### 공통 래퍼 함수 (hook_common.sh 정의)
@@ -116,9 +116,12 @@ permissions나 hook을 추가할 때 위에서 아래로 순서대로 묻는다.
 - `hook_gate <hook_path>` — 실패 시 exit 2 전파
 - `hook_measure <hook_path>` — trap ERR 예외 무시, timing만
 
-### 현재 실코드 상태 (Phase 2-A 문서화, 전환은 Phase 2-B)
-- `debate_verify.sh`·`commit_gate.sh` 등 "설계상 gate"인 훅도 현재는 `set -u + || true + exit 0` 패턴으로 **실질 advisory 성격**. Phase 2-B에서 gate 전환 시 영향 범위 평가 후 적용.
-- 확장 여지: 복구(cleanup/teardown) 등급 — 실패 시 후처리 담당. 세션72 이후 평가 (Gemini 제안).
+### Phase 2-B 적용 현황 (2026-04-19 세션72)
+- **exit 2 + timing 배선 완료 (6개 gate)**: `commit_gate.sh`, `block_dangerous.sh`, `date_scope_guard.sh`, `protect_files.sh`, `evidence_stop_guard.sh`, `stop_guard.sh`
+- **timing만 배선 (Phase 2 승격 보류)**: `debate_verify.sh` — `incident_ledger` `debate_verify` 태그 18건 잔존. incident 7일 0건 달성 시 Phase 2-C에서 exit 2 전환
+- **completion_gate.sh 소프트 블록 추가**: 최근 7일 permissions 1회용 패턴 동일 라벨 3회 이상 누적 시 deny 1회(60초 쿨다운) — 하드페일 없음
+- **나머지 훅 등급 분류**: `.claude/hooks/README.md` 표 참조. 일괄 timing 배선은 Phase 2-C 이월
+- 확장 여지: 복구(cleanup/teardown) 등급 — Gemini 제안, 세션73+ 평가
 
 ## 금지
 - 원본 xlsx/docx/pdf 직접 수정

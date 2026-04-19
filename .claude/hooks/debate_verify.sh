@@ -3,13 +3,19 @@
 # 세션68 Claude 오케스트레이션 누락 사고 재발 방지
 # 2026-04-18 3자 토론 Round 2 (Claude 설계 주체)
 #
+# 훅 등급: Phase 1 advisory (설계상 gate, 실코드 advisory)
 # Phase 1: 경고만 (stderr + exit 0) — 1주 운영 후 incident 0건이면 Phase 2 전환
-# Phase 2: 차단 (exit 2) — 세션69 이후 전환 예정
+# Phase 2: 차단 (exit 2) — incident_ledger "debate_verify" 태그 7일 연속 0건 달성 시 승격
+#   현재(2026-04-19 세션72): incident 18건 잔존 → Phase 2 전환 **보류**. Phase 2-C에서 재평가.
 # Phase 3: step5_final_verification.md 자동 생성 헬퍼
+#
+# Phase 2-B 진행 사항 (2026-04-19 세션72): timing 계측만 추가. exit 코드 정책 변경 없음.
 
 set -u
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+
+_DV_START=$(hook_timing_start)
 
 # Claude Code PreToolUse hook: stdin으로 JSON 전달 (tool_input 포함)
 INPUT=$(cat)
@@ -17,6 +23,7 @@ INPUT=$(cat)
 # Bash 매처에만 반응
 TOOL_NAME=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
 if [ "$TOOL_NAME" != "Bash" ]; then
+  hook_timing_end "debate_verify" "$_DV_START" "skip_nonbash"
   exit 0
 fi
 
@@ -25,11 +32,12 @@ COMMAND=$(printf '%s' "$INPUT" | python3 -c "import json,sys; d=json.load(sys.st
 # git commit 명령만 대상
 case "$COMMAND" in
   *"git commit"*|*"git -C"*"commit"*) ;;
-  *) exit 0 ;;
+  *) hook_timing_end "debate_verify" "$_DV_START" "skip_noncommit"; exit 0 ;;
 esac
 
 # WIP 예외: [WIP 3way] 접두사 시 스킵
 if echo "$COMMAND" | grep -qE '\[WIP 3way\]'; then
+  hook_timing_end "debate_verify" "$_DV_START" "skip_wip"
   exit 0
 fi
 
@@ -49,6 +57,7 @@ fi
 
 # 3way 아니면 통과
 if [ "$IS_3WAY" -eq 0 ]; then
+  hook_timing_end "debate_verify" "$_DV_START" "skip_non3way"
   exit 0
 fi
 
@@ -143,6 +152,7 @@ fi
 
 # 결과 출력
 if [ ${#ERRORS[@]} -eq 0 ]; then
+  hook_timing_end "debate_verify" "$_DV_START" "pass"
   exit 0
 fi
 
@@ -161,5 +171,6 @@ if [ -w "$(dirname "$LEDGER")" ]; then
   echo "{\"ts\":\"$TS\",\"tag\":\"debate_verify\",\"phase\":1,\"count\":${#ERRORS[@]},\"issues\":$ISSUES_JSON,\"resolved\":false}" >> "$LEDGER"
 fi
 
-# Phase 1: 경고만, 차단 없음
+# Phase 1: 경고만, 차단 없음 (Phase 2-C 이후 exit 2 전환 예정 — incident 0건 조건)
+hook_timing_end "debate_verify" "$_DV_START" "phase1_warn"
 exit 0

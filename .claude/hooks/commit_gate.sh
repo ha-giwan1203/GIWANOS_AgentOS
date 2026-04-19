@@ -3,8 +3,15 @@
 # final_check.sh --fast 실패 시 커밋/푸시 차단
 # hook 변경 감지 시 --full 자동 승격
 # GPT+Claude 합의 2026-04-07
+#
+# 훅 등급: gate (의제5 Phase 2-B 전환 2026-04-19 세션72)
+#   - 차단 메커니즘: JSON `{"decision":"deny",...}` (PreToolUse 네이티브) + exit 2 (belt-and-suspenders)
+#   - timing 계측: hook_timing_start/end 호출부 배선 완료
 
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
+
+# Phase 2-B: 전체 실행 시간 계측 (의제4 수집 데이터)
+_CG_START=$(hook_timing_start)
 
 # --- fingerprint suppress 함수 (세션46 GPT+Claude 합의: 2단 분리) ---
 
@@ -59,11 +66,13 @@ if [ -z "$COMMAND" ]; then
     hook_log "PreToolUse/Bash" "commit_gate: JSON 파싱 실패 fallback — raw INPUT에서 git commit/push 감지" 2>/dev/null
     COMMAND="git commit"  # fallback 값 설정하여 아래 검사 계속 진행
   else
+    hook_timing_end "commit_gate" "$_CG_START" "skip_empty"
     exit 0
   fi
 fi
 # git commit 또는 git push가 아니면 통과
 if ! echo "$COMMAND" | grep -qE 'git (commit|push)'; then
+  hook_timing_end "commit_gate" "$_CG_START" "skip_nongit"
   exit 0
 fi
 
@@ -84,7 +93,8 @@ if [ -f "$_MARKER" ] && echo "$COMMAND" | grep -q 'git commit'; then
     # 둘 다 없으면 차단
     echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] write_marker 존재 — TASKS.md 또는 HANDOFF.md를 함께 staged하세요.\\n상태문서 갱신 없이는 커밋할 수 없습니다.\"}"
     hook_log "PreToolUse/Bash" "commit_gate BLOCK: 상태문서 미동봉 (write_marker 존재, TASKS/HANDOFF 미staged)" 2>/dev/null
-    exit 0
+    hook_timing_end "commit_gate" "$_CG_START" "block_marker"
+    exit 2
   fi
 fi
 
@@ -136,7 +146,8 @@ if [ "$EXIT_CODE" -ne 0 ]; then
     hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"mode\":\"$MODE\",\"promoted_to_full\":$PROMOTED,\"normal_flow\":$NORMAL_FLOW,\"fail_keywords\":\"$FAIL_KEYWORDS\",\"warn_keywords\":\"$WARN_KEYWORDS\",\"fingerprint\":\"$_fingerprint\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
   fi
   echo "{\"decision\":\"deny\",\"reason\":\"[COMMIT GATE] final_check $MODE 실패 — 자체검증 통과 후 커밋하세요.\\n$FAILS\"}"
-  exit 0
+  hook_timing_end "commit_gate" "$_CG_START" "block_final_check"
+  exit 2
 fi
 
 # === C2: WARN 개별 incident 기록 (세션45 학습 루프 사각지대 해소) ===
@@ -157,4 +168,5 @@ if [ -n "$WARN_KEYWORDS" ]; then
 fi
 
 hook_log "PreToolUse/Bash" "commit_gate PASS: final_check $MODE" 2>/dev/null
+hook_timing_end "commit_gate" "$_CG_START" "pass"
 exit 0

@@ -3,7 +3,7 @@
 > 2026-04-15 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (32개 스크립트, settings.local.json 등록)
+## 활성 Hook (34개 스크립트, settings.local.json 등록)
 
 > `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 
@@ -79,64 +79,6 @@
 
 결론: 각 훅 책임 직교. 통합 금지. 세션72 이후에도 유지.
 
-## 훅 등급 분류 (2026-04-19 의제5 3자 토론 합의)
-
-> `hook_common.sh`의 공통 래퍼(`hook_advisory`·`hook_gate`·`hook_measure`) 호출부 전환은 Phase 2-B.
-> 현 단계는 **설계 등급 분류** + **실코드 현재 상태** 기록. 전환 전까지 각 훅 내부 동작은 불변.
-> 복구(cleanup/teardown) 등급은 세션72+ 확장 여지 (Gemini 제안).
-
-| 훅 | 설계 등급 | 실코드 현재 상태 | 2-B 전환 필요성 |
-|---|---|---|---|
-| `block_dangerous.sh` | gate | `exit 0 + JSON decision=deny` (Claude Code deny JSON 규약) | 유지 — JSON decision이 실질 gate 역할 |
-| `commit_gate.sh` | gate | `\|\| true + exit 0` (설계상 gate, 실코드 advisory) | **Phase 2-B 전환 후보** — final_check FAIL 시 exit 2 |
-| `debate_verify.sh` | gate | `set -u + \|\| true + exit 0` (설계상 gate, 실코드 advisory) | **Phase 2-B 전환 후보** — 서명 위반 시 exit 2 |
-| `date_scope_guard.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `evidence_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `protect_files.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `state_rebind_check.sh` | advisory | `exit 0`, detect-only | 유지 |
-| `mcp_send_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `harness_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `instruction_read_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `skill_instruction_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `debate_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `debate_independent_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `navigate_gate.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `permissions_sanity.sh` | advisory (신규) | `exit 0`, stderr 경고만 | 유지 — 설계 의도대로 advisory |
-| `auto_compile.sh` | advisory | `exit 0` | 유지 |
-| `write_marker.sh` | measurement | `exit 0` | 유지 |
-| `handoff_archive.sh` | measurement | `exit 0` | 유지 |
-| `evidence_mark_read.sh` | measurement | `exit 0` | 유지 |
-| `debate_send_gate_mark.sh` | measurement | `exit 0` | 유지 |
-| `gpt_followup_post.sh` | measurement | `exit 0` async | 유지 |
-| `post_commit_notify.sh` | measurement | `exit 0` async | 유지 |
-| `notify_slack.sh` | measurement | `exit 0` | 유지 |
-| `stop_guard.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `gpt_followup_stop.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `completion_gate.sh` | gate | `exit 0 + JSON decision=deny` | Phase 2-B: 1회용 3회 누적 시 소프트 블록 추가 |
-| `evidence_stop_guard.sh` | gate | `exit 0 + JSON decision=deny` | 유지 |
-| `session_start_restore.sh` | measurement | `exit 0` | 유지 |
-| `precompact_save.sh` | measurement | `exit 0` | 유지 |
-| `risk_profile_prompt.sh` | measurement (.req 생성 보조) | `exit 0` | 유지 |
-
-### 공통 래퍼 사용 예 (Phase 2-B 전환 시 참고)
-```bash
-source "$(dirname "$0")/hook_common.sh"
-
-# advisory 훅 호출 (실패해도 계속):
-hook_advisory "permissions_sanity" bash .claude/hooks/permissions_sanity.sh
-
-# gate 훅 호출 (실패 시 exit 2):
-hook_gate "commit_gate" bash .claude/hooks/commit_gate.sh
-
-# measurement 훅 호출 (영향 없음):
-hook_measure "handoff_archive" bash .claude/hooks/handoff_archive.sh
-```
-
-### 통합·순서 평가 (의제4 세션72 이월)
-- `hook_timing.jsonl` 수집 (advisory·measurement 성격 훅 대상, Phase 2-A 신설)
-- 1주일 누적 후 의제4에서 통합 후보 평가
-- 고정 순서: `block_dangerous` → `commit_gate` → `debate_verify` (절대 변경 금지)
-
 ## 훅별 실패 계약 (Failure Contract)
 
 > 각 훅이 내부 오류(파싱 실패, 파일 미존재 등)를 만났을 때의 동작 정책.
@@ -193,6 +135,45 @@ hook_measure "handoff_archive" bash .claude/hooks/handoff_archive.sh
 | `smoke_fast.sh` | SessionStart용 빠른 smoke (5~8건, 로컬/결정적만). session_start_restore.sh에서 호출 |
 | `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
 | `e2e_test.sh` | E2E 테스트 (block_dangerous/protect_files/session_start/evidence_gate 10개 시나리오). 수동 실행 |
+
+## 훅 등급 분류 (2026-04-19 의제5 3자 토론 합의, Phase 2-B 일부 반영)
+
+> Phase 2-A (세션71): 등급 분류 + `hook_common.sh` 래퍼 정의.
+> Phase 2-B (세션72, 2026-04-19): **핵심 훅 6종 timing 배선 + exit 2 전환 + 소프트 블록 추가**.
+> Phase 2-C (세션73+): 나머지 훅 일괄 등급 주석 + incident 0건 달성 시 `debate_verify` 승격.
+>
+> 아래 테이블은 훅 이름을 참조용으로 나열한다. `final_check.sh`의 활성 hook 개수 기준은 상단 "활성 Hook" 섹션이며, 이 등급 분류 테이블은 별도 통계 대상이 아니다.
+
+### Phase 2-B 적용 현황 (2026-04-19 세션72)
+
+- **소프트 블록 신설**: `completion_gate.sh` — 1회용 3회 누적 7일 내 감지 시 deny 1회 (60초 쿨다운)
+- **exit 2 전환 완료 (6종)**: `commit_gate.sh`, `block_dangerous.sh`, `date_scope_guard.sh`, `protect_files.sh`, `evidence_stop_guard.sh`(기존 유지), `stop_guard.sh`(기존 유지)
+- **timing 배선만**: `debate_verify.sh` — Phase 2 승격은 incident 18건 잔존으로 보류, Phase 2-C 재평가 조건 7일 연속 0건
+
+### 나머지 훅 등급 분류 (Phase 2-C 이월)
+
+- **gate 승격 검토 대상**: evidence_gate / mcp_send_gate / harness_gate / instruction_read_gate / skill_instruction_gate / debate_gate / debate_independent_gate / navigate_gate / gpt_followup_stop
+- **advisory 유지**: state_rebind_check / permissions_sanity / auto_compile / skill_drift_check
+- **measurement (timing 배선 예정)**: write_marker / handoff_archive / evidence_mark_read / debate_send_gate_mark / gpt_followup_post / post_commit_notify / notify_slack / session_start_restore / precompact_save / risk_profile_prompt
+
+### 공통 래퍼 사용 예 (Phase 2-C 이관 시 참고)
+```bash
+source "$(dirname "$0")/hook_common.sh"
+
+# advisory 훅 호출 (실패해도 계속):
+hook_advisory "permissions_sanity" bash .claude/hooks/permissions_sanity.sh
+
+# gate 훅 호출 (실패 시 exit 2):
+hook_gate "commit_gate" bash .claude/hooks/commit_gate.sh
+
+# measurement 훅 호출 (영향 없음):
+hook_measure "handoff_archive" bash .claude/hooks/handoff_archive.sh
+```
+
+### 통합·순서 평가 (의제4 세션72 이월)
+- `hook_timing.jsonl` 수집 (advisory·measurement 성격 훅 대상, Phase 2-A 신설)
+- 1주일 누적 후 의제4에서 통합 후보 평가
+- 고정 순서: `block_dangerous` → `commit_gate` → `debate_verify` (절대 변경 금지)
 
 ## 참조
 
