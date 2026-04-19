@@ -37,6 +37,12 @@ Step 5 양측 검증: GPT "동의" + Gemini "동의" → pass_ratio 1.0
 
 **STATUS.md 관련**: GPT가 원래 드리프트로 지적했으나 Gemini "도메인과 시스템 범위 혼동. 조립비정산 STATUS는 세션78 무관" 근거로 3자 버림. GPT Step 4에서 자기 철회. **건드리지 않음 확정**.
 
+**[최종 공유 판정] GPT PASS** (2ccc8589 실물 확인): "Step 5 설계안 반영 정합 PASS. evidence_gate·smoke_test·TASKS/HANDOFF 모두 설계안 그대로 반영."
+
+**[세션79 후속 — A 분류 기록]**
+- smoke_test 전수 실행 로그 첨부 (이번 세션에서 사용자 요청으로 생략됨, bash -n 구문 검사만 완료)
+- 세션79 첫 액션 시 `SMOKE_TEST_FORCE=1 bash .claude/hooks/smoke_test.sh` 1회 실행 후 결과 아카이브
+
 ---
 
 ## 세션78 후속 반영 (2026-04-20, 공유→3자 자동 승격 규칙)
