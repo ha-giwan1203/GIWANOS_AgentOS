@@ -1,29 +1,29 @@
 {
-  "terminal_state": "done",
-  "committed_pushed": true,
-  "gpt_shared": true,
-  "gpt_judgment": "PASS",
-  "gemini_judgment": "PASS",
-  "user_reported": true,
-  "followup_checked": true,
+  "terminal_state": "in_progress",
+  "committed_pushed": false,
+  "gpt_shared": false,
+  "gpt_judgment": null,
+  "gemini_judgment": null,
+  "user_reported": false,
+  "followup_checked": false,
   "exception_reason": null,
-  "session": "session82",
-  "summary": "weekly-self-audit 스케줄 실행 → P1·P2 hook 문서 정합 보정 + 잔여 안건 3건 3자 토론 Round 1 완결. 의제 2 생산계획자동화 98_아카이브 이동, 의제 3 debate_verify.sh Phase 2-C 조건 헤더 문서화(exit 2 전환은 2026-04-27+ 이월), 의제 1 evidence_gate 333건 원인 분석은 양측 '검증 필요' 판정으로 세션83+ 이월. 양측 최종 PASS.",
-  "commits": ["2d092e1b", "e84e410d", "d073cdd3"],
+  "session": "session83",
+  "summary": "이전 세션 이어받아 5개 안건 완결: B(04-19 165건 audit 분석) + A(evidence_gate GRACE 30→120 + tail -30→-100, [3way] API 예외) + C(gpt-read/gpt-send thinking 확장추론 대응, [3way] API 예외) + E(TASKS.md 924→724줄) + D(경로 3종 회귀 테스트 체크리스트). 4개 확장추론 모델(Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2) API 교차 검증, Claude 독립의견 유지(Gemini-flash 역방향 제안 2건 버림 + GPT-5.2 네트워크 idle 미채택). smoke_test 섹션 48·49 총 10건 PASS.",
+  "commits": ["dd3e06f3", "dc1be5be", "4f28cba8"],
   "harness_analysis": {
-    "adopted": 7,
+    "adopted": 6,
     "held": 1,
-    "discarded": 0,
-    "note": "양측 PASS. GPT·Gemini 추가 A 제안 2건(회귀 테스트 체크리스트 템플릿 / 04-19 audit_log 분석)은 즉시 반영 대신 세션83+ 이월. Gemini item 4(thinking 탐지) 메타순환/보류 1건."
+    "discarded": 3,
+    "note": "A 채택 3건(Q1·Q2·Q3 각 3자 만장일치), C 채택 3건(Q1·Q2·Q3), 보류 1건(C Q3 gpt-5.2 '보류' 별건 분리 권고 실질 동의), 버림 3건(A Gemini-flash α조치 fresh_ok 완화 + γ cooldown 중 차단 생략 + C GPT-5.2 Q3 B안 네트워크 idle)"
   },
   "pass_ratio_final": 1.0,
-  "three_way_log": "90_공통기준/토론모드/logs/debate_20260420_131100_3way/",
+  "api_exception_log": "90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/",
+  "api_exception_reason": "사용자 명시 승인 — 이번 세션만 토론모드 [NEVER] API 호출 완화. 다음 세션부터 원복",
+  "openai_key_status": "claude-code-debate-20260420 유지 (사용자 선택: 다음 세션까지 이어 사용)",
   "carried_over": [
-    "의제 1 evidence_gate 333건 후속 3자 토론 — evidence_mark_read 범위 확장 / 정규식 재검토 / 구버전 vs 현재 로그 분리 재집계",
-    "gpt-send/gpt-read 스킬 thinking 탐지 개선 — data-message-model-slug$='-thinking' 감지 시 완료 대기 600초 자동 연장, stop-button 단독 판정 금지",
-    "Phase 2-C 재평가 (2026-04-27 전후) — incident_review.py 재집계 후 exit 2 전환 결정",
-    "[GPT A] Phase 2-C 재평가 전 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 템플릿 고정",
-    "[Gemini A] 04-19 evidence_missing 165건 집중 audit_log 상세 분석 → 세션83 첫 작업"
+    "skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)",
+    "Phase 2-C 재평가 (2026-04-27 전후) — step5_final_verification_path_regression.md 체크리스트 실행 후 debate_verify.sh advisory→gate 승격 판정",
+    "OpenAI API 키 revoke (다음 세션 종료 시)"
   ],
-  "updated_at": "2026-04-20T15:40:00+09:00"
+  "updated_at": "2026-04-20T14:55:00+09:00"
 }
