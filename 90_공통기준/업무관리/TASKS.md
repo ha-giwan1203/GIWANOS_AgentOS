@@ -43,6 +43,16 @@
 - 로그: `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/round2_summary.md`
 - OpenAI API 클라이언트: `90_공통기준/토론모드/openai/openai_debate.py` (reasoning 모델 max_completion_tokens 분기)
 
+**[완료] 안건 E — TASKS.md 감축** (924→724줄)
+- 이관: 세션71~68 블록(718~924행) → `98_아카이브/tasks_archive_20260420_session83.md` (207줄)
+- 백업: `90_공통기준/업무관리/TASKS.md.bak_20260420_session83`
+- STRONG 임계(800줄) 완화. token_threshold_check 경고 해소
+
+**[완료] 안건 D — 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 고정**
+- 신설: `90_공통기준/토론모드/step5_final_verification_path_regression.md`
+- 세션82 GPT A 제안 반영. Phase 2-C 승격 전 필수 검증 3케이스 고정
+- 합격 기준·실행 절차·변경 이력 포함
+
 **[이월·세션84+] 안건 δ — skill_instruction_gate 36건 별건 분석** (본 토론 합의로 분리)
 
 ### 세션83 주의사항
@@ -715,210 +725,10 @@ Step 5 양측 검증: GPT "동의" + Gemini "동의" → pass_ratio 1.0
 
 ---
 
-## 세션71 반영 (2026-04-19, 의제5 토론 + 근본해결 실물 이행 세션)
-
-**[완료] 의제5 3자 토론 Round 1 합의** (`debate_20260418_190429_3way/`, pass_ratio 1.33)
-- 로그: GPT 동의, Gemini 동의, 양측 Claude 종합 설계안 동의 (4/3 = 1.33, 채택 조건 ≥0.67 초과)
-- critic-reviewer WARN 반영 — 실물 훅(debate_verify·commit_gate) exit code 분기 Read 확인 후 진행
-- 합의 8개 쟁점 채택 (A~F + 신규 G·H)
-
-**[완료] 의제5 Phase 2-A 실물 이행 (근본해결)**
-1. `.claude/settings.local.json` permissions 20건 정리 (114→94): 1회용 18건 + 완전 중복 2건 제거
-2. `.claude/hooks/permissions_sanity.sh` 신설 — advisory 등급, stderr 경고, 60분 캐시, 차단 없음
-3. `CLAUDE.md` 루트 신규 섹션 3개:
-   - "hook vs permissions 역할 경계" — 5단계 의사결정 트리 (GPT 제안 1단계 선행 질문 포함)
-   - "settings 계층 분리 가이드" — 쟁점 G 선제조건 명시
-   - "훅 등급 + 에러 전파 정책" — advisory/gate/measurement 3종 + exit code 표준
-4. `.claude/hooks/hook_common.sh` — `hook_timing_start/end` + `hook_advisory/hook_gate/hook_measure` 공통 래퍼 함수 (호출부 전환은 Phase 2-B)
-5. `.claude/hooks/README.md` — Stop hook 책임 매트릭스 + 훅 등급 분류 테이블 (30개 훅 현재 실코드 상태 기록)
-6. `90_공통기준/토론모드/settings_inventory_20260419.md` — 쟁점 G 재분류 인벤토리 (실물 이동은 세션72 이월)
-7. `permissions_sanity.sh` PreToolUse Bash 매처 9번째 등록 (advisory)
-
-**[완료] 의제3 Phase A skill_drift_check 신설**
-- `.claude/hooks/skill_drift_check.sh` 신설 — advisory, git commit 시점에만 실행, 5종 래퍼/실물 SKILL.md 정합성 감지
-- 대상 5종 정합성 확인: debate-mode, settlement, line-batch-management, line-batch-outer-main, daily 모두 OK
-- PreToolUse Bash 매처 3번째(commit_gate 뒤, debate_verify 앞) 등록
-
-**[검증]**
-- `smoke_fast.sh` 9/9 PASS
-- `doctor_lite.sh` OK
-- `debate_verify.sh` exit 0
-- `permissions_sanity.sh` 경고 0건
-
-**[이월]**
-- Phase 2-B: `completion_gate.sh` 소프트 블록 (1회용 패턴 3회 누적 사용자 확인) + 기존 훅 전수 등급 재분류 → 공통 래퍼 호출 전환
-- 의제4: 세션72, hook_timing.jsonl 1주일 수집 후 통합 평가
-- 쟁점 G: settings 계층 분리 실물 이행 (settings.json 이동)
-- 의제6: Gemini 진입 강제 hook 신설
-- 의제7: 탭 throttling 자동 회복 설계
 
 ---
 
-## 세션70 반영 (2026-04-18, 이월 의제 재개 세션)
+## 이전 세션 아카이브
 
-**[완료] 백그라운드 탭 Throttling 대응 지침 전파 (세션70 실증 반영)**
-- 토론모드 CLAUDE.md "백그라운드 탭 Throttling 대응" 섹션 신규
-- gpt-send / gemini-send: Step 1-C "대상 탭 activate navigate" 추가
-- gpt-read / gemini-read: 3-prep "navigate 재호출로 탭 foreground 전환" 강화 (기존 visibilityChange만으로는 해결 안 됨 실증)
-- debate-mode.md: 3자 토론 직렬 실행 원칙 추가
-- debate-mode/SKILL.md: NEVER 생략 주의 추가
-- 근거: Chrome MCP는 tab activate API 미제공 → `navigate(동일URL)` 재호출이 유일 회피 경로
-
-
-**[완료] 의제3 Gemini synthesis 재수령 → 합의 승격 (pass_ratio 0.50 → 0.67)**
-로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
-- `gemini_verifies_claude`: 미수령 → 동의 (근거: pre-commit 훅 이중 배치 + 도메인 의존성 3단계 이관 절충안 합리성)
-- `result.json` status: 부분합의 → 합의 (양측 동의)
-- `step5_final_verification.md` 신규 — GPT/Gemini 양측 **통과** 판정
-- 블로커 해소: 세션69 gpt-read/gemini-read 패치 + 세션70 기존 Gem 대화방 직접 진입
-- 실물 이행(Phase A 즉시 이관 4종)은 세션71+로 분리
-
-**[완료] 의제5 hook vs permissions 감사 리포트 작성 (토론 입력용 read-only)**
-- 산출물: `90_공통기준/토론모드/의제5_hook_permissions_감사리포트.md`
-- 총 hook: 35 .sh + 5 .py / 실행 지점 29개 / permissions.allow 109 항목
-- 정리 후보: 18건 (1회용 16 + 완전 중복 2)
-- 쟁점 A~F 정리 → 세션71 3자 토론 입력으로 사용
-
----
-
-## 세션69 반영 (2026-04-18, 3자 토론 세션)
-
-**[완료] 의제1 /schedule 작업 분류 매트릭스 (pass_ratio 1.00)**
-로그: `90_공통기준/토론모드/logs/debate_20260418_161959_3way/`
-- Tier 1 실행 모드 게이트: Cloud / Desktop / /loop
-- Tier 2 Cloud 4칸: GitHub-only(+env 2차검증) / 커넥터(Phase 2) / 로컬실물(Desktop) / 사내망(로컬)
-- Phase 1 이관 후보 읽기전용 3종: `/self-audit`, `/doc-check`, `/review-claude-md`
-- 하이브리드 작업: 축 신설 안함. [로컬 Desktop 수집 → Git commit → Cloud 가공] 분리
-
-**[완료-합의 2026-04-18 / 실물 구현 2026-04-20 세션79] 의제2 토큰 임계치 경고 스킬 `token-threshold-warn` (pass_ratio 1.00)**
-로그: `90_공통기준/토론모드/logs/debate_20260418_164115_3way/`
-- 임계치: TASKS 400/800, HANDOFF 500/800, MEMORY 인덱스 120/200, 개별메모리 60/100, incident 1MB/3MB
-- SessionStart hook 경고 + Stop hook 증가량 기록 (차단 없음)
-- 자동 아카이브 이동 금지, 토큰 근사치 계산 금지
-- **세션79 실물화**: Phase 1(SessionStart 경고) 완료. Phase 2(Stop hook) 1주 후 재평가. 상세: 상단 세션79 블록 참조.
-
-**[합의 (세션70 승격)] 의제3 skill-creator 경로화 (pass_ratio 0.50 → 0.67)**
-로그: `90_공통기준/토론모드/logs/debate_20260418_170000_3way/`
-- 채택: 래퍼 방식, skill-creator+커밋관문 이중 동기화, 도메인 의존성 우선순위, 3단계 이관(즉시 4종/7일 7종/유지)
-- 세션69 상태: Gemini synthesis 미수령(Chrome throttling)
-- 세션70: 재진입으로 Gemini 동의 수령 → 합의 완료. 실물 이행(Phase A 4종 즉시 이관)은 세션71+ 분리
-
-**[완료] 즉시 조치 4건 (사용자 지적)**
-1. `.claude/commands/debate-mode.md` — Gemini/3자 토론 진입 지침 추가 (기존엔 GPT만 언급)
-2. `settings.local.json permissions.allow` — `Bash(echo:*)`/`Bash(cat:*)` 포괄 패턴 추가 (반복 팝업 해소)
-3. `.claude/commands/gpt-read.md` 근본 버그 수정 — placeholder 스킵 역순 스캔, 2회 안정성 판정, visibilitychange 트리거, 3단계 재시도(sleep→navigate reload→수동 요청)
-4. `.claude/commands/gemini-read.md` 근본 버그 수정 — 메타 텍스트 스킵, 전송버튼 fallback 3중, `not_found` 5회 재시도, 동일 복구 체인
-
----
-
-## 세션70 이월 (다음 세션에서 재개)
-
-**[완료·세션70] 의제3 Gemini synthesis 검증 재확인** — 합의 승격 완료
-**[완료·세션70] 의제5 감사 리포트 작성** — 토론은 세션71에서
-**[이월] 의제3 Phase A 실물 이관 4종** — debate-mode, settlement, line-batch-* 4종, daily → 래퍼 자동 생성 + skill_drift_check.sh pre-commit hook 신규
-**[이월] 의제4 `/debate-verify` 실행 순서 재평가** — Phase 2 실측 기반 (의제5 쟁점 D와 연계)
-**[이월] 의제5 3자 토론** — 감사 리포트(`의제5_hook_permissions_감사리포트.md`) 입력으로 진입
-**[이월] 의제6 진입 단계 Gemini 강제 hook 신설** — 사용자 진단
-**[이월] 의제7 3자 토론 탭 throttling 자동 회복** — 세션70 수동 재진입 성공이 해결 패턴 제시, 본격 자동화 설계는 다음 세션
-
----
-
-## 세션68 즉시 적용 (2026-04-18, 3자 토론 합의)
-
-**[완료] Claude Code 명령어 매뉴얼 영상(2rzKCZ7XvQU) 분석 기반 개선 4건 — Round 1 합의**
-1. ✅ `/rewind` 한계 CLAUDE.md 명시 — bash 삭제 복구 불가, Git 대체재 아님
-2. ✅ context7 우선 규칙 CLAUDE.md 명시 — 라이브러리 문서 조회 시 WebSearch보다 우선
-3. ✅ `doctor_lite.sh` 경량 진단 스크립트 + session_start hook 연동 — settings JSON·필수 hook·핵심 문서·git 체크
-4. ✅ `statusline.sh` 설정 + `settings.local.json` statusLine 등록 — 모델·경로·브랜치·비용 상시 표시
-
-**[완료] SKILL.md Step 5 지침 버그 패치** — 3way에서 Gemini 누락 방지 (사용자 지적으로 발견)
-- 5-3: 3way 양측 동시 전송 [MUST] 명시
-- 5-4: 3way 종결 조건 분기 신설
-- 5-5: Gemini 판정 필드 필수
-
-**[완료] /debate-verify hook Phase 1 — Round 2 합의**
-- `.claude/hooks/debate_verify.sh` — PreToolUse Bash 매처, git commit 시 3way 로그 서명 검증
-- 검증: cross_verification 4키 + verdict enum + reason + pass_ratio + step5 양측 판정 섹션
-- round_count/max_rounds 일관성 검증
-- `incident_ledger.jsonl`에 "tag":"debate_verify" 기록 (Phase 2 전환 계측)
-- CP949 인코딩 버그 수정 (Gemini 지적 실물 재현)
-- `/debate-verify` 수동 스킬 (`.claude/commands/debate-verify.md`) — --dry-run 사전 점검
-
-**[검증 후 적용 대기 — 세션69 이후]**
-- `/schedule` 이관 — 작업 분류 매트릭스(로컬/사내망/GitHub-only/커넥터) 수립 후 GitHub 문서 리포트형만 클라우드화
-- `skill-creator` 경로화 — 신규 스킬만 스킬 경로 우선. 기존 `.claude/commands/*.md` 점진 이관
-- 토큰 임계치 경고 스킬 (Gemini 제안) — TASKS/STATUS 비대 시 컨텍스트 압축·세션 재시작 권고
-- /debate-verify Phase 2 전환 — 1주 운영 후 incident_ledger debate_verify 태그 0건이면 차단 모드(exit 2) 전환
-- /debate-verify 실행 순서 재평가 — GPT/Gemini 대립 쟁점, Phase 2 실측 기반 결정
-
-**[폐기]**
-- `/batch` — main 직행 아키텍처와 상충 (워크트리 실험 레인 규정 선결 시 재검토)
-- `/insights` — ERP 자동화 본선 기여도 낮음, `/self-audit`와 중복
-- `--bare` — hook/gate 중심 안전장치 스킵은 리스크
-
----
-
-## 다음 세션 안건
-
-**[낮] evidence_missing 7일 후 재측정 (세션65 GPT 합의)**
-- **1차 측정 결과** (2026-04-18 12:19 KST, 배포 기준시각 2026-04-18T02:13:00Z):
-  - 배포 전 7일: 101건 (map_scope 33, skill_read 41, tasks_handoff 20, auth_diag 4, date_check 2, skill_instr 1)
-  - 배포 후 ~10시간: 2건 (map_scope 1, skill_read 1)
-  - 감소율: 98% (TASKS 목표 50건 이하 대비 초과 달성)
-  - **판정: 5조건 보류** (POST ≤ 50)
-- **7일 후 재측정 필요** (2026-04-25 이후): 배포 후 7일 데이터로 최종 확정
-  - 스크립트: `.claude/scripts/evidence_missing_stats.sh 2026-04-18T02:13:00Z`
-  - 71건 이상 또는 감소율 60% 미만 시 5조건 즉시 구현
-- **5조건 구현 보류 상태** (기존 TASKS 안건 유지, 조건부 승격):
-  1. req가 실제 생성돼 있어야 함
-  2. 같은 세션에서 해당 문서/스킬 읽기 흔적 있어야 함
-  3. 해당 스킬이 정상 종료해야 함
-  4. 정상 종료 직후에만 대응 ok 자동 발급
-  5. 중간 실패·재시도 중·부분 실행 시 발급 금지
-
-**[낮] notebooklm-mcp cleanup_data preserve_library 보호 누락 별건 (이슈 #2)**
-- **증상**: `cleanup_data(preserve_library=true)` 실행 시 `Legacy Installation` 카테고리에 현행 `AppData/Roaming/notebooklm-mcp` 경로가 포함되어 삭제됨. 결과적으로 `library.json` 소실
-- **세션59 실적**: 2개 노트북(`조립비정산_대원테크`, `라인배치_대원테크`) 수동 재등록으로 복구
-- **조치 방향**:
-  - 업스트림 이슈 리포트 (문서와 실동작 불일치)
-  - 로컬 백업 루틴 검토 — cleanup 전 `library.json` 스냅샷
-
-**[낮] safe_json_get 파서 교체 (세션51 GPT 합의: incident 발생 시 승격)**
-- 현재 grep/sed 기반. 실제 파싱 실패 incident 미발견 → 후순위 유지
-- 승격 조건 명시화(세션54 GPT): ①navigate/evidence/completion_gate 중 JSON 파싱 실패 incident 1회 + ②중첩키 빈값 재현 + ③7일 내 파싱 incident 2회 누적
-
----
-
-## 다음 세션 안건 (추가)
-
-**[낮] Composio Gemini MCP 통합 검토 (조건부)**
-- **조건**: `/ask-gemini` 호출 빈도 ≥ 주 5회 시 승격
-- **검토 항목**: Composio 계정/API 키 비용, 자체 호스팅 대안 (RaiAnsar/RLabs 오픈소스 MCP), 본 환경 검증
-- **현 상태**: `/ask-gemini` (CLI minion) 1순위 운용. MCP는 빈도 누적 후 결정 (단, 3자 토론 내 사용 금지 — 세션67)
-
-**[중] 3way cross_verification 자동 게이트 스크립트 (세션67)**
-- **배경**: SKILL.md v2.10 "자동 게이트" 규정은 명시되었으나 실제 강제 스크립트/훅 미구현. 현재는 Claude 운영 규칙 수준
-- **구현 범위**:
-  - 3자 토론 로그 디렉터리(`logs/debate_*_3way/`) 내 JSON 스키마 검사
-  - `cross_verification` 4개 필수 키 존재, `verdict` enum(`동의`/`이의`/`검증 필요`), `pass_ratio_numeric` 재계산 일치
-  - `round_count ≤ max_rounds(=3)` 검사 (세션67 v2.11로 3회 원복)
-  - 실패 시 라운드 재실행 신호 또는 `consensus_failure.md` 생성
-- **위치 후보**: `.claude/scripts/verify_cross_verification.py` + PostToolUse hook 또는 critic-reviewer 승격
-- **조건**: 3자 토론 실사용 2회 누적 후 착수 (과잉설계 방지)
-
-~~**[중] 토론 검증 프로토콜 보완 (세션66 사용자 지적)**~~ → **세션66 종결 시 즉시 구현 완료** (아래 "최근 완료" 항목 참조)
-
----
-
-## 활성 대기 항목
-
-### [대기] 4월 실적 정산 — **대기: 4월 GERP/구ERP 데이터**
-- 4월 정산 데이터 입수 후 `/settlement 04` 실행
-
-### [종료·아카이브] verify_xlsm.py COM 실검증 — `98_아카이브/tasks_archive_20260420.md` 참조
-
----
-
-## 완료 이력 아카이브
-
-> 세션67 이전 완료 + "최근 완료"/"완료됨" 섹션은 `98_아카이브/tasks_archive_20260420.md`로 이관 (세션80, 1262줄 → 1줄). 원본 백업: `TASKS.md.bak_20260420`. TASKS.md는 세션77~79 블록 + 활성 대기만 유지.
+- **세션68~70**: `98_아카이브/tasks_archive_20260420.md` (세션80 이관)
+- **세션68~71**: `98_아카이브/tasks_archive_20260420_session83.md` (세션83 2차 이관)

@@ -49,10 +49,17 @@
 - 네트워크 idle(GPT-5.2 B안)은 MCP 환경 불안정으로 미채택, Claude 독립 판단
 - smoke_test 섹션 49 5/5 PASS
 
-### 다음 AI 액션 (세션83 이후)
-- E: TASKS.md 887→≤800줄 감축
-- D: 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 고정
+### 안건 E 완료 (TASKS.md 감축)
+- 924→724줄, 세션71~68 블록 `98_아카이브/tasks_archive_20260420_session83.md`로 이관 (207줄)
+- 백업: `TASKS.md.bak_20260420_session83`
+
+### 안건 D 완료 (경로 3종 회귀 테스트 체크리스트)
+- `90_공통기준/토론모드/step5_final_verification_path_regression.md` 신설
+- 세션82 GPT A 제안 반영. Phase 2-C 승격 전 필수 검증 기준 고정
+
+### 다음 AI 액션 (세션84+)
 - skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)
+- Phase 2-C 재평가 (2026-04-27 전후): `step5_final_verification_path_regression.md` 체크리스트 실행 → 통과 시 debate_verify.sh advisory→gate 승격
 - OpenAI API 키 revoke (세션 종료 시)
 
 ### 주의사항
