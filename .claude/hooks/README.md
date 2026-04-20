@@ -114,6 +114,11 @@
 | `debate_independent_gate.sh` | fail-closed | deny JSON | 독립견해 마커 미존재 시 전송 차단 |
 | `navigate_gate.sh` | conditional fail-closed | deny JSON | debate_mode 활성 시 fail-closed, 그 외 fail-open |
 | `debate_send_gate_mark.sh` | fail-open + WARN | 없음 | 마커 생성 실패 시 WARN 로그 후 통과 (debate_gate가 2차 차단) |
+| `skill_drift_check.sh` | fail-open | 없음 | advisory. SKILL.md drift 감지 시 stderr 경고만, 차단 없음 |
+| `permissions_sanity.sh` | fail-open | 없음 | advisory. 1회용 패턴·완전 중복 탐지 시 stderr 경고만, 60분 캐시 |
+| `token_threshold_check.sh` | fail-open | 없음 | advisory. 문서 비대화 임계 초과 시 stderr 경고만, exit 0 강제 (보조 스크립트, session_start_restore에서 호출) |
+| `share_gate.sh` | fail-open | 없음 | advisory. 3way 감지 조건 미충족 시 stderr 경고만, 차단 없음 (보조 스크립트, share-result 수동 실행) |
+| `doctor_lite.sh` | fail-open | 없음 | advisory. 설정 드리프트 감지 시 경고만, 차단 없음 (보조 스크립트) |
 
 ## req clear 규칙 (세션49 합의, 세션52 문서화)
 
@@ -135,6 +140,11 @@
 | `smoke_fast.sh` | SessionStart용 빠른 smoke (5~8건, 로컬/결정적만). session_start_restore.sh에서 호출 |
 | `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
 | `e2e_test.sh` | E2E 테스트 (block_dangerous/protect_files/session_start/evidence_gate 10개 시나리오). 수동 실행 |
+| `doctor_lite.sh` | 경량 설정 드리프트 진단 (3자 토론 2026-04-18 합의). session_start_restore.sh에서 호출 |
+| `token_threshold_check.sh` | 저장소 문서 비대화 사전 감시 (세션68 3자 합의 / 세션79 실물 구현). session_start_restore.sh에서 호출. 등급: advisory (exit 0 강제) |
+| `share_gate.sh` | share-result 0단계 3way 감지 조건 자동 검증 (세션79). `/share-result` 스킬 진입 시 수동 실행. 등급: advisory (stderr 경고만) |
+| `nightly_capability_check.sh` | Silent Failure 방지용 야간 capability 점검. Windows schtasks 수동 등록 필요 (세부 절차 별도 안내) |
+| `pruning_observe.sh` | MEMORY/TASKS 항목 pruning 관찰 리포트 (수동 실행) |
 
 ## 훅 등급 분류 (2026-04-19 의제5 3자 토론 합의, Phase 2-B 일부 반영)
 

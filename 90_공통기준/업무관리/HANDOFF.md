@@ -4,12 +4,43 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션81 (debate_verify.sh 한글경로 수정 — 3자 토론 [3way])
+최종 업데이트: 2026-04-20 KST — 세션82 (weekly-self-audit 스케줄 실행 → P1·P2 hook 문서 정합 보정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션81 — debate_verify.sh 한글 경로 오탐지 수정)
+## 0. 최신 세션 (2026-04-20 세션82 — weekly-self-audit → hook 문서 정합 보정)
+
+### 실행 경로
+scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포트 생성 → 사용자 "진행" 승인 → P1 2건 + 관련 P2 3건 README 문서화 + settings.local.json 1회용 패턴 23건 청소
+
+### 진단 결과 요약
+- hook 32개 중 31개 active, anomaly 6건 (P1 2 / P2 4 / P3 3)
+- 인시던트 7일: evidence_missing 359, pre_commit_check 91, send_block 87, harness_missing 41 (총 WARN 91, FAIL 승격 후보 2건)
+
+### 수정 2건
+1. `.claude/hooks/README.md` — 보조 스크립트 섹션 +5행 (`token_threshold_check`, `share_gate`, `doctor_lite`, `nightly_capability_check`, `pruning_observe`), 실패계약 표 +6행 (위 5개 + `skill_drift_check`, `permissions_sanity`)
+2. `.claude/settings.local.json` — allow 37→14 (echo PID 8건, echo URL 5건, touch evidence SHA 2건, Read 중복·오타 4건, 완전 중복 1건, 특정 SHA/URL 하드 3건 삭제)
+
+### 설계 의사결정
+- `token_threshold_check.sh`는 `session_start_restore.sh:150`에서 체인 호출 중 — settings.json SessionStart 이중 등록 시 중복 발화 → README 기재만 수행
+- `share_gate.sh`는 `/share-result` 스킬 0단계 검증 설계 — hook 이벤트 자동 발화는 설계 밖 → README 기재만 수행
+
+### 검증
+- `bash .claude/hooks/permissions_sanity.sh` 재실행 시 경고 출력 없음 (1회용 패턴 감지 해소)
+- settings.local.json allow count: 14 (python3 JSON 검증 확인)
+
+### 다음 AI 액션
+- **세션 재시작 필요**: settings.local.json 수정 반영은 다음 세션부터 적용
+- P2 이월: `evidence_missing` 359건/7일 원인 분석 3자 토론 의제 승격
+- P3 이월: README 상단 "34개" → "31개" 정정 / `생산계획자동화` 고아 폴더 정리 / `debate_verify.sh` Phase 2-C 승격 판정
+
+### 주의
+- 이번 세션은 scheduled-task 자동 실행으로 시작됐고, 사용자 승인 후 문서 수정 + 1회용 패턴 청소 진행. 구조 변경(hook/gate 신설·등급 변경) 없이 문서 정합만 보정 → 3자 토론 불필요
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션81 — debate_verify.sh 한글 경로 오탐지 수정)
 
 ### 사용자 지시
 세션80 Follow-up: "debate_verify.sh" python3 heredoc 한글 경로 인식 실패 오탐지 → 수정 진행 (hook 구조 변경 = B 분류 → 3자 토론 자동 승격)

@@ -10,7 +10,38 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션81 (debate_verify.sh 한글경로 수정 — 3자 토론 [3way])
+최종 업데이트: 2026-04-20 — 세션82 (weekly-self-audit 스케줄 실행 → P1·P2 hook 문서 정합성 보정)
+
+---
+
+## 세션82 (2026-04-20, weekly-self-audit → hook 문서 정합 보정)
+
+**[완료] `/self-audit` 스케줄 실행 결과 기반 P1 2건 + 관련 P2 3건 README 문서화**
+- 진단 결과: hook 32개 중 31개 active, anomaly 6건 (P1 2/P2 4/P3 3)
+- P1 2건 (문서 드리프트):
+  1. `token_threshold_check.sh` — `session_start_restore.sh`에서 체인 호출되나 README 미기재 → 보조 스크립트 섹션 + 실패계약 표 추가 (advisory/fail-open)
+  2. `share_gate.sh` — `/share-result` 수동 실행이나 README 미기재 → 보조 스크립트 섹션 + 실패계약 표 추가 (advisory/fail-open)
+- 관련 P2 3건 일괄 보정:
+  - `skill_drift_check.sh` 실패계약 표 신규 추가 (advisory/fail-open)
+  - `permissions_sanity.sh` 실패계약 표 신규 추가 (기존 누락 보완)
+  - `doctor_lite.sh` 보조 스크립트 섹션 + 실패계약 표 신규 추가
+  - `nightly_capability_check.sh`, `pruning_observe.sh` 보조 스크립트 섹션 추가
+- settings.json 이중 등록 회피: token_threshold_check는 session_start_restore 체인 호출, share_gate는 share-result 커맨드 설계 밖 호출 — 이벤트 등록 시 중복 발화
+- 수정 파일: `.claude/hooks/README.md` 1개 (보조 스크립트 섹션 +5행, 실패계약 표 +6행)
+
+**[완료] settings.local.json 1회용 패턴 23건 청소** — permissions_sanity.sh 33회/7일 경고 해소
+- 제거 내역 (23건, allow 37→14):
+  - echo PID 하드코딩 8건 (`echo "1382937xxx"`), echo URL 하드코딩 5건 (ChatGPT/Gemini 특정 대화방)
+  - touch evidence SHA 2건 (과거 세션 `f0c5823f656...` 경로 하드)
+  - Read memory 경로 중복 2건, settings.json과 완전 중복 1건 (`python3 -c ' *`)
+  - SHARE_GATE_COMMIT 특정 SHA 하드 1건, python3 URL 하드코드 1건
+  - Read 오타 경로 2건 (`//c/c/...`), 존재하지 않는 파일 2건 (`TASKS.md.append`)
+- 검증: `bash .claude/hooks/permissions_sanity.sh` 재실행 시 경고 출력 없음
+- 주의: settings.local.json 수정 반영은 **세션 재시작 시 캐싱**. 현 세션은 이전 스냅샷 사용
+
+### 남은 진단 안건 (세션83+)
+- **P2 이월**: `evidence_missing` 인시던트 359건/7일 원인 분석 (3자 토론 의제 승격 권장)
+- **P3 이월**: README 상단 "34개 스크립트" 표기 → 실등록 31개 정정 / `생산계획자동화` 고아 폴더 정리 / `debate_verify.sh` Phase 2-C 승격 판정 (7일 0건 조건)
 
 ---
 

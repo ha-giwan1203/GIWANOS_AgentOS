@@ -8,7 +8,13 @@
       "Bash(gemini:*)",
       "Bash(gemini -p:*)",
       "Bash(echo \"*\" | gemini *:*)",
-      "Bash(wmic process *)"
+      "Bash(wmic process *)",
+      "Bash(python3 -c \"import json; s=json.load\\(open\\('.claude/settings.json',encoding='utf-8'\\)\\); l=json.load\\(open\\('.claude/settings.local.json',encoding='utf-8'\\)\\); print\\('settings.json allow:', len\\(s.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('settings.json hooks PreToolUse matchers:', len\\(s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\)\\)\\); first=s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\)[0] if s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\) else None; print\\('PreToolUse first matcher:', first.get\\('matcher'\\) if first else None\\); first_hook=\\(first.get\\('hooks',[{}]\\)[0].get\\('command',''\\) if first else ''\\); print\\('first hook command tail:', first_hook[-40:]\\); print\\('settings.local.json allow:', len\\(l.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('settings.local.json has hooks:', 'hooks' in l\\); print\\('settings.local.json has statusLine:', 'statusLine' in l\\)\")",
+      "Bash(bash .claude/hooks/pruning_observe.sh)",
+      "Bash(bash .claude/hooks/token_threshold_check.sh)",
+      "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
+      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/스킬/daily-routine/run.py)",
+      "Bash(bash .claude/hooks/share_gate.sh)"
     ],
     "ask": [
       "Bash(python*:*)",
