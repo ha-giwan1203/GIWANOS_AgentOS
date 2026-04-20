@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션82 (weekly-self-audit 스케줄 실행 → P1·P2 hook 문서 정합성 보정)
+최종 업데이트: 2026-04-20 — 세션82 (weekly-self-audit + 잔여 안건 3건 3자 토론 [3way])
 
 ---
 
@@ -39,9 +39,37 @@
 - 검증: `bash .claude/hooks/permissions_sanity.sh` 재실행 시 경고 출력 없음
 - 주의: settings.local.json 수정 반영은 **세션 재시작 시 캐싱**. 현 세션은 이전 스냅샷 사용
 
-### 남은 진단 안건 (세션83+)
-- **P2 이월**: `evidence_missing` 인시던트 359건/7일 원인 분석 (3자 토론 의제 승격 권장)
-- **P3 이월**: README 상단 "34개 스크립트" 표기 → 실등록 31개 정정 / `생산계획자동화` 고아 폴더 정리 / `debate_verify.sh` Phase 2-C 승격 판정 (7일 0건 조건)
+### 남은 진단 안건 → 3자 토론 라운드 1 진행 (2026-04-20 오후)
+
+**[완료] README 상단 "34개" → "31개" 정정** — A 분류 (단순 숫자 정정). PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4 = 실등록 31개
+
+**[3자 토론 Round 1 완료] 3의제 일괄 처리 — 로그: `90_공통기준/토론모드/logs/debate_20260420_131100_3way/`**
+
+#### 의제 1 — evidence_gate 과다 발화 원인 분석
+- **판정**: GPT "검증 필요" + Gemini "검증 필요" → **즉시 조치 유보**, 세션83+ 별건 이월
+- 실측: 333건/7일 = map_scope.req 99 + skill_read 86 + tasks_handoff 63 + MES-no-SKILL 60 + commit차단 16. 2026-04-19 165건(50%) / 04-14 64건(19%) 집중
+- 양측 공통 원인 가설: 구버전 tasks_handoff 패턴 + 현재 map_scope 반복 + commit 시점 차단 **혼재**
+- **세션83+ 이월 안건**: (1) evidence_mark_read.sh 자동 충족 범위 확장 (2) Gate 탐지 정규식 범위 재검토 (3) 구버전 vs 현재 로그 분리 재집계
+
+#### 의제 2 — 90_공통기준/스킬/생산계획자동화/ 고아 폴더 [완료]
+- **판정**: GPT "A 동의" + Gemini "A 동의" → pass_ratio 양측 동의
+- 조치: `90_공통기준/스킬/생산계획자동화/` → `98_아카이브/생산계획자동화_구버전_20260420/` 이동 (파일 3건: 변경이력·운영절차·자동화규칙 v3.0)
+- 활성 스킬 `90_공통기준/스킬/sp3-production-plan/SKILL.md` 유지 (이중화 회피)
+
+#### 의제 3 — debate_verify.sh Phase 2-C 승격 판정 [헤더 문서화 완료, exit 2 전환은 7일 후]
+- **판정**: GPT "동의" + Gemini "동의 (회귀 테스트 보강)" → pass_ratio 양측 동의
+- 조치: `debate_verify.sh` 헤더에 Phase 2-C 조건 주석 추가
+  - 재집계 시작점: **세션81 수정 커밋 SHA 408c4856** (2026-04-20 ~10:54 KST)
+  - 관찰 기간: post-fix 7일 연속 type=debate_verify incident 0건
+  - 회귀 테스트: 영문/특수문자/한글 경로 커버 (Gemini 보강)
+  - 승격 방식: hook_gate 래퍼 + exit 2 + JSON decision=deny (기존 Phase 2-B 6종 준용)
+- **평가 시점**: 2026-04-27 세션89+ 예상. incident_review.py 재집계 결과에 따름.
+
+### 세션83+ 이월 안건 (3자 토론 후속)
+- **의제 1 후속 3자 토론** (필수): evidence_gate 333건 원인 세부 분석 + 정규식 검토 + 조치안 확정
+- **gpt-send/gpt-read 스킬 개선** (세션82 실증): `data-message-model-slug$="-thinking"` 감지 시 완료 대기 시간 자동 연장 (stop-button 단독 판정 금지)
+- **Phase 2-C 재평가** (2026-04-27 전후): incident_review.py 결과 확인 후 exit 2 전환 결정
+- (기존 P3 이월) Phase 2-C 재평가 시 회귀 테스트 실행
 
 ---
 

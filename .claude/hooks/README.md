@@ -1,11 +1,12 @@
 # Hooks 운영 현황
 
-> 2026-04-15 갱신 — settings.local.json 등록 기준 (실제 활성 hook만 기재)
+> 2026-04-20 갱신 — settings.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (34개 스크립트, settings.local.json 등록)
+## 활성 Hook (31개 등록, settings.json 기준)
 
-> `final_check.sh`는 `settings.local.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+> `final_check.sh`는 `settings.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+> 이벤트별 등록 수: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4 = **31**
 
 ### 이벤트층 (SessionStart / PreCompact)
 

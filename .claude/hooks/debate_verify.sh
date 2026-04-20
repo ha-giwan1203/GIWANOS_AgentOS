@@ -10,6 +10,14 @@
 # Phase 3: step5_final_verification.md 자동 생성 헬퍼
 #
 # Phase 2-B 진행 사항 (2026-04-19 세션72): timing 계측만 추가. exit 코드 정책 변경 없음.
+#
+# Phase 2-C 승격 조건 (2026-04-20 세션82 3자 토론 합의 [3way], GPT·Gemini 양측 동의):
+#   - **재집계 시작점**: 세션81 한글경로 Python3 오탐지 수정 커밋(2026-04-20 ~10:54 KST, SHA 408c4856)
+#   - **관찰 기간**: post-fix 기준 7일 연속 type=debate_verify incident 0건
+#   - **회귀 테스트 요건**(Gemini 제안 보강): 영문/특수문자/한글 경로 모두 커버. 단순 시간 경과가 아닌 "검증 기간"으로 정의
+#   - **승격 방식**: 기존 Phase 2-B 6종 준용 (hook_gate 래퍼 + exit 2 + JSON decision=deny). 탐지 로직 변경 없이 advisory 출력 → deny 경로 감싸기만
+#   - 로그: 90_공통기준/토론모드/logs/debate_20260420_131100_3way/
+#   - 평가 시점: 빠르면 2026-04-27 세션89+, 실제 스케줄은 incident_review.py 재집계 결과에 따름.
 
 set -u
 
