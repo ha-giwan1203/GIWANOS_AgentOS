@@ -43,8 +43,13 @@
 - `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/gemini_pro_round2.md`
 - `90_공통기준/업무관리/evidence_gate_20260419_analysis.md`
 
+### 안건 C 완료 (gpt-read/gpt-send thinking 대응)
+- GPT-5.2 + Gemini 3.1-pro-preview 교차 검증 — Claude 독립 종합
+- slug includes 'thinking'/'reasoning' 판정 + maxTimeout 300→600 조건부 + 블록 안정 3회 연속 동일 종료 경로
+- 네트워크 idle(GPT-5.2 B안)은 MCP 환경 불안정으로 미채택, Claude 독립 판단
+- smoke_test 섹션 49 5/5 PASS
+
 ### 다음 AI 액션 (세션83 이후)
-- C: gpt-send/gpt-read thinking 모델 탐지 로직 개선 (3자 API 토론)
 - E: TASKS.md 887→≤800줄 감축
 - D: 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 고정
 - skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)

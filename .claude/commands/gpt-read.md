@@ -9,14 +9,38 @@ GPT 프로젝트방의 최신 응답을 읽어오는 단일 명령.
 - `tabs_context_mcp` → 기존 ChatGPT 탭 확인
 - ChatGPT 탭이 없으면: `.claude/state/debate_chat_url` 읽기 → navigate
 
-### 2. 응답 완료 + 안정성 확인 (세션69 개선)
+### 2. 응답 완료 + 안정성 확인 (세션69 개선, 세션83 thinking 확장)
 
-2-a. **stop-button 감지**:
+2-a. **thinking 모델 감지 + stop-button 병행 판정** (세션83 Round 1, 3자 API 합의):
 ```javascript
-document.querySelector('[data-testid="stop-button"]') !== null
+(() => {
+  const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
+  const last = blocks.length ? blocks[blocks.length - 1] : null;
+  const slug = (last && last.getAttribute('data-message-model-slug') || '').toLowerCase();
+  const isExtended = slug.includes('thinking') || slug.includes('reasoning');
+  const stopBtn = document.querySelector('[data-testid="stop-button"]') !== null;
+  const lastText = last ? (last.innerText || '').trim() : '';
+  return JSON.stringify({
+    isExtended, slug, stopBtn,
+    maxTimeout: isExtended ? 600 : 300,
+    lastLen: lastText.length,
+    lastSlice: lastText.slice(-100)
+  });
+})();
 ```
-- true면 아직 생성 중 → 적응형 polling (3/5/8초, 최대 300초)
-- false면 2-b로
+
+**폴링 정책**:
+- `isExtended=false`: 3/5/8초 단계, 최대 300초 (기존 유지)
+- `isExtended=true`: 3/5/8/15초 반복, 300초 이후만 30초 단계로 전환, 최대 600초
+- **종료 판정은 stop-button 단독으로 하지 않음** (세션82 실증: thinking 중 stop-button 지속 유지되며 Claude가 오클릭)
+  - 종료 조건 OR:
+    1. `stopBtn=false` AND 2-b 안정성(2회 연속 동일) PASS (기존 경로)
+    2. 블록 안정 3회 연속 동일 (`lastLen`·`lastSlice` 3회 동일) → stop-button 잔존 무관 완료 판정 (세션83 신설, thinking 응답 완결 후 DOM 안정 보장)
+
+**slug 정규화 이유 (GPT-5.2·Gemini 3.1-pro-preview 교차 검증)**:
+- `toLowerCase().includes('thinking' or 'reasoning')`: 향후 `-thinking-v2`, `-reasoning-exp`, `-thinking-preview` 변형 대응
+- `endsWith('-thinking')`만으로는 미래 slug 변형 누락 위험 (Gemini 지적)
+- 과도한 allowlist는 유지보수 부담 (GPT-5.2 우려 부분 반영하되 단순화)
 
 2-b. **마지막 유효 블록 안정성 확인** (placeholder 스킵 + 2회 연속 동일 여부):
 ```javascript
@@ -124,3 +148,8 @@ python3 .claude/hooks/record_incident.py \
   - 2회 연속 동일 측정 안정성 판정
   - 백그라운드 throttling 대응 (visibilitychange 트리거)
   - 읽기 실패 시 자동 재시도 (sleep → navigate reload → 수동 요청)
+- 세션83 (2026-04-20): thinking 모델 확장 추론 대응 (3자 API 예외 합의)
+  - `data-message-model-slug` includes `thinking`/`reasoning` lowercase 매칭
+  - isExtended=true 시 maxTimeout 300→600초 + 후기 30초 단계 도입
+  - stop-button 단독 판정 금지 — 블록 안정 3회 연속 동일 종료 경로 추가 (stop-button 잔존 대비)
+  - 세션82 실증: gpt-5-4-thinking 응답 중 stop 오클릭 사건 해소

@@ -1176,6 +1176,32 @@ check $? "evidence_gate: fresh_ok 검증 흐름 유지 (역방향 완화 차단)
 
 echo ""
 
+# === 섹션 49: gpt-send/gpt-read thinking 모델 탐지 (세션83 C [3way] API 예외) ===
+# 배경: 세션82 gpt-5-4-thinking 확장 추론 중 stop-button 잔존 → Claude stop 오클릭
+# 합의: slug includes 'thinking'|'reasoning' + stop-button 단독 판정 금지 (블록 안정 3회 연속 동일)
+
+# 49-1: gpt-read에 isExtended 감지 로직
+grep -qE "slug\.includes\('thinking'\) \|\| slug\.includes\('reasoning'\)" "$PROJECT_ROOT/.claude/commands/gpt-read.md"
+check $? "gpt-read: data-message-model-slug thinking/reasoning 감지 (세션83)"
+
+# 49-2: gpt-read에 maxTimeout 600초 조건부
+grep -qE "maxTimeout: isExtended \? 600 : 300" "$PROJECT_ROOT/.claude/commands/gpt-read.md"
+check $? "gpt-read: isExtended=true 시 600초 확장"
+
+# 49-3: gpt-read에 블록 안정 3회 연속 동일 종료 경로
+grep -qE "블록 안정 3회 연속 동일" "$PROJECT_ROOT/.claude/commands/gpt-read.md"
+check $? "gpt-read: 블록 안정 3회 연속 종료 경로 (stop-button 단독 판정 금지)"
+
+# 49-4: gpt-send에 isExtended 탐지 동기화
+grep -qE "isExtended.*thinking.*reasoning" "$PROJECT_ROOT/.claude/commands/gpt-send.md"
+check $? "gpt-send: thinking/reasoning 감지 동기화 (세션83)"
+
+# 49-5: gpt-send에 stop-button 단독 판정 금지 명시
+grep -qE "stop-button 단독 판정 금지" "$PROJECT_ROOT/.claude/commands/gpt-send.md"
+check $? "gpt-send: stop-button 단독 판정 금지 명시"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)

@@ -22,6 +22,15 @@
 - 04-19 01:06~01:53 KST 47분간 42건 단일 세션 commit/push 루프
 - fingerprint 상위 3종 180/272 = 66% 집중, resolved:false 100%
 
+**[완료] 안건 C — gpt-read/gpt-send thinking 확장추론 대응 ([3way] API 예외 토론)**
+- 사용 모델: GPT-5.2 + Gemini 3.1-pro-preview (2자 API 교차 검증, Claude 독립 종합)
+- Q1 slug 탐지: `slug.toLowerCase().includes('thinking'|'reasoning')` — GPT-5.2 allowlist 우려 부분 반영, Gemini 유연성 채택
+- Q2 polling: isExtended=true 시 3/5/8/15초 반복, 300초 이후 30초, 최대 600초
+- Q3 종료 판정: 블록 안정 3회 연속 동일 (stop-button 단독 판정 금지). 네트워크 idle(GPT-5.2 B안)은 MCP 불안정으로 미채택
+- 수정: `.claude/commands/gpt-read.md` 2-a 확장, `.claude/commands/gpt-send.md` 4단계 보완
+- smoke_test 섹션 49 신설 5/5 PASS
+- 로그: `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/c_round1_summary.md`
+
 **[완료] 안건 A — evidence_gate fingerprint suppress 확장 ([3way] API 예외 토론)**
 - 사용자 명시 예외: 토론모드 `[NEVER] API 호출` 1회 완화. 별도 로그 경로 분리
 - 4개 확장추론 모델 재판정 (Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2) 만장일치:

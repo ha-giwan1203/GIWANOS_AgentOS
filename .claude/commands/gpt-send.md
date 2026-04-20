@@ -71,13 +71,24 @@ setTimeout(() => {
 - `type` / `form_input` / CDP 금지
 
 ### 4. 응답 완료 대기
-- 적응형 polling (세션79 속도 개선):
-  - 0~20초: sleep 2 (기존 3)
-  - 20~60초: sleep 3 (기존 5)
-  - 60초~: sleep 5 (기존 8)
-  - 최대 300초
-- `javascript_tool`로 `document.querySelector('[data-testid="stop-button"]') !== null` 확인
-- false가 되면 완료
+- 적응형 polling (세션79 속도 개선 + 세션83 thinking 확장):
+  - thinking·reasoning 모델 감지는 `/gpt-read` 2-a 참조 (data-message-model-slug includes 판정)
+  - 일반 모델: 2/3/5초 단계, 최대 300초
+  - 확장추론 모델(isExtended=true): 2/3/5/8초 반복, 300초 이후 15/30초 단계, 최대 600초
+- `javascript_tool`로 stop-button + 마지막 블록 상태 병행 확인 (stop-button 단독 판정 금지):
+  ```javascript
+  (() => {
+    const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
+    const last = blocks.length ? blocks[blocks.length - 1] : null;
+    const slug = (last && last.getAttribute('data-message-model-slug') || '').toLowerCase();
+    return JSON.stringify({
+      stopBtn: document.querySelector('[data-testid="stop-button"]') !== null,
+      isExtended: slug.includes('thinking') || slug.includes('reasoning'),
+      lastLen: last ? (last.innerText || '').trim().length : 0
+    });
+  })();
+  ```
+- 완료 판정: `stopBtn=false` 경로 또는 블록 안정 3회 연속 동일 (세션83, thinking 응답 중 stop-button 잔존 대비)
 
 ### 5. 응답 읽기
 ```javascript
