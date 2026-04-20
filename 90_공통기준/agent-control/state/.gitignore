@@ -3,3 +3,4 @@ current_task
 dirty.flag
 gpt_followup_pending.flag
 *.flag
+write_marker.json
