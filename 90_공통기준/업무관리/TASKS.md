@@ -69,7 +69,16 @@
 - **의제 1 후속 3자 토론** (필수): evidence_gate 333건 원인 세부 분석 + 정규식 검토 + 조치안 확정
 - **gpt-send/gpt-read 스킬 개선** (세션82 실증): `data-message-model-slug$="-thinking"` 감지 시 완료 대기 시간 자동 연장 (stop-button 단독 판정 금지)
 - **Phase 2-C 재평가** (2026-04-27 전후): incident_review.py 결과 확인 후 exit 2 전환 결정
+- **[GPT A 제안]** Phase 2-C 재평가 전 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트를 `step5_final_verification.md` 또는 별도 검증 로그 템플릿으로 고정
+- **[Gemini A 제안]** 04-19 evidence_missing 165건(50%) 집중 발화 audit_log 상세 분석 → 세션83 첫 작업 권장
 - (기존 P3 이월) Phase 2-C 재평가 시 회귀 테스트 실행
+
+### 3자 토론 Round 1 최종 판정 (양측 PASS — 2026-04-20)
+- **GPT 판정**: PASS (item 1·2·3 실증됨/동의, item 4 환경미스매치/동의)
+- **Gemini 판정**: PASS (item 1·2·3 실증됨/동의, item 4 메타순환/보류)
+- **공통 합의**: 의제 2·3 실물 반영 정합, 의제 1 세션83+ 이월 정합
+- **pass_ratio**: 의제 2·3 = 2/2, 의제 1 = 2/2(이월 합의)
+- 로그: `90_공통기준/토론모드/logs/debate_20260420_131100_3way/`
 
 ---
 

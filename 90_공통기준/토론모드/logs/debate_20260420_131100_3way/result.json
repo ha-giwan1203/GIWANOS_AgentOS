@@ -1,0 +1,61 @@
+{
+  "session_id": "debate_20260420_131100_3way",
+  "mode": "3way",
+  "started_at": "2026-04-20T13:11:00+09:00",
+  "completed_at": "2026-04-20T15:30:00+09:00",
+  "agenda": [
+    {
+      "id": 1,
+      "title": "evidence_gate 과다 발화 원인 분석 (333건/7일)",
+      "gpt_verdict": "검증 필요",
+      "gemini_verdict": "검증 필요",
+      "resolution": "즉시 조치 유보, 세션83+ 이월 3건",
+      "final_pass_ratio": 0.67,
+      "note": "양측 공통 가설: 구버전 tasks_handoff + 현재 map_scope 반복 + commit 시점 차단 혼재"
+    },
+    {
+      "id": 2,
+      "title": "생산계획자동화 고아 폴더 처리",
+      "gpt_verdict": "동의 A(아카이브)",
+      "gemini_verdict": "동의 A(아카이브)",
+      "resolution": "98_아카이브/생산계획자동화_구버전_20260420/ 이동 완료",
+      "final_pass_ratio": 1.0
+    },
+    {
+      "id": 3,
+      "title": "debate_verify.sh Phase 2-C 승격 판정",
+      "gpt_verdict": "동의",
+      "gemini_verdict": "동의 (회귀 테스트 보강)",
+      "resolution": "debate_verify.sh 헤더 Phase 2-C 조건 주석 추가 (재집계 시작점 408c4856, post-fix 7일, 회귀 테스트 영문/특수문자/한글, hook_gate + exit 2)",
+      "final_pass_ratio": 1.0
+    }
+  ],
+  "commits": [
+    {"sha": "408c4856", "msg": "fix(session81) debate_verify.sh 한글경로 오탐지 수정 [3way]"},
+    {"sha": "2d092e1b", "msg": "docs(session82) self-audit P1·P2 hook 문서 정합 + settings.local.json 1회용 청소"},
+    {"sha": "e84e410d", "msg": "feat(session82) self-audit 잔여 안건 3건 3자 토론 [3way] — 의제 2·3 반영"}
+  ],
+  "final_step5_verdict": {
+    "gpt": {
+      "verdict": "PASS",
+      "items": {
+        "item1_archive": {"label": "실증됨", "decision": "동의"},
+        "item2_phase2c_header": {"label": "실증됨", "decision": "동의"},
+        "item3_agenda1_deferred": {"label": "실증됨", "decision": "동의"},
+        "item4_thinking_detection": {"label": "환경미스매치", "decision": "동의"}
+      },
+      "additional_proposal": {"classification": "A", "content": "Phase 2-C 재평가 전 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트를 step5_final_verification.md 또는 별도 검증 로그 템플릿으로 고정"}
+    },
+    "gemini": {
+      "verdict": "PASS",
+      "items": {
+        "item1_archive": {"label": "실증됨", "decision": "동의"},
+        "item2_phase2c_header": {"label": "실증됨", "decision": "동의"},
+        "item3_agenda1_deferred": {"label": "실증됨", "decision": "동의"},
+        "item4_thinking_detection": {"label": "메타순환", "decision": "보류"}
+      },
+      "additional_proposal": {"classification": "A", "content": "04-19 evidence_missing 165건 집중 audit_log 상세 분석 → 세션83 첫 작업"}
+    }
+  },
+  "terminal_state": "done"
+}
