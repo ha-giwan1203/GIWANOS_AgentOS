@@ -2,36 +2,45 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "PASS",
-  "gemini_judgment": "PASS",
+  "gpt_judgment": "조건부 통과",
+  "gemini_judgment": "통과",
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "session83",
-  "summary": "이전 세션 이어받아 5개 안건 완결 + 양측 웹 공유 PASS: B(04-19 165건 audit 분석) + A(evidence_gate GRACE 30→120 + tail -30→-100, [3way] API 예외) + C(gpt-read/gpt-send thinking 확장추론 대응, [3way] API 예외) + E(TASKS.md 924→724줄) + D(경로 3종 회귀 테스트 체크리스트). 4개 확장추론 모델(Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2) API 교차 검증, Claude 독립의견 유지(Gemini-flash 역방향 제안 2건 버림 + GPT-5.2 네트워크 idle 미채택). smoke_test 섹션 48·49 총 10건 PASS. 최종 GPT+Gemini 웹 공유 양측 PASS(Gemini는 Gem 삭제 이슈로 Claude-Gemini 토론파트너 Gem에 새 대화 개설).",
-  "commits": ["dd3e06f3", "dc1be5be", "4f28cba8", "faf1a221"],
+  "session": "session84",
+  "summary": "토론모드 진입 병목 감축 — D안(스킬 진입 세션캐시, 진입 tool 호출 7→3회 57% 감축 실측 PASS, 사용자 지시 예외) + A안-1(자동 승격 트리거 A/B 분류 합리화 + 사용자 지시 예외 조항 신설) + A안-2(6-5 조건부 생략 규정 [3way] pass_ratio=1.0 만장일치) + TASKS/HANDOFF 세션84 블록 + settings.local.json touch .claude/state/*.ok 포괄화. 양측 판정 GPT 조건부 통과(A안-1 실운영 1회 검증 이월) + Gemini 통과(세션84 통합 최종 승인). critic-reviewer WARN(독립 반론 부재, 실증 이월). 이월 4건: β안(토론 내부 API 분기, 세션67 [NEVER] 재검토) / A안-2 실증 / TASKS.md 감축 / incident_ledger 1000건.",
+  "commits": ["ed0ba225", "35a9ae32", "a37fd0fc", "b3c9713d"],
   "harness_analysis": {
-    "adopted": 6,
-    "held": 1,
-    "discarded": 3,
-    "note": "A 채택 3건(Q1·Q2·Q3 각 3자 만장일치), C 채택 3건(Q1·Q2·Q3), 보류 1건(C Q3 gpt-5.2 '보류' 별건 분리 권고 실질 동의), 버림 3건(A Gemini-flash α조치 fresh_ok 완화 + γ cooldown 중 차단 생략 + C GPT-5.2 Q3 B안 네트워크 idle)"
+    "adopted": 5,
+    "held": 0,
+    "discarded": 0,
+    "note": "A안-2 Round 1 GPT 5보강 + Gemini 2보강 중 5건 채택(claude_delta 기계판정 / JSON 4필드 확장 / round_count===1 하드제약 / reason 단서 키워드 리스트 / 조건 A/B/C 3분류). Gemini 조건 통폐합 제안은 의제 성격 C 분리 유지로 부분 수용."
   },
   "pass_ratio_final": 1.0,
-  "final_web_share": {
-    "gpt_verdict": "PASS",
-    "gpt_items": "item 1·2·3 모두 실증됨/동의",
-    "gemini_verdict": "PASS",
-    "gemini_items": "item 1·2·3 모두 동의",
-    "common_a_suggestion": "다음 세션 시작 시 API 예외 원복·OpenAI 키 revoke 여부 HANDOFF 1줄 기록 (양측 공통 A분류)"
+  "critic_review": {
+    "verdict": "WARN",
+    "reason": "독립 반론 부재 + '실증됨' 라벨 근거가 양측 합의 대체. Step 5 진행 허용, 실증 이월."
   },
-  "api_exception_log": "90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/",
-  "api_exception_reason": "사용자 명시 승인 — 이번 세션만 토론모드 [NEVER] API 호출 완화. 다음 세션부터 원복",
-  "openai_key_status": "claude-code-debate-20260420 유지 (사용자 선택: 다음 세션까지 이어 사용)",
-  "carried_over": [
-    "[세션84 첫 작업] API 예외 원복 확인 + OpenAI 키 revoke 여부 HANDOFF 1줄 기록 (양측 A분류 공통 제안)",
-    "skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)",
-    "Phase 2-C 재평가 (2026-04-27 전후) — step5_final_verification_path_regression.md 체크리스트 실행 후 debate_verify.sh advisory→gate 승격 판정"
+  "final_web_share": {
+    "gpt": {
+      "judgment": "조건부 통과",
+      "reason": "ed0ba225·b3c9713d 실물 정합성 OK. 35a9ae32는 예외 조항 자기적용 메타성 → 실제 운영 1회 검증 이월"
+    },
+    "gemini": {
+      "judgment": "통과",
+      "reason": "diff 확인 후 설계 합의안대로 정확히 반영 확인. 세션84 통합 최종 승인"
+    }
+  },
+  "carryover": [
+    "β안 토론 내부 단발 검증(6-2/6-4) API 전환 — 세션67 [NEVER] 재검토, 3자 토론 필수",
+    "A안-2 실증 — 실제 A 분류 의제 발생 시 skip_65 자연 테스트 (critic WARN 해소)",
+    "TASKS.md 감축 — 734줄 강경고 초과 지속",
+    "incident_ledger 1000건 미해결 — /auto-fix 분석 가능"
   ],
-  "three_way_log": "90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/",
-  "updated_at": "2026-04-20T15:05:00+09:00"
+  "user_feedback_applied": [
+    "스킬 진입 세션캐시 D안 (사용자 '스킬 사용하면 바로 웹 열어서 접속 해야 되는대 너무 느려' 실시간 대응)",
+    "사용자 지시 예외 선례 신설 (3자 토론 중단 후 직접 구현 경로 정당화)",
+    "settings.local.json 포괄 허용 (마커 팝업 재발 방지, 사용자 '마커 팝업 안뜨게' 지시)",
+    "Step 5 양측 검증 필요성 재확인 (사용자 '이래서 마지막 검증 단계가 필요한거다')"
+  ]
 }
