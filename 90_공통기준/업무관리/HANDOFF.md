@@ -4,12 +4,45 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션83 (evidence_gate 원인 3자 API 예외 토론 [3way], 독립의견 유지)
+최종 업데이트: 2026-04-20 KST — 세션84 (토론모드 진입 병목 감축 D안·A안-1·A안-2 [3way] 만장일치)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
+## 0. 최신 세션 (2026-04-20 세션84 — 토론모드 진입 병목 감축 [3way] + 사용자 지시 예외 선례)
+
+### 실행 경로
+세션83 마감 → 세션84 "토론모드 개선 검토" → 사용자 실시간 불만(진입 단계) 반영 → D안 직접 구현 → A안-1 문서 개정 → A안-2 3자 토론 만장일치 합의 → 세션 마무리
+
+### D안: 스킬 진입 세션캐시 (커밋 `ed0ba225`, 사용자 지시 예외 적용)
+- 진입 tool 호출 7회 → 3회 실측 (57% 감축), "수신 확인" 응답 정상 수령
+- `session_start_restore.sh`: 세션 시작 시 `*_skill_entry.ok` 자동 삭제
+- `gpt-send.md`/`gemini-send.md`: 1-Z(캐시 체크) 존재 시 1-A/1-B 스킵 → 1-C 직행, 1-D(기록) 1회차 완료 시 touch
+- 토론 중단 로그 + 직접 구현 경위: `90_공통기준/토론모드/logs/debate_20260420_163810_3way/abort.md`
+
+### A안-1: 자동 승격 트리거 합리화 (커밋 `35a9ae32`)
+- B 분류 엄격화: "실행 흐름·판정 분기·차단 정책이 바뀌는 경우"로 한정. 단순 로그·timing·주석 추가 제외
+- A 분류 확장: 훅 로그 추가, 스킬 md 주석 추가, 사용자 지시 예외 작업 포함
+- **사용자 지시 예외 조항 신설**: B→A 강등 1건 한정 허용, 커밋에 예외 근거 + 중단 로그 링크 필수
+- 메모리 `feedback_structural_change_auto_three_way.md` 동기화
+
+### A안-2: 6-5 조건부 생략 (커밋 `a37fd0fc` [3way] pass_ratio=1.0)
+- SKILL.md Step 3-W에 "6-5 조건부 생략" 섹션 신설 + JSON 스키마 4필드 확장
+- 합의: A(양측 무단서 동의) + B(Claude `claude_delta="none"`) + C(A 분류만) + 시스템 제약(`round_count === 1`)
+- Gemini 보강 수용: `current_round === 1` 하드제약, 조건 통폐합 부분 수용(의제 성격 C 분리 유지)
+- critic-reviewer: WARN (독립 반론 부재, 실증 이월)
+- GPT 최종: 조건부 통과(실증 이월) / Gemini 최종: 통과
+- 로그: `90_공통기준/토론모드/logs/debate_20260420_171419_3way/`
+
+### 다음 AI 액션
+1. **β안 (토론 내부 단발 검증 6-2/6-4 API 전환)** — 세션67 [NEVER] 재검토. 3자 토론 필수. 기대 효과: 라운드당 진입 절반 추가 감축.
+2. **A안-2 실증** — 실제 A 분류 의제 발생 시 `skip_65` 자연 테스트. critic-reviewer WARN 해소 조건.
+3. **TASKS.md 감축** — 734줄 강경고 초과 지속. 세션80~82 블록 아카이브 고려.
+4. **incident_ledger 1000건 미해결** — `/auto-fix` 분석 가능.
+
+---
+
+## 세션83 이전 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
 
 ### 실행 경로
 이전 세션(82) 마감 → 세션83 "이전 세션 이어서" → B 실측 분석 → A 3자 API 토론 Round 2 (사용자 명시 예외) → 구현 → smoke_test 48 섹션 5/5 PASS
