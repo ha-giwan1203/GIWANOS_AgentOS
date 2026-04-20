@@ -27,6 +27,12 @@ if [ -d "$INSTRUCTION_DIR" ]; then
   hook_log "session_start_restore" "instruction_reads cleared"
 fi
 
+# 스킬 진입 세션캐시 무효화 (D안 2026-04-20): 이전 세션 탭/채팅방 재사용 금지.
+# 1회차는 전체 진입, 2회차 이후만 1-B 스킵. 존재 여부로 판정.
+STATE_DIR="$PROJECT_ROOT/.claude/state"
+rm -f "$STATE_DIR/gpt_skill_entry.ok" "$STATE_DIR/gemini_skill_entry.ok" 2>/dev/null
+hook_log "session_start_restore" "skill_entry markers cleared"
+
 hook_log "session_start_restore" "source=$SOURCE"
 
 # hook_config.json에서 설정 읽기 (Phase 2: 중앙 설정형)

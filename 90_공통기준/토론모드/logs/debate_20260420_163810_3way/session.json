@@ -1,0 +1,26 @@
+{
+  "session_id": "debate_20260420_163810_3way",
+  "mode": "3way",
+  "topic": "토론모드 진입 병목 감축 — β안(토론 내부 단발 검증 API 전환) + B안 훅 세션캐시화",
+  "chat_url": "",
+  "turn_number": 0,
+  "last_reply_hash": "",
+  "turns": [],
+  "result": null,
+  "critic_review": null,
+  "cross_verification_policy": {
+    "required_keys": ["gpt_verifies_gemini", "gemini_verifies_gpt", "gpt_verifies_claude", "gemini_verifies_claude"],
+    "verdict_enum": ["동의", "이의", "검증 필요"],
+    "pass_threshold": 0.67,
+    "max_rounds": 3
+  },
+  "context_refs": {
+    "plan_file": "C:\\Users\\User\\.claude\\plans\\magical-humming-wand.md",
+    "prior_decision_session": "세션67 — /ask-gemini 3자 토론 금지 확정",
+    "never_rules_affected": [
+      "90_공통기준/토론모드/CLAUDE.md L20 (API 사용 금지)",
+      "90_공통기준/토론모드/CLAUDE.md L128 (ChatGPT API 호출 금지)",
+      "90_공통기준/토론모드/debate-mode/SKILL.md L127 (3자 토론 내 /ask-gemini 금지)"
+    ]
+  }
+}
