@@ -4,12 +4,59 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션82 (weekly-self-audit + 잔여 안건 3건 3자 토론 [3way])
+최종 업데이트: 2026-04-20 KST — 세션83 (evidence_gate 원인 3자 API 예외 토론 [3way], 독립의견 유지)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션82 — weekly-self-audit → hook 문서 정합 보정)
+## 0. 최신 세션 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
+
+### 실행 경로
+이전 세션(82) 마감 → 세션83 "이전 세션 이어서" → B 실측 분석 → A 3자 API 토론 Round 2 (사용자 명시 예외) → 구현 → smoke_test 48 섹션 5/5 PASS
+
+### 안건 B: 04-19 165건 audit_log 분석 완료
+- 산출: `90_공통기준/업무관리/evidence_gate_20260419_analysis.md`
+- 7일 332건, 04-19 49.7% 집중, 01:06~01:53 47분간 42건 단일 루프
+- fingerprint 상위 3종 180/272 = 66% 집중, resolved:false 100%
+
+### 안건 A: 3자 API 확장추론 토론 Round 2 (4개 모델 만장일치)
+| 문항 | Gemini 2.5-pro | Gemini 3.1-pro-preview | GPT o4-mini | GPT-5.2 |
+|------|---------------|----------------------|-------------|---------|
+| Q1 α 원인 | Claude 가설 / 실증됨 | Claude 가설 / 실증됨 | Claude 가설 / 실증됨 | Claude 가설 / 실증됨 |
+| Q2 γ | (A) / 일반론 | (A) / 일반론 | (A) / 실증됨 | (A) / 실증됨 |
+| Q3 δ | 별건 분리 / 환경미스매치 | 별건 분리 / 일반론 | 별건 분리 / 실증됨 | 보류(별건 분리 권고) / 구현경로미정 |
+
+**독립의견 유지 증거**: Gemini-flash 초기 제안(fresh_ok 완화 + cooldown 중 차단 생략) Claude 코드 대조 후 독립 반박 → 4개 확장추론 모델이 Claude 반박 만장일치 채택 → 최종 버림 + smoke_test 48-5 "fresh_ok 검증 흐름 유지 (역방향 완화 차단)"로 회귀 방지
+
+### 수정
+1. `.claude/hooks/evidence_gate.sh` — fingerprint suppress 확장
+   - GRACE_WINDOW 30→120초 (실측 반복 간격 30~90초)
+   - ledger scan tail -30→-100 (다른 fp 혼재 상황 대응)
+   - stderr 경고 문구 추가 ("반복 차단 감지")
+   - **차단 자체는 유지** (Q2 A 만장일치)
+2. `.claude/hooks/smoke_test.sh` — 섹션 48 신설 (5건, 5/5 PASS)
+3. `.claude/settings.local.json` — openai 호출용 permission 추가 (bash python3 openai_debate)
+
+### 산출물
+- `90_공통기준/토론모드/openai/openai_debate.py` (API 예외 경로 클라이언트, reasoning 모델 분기)
+- `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/round2_summary.md`
+- `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/gemini_pro_round2.md`
+- `90_공통기준/업무관리/evidence_gate_20260419_analysis.md`
+
+### 다음 AI 액션 (세션83 이후)
+- C: gpt-send/gpt-read thinking 모델 탐지 로직 개선 (3자 API 토론)
+- E: TASKS.md 887→≤800줄 감축
+- D: 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 고정
+- skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)
+- OpenAI API 키 revoke (세션 종료 시)
+
+### 주의사항
+- 이번 세션 OpenAI API 1회 예외 — 토론모드 `[NEVER] API 호출` 규정 다음 세션부터 원복
+- 2 FAIL은 선행 누적 이슈 (세션80부터 1건 존재), 본건 무관. 별건 조사 이월
+
+---
+
+## 1. 이전 최신 세션 (2026-04-20 세션82 — weekly-self-audit → hook 문서 정합 보정)
 
 ### 실행 경로
 scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포트 생성 → 사용자 "진행" 승인 → P1 2건 + 관련 P2 3건 README 문서화 + settings.local.json 1회용 패턴 23건 청소

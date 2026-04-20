@@ -47,10 +47,16 @@ deny() {
   local req_name="$2"  # optional: 해결 방법 안내용 req 이름
   hook_log "PreToolUse/evidence_gate" "BLOCK: $reason"
 
-  # fingerprint 기반 incident suppress (GPT+Claude 합의 세션43):
+  # fingerprint 기반 incident suppress (GPT+Claude 합의 세션43, 세션83 Round 2 확장):
   # fingerprint = hash(reason_prefix|command_prefix) — 사건 동일성 판별
   # 동일 fingerprint가 GRACE_WINDOW초 이내에 이미 기록된 경우 → 기록 생략 (차단은 유지)
-  local GRACE_WINDOW=30
+  #
+  # 세션83 Round 2 (4개 확장추론 모델 만장일치 — API 예외 토론):
+  #   실측: 04-19 165건 중 fp 상위 3종 66% 집중, 반복 간격 30~90초
+  #   기존 GRACE_WINDOW=30·tail -30은 경계선 탈출 + 다른 fp 혼재 시 suppress 실패
+  #   변경: GRACE_WINDOW 30→120, tail -30→-100 (차단은 유지, 기록 중복만 확장 억제)
+  #   금지(4자 합의): fresh_ok 완화, cooldown 중 차단 생략 — 역방향 위험
+  local GRACE_WINDOW=120
   local _fp_raw
   _fp_raw="${reason:0:80}|${COMMAND:0:50}"
   local _fingerprint
@@ -79,14 +85,15 @@ deny() {
           break
         fi
       fi
-    done < <(tail -30 "$INCIDENT_LEDGER")
+    done < <(tail -100 "$INCIDENT_LEDGER")
   fi
 
   if [ "$_should_record" = "true" ]; then
     hook_incident "gate_reject" "evidence_gate" "" "$reason" \
       "\"classification_reason\":\"evidence_missing\",\"fingerprint\":\"$_fingerprint\"" 2>/dev/null || true
   else
-    hook_log "PreToolUse/evidence_gate" "incident suppress (fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s)" 2>/dev/null
+    hook_log "PreToolUse/evidence_gate" "incident suppress (fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s, scan=100)" 2>/dev/null
+    echo "[evidence_gate] 반복 차단 감지 (fp=$_fingerprint, 최근 ${GRACE_WINDOW}s 내 동일 사유). 차단 유지, 기록만 억제." >&2
   fi
 
   # 해결 방법 안내 포함 (사용자가 탈출 경로를 알 수 있도록)

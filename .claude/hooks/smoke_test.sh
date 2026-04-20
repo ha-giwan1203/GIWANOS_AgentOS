@@ -1150,6 +1150,32 @@ rm -rf "$_tt_mock_memdir" 2>/dev/null
 
 echo ""
 
+# === 섹션 48: evidence_gate fingerprint suppress 확장 (세션83 Round 2 [3way] API 예외) ===
+# 배경: 04-19 165건 중 fp 상위 3종 66% 집중, 반복 간격 30~90초 → 기존 GRACE=30 경계선 탈출
+# 4개 확장추론 모델 만장일치(Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2): 차단 유지 + 기록 억제 확장
+
+# 48-1: GRACE_WINDOW=120 확장 확인
+grep -qE 'GRACE_WINDOW=120' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: GRACE_WINDOW 30→120 확장 (세션83 Round 2)"
+
+# 48-2: fingerprint scan 범위 tail -30→-100 확장
+grep -qE 'tail -100 "\$INCIDENT_LEDGER"' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: fingerprint scan tail=100 (세션83 Round 2)"
+
+# 48-3: stderr 반복 차단 경고 문구 추가
+grep -qE '반복 차단 감지' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: stderr 반복 차단 경고 (세션83 Round 2)"
+
+# 48-4: 기존 suppress 로직 유지 확인 (_should_record 제어 플로우)
+grep -qE '_should_record=false' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: _should_record 억제 플로우 유지"
+
+# 48-5: 역방향 방어 — fresh_ok 호출 흐름 유지 (Gemini-flash 역방향 제안 차단)
+grep -qE '! fresh_ok "tasks_updated" \|\| ! fresh_ok "handoff_updated"' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: fresh_ok 검증 흐름 유지 (역방향 완화 차단)"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)

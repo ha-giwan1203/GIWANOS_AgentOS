@@ -10,7 +10,35 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션82 (weekly-self-audit + 잔여 안건 3건 3자 토론 [3way])
+최종 업데이트: 2026-04-20 — 세션83 (A의제 3자 API 확장추론 토론 [3way] — 독립의견 유지)
+
+---
+
+## 세션83 (2026-04-20, evidence_gate 333건 원인 3자 API 예외 토론 [3way])
+
+**[완료] 안건 B — 2026-04-19 evidence_missing 165건 집중 발화 audit_log 상세 분석**
+- 산출: `90_공통기준/업무관리/evidence_gate_20260419_analysis.md`
+- 7일 332건 (evidence_gate 272 + skill_instruction_gate 56 + instruction_not_read 4), 04-19 165건(49.7%)
+- 04-19 01:06~01:53 KST 47분간 42건 단일 세션 commit/push 루프
+- fingerprint 상위 3종 180/272 = 66% 집중, resolved:false 100%
+
+**[완료] 안건 A — evidence_gate fingerprint suppress 확장 ([3way] API 예외 토론)**
+- 사용자 명시 예외: 토론모드 `[NEVER] API 호출` 1회 완화. 별도 로그 경로 분리
+- 4개 확장추론 모델 재판정 (Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2) 만장일치:
+  - Q1 α 원인: Claude 가설(반복 commit 흐름) 채택 / 실증됨 3/3
+  - Q2 γ self-throttle: (A) 차단 유지+incident 중복 억제만 채택 / 실증됨 3/3
+  - Q3 δ(skill_instruction_gate): 별건 분리 / 실증됨 3/3
+- Gemini-flash 초기 제안 2건(fresh_ok 완화·cooldown 중 차단 생략) Claude 독립 반박 후 **버림** — 세션78 안전망 역방향 위험
+- 수정: `.claude/hooks/evidence_gate.sh` GRACE_WINDOW 30→120 + tail -30→-100 + stderr 경고 추가 (차단 유지, 기록만 억제 확장)
+- smoke_test 섹션 48 신설 (5건 PASS): GRACE=120·tail=100·경고·_should_record·fresh_ok 유지(역방향 차단)
+- 로그: `90_공통기준/토론모드/logs/debate_20260420_143000_api_exception/round2_summary.md`
+- OpenAI API 클라이언트: `90_공통기준/토론모드/openai/openai_debate.py` (reasoning 모델 max_completion_tokens 분기)
+
+**[이월·세션84+] 안건 δ — skill_instruction_gate 36건 별건 분석** (본 토론 합의로 분리)
+
+### 세션83 주의사항
+- OpenAI API 키 `claude-code-debate-20260420`을 2026-04-20 14:22 KST 발급. 토론 종료 후 revoke 권장
+- 토론모드 CLAUDE.md `[NEVER] API 호출` 규정은 다음 세션부터 원복 (이번 세션만 예외)
 
 ---
 
