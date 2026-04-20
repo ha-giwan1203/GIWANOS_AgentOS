@@ -4,12 +4,60 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션79 (영상분석 드리프트 보정: token-threshold-warn Phase 1 실물 구현)
+최종 업데이트: 2026-04-20 KST — 세션80 (학습루프 진단 + 4단계 보정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션79 — 영상 분석 적용 점검 및 드리프트 보정)
+## 0. 최신 세션 (2026-04-20 세션80 — 학습루프 진단 + 4단계 보정)
+
+### 사용자 지시
+"학습루프 진단" → plan 승인 → "권장 순서대로 진행" → "마무리"
+
+### 진단 결과
+학습루프(외부 입력 → 3자 토론 검증 → TASKS/메모리/스킬/hook 반영 → 드리프트 재검증 → 재발방지) 상태:
+- **PASS 4건**: 루프 정의 존재 / share_gate.sh 신설+배선 / 피드백 메모리 3건 반영 / token-threshold-warn Phase 1
+- **FAIL 3건**: incident_ledger debate_verify 37건 전원 resolved:false / Phase 2 지표 측정 불능 / session_kernel 48h stale
+- **HOLD 3건**: TASKS.md 1249줄 초과 / 임계치 단일 원본화 / 보류 지표 4종
+
+### 조치 4단계 (전부 완료)
+
+**단계 1** — session_kernel 수동 갱신 (precompact_save.sh 1회 실행)
+- `.claude/state/session_kernel.md` 2026-04-18 09:47 → 2026-04-20 10:23
+- session_progress.json + task_cursor.json 동기 갱신
+
+**단계 2** — incident_ledger debate_verify 37건 전원 resolved:true
+- 5개 3way 세션 전수 조회: 1,2번(step5 정상) + 3,4번(round1_final_verification 정상) + 5번(debate_20260420_010101_3way)
+- 세션5 `result.json` + `step5_final_verification.md` retrospective 생성 (round1_*.md 실물 기반)
+- sed 기반 일괄 `resolved:false → true` + `resolved_reason:"session80_learning_loop_step2"`
+- 백업: `.claude/incident_ledger.jsonl.bak_20260420_learning_loop`
+
+**단계 3** — hook_timing 집계 스크립트 신설
+- `.claude/scripts/hook_timing_summary.py` — Phase 2 진입 지표 1(주간 경고 변동률 < 20%) 측정 기반
+- 실측 (최근 7일): 2770건 / 경고 98건 / 3.5% / avg duration 1973ms
+- 직전 7일 0건 — 1주 데이터 축적 후 변동률 실측 가능
+
+**단계 4** — TASKS.md 감축 2049 → 799줄 (61% 축소)
+- 788-2049행 → `98_아카이브/tasks_archive_20260420.md` (gitignore됨, 로컬 보존)
+- 세션77~79 블록 + 활성 대기 2건만 유지
+- STRONG 경고 (800줄) 해소 → WARN (400줄)만 잔존
+- 백업: `90_공통기준/업무관리/TASKS.md.bak_20260420`
+
+### 발견된 별건 (spawn_task 분리)
+`debate_verify.sh` 한글 경로 파싱 버그 — `python3 open(r"$RESULT")`에서 한글 경로 인식 실패 → incident 매번 오탐지. B 분류(hook 구조 변경)이므로 3자 토론 자동 승격 후 별건 수정.
+
+### 검증
+- `bash .claude/hooks/token_threshold_check.sh` → `[WARN] TASKS.md: 799/400줄` (STRONG 해소 확인)
+- `python3 .claude/scripts/hook_timing_summary.py --days 7 --compare` → 스크립트 정상 작동
+
+### 다음 AI 액션
+1. 커밋 대상: TASKS.md / incident_ledger.jsonl / hook_timing_summary.py / result.json / step5_final_verification.md
+2. gitignore된 아카이브·백업은 로컬 보존
+3. 이후: debate_verify 한글 경로 버그 3자 토론 수정 (spawn_task 분리)
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션79 — 영상 분석 적용 점검 및 드리프트 보정)
 
 ### 사용자 지시
 "앞전 영상 분석 후 시스템에 적용하면서 진행된 거잖아 이제 의도대로 적용되었는지 점검이 필요해"
