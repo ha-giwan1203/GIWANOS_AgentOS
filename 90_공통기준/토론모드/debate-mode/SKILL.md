@@ -150,6 +150,56 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - 원문 요약·발췌·생략 금지. 모델이 요약본만 보고 검증하면 맥락 손실 발생
 - 원문이 너무 긴 경우에도 절삭 금지 — 길이 제한 초과 시 라운드 재설계 (의제 분할)
 
+#### β안-C — Step 6-2/6-4 단발 검증 API 병렬 전환 (세션85 3자 만장일치, 2026-04-20)
+
+> 배경: `debate_20260420_190020_beta_3way/round1_final.md` pass_ratio=1.0. `[NEVER] API 호출`의 **유일 예외**. 상위 규정: `../CLAUDE.md` "β안-C 예외" 섹션.
+
+**허용 전제 (이것만)** — 웹 UI 본론·종합은 불변:
+- Step 6-2 (Gemini→GPT 1줄 검증)와 Step 6-4 (GPT→Gemini 1줄 검증) — API 병렬 호출 허용
+- Step 6-1·6-3 본론, 6-5 종합·최종 판정 — 웹 UI 멀티턴 유지
+
+**API 호출 전제 조건** (모두 충족 시 활성, 하나라도 미달 시 웹 UI fallback):
+1. 본론(6-1, 6-3) 원문 전체를 payload에 동봉 (요약·발췌·절삭 금지)
+2. 6-2/6-4 병렬 실행 (순차 금지 — 속도 이점의 전제)
+3. 본론 웹 UI와 동일 프로바이더 API (OpenAI↔OpenAI, Google↔Google)
+4. API 실패 시 1회 재시도 → 실패 지속 시 기존 웹 UI 경로 자동 복귀
+5. 호출 시 model_id 로그 기록
+
+**로그 브릿지 파이프라인 (Gemini 신규 제안 채택, 필수)**:
+- 6-5 Claude 종합 시작 전 아래 JSON을 웹 UI 프롬프트로 **원문 주입**:
+```json
+{
+  "cross_verification": {
+    "gemini_verifies_gpt": {"verdict": "동의|이의|검증 필요", "reason": "...", "model_id": "..."},
+    "gpt_verifies_gemini": {"verdict": "동의|이의|검증 필요", "reason": "...", "model_id": "..."},
+    "log_path": "90_공통기준/토론모드/logs/debate_*/roundN_cross_verification.md"
+  }
+}
+```
+- 저장 이중화: `logs/debate_*/roundN_cross_verification.{md,json}`
+- 주입 누락 시 Claude 종합 착수 금지 (가시 증거 단절 방지)
+
+**실행 모드 분기 (스킬 선택)**:
+- **기본값 (문서 반영만, 세션85 현재 상태)**: 웹 UI 멀티턴 유지 — `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 사용
+- **API 모드 활성 (세션86+ 구현 후)**: 
+  - `90_공통기준/토론모드/openai/openai_debate.py` (세션83 재사용 리팩터)
+  - `90_공통기준/토론모드/google/gemini_debate.py` (신설)
+  - 활성 조건: 위 5개 전제 + 7개 보안 조건(`../CLAUDE.md` β안-C 예외 섹션) 모두 만족
+
+**2주 관찰 기간 (API 모드 구현 완료 후)**:
+- 구현 고정 전 `logs/debate_*/` 내 incident 0건 확인
+- smoke_test 섹션 신설 (최소 5건: 원문 payload 누락 차단, 병렬 실패 fallback, 모델 드리프트 감지, 로그 브릿지 누락 감지, 예산 상한 초과 차단)
+
+**[NEVER]**:
+- 본론(6-1, 6-3) API 전환 금지
+- 종합(6-5) API 전환 금지 — Claude는 웹 UI 프롬프트 기반만
+- 최종 판정(통과/조건부/실패) API 수령 금지
+- 병렬 아닌 순차 API 호출 금지 (속도 이점 전제 위반)
+- 원문 payload 누락·절삭 금지
+- API 실패 시 사용자 보고 없이 무한 재시도 금지 (1회 재시도 후 웹 UI fallback)
+
+**관련 로그**: `90_공통기준/토론모드/logs/debate_20260420_190020_beta_3way/` (Round 1 만장일치, β안-C 합의 원본)
+
 #### 자동 게이트 (3way 필수 — GPT 지적 반영)
 
 라운드 종료 시 다음을 자동 검사한다:

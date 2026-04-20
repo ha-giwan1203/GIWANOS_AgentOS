@@ -4,12 +4,45 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션84 (토론모드 진입 병목 감축 D안·A안-1·A안-2 [3way] 만장일치)
+최종 업데이트: 2026-04-20 KST — 세션85 (이월 4건 처리: TASKS 감축·incident 집계·β안-C [3way] 만장일치·A안-2 판정)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션84 — 토론모드 진입 병목 감축 [3way] + 사용자 지시 예외 선례)
+## 0. 최신 세션 (2026-04-20 세션85 — 이월 4건 처리 + β안-C [3way] 만장일치 + 규정 실물 반영)
+
+### 실행 경로
+세션84 마감 → 세션85 "이전방 안건 이어서 진행" → 플랜 모드 4건 순차 → Step1(TASKS 96줄 감축) → Step2(incident 집계 + /auto-fix 부적합 판정) → Step3(β안 3자 토론 Round 1 만장일치) → Step3-Next(사용자 "추천대로" 승인 → 규정 실물 반영) → A안-2 실증 판정(β안 B 분류 → skip_65 불가)
+
+### Step 1·2 경량 작업
+- TASKS.md 770→674줄 (세션82~80 블록 이관, `98_아카이브/tasks_archive_20260420_session85.md`)
+- incident 실측 집계 보고서: `90_공통기준/업무관리/incident_audit_20260420_session85.md`
+- 미해결 960건 중 상위 5종 658건(68%) 전부 정책 gate 정상 차단 로그 → `/auto-fix` 일괄 적용 부적합 판정
+
+### Step 3 β안 3자 토론 (pass_ratio 1.0)
+- 로그 폴더: `90_공통기준/토론모드/logs/debate_20260420_190020_beta_3way/`
+- 만장일치 채택: β안-C(6-2/6-4만 API 병렬 + 원문 payload + 로그 브릿지)
+- 독립의견 유지 증거: 쟁점 3 리스크 순위 역순 + Gemini 단독 "로그 브릿지" 제안
+- 규정 실물 반영:
+  1. `90_공통기준/토론모드/CLAUDE.md` — `[NEVER] API 호출` 유일 예외 신설 + "β안-C 예외" 섹션 7개 조건
+  2. `90_공통기준/토론모드/debate-mode/SKILL.md` — Step 6-2/6-4 β안-C 섹션 추가 (API 전제 5개 + JSON 스키마 + [NEVER] 6개)
+
+### A안-2 판정 (세션84 이월)
+β안 의제 B 분류 → `skip_65` 조건 C 불충족. critic-reviewer WARN(실증 이월) 지속.
+
+### 다음 AI 액션 (세션86+)
+1. **β안-C 실제 구현** — `openai_debate.py` 리팩터(세션83 재사용) + Gemini API 클라이언트 신설 + smoke_test 신규 섹션 5건 + 2주 관찰 기간. **사용자 명시 승인 필수** (외부 API 키 발급·예산 설정 동반)
+2. **A안-2 실증** — 자연 발생 A 분류 의제에서 `skip_65=true` 테스트
+3. **incident 근본 개선** — evidence_gate self-throttle(GRACE 120s + tail -100) 추가 효과 측정, completion_gate 소프트 블록 정책 재검토
+4. **Phase 2-C 재평가** — 2026-04-27 전후, `step5_final_verification_path_regression.md` 체크리스트 실행
+
+### 주의
+- β안-C 실제 API 구현은 본 세션 범위 밖(합의·규정 반영까지만). 세션86+에서 사용자 명시 승인 후 착수
+- 세션83 API 키 `claude-code-debate-20260420` revoke 상태 확인은 세션86 착수 선제 조건(HANDOFF 세션83 주의사항)
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션84 — 토론모드 진입 병목 감축 [3way] + 사용자 지시 예외 선례)
 
 ### 실행 경로
 세션83 마감 → 세션84 "토론모드 개선 검토" → 사용자 실시간 불만(진입 단계) 반영 → D안 직접 구현 → A안-1 문서 개정 → A안-2 3자 토론 만장일치 합의 → 세션 마무리
@@ -42,7 +75,7 @@
 
 ---
 
-## 세션83 이전 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
+## 2. 이전 세션 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
 
 ### 실행 경로
 이전 세션(82) 마감 → 세션83 "이전 세션 이어서" → B 실측 분석 → A 3자 API 토론 Round 2 (사용자 명시 예외) → 구현 → smoke_test 48 섹션 5/5 PASS
@@ -101,7 +134,7 @@
 
 ---
 
-## 1. 이전 최신 세션 (2026-04-20 세션82 — weekly-self-audit → hook 문서 정합 보정)
+## 3. 이전 세션 (2026-04-20 세션82 오전 — weekly-self-audit → hook 문서 정합 보정)
 
 ### 실행 경로
 scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포트 생성 → 사용자 "진행" 승인 → P1 2건 + 관련 P2 3건 README 문서화 + settings.local.json 1회용 패턴 23건 청소
@@ -135,7 +168,7 @@ scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포
 
 ---
 
-## 1. 세션82 3자 토론 Round 1 (2026-04-20 오후, [3way])
+## 4. 이전 세션 (2026-04-20 세션82 오후 — 3자 토론 Round 1 [3way])
 
 ### 의제 3건 집계
 | 의제 | GPT 판정 | Gemini 판정 | 조치 |

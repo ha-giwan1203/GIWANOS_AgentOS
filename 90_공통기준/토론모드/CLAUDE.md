@@ -140,11 +140,41 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 구현 → `git commit` → `git push` → SHA + `git show --stat` 요약 포함 공유 (한 번에). 커밋 없이 먼저 공유 금지.
 
 ## 금지사항
-- [NEVER] ChatGPT API 호출
+- [NEVER] ChatGPT API 호출 — **예외 1건**: Step 6-2/6-4 단발 교차 검증(β안-C, 세션85 3자 만장일치). 아래 "β안-C 예외" 섹션 참조
 - [NEVER] DataTransfer/synthetic paste 입력
 - [NEVER] JS 내부 polling (sleep 분리 호출만)
 - [NEVER] sleep 60 같은 긴 고정 대기
 - [NEVER] CDP 스크립트 사용 (cdp_chat_send.py 등 — 폐기됨)
+
+## β안-C 예외 — 단발 교차 검증 API 허용 (세션85 3자 만장일치, 2026-04-20)
+
+> 배경: debate_20260420_190020_beta_3way/ pass_ratio=1.0. `[NEVER] API 호출`의 **유일 예외**. 범위 확대 금지.
+
+**허용 범위 (이것만)**:
+- `debate-mode/SKILL.md` Step 6-2 (Gemini→GPT 1줄 검증)
+- `debate-mode/SKILL.md` Step 6-4 (GPT→Gemini 1줄 검증)
+
+**필수 조건 (모두 만족 시에만 활성)**:
+1. **원문 payload 동봉**: 검증 대상 원문 전체 + 판정 기준 프롬프트 포함. 요약·발췌·절삭 금지
+2. **병렬 실행**: 6-2와 6-4를 API 병렬 호출 (순차 대비 추가 감축)
+3. **모델 매칭**: 본론 웹 UI 모델과 동일 프로바이더 API 사용 — OpenAI↔OpenAI, Google↔Google. 드리프트 최소화
+4. **실패 fallback**: API 실패 시 1회 재시도 후 기존 웹 UI 경로 자동 복귀
+5. **로그 브릿지**: 6-5 Claude 종합 시작 전 `cross_verification` JSON을 웹 UI 프롬프트로 **원문 주입**. `logs/debate_*/roundN_cross_verification.{md,json}` 이중 기록
+6. **키 관리**: 세션별 발급·종료 시 revoke, OpenAI/Gemini 월별 예산 상한 설정
+7. **모델 버전 로그 고정**: 드리프트 추적 가능하도록 호출 시 model_id 로그 기록
+
+**[NEVER] 확대 금지**:
+- 본론(Step 6-1, 6-3) API 전환 금지 — 웹 UI 멀티턴 유지
+- 종합(Step 6-5) API 전환 금지 — Claude 종합은 웹 UI 프롬프트 기반
+- 양측 최종 판정(통과/조건부/실패)은 웹 UI 수령만 인정
+- 단발 검증 외 일반 토론 API 호출 금지
+
+**구현 경로**:
+- `90_공통기준/토론모드/openai/openai_debate.py` 리팩터 (세션83 재사용)
+- Gemini API 클라이언트 신설
+- 2주 관찰 기간: 구현 후 incident 0건 확인 시 고정
+
+**로그**: `90_공통기준/토론모드/logs/debate_20260420_190020_beta_3way/round1_final.md`
 
 ## 상세 참조
 selector 목록, fallback 체인, 오류 대응, 로그 형식, 병행 작업 규칙 → `REFERENCE.md`
