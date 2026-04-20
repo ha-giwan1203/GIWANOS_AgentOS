@@ -39,11 +39,34 @@
 3. Phase 2 진입 판정 지표 4종 (GPT 제안 추가분 반영, TASKS.md 이월 블록 참조)
 4. TASKS.md 감축 작업 — 별도 커밋 이월
 
-### GPT 판정 요약 (2026-04-20 수령)
-- 합의 스펙 대비 구현 정합성: **PASS**. Phase 1 범위 정확 실물화, 임계치 5종·차단 금지·doc_drift incident·Phase 2/3 보류 구조 일치. `wc -c` vs `du -b` 예시 차이는 바이트 측정 목적 동일해 FAIL 사유 아님
-- 재사용 vs 신규 경계: 깔끔. "복붙 수준 아님". 경미 중복 1건 — 임계치 숫자가 shell 스크립트+SKILL.md 이중 기재. Phase 2 `token_threshold_delta.sh` 생길 때 단일 원본화 이월
-- Phase 2 진입 지표 추가 3건: SessionStart p95 ≤ 300ms / 경고 상위 대상 안정성 / 증가량 추적 실효성(주간 순증가 ≥ 10% 또는 반복 강경고+정리 부재)
-- 4종 미충족 시: **TASKS 감축이 Phase 2보다 우선**
+### 3자 검증 판정 요약 (2026-04-20)
+
+**GPT 판정 (자동 공유 수령): PASS**
+- 합의 스펙 대비 구현 정합성: PASS. Phase 1 범위 정확 실물화, 임계치 5종·차단 금지·doc_drift incident·Phase 2/3 보류 구조 일치. `wc -c` vs `du -b` 예시 차이는 바이트 측정 목적 동일해 FAIL 사유 아님
+- 재사용 vs 신규 경계: 깔끔. "복붙 수준 아님". 경미 중복 1건 — 임계치 숫자가 shell 스크립트+SKILL.md 이중 기재
+- Phase 2 진입 지표 추가 3건 (시스템 측): SessionStart p95 ≤ 300ms / 경고 상위 대상 안정성 / 증가량 추적 실효성
+
+**Gemini 판정 (사용자 수동 전달): PASS**
+- 합의 스펙 정합성: PASS. advisory 원칙·doc_drift 자동 기록·SessionStart 배선 타당성 모두 적합. "Phase 2 전 데이터 축적 브릿지 설계"로 평가
+- 코드 경계: 타당. 중복 없음. `_measure_*` 로직 별도 함수 분리는 향후 tiktoken 도입 대비 적절한 캡슐화
+- Phase 2 진입 지표 추가 2건 (행동 측): 무시/관용 비율 ≤ 80% / 조치 전환율 — 세션77 map_scope Policy-Workflow Mismatch 동일 패턴 경고
+
+**최종 지표**: 6종 (Claude 기본 1 + GPT 3 + Gemini 2) — TASKS 이월 블록 참조
+
+### 공유 경로 오판 기록 (사용자 지적 수용)
+
+Claude가 "이미 3자 합의된 스펙의 실물화이므로 2자 경로 충분"으로 판단해 `share-result` 0단계에서 2way 모드 선택 → Gemini 공유 생략. 사용자 지적: "넌 무슨 근거로 제미나이에게는 공유 안하는거냐?"
+
+**근본 원인**:
+1. 공유 대상 커밋이 `.claude/hooks/*.sh` 신설 + `settings.json` 변경 포함 → 토론모드 CLAUDE.md "자동 승격 트리거" B분류 첫 조건 해당인데 판단에서 누락
+2. 합의(스펙) 시점과 실물 PASS 판정 시점은 별개임에도 "스펙 합의 완료 = 실물 재검증 불필요"로 잘못 해석 (`feedback_threeway_share_both_required.md` 위반)
+3. **세션78 반쪽 패치 사건과 동일한 실수 반복** — a4b54a2e가 바로 그 보완 규칙이었음
+
+**share-result.md 0단계 감지 조건 허점**:
+현재 3가지 조건은 모두 "토론 맥락"만 검사 — [3way] 태그 / 세션 내 debate-mode 호출 / 직전 [3way] 미종결. 공유 대상 커밋 자체의 구조 변경(hook/settings 신설·수정) 검사 누락.
+
+### 세션80 우선 의제 (3자 토론 대상)
+`share-result.md` 0단계 감지 조건에 **4번째 조건 신설** — 공유 대상 커밋이 `.claude/hooks/*.sh` 신설 또는 `.claude/settings*.json` 구조 변경을 포함하면 3way 모드 강제. 이 확장 자체가 구조 변경이므로 3자 토론 경로로 설계·채택.
 
 ### 선행 FAIL 기록 (본건 무관)
 - smoke_test 25번 `classify_feedback.py --validate ALL OK` 실패. 세션46(ac549431) 이후 잔존 가능성. 이번 변경과 무관하나 추후 원인 추적 필요.
