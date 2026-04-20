@@ -24,7 +24,7 @@ Gemini 웹 UI (gemini.google.com)에 메시지를 입력하고 전송한 뒤 응
 
 #### 1-B. 대화방 진입 (매 세션 최상단 재탐지)
 
-1. `.claude/state/gemini_gem_url` 읽기 → 해당 URL로 navigate → **1초 대기** (세션79 속도 개선: 3초→1초)
+1. `.claude/state/gemini_gem_url` 읽기 → 해당 URL로 navigate → **1초 대기** (세션79 속도 개선). **fallback**: 1초 후 `.ql-editor` 또는 `recent-chat-list-item` 미탐지 시 **3초 추가 대기 1회** 재시도. 2회째 실패 시 "Gemini UI 로드 실패" 보고 (GPT A분류 제안 반영, 양측 PASS)
 2. `javascript_tool`로 이 Gem의 **최상단 최근 대화방 href** 추출:
 ```javascript
 // recent-chat-list-item = 이 Gem 전용 최근 대화 (최대 3개)
