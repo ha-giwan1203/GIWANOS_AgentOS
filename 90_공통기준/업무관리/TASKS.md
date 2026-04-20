@@ -10,7 +10,23 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션85 (이월 4건 처리: TASKS 감축·incident 집계·β안-C [3way] 만장일치·A안-2 판정)
+최종 업데이트: 2026-04-20 — 세션86 (로그 자기순환 루프 차단 — skill_usage.jsonl Git 추적 해제 + evidence_gate 예외 규정 [2way] 의제화)
+
+---
+
+## 세션86 (2026-04-20, 로그 자기순환 루프 차단 — 2순위 즉시 + 1순위 [2way] 토론)
+
+**[완료] skill_usage.jsonl Git 추적 해제 — 자기순환 커밋 루프 #1 원인 제거**
+- 배경: stop_hook → skill 증분 커밋 → evidence_gate tasks_handoff.req deny → incident_ledger append → 재커밋 루프. 오늘 3회 연속 재생산(`d872e62`·`a143b2a`·`2767ba2`).
+- 조치: `git rm --cached .claude/hooks/skill_usage.jsonl` (로컬 파일 유지) + `.gitignore` 주석 문서화(세션15 정책 옆 세션86 정책 명시)
+- 다운스트림 확인: `.claude/README.md:29`에 이미 "로컬 전용 상태"로 기술됨 — 수정 불필요. `hook_common.sh:64` append 함수·`self-audit.md:22` 인벤토리 모두 로컬 파일 존재만 요구, Git 추적 의존 없음
+- 효과: 매 스킬 호출 시 발생하던 uncommitted 경고 중단 (세션85 보고서 상위 #5 패턴 재발 감소 기대)
+
+**[진행 중] evidence_gate 예외 규칙 [2way] 토론 — 자기순환 #2 원인(incident_ledger append) 해결 방안 확정**
+- 의제: `evidence_gate.sh` 124-128 tasks_handoff deny에 `git diff --cached --name-only` 기반 **로그 단독 diff 화이트리스트 스킵** 전치 조건 추가 여부
+- 화이트리스트 초안: `.claude/incident_ledger.jsonl` (세션 자동 증분 유일 항목)
+- 모드: 2자 토론 (Claude+GPT). 승격 시 3자 자동 전환
+- 판정 후 처리: 채택 → 세션87+ 구현 과제 신설 / 보류 → 근거 수집 과제 이월 / 버림 → `/finish` 강제 + self-throttle 튜닝 2안 이월
 
 ---
 

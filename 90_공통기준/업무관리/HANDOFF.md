@@ -4,12 +4,38 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션85 (이월 4건 처리: TASKS 감축·incident 집계·β안-C [3way] 만장일치·A안-2 판정)
+최종 업데이트: 2026-04-20 KST — 세션86 (로그 자기순환 루프 차단 — skill_usage.jsonl Git 추적 해제 + evidence_gate 예외 [2way] 토론)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션85 — 이월 4건 처리 + β안-C [3way] 만장일치 + 규정 실물 반영)
+## 0. 최신 세션 (2026-04-20 세션86 — 로그 자기순환 루프 차단: 2순위 즉시 + 1순위 [2way] 토론)
+
+### 실행 경로
+세션85 마감 → 세션86 시작 시 stop_hook이 skill_usage.jsonl 증분 3회 연속 감지(`d872e62`·`a143b2a`·`2767ba2`) → incident_audit 보고서 상위 #5 패턴(tasks_handoff.req 65건) 재생산 확인 → 사용자 "추천 방향" 질의 → 2순위(gitignore) + 1순위(evidence_gate 예외 [2way] 토론) 조합 승인 → 플랜 모드 작성 → 승인 → 실행
+
+### Step 1 — skill_usage.jsonl Git 추적 해제 (즉시 완료)
+- `git rm --cached .claude/hooks/skill_usage.jsonl` (로컬 파일 유지)
+- `.gitignore`에 세션86 정책 주석 추가 (라인 50 세션15 정책 아래)
+- 다운스트림 확인: `.claude/README.md:29` 이미 "로컬 전용 상태"로 명시 — 수정 불필요
+- 기대 효과: 스킬 호출 시 uncommitted 경고 중단 → 자기순환 커밋 루프 3건 중 2건 제거
+
+### Step 2 — evidence_gate 예외 규정 [2way] 토론 (본 세션 내 개최)
+- 의제: `evidence_gate.sh:124-128` tasks_handoff deny 전치 조건 추가 — 로그 단독 diff(`incident_ledger.jsonl`) 화이트리스트 스킵
+- 모드: 2자 토론 (Claude+GPT). B 분류 승격 시 3자 자동 전환
+- 판정별 후속:
+  - 채택 → TASKS.md 세션87+ "evidence_gate 화이트리스트 패치" 이월 과제 신설
+  - 보류 → 반대 논리 근거 수집 과제 이월
+  - 버림 → `/finish` 사용 강제 + self-throttle 튜닝 2안 이월
+- 결과: *(토론 후 기록)*
+
+### 다음 AI 액션
+- Step 2 2자 토론 결과 본 섹션에 1줄 요약 추가
+- 최종 커밋/푸시 후 세션 마감 보고
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션85 — 이월 4건 처리 + β안-C [3way] 만장일치 + 규정 실물 반영)
 
 ### 실행 경로
 세션84 마감 → 세션85 "이전방 안건 이어서 진행" → 플랜 모드 4건 순차 → Step1(TASKS 96줄 감축) → Step2(incident 집계 + /auto-fix 부적합 판정) → Step3(β안 3자 토론 Round 1 만장일치) → Step3-Next(사용자 "추천대로" 승인 → 규정 실물 반영) → A안-2 실증 판정(β안 B 분류 → skip_65 불가)
