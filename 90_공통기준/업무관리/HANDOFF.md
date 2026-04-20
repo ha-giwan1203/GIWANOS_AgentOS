@@ -58,9 +58,9 @@
 - 세션82 GPT A 제안 반영. Phase 2-C 승격 전 필수 검증 기준 고정
 
 ### 다음 AI 액션 (세션84+)
+- **[세션84 첫 작업 필수]** API 예외 원복 확인 (토론모드 [NEVER] API 호출 규정 복귀) + OpenAI 키 `claude-code-debate-20260420` revoke 완료 여부 1줄 기록 (GPT·Gemini 양측 A분류 공통 제안)
 - skill_instruction_gate 36건 별건 분석 (세션83 δ 분리 합의)
 - Phase 2-C 재평가 (2026-04-27 전후): `step5_final_verification_path_regression.md` 체크리스트 실행 → 통과 시 debate_verify.sh advisory→gate 승격
-- OpenAI API 키 revoke (세션 종료 시)
 
 ### 주의사항
 - 이번 세션 OpenAI API 1회 예외 — 토론모드 `[NEVER] API 호출` 규정 다음 세션부터 원복
