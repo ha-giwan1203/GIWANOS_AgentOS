@@ -2,26 +2,28 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "통과",
-  "gemini_judgment": "PASS×3",
+  "gpt_judgment": "PASS",
+  "gemini_judgment": "PASS",
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "session81",
-  "summary": "debate_verify.sh 한글 경로 Python3 오탐지 수정 — 3자 토론 [3way] 완결. POSIX 경로 + 쉘 인라인 locale 깨짐 진단, cygpath+sed+<<'PY'+os.environ+Python 2차 정규화 조합. statusline.sh 동일 패턴 stdin 파이프 전환. 양측 최종 PASS: GPT 조건부 해제 통과, Gemini 실물 diff 대조 PASS×3.",
-  "commits": ["408c4856"],
+  "session": "session82",
+  "summary": "weekly-self-audit 스케줄 실행 → P1·P2 hook 문서 정합 보정 + 잔여 안건 3건 3자 토론 Round 1 완결. 의제 2 생산계획자동화 98_아카이브 이동, 의제 3 debate_verify.sh Phase 2-C 조건 헤더 문서화(exit 2 전환은 2026-04-27+ 이월), 의제 1 evidence_gate 333건 원인 분석은 양측 '검증 필요' 판정으로 세션83+ 이월. 양측 최종 PASS.",
+  "commits": ["2d092e1b", "e84e410d", "d073cdd3"],
   "harness_analysis": {
-    "adopted": 8,
+    "adopted": 7,
     "held": 1,
-    "discarded": 1,
-    "note": "GPT 실패 판정(C드라이브 전용 fallback) 수용하여 범용 sed + Python 2차 안전망으로 대체. CP949 단정 표현 완화 1건 보류 반영."
+    "discarded": 0,
+    "note": "양측 PASS. GPT·Gemini 추가 A 제안 2건(회귀 테스트 체크리스트 템플릿 / 04-19 audit_log 분석)은 즉시 반영 대신 세션83+ 이월. Gemini item 4(thinking 탐지) 메타순환/보류 1건."
   },
-  "pass_ratio_final": 0.83,
-  "three_way_log": "90_공통기준/토론모드/logs/debate_20260420_105428_3way/",
+  "pass_ratio_final": 1.0,
+  "three_way_log": "90_공통기준/토론모드/logs/debate_20260420_131100_3way/",
   "carried_over": [
-    "base64 긴 문자열 자동 전송이 Anthropic Usage Policy 필터에 차단 — 짧은 평문 요약 + diff 분할 전송으로 우회",
-    "classify_feedback.py --validate FAIL — 메모리 enforcement 태그 4건 누락 (본건 무관, 별도 트랙)",
-    "Phase 2-C 승격 타이밍: 기존 7일 연속 0건 유지, 이 fix로 incident 재집계 시작점 리셋"
+    "의제 1 evidence_gate 333건 후속 3자 토론 — evidence_mark_read 범위 확장 / 정규식 재검토 / 구버전 vs 현재 로그 분리 재집계",
+    "gpt-send/gpt-read 스킬 thinking 탐지 개선 — data-message-model-slug$='-thinking' 감지 시 완료 대기 600초 자동 연장, stop-button 단독 판정 금지",
+    "Phase 2-C 재평가 (2026-04-27 전후) — incident_review.py 재집계 후 exit 2 전환 결정",
+    "[GPT A] Phase 2-C 재평가 전 영문/특수문자/한글 경로 3종 회귀 테스트 체크리스트 템플릿 고정",
+    "[Gemini A] 04-19 evidence_missing 165건 집중 audit_log 상세 분석 → 세션83 첫 작업"
   ],
-  "updated_at": "2026-04-20T12:05:00+09:00"
+  "updated_at": "2026-04-20T15:40:00+09:00"
 }
