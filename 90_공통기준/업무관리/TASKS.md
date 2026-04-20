@@ -65,6 +65,13 @@ Phase 2 진입 판정 지표 (Claude 독립 점검·라벨링 결과, 2026-04-20
 2. merge/revert/cherry-pick 시 HEAD~1 비교 약함 대응 (머지 베이스 감지)
 3. 조건3 (직전 [3way] 미종결) 오탐 튜닝 — Gemini PASS 문구 인식 범위 확대
 
+**[완료·세션79] 토론 모드 속도 개선 (1a552f55)** — 사용자 지적 "너무 답답한대"
+- share-result 판정 응답 구조화 템플릿 강제 (장문 서사 금지)
+- gpt-send·gemini-send: sleep 3→1, polling 3/5/8→2/3/5
+- gpt-read·gemini-read: {len, text} JSON 반환 → MCP truncate 시 1회 slice만 추가
+- 병렬 브라우저 창 분리는 MCP 제약(단일 탭 그룹)으로 기각
+- 예상 효과: 3자 1라운드 60~90초 → 30~40초. 세션80 첫 토론에서 실측 검증
+
 **[이월] TASKS.md 감축 작업** — 현재 2008줄(강경고 2.5배 초과). 세션79 스킬 구현과 분리하여 후속 별도 커밋으로 진행. 세션블록 최근 3개만 유지하고 나머지 `98_아카이브/tasks_archive_20260420.md`로 이관 검토. Phase 2 진입 조건 4종 미충족 시 이 감축 작업이 Phase 2보다 우선
 
 ---
