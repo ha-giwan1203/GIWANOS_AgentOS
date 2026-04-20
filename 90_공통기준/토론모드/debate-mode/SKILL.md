@@ -160,6 +160,56 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 > 자동 게이트 스크립트 구현은 별건 안건: TASKS "3way cross_verification 자동 게이트 스크립트" 참조.
 
+#### 6-5 조건부 생략 (A안-2 2026-04-20 3자 토론 만장일치 합의)
+
+> 세션84 3자 토론 `debate_20260420_171419_3way` pass_ratio=1.0. 6-5는 Claude 종합 오해를 잡는 마지막 안전장치이므로 원칙은 유지. 다음 **3조건 + 시스템 제약** 모두 충족 시에만 예외 허용.
+
+**생략 조건 (모두 필수)**:
+
+- **조건 A — 양측 무단서 동의**:
+  - 6-2 `gemini_verifies_gpt.verdict == "동의"` AND 6-4 `gpt_verifies_gemini.verdict == "동의"`
+  - 두 `reason` 문장에 조건부 단서 키워드 없음: `"단, "`, `"조건부"`, `"추가 확인 필요"`, `"다만"`, `"하지만"`
+- **조건 B — Claude 종합안 순수 축약**:
+  - 신규 정책/예외/분기/설계 문장 추가 없이 "채택/보류/버림 정리"만
+  - 양측 답변의 공통분모를 벗어나는 재해석·범위 확장·표현 변경 금지
+  - Claude가 `claude_delta: "none"` self-declare (기계판정 가능한 증적 필드)
+- **조건 C — 의제 성격**:
+  - 단순 판정형(A 분류: 오타·값·버그·문서 정리·도메인 데이터)
+  - 구조·정책·프로토콜 변경(B 분류)이면 **무조건 6-5 유지** — `issue_class` 필드로 기계판정
+
+**시스템 제약 (하드코딩)**:
+- `round_count === 1`일 때만 생략 로직 활성. Round 2/3는 자동 생략 불가.
+- 이유: Round 2/3은 불일치 누적 맥락이라 Claude 종합 오해 방지 안전장치 필수 (GPT 판정 4 실패 근거)
+
+**생략 시 pass_ratio**:
+- 6-2/6-4 두 verdict만으로 계산 (분모 2, 2/3 threshold → 실질 2/2 동의 필요)
+- 한쪽이라도 "이의"·"검증 필요"면 생략 불가 → 6-5 수행
+
+**JSON 스키마 확장** (필수 4필드):
+```json
+{
+  "cross_verification": {
+    "skip_65": true,
+    "skip_65_reason": "양측 무단서 동의 + 순수 축약 + A 분류 + Round 1",
+    "claude_delta": "none",
+    "issue_class": "A"
+  }
+}
+```
+
+**기록 의무**:
+- 생략 시 `round{N}_claude_synthesis.md`에 `skip_65=true` 마킹
+- 4 JSON 필드(`skip_65`, `skip_65_reason`, `claude_delta`, `issue_class`) 감사 가능하게 보존
+- 생략 안 할 때도 `skip_65: false` + 사유(`claude_delta` 값, `issue_class`) 기록
+
+**[NEVER]**:
+- 의제가 B 분류인데 A로 낮춰 생략 금지
+- Claude가 `claude_delta="partial"` 또는 `"major"`를 `"none"`으로 낮춰 자체 선언 금지
+- Round 2/3에서 수동 생략 시도 금지
+- 시스템 제약(`round_count === 1`) 우회 금지
+
+**선례**: 세션84 Round 1 메타 사례 — 본 규정 신설 의제 자체가 B 분류라 `skip_65=false, claude_delta="partial", issue_class="B"`로 6-5 수행, 양측 만장일치 동의(pass_ratio=1.0) 수령 후 반영. 로그: `90_공통기준/토론모드/logs/debate_20260420_171419_3way/`.
+
 #### 로그 파일 구조
 - 3자 토론 로그: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS_3way/`
 - 라운드별 파일: `round{N}_gpt.md`, `round{N}_gemini.md`, `round{N}_cross_verify.md`, `round{N}_claude_synthesis.md`
@@ -260,7 +310,11 @@ JSON 필수 필드: `session_id`, `chat_url`, `turn_number`, `last_reply_hash`, 
     "gemini_verifies_claude": {"verdict": "동의|이의|검증 필요", "reason": "근거 1문장"},
     "pass_ratio_numeric": 0.67,
     "round_count": 1,
-    "max_rounds": 3
+    "max_rounds": 3,
+    "skip_65": false,
+    "skip_65_reason": null,
+    "claude_delta": "none|partial|major",
+    "issue_class": "A|B|null"
   }
 }
 ```

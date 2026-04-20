@@ -1,0 +1,45 @@
+{
+  "session_id": "debate_20260420_171419_3way",
+  "mode": "3way",
+  "topic": "A안-2 Round 1 합의 시 6-5 양측 재검증 생략 조건 명문화",
+  "rounds": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "6-5 조건부 생략 3조건 명문화 제안",
+      "gpt": "조건부 통과 3 + 실패 2 → 보강 5조건 제시 (verdict+reason 검증 / claude_delta / Round 1 한정 / JSON 스키마)",
+      "gemini": "6-2 GPT 보강 동의 + 6-3 독자 보강 2개 (current_round===1 하드제약 / 조건 통폐합)",
+      "harness": {
+        "summary_counts": {"채택": 5, "보류": 0, "버림": 0},
+        "채택": [
+          {"item": "claude_delta 기계판정 필드", "label": "실증됨", "evidence": "GPT/Gemini 양측 동의, Gemini 오남용 방지 기술 한계 지적 수용", "ref": "round1_gpt.md"},
+          {"item": "JSON 스키마 4필드 확장 (skip_65/skip_65_reason/claude_delta/issue_class)", "label": "실증됨", "evidence": "양측 동의, 기계판정 증적 가능", "ref": "round1_gpt.md"},
+          {"item": "current_round === 1 하드코딩 시스템 제약", "label": "실증됨", "evidence": "Gemini 추가 보강 제안, GPT 동의 수용", "ref": "round1_gemini.md"},
+          {"item": "reason 조건부 단서 키워드 리스트 검증", "label": "실증됨", "evidence": "GPT 보강 조건 (2) 반영", "ref": "round1_gpt.md"},
+          {"item": "조건 A/B/C 3분류 (의제 성격 C 분리 유지)", "label": "환경미스매치", "evidence": "Gemini는 통폐합 제안했으나 Claude 의제 성격 분리 유지 → 프로토콜 변경 자동 차단 목적", "ref": "round1_claude_synthesis.md"}
+        ],
+        "보류": [],
+        "버림": []
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "동의", "reason": "Round 1 한정 하드제약과 2조건 중심 재정의는 6-5 생략 범위를 좁히면서도 상호 감시 원칙 훼손을 최소화"},
+        "gemini_verifies_gpt": {"verdict": "동의", "reason": "Claude 임의 확장을 막는 기계적 통제 장치(claude_delta 등) 도입 필수성에 동의"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "claude_delta=partial 상태 프로토콜 변경안이라 스스로 정의한 조건상 6-5 생략 대상 아님 (자기정합성)"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "Round 1 하드코딩 제약 시스템 수용 + 의제 성격(C) 분리 유지 판단이 프로토콜 변경 우회 차단 안전장치로 타당"},
+        "pass_ratio_numeric": 1.0,
+        "round_count": 1,
+        "max_rounds": 3,
+        "skip_65": false,
+        "skip_65_reason": "의제 자체가 프로토콜 변경(B 분류)이라 메타적으로 6-5 생략 불가. claude_delta=partial",
+        "claude_delta": "partial",
+        "issue_class": "B"
+      }
+    }
+  ],
+  "result": {
+    "consensus_reached": true,
+    "consensus_round": 1,
+    "final_design": "SKILL.md Step 3-W에 '6-5 조건부 생략' 신설 — 조건 A/B/C + current_round===1 하드제약 + JSON 4필드 + 기록 의무",
+    "critic_review": null
+  }
+}

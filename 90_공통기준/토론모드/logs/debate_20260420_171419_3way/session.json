@@ -1,0 +1,24 @@
+{
+  "session_id": "debate_20260420_171419_3way",
+  "mode": "3way",
+  "topic": "A안-2 Round 1 합의 시 6-5 양측 재검증 생략 조건 명문화",
+  "chat_url": "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e57ef4-dd70-83e8-9458-dca5d85f01db",
+  "turn_number": 0,
+  "last_reply_hash": "",
+  "turns": [],
+  "result": null,
+  "critic_review": null,
+  "cross_verification_policy": {
+    "required_keys": ["gpt_verifies_gemini", "gemini_verifies_gpt", "gpt_verifies_claude", "gemini_verifies_claude"],
+    "verdict_enum": ["동의", "이의", "검증 필요"],
+    "pass_threshold": 0.67,
+    "max_rounds": 3
+  },
+  "context_refs": {
+    "plan_file": "C:\\Users\\User\\.claude\\plans\\magical-humming-wand.md",
+    "prior_sessions": {
+      "D안 실측 검증": "PASS 2026-04-20",
+      "A안-1 반영": "커밋 35a9ae32"
+    }
+  }
+}
