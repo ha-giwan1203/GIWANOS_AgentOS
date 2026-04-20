@@ -24,7 +24,7 @@ Gemini 웹 UI (gemini.google.com)에 메시지를 입력하고 전송한 뒤 응
 
 #### 1-B. 대화방 진입 (매 세션 최상단 재탐지)
 
-1. `.claude/state/gemini_gem_url` 읽기 → 해당 URL로 navigate → 3초 대기
+1. `.claude/state/gemini_gem_url` 읽기 → 해당 URL로 navigate → **1초 대기** (세션79 속도 개선: 3초→1초)
 2. `javascript_tool`로 이 Gem의 **최상단 최근 대화방 href** 추출:
 ```javascript
 // recent-chat-list-item = 이 Gem 전용 최근 대화 (최대 3개)
@@ -41,7 +41,7 @@ if (topTitle) {
 }
 JSON.stringify({topTitle, href});
 ```
-3. `href`가 `/app/{conv_id}` 형태면 → `https://gemini.google.com${href}` 로 navigate → 3초 대기
+3. `href`가 `/app/{conv_id}` 형태면 → `https://gemini.google.com${href}` 로 navigate → **1초 대기** (세션79 속도 개선: 3초→1초)
 4. 진입 성공 시 (URL이 `/app/` 또는 `/gem/{gem_id}/{conv_id}` 형태 확인 후):
    - `.claude/state/gemini_chat_url` 갱신 (최종 current URL)
    - `.claude/state/gemini_tab_id`에 현재 tabId 저장 (다음 세션 재사용용)
@@ -101,10 +101,10 @@ const btn = document.querySelector('[aria-label="메시지 보내기"]');
 btn ? btn.getAttribute('aria-disabled') : 'not_found';
 ```
 
-- 적응형 polling:
-  - 0~20초: sleep 3
-  - 20~60초: sleep 5
-  - 60초~: sleep 8
+- 적응형 polling (세션79 속도 개선):
+  - 0~20초: sleep 2 (기존 3)
+  - 20~60초: sleep 3 (기존 5)
+  - 60초~: sleep 5 (기존 8)
   - 최대 300초
 - `aria-disabled="false"` 반환 시 완료
 

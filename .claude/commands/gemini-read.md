@@ -40,7 +40,7 @@ Gemini 웹 UI의 최신 응답을 읽어오는 단일 명령.
 ```
 - 2초 간격으로 2회 측정, `len`·`lastSlice` 동일하면 안정 판정 → 3으로
 
-### 3. 최신 응답 읽기 (placeholder·메타 스킵 버전)
+### 3. 최신 응답 읽기 (placeholder·메타 스킵 + 한 번에 전체 반환 — 세션79 속도 개선)
 
 ```javascript
 (() => {
@@ -48,11 +48,18 @@ Gemini 웹 UI의 최신 응답을 읽어오는 단일 명령.
   for (let i = blocks.length - 1; i >= 0; i--) {
     const t = (blocks[i].innerText || '').trim();
     const cleaned = t.replace(/^C\s*Claude-Gemini[^\n]*\n사용자설정 Gem[^\n]*\n[^\n]*\n[^\n]*\n/, '').trim();
-    if (cleaned.length >= 30) return cleaned;
+    if (cleaned.length >= 30) {
+      return JSON.stringify({
+        len: cleaned.length,
+        text: cleaned
+      });
+    }
   }
-  return '';
+  return JSON.stringify({len: 0, text: ''});
 })();
 ```
+
+**반환 해석**: MCP tool result 자동 truncate 시 `len`으로 전체 크기 파악. 필요시 `cleaned.slice(1200)` 1회 추가 호출로 완결(기존 3~4회 → 최대 2회).
 
 ### 3-prep. 백그라운드 throttling 대응 (세션70 실증 — 필수)
 

@@ -33,18 +33,26 @@ document.querySelector('[data-testid="stop-button"]') !== null
 - 2초 간격으로 2회 측정, `len`·`lastSlice` 동일하면 안정 판정 → 3으로
 - 변화 중이면 stop-button 다시 확인
 
-### 3. 최신 응답 읽기 (placeholder 스킵 버전)
+### 3. 최신 응답 읽기 (placeholder 스킵 + 한 번에 전체 반환 — 세션79 속도 개선)
 
 ```javascript
 (() => {
   const blocks = document.querySelectorAll('[data-message-author-role="assistant"]');
   for (let i = blocks.length - 1; i >= 0; i--) {
     const t = (blocks[i].innerText || '').trim();
-    if (t.length >= 30) return blocks[i].innerText;
+    if (t.length >= 30) {
+      // 세션79 속도 개선: 첫 호출에서 길이 + 전체 텍스트 반환 → 분할 slice 호출 제거
+      return JSON.stringify({
+        len: t.length,
+        text: t  // MCP가 자동 truncate해도 len으로 전체 크기 파악 가능, 필요시만 slice 후속 호출
+      });
+    }
   }
-  return '';
+  return JSON.stringify({len: 0, text: ''});
 })();
 ```
+
+**반환 해석**: MCP tool result는 최대 ~1200자에서 truncate되는 경향 있음. `len`이 이보다 크면 `txt.slice(1200)` 1회만 추가 호출. 장문 응답도 최대 2회 호출로 완결(기존 3~4회 → 2회).
 
 ### 3-prep. 백그라운드 throttling 대응 (세션70 실증 — 필수)
 
