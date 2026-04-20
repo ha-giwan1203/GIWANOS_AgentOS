@@ -22,11 +22,13 @@
 - 다운스트림 확인: `.claude/README.md:29`에 이미 "로컬 전용 상태"로 기술됨 — 수정 불필요. `hook_common.sh:64` append 함수·`self-audit.md:22` 인벤토리 모두 로컬 파일 존재만 요구, Git 추적 의존 없음
 - 효과: 매 스킬 호출 시 발생하던 uncommitted 경고 중단 (세션85 보고서 상위 #5 패턴 재발 감소 기대)
 
-**[진행 중] evidence_gate 예외 규칙 [2way] 토론 — 자기순환 #2 원인(incident_ledger append) 해결 방안 확정**
+**[중단·이월] evidence_gate 예외 규칙 [2way] 토론 — 환경 제약으로 정규 토론 불가**
 - 의제: `evidence_gate.sh` 124-128 tasks_handoff deny에 `git diff --cached --name-only` 기반 **로그 단독 diff 화이트리스트 스킵** 전치 조건 추가 여부
 - 화이트리스트 초안: `.claude/incident_ledger.jsonl` (세션 자동 증분 유일 항목)
-- 모드: 2자 토론 (Claude+GPT). 승격 시 3자 자동 전환
-- 판정 후 처리: 채택 → 세션87+ 구현 과제 신설 / 보류 → 근거 수집 과제 이월 / 버림 → `/finish` 강제 + self-throttle 튜닝 2안 이월
+- 중단 사유: 현재 Claude 세션(GitHub MCP 컨텍스트)에 Chrome MCP 도구(`navigate`·`tabs_context_mcp`·`javascript_tool` 등) 미로드 → `/gpt-send` 실행 불가
+- 의제·abort 로그: `90_공통기준/토론모드/logs/debate_20260420_225550/` (agenda.md, abort.md, result.json)
+- **[이월·세션87+]** 정규 Claude Code 세션(브라우저 MCP 포함)에서 같은 로그 폴더 재진입 → `/debate-mode` 재호출 → GPT 의견 수령 → 하네스 분석 → 판정
+- 판정 후 처리(세션87+): 채택 → 구현 과제 신설(B 분류라 3자 승격 필요) / 보류 → 근거 수집 이월 / 버림 → `/finish` 강제 + self-throttle 튜닝 2안 이월
 
 ---
 

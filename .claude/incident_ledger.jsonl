@@ -1149,3 +1149,5 @@
 {"ts":"2026-04-20T22:42:48Z","type":"gate_reject","hook":"evidence_gate","file":"","detail":"commit 차단. 이번 세션에 TASKS.md/HANDOFF.md 갱신 흔적이 없습니다.","resolved":false,"classification_reason":"evidence_missing","fingerprint":"19d5d3434d8a7a50"}
 {"ts":"2026-04-20T22:44:54Z","type":"warn_recorded","hook":"commit_gate","file":"","detail":"python3 의존 잔존","resolved":false,"classification_reason":"python3_dependency","source":"final_check","warn_raw":"[WARN] python3 의존 잔존:;","normal_flow":true}
 {"ts":"2026-04-20T22:46:17Z","type":"warn_recorded","hook":"commit_gate","file":"","detail":"python3 의존 잔존","resolved":false,"classification_reason":"python3_dependency","source":"final_check","warn_raw":"[WARN] python3 의존 잔존:;","normal_flow":true}
+{"ts":"2026-04-20T22:54:53Z","type":"hook_block","hook":"harness_gate","file":"","detail":"하네스 분석 미수행. 누락: 채택: 보류:/버림: 독립견해","resolved":false,"classification_reason":"harness_missing"}
+{"ts":"2026-04-20T22:54:54Z","type":"warn_recorded","hook":"commit_gate","file":"","detail":"python3 의존 잔존","resolved":false,"classification_reason":"python3_dependency","source":"final_check","warn_raw":"[WARN] python3 의존 잔존:;","normal_flow":true}

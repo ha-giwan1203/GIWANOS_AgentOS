@@ -20,18 +20,17 @@
 - 다운스트림 확인: `.claude/README.md:29` 이미 "로컬 전용 상태"로 명시 — 수정 불필요
 - 기대 효과: 스킬 호출 시 uncommitted 경고 중단 → 자기순환 커밋 루프 3건 중 2건 제거
 
-### Step 2 — evidence_gate 예외 규정 [2way] 토론 (본 세션 내 개최)
+### Step 2 — evidence_gate 예외 규정 [2way] 토론 (환경 제약으로 중단·세션87+ 이월)
 - 의제: `evidence_gate.sh:124-128` tasks_handoff deny 전치 조건 추가 — 로그 단독 diff(`incident_ledger.jsonl`) 화이트리스트 스킵
-- 모드: 2자 토론 (Claude+GPT). B 분류 승격 시 3자 자동 전환
-- 판정별 후속:
-  - 채택 → TASKS.md 세션87+ "evidence_gate 화이트리스트 패치" 이월 과제 신설
-  - 보류 → 반대 논리 근거 수집 과제 이월
-  - 버림 → `/finish` 사용 강제 + self-throttle 튜닝 2안 이월
-- 결과: *(토론 후 기록)*
+- 모드: 2자 토론 (Claude+GPT). B 분류 → 승격 시 3자 자동 전환
+- **중단 사유**: 현재 세션에 Chrome MCP 도구 미로드 → `/gpt-send` 실행 불가. `ToolSearch`로 `navigate`·`tabs_context_mcp`·`javascript_tool` 전부 없음 확인
+- 로그: `90_공통기준/토론모드/logs/debate_20260420_225550/` (agenda.md, abort.md, result.json 초안)
+- 결과: 미결 — 정규 Claude Code 세션에서 재진입 필요
 
-### 다음 AI 액션
-- Step 2 2자 토론 결과 본 섹션에 1줄 요약 추가
-- 최종 커밋/푸시 후 세션 마감 보고
+### 다음 AI 액션 (세션87+)
+- 브라우저 MCP 포함 정규 세션에서 `/debate-mode` 재호출 + `debate_20260420_225550/agenda.md` 첨부 전송
+- GPT 응답 수령 → 하네스 분석 → 판정 → `result.json` 최종화
+- 채택 시 B 분류 3자 토론 승격 후 실제 `evidence_gate.sh` 코드 변경
 
 ---
 
