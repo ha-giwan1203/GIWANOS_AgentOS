@@ -10,7 +10,27 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션80 (학습루프 진단 + 4단계 보정)
+최종 업데이트: 2026-04-20 — 세션81 (debate_verify.sh 한글경로 수정 — 3자 토론 [3way])
+
+---
+
+## 세션81 (2026-04-20, debate_verify.sh 한글 경로 오탐지 수정 [3way])
+
+**[완료] `.claude/hooks/debate_verify.sh` + `.claude/hooks/statusline.sh` heredoc 인라인 삽입 취약 패턴 수정** — 세션80 Follow-up 항목 해소
+
+- 근본 원인 (3자 토론 실증): POSIX 경로(`/c/Users/...`) → Windows 네이티브 Python3 비호환 + 쉘 `$RESULT` 인라인 전개 시 locale/code page 경유 한글 경로 깨짐. surrogate escape 아님.
+- 수정 (3파일):
+  1. `debate_verify.sh` 80-85행: `<<'PY'` quoted heredoc + `os.environ['RESULT_ENV']` + `cygpath -w` 우선 + 범용 sed `s|^/([a-zA-Z])/|\1:/|` fallback + Python 내부 `re.sub` + `os.path.normpath()` 2차 안전망
+  2. `statusline.sh` 7-22행: heredoc 인라인 삽입(`json.loads('''$input''')`) → stdin 파이프(`json.load(sys.stdin)`) 전환
+  3. 주석 표현 완화: "CP949가 원인" 단정 제거 → "쉘 인라인 전개 중 locale/code page 경유 한글 경로 깨짐"
+- 3자 토론 (`90_공통기준/토론모드/logs/debate_20260420_105428_3way/`):
+  - Round 1: GPT 조건부통과×3 + 통과×1 + 실패×1 (C드라이브 전용 fallback 한계 지적)
+  - Gemini Round 1: GPT 5개 판정 전면 동의 (사용자 수동 중재 경유, base64 자동 전송은 Usage Policy 필터로 차단)
+  - Step 5: GPT 조건부 통과(구현 후 재판정 요청), Gemini 통과(구현 진행 승인)
+  - pass_ratio 최종 = 0.83
+- 검증: debate_verify.sh 재실행 시 "파싱 실패 [Errno 2]" 오탐지 해소, 정상 검증 로직 진입 확인. smoke_test 181/182 PASS (1 FAIL은 본건 무관 — `classify_feedback.py --validate`, 메모리 enforcement 태그 4건 누락 선행 이슈)
+
+**[이월·세션82+]** GPT 조건부 통과 사후 재판정 — 커밋 SHA + git diff + smoke_test 결과 + [3way] 커밋 1건 성공 로그 양측 공유. Phase 2-C 승격 타이밍 기존 7일 유지 + incident 재집계 시작점만 리셋.
 
 ---
 
@@ -18,7 +38,7 @@
 
 **[완료] 4단계 보정**: ①session_kernel 수동 갱신(48h stale 해소) ②incident_ledger `debate_verify` 37건 resolved:true(세션5 `result.json`+`step5` retrospective 생성, 백업 `.bak_20260420_learning_loop`) ③`hook_timing_summary.py` 신설(최근 7일 2770건/경고 3.5% 실측) ④TASKS.md 2049→799줄 감축(`98_아카이브/tasks_archive_20260420.md` 이관, 백업 `.bak_20260420`)
 
-**[Follow-up·세션81+]** `debate_verify.sh` python3 `open(r"$RESULT")` 한글 경로 인식 실패 → incident 오탐지. B 분류 → 3자 토론 승격 후 수정 (spawn_task 분리)
+**[완료·세션81 반영]** `debate_verify.sh` python3 `open(r"$RESULT")` 한글 경로 인식 실패 → 세션81에서 수정 완료 (위 세션81 섹션 참조)
 
 ---
 

@@ -4,16 +4,15 @@
 # 출력: 첫 줄만 표시됨
 # 2026-04-18 3자 토론 합의안 (우선순위 4)
 
-input=$(cat)
-
-# Python으로 JSON 파싱 (jq 없는 환경 대비)
-parsed=$(python3 <<PY 2>/dev/null
+# 2026-04-20 3자 토론 합의안: heredoc 인라인 삽입 패턴(json.loads('''$input''')) 제거 →
+# stdin 파이프(json.load(sys.stdin))로 전달. 입력 escape 문제 근본 해소.
+parsed=$(cat | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<'PY' 2>/dev/null
 import json, sys, os
 try:
-    d = json.loads('''$input''')
+    d = json.load(sys.stdin)
     model = d.get('model', {}).get('display_name', 'claude')
     cwd = d.get('workspace', {}).get('current_dir', os.getcwd())
-    cwd_short = os.path.basename(cwd.rstrip('/').rstrip('\\\\'))
+    cwd_short = os.path.basename(cwd.rstrip('/').rstrip('\\'))
     cost = d.get('cost', {}).get('total_cost_usd', 0)
     print(f"{model}|{cwd_short}|{cost:.2f}")
 except Exception:

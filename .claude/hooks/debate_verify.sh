@@ -74,13 +74,24 @@ else
   STEP5="$LATEST_3WAY/step5_final_verification.md"
 
   # 1. result.json 존재 + JSON 유효
+  # Windows Git Bash POSIX 경로(/c/Users/...)를 네이티브 Python3에 전달 시 os.path.exists
+  # 오탐지 + 쉘 인라인 전개 중 locale/code page 경유 한글 경로 깨짐 이슈 해결.
+  # cygpath + os.environ + <<'PY' quoted heredoc + Python 2차 정규화 조합으로 다중 방어.
+  # 2026-04-20 3자 토론(Claude×GPT×Gemini) 합의안 반영.
   if [ ! -f "$RESULT" ]; then
     ERRORS+=("result.json 누락: $RESULT")
   else
-    VALIDATE=$(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<PY 2>&1
-import json, sys
+    # 경로를 Windows 형식으로 사전 변환 (cygpath 우선 + 범용 sed fallback)
+    RESULT_WIN=$(cygpath -w "$RESULT" 2>/dev/null || \
+                 echo "$RESULT" | sed -E 's|^/([a-zA-Z])/|\1:/|')
+    VALIDATE=$(RESULT_ENV="$RESULT_WIN" PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<'PY' 2>&1
+import json, sys, os, re
+path = os.environ['RESULT_ENV']
+# Python 측 2차 안전망: POSIX /<letter>/ prefix 정규화 + normpath
+path = re.sub(r'^/([a-zA-Z])/', r'\1:/', path)
+path = os.path.normpath(path)
 try:
-    with open(r"$RESULT", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         d = json.load(f)
 except Exception as e:
     print(f"JSON_ERROR:{e}"); sys.exit(1)
