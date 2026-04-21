@@ -4,8 +4,29 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-21 KST — 세션88 (Notion Auto 페이지 분리 + 운영현황 확장 [3way])
+최종 업데이트: 2026-04-21 KST — 세션89 (Notion API after deprecated 마이그레이션)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 0. 최신 세션 (2026-04-21 세션89 — Notion API after deprecated 마이그레이션)
+
+### 실행 경로
+context7 공식 문서에서 `after` deprecated 확인 → `notion_sync.py` 2곳 수정 → 커밋 `0521cc49` → TASKS 갱신 커밋 `e20e18aa` → 푸시 → GPT PASS / Gemini PASS
+
+### 변경 파일
+- 수정: `90_공통기준/업무관리/notion_sync.py` (:684, :1466 — `after` → `position.after_block`)
+
+### 하네스 분석
+- GPT: 채택 2 / 보류 0 / 버림 0 (A분류 추가제안: 주석 정리)
+- Gemini: 채택 1 / 보류 0 / 버림 0 (추가제안 없음)
+
+### GPT 추가제안 A분류
+- `notion_sync.py` 상단 주석·함수 설명에 남은 `after` 표현 정리 → 다음 세션 반영 검토
+
+### 다음 AI 액션
+- GPT A분류 후속: notion_sync.py 주석 내 `after` 표현 정리 (선택적)
+- B3 Self-Evolution (Layer 3) 토론: B2 안정화 4주 후 (대략 2026-05-19 이후)
 
 ---
 
