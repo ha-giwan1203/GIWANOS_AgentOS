@@ -12,9 +12,21 @@
       "Bash(python3 -c \"import json; s=json.load\\(open\\('.claude/settings.json',encoding='utf-8'\\)\\); l=json.load\\(open\\('.claude/settings.local.json',encoding='utf-8'\\)\\); print\\('settings.json allow:', len\\(s.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('settings.json hooks PreToolUse matchers:', len\\(s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\)\\)\\); first=s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\)[0] if s.get\\('hooks',{}\\).get\\('PreToolUse',[]\\) else None; print\\('PreToolUse first matcher:', first.get\\('matcher'\\) if first else None\\); first_hook=\\(first.get\\('hooks',[{}]\\)[0].get\\('command',''\\) if first else ''\\); print\\('first hook command tail:', first_hook[-40:]\\); print\\('settings.local.json allow:', len\\(l.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('settings.local.json has hooks:', 'hooks' in l\\); print\\('settings.local.json has statusLine:', 'statusLine' in l\\)\")",
       "Bash(bash .claude/hooks/pruning_observe.sh)",
       "Bash(bash .claude/hooks/token_threshold_check.sh)",
-      "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/스킬/daily-routine/run.py)",
-      "Bash(bash .claude/hooks/share_gate.sh)"
+      "Bash(bash .claude/hooks/share_gate.sh)",
+      "Bash(mkdir -p \"98_아카이브/생산계획자동화_구버전_20260420\")",
+      "Bash(rmdir \"90_공통기준/스킬/생산계획자동화\")",
+      "Bash(echo \"https://gemini.google.com/gem/3333ff7eb4ba/b6f75f1fa3edab13\")",
+      "Bash(echo \"1382937912\")",
+      "Bash(echo \"1382937913\")",
+      "Bash(echo \"https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e57ef4-dd70-83e8-9458-dca5d85f01db\")",
+      "Bash(echo \"https://gemini.google.com/app/b6f75f1fa3edab13\")",
+      "Bash(echo \"1382937916\")",
+      "Bash(touch .claude/state/*.ok)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/bridge/*:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/openai/*:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/gemini/*:*)",
+      "Bash(bash .claude/hooks/smoke_test.sh:*)"
     ],
     "ask": [
       "Bash(python*:*)",

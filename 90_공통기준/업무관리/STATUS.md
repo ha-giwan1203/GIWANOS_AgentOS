@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 32개 등록 + 스킬 18개. 세션76 commit_gate push 단독 final_check 스킵 근본 해결 (Policy-Workflow Mismatch 실증 자체 교정 사례). 세션74 쟁점 G 실물 분리: settings.json(TEAM) 신설 + settings.local.json(PERSONAL 8) 축소 + 검증 스크립트 5개(final_check/smoke_test/smoke_fast/doctor_lite/permissions_sanity) team+local union 지원. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 + timing 배선. GPT 통과 |
+| hooks 체계 | 31개 등록 + 스킬 18개 (세션86 오후 GPT 시스템 감사 실물 검증 결과 README.md 기준 31개로 정정 — 이전 "32" 표기는 구값). 세션76 commit_gate push 단독 final_check 스킵 근본 해결 (Policy-Workflow Mismatch 실증 자체 교정 사례). 세션74 쟁점 G 실물 분리: settings.json(TEAM) 신설 + settings.local.json(PERSONAL 8) 축소 + 검증 스크립트 5개(final_check/smoke_test/smoke_fast/doctor_lite/permissions_sanity) team+local union 지원. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 + timing 배선. GPT 통과 |
 
 ---
 
