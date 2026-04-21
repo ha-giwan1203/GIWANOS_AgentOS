@@ -10,7 +10,40 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션86 (incident Case A 완료 + Notion 동기화 정상화 3way 최종 통과)
+최종 업데이트: 2026-04-21 — 세션87 (Self-X Layer 1 Self-Detection 3way 만장일치 통과 + 학습루프 점검)
+
+---
+
+## 세션87 (2026-04-21, Self-X 4-Layer 도입 Phase A + 학습루프 점검)
+
+**[완료] Self-X Layer 1 Self-Detection — 3자 토론 만장일치 통과 + 구현·검증 완료 (2026-04-21 오후)**
+- 배경: 사용자 본인 진단 "운영 너무 힘들다 / 어디 고장났는지 모르겠다" → 자가 진단/복구/진화 시스템 도입 결정
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260421_133506_3way/` (agenda + round1~3 + cross_verification + step5)
+- 판정 이력: R1 양측 독립 비판 → R2 GPT 조건부·Gemini 통과 → R3 양측 통과 (pass_ratio=1.0) → Step5 GPT 조건부 → A분류 3건 보정 → Step5 양측 통과 (pass_ratio=1.0)
+- 채택안 구현 (16 파일):
+  - `90_공통기준/invariants.yaml` — 8 invariants + 5 정책 + 4 메커니즘 명세
+  - `.claude/self/diagnose.py` — invariants 평가 엔진 (391 라인, OS timeout 격리, 1세션 캐시)
+  - `.claude/hooks/health_check.sh` — SessionStart hook ([System Health] stderr 주입)
+  - `.claude/hooks/health_summary_gate.sh` — UserPromptSubmit advisory (프로젝트 키워드 매칭 시만)
+  - `.claude/settings.json` — SessionStart + UserPromptSubmit 등록
+  - `CLAUDE.md` — Self-X Layer 1 health summary 의무 조항
+- 커밋: `9cb8e740` (선행 정리) + `fa03658b` (Layer 1 구현) + `e1718a27` (A분류 보정)
+- 첫 실행 즉시 가시화 효과 (사각지대 해소 입증): 3 OK · 5 WARN
+  - WARN: mes(270.6h)·uncommitted(187.5h/25건)·incident(470)·session_kernel(27.6h)·settings_drift
+- 분리 의제: B5 Subtraction Quota (hook≤36, skill≤50, memory≤30) — 별도 토론
+
+**[완료] 학습루프 점검 + incident_ledger 정리 (2026-04-21)**
+- incident_ledger.jsonl: surrogate 정규화(603 라인) + backfill_classification(미분류 59→0) + auto_resolve(485건 해소, 미해결 954→469)
+- debate_verify 미해결 2건 → 0건 (debate_20260421_102644_3way result.json+step5 생성, debate_20260420_010101_3way 기존 result.json resolved)
+- 7일 학습루프 분석: evidence_missing 298건/send_block 84건/pre_commit_check 32건/harness_missing 26건
+- 4-Layer Self-X 도입 플랜: `C:\Users\User\.claude\plans\wobbly-prancing-forest.md` (Phase A 완료)
+
+**[대기] 후속 — 우선순위 순**
+- B5 Subtraction Quota 3자 토론 (hook≤36 + skill 정원 + memory 정원)
+- B4 Self-Limiting (Layer 4 안전장치) 토론 — B2/B3 전 선행
+- B2 Self-Recovery (Layer 2 자가 복구 T1) 토론
+- B3 Self-Evolution (Layer 3 자가 진화) 토론 — B2 안정화 4주 후
+- (A 분류 후속) PROJECT_KEYWORDS 별도 설정 파일 분리 — GPT Step5 추가제안
 
 ---
 

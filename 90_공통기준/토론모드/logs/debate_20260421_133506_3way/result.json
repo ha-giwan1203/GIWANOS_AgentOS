@@ -42,5 +42,17 @@
     "B5 Subtraction Quota (hook≤36, skill≤50, memory≤30)"
   ],
   "claude_delta": "partial",
-  "issue_class": "B"
+  "issue_class": "B",
+  "step5_verification": {
+    "gpt_initial": "conditional (A 분류 3건 보정 요구)",
+    "claude_remediation_commit": "e1718a27",
+    "gpt_final": "pass",
+    "gemini_final": "pass",
+    "pass_ratio_step5": 1.0,
+    "implementation_commits": ["fa03658b", "e1718a27"]
+  },
+  "follow_up": [
+    "GPT 추가제안 (A 분류): PROJECT_KEYWORDS 별도 설정 파일 분리",
+    "B4 Self-Limiting (Layer 4 안전장치) 토론 진입 권고"
+  ]
 }
