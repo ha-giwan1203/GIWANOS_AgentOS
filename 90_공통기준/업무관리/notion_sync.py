@@ -681,7 +681,7 @@ def sync_parent_page(token: str, cfg: dict, repo_root: Path,
         "PATCH", f"/blocks/{pid}/children",
         token, {
             "children": new_blocks,
-            "after": heading_block_id,
+            "position": {"type": "after_block", "after_block": {"id": heading_block_id}},
         }, logger=logger
     )
     return result is not None
@@ -1463,7 +1463,7 @@ def sync_update_zone(page_id: str, snap: dict, token: str,
     pid = page_id.replace("-", "")
     result = _notion_request(
         "PATCH", f"/blocks/{pid}/children", token,
-        {"children": new_blocks, "after": start_id},
+        {"children": new_blocks, "position": {"type": "after_block", "after_block": {"id": start_id}}},
         logger=logger
     )
     if not result:
