@@ -10,7 +10,55 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-20 — 세션85 (이월 4건 처리: TASKS 감축·incident 집계·β안-C [3way] 만장일치·A안-2 판정)
+최종 업데이트: 2026-04-21 — 세션86 (incident 실측 + 2자 토론 GPT 조건부 통과 + Case A 구현 완료)
+
+---
+
+## 세션86 (2026-04-21, incident 근본 개선 실측 + 2자 토론 + Case A 구현)
+
+**[완료] 2자 토론 Round 1 — Case A (GRACE 120→300) GPT 조건부 통과**
+- 로그: `90_공통기준/토론모드/logs/debate_20260421_082410/` (agenda + round1_gpt)
+- GPT 모델: gpt-5-4-thinking (확장추론 ~80s)
+- 판정: 조건부 통과 (방향 맞음, A 분류 확정, 세션83 합의 경계 내)
+- 수정 항목 2건: smoke 섹션 51에 299s/301s 경계쌍 + evidence_gate 주석에 세션86 근거
+- Claude 하네스: 채택 3 / 보류 1 (90~119s 하위 경계, 우선순위 낮음) / 버림 0
+- critic-reviewer: WARN (하네스 채택 2·3번 "실증됨" 라벨 + 0건감사 — Step 5 진행 허용, SHA 소급 기재 조건)
+
+**[완료] Case A 실제 구현 — `evidence_gate.sh` GRACE_WINDOW 120→300**
+- 변경: `.claude/hooks/evidence_gate.sh:59` 단일 상수 + 세션86 근거 주석 7줄 추가
+- 불변: deny 경로, fingerprint 정의(reason:0:80|command:0:50), fresh_ok 역방향 방어
+- smoke_test 섹션 51 신설 (6건, 6/6 PASS): GRACE=300 + 주석 근거 + 경계쌍 + fp 정의 + deny 라벨 + fresh_ok 회귀
+- 섹션 48-1 회귀 연계 수정: `GRACE_WINDOW=120` grep → `GRACE_WINDOW=30` 부재 체크 (세션83 Round 2 의도 유지)
+- smoke_test 전체 210/212 PASS (남은 2 FAIL은 세션80부터의 선행 이슈 — README 훅 개수·classify_feedback --validate, 본 변경 무관)
+
+**[완료] incident_ledger 실측 집계 (세션85→86 증분 10건)**
+- 산출: `90_공통기준/업무관리/incident_improvement_20260421_session86.md` (245줄)
+- 증분 tag: α 5 + β 4 + γ 1
+- 11:38~11:48 10분 클러스터 7건 연속 간격 [122,119,135,209,5,4] — GRACE 120 경계 탈출 실증
+
+**[완료] fingerprint suppress 효과 측정 (7일 evidence_gate 272건, 249 간격 샘플)**
+- GRACE=120 설계가 81.5% 반복을 놓침. 실측 median 347s
+- Top3 fp(7일 194건=71%) median 320~370s, over-120 82~93%
+- GRACE 300 확장 시 기대 억제율 46.2% (2.5배)
+
+**[완료] completion_gate 52건 분석 — Case C 보류 확정**
+- 최근 7일 발동 0건, 현행 소프트 블록 정책 정상 동작
+
+**[이월·세션87+] 2주 관찰 기간 (2026-04-21 ~ 2026-05-05)** — Top3 fingerprint 억제율 변화 측정 → Case B 필요 여부 판단
+
+**[이월·세션87+] 90~119s 하위 경계 smoke 보조 테스트** — 2자 토론 보류 항목. 필요 시 추가
+
+**[이월·별건] γ 1건 line 1198 원인 추적** — `hook`·`type`·`classification_reason` 전부 null, 스키마 불완전 레코드
+
+**[이월·별건] 세션 시작훅 "최근 24h 신규" 집계 기준 검토** — ledger 증분 10 vs 훅 카운트 12 오차 2건
+
+**[이월·별건] smoke_test 선행 2 FAIL 해소** — README 활성 훅 개수 표기 정합 + classify_feedback.py --validate 실패 (세션80부터 잔존)
+
+**[이월 지속] β안-C 실제 구현** — 사용자 명시 승인 + API 키·예산 필요 (세션85 합의)
+
+**[이월 지속] A안-2 실증** — 자연 발생 A 분류 의제 대기
+
+**[이월 지속] Phase 2-C 재평가** — 2026-04-27 전후, `step5_final_verification_path_regression.md` 체크리스트
 
 ---
 

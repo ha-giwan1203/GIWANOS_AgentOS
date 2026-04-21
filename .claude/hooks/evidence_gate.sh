@@ -56,7 +56,15 @@ deny() {
   #   기존 GRACE_WINDOW=30·tail -30은 경계선 탈출 + 다른 fp 혼재 시 suppress 실패
   #   변경: GRACE_WINDOW 30→120, tail -30→-100 (차단은 유지, 기록 중복만 확장 억제)
   #   금지(4자 합의): fresh_ok 완화, cooldown 중 차단 생략 — 역방향 위험
-  local GRACE_WINDOW=120
+  #
+  # 세션86 (2026-04-21, Case A — 2자 토론 GPT 조건부 통과 수정 반영):
+  #   실측 보고서: 90_공통기준/업무관리/incident_improvement_20260421_session86.md
+  #   7일 evidence_gate 미해결 272건 / 동일 fp 연속 간격 249샘플 / GRACE=120 설계가 81.5% 반복 놓침
+  #   median 347s, Top3 fp(7일 194건=71%) median 320~370s, over-120 82~93%
+  #   변경: GRACE_WINDOW 120→300 (120~300 구간 회수 목적, 기대 억제율 18.5%→46.2% 2.5배)
+  #   경계: 299s 이내 동일 fp → suppress / 301s 이상 → record
+  #   불변: deny 경로, fingerprint 정의(reason:0:80|command:0:50), fresh_ok 역방향 방어
+  local GRACE_WINDOW=300
   local _fp_raw
   _fp_raw="${reason:0:80}|${COMMAND:0:50}"
   local _fingerprint

@@ -1154,9 +1154,10 @@ echo ""
 # 배경: 04-19 165건 중 fp 상위 3종 66% 집중, 반복 간격 30~90초 → 기존 GRACE=30 경계선 탈출
 # 4개 확장추론 모델 만장일치(Gemini 2.5-pro/3.1-pro-preview + GPT o4-mini/5.2): 차단 유지 + 기록 억제 확장
 
-# 48-1: GRACE_WINDOW=120 확장 확인
-grep -qE 'GRACE_WINDOW=120' "$HOOKS_DIR/evidence_gate.sh"
-check $? "evidence_gate: GRACE_WINDOW 30→120 확장 (세션83 Round 2)"
+# 48-1: GRACE_WINDOW 30에서 확장됨 (세션83 Round 2 이후 30이 아닌 값 유지)
+# 세션86 Case A에서 120→300 재조정됨. 구체 값 검증은 섹션 51-1.
+! grep -qE 'local GRACE_WINDOW=30$' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: GRACE_WINDOW 30에서 확장 유지 (세션83 Round 2 기준)"
 
 # 48-2: fingerprint scan 범위 tail -30→-100 확장
 grep -qE 'tail -100 "\$INCIDENT_LEDGER"' "$HOOKS_DIR/evidence_gate.sh"
@@ -1202,11 +1203,95 @@ check $? "gpt-send: stop-button 단독 판정 금지 명시"
 
 echo ""
 
+# === 섹션 50: β안-C 단발 교차 검증 API 병렬 예외 (세션86 [3way] 만장일치 구현) ===
+# 배경: 세션85 debate_20260420_190020_beta_3way pass_ratio=1.0 만장일치 채택.
+# Step 6-2/6-4 단발 교차 검증만 API 병렬 허용. 본론·종합·최종판정 API 호출 금지.
+# 구현: openai/openai_debate.py(call_openai_parallel) + gemini/gemini_debate.py(call_gemini_parallel)
+#      + bridge/log_bridge.py (JSON 스키마 검증) + bridge/api_fallback.py (1회 재시도 + rate limit 분기)
+BETA_C_DIR="$PROJECT_ROOT/90_공통기준/토론모드"
+
+# 50-1: 원문 payload 누락 assert 차단 — openai.call_openai require_payload 임계 확인
+grep -qE "require_payload: bool = False" "$BETA_C_DIR/openai/openai_debate.py"
+check $? "β안-C: openai_debate.call_openai require_payload 플래그 존재"
+grep -qE "PAYLOAD_MIN_LEN" "$BETA_C_DIR/openai/openai_debate.py"
+check $? "β안-C: openai_debate PAYLOAD_MIN_LEN 임계 정의"
+grep -qE "PAYLOAD_MIN_LEN" "$BETA_C_DIR/gemini/gemini_debate.py"
+check $? "β안-C: gemini_debate PAYLOAD_MIN_LEN 임계 정의"
+
+# 50-2: 병렬 호출 함수 존재 (순차 금지 [NEVER] 4번)
+grep -qE "def call_openai_parallel" "$BETA_C_DIR/openai/openai_debate.py"
+check $? "β안-C: openai_debate.call_openai_parallel 정의"
+grep -qE "def call_gemini_parallel" "$BETA_C_DIR/gemini/gemini_debate.py"
+check $? "β안-C: gemini_debate.call_gemini_parallel 정의"
+grep -qE "ThreadPoolExecutor" "$BETA_C_DIR/openai/openai_debate.py"
+check $? "β안-C: openai_debate ThreadPoolExecutor 사용 (병렬화)"
+
+# 50-3: API 실패 fallback self-test PASS (무한 재시도 금지 [NEVER] 6번)
+if PYTHONIOENCODING=utf-8 python3 "$BETA_C_DIR/bridge/api_fallback.py" --self-test 2>&1 | grep -q "\[PASS\] api_fallback self-test 4/4"; then
+  check 0 "β안-C: api_fallback self-test 4/4 PASS (1회 재시도 + rate limit 즉시 fallback)"
+else
+  check 1 "β안-C: api_fallback self-test FAIL"
+fi
+
+# 50-4: 로그 브릿지 JSON 스키마 검증 (cross_verification 4필드 필수)
+if PYTHONIOENCODING=utf-8 python3 "$BETA_C_DIR/bridge/log_bridge.py" --self-test 2>&1 | grep -q "\[PASS\] log_bridge self-test 4/4"; then
+  check 0 "β안-C: log_bridge self-test 4/4 PASS (enum·필수필드·log_path 검증)"
+else
+  check 1 "β안-C: log_bridge self-test FAIL"
+fi
+grep -qE "gemini_verifies_gpt" "$BETA_C_DIR/bridge/log_bridge.py"
+check $? "β안-C: log_bridge JSON 스키마 gemini_verifies_gpt 필드"
+grep -qE "gpt_verifies_gemini" "$BETA_C_DIR/bridge/log_bridge.py"
+check $? "β안-C: log_bridge JSON 스키마 gpt_verifies_gemini 필드"
+
+# 50-5: [NEVER] 회귀 — 본론·종합·최종판정 API 전환 금지 규정 실물 존재
+grep -qE "본론.*6-1.*6-3.*API 전환 금지" "$BETA_C_DIR/CLAUDE.md"
+check $? "β안-C [NEVER]: 본론(6-1/6-3) API 전환 금지 규정 유지"
+grep -qE "종합.*6-5.*API 전환 금지" "$BETA_C_DIR/CLAUDE.md"
+check $? "β안-C [NEVER]: 종합(6-5) API 전환 금지 규정 유지"
+grep -qE "최종 판정.*웹 UI" "$BETA_C_DIR/CLAUDE.md"
+check $? "β안-C [NEVER]: 최종 판정 웹 UI 수령만 인정 규정 유지"
+
+echo ""
+
+# === 섹션 51: evidence_gate GRACE 확장 (세션86 Case A, 2자 토론 GPT 조건부 통과) ===
+# 배경: 세션86 실측 (incident_improvement_20260421_session86.md) — GRACE=120 설계가 7일 81.5% 반복 놓침
+# 실측 median 347s, Top3 fp median 320~370s → 120→300 확장 (120~300 구간 회수)
+# GPT(gpt-5-4-thinking) 조건부 통과 수정: 경계쌍(299s suppress / 301s record) + 주석 근거 강제
+
+# 51-1: GRACE_WINDOW=300 확장 확인 (세션86 Case A 핵심)
+grep -qE 'GRACE_WINDOW=300' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: GRACE_WINDOW 120→300 확장 (세션86 Case A)"
+
+# 51-2: 세션86 실측 근거 주석 존재 (GPT 수정 항목 #2)
+grep -qE '세션86.*Case A' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: 세션86 Case A 주석 근거 추가"
+grep -qE '120~300 구간 회수' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: '120~300 구간 회수' 목적 주석 (GPT 수정 #2)"
+
+# 51-3: 경계쌍 주석 명시 — 299s suppress / 301s record (GPT 수정 항목 #1)
+grep -qE '299s.*suppress.*301s.*record' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: 경계쌍 299s/301s 주석 박음 (GPT 수정 #1)"
+
+# 51-4: fingerprint 정의 불변 확인 (Case B 분리 경계 — GPT 지적 반영)
+grep -qE '\$\{reason:0:80\}\|\$\{COMMAND:0:50\}' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: fingerprint 정의(reason:0:80|command:0:50) 변경 없음 (Case B 분리)"
+
+# 51-5: deny 경로 불변 확인 (classification_reason evidence_missing 유지)
+grep -qE 'classification_reason.*evidence_missing' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: deny evidence_missing 라벨 유지"
+
+# 51-6: fresh_ok 역방향 방어 유지 (섹션 48-5 회귀 보장)
+grep -qE '! fresh_ok "tasks_updated" \|\| ! fresh_ok "handoff_updated"' "$HOOKS_DIR/evidence_gate.sh"
+check $? "evidence_gate: fresh_ok 역방향 방어 유지 (세션83 섹션 48-5 회귀)"
+
+echo ""
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 51"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""

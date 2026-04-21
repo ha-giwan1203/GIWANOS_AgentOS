@@ -4,12 +4,68 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-20 KST — 세션85 (이월 4건 처리: TASKS 감축·incident 집계·β안-C [3way] 만장일치·A안-2 판정)
+최종 업데이트: 2026-04-21 KST — 세션86 (incident 실측 + 2자 토론 GPT 조건부 통과 + Case A 구현 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-20 세션85 — 이월 4건 처리 + β안-C [3way] 만장일치 + 규정 실물 반영)
+## 0. 최신 세션 (2026-04-21 세션86 — incident 실측 + 2자 토론 + Case A 구현)
+
+### 실행 경로
+세션85 마감 → 세션86 착수 → 플랜 모드 수립(실측만) → Auto 모드 → Step1~7 실측·보고서 작성 → 사용자 "2자 토론모드 + 구현까지" 지시 → 2자 토론 Round 1 → GPT 조건부 통과 → Case A 구현 + smoke 섹션 51 + 섹션 48-1 회귀 연계 수정 → critic WARN → TASKS/HANDOFF 갱신
+
+### 실측 핵심 수치 (Step 2)
+- GRACE=120 설계 대비 실측 81.5% 반복 놓침 (203/249 >120s)
+- 실측 median 347s, Top3 fp(7일 194건=71%) median 320~370s
+- GRACE 300 확장 시 기대 억제율 46.2% (2.5배)
+
+### 2자 토론 Round 1 (debate_20260421_082410)
+- GPT 모델: gpt-5-4-thinking (확장추론 ~80s)
+- 판정: **조건부 통과**
+  - 분류 A 판정 + 세션83 합의 경계 내 조정 맞음
+  - 역방향 리스크: ledger 기록 해상도 손실만, 안전성 아님 → A만 먼저
+  - Case B/D 동시 묶기 부적절 → A 단독 → 2주 관찰 → B 검토 순서
+  - smoke 4건 부족 — 경계쌍(299s suppress / 301s record) 필수
+  - 주석에 "세션86 실측 보고서 기준 120~300 구간 회수 목적" 한 줄
+- Claude 하네스: 채택 3 / 보류 1 (90~119s 하위 경계) / 버림 0
+- critic-reviewer: **WARN** (하네스 채택 2·3번 "실증됨" 라벨 + 0건감사 — Step 5 진행 허용, SHA 소급 기재 조건)
+
+### Case A 실제 구현 (본 세션 핵심 변경)
+- `.claude/hooks/evidence_gate.sh:59` `local GRACE_WINDOW=120` → `=300`
+- 세션86 근거 주석 7줄 추가 (line 60~66 범위): 실측 보고서 경로 + 간격 분포 + 경계쌍 설명
+- **불변**: deny 경로, fingerprint 정의(reason:0:80|command:0:50), fresh_ok 역방향 방어
+- `.claude/hooks/smoke_test.sh` 섹션 51 신설 (6건, 6/6 PASS)
+- 섹션 48-1 회귀 연계 수정: `GRACE_WINDOW=120` grep → `=30` 부재 체크 (세션83 Round 2 의도 유지)
+- smoke_test 전체 210/212 PASS (남은 2 FAIL은 세션80부터 선행 이슈 — README 훅 개수·classify_feedback)
+
+### 산출물
+- `90_공통기준/토론모드/logs/debate_20260421_082410/agenda.md` + `round1_gpt.md`
+- `90_공통기준/업무관리/incident_improvement_20260421_session86.md` (245줄 실측 보고서)
+- `.claude/hooks/evidence_gate.sh` (GRACE 120→300 + 주석 7줄)
+- `.claude/hooks/smoke_test.sh` (섹션 51 신설 6건 + 섹션 48-1 회귀 연계)
+- TASKS.md + HANDOFF.md 세션86 블록
+
+### 분류 판정 (본 변경)
+- **A 분류** 확정 (세션84 A안-1 기준) — 실행 흐름·판정 분기·차단 정책 전부 불변
+- 3자 토론 승격 불필요 — 사용자 지시로 2자 토론 1회 검증 경유
+
+### 다음 AI 액션 (세션87+)
+1. **2주 관찰 기간 (~2026-05-05)** — Top3 fp 억제율 변화 측정 → Case B 필요 여부 판단
+2. **γ 1건 별건 조사** — line 1198 스키마 결함 원인 추적
+3. **세션 시작훅 최근24h 집계 기준 검토** — ledger 증분 10 vs 훅 카운트 12
+4. **smoke_test 선행 2 FAIL 해소** — README 훅 개수·classify_feedback --validate
+5. **β안-C 실제 구현 (세션85 이월)** — 사용자 승인 + API 키 예산
+6. **A안-2 실증 (세션84 이월)** — 자연 발생 A 분류 대기
+7. **Phase 2-C 재평가 (2026-04-27+)** — 체크리스트
+8. **90~119s 하위 경계 smoke 보조 (2자 토론 보류 항목)** — 필요 시 추가
+
+### 주의
+- critic WARN 조건: round1_gpt.md 하네스 ref에 smoke 6/6 PASS SHA + 보고서 SHA **소급 기재 필수** (push 후)
+- 본 세션은 플랜 범위 확장(실측→토론→구현). 사용자 명시 지시("2자 토론모드로 구현까지 진행")로 진행
+
+---
+
+## 1. 이전 세션 (2026-04-20 세션85 — 이월 4건 처리 + β안-C [3way] 만장일치 + 규정 실물 반영)
 
 ### 실행 경로
 세션84 마감 → 세션85 "이전방 안건 이어서 진행" → 플랜 모드 4건 순차 → Step1(TASKS 96줄 감축) → Step2(incident 집계 + /auto-fix 부적합 판정) → Step3(β안 3자 토론 Round 1 만장일치) → Step3-Next(사용자 "추천대로" 승인 → 규정 실물 반영) → A안-2 실증 판정(β안 B 분류 → skip_65 불가)
@@ -42,7 +98,7 @@
 
 ---
 
-## 1. 이전 세션 (2026-04-20 세션84 — 토론모드 진입 병목 감축 [3way] + 사용자 지시 예외 선례)
+## 2. 이전 세션 (2026-04-20 세션84 — 토론모드 진입 병목 감축 [3way] + 사용자 지시 예외 선례)
 
 ### 실행 경로
 세션83 마감 → 세션84 "토론모드 개선 검토" → 사용자 실시간 불만(진입 단계) 반영 → D안 직접 구현 → A안-1 문서 개정 → A안-2 3자 토론 만장일치 합의 → 세션 마무리
@@ -75,7 +131,7 @@
 
 ---
 
-## 2. 이전 세션 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
+## 3. 이전 세션 (2026-04-20 세션83 — evidence_gate fingerprint suppress 확장 [3way] API 예외)
 
 ### 실행 경로
 이전 세션(82) 마감 → 세션83 "이전 세션 이어서" → B 실측 분석 → A 3자 API 토론 Round 2 (사용자 명시 예외) → 구현 → smoke_test 48 섹션 5/5 PASS
@@ -134,7 +190,7 @@
 
 ---
 
-## 3. 이전 세션 (2026-04-20 세션82 오전 — weekly-self-audit → hook 문서 정합 보정)
+## 4. 이전 세션 (2026-04-20 세션82 오전 — weekly-self-audit → hook 문서 정합 보정)
 
 ### 실행 경로
 scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포트 생성 → 사용자 "진행" 승인 → P1 2건 + 관련 P2 3건 README 문서화 + settings.local.json 1회용 패턴 23건 청소
@@ -168,7 +224,7 @@ scheduled-task `weekly-self-audit` 자동 실행 → `/self-audit` 진단 리포
 
 ---
 
-## 4. 이전 세션 (2026-04-20 세션82 오후 — 3자 토론 Round 1 [3way])
+## 5. 이전 세션 (2026-04-20 세션82 오후 — 3자 토론 Round 1 [3way])
 
 ### 의제 3건 집계
 | 의제 | GPT 판정 | Gemini 판정 | 조치 |
