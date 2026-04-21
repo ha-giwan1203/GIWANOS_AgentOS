@@ -1,0 +1,42 @@
+{
+  "debate_id": "debate_20260421_102644_3way",
+  "topic": "Notion 동기화 정상화 — finish.md 독립 실행 + sync_from_finish wrapper",
+  "started_at": "2026-04-21T02:30:00Z",
+  "completed_at": "2026-04-21T02:56:00Z",
+  "round_count": 2,
+  "max_rounds": 3,
+  "pass_ratio": 1.0,
+  "final_verdict": "pass",
+  "participants": ["Claude", "GPT", "Gemini"],
+  "rounds": [
+    {
+      "round": 1,
+      "gpt_verdict": "conditional",
+      "gemini_verdict": "pass",
+      "notes": "GPT: wrapper 구현 요구. Gemini: 통과"
+    },
+    {
+      "round": 2,
+      "gpt_verdict": "conditional",
+      "gemini_verdict": "pass",
+      "notes": "GPT: 8/9단계 표기 통일 + smoke 52-(b) 강화 요구. Gemini: 통과"
+    },
+    {
+      "round": 3,
+      "gpt_verdict": "pass",
+      "gemini_verdict": "pass",
+      "notes": "GPT: 9단계 표기 정리 + smoke 52-(b) 강화 확인. Gemini: Round 2에서 이미 종료 승인"
+    }
+  ],
+  "commits": ["425cf186", "9d3bc66b"],
+  "adopted_items": [
+    "finish.md 4.5단계 Notion 동기화 독립 실행",
+    "sync_from_finish() wrapper (update_summary + sync_parent_page 전용)",
+    "smoke_test 섹션 52 3축 (finish 호출·share-result 비위임·wrapper 존재)",
+    "smoke 52-(b): 주석·인용 제외 후 실제 Notion 호출 패턴 전수 차단",
+    "git commit 후 동기화 순서 (4.5단계)"
+  ],
+  "generated_reason": "세션86 Notion 동기화 정상화 3자 토론 완료 — round3_final.md 실물 기반 result.json 생성 (학습루프 점검 세션87)",
+  "notion_sync_verified": true,
+  "notion_sync_ts": "2026-04-21T02:28:00Z"
+}
