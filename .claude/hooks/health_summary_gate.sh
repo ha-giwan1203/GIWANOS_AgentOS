@@ -25,7 +25,16 @@ fi
 
 # Q-Range (3way 합의): 프로젝트성 작업 키워드 매칭 시만 강제
 # 미매칭이면 면제 (GPT 우려: "단순 질문에 진단 튀어나옴" 방지)
-PROJECT_KEYWORDS='/finish|/debate-mode|/settlement|/share-result|/sync|/auto-fix|/self-audit|/daily|/line-batch|/production|/zdm|정산|라인배치|생산실적|MES|ERP|토론모드|자가진단|invariant|self-x|health|배포|런북|deploy'
+# 키워드 목록 출처: 90_공통기준/project_keywords.txt (세션88 분리)
+# 파일 부재·읽기 실패 시 하드코딩 fallback 유지 (advisory hook 특성: exit 0 보장)
+KEYWORDS_FILE="$PROJECT_ROOT/90_공통기준/project_keywords.txt"
+PROJECT_KEYWORDS=""
+if [ -r "$KEYWORDS_FILE" ]; then
+  PROJECT_KEYWORDS=$(grep -vE '^\s*(#|$)' "$KEYWORDS_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
+fi
+if [ -z "$PROJECT_KEYWORDS" ]; then
+  PROJECT_KEYWORDS='/finish|/debate-mode|/settlement|/share-result|/sync|/auto-fix|/self-audit|/daily|/line-batch|/production|/zdm|정산|라인배치|생산실적|MES|ERP|토론모드|자가진단|invariant|self-x|health|배포|런북|deploy'
+fi
 if ! echo "$PROMPT" | grep -qiE "$PROJECT_KEYWORDS"; then
   hook_log "health_summary_gate" "exempt non_project_msg"
   hook_timing_end "health_summary_gate" "$_HSG_START" "advisory"

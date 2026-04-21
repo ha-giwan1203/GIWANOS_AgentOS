@@ -65,6 +65,7 @@
 - WARN/CRITICAL 시 자동 펼침 (각 1줄, 상세는 `.claude/self/HEALTH.md`)
 - 면제: 단순 인사·확인·일반 대화 (프로젝트 키워드 미매칭)
 - 강제 메커니즘: `UserPromptSubmit` hook(`health_summary_gate.sh`)이 프로젝트 키워드 매칭 시 advisory 리마인더 stderr 주입 (사용자 메시지 차단 없음, Phase 2-C에서 hard gate 검토)
+- 키워드 목록: `90_공통기준/project_keywords.txt` (세션88 분리, hook 수정 없이 증감 가능. 파일 부재 시 하드코딩 fallback)
 - 정책: Layer 1은 감지만 (자동 조치 절대 금지). 출처: `90_공통기준/토론모드/logs/debate_20260421_133506_3way/`
 
 invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 메커니즘 4개). 평가: `.claude/self/diagnose.py`.

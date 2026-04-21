@@ -1,0 +1,39 @@
+# Self-X Layer 1 — 프로젝트성 작업 키워드 목록
+# 출처: .claude/hooks/health_summary_gate.sh (세션88 분리)
+# 용도: health_summary_gate.sh + 향후 유사 hook이 재사용하는 키워드 사전
+# 규칙: 한 줄 1키워드. `#` 주석 허용. 빈줄 허용. grep -E 정규식 OR 결합됨.
+#
+# 편집 시 주의:
+# - 단어 경계가 필요한 짧은 키워드는 \b 추가 고려 (예: `\bMES\b`)
+# - 슬래시 커맨드는 `/xxx` 형식 그대로 기재
+# - 변경 후 smoke_test.sh 관련 섹션 재실행 권장
+
+# ── 슬래시 커맨드 (프로젝트성 자동화 진입점)
+/finish
+/debate-mode
+/settlement
+/share-result
+/sync
+/auto-fix
+/self-audit
+/daily
+/line-batch
+/production
+/zdm
+
+# ── 도메인 키워드 (실무 업무)
+정산
+라인배치
+생산실적
+MES
+ERP
+토론모드
+
+# ── Self-X / 운영 키워드
+자가진단
+invariant
+self-x
+health
+배포
+런북
+deploy
