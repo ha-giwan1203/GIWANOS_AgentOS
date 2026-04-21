@@ -810,14 +810,40 @@ def _count_hooks(repo_root: Path) -> tuple[int, int]:
     """훅 수 반환: (raw 파일 수, settings.json 등록 수).
 
     raw: .claude/hooks/*.sh 파일 개수
-    활성: settings.json 제출하지 않고 간단 추정 — 실패 시 raw와 동일
+    활성: settings.json(team) + settings.local.json(personal) hooks 블록에서 실제 등록된
+          .claude/hooks/*.sh 경로 수 (중복 제거). GPT 세션88 A분류 지적 반영.
     """
     hooks_dir = repo_root / ".claude" / "hooks"
     raw = 0
     if hooks_dir.exists():
         raw = sum(1 for p in hooks_dir.glob("*.sh") if p.is_file())
-    # 활성 수는 settings.json 파싱 비용이 커서 생략. raw만 보고.
-    return raw, raw
+
+    active_commands: set[str] = set()
+    for name in ("settings.json", "settings.local.json"):
+        sf = repo_root / ".claude" / name
+        if not sf.exists():
+            continue
+        try:
+            data = json.loads(sf.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        hooks = data.get("hooks", {})
+        if not isinstance(hooks, dict):
+            continue
+        for _event, matchers in hooks.items():
+            if not isinstance(matchers, list):
+                continue
+            for m in matchers:
+                if not isinstance(m, dict):
+                    continue
+                for h in m.get("hooks", []):
+                    if isinstance(h, dict):
+                        cmd = h.get("command", "")
+                        if isinstance(cmd, str) and cmd:
+                            for match in _re.finditer(r'(\.claude/hooks/[^\s"\'`]+\.sh)', cmd):
+                                active_commands.add(match.group(1))
+    active = len(active_commands) if active_commands else raw
+    return raw, active
 
 
 def _count_commands(repo_root: Path) -> int:

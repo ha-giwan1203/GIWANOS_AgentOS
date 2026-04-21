@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-04-21 17:15 KST",
+  "generated_at": "2026-04-21 17:31 KST",
   "last_updated": "세션88 갱신 2026-04-21",
-  "github_sha": "17f159c06b5e7180e7658c1059be7c41461ae108",
-  "github_sha_short": "17f159c0",
+  "github_sha": "ddaa1a3267c5656003f98668a9a3a34f0ff17856",
+  "github_sha_short": "ddaa1a32",
   "hooks_raw": 47,
-  "hooks_active": 47,
+  "hooks_active": 36,
   "commands": 30,
   "smoke": "unknown",
   "recent_sessions": [
@@ -51,7 +51,22 @@
         "- 검증: 인사 exempt / 프로젝트키워드 주입 / 파일 부재 fallback / smoke_test 215/215 PASS",
         "- 판정: GPT PASS (1차 FAIL은 미푸시 오판 → 푸시 후 재검증 PASS) / Gemini PASS",
         "- 하네스: 채택 3 (정규식 이스케이프 A분류 실증됨) / 보류 0 / 버림 0",
-        "**[이월 유지] B3 Self-Evolution (Layer 3)** — B2 안정화 4주 모니터링 후 토론 권고. 로그: `debate_20260421_152101_3way/`"
+        "**[이월 유지] B3 Self-Evolution (Layer 3)** — B2 안정화 4주 모니터링 후 토론 권고. 로그: `debate_20260421_152101_3way/`",
+        "**[완료] Notion 동기화 범위 확장 — 3자 토론 만장일치(pass_ratio 1.0) + Auto 페이지 분리 재설계**",
+        "- 의제: 세션86 sync_from_finish()의 \"동기화 시각 1줄만 갱신\" 설계로 STATUS 본문 2주 정체 (세션45/훅23/smoke 140 고정)",
+        "- 3자 토론 로그: `90_공통기준/토론모드/logs/debate_20260421_160431_3way/`",
+        "- 합의안 B+' 7묶음: SYNC_START/END marker + position.after_block 전환 + 세션경계 제목 갱신 + 제목실패 반환값 승격 + 편집금지 헤더 + notion_snapshot.json + 마커 자동 재생성",
+        "- 사용자 \"삽질\" 지적 → **근본 재설계 A안 (Auto 페이지 분리)** 전환",
+        "  - 신규 Auto 페이지 2개 자동 생성 (notion API POST /pages):",
+        "    - `📊 STATUS (Auto)`: 349fee670be88124a65dc740b1f1d0fe",
+        "    - `✅ TASKS (Auto)`: 349fee670be88140aaefcffb243a31d2",
+        "  - historical 페이지(331fee...)는 수기 기록 보존, 건드리지 않음",
+        "  - legacy regex 덮어쓰기 땜질 제거",
+        "- STATUS (Auto) — 실질 운영 현황:",
+        "  - System Health (invariants 8개 OK/WARN/CRITICAL 아이콘)",
+        "  - 핵심 지표 (session/SHA/훅/커맨드/smoke)",
+        "  - Circuit Breaker (잠금/trip/T1·T2 한도)",
+        "  - 최근 Self-Recovery (auto_recovery.jsonl 5건)"
       ]
     },
     {
