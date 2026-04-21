@@ -1,0 +1,20 @@
+{
+  "round": 1,
+  "topic": "B1 Self-X Layer 1 Self-Detection",
+  "method": "web_ui_cross_verify",
+  "gpt_verifies_gemini": {
+    "verdict": "검증 필요",
+    "reason": "D4 비동기 전용과 D5 1-click은 운영 누락·후보 폭주 위험",
+    "model_id": "gpt-web-ui"
+  },
+  "gemini_verifies_gpt": {
+    "verdict": "동의",
+    "reason": "외부 시스템 무접촉 판정(D4)과 UX 보호 조건부 진단(추가 위험 2) 등 실무적 한계 보완 타당",
+    "model_id": "gemini-web-ui"
+  },
+  "skip_65": false,
+  "skip_65_reason": "GPT 검증필요 + B 분류 → 6-5 Claude 종합 필수",
+  "claude_delta": "partial",
+  "issue_class": "B",
+  "log_path": "90_공통기준/토론모드/logs/debate_20260421_133506_3way/"
+}

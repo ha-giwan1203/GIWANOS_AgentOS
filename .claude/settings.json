@@ -99,6 +99,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/session_start_restore.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/health_check.sh"
           }
         ]
       }
@@ -109,6 +113,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/risk_profile_prompt.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/health_summary_gate.sh"
           }
         ]
       }

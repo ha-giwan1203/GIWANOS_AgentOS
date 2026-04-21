@@ -1,0 +1,5 @@
+# 매 평가시 자동 생성되는 derived 파일은 추적 안 함
+HEALTH.md
+last_diagnosis.json
+summary.txt
+__pycache__/

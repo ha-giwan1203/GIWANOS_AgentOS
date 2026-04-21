@@ -57,6 +57,18 @@
 - **상호 감시**: 3자 토론 시 단일 모델 단독 통과 금지 — GPT 답은 Gemini 검증, Gemini 답은 GPT 검증, Claude 설계는 양측 검증 (`90_공통기준/토론모드/CLAUDE.md` "상호 감시 프로토콜")
 - 자세한 합의안: 메모리 `project_three_tool_workflow.md`
 
+## Self-X Layer 1 — Health Summary 의무 (B1 3way 만장일치, 2026-04-21)
+
+**[MUST]** Claude는 매 세션 첫 사용자 응답에 **health summary 1줄을 포함**한다.
+- 형식: `[health] N OK · M WARN · K CRITICAL` (정상 시 `[health] N OK`만)
+- 출처: `.claude/self/summary.txt` (SessionStart에서 `health_check.sh` 자동 갱신)
+- WARN/CRITICAL 시 자동 펼침 (각 1줄, 상세는 `.claude/self/HEALTH.md`)
+- 면제: 단순 인사·확인·짧은 메시지(20자 미만)
+- 강제: `UserPromptSubmit` hook(`health_summary_gate.sh`)이 첫 메시지 시점에 리마인더 자동 주입
+- 정책: Layer 1은 감지만 (자동 조치 절대 금지). 출처: `90_공통기준/토론모드/logs/debate_20260421_133506_3way/`
+
+invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 강제 4개). 평가: `.claude/self/diagnose.py`.
+
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
 - 장시간 세션 방치 금지 — 도메인/의제 전환 시 세션 재시작 권장

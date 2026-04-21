@@ -33,6 +33,11 @@ STATE_DIR="$PROJECT_ROOT/.claude/state"
 rm -f "$STATE_DIR/gpt_skill_entry.ok" "$STATE_DIR/gemini_skill_entry.ok" 2>/dev/null
 hook_log "session_start_restore" "skill_entry markers cleared"
 
+# Self-X Layer 1 (B1 의제 통과 2026-04-21): health summary 첫 메시지 marker 무효화
+# 매 세션 첫 사용자 메시지 시점에 health summary 의무 리마인더 재주입.
+rm -f "$STATE_DIR/health_summary_first.ok" 2>/dev/null
+hook_log "session_start_restore" "health_summary_first marker cleared"
+
 hook_log "session_start_restore" "source=$SOURCE"
 
 # hook_config.json에서 설정 읽기 (Phase 2: 중앙 설정형)

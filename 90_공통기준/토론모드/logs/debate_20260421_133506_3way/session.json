@@ -1,0 +1,14 @@
+{
+  "session_id": "debate_20260421_133506_3way",
+  "topic": "B1 Self-X Layer 1 Self-Detection",
+  "mode": "3way",
+  "claude_independent_opinion": "agenda.md 'Claude 독립 의견' 섹션 — D1②중간 12개, D2③혼합, D3③조건부, D4③즉시평가+5초timeout, D5③T2 1-click. invariant #12 정식 채택 권고",
+  "chat_url_gpt": "",
+  "chat_url_gemini": "",
+  "turn_number": 0,
+  "round_count": 0,
+  "max_rounds": 3,
+  "turns": [],
+  "result": null,
+  "critic_review": null
+}

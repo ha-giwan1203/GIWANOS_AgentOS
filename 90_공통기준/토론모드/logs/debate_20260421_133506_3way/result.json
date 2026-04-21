@@ -1,0 +1,46 @@
+{
+  "debate_id": "debate_20260421_133506_3way",
+  "topic": "B1 Self-X Layer 1 Self-Detection 도입",
+  "started_at": "2026-04-21T04:35:06Z",
+  "completed_at": "2026-04-21T05:00:00Z",
+  "round_count": 3,
+  "max_rounds": 3,
+  "pass_ratio": 1.0,
+  "final_verdict": "pass",
+  "participants": ["Claude", "GPT", "Gemini"],
+  "rounds": [
+    {
+      "round": 1,
+      "gpt_verdict": "independent_critique",
+      "gemini_verdict": "independent_critique",
+      "cross_verification": {
+        "gpt_verifies_gemini": "검증 필요 (D4·D5 우려)",
+        "gemini_verifies_gpt": "동의"
+      }
+    },
+    {
+      "round": 2,
+      "gpt_verdict": "conditional",
+      "gemini_verdict": "pass",
+      "notes": "GPT: M3 gate 격상 + Q-D2 표본하한 요구 / Gemini: 통과 (Q-D2 30일 유예 + Q-Range 프로젝트성만)"
+    },
+    {
+      "round": 3,
+      "gpt_verdict": "pass",
+      "gemini_verdict": "pass",
+      "notes": "M3 gate 격상 + D2 30일유예+표본하한+하한선 3중 안전장치 + Q-Range 프로젝트성 합의"
+    }
+  ],
+  "adopted_items": [
+    "8 invariants (notion/mes/uncommitted/incident/smoke/TASKS_lines/session_kernel/settings_drift)",
+    "5 policies (감지만/SessionStart 1회 캐시/OS timeout 격리/요약 incident/디바운스 N=3)",
+    "4 enforcement (SessionStart stdout/CLAUDE.md 의무/UserPromptSubmit gate/단순 인사 면제)",
+    "D2 3중 안전장치 (30일 유예 + 표본≥30 + 하드코딩 하한선)",
+    "Q-Range 프로젝트성 작업만 강제"
+  ],
+  "deferred_to_separate_debate": [
+    "B5 Subtraction Quota (hook≤36, skill≤50, memory≤30)"
+  ],
+  "claude_delta": "partial",
+  "issue_class": "B"
+}

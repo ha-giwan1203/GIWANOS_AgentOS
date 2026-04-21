@@ -1,0 +1,82 @@
+# Self-X Layer 1 — Health Invariants
+# 출처: debate_20260421_133506_3way (3way 만장일치 통과 pass_ratio=1.0)
+# 정책: P1 감지만 / P2 SessionStart 1회+캐시 / P3 OS timeout 5s / P4 요약만 incident / P5 디바운스 N=3
+# D2: 첫 30일 하드코딩만, 30일 후 동적 산출 검토 (현재는 하드코딩 단계)
+
+version: 1
+created: 2026-04-21
+debate_log: 90_공통기준/토론모드/logs/debate_20260421_133506_3way/
+
+policy:
+  layer: 1
+  detection_only: true   # P1: Layer 1은 감지만, 자동 조치 절대 금지
+  session_cache: true    # P2: SessionStart 1회 실행, 1세션 캐시
+  os_timeout_sec: 5      # P3: OS timeout 5s 격리
+  incident_summary_only: true  # P4: 요약 1건만 incident, 세부는 별도 JSON
+  debounce_count: 3      # P5: 연속 N회 실패 시만 격상
+
+invariants:
+  - name: notion_last_sync_age
+    severity: critical
+    threshold: 24h
+    method: file_mtime
+    target: 90_공통기준/업무관리/notion_sync_verify_*.log
+    description: Notion 동기화 검증 로그 24h 초과 시 CRITICAL (세션86 사건 박제)
+    fallback: stale_warn
+
+  - name: mes_last_upload_age
+    severity: warn
+    threshold: business_days_7
+    method: file_mtime
+    target: 99_임시수집/zdm_daily_inspection_api_*.json
+    description: MES 마지막 업로드 후 영업일 7일 초과 시 WARN (last_ok 무접촉)
+
+  - name: uncommitted_changes_age
+    severity: warn
+    threshold: 24h
+    method: git_status
+    description: Git 미커밋 변경이 24h 초과 시 WARN (Git 원본주의 — Gemini 신규)
+
+  - name: incident_unresolved
+    severity: warn
+    threshold: 100
+    method: count
+    target: .claude/incident_ledger.jsonl
+    description: 미해결 incident가 100건 초과 시 WARN (디바운스 N=3 적용)
+
+  - name: smoke_test
+    severity: critical
+    threshold: ALL_PASS
+    method: smoke_run
+    target: .claude/hooks/smoke_fast.sh
+    description: smoke_fast 실패 시 CRITICAL (기존 자산 활용)
+
+  - name: tasks_md_lines
+    severity: warn
+    threshold: 800
+    method: line_count
+    target: 90_공통기준/업무관리/TASKS.md
+    description: TASKS.md 800줄 초과 시 WARN (token_threshold 정책)
+
+  - name: session_kernel_age
+    severity: warn
+    threshold: 24h
+    method: file_mtime
+    target: .claude/state/session_kernel.md
+    description: session_kernel.md 24h 초과 시 stale → fallback 알림
+
+  - name: settings_drift
+    severity: warn
+    threshold: 0
+    method: drift_check
+    targets:
+      - settings.json hook count
+      - hooks/README.md hook count
+      - STATUS.md hook count
+    description: settings/README/STATUS hook 수 불일치 시 WARN (GPT 신규)
+
+# 추후 도입 예정 (B5 별도 의제 통과 후)
+deferred:
+  - hook_count_le_36   # Subtraction Quota — B5 의제로 분리
+  - skill_count_le_50
+  - memory_entry_le_30
