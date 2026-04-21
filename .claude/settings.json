@@ -370,6 +370,14 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash .claude/hooks/self_recovery_t1.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash .claude/hooks/gpt_followup_stop.sh"
           }
         ]

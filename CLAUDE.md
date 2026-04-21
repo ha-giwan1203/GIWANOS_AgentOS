@@ -69,6 +69,24 @@
 
 invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 메커니즘 4개). 평가: `.claude/self/diagnose.py`.
 
+## Self-X Layer 2 — T1 Self-Recovery (B2 3way 만장일치, 2026-04-21)
+
+**[POLICY]** Stop hook 시점 자동 cleanup (사용자 승인 없음, 감사 로그 jsonl).
+
+- **T1 항목 (4종, 모두 idempotent + 기존 자산 재사용)**:
+  - log rotation (hook_log >512KB)
+  - archive_resolved (incident_repair.py — resolved 30d+, **unresolved 절대 보존**)
+  - backfill_classification (incident_repair.py — 미분류 자동 분류)
+  - auto_resolve (incident_repair.py — `.ok` 파일 존재 시)
+- **T2 격상**: session_kernel >24h 강제 재생성 (파괴적 → 1-click 승인 필수, 추후 도입)
+- **실행 시점**: **Stop hook만**. SessionStart는 B1 진단 전용 (재현성 보장).
+- **실패 정책**: 결정적 작업 1회 재시도 (가중치 1.0) / 청소 작업 0회 재시도 (가중치 0.5) → Circuit Breaker 가중 카운트 + `.failed` 마커
+- **상한**: B4 합의 T1 일일 6건 (Circuit Breaker 잠금 시 즉시 중단)
+- **가시성**: `.claude/self/auto_recovery.jsonl` (append-only 실시간) + 일일 1회 .md 요약 + 다음 세션 첫 메시지 1줄
+- 출처: `90_공통기준/토론모드/logs/debate_20260421_151042_3way/`
+
+hook: `.claude/hooks/self_recovery_t1.sh` (Stop matcher).
+
 ## Self-X Layer 4 — Self-Limiting / Circuit Breaker (B4 3way 만장일치, 2026-04-21)
 
 **[POLICY]** self-X 자체 폭주 방지. B2/B3 도입 전 선행 안전장치.

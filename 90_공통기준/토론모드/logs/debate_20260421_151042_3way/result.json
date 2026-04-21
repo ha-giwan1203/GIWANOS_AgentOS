@@ -1,0 +1,28 @@
+{
+  "debate_id": "debate_20260421_151042_3way",
+  "topic": "B2 Self-Recovery (Layer 2 T1)",
+  "round_count": 3,
+  "max_rounds": 3,
+  "pass_ratio": 1.0,
+  "final_verdict": "pass",
+  "rounds": [
+    {"round": 1, "gpt_verdict": "deep_critique", "gemini_verdict": "deep_critique"},
+    {"round": 2, "gpt_verdict": "conditional", "gemini_verdict": "pass", "notes": "GPT: SessionStart 재현성 + jsonl"},
+    {"round": 3, "gpt_verdict": "pass", "gemini_verdict": "pass"}
+  ],
+  "adopted_items": [
+    "T1 항목 4종 (모두 기존 incident_repair.py·hook_common rotate 재사용)",
+    "session_kernel 재생성 T2 격상 (파괴적 → 1-click 승인)",
+    "Stop hook만 실행 (SessionStart 재현성 보장)",
+    "실패 가중치: 결정적 1.0 (1회 재시도) / 청소 0.5 (재시도 0회)",
+    "auto_recovery.jsonl append-only + 일일 .md 요약 + 다음 세션 1줄",
+    "7d rolling = archive_resolved만 (unresolved 보존)",
+    "Circuit Breaker 잠금 시 T1 즉시 중단"
+  ],
+  "implementation_files": [
+    ".claude/hooks/self_recovery_t1.sh",
+    ".claude/self/auto_recovery.jsonl (append-only, 자동 생성)",
+    ".claude/settings.json (Stop matcher)",
+    "CLAUDE.md (Self-X Layer 2 조항)"
+  ]
+}
