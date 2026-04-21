@@ -10,7 +10,19 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션88 (Notion Auto 페이지 분리 + 운영현황 확장 [3way] 완료)
+최종 업데이트: 2026-04-21 — 세션89 (Notion API `after` deprecated 마이그레이션)
+
+---
+
+## 세션89 (2026-04-21)
+
+**[완료] Notion API `after` → `position.after_block` 마이그레이션**
+- 배경: context7 공식 문서에서 `PATCH /v1/blocks/{id}/children` 의 `after` 파라미터 deprecated 확인
+- 수정: `notion_sync.py:684` heading 블록 뒤 children 삽입
+- 수정: `notion_sync.py:1466` SYNC_START 뒤 snapshot 삽입
+- 변경 전: `{"children": [...], "after": "<block_id>"}`
+- 변경 후: `{"children": [...], "position": {"type": "after_block", "after_block": {"id": "<block_id>"}}}`
+- 커밋: `0521cc49`
 
 ---
 
