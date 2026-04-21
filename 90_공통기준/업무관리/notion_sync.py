@@ -863,6 +863,77 @@ def _parse_recent_sessions(repo_root: Path, n: int = 5) -> list[str]:
     return found
 
 
+def _parse_all_sessions(repo_root: Path, limit: int = 50) -> list[str]:
+    """TASKS.md 전체 세션 헤더 목록 추출 (최대 limit개).
+
+    반환 형식: "세션NN — 제목" (제목은 `## 세션NN ...` 헤더에서 파싱)
+    """
+    tasks = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if not tasks.exists():
+        return []
+    found = []
+    try:
+        for line in tasks.read_text(encoding="utf-8").splitlines():
+            m = _re.match(r"^##\s+(세션\d+.*)", line)
+            if m:
+                found.append(m.group(1).strip()[:200])
+                if len(found) >= limit:
+                    break
+    except Exception:
+        pass
+    return found
+
+
+def _parse_sessions_detail(repo_root: Path, limit: int = 20,
+                           body_lines_per_session: int = 25) -> list[dict]:
+    """TASKS.md 각 세션 블록 파싱 — header + body (bullet/완료 항목).
+
+    반환: [{"header": str, "body": [str, ...]}]
+    body에는 "**[완료]**", "**[이월]**", "- ", "  - " 등 주요 라인만 수집.
+    세션 구분자: 다음 `## 세션` 또는 EOF.
+    """
+    tasks = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if not tasks.exists():
+        return []
+    result = []
+    try:
+        lines = tasks.read_text(encoding="utf-8").splitlines()
+    except Exception:
+        return []
+
+    i = 0
+    while i < len(lines) and len(result) < limit:
+        line = lines[i]
+        m = _re.match(r"^##\s+(세션\d+.*)", line)
+        if not m:
+            i += 1
+            continue
+        header = m.group(1).strip()[:200]
+        body: list[str] = []
+        i += 1
+        while i < len(lines):
+            nxt = lines[i]
+            if _re.match(r"^##\s+", nxt) or _re.match(r"^---\s*$", nxt):
+                break
+            stripped = nxt.rstrip()
+            if not stripped:
+                i += 1
+                continue
+            # 주요 정보 라인만 수집
+            if (stripped.startswith("**[") or
+                stripped.startswith("- ") or
+                stripped.startswith("  - ") or
+                stripped.startswith("    - ")):
+                body.append(stripped[:220])
+                if len(body) >= body_lines_per_session:
+                    break
+            i += 1
+        result.append({"header": header, "body": body})
+        while i < len(lines) and not _re.match(r"^##\s+", lines[i]):
+            i += 1
+    return result
+
+
 def generate_snapshot(repo_root: Path) -> dict:
     """Notion snapshot 필드 수집 (TASKS/HANDOFF + git + 파일 수).
 
@@ -899,6 +970,9 @@ def generate_snapshot(repo_root: Path) -> dict:
     snap["commands"] = _count_commands(repo_root)
     snap["smoke"] = _read_smoke_result(repo_root)
     snap["recent_sessions"] = _parse_recent_sessions(repo_root, 5)
+    snap["all_sessions"] = _parse_all_sessions(repo_root, 50)
+    # 세션 상세: 최근 20세션만 body 포함 (Notion 페이지 비대 방지)
+    snap["sessions_detail"] = _parse_sessions_detail(repo_root, limit=20, body_lines_per_session=25)
 
     return snap
 
@@ -917,35 +991,266 @@ def write_snapshot_json(snap: dict, logger: logging.Logger = None) -> bool:
         return False
 
 
-def _snapshot_to_blocks(snap: dict) -> list[dict]:
-    """snapshot dict을 Notion 블록 목록으로 변환 (SYNC zone 내부용)."""
+def _recent_commits(repo_root: Path, n: int = 10) -> list[str]:
+    """git log 최근 N건 — 'SHA — subject' 형식."""
+    out = _run_cmd(["git", "log", f"-{n}", "--pretty=format:%h — %s"], repo_root, timeout=5)
+    return [l for l in out.splitlines() if l.strip()]
+
+
+def _incident_top_kinds(repo_root: Path, days: int = 7, top: int = 8) -> list[tuple[str, int]]:
+    """incident_ledger.jsonl에서 최근 N일 이내 classification/reason 상위 kind 카운트."""
+    ledger = repo_root / ".claude" / "incident_ledger.jsonl"
+    if not ledger.exists():
+        return []
+    from collections import Counter
+    cutoff = datetime.now() - timedelta(days=days)
+    counter: Counter = Counter()
+    try:
+        with open(ledger, encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                ts_str = obj.get("ts") or obj.get("timestamp") or ""
+                try:
+                    ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    if ts.tzinfo is not None:
+                        ts = ts.replace(tzinfo=None)
+                    if ts < cutoff:
+                        continue
+                except Exception:
+                    pass
+                resolved = obj.get("resolved", False)
+                if resolved is True:
+                    continue
+                kind = obj.get("classification") or obj.get("reason") or obj.get("kind") or "unknown"
+                counter[str(kind)[:60]] += 1
+    except Exception:
+        return []
+    return counter.most_common(top)
+
+
+def _recent_auto_recovery(repo_root: Path, n: int = 5) -> list[str]:
+    """auto_recovery.jsonl 최근 N건 행동 요약."""
+    rec = repo_root / ".claude" / "self" / "auto_recovery.jsonl"
+    if not rec.exists():
+        return []
+    out = []
+    try:
+        with open(rec, encoding="utf-8", errors="ignore") as f:
+            for line in f.readlines()[-n:]:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                    ts = obj.get("ts") or obj.get("date") or ""
+                    action = obj.get("action") or "?"
+                    detail_keys = [k for k in obj.keys() if k not in ("ts", "date", "action")]
+                    detail = " / ".join(f"{k}={obj[k]}" for k in detail_keys[:3])
+                    out.append(f"{ts} · {action}" + (f" · {detail}" if detail else ""))
+                except Exception:
+                    pass
+    except Exception:
+        return []
+    return out
+
+
+def _build_status_blocks(snap: dict, repo_root: Path) -> list[dict]:
+    """STATUS (Auto) — 시스템 운영 현황. 실질적 상태 정보 중심."""
     blocks = [
-        # 편집 금지 경고 헤더
         _text_block(SYNC_EDIT_WARNING),
         _text_block(f"자동 갱신: {snap.get('generated_at', '')}"),
         _divider_block(),
-        _heading3_block("핵심 지표"),
     ]
+
+    # ── System Health (Self-X Layer 1 invariants 전체) ──
+    diag = repo_root / ".claude" / "self" / "last_diagnosis.json"
+    if diag.exists():
+        try:
+            data = json.loads(diag.read_text(encoding="utf-8"))
+            agg = data.get("aggregate", {})
+            ok = agg.get("ok", 0)
+            warn = agg.get("warn", 0)
+            crit = agg.get("critical", 0)
+            overall = agg.get("overall", "?")
+            summary_line = f"[health] {ok} OK · {warn} WARN · {crit} CRITICAL (overall {overall})"
+            blocks.append(_heading3_block(f"System Health — {summary_line}"))
+            for r in data.get("results", []):
+                name = r.get("name", "?")
+                status = r.get("status", "?")
+                msg = r.get("message", "") or r.get("value", "")
+                icon = "🟢" if status == "OK" else ("🔴" if status == "CRITICAL" else "🟡")
+                blocks.append(_bullet_block(f"{icon} {name} — {msg}"[:180]))
+        except Exception as e:
+            blocks.append(_bullet_block(f"(diagnose.json 파싱 실패: {e})"))
+    else:
+        health_file = repo_root / ".claude" / "self" / "summary.txt"
+        if health_file.exists():
+            try:
+                line = health_file.read_text(encoding="utf-8").strip().splitlines()[0]
+                blocks.append(_heading3_block("System Health"))
+                blocks.append(_bullet_block(line[:180]))
+            except Exception:
+                pass
+
+    # ── 핵심 지표 ──
+    blocks.append(_heading3_block("핵심 지표"))
     last = snap.get("last_updated") or "(미기록)"
     sha = snap.get("github_sha_short") or "(미기록)"
     hooks_r = snap.get("hooks_raw", 0)
     hooks_a = snap.get("hooks_active", 0)
     cmds = snap.get("commands", 0)
     smoke = snap.get("smoke") or "unknown"
-
     blocks.append(_bullet_block(f"최종 업데이트: {last}"))
     blocks.append(_bullet_block(f"GitHub 동기화: commit {sha}"))
     blocks.append(_bullet_block(f"훅 시스템: {hooks_r}개 (raw) / {hooks_a}개 (활성 추정)"))
     blocks.append(_bullet_block(f"슬래시 커맨드: {cmds}개"))
     blocks.append(_bullet_block(f"smoke_test: {smoke}"))
 
-    recent = snap.get("recent_sessions", [])
-    if recent:
-        blocks.append(_heading3_block("최근 세션"))
-        for s in recent[:5]:
+    # ── Circuit Breaker 상태 (Self-X Layer 4) ──
+    cb = repo_root / ".claude" / "self" / "circuit_breaker.json"
+    if cb.exists():
+        try:
+            data = json.loads(cb.read_text(encoding="utf-8"))
+            st = data.get("state", {})
+            th = data.get("thresholds", {})
+            locked = st.get("locked", False)
+            lock_icon = "🔒" if locked else "🔓"
+            lock_reason = st.get("locked_reason", "") or "정상"
+            trip_count = st.get("tripped_count_24h", 0)
+            blocks.append(_heading3_block(f"Circuit Breaker {lock_icon}"))
+            blocks.append(_bullet_block(f"상태: {'잠김' if locked else '정상'} ({lock_reason})"))
+            blocks.append(_bullet_block(f"24h trip 카운트: {trip_count}"))
+            blocks.append(_bullet_block(
+                f"일일 한도: T1 {th.get('daily_t1_limit', '?')} / T2 {th.get('daily_t2_limit', '?')}"
+            ))
+        except Exception:
+            pass
+
+    # ── 최근 Self-Recovery (Layer 2 T1) ──
+    recs = _recent_auto_recovery(repo_root, 5)
+    if recs:
+        blocks.append(_heading3_block(f"최근 Self-Recovery ({len(recs)}건)"))
+        for r in recs:
+            blocks.append(_bullet_block(r[:180]))
+
+    # ── Incident 상위 kind (최근 7일 미해결) ──
+    top_kinds = _incident_top_kinds(repo_root, days=7, top=8)
+    if top_kinds:
+        total = sum(c for _, c in top_kinds)
+        blocks.append(_heading3_block(f"미해결 Incident 상위 (최근 7일, 표시 {total}건)"))
+        for kind, count in top_kinds:
+            blocks.append(_bullet_block(f"{kind}: {count}건"))
+
+    # ── 최근 커밋 ──
+    commits = _recent_commits(repo_root, 10)
+    if commits:
+        blocks.append(_heading3_block(f"최근 커밋 ({len(commits)}건)"))
+        for c in commits:
+            blocks.append(_bullet_block(c[:200]))
+
+    return blocks
+
+
+def _parse_tasks_sections(repo_root: Path) -> dict:
+    """TASKS.md 진행/대기/완료 섹션 파싱 (상세 이름 + 차단 사유)."""
+    tasks = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if not tasks.exists():
+        return {"progress": [], "pending": [], "completed": []}
+    result = {"progress": [], "pending": [], "completed": []}
+    section = ""
+    try:
+        for line in tasks.read_text(encoding="utf-8").splitlines():
+            s = line.strip()
+            if s.startswith("## 진행 중"):
+                section = "progress"
+            elif s.startswith("## 대기 중"):
+                section = "pending"
+            elif s.startswith("## 완료됨") or s.startswith("## 최근 완료"):
+                section = "completed"
+            elif s.startswith("## "):
+                section = ""
+            elif section and s.startswith("### ") and "~~" not in s:
+                name = s.lstrip("# ").strip()[:180]
+                result[section].append(name)
+    except Exception:
+        pass
+    # 완료 항목은 최근 30건만
+    result["completed"] = result["completed"][:30]
+    return result
+
+
+def _build_tasks_blocks(snap: dict, repo_root: Path) -> list[dict]:
+    """TASKS (Auto) 페이지 — 작업 목록 중심.
+
+    포함: 진행/대기/완료 요약 + 세션별 완료 상세 toggle
+    제외: 시스템 건강 지표 (STATUS 페이지에서 담당)
+    """
+    blocks = [
+        _text_block(SYNC_EDIT_WARNING),
+        _text_block(f"자동 갱신: {snap.get('generated_at', '')}"),
+        _divider_block(),
+    ]
+
+    sections = _parse_tasks_sections(repo_root)
+
+    blocks.append(_heading3_block("작업 요약"))
+    blocks.append(_bullet_block(f"진행 중: {len(sections['progress'])}건"))
+    blocks.append(_bullet_block(f"대기 중: {len(sections['pending'])}건"))
+    blocks.append(_bullet_block(f"완료(최근): {len(sections['completed'])}건"))
+
+    if sections["progress"]:
+        blocks.append(_heading3_block("진행 중"))
+        for name in sections["progress"][:15]:
+            blocks.append(_bullet_block(name))
+    if sections["pending"]:
+        blocks.append(_heading3_block("대기 중"))
+        for name in sections["pending"][:15]:
+            blocks.append(_bullet_block(name))
+
+    # 세션별 완료 상세 (toggleable heading)
+    sessions_detail = snap.get("sessions_detail", [])
+    all_sess = snap.get("all_sessions", [])
+    if sessions_detail:
+        blocks.append(_heading3_block(
+            f"세션별 완료 이력 (최근 {len(sessions_detail)}건 상세 / 전체 {len(all_sess)}건)"
+        ))
+        for s in sessions_detail:
+            header = s.get("header", "")[:180]
+            body = s.get("body", [])
+            toggle_block = {
+                "object": "block",
+                "type": "heading_3",
+                "heading_3": {
+                    "rich_text": [{"type": "text", "text": {"content": header}}],
+                    "is_toggleable": True,
+                    "children": [_bullet_block(b) for b in body] if body else [_text_block("(세부 내용 없음)")]
+                }
+            }
+            blocks.append(toggle_block)
+
+    if all_sess and len(all_sess) > len(sessions_detail):
+        blocks.append(_heading3_block(f"전체 세션 헤더 목록 ({len(all_sess)}건)"))
+        for s in all_sess:
             blocks.append(_bullet_block(s[:180]))
 
     return blocks
+
+
+# 호환 wrapper (기존 sync_update_zone 호출 유지용) — page_type 기본값 "status"
+def _snapshot_to_blocks(snap: dict, page_type: str = "status",
+                        repo_root: Path | None = None) -> list[dict]:
+    """snapshot → Notion 블록. page_type: 'status' | 'tasks'."""
+    if repo_root is None:
+        repo_root = Path(__file__).parent.parent.parent
+    if page_type == "tasks":
+        return _build_tasks_blocks(snap, repo_root)
+    return _build_status_blocks(snap, repo_root)
 
 
 def _find_marker_block_ids(page_id: str, token: str,
@@ -997,9 +1302,9 @@ def _create_sync_markers(page_id: str, token: str,
     사용자가 수동으로 marker 블록을 페이지 상단으로 드래그해 재배치 가능.
     """
     pid = page_id.replace("-", "")
+    # marker만 생성 (warning은 snapshot_to_blocks에서 zone 내부에 삽입)
     marker_blocks = [
         _text_block(SYNC_MARKER_START),
-        _text_block(SYNC_EDIT_WARNING),
         _text_block(SYNC_MARKER_END),
     ]
     result = _notion_request(
@@ -1009,7 +1314,7 @@ def _create_sync_markers(page_id: str, token: str,
     if not result:
         return None, None
     added = result.get("results", [])
-    if len(added) < 3:
+    if len(added) < 2:
         return None, None
     start_id = added[0].get("id")
     end_id = added[-1].get("id")
@@ -1018,8 +1323,80 @@ def _create_sync_markers(page_id: str, token: str,
     return start_id, end_id
 
 
+def _update_legacy_header_lines(page_id: str, snap: dict, token: str,
+                                 logger: logging.Logger = None) -> bool:
+    """STATUS 페이지 상단 legacy 텍스트 라인을 snapshot 값으로 덮어쓰기.
+
+    대상 3라인 (정규식 매칭 첫 발견):
+    - "최종 업데이트: YYYY-MM-DD — 세션NN ..."
+    - "GitHub 동기화: YYYY-MM-DD / commit XXXXXX"
+    - "원본: Git/TASKS.md 기준 | 동기화: YYYY-MM-DD"
+
+    세션88 3way 합의 이후 사용자 지적("제목은 세션88인데 본문은 세션45") 해소용.
+    SYNC zone은 하단 생성 (Notion API 제약)이므로 상단 legacy 라인도 최신화 필요.
+    """
+    blocks = _get_page_blocks(page_id, token)
+    if not blocks:
+        return False
+
+    last_updated = snap.get("last_updated") or "(미기록)"
+    sha_short = snap.get("github_sha_short") or "(미기록)"
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # 세션 태그에서 "세션NN" 부분만 추출 (중복 날짜 제거)
+    session_only = last_updated
+    m_sess = _re.match(r"(세션\d+)", last_updated)
+    if m_sess:
+        session_only = m_sess.group(1)
+
+    # 새 텍스트 라인
+    new_last_updated = f"최종 업데이트: {today} — {session_only}"
+    new_github_sync = f"GitHub 동기화: {today} / commit {sha_short}"
+    new_origin = f"원본: Git/TASKS.md 기준 | 동기화: {today}"
+
+    # 느슨한 매칭: startswith + 키워드 포함 (Notion paragraph 안에 Shift+Enter로 여러 line 있을 가능성 대응)
+    patterns = [
+        (lambda t: t.startswith("최종 업데이트:") and _re.search(r"\d{4}-\d{2}-\d{2}", t), new_last_updated),
+        (lambda t: t.startswith("GitHub 동기화:") and _re.search(r"\d{4}-\d{2}-\d{2}", t), new_github_sync),
+        (lambda t: t.startswith("원본:") and "동기화" in t, new_origin),
+    ]
+    matched = [False] * len(patterns)
+
+    # paragraph + callout + quote 모두 검사 (Notion 본문의 상단 강조 라인은 callout 또는 quote일 수 있음)
+    TEXT_BLOCK_TYPES = ("paragraph", "callout", "quote")
+
+    updated = 0
+    for b in blocks:
+        btype = b.get("type", "")
+        if btype not in TEXT_BLOCK_TYPES:
+            continue
+        rich = b.get(btype, {}).get("rich_text", [])
+        text = "".join(r.get("plain_text", "") for r in rich).strip()
+        for i, (check, new_text) in enumerate(patterns):
+            if matched[i]:
+                continue
+            if check(text):
+                # btype별 payload 구조 — callout/quote도 rich_text 업데이트, icon/color는 보존 생략
+                payload = {btype: {
+                    "rich_text": [{"type": "text", "text": {"content": new_text}}]
+                }}
+                result = _notion_request(
+                    "PATCH", f"/blocks/{b['id']}", token,
+                    payload, logger=logger
+                )
+                if result:
+                    updated += 1
+                    matched[i] = True
+                break
+
+    if logger:
+        logger.info(f"legacy 상단 라인 갱신: {updated}/{len(patterns)}건 매칭")
+    return updated > 0
+
+
 def sync_update_zone(page_id: str, snap: dict, token: str,
-                     logger: logging.Logger = None) -> bool:
+                     logger: logging.Logger = None,
+                     page_type: str = "status") -> bool:
     """SYNC_START/END 사이 블록을 snapshot 내용으로 덮어쓰기.
 
     1. marker 찾기. 없으면 자동 재생성.
@@ -1055,8 +1432,8 @@ def sync_update_zone(page_id: str, snap: dict, token: str,
     if logger and inner_ids:
         logger.info(f"SYNC zone 내부 {len(inner_ids)}개 중 {deleted}개 삭제")
 
-    # snapshot 블록 생성 후 SYNC_START 뒤에 삽입
-    new_blocks = _snapshot_to_blocks(snap)
+    # snapshot 블록 생성 후 SYNC_START 뒤에 삽입 (page_type별 분기)
+    new_blocks = _snapshot_to_blocks(snap, page_type=page_type)
     pid = page_id.replace("-", "")
     result = _notion_request(
         "PATCH", f"/blocks/{pid}/children", token,
@@ -1088,6 +1465,101 @@ def _parse_session_tag(repo_root: Path) -> str | None:
     except Exception:
         return None
     return None
+
+
+# ── Auto 페이지 자동 생성 (세션88 3way A안) ──────────────────────────────
+
+def _create_auto_page(parent_page_id: str, title: str, token: str,
+                       logger: logging.Logger = None) -> str | None:
+    """parent_page_id 하위에 자동 동기화 전용 자식 페이지 생성. 반환 page_id.
+
+    Notion API: POST /pages. parent는 page_id. properties.title만 설정.
+    생성 직후 페이지 children은 비어있음 → sync_update_zone이 이후 SYNC marker + 블록 생성.
+    """
+    if not parent_page_id:
+        if logger:
+            logger.error("parent_page_id 없음 — auto 페이지 생성 불가")
+        return None
+    pid = parent_page_id.replace("-", "")
+    payload = {
+        "parent": {"type": "page_id", "page_id": pid},
+        "properties": {
+            "title": {
+                "title": [{"type": "text", "text": {"content": title}}]
+            }
+        }
+    }
+    result = _notion_request("POST", "/pages", token, payload=payload, logger=logger)
+    if not result:
+        if logger:
+            logger.error(f"auto 페이지 생성 실패: title={title}")
+        return None
+    new_id = result.get("id")
+    if logger and new_id:
+        logger.info(f"auto 페이지 생성: title='{title}' id={new_id}")
+    return new_id
+
+
+def _ensure_auto_pages(cfg: dict, token: str,
+                        logger: logging.Logger = None) -> tuple[str | None, str | None]:
+    """auto 페이지 ID 확보. 없으면 생성 + notion_config.yaml 갱신.
+
+    반환: (status_auto_id, tasks_auto_id). 실패 시 None.
+    """
+    notion_cfg = cfg.get("notion", {})
+    status_auto = notion_cfg.get("status_auto_page_id") or ""
+    tasks_auto = notion_cfg.get("tasks_auto_page_id") or ""
+    parent_id = notion_cfg.get("parent_page_id") or ""
+
+    updated = False
+
+    if not status_auto:
+        new_id = _create_auto_page(
+            parent_id, "📊 STATUS (Auto) — 자동 운영 현황", token, logger
+        )
+        if new_id:
+            status_auto = new_id
+            updated = True
+        elif logger:
+            logger.error("STATUS (Auto) 페이지 자동 생성 실패 — 수동 생성 후 notion_config.yaml 기입 필요")
+
+    if not tasks_auto:
+        new_id = _create_auto_page(
+            parent_id, "✅ TASKS (Auto) — 자동 작업 목록", token, logger
+        )
+        if new_id:
+            tasks_auto = new_id
+            updated = True
+        elif logger:
+            logger.error("TASKS (Auto) 페이지 자동 생성 실패 — 수동 생성 후 notion_config.yaml 기입 필요")
+
+    # yaml 영구 기입 (다음 실행부터 재사용)
+    if updated:
+        try:
+            cfg_path = CONFIG_PATH
+            content = cfg_path.read_text(encoding="utf-8")
+            # 라인 말미 preserve (개행 손실 방지)
+            content = _re.sub(
+                r'(status_auto_page_id:\s*)"[^"]*"',
+                lambda m: f'{m.group(1)}"{status_auto}"',
+                content,
+            )
+            content = _re.sub(
+                r'(tasks_auto_page_id:\s*)"[^"]*"',
+                lambda m: f'{m.group(1)}"{tasks_auto}"',
+                content,
+            )
+            cfg_path.write_text(content, encoding="utf-8")
+            # in-memory cfg도 갱신 (이번 실행 내 재사용)
+            cfg["notion"]["status_auto_page_id"] = status_auto
+            cfg["notion"]["tasks_auto_page_id"] = tasks_auto
+            if logger:
+                logger.info(f"notion_config.yaml auto_page_id 기입 완료")
+        except Exception as e:
+            if logger:
+                logger.error(f"notion_config.yaml 갱신 예외: {e}")
+
+    return (status_auto or None, tasks_auto or None)
 
 
 def update_page_title(page_id: str, new_title: str, token: str,
@@ -1147,16 +1619,41 @@ def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
     except Exception as e:
         logger.error(f"sync_parent_page 예외: {e}")
 
-    # 페이지 제목 갱신 (세션88 3way: best-effort → 반환값 반영으로 승격)
-    # 세션 경계 감지: 이전 호출과 세션 태그가 다를 때만 실제 갱신 (churn 억제 — GPT 조건)
+    # 세션88 3way A안: auto 페이지 대상으로 전환. legacy regex 땜질 제거.
+    # 기존 status_page_id / tasks_page_id는 historical 보존(건드리지 않음).
+
+    # Auto 페이지 ID 확보 (없으면 자동 생성)
+    status_auto_pid, tasks_auto_pid = _ensure_auto_pages(cfg, token, logger)
+
+    # SYNC zone 갱신 + snapshot.json 저장
+    ok_zone = True
+    ok_snap_json = True
+    snap = None
+    try:
+        snap = generate_snapshot(repo_root)
+        ok_snap_json = write_snapshot_json(snap, logger)
+
+        for pid_name, pid, ptype in [
+            ("STATUS(Auto)", status_auto_pid, "status"),
+            ("TASKS(Auto)", tasks_auto_pid, "tasks"),
+        ]:
+            if not pid:
+                ok_zone = False
+                if logger:
+                    logger.error(f"{pid_name} page_id 없음 — SYNC zone 갱신 불가")
+                continue
+            ok_page = sync_update_zone(pid, snap, token, logger, page_type=ptype)
+            ok_zone = ok_zone and ok_page
+    except Exception as e:
+        ok_zone = False
+        if logger:
+            logger.error(f"SYNC zone 갱신 예외: {e}")
+
+    # Auto 페이지 제목 갱신 (세션 경계 감지)
     ok_titles = True
     try:
         session_tag = _parse_session_tag(repo_root)
         if session_tag:
-            notion_cfg = cfg.get("notion", {})
-            status_pid = notion_cfg.get("status_page_id")
-            tasks_pid = notion_cfg.get("tasks_page_id")
-            # 세션 경계 감지: .last_session_tag 파일로 직전 태그 기억
             tag_cache = Path(__file__).parent / ".notion_last_session_tag"
             prev_tag = ""
             if tag_cache.exists():
@@ -1165,24 +1662,25 @@ def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
                 except Exception:
                     prev_tag = ""
             if prev_tag == session_tag:
-                # 동일 세션 내 반복 호출 — 제목 갱신 스킵 (churn 억제)
                 if logger:
                     logger.info(f"세션 태그 동일({session_tag}) — 제목 갱신 스킵")
             else:
-                if status_pid:
+                if status_auto_pid:
                     ok_s = update_page_title(
-                        status_pid, f"📊 STATUS — 전체 운영 현황 ({session_tag})",
+                        status_auto_pid,
+                        f"📊 STATUS (Auto) — 자동 운영 현황 ({session_tag})",
                         token, logger
                     )
                     ok_titles = ok_titles and ok_s
-                if tasks_pid:
+                if tasks_auto_pid:
                     ok_t = update_page_title(
-                        tasks_pid, f"✅ TASKS — 작업 목록 ({session_tag})",
+                        tasks_auto_pid,
+                        f"✅ TASKS (Auto) — 자동 작업 목록 ({session_tag})",
                         token, logger
                     )
                     ok_titles = ok_titles and ok_t
                 if logger:
-                    logger.info(f"페이지 제목 갱신 태그: {session_tag} (titles_ok={ok_titles})")
+                    logger.info(f"auto 페이지 제목 태그 갱신: {session_tag} (ok={ok_titles})")
                 if ok_titles:
                     try:
                         tag_cache.write_text(session_tag, encoding="utf-8")
@@ -1190,27 +1688,12 @@ def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
                         pass
         elif logger:
             logger.warning("TASKS.md 최종 업데이트 라인 파싱 실패 — 제목 갱신 스킵")
-            ok_titles = False  # 세션88 3way: 파싱 실패도 승격 (GPT 조건 4)
+            ok_titles = False
     except Exception as e:
         ok_titles = False
         if logger:
-            logger.error(f"페이지 제목 갱신 예외: {e}")
+            logger.error(f"auto 제목 갱신 예외: {e}")
 
-    # SYNC zone 갱신 (세션88 3way 신규 — STATUS 상단 marker 내부 덮어쓰기)
-    ok_zone = True
-    ok_snap_json = True
-    try:
-        snap = generate_snapshot(repo_root)
-        ok_snap_json = write_snapshot_json(snap, logger)
-        status_pid = cfg.get("notion", {}).get("status_page_id")
-        if status_pid:
-            ok_zone = sync_update_zone(status_pid, snap, token, logger)
-    except Exception as e:
-        ok_zone = False
-        if logger:
-            logger.error(f"SYNC zone 갱신 예외: {e}")
-
-    # 세션88 3way: 모든 하위 결과를 반환값에 반영 (best-effort 조용 실패 제거)
     return ok_summary and ok_parent and ok_titles and ok_zone and ok_snap_json
 
 
