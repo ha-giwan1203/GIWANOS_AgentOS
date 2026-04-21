@@ -781,6 +781,52 @@ def sync_batch(batch_id: str, events: list,
     return ok1 and ok2 and ok3
 
 
+import re as _re  # 세션86 오후 별건: 최종 업데이트 라인 파싱용
+
+
+def _parse_session_tag(repo_root: Path) -> str | None:
+    """TASKS.md '최종 업데이트: YYYY-MM-DD — 세션NN' 라인에서 제목용 태그 생성.
+
+    반환: "세션86 갱신 2026-04-21" 형식, 실패 시 None.
+    """
+    tasks_md = repo_root / "90_공통기준" / "업무관리" / "TASKS.md"
+    if not tasks_md.exists():
+        return None
+    try:
+        for line in tasks_md.read_text(encoding="utf-8").splitlines()[:30]:
+            m = _re.match(r"^최종 업데이트:\s*(\d{4}-\d{2}-\d{2})\s*—\s*(세션\d+)", line)
+            if m:
+                return f"{m.group(2)} 갱신 {m.group(1)}"
+    except Exception:
+        return None
+    return None
+
+
+def update_page_title(page_id: str, new_title: str, token: str,
+                      logger: logging.Logger = None) -> bool:
+    """Notion 페이지 제목 갱신. PATCH /pages/{page_id}.
+
+    세션86 오후 별건 추가: notion_sync가 요약 블록만 갱신하고 페이지 제목은
+    세션45 상태로 남아 있던 드리프트를 해소.
+    """
+    if not page_id:
+        return True  # 설정 없음 = 대상 없음 (성공 간주)
+    body = {
+        "properties": {
+            "title": {
+                "title": [{"type": "text", "text": {"content": new_title}}]
+            }
+        }
+    }
+    result = _notion_request("PATCH", f"/pages/{page_id}", token,
+                             payload=body, logger=logger)
+    if result is None:
+        if logger:
+            logger.error(f"페이지 제목 갱신 실패: page_id={page_id}")
+        return False
+    return True
+
+
 # ── /finish 4.5단계 실운영 wrapper (세션86 3자 토론 채택, GPT 조건부 통과 보정) ──
 
 def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
@@ -812,6 +858,36 @@ def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
         ok_parent = sync_parent_page(token, cfg, repo_root, logger)
     except Exception as e:
         logger.error(f"sync_parent_page 예외: {e}")
+
+    # 페이지 제목 갱신 (세션86 오후 별건 — 세션45 고정 제목 드리프트 해소)
+    # 실패는 best-effort, 전체 결과에 영향 없음
+    ok_titles = True
+    try:
+        session_tag = _parse_session_tag(repo_root)
+        if session_tag:
+            notion_cfg = cfg.get("notion", {})
+            status_pid = notion_cfg.get("status_page_id")
+            tasks_pid = notion_cfg.get("tasks_page_id")
+            if status_pid:
+                ok_s = update_page_title(
+                    status_pid, f"📊 STATUS — 전체 운영 현황 ({session_tag})",
+                    token, logger
+                )
+                ok_titles = ok_titles and ok_s
+            if tasks_pid:
+                ok_t = update_page_title(
+                    tasks_pid, f"✅ TASKS — 작업 목록 ({session_tag})",
+                    token, logger
+                )
+                ok_titles = ok_titles and ok_t
+            if logger:
+                logger.info(f"페이지 제목 갱신 태그: {session_tag} (titles_ok={ok_titles})")
+        elif logger:
+            logger.warning("TASKS.md 최종 업데이트 라인 파싱 실패 — 제목 갱신 스킵")
+    except Exception as e:
+        if logger:
+            logger.error(f"페이지 제목 갱신 예외 (무시): {e}")
+        # ok_titles는 True 유지 — 기존 summary/parent 결과 훼손 방지
 
     return ok_summary and ok_parent
 
