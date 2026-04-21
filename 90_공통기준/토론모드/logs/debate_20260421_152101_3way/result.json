@@ -1,0 +1,11 @@
+{
+  "debate_id": "debate_20260421_152101_3way",
+  "topic": "B3 Self-Evolution (Layer 3)",
+  "status": "deferred",
+  "round_count": 0,
+  "max_rounds": 3,
+  "pass_ratio": null,
+  "final_verdict": "deferred",
+  "deferred_reason": "사용자 지시 — B2 안정화 4주 후 본격 토론 진행. agenda.md에 Claude 독립 의견·5가지 질문 보존.",
+  "next_session_action": "agenda.md 그대로 GPT·Gemini 재송부 → Round 1 재시작"
+}

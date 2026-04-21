@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션87 (Self-X Layer 1 Self-Detection 3way 만장일치 통과 + 학습루프 점검)
+최종 업데이트: 2026-04-21 — 세션87 (Self-X 4-Layer 도입 Phase A~D 완료: B1·B5·B4·B2 양측 만장일치 + B3·A 후속 다음 세션 이월)
 
 ---
 
@@ -38,12 +38,14 @@
 - 7일 학습루프 분석: evidence_missing 298건/send_block 84건/pre_commit_check 32건/harness_missing 26건
 - 4-Layer Self-X 도입 플랜: `C:\Users\User\.claude\plans\wobbly-prancing-forest.md` (Phase A 완료)
 
-**[대기] 후속 — 우선순위 순**
-- B5 Subtraction Quota 3자 토론 (hook≤36 + skill 정원 + memory 정원)
-- B4 Self-Limiting (Layer 4 안전장치) 토론 — B2/B3 전 선행
-- B2 Self-Recovery (Layer 2 자가 복구 T1) 토론
-- B3 Self-Evolution (Layer 3 자가 진화) 토론 — B2 안정화 4주 후
-- (A 분류 후속) PROJECT_KEYWORDS 별도 설정 파일 분리 — GPT Step5 추가제안
+**[완료] 추가 의제 (세션87 오후)**
+- B5 Subtraction Quota — 양측 만장일치 (커밋 eaf19586). protected_assets.yaml + quota_diagnose.py + quota_advisory.sh
+- B4 Self-Limiting (Layer 4) — 양측 만장일치 (커밋 e076e562). circuit_breaker.json + meta.json + circuit_breaker_check.sh
+- B2 Self-Recovery (Layer 2 T1) — 양측 만장일치 (커밋 3672f17f). self_recovery_t1.sh (Stop hook) + auto_recovery.jsonl
+
+**[이월] 다음 세션**
+- B3 Self-Evolution (Layer 3) — Round 1 송부 후 사용자 지시 중단. agenda.md에 Claude 독립의견·5질문 보존. 로그: `90_공통기준/토론모드/logs/debate_20260421_152101_3way/`. **B2 안정화 4주 모니터링 후 토론 권고**.
+- (A 분류 후속) PROJECT_KEYWORDS 별도 설정 파일 분리 — GPT Step5 추가제안. 1세션 내 처리 가능.
 
 ---
 
