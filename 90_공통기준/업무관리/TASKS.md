@@ -16,13 +16,15 @@
 
 ## 세션88 (2026-04-21, 세션87 A분류 이월 처리)
 
-**[완료] PROJECT_KEYWORDS 외부 설정 파일 분리**
+**[완료] PROJECT_KEYWORDS 외부 설정 파일 분리 — 양측 PASS**
 - 배경: 세션87 Layer 1 B1 Step5 GPT A분류 후속. `.claude/hooks/health_summary_gate.sh:28` 하드코딩 키워드를 외부 파일로 분리
 - 신규: `90_공통기준/project_keywords.txt` (주석·빈줄 허용, grep -E OR 결합)
 - 수정: `health_summary_gate.sh` — 파일 로드 + 부재 시 하드코딩 fallback (advisory 특성 exit 0 보장)
 - 수정: `CLAUDE.md` Self-X Layer 1 — 키워드 목록 출처 기재
-- 커밋: `618f46a2`
+- 커밋: `618f46a2` + `bdba5040` + `a74981d1` (정규식 이스케이프 주의 — GPT A분류 반영)
 - 검증: 인사 exempt / 프로젝트키워드 주입 / 파일 부재 fallback / smoke_test 215/215 PASS
+- 판정: GPT PASS (1차 FAIL은 미푸시 오판 → 푸시 후 재검증 PASS) / Gemini PASS
+- 하네스: 채택 3 (정규식 이스케이프 A분류 실증됨) / 보류 0 / 버림 0
 
 **[이월 유지] B3 Self-Evolution (Layer 3)** — B2 안정화 4주 모니터링 후 토론 권고. 로그: `debate_20260421_152101_3way/`
 
