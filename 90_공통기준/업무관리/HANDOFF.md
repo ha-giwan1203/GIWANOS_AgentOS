@@ -4,12 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-21 KST — 세션86 (incident 실측 + 2자 토론 GPT 조건부 통과 + Case A 구현 완료)
+최종 업데이트: 2026-04-21 KST — 세션86 오후 (Notion 동기화 정상화 3자 토론 최종 통과 + 실측 동기화 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-21 세션86 — incident 실측 + 2자 토론 + Case A 구현)
+## 0. 최신 세션 (2026-04-21 세션86 오후 — Notion 동기화 정상화 3자 토론)
+
+### 실행 경로 (오후 추가분)
+Notion 관리 상태 질문 → 진단(share-result 위임 공백) → 사용자 "api 모드 3자 토론" 지시 → debate-mode 진입 → Round 1 GPT 조건부(wrapper 지적)·Gemini 통과 → β안-C API 병렬 교차검증(양측 동의) → 구현 커밋(`425cf186`) → Round 2 GPT 조건부(8/9단계+52-b)·Gemini 통과 → 보정 커밋(`9d3bc66b`) → Round 3 양측 통과 → Notion 실측 동기화 실행 성공
+
+### 3자 토론 요점 (debate_20260421_102644_3way)
+- 채택안: B안(finish.md 독립 실행) + Gemini의 Git 커밋 후 동기화(4.5단계) + Claude의 스크립트 직접 호출 + GPT의 실운영 wrapper 경유
+- 핵심 설계: `sync_from_finish()` wrapper — `update_summary` + `sync_parent_page`만 호출, `sync_batch`/`_mark_done`/dedup 우회 (허위 이력 append 방지)
+- 재발 방지: smoke_test 섹션 52 3축 (finish 호출·share-result 비위임·wrapper 존재). 52-(b)는 주석·인용 제외 후 실제 호출 패턴 전수 차단으로 강화
+
+### 실측 동기화
+- `python 90_공통기준/업무관리/notion_sync.py --manual-sync` → ExitCode 0
+- Notion STATUS 요약 블록 "동기화: 2026-04-21 11:28 KST" 반영 (MCP fetch 확인)
+- Notion 페이지 제목("세션45 갱신 2026-04-14") 갱신은 notion_sync 대상 아님 — 별건 후속
+
+### 다음 AI 액션
+- 다음 /finish 호출부터 4.5단계 자동 실행 — pending.flag 로직 동작 확인
+- Notion 페이지 제목 자동 갱신 별건 안건 (update_title API 추가 여부)
+- 세션45~84 분량은 소급 포기 합의 완료 (양측 만장일치)
+
+---
+
+## 1. 세션86 선행 (오전 — incident 실측 + 2자 토론 + Case A 구현)
 
 ### 실행 경로
 세션85 마감 → 세션86 착수 → 플랜 모드 수립(실측만) → Auto 모드 → Step1~7 실측·보고서 작성 → 사용자 "2자 토론모드 + 구현까지" 지시 → 2자 토론 Round 1 → GPT 조건부 통과 → Case A 구현 + smoke 섹션 51 + 섹션 48-1 회귀 연계 수정 → critic WARN → TASKS/HANDOFF 갱신

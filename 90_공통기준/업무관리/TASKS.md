@@ -10,11 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션86 (incident 실측 + 2자 토론 GPT 조건부 통과 + Case A 구현 완료)
+최종 업데이트: 2026-04-21 — 세션86 (incident Case A 완료 + Notion 동기화 정상화 3way 최종 통과)
 
 ---
 
-## 세션86 (2026-04-21, incident 근본 개선 실측 + 2자 토론 + Case A 구현)
+## 세션86 (2026-04-21, Notion 동기화 정상화 3자 토론 + incident Case A)
+
+**[완료] Notion 동기화 정상화 — 3자 토론 최종 만장일치 통과 (2026-04-21 오후)**
+- 배경: 세션45~86 (7일/41세션) Notion 미동기화 사건. 원인: `.claude/commands/finish.md:35-39` 3.5단계 명세가 `/share-result` 위임 구조에 묻혀 미실행
+- 3자 토론 로그: `90_공통기준/토론모드/logs/debate_20260421_102644_3way/`
+- 판정 이력: Round 1 GPT 조건부·Gemini 통과 → Round 2 GPT 조건부(wrapper)·Gemini 통과 → Round 3 양측 **통과**
+- API 병렬 교차검증 (β안-C): 6-2·6-4 양측 "동의" (단서 없음)
+- 채택안 구현:
+  - `notion_sync.py` — `sync_from_finish()` wrapper 신설 (events 없이 요약+부모만 갱신, 허위 이력 차단) + `--manual-sync` CLI
+  - `finish.md` — 3.5 제거, 4.5 신설 (커밋+푸시 후 Notion 동기화, 9단계 체제, Git 원본주의 보호)
+  - `share-result.md` — Notion 비위임 주석
+  - `smoke_test.sh` — 섹션 52 3축 배선 검증 + 52-(b) 강화 (실제 호출 패턴 전수 차단)
+- 커밋: `425cf186` (Round 1 구현) + `9d3bc66b` (Round 2 보정)
+- smoke_test 215/215 ALL PASS
+- 실측 동기화 실행: `python notion_sync.py --manual-sync` → Notion MCP fetch 확인 (STATUS 요약 "2026-04-21 11:28 KST" 반영)
+
+---
+
+## 세션86 선행 (incident 근본 개선 실측 + 2자 토론 + Case A 구현)
 
 **[완료] 2자 토론 Round 1 — Case A (GRACE 120→300) GPT 조건부 통과**
 - 로그: `90_공통기준/토론모드/logs/debate_20260421_082410/` (agenda + round1_gpt)
