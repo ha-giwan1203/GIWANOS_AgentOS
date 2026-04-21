@@ -1304,10 +1304,12 @@ NOTION_PY="$PROJECT_DIR/90_공통기준/업무관리/notion_sync.py"
 grep -q "notion_sync.py --manual-sync" "$FINISH_MD" 2>/dev/null
 check $? "(a) finish.md: 'notion_sync.py --manual-sync' 호출 구문 존재"
 
-! grep -q "notion_sync" "$SHARE_MD" 2>/dev/null || \
-  grep -q "Notion 동기화는" "$SHARE_MD" 2>/dev/null
-# share-result.md는 notion_sync 호출 금지. 단 "/finish 4.5 전용" 주석은 허용 (역할 분리 명시)
-check $? "(b) share-result.md: Notion 호출 미포함 (주석만 허용)"
+# (b) share-result.md: 주석/안내 라인 제외 후 실제 Python 호출 패턴이 있으면 FAIL
+# — 이전 검증식은 "Notion 동기화는" 주석이 있으면 실제 호출이 섞여도 통과하는 구멍 (세션86 GPT Round 2 지적)
+# — 강화: `>` 블록인용·`#` 주석 + 설계 주석 제외 후 본문에 notion_sync·sync_batch·sync_from_finish 호출 차단
+! grep -vE "^\s*>|^\s*#|Notion 동기화는|/finish 4.5 전용|로그.*debate" "$SHARE_MD" 2>/dev/null \
+  | grep -qE "notion_sync|sync_batch|sync_from_finish"
+check $? "(b) share-result.md: Notion 실제 호출 차단 (주석·인용만 허용, GPT R2 보정)"
 
 grep -q "def sync_from_finish" "$NOTION_PY" 2>/dev/null
 check $? "(c) notion_sync.py: sync_from_finish wrapper 존재 (허위 이력 방지)"
