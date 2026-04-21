@@ -48,11 +48,26 @@
 
 **[이월·세션87+] 90~119s 하위 경계 smoke 보조 테스트** — 2자 토론 보류 항목. 필요 시 추가
 
-**[이월·별건] γ 1건 line 1198 원인 추적** — `hook`·`type`·`classification_reason` 전부 null, 스키마 불완전 레코드
+**[완료] γ 1건 line 1198 원인 추적**
+- 결과: 코드 결함 아님. `debate_verify.sh` advisory phase 1의 alternative schema(`tag`/`phase`/`count`/`issues`) 정상 레코드
+- 본 보고서 분석 스크립트가 `r.get("hook")` 단일 필드만 보고 None으로 분류한 누락
+- 보고서 footnote 정정 완료(`incident_improvement_20260421_session86.md` §3.5)
+- γ 분류 폐기. 후속 보고서 작성 시 `tag` 필드도 분류 키로 사용
 
-**[이월·별건] 세션 시작훅 "최근 24h 신규" 집계 기준 검토** — ledger 증분 10 vs 훅 카운트 12 오차 2건
+**[완료] 세션 시작훅 "최근 24h 신규" 집계 기준 검토 — TZ 버그 수정**
+- 원인: `session_start_restore.sh:189` `date -d "-24 hours"`가 KST 로컬 시간(`2026-04-20T09:19`) 출력하는데 ledger ts는 UTC(`Z` 접미사). 사전순 비교 시 9시간 오프셋
+- 수정: `date -u -d "-24 hours"` (UTF) + 주석 추가
+- 실측 검증: awk 31건 → 97건(Python 동등 93건 ±5분 시차 수준 일치)
+- A 분류 (단일 옵션 추가, 흐름 변경 없음)
 
-**[이월·별건] smoke_test 선행 2 FAIL 해소** — README 활성 훅 개수 표기 정합 + classify_feedback.py --validate 실패 (세션80부터 잔존)
+**[완료] smoke_test 선행 2 FAIL 해소 (세션80부터 잔존)**
+- FAIL 1 (README 훅 개수): smoke grep `'[0-9]+개 스크립트'` → `'[0-9]+개 (스크립트|등록)'`로 패턴 확장. README 의미 변경 없이 grep만 유연화
+- FAIL 2 (classify_feedback --validate): 글로벌 메모리 4개 파일에 `enforcement: promptable` 태그 추가
+  - `feedback_harness_label_required.md` (frontmatter 신규)
+  - `feedback_share_gate_hook.md` (frontmatter 신규)
+  - `feedback_structural_change_auto_three_way.md` (enforcement 자동 추가)
+  - `feedback_threeway_share_both_required.md` (enforcement 자동 추가)
+- smoke_test 결과: **212/212 PASS, 0 FAIL** (세션86 0이 됨)
 
 **[이월 지속] β안-C 실제 구현** — 사용자 명시 승인 + API 키·예산 필요 (세션85 합의)
 

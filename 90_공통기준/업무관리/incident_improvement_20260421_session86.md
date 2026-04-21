@@ -150,6 +150,12 @@
 - `hook`·`type`·`classification_reason` 전부 null
 - 실제 파일 line 1198 확인하여 원본 JSON 스키마 파악 필요 (별건)
 
+> **정정 (세션86 후속, 2026-04-21)**: 본 레코드는 코드 결함이 아니라 `debate_verify.sh`의 advisory phase 1 로그가 사용하는 alternative schema(`tag`/`phase`/`count`/`issues` 필드 사용, `hook`/`type` 필드 없음)였음. 실측 직접 확인:
+> ```json
+> {"ts":"2026-04-20T10:39:58Z","tag":"debate_verify","phase":1,"count":2,"issues":["result.json 누락: ...beta_3way/result.json", "step5_final_verification.md 누락 — 3way Step 5 기록 필수"],"resolved":false}
+> ```
+> 본 보고서 분석 스크립트가 `r.get("hook")` 단일 필드만 보고 None으로 분류. **별건 코드 수정 불필요**. 후속 보고서 작성 시 `tag` 필드도 함께 분류 키로 사용해야 정확. γ 분류는 폐기.
+
 ---
 
 ## 섹션 4 — completion_gate 52건 분석

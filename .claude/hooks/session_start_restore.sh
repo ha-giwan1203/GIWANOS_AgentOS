@@ -186,7 +186,8 @@ if [ -f "$INCIDENT_LEDGER" ]; then
   RESOLVED_COUNT=$(grep -c '"resolved":true\|"resolved": true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
   OPEN_COUNT=$(( TOTAL_COUNT - RESOLVED_COUNT ))
   # 24시간 이내 신규 건수 (incident 필드명: "ts")
-  CUTOFF_24H=$(date -d "-24 hours" "+%Y-%m-%dT%H:%M" 2>/dev/null || date -v-24H "+%Y-%m-%dT%H:%M" 2>/dev/null || echo "")
+  # 세션86: ledger ts는 UTC(Z 접미사) → cutoff도 UTC로 생성 (-u). KST 로컬 시간으로 비교 시 9시간 오프셋 발생
+  CUTOFF_24H=$(date -u -d "-24 hours" "+%Y-%m-%dT%H:%M" 2>/dev/null || date -u -v-24H "+%Y-%m-%dT%H:%M" 2>/dev/null || echo "")
   RECENT_COUNT=0
   if [ -n "$CUTOFF_24H" ]; then
     RECENT_COUNT=$(awk -v cutoff="$CUTOFF_24H" '/"ts"/ { match($0, /"ts":"([^"]+)"/, a); if(a[1] >= cutoff) c++ } END { print c+0 }' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
