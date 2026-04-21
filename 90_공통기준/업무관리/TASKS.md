@@ -10,7 +10,21 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션87 (Self-X 4-Layer 도입 Phase A~D 완료: B1·B5·B4·B2 양측 만장일치 + B3·A 후속 다음 세션 이월)
+최종 업데이트: 2026-04-21 — 세션88 (A분류 후속 PROJECT_KEYWORDS 외부 설정 분리 완료, B3 Layer 3 이월 유지)
+
+---
+
+## 세션88 (2026-04-21, 세션87 A분류 이월 처리)
+
+**[완료] PROJECT_KEYWORDS 외부 설정 파일 분리**
+- 배경: 세션87 Layer 1 B1 Step5 GPT A분류 후속. `.claude/hooks/health_summary_gate.sh:28` 하드코딩 키워드를 외부 파일로 분리
+- 신규: `90_공통기준/project_keywords.txt` (주석·빈줄 허용, grep -E OR 결합)
+- 수정: `health_summary_gate.sh` — 파일 로드 + 부재 시 하드코딩 fallback (advisory 특성 exit 0 보장)
+- 수정: `CLAUDE.md` Self-X Layer 1 — 키워드 목록 출처 기재
+- 커밋: `618f46a2`
+- 검증: 인사 exempt / 프로젝트키워드 주입 / 파일 부재 fallback / smoke_test 215/215 PASS
+
+**[이월 유지] B3 Self-Evolution (Layer 3)** — B2 안정화 4주 모니터링 후 토론 권고. 로그: `debate_20260421_152101_3way/`
 
 ---
 

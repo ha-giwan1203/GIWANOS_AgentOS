@@ -4,8 +4,24 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-21 KST — 세션86 오후 (Notion 동기화 정상화 3자 토론 최종 통과 + 실측 동기화 완료)
+최종 업데이트: 2026-04-21 KST — 세션88 (A분류 후속 PROJECT_KEYWORDS 외부 설정 분리 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 0. 최신 세션 (2026-04-21 세션88 — PROJECT_KEYWORDS 분리)
+
+### 실행 경로
+세션87 이월 확인 → Plan 모드 수립 → 승인 → `project_keywords.txt` 신설 → `health_summary_gate.sh` 로드+fallback 변경 → CLAUDE.md 갱신 → 수동 검증(인사/키워드/파일부재) → smoke 215/215 PASS → 커밋 `618f46a2`
+
+### 변경 파일
+- 신규: `90_공통기준/project_keywords.txt`
+- 수정: `.claude/hooks/health_summary_gate.sh` (line 26~39: KEYWORDS_FILE 로드 + fallback)
+- 수정: `CLAUDE.md` (Self-X Layer 1 섹션에 키워드 출처 1줄 추가)
+
+### 다음 AI 액션
+- B3 Self-Evolution (Layer 3) 토론: B2 안정화 4주 모니터링 후 (대략 2026-05-19 이후)
+- 그 사이 발견되는 hook/gate 설계 지적은 CLAUDE.md 피드백 규칙대로 3자 자동 승격
 
 ---
 
