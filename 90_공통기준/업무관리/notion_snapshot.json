@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-04-21 16:33 KST",
+  "last_updated": "세션88 갱신 2026-04-21",
+  "github_sha": "6689b7e326f2ebe9d8ce9a6ffb0dced71f2576b8",
+  "github_sha_short": "6689b7e3",
+  "hooks_raw": 47,
+  "hooks_active": 47,
+  "commands": 30,
+  "smoke": "unknown",
+  "recent_sessions": [
+    "세션88 (2026-04-21, 세션87 A분류 이월 처리)",
+    "세션87 (2026-04-21, Self-X 4-Layer 도입 Phase A + 학습루프 점검)",
+    "세션86 (2026-04-21, Notion 동기화 정상화 3자 토론 + incident Case A)",
+    "세션86 선행 (incident 근본 개선 실측 + 2자 토론 + Case A 구현)",
+    "세션85 (2026-04-20, 이월 4건 처리 + β안-C [3way] 만장일치)"
+  ]
+}
