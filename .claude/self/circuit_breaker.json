@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "created": "2026-04-21",
+  "policy": "B4 3way 만장일치 통과 — debate_20260421_145810_3way",
+  "state": {
+    "locked": false,
+    "locked_reason": null,
+    "locked_since": null,
+    "tripped_count_24h": 0
+  },
+  "thresholds": {
+    "daily_t1_limit": 6,
+    "daily_t2_limit": 2,
+    "trip_window_hours": 1,
+    "trip_same_area_count": 3,
+    "trip_smoke_with_debounce_count": 2,
+    "meta_invariant_depth": 1
+  },
+  "release_criteria": {
+    "smoke_test_pass": true,
+    "no_recurrence_24h": true,
+    "bypass_debt_zero": true,
+    "protected_assets_unchanged": true
+  },
+  "rules": [
+    "Circuit Breaker: 1h 동일 영역 gate/block 3회 OR (smoke 실패 + 1h 동일 2회) OR override",
+    "잠금 해제: 잠금 상태에서만 4개 기준 충족 시 1-click 승인 프롬프트 (자동 해제 폐기)",
+    "메타 invariant 깊이 1 하드코딩 — self-meta 실패는 WARN 파일만, 2차 평가 금지",
+    "advisory 제외, gate/block만 집계 + cooldown",
+    "self-X 변경 = 1커밋 1논리단위 강제",
+    "롤백: git revert (자동 변경 단위)"
+  ]
+}

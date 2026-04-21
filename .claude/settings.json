@@ -103,6 +103,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/health_check.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/circuit_breaker_check.sh"
           }
         ]
       }

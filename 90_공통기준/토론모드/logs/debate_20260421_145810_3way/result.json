@@ -1,0 +1,29 @@
+{
+  "debate_id": "debate_20260421_145810_3way",
+  "topic": "B4 Self-Limiting (Layer 4 안전장치)",
+  "round_count": 3,
+  "max_rounds": 3,
+  "pass_ratio": 1.0,
+  "final_verdict": "pass",
+  "rounds": [
+    {"round": 1, "gpt_verdict": "deep_critique", "gemini_verdict": "deep_critique", "notes": "양측 강력 비판 — 메타 깊이 1 하드코딩 + T1/T2 보수 + 자동 해제 위험"},
+    {"round": 2, "gpt_verdict": "conditional", "gemini_verdict": "pass", "notes": "GPT: smoke 과민 + 1-click 범위 + self-meta 표기 3건"},
+    {"round": 3, "gpt_verdict": "pass", "gemini_verdict": "pass", "notes": "보정안 양측 만장일치"}
+  ],
+  "adopted_items": [
+    "일일 상한 T1 6 / T2 2 (구조변경만)",
+    "Circuit Breaker: 1h 동일 영역 3회 OR (smoke 실패 + 1h 동일 2회) OR override",
+    "잠금 해제: 잠금 상태에서만 4개 기준 충족 시 1-click 승인 (자동 해제 폐기)",
+    "메타 invariant 깊이=1 하드코딩 (재귀 차단), self-meta 실패는 WARN 파일만",
+    "상태 분리: .claude/self/circuit_breaker.json + meta.json",
+    "롤백: git commit 단위 + 자동변경은 1커밋 1논리단위",
+    "과민 방지: advisory 제외, gate/block만 집계 + cooldown"
+  ],
+  "implementation_files": [
+    ".claude/self/circuit_breaker.json",
+    ".claude/self/meta.json",
+    ".claude/hooks/circuit_breaker_check.sh",
+    ".claude/settings.json (SessionStart 등록)",
+    "CLAUDE.md (Self-X Layer 4 조항)"
+  ]
+}

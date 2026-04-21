@@ -69,6 +69,22 @@
 
 invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 메커니즘 4개). 평가: `.claude/self/diagnose.py`.
 
+## Self-X Layer 4 — Self-Limiting / Circuit Breaker (B4 3way 만장일치, 2026-04-21)
+
+**[POLICY]** self-X 자체 폭주 방지. B2/B3 도입 전 선행 안전장치.
+
+- **일일 상한**: T1 자동 변경 6건 / T2 구조변경(protected asset·gate 흐름) 2건. 문서성 수정은 T2 제외.
+- **Circuit Breaker 트리거**: 1h 동일 영역 gate/block 3회 OR (smoke 실패 + 1h 동일 2회) OR override
+- **잠금 해제**: **잠금 상태에서만** 4개 기준 충족 시 1-click 승인 프롬프트. 자동 해제 폐기.
+  - 4개 기준: 대상 영역 smoke PASS / 24h 동일 classification 재발 0 / bypass debt 0 / 보호자산 무변경
+- **메타 invariant**: 깊이=1 하드코딩 (재귀 차단). self-meta 실패 시 WARN 파일만, 2차 평가 금지.
+- **상태 분리**: `.claude/self/circuit_breaker.json` + `meta.json` (Layer 4 전용, invariants.yaml과 명확 구분)
+- **롤백**: git commit 단위 + 자동변경은 1커밋 1논리단위 강제
+- **과민 방지**: advisory는 누적 제외, gate/block만 집계 + cooldown
+- 출처: `90_공통기준/토론모드/logs/debate_20260421_145810_3way/`
+
+상태 hook: `.claude/hooks/circuit_breaker_check.sh` (SessionStart에서 잠금 상태 표시).
+
 ## Self-X Layer 2/4 — Subtraction Quota (B5 3way 만장일치, 2026-04-21)
 
 **[POLICY]** 추가 = 제거 강제 (실행 표면 정원제 + 지식 표면 TTL).
