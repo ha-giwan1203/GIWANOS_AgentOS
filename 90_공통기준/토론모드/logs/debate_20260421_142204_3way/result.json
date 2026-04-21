@@ -1,0 +1,35 @@
+{
+  "debate_id": "debate_20260421_142204_3way",
+  "topic": "B5 Subtraction Quota — 추가=제거 정원제",
+  "round_count": 3,
+  "max_rounds": 3,
+  "pass_ratio": 1.0,
+  "final_verdict": "pass",
+  "claude_delta": "major",
+  "issue_class": "B",
+  "rounds": [
+    {"round": 1, "gpt_verdict": "deep_critique", "gemini_verdict": "deep_critique", "notes": "양측 강력 비판 — Claude 원안 70%+ 수정 요구"},
+    {"round": 2, "gpt_verdict": "conditional", "gemini_verdict": "pass", "notes": "GPT: Q-Activate 세분화 + M4 invariant 제외 요구"},
+    {"round": 3, "gpt_verdict": "pass", "gemini_verdict": "pass", "notes": "보정안 양측 만장일치 통과"}
+  ],
+  "adopted_items": [
+    "실행 표면(hook/command/agent) 정원제 + 지식 표면(skill/memory) TTL 분리",
+    "Glide Path: raw 시작 + 활성 목표 + 점진 감축",
+    "측정 raw+활성 병행, 차단 활성 기준",
+    "보호 레지스트리 protected_assets.yaml (path/class/reason/removal_policy)",
+    "강제 M1~M3 (advisory/100% 1in1out/[bypass-quota]+페널티)",
+    "산출 알고리즘 (보호제외→고아0순위→settings미등록→90일무변경→4등급)",
+    "4등급: 삭제금지/병합후삭제/아카이브우선/즉시삭제후보"
+  ],
+  "claude_independent_additions": [
+    "Glide Path 속도: 주 1~2개 너무 김 → 월 정리 세션 + 4~6개씩 감축 (weekly_2_or_session_4)",
+    "Phase 2 후속: orphan 4건 이상 누적 시 commit_gate 추가 경고로 강제력 보강"
+  ],
+  "implementation_files": [
+    "90_공통기준/protected_assets.yaml",
+    ".claude/self/quota_diagnose.py",
+    ".claude/hooks/quota_advisory.sh",
+    ".claude/settings.json (PostToolUse Bash matcher)",
+    "CLAUDE.md (Self-X Layer 2/4 조항)"
+  ]
+}

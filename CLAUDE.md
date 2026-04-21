@@ -69,6 +69,19 @@
 
 invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 메커니즘 4개). 평가: `.claude/self/diagnose.py`.
 
+## Self-X Layer 2/4 — Subtraction Quota (B5 3way 만장일치, 2026-04-21)
+
+**[POLICY]** 추가 = 제거 강제 (실행 표면 정원제 + 지식 표면 TTL).
+
+- **실행 표면 정원제** (Glide Path): hook 44(raw)→36(활성 목표) / command 30→25 / agent 9→12(여유)
+- **지식 표면 TTL**: skill 미사용 90일 archive 후보 / memory 미사용 180일 만료 후보
+- **측정**: raw 카운트 + 활성 등록 카운트 분리 (`.claude/self/quota_diagnose.py`)
+- **차단 기준**: 활성 등록수 우선 (raw는 advisory 정보)
+- **보호 레지스트리**: `90_공통기준/protected_assets.yaml` (path/class/reason/removal_policy/replacement_evidence)
+- **강제**: M1 advisory(`quota_advisory.sh`) PostToolUse Bash matcher / M2 100% 도달 시 1 in 1 out / M3 [bypass-quota] 태그 1회 면제 + 다음 정상 작업 2개 삭제 페널티
+- **산출 알고리즘**: 보호 제외 → 고아(30일 호출 0 + 참조 없음) 0순위 → settings 미등록 → 90일 무변경 → 4등급(삭제금지/병합후삭제/아카이브우선/즉시삭제후보)
+- 출처: `90_공통기준/토론모드/logs/debate_20260421_142204_3way/`
+
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
 - 장시간 세션 방치 금지 — 도메인/의제 전환 시 세션 재시작 권장

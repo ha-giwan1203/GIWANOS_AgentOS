@@ -1,0 +1,156 @@
+# Self-X Layer 2/4 — Subtraction Quota 보호 레지스트리
+# 출처: debate_20260421_142204_3way (B5 3way 만장일치 통과)
+# 정책: 정원제 자동 제거 후보 산출 시 본 파일 항목은 원천 배제
+
+version: 1
+created: 2026-04-21
+
+# class: core (OS 구동 필수) / guard (보안·차단) / recovery (재난 대응)
+# removal_policy: never (영구 보호) / manual (사용자 명시 승인) / replace-only (대체 hook 증명)
+
+protected:
+  # === SessionStart 계열 (core) ===
+  - path: .claude/hooks/session_start_restore.sh
+    class: core
+    reason: 세션 시작 상태 복원 (kernel/instruction_reads/skill_entry/health_summary marker 무효화)
+    removal_policy: never
+
+  - path: .claude/hooks/health_check.sh
+    class: core
+    reason: Self-X Layer 1 자가 진단 (B1 채택)
+    removal_policy: replace-only
+    replacement_evidence: invariant 평가 + HEALTH.md 생성 동등 기능
+
+  # === UserPromptSubmit 계열 (guard) ===
+  - path: .claude/hooks/risk_profile_prompt.sh
+    class: guard
+    reason: 사용자 프롬프트 위험 분류 (evidence_gate req 발행 가드)
+    removal_policy: replace-only
+
+  - path: .claude/hooks/health_summary_gate.sh
+    class: core
+    reason: B1 M3 advisory + 컨텍스트 주입
+    removal_policy: replace-only
+
+  # === Stop 계열 (guard) ===
+  - path: .claude/hooks/stop_guard.sh
+    class: guard
+    reason: 작업 종료 가드
+    removal_policy: never
+
+  - path: .claude/hooks/completion_gate.sh
+    class: guard
+    reason: 완료 게이트 (Stop 차단)
+    removal_policy: never
+
+  - path: .claude/hooks/evidence_stop_guard.sh
+    class: guard
+    reason: evidence 종료 가드
+    removal_policy: replace-only
+
+  # === commit/evidence 계열 (guard) ===
+  - path: .claude/hooks/commit_gate.sh
+    class: guard
+    reason: 커밋 게이트 (push 차단)
+    removal_policy: never
+
+  - path: .claude/hooks/evidence_gate.sh
+    class: guard
+    reason: evidence 검증 게이트
+    removal_policy: never
+
+  - path: .claude/hooks/evidence_mark_read.sh
+    class: guard
+    reason: evidence read 마커
+    removal_policy: replace-only
+
+  # === debate 계열 (core) ===
+  - path: .claude/hooks/debate_verify.sh
+    class: core
+    reason: 3way 토론 검증 hook
+    removal_policy: never
+
+  - path: .claude/hooks/debate_gate.sh
+    class: guard
+    reason: 토론모드 진입 게이트
+    removal_policy: replace-only
+
+  - path: .claude/hooks/debate_independent_gate.sh
+    class: guard
+    reason: 독립 의견 게이트 (외부 모델 응답 단순 전달 차단)
+    removal_policy: replace-only
+
+  - path: .claude/hooks/debate_send_gate_mark.sh
+    class: guard
+    reason: 토론 송부 게이트 마커
+    removal_policy: replace-only
+
+  # === recovery / 재난 대응 ===
+  - path: .claude/hooks/block_dangerous.sh
+    class: guard
+    reason: 위험 명령 차단
+    removal_policy: never
+
+  - path: .claude/hooks/protect_files.sh
+    class: guard
+    reason: 보호 파일 차단
+    removal_policy: never
+
+  - path: .claude/hooks/date_scope_guard.sh
+    class: guard
+    reason: 날짜 범위 가드
+    removal_policy: replace-only
+
+  # === 공통 모듈 ===
+  - path: .claude/hooks/hook_common.sh
+    class: core
+    reason: 공통 래퍼 함수 (advisory/gate/measure 등급)
+    removal_policy: never
+
+  - path: .claude/hooks/json_helper.py
+    class: core
+    reason: JSON 헬퍼 함수
+    removal_policy: never
+
+  - path: .claude/hooks/incident_repair.py
+    class: core
+    reason: incident 자동 분류·해소
+    removal_policy: replace-only
+
+  - path: .claude/hooks/incident_review.py
+    class: core
+    reason: incident 7일 분석
+    removal_policy: replace-only
+
+  - path: .claude/hooks/smoke_test.sh
+    class: core
+    reason: smoke 215+ 테스트
+    removal_policy: never
+
+  - path: .claude/hooks/smoke_fast.sh
+    class: core
+    reason: smoke fast 10건 (SessionStart)
+    removal_policy: never
+
+# 정원제 임계값 (Glide Path 목표)
+# 출처: B5 3way 만장일치
+quota:
+  hook:
+    raw_initial: 44       # 현재 raw 카운트 (시작 상한)
+    activate_target: 36   # 활성 등록 목표
+    glide_path: weekly_2_or_session_4  # 주 1~2개 또는 정리 세션 시 4개 (Claude 자체 추가)
+  command:
+    raw_initial: 30
+    activate_target: 25
+  agent:
+    raw_initial: 9
+    activate_target: 12   # 여유 (현재 9개)
+
+# 지식 표면 TTL (정원제 미적용)
+ttl:
+  skill:
+    unused_days_warn: 90
+    unused_days_archive: 180
+  memory:
+    unused_days_warn: 180
+    unused_days_archive: 365
