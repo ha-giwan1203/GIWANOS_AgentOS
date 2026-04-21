@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-21 KST — 세션88 (A분류 후속 PROJECT_KEYWORDS 외부 설정 분리 완료)
+최종 업데이트: 2026-04-21 KST — 세션88 (Notion Auto 페이지 분리 + 운영현황 확장 [3way])
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -22,6 +22,29 @@
 ### 다음 AI 액션
 - B3 Self-Evolution (Layer 3) 토론: B2 안정화 4주 모니터링 후 (대략 2026-05-19 이후)
 - 그 사이 발견되는 hook/gate 설계 지적은 CLAUDE.md 피드백 규칙대로 3자 자동 승격
+
+---
+
+## 0. 최신 세션 (2026-04-21 세션88 오후 — Notion Auto 페이지 분리)
+
+### 실행 경로
+Notion 본문 2주 정체 지적 → 3자 토론 B+' 합의(pass_ratio 1.0) → 1차 구현(SYNC zone) → 사용자 "삽질" 지적 → 근본 재설계 Plan(A안 자동 페이지 분리) → 승인 → 구현:
+- `_ensure_auto_pages()` 신규 — notion API POST로 auto 페이지 자동 생성
+- STATUS(Auto) = System Health + 핵심 지표 + Circuit Breaker + Self-Recovery + Incident + 최근 커밋
+- TASKS(Auto) = 작업 요약 + 세션별 완료 이력 toggle 20건
+- legacy regex 덮어쓰기 땜질 경로 제거
+
+### 생성된 Auto 페이지
+- STATUS: https://www.notion.so/349fee670be88124a65dc740b1f1d0fe
+- TASKS: https://www.notion.so/349fee670be88140aaefcffb243a31d2
+
+### 자동 동기화 경로
+- `/finish` 9단계 4.5단계에서 `sync_from_finish()` 자동 호출
+- 수동: `python 90_공통기준/업무관리/notion_sync.py --manual-sync`
+
+### 다음 AI 액션
+- 다음 세션부터 `/finish` 루틴 사용 시 auto 페이지 자동 갱신 관찰
+- TASKS/STATUS (Auto) 페이지 내용 부족 시 `_build_*_blocks` 확장 (관찰 후 반영)
 
 ---
 

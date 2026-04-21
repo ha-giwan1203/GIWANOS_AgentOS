@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션88 (A분류 후속 PROJECT_KEYWORDS 외부 설정 분리 완료, B3 Layer 3 이월 유지)
+최종 업데이트: 2026-04-21 — 세션88 (Notion Auto 페이지 분리 + 운영현황 확장 [3way] 완료)
 
 ---
 
@@ -27,6 +27,30 @@
 - 하네스: 채택 3 (정규식 이스케이프 A분류 실증됨) / 보류 0 / 버림 0
 
 **[이월 유지] B3 Self-Evolution (Layer 3)** — B2 안정화 4주 모니터링 후 토론 권고. 로그: `debate_20260421_152101_3way/`
+
+**[완료] Notion 동기화 범위 확장 — 3자 토론 만장일치(pass_ratio 1.0) + Auto 페이지 분리 재설계**
+- 의제: 세션86 sync_from_finish()의 "동기화 시각 1줄만 갱신" 설계로 STATUS 본문 2주 정체 (세션45/훅23/smoke 140 고정)
+- 3자 토론 로그: `90_공통기준/토론모드/logs/debate_20260421_160431_3way/`
+- 합의안 B+' 7묶음: SYNC_START/END marker + position.after_block 전환 + 세션경계 제목 갱신 + 제목실패 반환값 승격 + 편집금지 헤더 + notion_snapshot.json + 마커 자동 재생성
+- 사용자 "삽질" 지적 → **근본 재설계 A안 (Auto 페이지 분리)** 전환
+  - 신규 Auto 페이지 2개 자동 생성 (notion API POST /pages):
+    - `📊 STATUS (Auto)`: 349fee670be88124a65dc740b1f1d0fe
+    - `✅ TASKS (Auto)`: 349fee670be88140aaefcffb243a31d2
+  - historical 페이지(331fee...)는 수기 기록 보존, 건드리지 않음
+  - legacy regex 덮어쓰기 땜질 제거
+- STATUS (Auto) — 실질 운영 현황:
+  - System Health (invariants 8개 OK/WARN/CRITICAL 아이콘)
+  - 핵심 지표 (session/SHA/훅/커맨드/smoke)
+  - Circuit Breaker (잠금/trip/T1·T2 한도)
+  - 최근 Self-Recovery (auto_recovery.jsonl 5건)
+  - 미해결 Incident 상위 (최근 7일)
+  - 최근 커밋 10건
+- TASKS (Auto) — 작업 목록:
+  - 작업 요약 (진행/대기/완료)
+  - 세션별 완료 이력 toggleable heading 20건 + 전체 22건 목록
+  - 각 세션 body에 완료·커밋·판정·하네스 세부
+- 자동 동기화: `/finish` 4.5단계에서 `sync_from_finish()` 호출 → 매 세션 반영
+- 커밋: `17f159c0` (SYNC zone 1차) + `587f6a4e` (Auto 페이지 분리 + STATUS 확장)
 
 ---
 
