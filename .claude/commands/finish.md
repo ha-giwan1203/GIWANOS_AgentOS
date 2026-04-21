@@ -1,7 +1,8 @@
-# /finish — 작업 완료 8단계 자동 루틴
+# /finish — 작업 완료 9단계 자동 루틴
 
-> `/share-result` 확장 루틴의 alias/wrapper.
+> `/share-result` 확장 루틴의 alias/wrapper. 단, 4.5단계(Notion 동기화)는 share-result 위임 밖 독립 실행.
 > GPT 합의 2026-04-04: 8단계 자동 루틴 강제 방안
+> 세션86 3자 토론(2026-04-21) 3way 만장일치: 4.5단계 Notion 동기화를 `/finish` 전용으로 분리.
 
 이 명령은 파일 변경이 포함된 작업 완료 시 8단계를 끊김 없이 실행한다.
 내부적으로 `/share-result`의 확장 루틴을 따른다.
@@ -32,12 +33,6 @@
 - HANDOFF.md 세션 변경사항 갱신
 - STATUS.md 재개 위치 갱신 (필요 시)
 
-### 3.5단계: Notion 동기화
-- TASKS.md 변경사항 → Notion "✅ TASKS — 작업 목록" 페이지 반영 (ID: `331fee67-0be8-818c-b2bc-cd8da0a40db8`)
-- STATUS.md 변경사항 → Notion "📊 STATUS — 전체 운영 현황" 페이지 반영 (ID: `331fee67-0be8-81f7-9f15-c3aaabfbd94a`)
-- MCP `notion-update-page` 도구 사용
-- 실패 시 예외 처리하되 다음 단계 진행 (Notion은 보조 채널)
-
 ### 3.7단계: untracked 파일 체크 (GPT 합의 세션64)
 - `git status --short | grep '^??'` 실행으로 untracked 파일 감지
 - 감지된 각 파일에 대해 3분류:
@@ -50,6 +45,16 @@
 - `bash .claude/hooks/final_check.sh --full --fix` 선행 (STATUS 드리프트 시 자동 갱신)
 - `git add` → `git commit` → `git push`
 - finish_state.json에 `committed_pushed: true` 기록
+
+### 4.5단계: Notion 동기화 (세션86 3자 토론 채택 — Git 커밋+푸시 완료 후)
+- 실행: `python 90_공통기준/업무관리/notion_sync.py --manual-sync || true`
+- 동작: events 없이 STATUS 요약(update_summary) + 부모 페이지(sync_parent_page) 갱신. 허위 이력 append 없음.
+- 배치: 페이지 ID 3개는 `90_공통기준/업무관리/notion_config.yaml` 참조
+  - 부모: `331fee67-0be8-81fd-9bf7-d0c2af54bc07`
+  - STATUS: `331fee67-0be8-81f7-9f15-c3aaabfbd94a`
+  - TASKS: `331fee67-0be8-818c-b2bc-cd8da0a40db8`
+- 실패 정책: soft-fail (`|| true`). `90_공통기준/agent-control/state/notion_sync_pending.flag` 생성 + 다음 단계 진행. 성공 시 flag 제거.
+- 이 단계는 `/finish` 전용 — `/share-result` 단독 호출 경로에서는 실행되지 않는다 (책임 분리)
 
 ### 5단계: GPT 공유
 - Chrome MCP로 GPT 토론방에 전송 (CDP 폐기됨)

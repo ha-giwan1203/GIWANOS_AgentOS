@@ -1288,11 +1288,35 @@ check $? "evidence_gate: fresh_ok 역방향 방어 유지 (세션83 섹션 48-5 
 
 echo ""
 
+# === 52. /finish 4.5단계 Notion 동기화 배선 검증 (세션86 3자 토론 만장일치 채택) ===
+# 배경: 세션45~86 Notion 미동기화 사건. finish.md 3.5단계 명세 있었으나 share-result 위임 구조로 실행 누락.
+# 검증 3축 (GPT 조건부 통과 보정 반영):
+#   (a) finish.md가 --manual-sync 플래그로 notion_sync.py 호출
+#   (b) share-result.md가 Notion 로직을 포함하지 않음 (책임 분리)
+#   (c) notion_sync.py에 sync_from_finish wrapper 존재 (허위 이력 append 방지)
+echo ""
+echo "--- 52. /finish 4.5 Notion 동기화 배선 (세션86 3자) ---"
+
+FINISH_MD="$PROJECT_DIR/.claude/commands/finish.md"
+SHARE_MD="$PROJECT_DIR/.claude/commands/share-result.md"
+NOTION_PY="$PROJECT_DIR/90_공통기준/업무관리/notion_sync.py"
+
+grep -q "notion_sync.py --manual-sync" "$FINISH_MD" 2>/dev/null
+check $? "(a) finish.md: 'notion_sync.py --manual-sync' 호출 구문 존재"
+
+! grep -q "notion_sync" "$SHARE_MD" 2>/dev/null || \
+  grep -q "Notion 동기화는" "$SHARE_MD" 2>/dev/null
+# share-result.md는 notion_sync 호출 금지. 단 "/finish 4.5 전용" 주석은 허용 (역할 분리 명시)
+check $? "(b) share-result.md: Notion 호출 미포함 (주석만 허용)"
+
+grep -q "def sync_from_finish" "$NOTION_PY" 2>/dev/null
+check $? "(c) notion_sync.py: sync_from_finish wrapper 존재 (허위 이력 방지)"
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
 REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30"
-CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 51"
+CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 51 52"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 
 echo ""

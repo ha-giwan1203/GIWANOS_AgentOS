@@ -10,6 +10,7 @@ import fnmatch
 import json
 import logging
 import os
+import sys
 import time
 import urllib.request
 from datetime import datetime, timedelta
@@ -780,17 +781,59 @@ def sync_batch(batch_id: str, events: list,
     return ok1 and ok2 and ok3
 
 
+# ── /finish 4.5단계 실운영 wrapper (세션86 3자 토론 채택, GPT 조건부 통과 보정) ──
+
+def sync_from_finish(cfg: dict = None, logger: logging.Logger = None) -> bool:
+    """/finish 4.5단계 수동 동기화 전용 wrapper.
+
+    설계 (세션86 3자 토론):
+    - events 없이 STATUS 요약(update_summary) + 부모 페이지(sync_parent_page)만 갱신
+    - sync_batch/_mark_done/dedup 로직 완전 우회 — 허위 이력 append 방지 (GPT 지적)
+    - 실패 soft-fail — 부분 성공도 True 반환하지 않음. 호출자(finish.md)가 `|| true`로 감싸 non-blocking
+    """
+    if cfg is None:
+        cfg = load_config()
+    if logger is None:
+        logger = setup_error_logger(cfg)
+    token = load_token(cfg)
+    if not token:
+        logger.error("Notion 토큰 없음 — NOTION_TOKEN 환경변수 또는 .env 확인")
+        return False
+    repo_root = Path(__file__).parent.parent.parent
+
+    ok_summary = False
+    try:
+        ok_summary = update_summary(token, cfg, repo_root, logger)
+    except Exception as e:
+        logger.error(f"update_summary 예외: {e}")
+
+    ok_parent = False
+    try:
+        ok_parent = sync_parent_page(token, cfg, repo_root, logger)
+    except Exception as e:
+        logger.error(f"sync_parent_page 예외: {e}")
+
+    return ok_summary and ok_parent
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="Phase 5 Notion 동기화 테스트")
+    parser = argparse.ArgumentParser(description="Phase 5 Notion 동기화")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--batch-id", default="test1234")
+    parser.add_argument("--manual-sync", action="store_true",
+                        help="/finish 4.5단계 수동 동기화 (events 없이 요약+부모만 갱신)")
     args = parser.parse_args()
 
     cfg    = load_config()
     logger = setup_error_logger(cfg)
+
+    if args.manual_sync:
+        ok = sync_from_finish(cfg, logger)
+        print("Notion 수동 동기화 성공" if ok else "Notion 수동 동기화 실패")
+        sys.exit(0 if ok else 1)
 
     test_events   = [
         ("C:/Users/User/Desktop/업무리스트/CLAUDE.md", {"event_type": "modified"}),
