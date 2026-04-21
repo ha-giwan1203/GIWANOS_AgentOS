@@ -54,6 +54,13 @@
 - **24h 집계 TZ 버그**: `session_start_restore.sh:189` `date -u` 추가. awk 31→97건 정확화. A 분류
 - **smoke 2 FAIL**: README grep 확장 + 메모리 4개 enforcement 태그 추가. **smoke 212/212 PASS, 0 FAIL** 달성
 
+### share-result 결과 (3way 강제 — 양측 PASS)
+- share_gate hook이 직전 5커밋 내 `[3way]` 미종결 의심(1bd81a62 세션85 β안-C)으로 양측 공유 강제
+- **GPT (gpt-5-4-thinking)**: PASS — 4 items(Case A·Round 2·별건 3건·TASKS/HANDOFF) 전부 실증됨/동의. 추가제안 1건 A(2주 관찰 종료 시 Case B 수치 3개로 재판정 — 이미 이월 반영)
+- **Gemini**: Round 1 FAIL(기준 미확인 — diff 스니펫 요청, A 분류) → diff 회신 후 Round 2 **PASS** (3 items 전부 실증됨/동의)
+- 토론모드 SKILL Step 5-4 양측 PASS 종결 조건 충족
+- 잔여 이슈 없음
+
 ### 다음 AI 액션 (세션87+)
 1. **2주 관찰 기간 (~2026-05-05)** — Top3 fp 억제율 변화 측정 → Case B 필요 여부 판단
 2. **β안-C 실제 구현 (세션85 이월)** — 사용자 승인 + API 키 예산
