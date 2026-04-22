@@ -90,7 +90,7 @@
 - II-1 `health_summary_gate.sh` (UserPromptSubmit) 등록 해제
 - II-2 `project_keywords.txt` → `98_아카이브/session89_glimmering/project_keywords_20260422.txt`
 
-**활성 훅**: 36 → **30** (SessionStart 3→1 / UserPromptSubmit 2→1 / PostToolUse 8→7 / Stop 5→4)
+**활성 훅**: 36 → **31** (SessionStart 3→1 / UserPromptSubmit 2→1 / PostToolUse 8→7 / Stop 5→4) — 세션91에서 실측 31 정정 (세션90 "30" 표기는 오기, list_active_hooks.sh --count 기준)
 **회귀**: 전 커밋 smoke_fast 10/10 PASS
 
 **[대기] 다음 진입점 — 단계 III (게이트 3종 재절단)**

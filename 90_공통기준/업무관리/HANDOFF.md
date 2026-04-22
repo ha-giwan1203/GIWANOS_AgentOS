@@ -77,7 +77,7 @@
 - **GPT 2자 토론**: Round 1 조건부 통과 → Round 2 양측 통과. 로그 `90_공통기준/토론모드/logs/debate_20260422_095321/`
 
 ### 변경 파일
-- 수정: `.claude/settings.json` (활성 훅 36 → 30)
+- 수정: `.claude/settings.json` (활성 훅 36 → 31 — 세션91 실측 정정, 이전 "30" 표기는 오기)
 - 수정: `90_공통기준/invariants.yaml` (settings_drift deferred 이동)
 - 수정: `.claude/hooks/session_start_restore.sh` (freshness 로직 + Self-X marker cleanup)
 - 신규: `90_공통기준/업무관리/baseline_20260422/` (incident_baseline.json / dep_graph.md / baseline_tests.txt)
