@@ -1,29 +1,35 @@
-# 보호 레지스트리 (세션91 V-4/V-5 정리 2026-04-22)
-#
-# 이전 버전: 98_아카이브/session91_glimmering/protected_assets_quota_~session89.yaml
-# 변경 요약:
-#   - Self-X Layer 1 항목 제거: health_check.sh, health_summary_gate.sh
-#   - quota / ttl 블록 제거 (Self-X Layer 4 B5 Subtraction Quota)
-# 근거: .claude/self/migration_note_20260422.md + Plan glimmering-churning-reef V-4/V-5
-#
+# Self-X Layer 2/4 — Subtraction Quota 보호 레지스트리
+# 출처: debate_20260421_142204_3way (B5 3way 만장일치 통과)
+# 정책: 정원제 자동 제거 후보 산출 시 본 파일 항목은 원천 배제
+
+version: 1
+created: 2026-04-21
+
 # class: core (OS 구동 필수) / guard (보안·차단) / recovery (재난 대응)
 # removal_policy: never (영구 보호) / manual (사용자 명시 승인) / replace-only (대체 hook 증명)
-
-version: 2
-created: 2026-04-21
-updated: 2026-04-22
 
 protected:
   # === SessionStart 계열 (core) ===
   - path: .claude/hooks/session_start_restore.sh
     class: core
-    reason: 세션 시작 상태 복원 (kernel/instruction_reads/skill_entry marker 무효화)
+    reason: 세션 시작 상태 복원 (kernel/instruction_reads/skill_entry/health_summary marker 무효화)
     removal_policy: never
+
+  - path: .claude/hooks/health_check.sh
+    class: core
+    reason: Self-X Layer 1 자가 진단 (B1 채택)
+    removal_policy: replace-only
+    replacement_evidence: invariant 평가 + HEALTH.md 생성 동등 기능
 
   # === UserPromptSubmit 계열 (guard) ===
   - path: .claude/hooks/risk_profile_prompt.sh
     class: guard
     reason: 사용자 프롬프트 위험 분류 (evidence_gate req 발행 가드)
+    removal_policy: replace-only
+
+  - path: .claude/hooks/health_summary_gate.sh
+    class: core
+    reason: B1 M3 advisory + 컨텍스트 주입
     removal_policy: replace-only
 
   # === Stop 계열 (guard) ===
@@ -39,13 +45,13 @@ protected:
 
   - path: .claude/hooks/evidence_stop_guard.sh
     class: guard
-    reason: evidence 종료 가드 (세션91 III-5 완료축 블록 제거 후 auth_diag/skill_read 만 남음)
+    reason: evidence 종료 가드
     removal_policy: replace-only
 
   # === commit/evidence 계열 (guard) ===
   - path: .claude/hooks/commit_gate.sh
     class: guard
-    reason: 커밋 게이트 (push 차단, 세션91 III-1 Git/staging만으로 축소)
+    reason: 커밋 게이트 (push 차단)
     removal_policy: never
 
   - path: .claude/hooks/evidence_gate.sh
@@ -123,10 +129,28 @@ protected:
 
   - path: .claude/hooks/smoke_fast.sh
     class: core
-    reason: smoke fast 11건 (SessionStart, 세션91 III-4 gate_boundary_check 편입)
+    reason: smoke fast 10건 (SessionStart)
     removal_policy: never
 
-  - path: .claude/hooks/gate_boundary_check.sh
-    class: guard
-    reason: 게이트 3종 경계 재절단 회귀 트립와이어 (세션91 III-4 신설)
-    removal_policy: replace-only
+# 정원제 임계값 (Glide Path 목표)
+# 출처: B5 3way 만장일치
+quota:
+  hook:
+    raw_initial: 44       # 현재 raw 카운트 (시작 상한)
+    activate_target: 36   # 활성 등록 목표
+    glide_path: weekly_2_or_session_4  # 주 1~2개 또는 정리 세션 시 4개 (Claude 자체 추가)
+  command:
+    raw_initial: 30
+    activate_target: 25
+  agent:
+    raw_initial: 9
+    activate_target: 12   # 여유 (현재 9개)
+
+# 지식 표면 TTL (정원제 미적용)
+ttl:
+  skill:
+    unused_days_warn: 90
+    unused_days_archive: 180
+  memory:
+    unused_days_warn: 180
+    unused_days_archive: 365

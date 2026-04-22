@@ -57,65 +57,15 @@
 - **상호 감시**: 3자 토론 시 단일 모델 단독 통과 금지 — GPT 답은 Gemini 검증, Gemini 답은 GPT 검증, Claude 설계는 양측 검증 (`90_공통기준/토론모드/CLAUDE.md` "상호 감시 프로토콜")
 - 자세한 합의안: 메모리 `project_three_tool_workflow.md`
 
-## Self-X Layer 1 — Health Summary 의무 (B1 3way 만장일치, 2026-04-21)
+## 설계 원칙 (Plan glimmering-churning-reef, 2026-04-22 세션91 반영)
 
-**[MUST]** Claude는 **프로젝트성 작업** 첫 사용자 응답에 **health summary 1줄을 포함**한다.
-- 형식: `[health] N OK · M WARN · K CRITICAL` (정상 시 `[health] N OK`만)
-- 출처: `.claude/self/summary.txt` (SessionStart에서 `health_check.sh` 자동 갱신, **stderr 채널로 컨텍스트 주입**)
-- WARN/CRITICAL 시 자동 펼침 (각 1줄, 상세는 `.claude/self/HEALTH.md`)
-- 면제: 단순 인사·확인·일반 대화 (프로젝트 키워드 미매칭)
-- 강제 메커니즘: `UserPromptSubmit` hook(`health_summary_gate.sh`)이 프로젝트 키워드 매칭 시 advisory 리마인더 stderr 주입 (사용자 메시지 차단 없음, Phase 2-C에서 hard gate 검토)
-- 키워드 목록: `90_공통기준/project_keywords.txt` (세션88 분리, hook 수정 없이 증감 가능. 파일 부재 시 하드코딩 fallback)
-- 정책: Layer 1은 감지만 (자동 조치 절대 금지). 출처: `90_공통기준/토론모드/logs/debate_20260421_133506_3way/`
+자기유지형 시스템의 7원칙은 `.claude/self/DESIGN_PRINCIPLES.md` 단일 원본을 따른다.
+이전 Self-X Layer 1/2/4 + B5 Subtraction Quota 정책은 전면 폐기 (안전안 채택).
+자세한 맥락: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 2.
 
-invariants 정의: `90_공통기준/invariants.yaml` (8개 + 정책 5개 + 메커니즘 4개). 평가: `.claude/self/diagnose.py`.
-
-## Self-X Layer 2 — T1 Self-Recovery (B2 3way 만장일치, 2026-04-21)
-
-**[POLICY]** Stop hook 시점 자동 cleanup (사용자 승인 없음, 감사 로그 jsonl).
-
-- **T1 항목 (4종, 모두 idempotent + 기존 자산 재사용)**:
-  - log rotation (hook_log >512KB)
-  - archive_resolved (incident_repair.py — resolved 30d+, **unresolved 절대 보존**)
-  - backfill_classification (incident_repair.py — 미분류 자동 분류)
-  - auto_resolve (incident_repair.py — `.ok` 파일 존재 시)
-- **T2 격상**: session_kernel >24h 강제 재생성 (파괴적 → 1-click 승인 필수, 추후 도입)
-- **실행 시점**: **Stop hook만**. SessionStart는 B1 진단 전용 (재현성 보장).
-- **실패 정책**: 결정적 작업 1회 재시도 (가중치 1.0) / 청소 작업 0회 재시도 (가중치 0.5) → Circuit Breaker 가중 카운트 + `.failed` 마커
-- **상한**: B4 합의 T1 일일 6건 (Circuit Breaker 잠금 시 즉시 중단)
-- **가시성**: `.claude/self/auto_recovery.jsonl` (append-only 실시간) + 일일 1회 .md 요약 + 다음 세션 첫 메시지 1줄
-- 출처: `90_공통기준/토론모드/logs/debate_20260421_151042_3way/`
-
-hook: `.claude/hooks/self_recovery_t1.sh` (Stop matcher).
-
-## Self-X Layer 4 — Self-Limiting / Circuit Breaker (B4 3way 만장일치, 2026-04-21)
-
-**[POLICY]** self-X 자체 폭주 방지. B2/B3 도입 전 선행 안전장치.
-
-- **일일 상한**: T1 자동 변경 6건 / T2 구조변경(protected asset·gate 흐름) 2건. 문서성 수정은 T2 제외.
-- **Circuit Breaker 트리거**: 1h 동일 영역 gate/block 3회 OR (smoke 실패 + 1h 동일 2회) OR override
-- **잠금 해제**: **잠금 상태에서만** 4개 기준 충족 시 1-click 승인 프롬프트. 자동 해제 폐기.
-  - 4개 기준: 대상 영역 smoke PASS / 24h 동일 classification 재발 0 / bypass debt 0 / 보호자산 무변경
-- **메타 invariant**: 깊이=1 하드코딩 (재귀 차단). self-meta 실패 시 WARN 파일만, 2차 평가 금지.
-- **상태 분리**: `.claude/self/circuit_breaker.json` + `meta.json` (Layer 4 전용, invariants.yaml과 명확 구분)
-- **롤백**: git commit 단위 + 자동변경은 1커밋 1논리단위 강제
-- **과민 방지**: advisory는 누적 제외, gate/block만 집계 + cooldown
-- 출처: `90_공통기준/토론모드/logs/debate_20260421_145810_3way/`
-
-상태 hook: `.claude/hooks/circuit_breaker_check.sh` (SessionStart에서 잠금 상태 표시).
-
-## Self-X Layer 2/4 — Subtraction Quota (B5 3way 만장일치, 2026-04-21)
-
-**[POLICY]** 추가 = 제거 강제 (실행 표면 정원제 + 지식 표면 TTL).
-
-- **실행 표면 정원제** (Glide Path): hook 44(raw)→36(활성 목표) / command 30→25 / agent 9→12(여유)
-- **지식 표면 TTL**: skill 미사용 90일 archive 후보 / memory 미사용 180일 만료 후보
-- **측정**: raw 카운트 + 활성 등록 카운트 분리 (`.claude/self/quota_diagnose.py`)
-- **차단 기준**: 활성 등록수 우선 (raw는 advisory 정보)
-- **보호 레지스트리**: `90_공통기준/protected_assets.yaml` (path/class/reason/removal_policy/replacement_evidence)
-- **강제**: M1 advisory(`quota_advisory.sh`) PostToolUse Bash matcher / M2 100% 도달 시 1 in 1 out / M3 [bypass-quota] 태그 1회 면제 + 다음 정상 작업 2개 삭제 페널티
-- **산출 알고리즘**: 보호 제외 → 고아(30일 호출 0 + 참조 없음) 0순위 → settings 미등록 → 90일 무변경 → 4등급(삭제금지/병합후삭제/아카이브우선/즉시삭제후보)
-- 출처: `90_공통기준/토론모드/logs/debate_20260421_142204_3way/`
+- 활성 hook 자동 집계: `bash .claude/hooks/list_active_hooks.sh`
+- 주 1회 수동 점검: `bash .claude/self/selfcheck.sh`
+- 보호 자산: `90_공통기준/protected_assets.yaml` (Self-X/quota 블록 제거됨, 세션91 V-4/V-5)
 
 ## 운영 안정성
 - settings/hook 파일 변경 후 반드시 세션 재시작 (변경사항은 세션 시작 시 캐싱됨)
@@ -164,7 +114,7 @@ permissions나 hook을 추가할 때 위에서 아래로 순서대로 묻는다.
 
 ## 훅 등급 + 에러 전파 정책 (2026-04-19 의제5 Gemini 제안·GPT 승격)
 
-> 36개 `.sh` 훅이 맞물린 상태에서 특정 훅 exit 1 전파 정책이 제각각이던 문제를 표준화. hook_common.sh 공통 래퍼 + .claude/hooks/README.md 등급 분류 테이블 참조.
+> 활성 훅이 맞물린 상태에서 특정 훅 exit 1 전파 정책이 제각각이던 문제를 표준화. hook_common.sh 공통 래퍼 + .claude/hooks/README.md 등급 분류 테이블 참조. 활성 수 집계: `bash .claude/hooks/list_active_hooks.sh --count`.
 
 ### 훅 등급 3종
 - **advisory (경고성)**: 실패해도 세션 계속. `exit 0` 강제. stderr 로그만. `|| true` 허용 명시. 예: `permissions_sanity.sh`, `auto_compile.sh`, `notify_slack.sh`

@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 구현 완료 — 4커밋 전부 반영)
+최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III/IV/V/VI-1 실행)
 
 ---
 
@@ -37,8 +37,17 @@
 - [완료] IV-4: `.claude/self/DISPOSITION.md` 신설 (10개 파일 처리 방침)
 - [대기] IV-5: invariants.yaml archive — 단계 V-1/V-2 완료 후
 
-**[대기] 단계 V — Single Source 전환** (README/STATUS 자동 생성 + protected_assets.yaml 정리 + Self-X 서술 audit + Notion parity)
-**[대기] 단계 VI — 슬림화** (CLAUDE.md Self-X Layer 삭제 + MEMORY/TASKS 감축 + incident archive)
+**[진행중] 단계 V — Single Source 전환**
+- [완료] V-1: `.claude/hooks/list_active_hooks.sh` 신설 (settings 기반 자동 집계)
+- [완료] V-3: CLAUDE.md 훅 수 수동 서술 삭제 (list_active_hooks.sh 참조로 교체)
+- [완료] V-4/V-5: `protected_assets.yaml` Self-X 항목 제거 + quota/ttl 블록 제거 (원본 `98_아카이브/session91_glimmering/`)
+- [완료] V-6 (일부): CLAUDE.md Self-X Layer 전면 삭제
+- [대기] V-2 (완성형): README/STATUS 자동 생성 전환 (현재는 list_active_hooks.sh 도구 제공만)
+- [대기] V-7: Notion projection parity
+
+**[진행중] 단계 VI — 슬림화**
+- [완료] VI-1: CLAUDE.md Self-X Layer 전문 삭제 → `.claude/self/DESIGN_PRINCIPLES.md` 신설
+- [대기] VI-2: MEMORY.md 감축 / VI-4: TASKS.md 감축 / VI-5: incident_ledger archive
 **[대기] 단계 VII — Dormant surface 제거** (비활성 hook/self 파일 archive)
 **[대기] 단계 VIII — 30일 TTL 관찰** (2026-05-22 이후 효과 평가)
 

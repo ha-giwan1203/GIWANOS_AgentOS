@@ -164,6 +164,8 @@ _tmp/
 !98_아카이브/
 98_아카이브/**
 !98_아카이브/README.md
+!98_아카이브/session91_glimmering/
+!98_아카이브/session91_glimmering/**
 artifacts/
 !artifacts/.keep
 data/
