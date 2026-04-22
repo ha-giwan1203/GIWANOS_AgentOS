@@ -4,8 +4,61 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-21 KST — 세션89 (Notion API after deprecated 마이그레이션)
+최종 업데이트: 2026-04-22 KST — 세션90 (자기유지형 시스템 재설계 Plan 단계 0+I+II)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 0. 최신 세션 (2026-04-22 세션90 — Plan glimmering-churning-reef 단계 0/I/II 실행)
+
+### 실행 경로
+사용자 체감 둔화 질문 → Claude 독립 진단(Whac-A-Mole 6근본원인) → GPT 2자 토론 5라운드 → 사용자 "안전안" 선택 → 단계 0+I+II 실행 (7커밋) → 단계 III 진입 전 세션 재시작 권장 대기
+
+### 계획 파일 (Git 외부)
+`C:/Users/User/.claude/plans/glimmering-churning-reef.md`
+- Part 0~8 + 보강안 A~D (NEW_HOOK_CHECKLIST 증적번들 / last_selfcheck freshness / incident 유형별 카운트 / debate logs TTL archive)
+- 단계 0 → I → II (완료), III → IV → V → VI → VII → VIII (미진행)
+
+### 이번 세션 커밋 (8924431d → 471c07a8)
+| 커밋 | 단계 | 요약 |
+|------|------|------|
+| 8924431d | 0 | baseline snapshot + invariants settings_drift waiver |
+| 82be4ab0 | I-1 | quota_advisory (PostToolUse) 해제 |
+| 76d2c370 | I-2 | self_recovery_t1 (Stop) 해제 |
+| aea9e3d7 | I-3/4 | circuit_breaker_check + health_check (SessionStart) 해제 |
+| 2300ceb9 | I-5 | session_start_restore freshness 표시 + Self-X marker cleanup |
+| ddef9b77 | II-1 | health_summary_gate (UserPromptSubmit) 해제 |
+| 471c07a8 | II-2 | project_keywords.txt 아카이브 이동 |
+
+### 변경 파일
+- 수정: `.claude/settings.json` (활성 훅 36 → 30)
+- 수정: `90_공통기준/invariants.yaml` (settings_drift deferred 이동)
+- 수정: `.claude/hooks/session_start_restore.sh` (freshness 로직 + Self-X marker cleanup)
+- 신규: `90_공통기준/업무관리/baseline_20260422/` (incident_baseline.json / dep_graph.md / baseline_tests.txt)
+- 이동: `90_공통기준/project_keywords.txt` → `98_아카이브/session89_glimmering/`
+
+### 2자 토론 하네스 분석
+- Claude 독립 근본원인 6종 → GPT Round 3에서 #7(문서 드리프트) 추가 → 최종 7종
+- Round 4: 커버리지 매트릭스 누락 14건 → 계획 반영
+- Round 5: 추가 누락 2건(Notion projection, settings_drift 오염) + 순서 의존성 + 단계별 회귀 테스트 → 계획 반영
+- Round 5 GPT FAIL 판정은 plan vs execution 혼동(환경 미스매치) → Claude 기각
+- 독립 판정 유지: Meta Depth=0 엄격, V-5 archive 분리, V-6 삭제 금지 + historical 태깅
+
+### 다음 AI 액션
+**우선**: 이번 세션 **재시작**하고 SessionStart·UserPromptSubmit 체감(레이턴시·응답 포맷 강제 소실) 확인. 30분 정도 실무 사용 후 이상 없으면 단계 III 진입.
+
+**단계 III 진입점**:
+1. III-1: `commit_gate.sh` → Git/staging 검증만 남기고 TASKS/HANDOFF/STATUS 검증 로직 제거
+2. III-2: `evidence_gate.sh` → 사전 근거 검증만. 완료 선언 로직 제거
+3. III-3: `completion_gate.sh` → 최종 완료 선언만. 사전 근거 검증 제거
+4. III-4: `.claude/hooks/gate_boundary_check.sh` 신설 — 금지 토큰 검사
+5. III-5: `write_marker.sh` / `evidence_mark_read.sh` / `evidence_stop_guard.sh` 게이트 재절단 동반 갱신
+
+**회귀 기준**:
+- 각 커밋 후 `bash .claude/hooks/smoke_fast.sh` 10/10 PASS
+- III 전체 완료 후 `SMOKE_LEVEL=full bash .claude/hooks/final_check.sh --full` 실행 (fast로 경계 재절단 검증 불가)
+
+**금지**: 단계 III~VIII 중 새 hook 추가 (계획 Part 6 — 30일 TTL 금지)
 
 ---
 

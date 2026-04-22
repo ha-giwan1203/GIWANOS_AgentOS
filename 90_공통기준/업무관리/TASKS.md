@@ -10,7 +10,40 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-21 — 세션89 (Notion API `after` deprecated 마이그레이션)
+최종 업데이트: 2026-04-22 — 세션90 (자기유지형 시스템 재설계 Plan 단계 0+I+II)
+
+---
+
+## 세션90 (2026-04-22) — 자기유지형 시스템 재설계 (Plan glimmering-churning-reef)
+
+**[진행중] 2자 토론 기반 Self-X 자동 개입 폐기 + 수동 selfcheck 전환**
+- 계획 파일: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` (Part 0~8 + 보강안 A~D)
+- 2자 토론: Claude × GPT 5라운드 (Round 4에서 누락 14건 + Round 5에서 2건 추가 식별)
+- 사용자 선택: 안전안 (자기학습 포기 + 자기유지 보장). 메타 깊이 = 0 엄격 해석
+
+**[완료] 단계 0 — baseline + invariants waiver (8924431d)**
+- 0-1: incident baseline snapshot (unresolved 516 / gate_reject 376) → `90_공통기준/업무관리/baseline_20260422/incident_baseline.json`
+- 0-2: invariants.yaml settings_drift WARN 임시 비활성화 (단계 V 완료 시 복원)
+- 0-A: 활성 훅 37개 dep graph matrix → `baseline_20260422/dep_graph.md`
+- 0-C: smoke_fast 10/10 PASS, doctor_lite OK, health_check 3 OK·5 WARN
+
+**[완료] 단계 I — leaf hook 등록 해제 (82be4ab0 → 2300ceb9)**
+- I-1 `quota_advisory.sh` (PostToolUse) · I-2 `self_recovery_t1.sh` (Stop)
+- I-3 `circuit_breaker_check.sh` · I-4 `health_check.sh` (SessionStart)
+- I-5 `session_start_restore.sh` last_selfcheck freshness 표시 + Self-X marker cleanup
+
+**[완료] 단계 II — 감시 게이트 + dead config 정리 (ddef9b77, 471c07a8)**
+- II-1 `health_summary_gate.sh` (UserPromptSubmit) 등록 해제
+- II-2 `project_keywords.txt` → `98_아카이브/session89_glimmering/project_keywords_20260422.txt`
+
+**활성 훅**: 36 → **30** (SessionStart 3→1 / UserPromptSubmit 2→1 / PostToolUse 8→7 / Stop 5→4)
+**회귀**: 전 커밋 smoke_fast 10/10 PASS
+
+**[대기] 다음 진입점 — 단계 III (게이트 3종 재절단)**
+- 세션 재시작 후 체감 확인 선행 (권장 경로)
+- III-1 commit_gate → Git/staging만 / III-2 evidence_gate → 사전 근거만 / III-3 completion_gate → 최종 완료 선언만
+- III-4 `gate_boundary_check.sh` 신설 (금지 토큰 검사)
+- III-5 write_marker / evidence_mark_read / evidence_stop_guard 동반 정리
 
 ---
 
