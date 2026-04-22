@@ -44,6 +44,14 @@
 
 ### 다음 AI 액션
 1. **1주차 반영 후 7일 관찰**: evidence_gate 미해결 건수 추세. 현재 미해결 571건 / 최근 24h 신규 81건 (세션 시작 559/65 대비 약간 증가). 관찰 기준 지표는 세션86 기준 272건 → 목표 136건 (50%↓)
+
+### 1주차 직후 24h 증가 원인 분석 (GPT 부분PASS 후속 제안 반영, 2026-04-22)
+- 24h 전체 신규 84건 (세션93 커밋 전후 포함 구간)
+- **훅별 breakdown**: commit_gate 31건 (37%) / skill_instruction_gate 18건 (21%) / **evidence_gate 10건 (12%)** / navigate_gate 10건 / final_check 5건 / 기타
+- **evidence_gate 즉시 감소 확인**: 세션86 평균 39건/일 대비 **24h 10건 = 약 74% 감소**. fingerprint Top5가 각 1건씩(고유 이벤트, 반복 집중 없음) — 1주차 4번 coverage 축소 즉시 효과
+- 24h 전체 증가 주범: commit_gate 31건 (세션93 작업 중 커밋 시도 반복으로 누적), skill_instruction_gate 18건. 세션93 수술 자체가 원인 아님
+- 결론: GPT 우려(evidence_gate 24h 증가)는 실물 반박됨. evidence_gate는 이미 목표 초과 달성 추세 (136건/7일 목표 대비 10건/24h ≈ 70건/7일 추정)
+- 7일 실측은 예약된 scheduled-tasks session93-week1-checkpoint (2026-04-29 09:00 KST)에서 확인
 2. **2주차 5번 — evidence 3종 contract형 재설계**: 1주차 관찰 7일 후 재평가. 미해결 감소 추세 확인 시 착수
 3. **2주차 6번 — state 복원 축 경량화** (state_rebind_check detect-only 전환)
 4. **2주차 7번 — boundary smoke 시나리오 승격** (6건 runtime 케이스 추가)
