@@ -36,6 +36,9 @@
 !.claude/hooks/*.sh
 !.claude/hooks/README.md
 !.claude/hooks/incident_repair.py
+# 세션91 VII: 비활성 hook archive 화이트리스트
+!.claude/hooks/archive/
+!.claude/hooks/archive/**
 !.claude/scripts/
 !.claude/scripts/cdp/
 !.claude/scripts/cdp/cdp_chat_send.py
@@ -172,6 +175,9 @@ data/
 !data/.keep
 backup/
 archive/
+# 세션91 VII: .claude/hooks/archive/ 는 위 archive/ 차단에서 예외 (hooks 전용 아카이브)
+!.claude/hooks/archive/
+!.claude/hooks/archive/**
 secrets/
 private/
 config/private/
