@@ -1,0 +1,68 @@
+{
+  "ts": "2026-04-22 13:11 KST",
+  "summary": "[health] 3 OK · 4 WARN",
+  "aggregate": {
+    "ok": 3,
+    "warn": 4,
+    "critical": 0,
+    "overall": "WARN"
+  },
+  "results": [
+    {
+      "name": "notion_last_sync_age",
+      "severity": "critical",
+      "threshold": "24h",
+      "status": "OK",
+      "value": "2.6h",
+      "message": "last_ok=2.6h 전"
+    },
+    {
+      "name": "mes_last_upload_age",
+      "severity": "warn",
+      "threshold": "business_days_7",
+      "status": "WARN",
+      "value": "293.8h",
+      "message": "293.8h 경과 (임계 business_days_7)"
+    },
+    {
+      "name": "uncommitted_changes_age",
+      "severity": "warn",
+      "threshold": "24h",
+      "status": "WARN",
+      "value": "20개 / 최고령 210.7h",
+      "message": "미커밋 20건 / 210.7h 경과"
+    },
+    {
+      "name": "incident_unresolved",
+      "severity": "warn",
+      "threshold": "100",
+      "status": "WARN",
+      "value": 494,
+      "message": "494건 (임계 100)"
+    },
+    {
+      "name": "smoke_test",
+      "severity": "critical",
+      "threshold": "ALL_PASS",
+      "status": "OK",
+      "value": null,
+      "message": "ALL PASS"
+    },
+    {
+      "name": "tasks_md_lines",
+      "severity": "warn",
+      "threshold": "800",
+      "status": "WARN",
+      "value": 948,
+      "message": "948줄 (임계 800)"
+    },
+    {
+      "name": "session_kernel_age",
+      "severity": "warn",
+      "threshold": "24h",
+      "status": "OK",
+      "value": "16.4h",
+      "message": "last_ok=16.4h 전"
+    }
+  ]
+}

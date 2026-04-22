@@ -10,7 +10,27 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III/IV/V/VI/VII 완료 + VIII 관찰 시작)
+최종 업데이트: 2026-04-22 KST — 세션92 (Plan 단계 IV 완결 — Self-X Layer 1/4 원본 archive 이동)
+
+---
+
+## 세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)
+
+**[진행중] 단계 IV 완결 + V-7 Notion parity**
+- 계획 파일: `C:/Users/User/.claude/plans/staged-sprouting-perlis.md` (묶음 A/B/C)
+
+**[완료] 묶음 A — Self-X Layer 1/4 원본 archive 이동**
+- IV-5: `90_공통기준/invariants.yaml` → `98_아카이브/session91_glimmering/invariants_~session89.yaml`
+- IV-4 마무리: `diagnose.py` / `quota_diagnose.py` / `last_diagnosis.json` → `98_아카이브/session91_glimmering/self_state/`
+- 세션91 VII-2 staging 잔여(`circuit_breaker.json` / `meta.json` 삭제) 반영
+- `DISPOSITION.md` 갱신: 완료 상태 표기 + V-2 드리프트 감지 경로 교환(render_hooks_readme.sh 단일화) 명시
+- 검증: smoke_fast 11/11 ALL PASS / selfcheck "archive 상태" 정상 출력
+
+**[대기] 묶음 B — V-7 Notion projection parity**
+- notion_sync.py Self-X Layer 1/4 주석·Circuit Breaker 블록 정리
+- notion_snapshot.json 재생성 (offline 가능 경로 확인 후)
+
+**[대기] 묶음 C — HANDOFF 세션92 갱신 + 커밋**
 
 ---
 

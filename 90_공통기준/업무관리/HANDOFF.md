@@ -4,12 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 구현 완료 — 4커밋 반영)
+최종 업데이트: 2026-04-22 KST — 세션92 (Plan 단계 IV 완결 + V-7 진행 중)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-22 세션91 — Plan 단계 III 2자 토론 합의)
+## 0. 최신 세션 (2026-04-22 세션92 — 단계 IV 완결 + V-7)
+
+### 실행 경로
+세션 재시작 → 이전방 잔여 안건(IV-5 / IV-4 마무리 / V-7) 식별 → Plan 파일 `staged-sprouting-perlis.md` 작성·승인 → 묶음 A(파일 이동) 실행
+
+### 묶음 A 완료 — Self-X Layer 1/4 원본 archive 이동
+- `90_공통기준/invariants.yaml` → `98_아카이브/session91_glimmering/invariants_~session89.yaml` (IV-5)
+- `.claude/self/diagnose.py` → `98_아카이브/session91_glimmering/self_state/` (IV-4)
+- `.claude/self/quota_diagnose.py` → 동 (IV-4)
+- `.claude/self/last_diagnosis.json` → 동 (IV-4, gitignored 수동 이동)
+- `.claude/self/circuit_breaker.json` / `meta.json` 삭제 반영 (세션91 VII-2 staging 잔여)
+- DISPOSITION.md: 완료 표기 + V-2 드리프트 감지 교환(render_hooks_readme.sh 단일화) 명시
+- 검증: smoke_fast 11/11 ALL PASS, selfcheck "archive 상태" 정상 출력 (incident 총 1226/해결 679/미해결 547, 최근 24h 신규 0)
+
+### 다음 액션 (이번 세션 내 연속 진행)
+1. 묶음 B — `notion_sync.py` Self-X/Circuit Breaker 블록 정리 + `notion_snapshot.json` 재생성
+2. 묶음 C — HANDOFF 세션92 완결 블록 + 커밋 3건 정리
+
+---
+
+## 1. 이전 세션 (2026-04-22 세션91 — Plan 단계 III 2자 토론 합의)
 
 ### 실행 경로
 세션 재시작 후 남은 안건 확인 → 사용자 "2자 토론으로 진행" 지시 → Plan 파일 cosmic-jingling-toast.md 승인 → debate-mode 스킬 진입 → Round 1(의제 제시) → Round 2(합의 확정) → Round 3(조건 수용 + 종결) → critic-reviewer WARN 발생 → Round 4(critic 지적 GPT 재판정 + 실측 검증) → GPT 최종 통과 + 사유 문구 교체 합의
