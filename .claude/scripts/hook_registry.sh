@@ -1,12 +1,25 @@
 #!/bin/bash
-# hook_registry.sh — settings.local.json ↔ README.md ↔ STATUS.md 동기화 도구
+# hook_registry.sh — [LEGACY / DEPRECATED]
 #
-# 사용법:
-#   hook_registry.sh check  — 불일치만 리포트 (dry-run)
-#   hook_registry.sh sync   — settings 기준으로 README/STATUS hook 수 자동 갱신
+# 세션93 (2026-04-22) 2자 토론(Claude × GPT) 합의로 truth chain에서 제외됨.
+# 로그: 90_공통기준/토론모드/logs/debate_20260422_150445/plan.md 1주차 1번
 #
-# settings.local.json의 PreToolUse/PostToolUse/UserPromptSubmit/SessionStart/PreCompact/Notification/Stop
-# 이벤트에 등록된 고유 hook 파일명을 기준 축으로 사용.
+# 사유:
+#   - settings.local.json 전용 파싱 구조. 팀 공용 settings.json 미지원
+#   - 현재 저장소는 settings.json(team)에 모든 hooks 등록 + settings.local.json(local) hooks 비어 있음
+#   - 본 스크립트 실행 시 31개 중 29개를 WARN으로 잘못 보고
+#
+# 대체 경로 (Single Source of Truth):
+#   - 활성 hook 카운트:    bash .claude/hooks/list_active_hooks.sh --count
+#   - 이벤트별 분류:       bash .claude/hooks/list_active_hooks.sh --by-event
+#   - 드리프트 검사:       bash .claude/hooks/final_check.sh --fast
+#   - README/STATUS 갱신:  list_active_hooks 출력을 참고해 수동 갱신 (자동 sync 중단)
+#
+# 본 스크립트는 하위호환용으로만 보존. 새 진단 경로에서 호출 금지.
+#
+# [LEGACY] 기존 사용법:
+#   hook_registry.sh check  — [LEGACY] 불일치만 리포트 (settings.local.json만 참조)
+#   hook_registry.sh sync   — [LEGACY] settings.local.json 기준으로 갱신 (team settings 환경에서 오답 생성)
 
 set -euo pipefail
 

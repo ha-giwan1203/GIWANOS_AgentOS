@@ -4,12 +4,44 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션92 (Plan 단계 IV 완결 + V-7 진행 중)
+최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1번 — hook_registry 격하)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-22 세션92 — 단계 IV 완결 + V-7)
+## 0. 최신 세션 (2026-04-22 세션93 — Hook 시스템 개선 1주차 1번)
+
+### 실행 경로
+세션 재시작 → GPT 2차 진단 대화방 입장 → Claude 독립 검증 → 2자 토론(2라운드) → `plan.md` 작성 → 사용자 승인 → 1주차 1번(hook_registry 격하) 착수·완료
+
+### 2자 토론 결론
+- 모드: 2자(Claude × GPT) — 사용자 명시 지시(3자 자동 승격 예외)
+- 합의: "전면 재설계 대신 evidence 축 coverage 축소 + 남는 핵심 3종(date_check/auth_diag/identifier_ref) contract형 재설계 하이브리드"
+- 실행 순서: hook_registry 격하 → selfcheck 24h 정확화 → doctor_lite fallback → evidence coverage 축소 (1주차) → contract 재설계 + state 경량화 + boundary 시나리오 승격 (2주차)
+- 로그: `90_공통기준/토론모드/logs/debate_20260422_150445/` (round1/2 gpt·claude_harness, plan.md, session.json)
+
+### 1주차 1번 완료 — hook_registry 격하 (Single Source 확정)
+- 변경 파일:
+  - `.claude/scripts/hook_registry.sh` — 상단 [LEGACY / DEPRECATED] 주석 + 대체 경로 안내. 본문 유지(하위호환)
+  - `.claude/hooks/final_check.sh:139-149` — `--fix` 자동 sync 제거 → list_active_hooks 기준 수동 갱신 안내
+  - `.claude/hooks/README.md:6-12` — Single Source (list_active_hooks) 명시 / 155-156 보조 스크립트 표 추가
+  - `90_공통기준/업무관리/STATUS.md:19` — hooks 체계 기준축을 list_active_hooks로 명시
+- 검증:
+  - `list_active_hooks --count` = 31 (이벤트별 합도 일치)
+  - `final_check --fast` — 31/31/31 일치, exit 0
+  - `smoke_fast` 11/11 ALL PASS, `doctor_lite` OK
+- 위험도: 낮음 (계측 훅 격하, 실행 흐름 차단 경로 불변)
+
+### 다음 AI 액션 (1주차 잔여)
+1. **1주차 2번 — selfcheck 24h 정확 집계**: `selfcheck.sh:75-77` CUTOFF prefix grep 제거 → 정확 timestamp 비교 (예상 30분)
+2. **1주차 3번 — doctor_lite fallback**: `doctor_lite.sh:15` python3 하드의존 → smoke_fast:33 동일 패턴 (예상 15분)
+3. **1주차 4번 — evidence coverage 축소 (본 수술)**: Claude 교차검증 체크리스트 a~e (evidence_gate.sh tasks_handoff/map_scope/skill_read 블록 이관 + risk_profile_prompt 규칙 제거) (예상 반나절~1일)
+   - 검증 지표: evidence_gate 7일 미해결 ≤ 136건 (세션86 기준 272건 대비 50% 감소)
+4. **1주차 반영 후 7일 관찰** → 2주차 5번(contract 재설계) 착수 여부 판단
+
+---
+
+## 이전 세션 (2026-04-22 세션92 — 단계 IV 완결 + V-7)
 
 ### 실행 경로
 세션 재시작 → 이전방 잔여 안건(IV-5 / IV-4 마무리 / V-7) 식별 → Plan 파일 `staged-sprouting-perlis.md` 작성·승인 → 묶음 A(파일 이동) 실행

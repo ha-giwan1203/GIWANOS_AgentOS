@@ -10,7 +10,35 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션92 (Plan 단계 IV 완결 — Self-X Layer 1/4 원본 archive 이동)
+최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 2차 진단 + 개선 계획 수립 + 1주차 1번 착수)
+
+---
+
+## 세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)
+
+**[완료] 2차 진단 + 2자 토론 + 개선 계획 plan.md 작성**
+- 2차 진단: GPT 2차 정밀진단 수령 → Claude 독립 검증 11/11 실증 + 등급 재조정 2건 제안
+- 토론: 2자(Claude × GPT) 2라운드. 채택 11 / 보류 3 (해소 2, 잔존 1) / 버림 0
+- 결론: "전면 재설계 대신 evidence 축 coverage 축소 + 남는 핵심 3종 contract형 재설계 하이브리드"
+- 로그: `90_공통기준/토론모드/logs/debate_20260422_150445/plan.md` (1주차/2주차 + 검증 기준 + 롤백 조건)
+
+**[완료] 1주차 1번 — hook_registry 격하 (Single Source of Truth 확정)**
+- 변경 파일 (4개):
+  - `.claude/scripts/hook_registry.sh` 상단 주석 [LEGACY / DEPRECATED] 표기 + 대체 경로 안내
+  - `.claude/hooks/final_check.sh:139-149` `--fix` 경로 자동 sync 중단, list_active_hooks 기준 수동 갱신 안내로 전환
+  - `.claude/hooks/README.md:6-12, 155-156` Single Source (list_active_hooks) 명시 + 보조 스크립트 표에 list_active_hooks 추가 + hook_registry legacy 표기
+  - `90_공통기준/업무관리/STATUS.md:19` hooks 체계 기준축을 list_active_hooks로 명시
+- 검증:
+  - `list_active_hooks --count` = 31 (PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4)
+  - `final_check --fast` 31/31/31 일치, exit 0
+  - `smoke_fast` 11/11 ALL PASS
+  - `doctor_lite` OK
+- 소요: 약 30분
+
+**[예정] 1주차 2번 — selfcheck 24h 정확 집계** (plan.md 1주차 2번)
+**[예정] 1주차 3번 — doctor_lite python/python3 fallback** (plan.md 1주차 3번)
+**[예정] 1주차 4번 — evidence coverage 축소** (plan.md 1주차 4번, 본 수술)
+**[예정] 2주차 5~7번** (1주차 4번 + 1주 관찰 데이터 수령 후)
 
 ---
 

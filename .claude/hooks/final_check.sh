@@ -137,11 +137,15 @@ if [ -n "$README_COUNT" ]; then
   echo "  README 문서화: ${README_COUNT}개"
   if [ -n "$SETTINGS_HOOKS" ] && [ "$README_COUNT" -ne "$SETTINGS_HOOKS" ] 2>/dev/null; then
     if $FIX_MODE; then
-      echo "  [FIX] hook_registry.sh sync 실행..."
-      bash "$PROJECT_DIR/.claude/scripts/hook_registry.sh" sync 2>&1 | sed 's/^/    /'
-      echo "  [FIX] 완료. README/STATUS hook 수 자동 갱신됨"
+      # 세션93 (2026-04-22 2자 토론 합의): hook_registry.sh 자동 sync 제거
+      # 사유: hook_registry는 settings.local.json 전제 → team settings 환경에서 오답 생성
+      # 대체: list_active_hooks 출력을 참고해 README/STATUS 수동 갱신
+      echo "  [FIX] 자동 sync 중단 (hook_registry.sh legacy 격하, 세션93)"
+      echo "  [FIX] list_active_hooks 기준으로 README.md / STATUS.md를 수동 갱신하세요:"
+      echo "  [FIX]   bash .claude/hooks/list_active_hooks.sh --by-event"
+      echo "  [FIX]   bash .claude/hooks/list_active_hooks.sh --count"
     elif [ "$MODE" = "--full" ]; then
-      fail "README($README_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격). --fix로 자동 교정 가능"
+      fail "README($README_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트 (--full 모드: FAIL 승격). list_active_hooks 참조해 수동 갱신 필요"
     else
       warn "README($README_COUNT) ≠ settings($SETTINGS_HOOKS) — 문서 드리프트"
     fi

@@ -5,7 +5,11 @@
 
 ## 활성 Hook (31개 등록, settings.json 기준)
 
-> `final_check.sh`는 `settings.json`의 실제 등록 목록을 기준축으로 보고, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+> **Single Source of Truth (세션93, 2026-04-22 2자 토론 합의)**: 활성 hook의 **유일한 기준축은 `list_active_hooks.sh`**. `final_check.sh`는 이 기준을 따르며, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+> - 카운트: `bash .claude/hooks/list_active_hooks.sh --count`
+> - 이벤트별: `bash .claude/hooks/list_active_hooks.sh --by-event`
+> - `.claude/scripts/hook_registry.sh`는 **legacy 격하** (settings.local.json 전제만 참조). 자동 sync 중단.
+>
 > 이벤트별 등록 수: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4 = **31**
 
 ### 이벤트층 (SessionStart / PreCompact)
@@ -149,6 +153,8 @@
 | `share_gate.sh` | share-result 0단계 3way 감지 조건 자동 검증 (세션79). `/share-result` 스킬 진입 시 수동 실행. 등급: advisory (stderr 경고만) |
 | `nightly_capability_check.sh` | Silent Failure 방지용 야간 capability 점검. Windows schtasks 수동 등록 필요 (세부 절차 별도 안내) |
 | `pruning_observe.sh` | MEMORY/TASKS 항목 pruning 관찰 리포트 (수동 실행) |
+| `list_active_hooks.sh` | 활성 hook 단일 원본 (Single Source). settings.json(team+local union) 파싱, --count/--by-event/--names/--full 모드 (세션93 SSoT 확정) |
+| `../scripts/hook_registry.sh` | **[LEGACY, 세션93]** settings.local.json 전제. truth chain에서 제외. 대체: `list_active_hooks.sh` |
 
 ## 훅 등급 분류 (2026-04-19 의제5 3자 토론 합의, Phase 2-B 일부 반영)
 

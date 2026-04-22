@@ -1,0 +1,39 @@
+{
+  "session_id": "debate_20260422_150445",
+  "mode": "2way",
+  "agenda": "클로드코드 hook 시스템 2차 진단 결과 공유 + 개선 계획 수립",
+  "chat_url": "https://chatgpt.com/g/g-p-69bca228f9288191869d502d2056062c-gpt-keulrodeu-eobmu-jadonghwa-toron/c/69e85ff1-1644-83e8-8daf-ce14a730af47",
+  "turn_number": 2,
+  "user_directive": "2자 토론으로 진행 + 전체 시스템 구조 관점 필수",
+  "auto_promote_skipped": true,
+  "auto_promote_skipped_reason": "사용자 명시 지시 예외",
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "2way",
+      "claude": "Claude 독립 검증 11/11 실증됨 + 2건 등급 재조정 제안 + 개선 계획 4축 요청",
+      "gpt": "coverage 축소 우선 하이브리드 + 4축 분류 + 7단계 실행 순서",
+      "harness": {
+        "summary_counts": {"채택": 5, "보류": 2, "버림": 0},
+        "ref": "round1_gpt.md / round1_claude_harness.md"
+      }
+    },
+    {
+      "turn": 2,
+      "mode": "2way",
+      "claude": "보류 2건 해소 요청 + 독립 의견 4건 + 실행계획 문서 포맷 수락",
+      "gpt": "마커 A/B/C 3분류 + boundary 시나리오 6건 + 1주차/2주차 작업묶음 + 롤백 조건 + 손대지 않기 리스트",
+      "harness": {
+        "summary_counts": {"채택": 6, "보류": 1, "버림": 0},
+        "ref": "round2_gpt.md / round2_claude_harness.md"
+      }
+    }
+  ],
+  "result": {
+    "status": "planning_complete",
+    "plan_doc": "plan.md",
+    "next_step": "사용자 승인 대기 — Full Lane 수술 착수 여부",
+    "critic_reviewer_skipped": true,
+    "critic_reviewer_skip_reason": "설계 토론 종결, 구현 착수 전 단계. 승인 후 실제 구현 라운드에서 critic 재호출 가능"
+  }
+}
