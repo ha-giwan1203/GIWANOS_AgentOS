@@ -2,38 +2,19 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "조건부 통과",
-  "gemini_shared": true,
-  "gemini_judgment": "통과",
-  "user_reported": false,
-  "followup_checked": false,
+  "gpt_judgment": "PASS",
+  "gemini_judgment": null,
+  "user_reported": true,
+  "followup_checked": true,
   "exception_reason": null,
-  "session": "session85",
-  "summary": "이월 4건 처리 — (1) TASKS.md 770→674줄(세션82~80 블록 아카이브 96줄), (2) incident_ledger 실측 집계(1,197건 중 상위 5종 658건 모두 정책 gate 정상 차단 → /auto-fix 일괄 적용 부적합 판정), (3) β안 3자 토론 Round 1 만장일치(pass_ratio 1.0, β안-C 채택: 6-2/6-4 단발 검증 API 병렬 + 원문 payload + 로그 브릿지), (4) A안-2 실증 판정(β안 B 분류 → skip_65 불가, critic WARN 이월 지속). 규정 실물 반영: CLAUDE.md [NEVER] API 호출 유일 예외 + debate-mode/SKILL.md Step 6-2/6-4 β안-C 섹션. HANDOFF 번호 충돌 수정(0→4). 이월 세션86+: β안-C 실제 API 클라이언트 구현 + smoke_test 5건 + 2주 관찰.",
-  "commits": ["1bd81a62"],
-  "harness_analysis": {
-    "adopted": 6,
-    "held": 2,
-    "discarded": 0,
-    "note": "GPT 3건(쟁점 1·2·4 채택) + Gemini 2건(쟁점 1·2 채택) + Gemini 신규 로그 브릿지 파이프라인(채택). 쟁점 3 리스크 순위 역순(GPT b>a>c / Gemini c>a>b) 양측 관점 모두 통합 설계에 수용으로 보류 처리."
-  },
-  "pass_ratio_final": 1.0,
-  "critic_review": {
-    "status": "not_invoked",
-    "note": "Round 1 만장일치(4/4 동의, 단서 1건 보수적 해석) + 사용자 지시 독립의견 유지 준수(쟁점 3 역순·로그 브릿지 단독 제안) → critic-reviewer 호출 대신 하네스 라벨링으로 대체"
-  },
-  "issue_class": "B",
-  "skip_65": false,
-  "claude_delta": "mapping_and_integration",
-  "final_share_verdicts": {
-    "gpt": {
-      "verdict": "조건부 통과",
-      "reason": "CLAUDE.md β안-C 예외·SKILL.md Step 6-2/6-4 재정의·TASKS·HANDOFF 세션85 반영·incident 집계는 Git 실물 정합. 단 98_아카이브 파일은 git 미관리라 Git 기준 완료 판정 근거 못 쓰며, API 클라이언트·smoke·2주 관찰이 세션86+ 이월이라 일괄 PASS까지 한 단계 남음."
-    },
-    "gemini": {
-      "verdict_initial": "기준 미확인 (실물 diff 요구)",
-      "verdict_final": "통과",
-      "reason": "실물 diff 재공유 후 재판정. 합의된 β안-C의 모든 요구사항(원문 payload 필수, 실패 UI 자동 복귀, 로그 브릿지 파이프라인, 본론·종합 API 확장 차단 6개 [NEVER])이 CLAUDE.md·SKILL.md에 누락 없이 명문화됨을 실물 확인 후 최종 승인."
-    }
-  }
+  "session": "세션92",
+  "final_sha": "a1a81496",
+  "commits": [
+    "e539b380",
+    "60f76c9e",
+    "e341f8bb",
+    "a1a81496"
+  ],
+  "notion_sync": "ok",
+  "generated_at": "2026-04-22 KST"
 }

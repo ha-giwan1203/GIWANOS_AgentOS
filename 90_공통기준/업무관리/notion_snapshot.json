@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-04-22 14:24 KST",
+  "generated_at": "2026-04-22 14:44 KST",
   "last_updated": "",
-  "github_sha": "e539b38024a64b4fa4444d53ffcd4a3335daa79e",
-  "github_sha_short": "e539b380",
+  "github_sha": "a1a814963f2906cc9989797344dfda0f35d085b0",
+  "github_sha_short": "a1a81496",
   "hooks_raw": 45,
   "hooks_active": 31,
   "commands": 30,
@@ -23,7 +23,7 @@
     {
       "header": "세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)",
       "body": [
-        "**[진행중] 단계 IV 완결 + V-7 Notion parity**",
+        "**[완료] 단계 IV 완결 + V-7 Notion parity + VIII 관찰 지표 기록**",
         "- 계획 파일: `C:/Users/User/.claude/plans/staged-sprouting-perlis.md` (묶음 A/B/C)",
         "**[완료] 묶음 A — Self-X Layer 1/4 원본 archive 이동**",
         "- IV-5: `90_공통기준/invariants.yaml` → `98_아카이브/session91_glimmering/invariants_~session89.yaml`",
@@ -31,10 +31,23 @@
         "- 세션91 VII-2 staging 잔여(`circuit_breaker.json` / `meta.json` 삭제) 반영",
         "- `DISPOSITION.md` 갱신: 완료 상태 표기 + V-2 드리프트 감지 경로 교환(render_hooks_readme.sh 단일화) 명시",
         "- 검증: smoke_fast 11/11 ALL PASS / selfcheck \"archive 상태\" 정상 출력",
-        "**[대기] 묶음 B — V-7 Notion projection parity**",
-        "- notion_sync.py Self-X Layer 1/4 주석·Circuit Breaker 블록 정리",
-        "- notion_snapshot.json 재생성 (offline 가능 경로 확인 후)",
-        "**[대기] 묶음 C — HANDOFF 세션92 갱신 + 커밋**"
+        "**[완료] 묶음 B — V-7 Notion projection parity (코드 차원)**",
+        "- `notion_sync.py` 수정:",
+        "  - `_build_status_blocks` System Health 블록을 `summary.txt` 단일 경로로 단순화 (last_diagnosis.json fallback 제거)",
+        "  - Circuit Breaker 블록(L1141~1158) 전체 제거",
+        "  - Self-Recovery 블록 + `_recent_auto_recovery` 헬퍼 함수 제거",
+        "- grep 결과: `Self-X | Circuit Breaker | circuit_breaker | auto_recovery | Self-Recovery | quota_snapshot` 0건 (코드)",
+        "- `notion_snapshot.json` 재생성 — offline 경로(`generate_snapshot` + `write_snapshot_json` 직접 호출)",
+        "- 검증: python 구문 OK, hooks_active=31 유지, 렌더 블록 Self-X 현재 서술 0건",
+        "- 네트워크 push(`--manual-sync`)는 다음 `/finish` 또는 사용자 수동 트리거 시점에 자동 반영 예정",
+        "**[완료] 묶음 C — 단계 VIII 관찰 지표 기록 + 최종 정리**",
+        "- 지표 #2 smoke_fast: **11/11 ALL PASS** (2026-04-22 14:15 KST)",
+        "- 지표 #3 incident 신규 24h: **0건** (총 1226 / 해결 679 / 미해결 547 — 세션91 대비 변화 없음)",
+        "- 지표 #4 재도입 방지 grep: active 경로 **1건(의미상 0건)**",
+        "  - `.claude/hooks/hook_common.sh` `circuit_breaker_tripped()` + `commit_gate.sh` L86 호출부 + `smoke_test.sh` 해당 함수 capability 체크 3종은 **이름만 겹치는 incident_ledger 기반 advisory 함수** — Self-X Layer 4 런타임과 무관. archive 대상 아님.",
+        "  - 기타 매치: `migration_note_20260422.md`, `DESIGN_PRINCIPLES.md`, `DISPOSITION.md`, `session_start_restore.sh` historical 주석, `_archive/` 내부 = 전부 historical 서술. 재도입 아님.",
+        "- 지표 #5 Notion projection parity: Self-X 현재 서술 블록 **0건** (묶음 B에서 달성, 네트워크 push는 다음 /finish에 자동 반영)",
+        "- 지표 #1/#6 (체감 레이턴시 / archive 파일 30일 내 재생성): 세션간 유지형 지표 — 30일(2026-05-22) 만료 시점 재평가"
       ]
     },
     {

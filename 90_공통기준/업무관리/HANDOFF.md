@@ -41,6 +41,11 @@
 - 하네스: 채택 3 / 보류 0 / 버림 0
 - 후속 수정 요구 없음 — 세션92 완전 종결
 
+### /finish 종료 (2026-04-22 14:47 KST)
+- Notion `--manual-sync` 성공: Self-X/Circuit Breaker 서술 제거 확정 (외부 투영 parity 달성)
+- finish_state.json: terminal_state=done, final_sha=a1a81496
+- 세션92 최종 4커밋 origin 반영: `e539b380 → 60f76c9e → e341f8bb → a1a81496`
+
 ### 다음 세션 액션 (세션93~)
 1. **관찰 기간 유지**: 2026-04-22 ~ 2026-05-22 (30일 TTL). 신규 hook 추가 금지.
 2. **주 1회 수동 selfcheck**: `bash .claude/self/selfcheck.sh` — summary.txt / last_selfcheck.txt / HEALTH.md 갱신. 결과 세션 kick-off 시 확인.
