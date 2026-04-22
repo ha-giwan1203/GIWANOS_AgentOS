@@ -1060,32 +1060,6 @@ def _incident_top_kinds(repo_root: Path, days: int = 7, top: int = 8) -> list[tu
     return counter.most_common(top)
 
 
-def _recent_auto_recovery(repo_root: Path, n: int = 5) -> list[str]:
-    """auto_recovery.jsonl 최근 N건 행동 요약."""
-    rec = repo_root / ".claude" / "self" / "auto_recovery.jsonl"
-    if not rec.exists():
-        return []
-    out = []
-    try:
-        with open(rec, encoding="utf-8", errors="ignore") as f:
-            for line in f.readlines()[-n:]:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    obj = json.loads(line)
-                    ts = obj.get("ts") or obj.get("date") or ""
-                    action = obj.get("action") or "?"
-                    detail_keys = [k for k in obj.keys() if k not in ("ts", "date", "action")]
-                    detail = " / ".join(f"{k}={obj[k]}" for k in detail_keys[:3])
-                    out.append(f"{ts} · {action}" + (f" · {detail}" if detail else ""))
-                except Exception:
-                    pass
-    except Exception:
-        return []
-    return out
-
-
 def _build_status_blocks(snap: dict, repo_root: Path) -> list[dict]:
     """STATUS (Auto) — 시스템 운영 현황. 실질적 상태 정보 중심."""
     blocks = [
@@ -1094,35 +1068,15 @@ def _build_status_blocks(snap: dict, repo_root: Path) -> list[dict]:
         _divider_block(),
     ]
 
-    # ── System Health (Self-X Layer 1 invariants 전체) ──
-    diag = repo_root / ".claude" / "self" / "last_diagnosis.json"
-    if diag.exists():
+    # ── System Health (수동 selfcheck 요약 — 세션92 V-7 이후) ──
+    health_file = repo_root / ".claude" / "self" / "summary.txt"
+    if health_file.exists():
         try:
-            data = json.loads(diag.read_text(encoding="utf-8"))
-            agg = data.get("aggregate", {})
-            ok = agg.get("ok", 0)
-            warn = agg.get("warn", 0)
-            crit = agg.get("critical", 0)
-            overall = agg.get("overall", "?")
-            summary_line = f"[health] {ok} OK · {warn} WARN · {crit} CRITICAL (overall {overall})"
-            blocks.append(_heading3_block(f"System Health — {summary_line}"))
-            for r in data.get("results", []):
-                name = r.get("name", "?")
-                status = r.get("status", "?")
-                msg = r.get("message", "") or r.get("value", "")
-                icon = "🟢" if status == "OK" else ("🔴" if status == "CRITICAL" else "🟡")
-                blocks.append(_bullet_block(f"{icon} {name} — {msg}"[:180]))
-        except Exception as e:
-            blocks.append(_bullet_block(f"(diagnose.json 파싱 실패: {e})"))
-    else:
-        health_file = repo_root / ".claude" / "self" / "summary.txt"
-        if health_file.exists():
-            try:
-                line = health_file.read_text(encoding="utf-8").strip().splitlines()[0]
-                blocks.append(_heading3_block("System Health"))
-                blocks.append(_bullet_block(line[:180]))
-            except Exception:
-                pass
+            line = health_file.read_text(encoding="utf-8").strip().splitlines()[0]
+            blocks.append(_heading3_block("System Health"))
+            blocks.append(_bullet_block(line[:180]))
+        except Exception:
+            pass
 
     # ── 핵심 지표 ──
     blocks.append(_heading3_block("핵심 지표"))
@@ -1137,33 +1091,6 @@ def _build_status_blocks(snap: dict, repo_root: Path) -> list[dict]:
     blocks.append(_bullet_block(f"훅 시스템: {hooks_r}개 (raw) / {hooks_a}개 (활성 추정)"))
     blocks.append(_bullet_block(f"슬래시 커맨드: {cmds}개"))
     blocks.append(_bullet_block(f"smoke_test: {smoke}"))
-
-    # ── Circuit Breaker 상태 (Self-X Layer 4) ──
-    cb = repo_root / ".claude" / "self" / "circuit_breaker.json"
-    if cb.exists():
-        try:
-            data = json.loads(cb.read_text(encoding="utf-8"))
-            st = data.get("state", {})
-            th = data.get("thresholds", {})
-            locked = st.get("locked", False)
-            lock_icon = "🔒" if locked else "🔓"
-            lock_reason = st.get("locked_reason", "") or "정상"
-            trip_count = st.get("tripped_count_24h", 0)
-            blocks.append(_heading3_block(f"Circuit Breaker {lock_icon}"))
-            blocks.append(_bullet_block(f"상태: {'잠김' if locked else '정상'} ({lock_reason})"))
-            blocks.append(_bullet_block(f"24h trip 카운트: {trip_count}"))
-            blocks.append(_bullet_block(
-                f"일일 한도: T1 {th.get('daily_t1_limit', '?')} / T2 {th.get('daily_t2_limit', '?')}"
-            ))
-        except Exception:
-            pass
-
-    # ── 최근 Self-Recovery (Layer 2 T1) ──
-    recs = _recent_auto_recovery(repo_root, 5)
-    if recs:
-        blocks.append(_heading3_block(f"최근 Self-Recovery ({len(recs)}건)"))
-        for r in recs:
-            blocks.append(_bullet_block(r[:180]))
 
     # ── Incident 상위 kind (최근 7일 미해결) ──
     top_kinds = _incident_top_kinds(repo_root, days=7, top=8)

@@ -26,11 +26,17 @@
 - `DISPOSITION.md` 갱신: 완료 상태 표기 + V-2 드리프트 감지 경로 교환(render_hooks_readme.sh 단일화) 명시
 - 검증: smoke_fast 11/11 ALL PASS / selfcheck "archive 상태" 정상 출력
 
-**[대기] 묶음 B — V-7 Notion projection parity**
-- notion_sync.py Self-X Layer 1/4 주석·Circuit Breaker 블록 정리
-- notion_snapshot.json 재생성 (offline 가능 경로 확인 후)
+**[완료] 묶음 B — V-7 Notion projection parity (코드 차원)**
+- `notion_sync.py` 수정:
+  - `_build_status_blocks` System Health 블록을 `summary.txt` 단일 경로로 단순화 (last_diagnosis.json fallback 제거)
+  - Circuit Breaker 블록(L1141~1158) 전체 제거
+  - Self-Recovery 블록 + `_recent_auto_recovery` 헬퍼 함수 제거
+- grep 결과: `Self-X | Circuit Breaker | circuit_breaker | auto_recovery | Self-Recovery | quota_snapshot` 0건 (코드)
+- `notion_snapshot.json` 재생성 — offline 경로(`generate_snapshot` + `write_snapshot_json` 직접 호출)
+- 검증: python 구문 OK, hooks_active=31 유지, 렌더 블록 Self-X 현재 서술 0건
+- 네트워크 push(`--manual-sync`)는 다음 `/finish` 또는 사용자 수동 트리거 시점에 자동 반영 예정
 
-**[대기] 묶음 C — HANDOFF 세션92 갱신 + 커밋**
+**[대기] 묶음 C — 최종 TASKS/HANDOFF 세션92 블록 정리 + 단계 VIII 지표 기록**
 
 ---
 

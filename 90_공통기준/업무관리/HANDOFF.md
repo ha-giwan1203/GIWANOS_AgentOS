@@ -23,9 +23,16 @@
 - DISPOSITION.md: 완료 표기 + V-2 드리프트 감지 교환(render_hooks_readme.sh 단일화) 명시
 - 검증: smoke_fast 11/11 ALL PASS, selfcheck "archive 상태" 정상 출력 (incident 총 1226/해결 679/미해결 547, 최근 24h 신규 0)
 
+### 묶음 B 완료 — V-7 Notion projection parity (코드 차원)
+- `notion_sync.py`:
+  - System Health 블록 → `summary.txt` 단일 fallback 구조로 단순화
+  - Circuit Breaker 블록(L1141~1158) + Self-Recovery 블록 + `_recent_auto_recovery` 헬퍼 제거
+  - Self-X / Circuit Breaker / auto_recovery grep 결과 0건
+- `notion_snapshot.json` offline 재생성 (hooks_active=31 유지)
+- 네트워크 push: 다음 `/finish` 또는 `--manual-sync` 수동 트리거 시 반영
+
 ### 다음 액션 (이번 세션 내 연속 진행)
-1. 묶음 B — `notion_sync.py` Self-X/Circuit Breaker 블록 정리 + `notion_snapshot.json` 재생성
-2. 묶음 C — HANDOFF 세션92 완결 블록 + 커밋 3건 정리
+1. 묶음 C — 단계 VIII 관찰 지표 기록 + 최종 세션92 완결 블록
 
 ---
 
