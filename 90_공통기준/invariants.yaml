@@ -65,24 +65,20 @@ invariants:
     target: .claude/state/session_kernel.md
     description: session_kernel.md 24h 초과 시 stale → fallback 알림
 
-# BASELINE WAIVER 2026-04-22 — Plan glimmering-churning-reef 단계 0-2
-# settings_drift invariant를 임시 비활성화 (invariants 리스트에서 제외 → diagnose.py 스킵).
-# 해제 조건: 단계 V-1/V-2 완료 (README/STATUS 자동 생성으로 드리프트 구조적 제거).
-# 해제 후 아래 블록을 invariants 리스트로 복원.
-# 원본 블록 (아카이브):
-#   - name: settings_drift
-#     severity: warn
-#     threshold: 0
-#     method: drift_check
-#     targets:
-#       - settings.json hook count
-#       - hooks/README.md hook count
-#       - STATUS.md hook count
-#     description: settings/README/STATUS hook 수 불일치 시 WARN (GPT 신규)
+  # 세션91 V-2 완료 2026-04-22 — WAIVER 해제 + 원본 블록 복원
+  # 자동 생성 도구: .claude/hooks/render_hooks_readme.sh (settings.json 기반 README/STATUS 갱신)
+  - name: settings_drift
+    severity: warn
+    threshold: 0
+    method: drift_check
+    targets:
+      - settings.json hook count
+      - hooks/README.md hook count
+      - STATUS.md hook count
+    description: settings/README/STATUS hook 수 불일치 시 WARN. 갱신은 render_hooks_readme.sh 수행
 
 # 추후 도입 예정 (B5 별도 의제 통과 후)
 deferred:
-  - hook_count_le_36   # Subtraction Quota — B5 의제로 분리
-  - skill_count_le_50
-  - memory_entry_le_30
-  - settings_drift     # BASELINE WAIVER 2026-04-22, 단계 V 완료 시 복원
+  - hook_count_le_36   # 세션91 B5 Subtraction Quota 폐기, 지표 자체도 무효
+  - skill_count_le_50  # 동 (B5 폐기)
+  - memory_entry_le_30 # 동 (B5 폐기)

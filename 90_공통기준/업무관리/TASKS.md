@@ -37,13 +37,13 @@
 - [완료] IV-4: `.claude/self/DISPOSITION.md` 신설 (10개 파일 처리 방침)
 - [대기] IV-5: invariants.yaml archive — 단계 V-1/V-2 완료 후
 
-**[진행중] 단계 V — Single Source 전환**
-- [완료] V-1: `.claude/hooks/list_active_hooks.sh` 신설 (settings 기반 자동 집계)
-- [완료] V-3: CLAUDE.md 훅 수 수동 서술 삭제 (list_active_hooks.sh 참조로 교체)
-- [완료] V-4/V-5: `protected_assets.yaml` Self-X 항목 제거 + quota/ttl 블록 제거 (원본 `98_아카이브/session91_glimmering/`)
-- [완료] V-6 (일부): CLAUDE.md Self-X Layer 전면 삭제
-- [대기] V-2 (완성형): README/STATUS 자동 생성 전환 (현재는 list_active_hooks.sh 도구 제공만)
-- [대기] V-7: Notion projection parity
+**[완료] 단계 V — Single Source 전환**
+- V-1: `.claude/hooks/list_active_hooks.sh` 신설 (settings 기반 자동 집계)
+- V-2: `.claude/hooks/render_hooks_readme.sh` 신설 (README/STATUS 숫자 자동 갱신) + `invariants.yaml` settings_drift WAIVER 해제 (원본 블록 복원)
+- V-3: CLAUDE.md 훅 수 수동 서술 삭제 (list_active_hooks.sh 참조로 교체)
+- V-4/V-5: `protected_assets.yaml` Self-X 항목 제거 + quota/ttl 블록 제거 (원본 `98_아카이브/session91_glimmering/`)
+- V-6: CLAUDE.md Self-X Layer 전면 삭제
+- [대기] V-7: Notion projection parity — 다음 세션 (네트워크 필요 `notion_sync.py --manual-sync`)
 
 **[완료] 단계 VI — 슬림화**
 - VI-1: CLAUDE.md Self-X Layer 전문 삭제 → `.claude/self/DESIGN_PRINCIPLES.md` 신설
