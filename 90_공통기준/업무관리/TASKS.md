@@ -26,7 +26,8 @@
 
 **[진행중] 단계 III 구현 — 4커밋 순차 착수**
 - [완료] 커밋 A (1935efd8): `commit_gate.sh` L81-98 제거 + `final_check.sh` statusLine 제외 + README/STATUS 드리프트 동기화
-- [진행] 커밋 B: `evidence_stop_guard.sh` L63-70 제거 (latent completion branch 정리)
+- [완료] 커밋 B (96b14617): `evidence_stop_guard.sh` L63-70 제거 (latent completion branch 정리)
+- [진행] 커밋 C: `evidence_gate.sh` suppress 라벨 `suppress_reason=evidence_recent` 고정
 - 커밋 B: `.claude/hooks/evidence_stop_guard.sh` L63-70 제거 (사유: tasks_handoff req producer 제거 이후 latent completion branch 정리 + completion 책임 단일화. 실측 grep `touch_req.*tasks_handoff` 0 matches)
 - 커밋 C: `.claude/hooks/evidence_gate.sh` suppress 라벨 hook_log/stderr에 `suppress_reason=evidence_recent` 고정
 - 커밋 D: `.claude/hooks/gate_boundary_check.sh` 신설 (standalone 1회 → 오탐 확인 + `# [gate-boundary-allow]` 화이트리스트 → smoke_fast 편입)

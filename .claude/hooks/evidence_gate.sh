@@ -100,8 +100,11 @@ deny() {
     hook_incident "gate_reject" "evidence_gate" "" "$reason" \
       "\"classification_reason\":\"evidence_missing\",\"fingerprint\":\"$_fingerprint\"" 2>/dev/null || true
   else
-    hook_log "PreToolUse/evidence_gate" "incident suppress (fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s, scan=100)" 2>/dev/null
-    echo "[evidence_gate] 반복 차단 감지 (fp=$_fingerprint, 최근 ${GRACE_WINDOW}s 내 동일 사유). 차단 유지, 기록만 억제." >&2
+    # 세션91 단계 III-2 (2026-04-22): suppress 라벨 hook_log/stderr 고정.
+    # suppress_reason=evidence_recent — 이 경로는 사전 근거 범위 내 중복 억제일 뿐,
+    # incident_ledger row를 생성하지 않는다 (suppress 의미 파괴 방지).
+    hook_log "PreToolUse/evidence_gate" "incident suppress (suppress_reason=evidence_recent, fingerprint=$_fingerprint, grace=${GRACE_WINDOW}s, scan=100)" 2>/dev/null
+    echo "[evidence_gate] suppress_reason=evidence_recent — 반복 차단 감지 (fp=$_fingerprint, 최근 ${GRACE_WINDOW}s 내 동일 사유). 차단 유지, 기록만 억제." >&2
   fi
 
   # 해결 방법 안내 포함 (사용자가 탈출 경로를 알 수 있도록)
