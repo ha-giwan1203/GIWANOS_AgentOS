@@ -108,13 +108,16 @@ deny() {
   fi
 
   # 해결 방법 안내 포함 (사용자가 탈출 경로를 알 수 있도록)
+  # 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 4번):
+  #   evidence-core 3종(date_check / auth_diag / identifier_ref)만 resolve_hint 제공
+  #   map_scope / tasks_handoff / skill_read 힌트는 해당 블록과 함께 제거됨
   local resolve_hint=""
-  if [ "$req_name" = "map_scope" ]; then
-    resolve_hint=" 해결: /map-scope 실행 또는 변경 대상/연쇄 영향/후속 작업 3줄을 직접 선언하면 ok 마커가 생성됩니다."
-  elif [ "$req_name" = "date_check" ]; then
+  if [ "$req_name" = "date_check" ]; then
     resolve_hint=" 해결: date 명령으로 현재 날짜를 확인하면 date_check.ok가 생성됩니다."
-  elif [ "$req_name" = "tasks_handoff" ]; then
-    resolve_hint=" 해결: TASKS.md와 HANDOFF.md를 갱신하면 ok 마커가 생성됩니다."
+  elif [ "$req_name" = "auth_diag" ]; then
+    resolve_hint=" 해결: auth_diag 스크립트 실행 또는 수동 로그인 진단 수행 시 auth_diag.ok가 생성됩니다."
+  elif [ "$req_name" = "identifier_ref" ]; then
+    resolve_hint=" 해결: 기준정보 대조 수행 시 identifier_ref.ok가 생성됩니다."
   fi
 
   local _safe_msg
@@ -124,34 +127,31 @@ deny() {
   exit 0
 }
 
-# 세션78 P2 재정의 (Round 1 3자 합의): git commit만 검증 (push-only 면제)
-#   기존(~세션77): risk_profile_prompt에서 tasks_handoff.req 조기 발행 → is_commit_or_push 시점에 검증 → 시간차로 맥락 상실
-#   변경(세션78 초안): req 발행 제거, commit/push 감지 시 즉석 독립 검증 → 시간차 0
-#   Round 1 합의 (GPT FAIL + Gemini 동의 + Claude 합의): push-only는 면제. git commit만 grep.
-#     근거: git push는 이미 commit된 내역을 원격에 반영 — 문서 갱신 증거는 commit 시점에만 요구
-#           세션76 commit_gate.sh의 push-only 스킵 최적화(체감 0.57s)와 정합
-#           "문서=진실의 근원" 철학은 commit 단위에서 충분히 수호됨
-#   has_any_req 우회 방지: early-exit을 이 블록 뒤로 이동시켰으므로 req 없는 세션에서도 commit 검증 동작
-if echo "$COMMAND" | grep -qiE 'git commit'; then
-  if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
-    deny "commit 차단. 이번 세션에 TASKS.md/HANDOFF.md 갱신 흔적이 없습니다." "tasks_handoff"
-  fi
-fi
+# 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 4번 체크리스트 (a)):
+#   tasks_handoff 검증 블록 제거 — commit_gate/final_check + completion_gate로 책임 이관 완료
+#   - commit_gate.sh: PreToolUse Bash 매처에서 final_check --fast 호출 (세션76 push-only skip 포함)
+#   - final_check.sh: "--- 7. TASKS/HANDOFF 갱신 확인 ---" + after_state_sync 검증 (line 330~)
+#   - completion_gate.sh: Stop 훅에서 write_marker + after_state_sync + git_has_relevant_changes
+#   따라서 evidence_gate에서 commit 시 tasks_updated/handoff_updated fresh_ok 재검증 불필요
+# 세션93 체크리스트 (b):
+#   map_scope 차단 블록 제거 — evidence 버스에서 분리. /map-scope 스킬은 Claude 자발적 선언 경로로 유지
+# 세션93 체크리스트 (c):
+#   skill_read 그룹 제거 — skill_instruction_gate로 이관. identifier_ref는 evidence-core 유지
 
-# req 없으면 완전 통과 — 일상 작업 마찰 방지 (세션78: commit/push 검증 이후로 이동)
+# req 없으면 완전 통과 — 일상 작업 마찰 방지
 if ! has_any_req; then
   hook_timing_end "evidence_gate" "$_EVG_START" "skip_noreq"
   exit 0
 fi
 
-# 1) 날짜 검증 선행
+# 1) 날짜 검증 선행 (evidence-core)
 if fresh_req "date_check" && is_bash_risky_date; then
   if ! fresh_ok "date_check"; then
     deny "date_check.req 존재. date_check.ok 없이 날짜 관련 실행 금지." "date_check"
   fi
 fi
 
-# 2) 로그인/실패 진단 선행
+# 2) 로그인/실패 진단 선행 (evidence-core)
 if fresh_req "auth_diag" && is_bash_risky_auth; then
   # 진단 스크립트 자체 실행은 허용
   if ! echo "$COMMAND" | grep -qiE 'auth_diag(\.sh)?'; then
@@ -161,51 +161,13 @@ if fresh_req "auth_diag" && is_bash_risky_auth; then
   fi
 fi
 
-# 3) 식별자/기준 문서 선행
-# 세션78 P2 재정의: 스킬별 마커 skill_read__*.ok도 면제 대상에 포함
-#   기존: fresh_ok "skill_read" || fresh_ok "identifier_ref"만 검사 → evidence_mark_read.sh가 생성하는 skill_read__${SKILL_ID}.ok 무시되는 모순
-#   변경: 스킬별 마커가 세션에 하나라도 존재하면 통과 (재진입 사용자 흐름 존중)
-if (fresh_req "skill_read" || fresh_req "identifier_ref") && is_identifier_domain_edit; then
-  _has_skill_marker=false
-  if fresh_ok "skill_read" || fresh_ok "identifier_ref"; then
-    _has_skill_marker=true
-  else
-    for _m in "$PROOF_DIR"/skill_read__*.ok; do
-      [ -e "$_m" ] || continue
-      if [ "$_m" -nt "$START_FILE" ]; then
-        _has_skill_marker=true
-        break
-      fi
-    done
-  fi
-  if [ "$_has_skill_marker" = "false" ]; then
-    deny "skill_read.req / identifier_ref.req 존재. SKILL.md 또는 기준정보 대조 없이 관련 도메인 수정 금지." "skill_read"
+# 3) 식별자/기준 문서 선행 (evidence-core)
+# 세션93: skill_read 분리 → skill_instruction_gate가 SKILL.md 읽기 전담. 여기는 identifier_ref만 검증
+if fresh_req "identifier_ref" && is_identifier_domain_edit; then
+  if ! fresh_ok "identifier_ref"; then
+    deny "identifier_ref.req 존재. 기준정보 대조(identifier_ref.ok) 없이 관련 도메인 수정 금지." "identifier_ref"
   fi
 fi
-
-# 4) 사고 품질 — 고위험 수정 시 map_scope 선행
-# 세션77 Round 1 Step 1-c: 대상 파일 경로 체크 추가 (347건 71.4% 실증 기반 재정의)
-#   - 기존: 모든 Write/Edit/MultiEdit 차단 → 문서·도메인 데이터 수정도 차단되는 과탐지
-#   - 변경: Write/Edit 대상이 .claude/hooks/*.sh 또는 .claude/settings*.json일 때만 차단
-#     ( .md / 데이터 파일 / 업무 스프레드시트 / 일반 스크립트는 map_scope 면제 )
-if fresh_req "map_scope"; then
-  if ! fresh_ok "map_scope"; then
-    tool_name=$(echo "$INPUT" | safe_json_get "tool_name" 2>/dev/null || echo "")
-    if echo "$tool_name" | grep -qiE '(Write|Edit|MultiEdit)'; then
-      # 대상 파일 경로 추출 (safe_json_get은 top-level만 지원 → raw INPUT에서 직접 grep)
-      target_file=$(printf '%s' "$INPUT" | grep -oE '"file_path"[[:space:]]*:[[:space:]]*"[^"]+"' | head -1 | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
-      # 운영 훅(.claude/hooks/*.sh) 또는 settings json만 차단 대상
-      if echo "$target_file" | grep -qE '\.claude/hooks/[A-Za-z0-9_-]+\.sh$|\.claude/settings[A-Za-z0-9._-]*\.json$'; then
-        deny "map_scope.req 존재. 변경 대상/연쇄 영향/후속 작업 3줄 선언(map_scope.ok) 없이 운영 훅·settings 수정 금지." "map_scope"
-      fi
-      # 기타 파일(.md, 데이터, 일반 스크립트 등)은 map_scope 면제 — 통과
-    fi
-  fi
-fi
-
-# 5) 종료 문서 갱신 선행 — 세션78 P2 재정의로 상단 commit/push 우선 검증 블록으로 이동
-#   기존 조건 (fresh_req "tasks_handoff" && is_commit_or_push)은 req 조기 발행에 의존 → resolved 0% 초래
-#   새 구조: deny() 정의 직후 블록에서 req 유무 무관 commit/push 단독 검증
 
 hook_timing_end "evidence_gate" "$_EVG_START" "pass"
 exit 0

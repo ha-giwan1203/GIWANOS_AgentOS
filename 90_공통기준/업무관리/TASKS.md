@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 2차 진단 + 개선 계획 수립 + 1주차 1번 착수)
+최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1~4번 완료, 2주차는 7일 관찰 후)
 
 ---
 
@@ -35,10 +35,28 @@
   - `doctor_lite` OK
 - 소요: 약 30분
 
-**[예정] 1주차 2번 — selfcheck 24h 정확 집계** (plan.md 1주차 2번)
-**[예정] 1주차 3번 — doctor_lite python/python3 fallback** (plan.md 1주차 3번)
-**[예정] 1주차 4번 — evidence coverage 축소** (plan.md 1주차 4번, 본 수술)
-**[예정] 2주차 5~7번** (1주차 4번 + 1주 관찰 데이터 수령 후)
+**[완료] 1주차 2번 — selfcheck 24h 정확 집계**
+- `.claude/self/selfcheck.sh:75-97` CUTOFF prefix grep → python ISO8601 파싱 + datetime 비교로 교체
+- 검증: 기존 prefix=0건(해당 시각 매칭 없음) vs 정확=74건(실제 24h 범위) — 실효성 확인
+
+**[완료] 1주차 3번 — doctor_lite python/python3 fallback**
+- `.claude/hooks/doctor_lite.sh:6-17` PY_CMD fallback 추가 (smoke_fast.sh:33 동일 패턴)
+- 검증: `[doctor_lite] OK` 정상 출력
+
+**[완료] 1주차 4번 — evidence coverage 축소 (본 수술)**
+- (a) `evidence_gate.sh:127-139` tasks_handoff + tasks_updated/handoff_updated 검증 블록 제거 (commit_gate/final_check + completion_gate가 동일 책임 이미 수행)
+- (b) `evidence_gate.sh:186-204` + `risk_profile_prompt.sh:80-87` map_scope req/deny 블록 제거 (evidence 버스 분리)
+- (c) `evidence_gate.sh:165-184` + `risk_profile_prompt.sh:61-64` skill_read 그룹 제거 → skill_instruction_gate 전담. identifier_ref는 evidence-core로 유지
+- (d) `evidence_mark_read.sh` C분류 7종(skill_read/domain_read/tasks_read/handoff_read/status_read/tasks_updated/handoff_updated) mark 생성 제거. 유지: skill_read__<ID> + date_check/auth_diag/identifier_ref
+- (e) `smoke_test.sh` 섹션 53 신설(5건 정적 회귀 트립와이어), 섹션 17 런타임 케이스 44-3/4/5/7/9/11/12 무효화 정리 + 44-13 identifier_ref deny 런타임 추가. 섹션 19 skill_read/tasks_updated 마커 검증 교체. 섹션 48-5/51-6 무효화 주석 처리
+- 검증: smoke_test **211/211 ALL PASS**, smoke_fast 11/11, doctor_lite OK, selfcheck 총 1250/해결 679/미해결 571/최근 24h 81건
+
+**[관찰 예정] 1주차 반영 후 7일 관찰**
+- 정량 목표: evidence_gate 7일 미해결 ≤ 136건 (세션86 기준 272건 대비 50% 감소)
+- 현재 세션 시작 시점 지표: 미해결 559건 / 최근 24h 신규 65건
+- 관찰 기간 중: selfcheck로 주간 추세 확인, 미달 시 2주차 5번(contract 재설계) 재검토
+
+**[예정] 2주차 5~7번** (1주차 관찰 데이터 수령 후)
 
 ---
 

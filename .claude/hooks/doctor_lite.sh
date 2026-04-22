@@ -5,6 +5,11 @@
 
 source "$(dirname "$0")/hook_common.sh"
 
+# 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 3번):
+# python3 하드의존 → smoke_fast.sh:33 동일 패턴 fallback (환경 탄력성 통일)
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+
 ISSUES=()
 
 # 1. settings JSON 문법 검증 — team+local 양쪽 (세션74)
@@ -12,7 +17,7 @@ for SETTINGS_FILE in \
     "$PROJECT_ROOT/.claude/settings.json" \
     "$PROJECT_ROOT/.claude/settings.local.json"; do
   if [ -f "$SETTINGS_FILE" ]; then
-    if ! python3 -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS_FILE" 2>/dev/null; then
+    if ! "$PY_CMD" -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS_FILE" 2>/dev/null; then
       ISSUES+=("$(basename "$SETTINGS_FILE") JSON 문법 오류")
     fi
   fi

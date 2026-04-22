@@ -72,15 +72,35 @@ if [ -f "$INCIDENT_LEDGER" ]; then
   TOTAL=$(wc -l < "$INCIDENT_LEDGER" | tr -d ' ')
   RESOLVED=$(grep -c '"resolved":[[:space:]]*true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
   UNRESOLVED=$((TOTAL - RESOLVED))
-  CUTOFF=$(date -d '24 hours ago' '+%Y-%m-%dT%H' 2>/dev/null || date -v-24H '+%Y-%m-%dT%H' 2>/dev/null || echo "")
-  if [ -n "$CUTOFF" ]; then
-    RECENT=$(grep -c "\"ts\":\"$CUTOFF" "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
-    RECENT_APPROX="최근 24h(해당 시각 매칭): $RECENT건"
-  else
-    RECENT_APPROX=""
-  fi
+  # 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 2번):
+  # prefix grep (CUTOFF='%Y-%m-%dT%H') → 정확한 timestamp 비교로 교체
+  # 기존: "24h 전 그 한 시간대"만 카운트 → 실제 24h 범위 미반영
+  # 교체: python으로 ISO8601 파싱 후 current - 24h 이후 모든 incident 카운트
+  RECENT=$("$PY_CMD" - "$INCIDENT_LEDGER" <<'PYEOF' 2>/dev/null
+import sys, json
+from datetime import datetime, timedelta, timezone
+cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+count = 0
+try:
+    with open(sys.argv[1], encoding='utf-8') as f:
+        for line in f:
+            try:
+                ts_str = json.loads(line).get('ts', '')
+                if not ts_str:
+                    continue
+                ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+                if ts >= cutoff:
+                    count += 1
+            except Exception:
+                pass
+except Exception:
+    pass
+print(count)
+PYEOF
+)
+  RECENT="${RECENT:-0}"
   echo "  총 $TOTAL건 / 해결 $RESOLVED건 / 미해결 $UNRESOLVED건"
-  [ -n "$RECENT_APPROX" ] && echo "  $RECENT_APPROX"
+  echo "  최근 24h 신규: ${RECENT}건"
 else
   echo "  incident_ledger 없음"
 fi

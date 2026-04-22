@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1번 — hook_registry 격하)
+최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1~4번 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -32,12 +32,22 @@
   - `smoke_fast` 11/11 ALL PASS, `doctor_lite` OK
 - 위험도: 낮음 (계측 훅 격하, 실행 흐름 차단 경로 불변)
 
-### 다음 AI 액션 (1주차 잔여)
-1. **1주차 2번 — selfcheck 24h 정확 집계**: `selfcheck.sh:75-77` CUTOFF prefix grep 제거 → 정확 timestamp 비교 (예상 30분)
-2. **1주차 3번 — doctor_lite fallback**: `doctor_lite.sh:15` python3 하드의존 → smoke_fast:33 동일 패턴 (예상 15분)
-3. **1주차 4번 — evidence coverage 축소 (본 수술)**: Claude 교차검증 체크리스트 a~e (evidence_gate.sh tasks_handoff/map_scope/skill_read 블록 이관 + risk_profile_prompt 규칙 제거) (예상 반나절~1일)
-   - 검증 지표: evidence_gate 7일 미해결 ≤ 136건 (세션86 기준 272건 대비 50% 감소)
-4. **1주차 반영 후 7일 관찰** → 2주차 5번(contract 재설계) 착수 여부 판단
+### 1주차 2번/3번/4번 모두 완료 (세션93 연속 실행)
+- 2번: selfcheck 24h 정확 집계 (python ISO8601 파싱)
+- 3번: doctor_lite python/python3 fallback
+- 4번 (a~e): evidence coverage 축소
+  - evidence_gate.sh: tasks_handoff(a) / map_scope(b) / skill_read(c) 블록 제거. evidence-core 3종(date_check/auth_diag/identifier_ref)만 유지
+  - risk_profile_prompt.sh: map_scope/skill_read req 발행 제거. identifier_ref만 유지
+  - evidence_mark_read.sh (d): C분류 7종 마커(skill_read/domain_read/tasks_read/handoff_read/status_read/tasks_updated/handoff_updated) 생성 제거
+  - smoke_test.sh (e): 섹션 53 정적 회귀 트립와이어 5건 신설 + 섹션 17/19/48/51 세션93 무효화 정리 + 44-13 identifier_ref 런타임 검증 신설
+- 검증: **smoke_test 211/211 ALL PASS**, smoke_fast 11/11, doctor_lite OK, final_check --fast 31/31/31 일치
+
+### 다음 AI 액션
+1. **1주차 반영 후 7일 관찰**: evidence_gate 미해결 건수 추세. 현재 미해결 571건 / 최근 24h 신규 81건 (세션 시작 559/65 대비 약간 증가). 관찰 기준 지표는 세션86 기준 272건 → 목표 136건 (50%↓)
+2. **2주차 5번 — evidence 3종 contract형 재설계**: 1주차 관찰 7일 후 재평가. 미해결 감소 추세 확인 시 착수
+3. **2주차 6번 — state 복원 축 경량화** (state_rebind_check detect-only 전환)
+4. **2주차 7번 — boundary smoke 시나리오 승격** (6건 runtime 케이스 추가)
+5. **중간 관찰**: 사용자 지시 "전체 시스템 구조 관점" 유지 — 개별 수정 대신 축 간 의존(evidence 축 축소가 state/진단 축도 경량화시키는지) 관찰
 
 ---
 

@@ -30,18 +30,15 @@ TEXT="$(printf '%s' "$INPUT" | tr '\n' ' ' | sed 's/\\"/"/g')"
 # Windows 경로 정규화: 백슬래시 → 슬래시 (경로별 정밀 매칭용)
 NORM_TEXT="$(echo "$TEXT" | sed 's/\\\\/\//g')"
 
-# 도메인/기준 문서 읽기
-echo "$NORM_TEXT" | grep -qE 'SKILL\.md' && mark "skill_read"
-
-# 스킬별 SKILL.md 개별 마커 (skill_instruction_gate.sh 연동)
+# 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 4번 (d)):
+#   C분류 "직접 의존 못 찾은 마커" 5종 삭제:
+#     skill_read.ok (단일) / domain_read / tasks_read / handoff_read / status_read
+#   유지: skill_read__<SKILL_ID>.ok (skill_instruction_gate 전담 — B분류 instruction/control 축)
+# 스킬별 SKILL.md 개별 마커 (skill_instruction_gate.sh 연동, B분류 유지)
 SKILL_ID=$(echo "$NORM_TEXT" | sed -n 's|.*[/\\]스킬[/\\]\([^/\\]*\)[/\\]SKILL\.md.*|\1|p' | head -1)
 if [ -n "$SKILL_ID" ]; then
   mark "skill_read__${SKILL_ID}"
 fi
-echo "$NORM_TEXT" | grep -qE '(^|/|\\)CLAUDE\.md' && mark "domain_read"
-echo "$NORM_TEXT" | grep -qE 'TASKS\.md' && mark "tasks_read"
-echo "$NORM_TEXT" | grep -qE 'HANDOFF\.md' && mark "handoff_read"
-echo "$NORM_TEXT" | grep -qE 'STATUS\.md' && mark "status_read"
 
 # 토론모드 전용 마커 (경로 정밀 매칭) — 레거시 호환 유지
 INSTRUCTION_DIR="$PROJECT_ROOT/.claude/state/instruction_reads"
@@ -100,9 +97,10 @@ echo "$TEXT" | grep -qE 'date_check(\.sh)?' && mark "date_check"
 echo "$TEXT" | grep -qE 'auth_diag(\.sh)?' && mark "auth_diag"
 echo "$TEXT" | grep -qE 'identifier_ref_check(\.sh)?|기준정보 대조|identifier_ref' && mark "identifier_ref"
 
-# 문서 갱신 흔적
-echo "$TEXT" | grep -qE 'TASKS\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "tasks_updated"
-echo "$TEXT" | grep -qE 'HANDOFF\.md' && echo "$TEXT" | grep -qE '(Write|Edit|MultiEdit|file_path|path)' && mark "handoff_updated"
+# 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 4번 (d)):
+#   tasks_updated / handoff_updated 마커 생성 제거.
+#   사유: evidence_gate에서 tasks_handoff 블록 제거됨 → 이 마커는 더 이상 참조되지 않음.
+#   commit 시점 TASKS/HANDOFF 갱신 검증은 commit_gate(final_check)와 completion_gate(write_marker)가 담당.
 
 hook_timing_end "evidence_mark_read" "$_EMR_START" "ok"
 exit 0
