@@ -31,8 +31,16 @@
 - 커밋 D (d7ee12f8): `gate_boundary_check.sh` 신설 (standalone 3/3 ALL PASS, 오탐 0) + smoke_fast 11/11 편입
 - 회귀: 각 커밋 smoke_fast ALL PASS + final_check --full FAIL 0
 
-**[대기] 다음 진입점 — 단계 IV (뿌리 축소 + 수동화)**
-- IV-2: `.claude/self/selfcheck.sh` 신설 / IV-4: disposition 표 / IV-5: invariants.yaml archive
+**[진행중] 단계 IV — 뿌리 축소 + 수동화**
+- [완료] IV-1: health_check.sh SessionStart 등록 해제 (세션90에서 완료)
+- [완료] IV-2: `.claude/self/selfcheck.sh` 신설 (smoke_fast + doctor_lite + diagnose + quota + incident 묶음)
+- [완료] IV-4: `.claude/self/DISPOSITION.md` 신설 (10개 파일 처리 방침)
+- [대기] IV-5: invariants.yaml archive — 단계 V-1/V-2 완료 후
+
+**[대기] 단계 V — Single Source 전환** (README/STATUS 자동 생성 + protected_assets.yaml 정리 + Self-X 서술 audit + Notion parity)
+**[대기] 단계 VI — 슬림화** (CLAUDE.md Self-X Layer 삭제 + MEMORY/TASKS 감축 + incident archive)
+**[대기] 단계 VII — Dormant surface 제거** (비활성 hook/self 파일 archive)
+**[대기] 단계 VIII — 30일 TTL 관찰** (2026-05-22 이후 효과 평가)
 
 **계획 파일 갱신**: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 3 단계 III 세션91 합의 반영 완료
 

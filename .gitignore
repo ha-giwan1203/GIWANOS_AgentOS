@@ -44,6 +44,10 @@
 !.claude/docs/
 !.claude/docs/**
 !.claude/settings.json
+# 세션91 IV-2/IV-4: self 운영 파일 2종만 화이트리스트 (런타임 .json/.jsonl/.txt는 계속 차단)
+!.claude/self/
+!.claude/self/selfcheck.sh
+!.claude/self/DISPOSITION.md
 .claude/settings.local.json
 .claude/settings.local.json.bak_20260401
 .claude/settings.local.json.bak_20260419
