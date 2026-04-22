@@ -16,7 +16,7 @@
 
 ## 세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)
 
-**[진행중] 단계 IV 완결 + V-7 Notion parity**
+**[완료] 단계 IV 완결 + V-7 Notion parity + VIII 관찰 지표 기록**
 - 계획 파일: `C:/Users/User/.claude/plans/staged-sprouting-perlis.md` (묶음 A/B/C)
 
 **[완료] 묶음 A — Self-X Layer 1/4 원본 archive 이동**
@@ -36,7 +36,23 @@
 - 검증: python 구문 OK, hooks_active=31 유지, 렌더 블록 Self-X 현재 서술 0건
 - 네트워크 push(`--manual-sync`)는 다음 `/finish` 또는 사용자 수동 트리거 시점에 자동 반영 예정
 
-**[대기] 묶음 C — 최종 TASKS/HANDOFF 세션92 블록 정리 + 단계 VIII 지표 기록**
+**[완료] 묶음 C — 단계 VIII 관찰 지표 기록 + 최종 정리**
+- 지표 #2 smoke_fast: **11/11 ALL PASS** (2026-04-22 14:15 KST)
+- 지표 #3 incident 신규 24h: **0건** (총 1226 / 해결 679 / 미해결 547 — 세션91 대비 변화 없음)
+- 지표 #4 재도입 방지 grep: active 경로 **1건(의미상 0건)**
+  - `.claude/hooks/hook_common.sh` `circuit_breaker_tripped()` + `commit_gate.sh` L86 호출부 + `smoke_test.sh` 해당 함수 capability 체크 3종은 **이름만 겹치는 incident_ledger 기반 advisory 함수** — Self-X Layer 4 런타임과 무관. archive 대상 아님.
+  - 기타 매치: `migration_note_20260422.md`, `DESIGN_PRINCIPLES.md`, `DISPOSITION.md`, `session_start_restore.sh` historical 주석, `_archive/` 내부 = 전부 historical 서술. 재도입 아님.
+- 지표 #5 Notion projection parity: Self-X 현재 서술 블록 **0건** (묶음 B에서 달성, 네트워크 push는 다음 /finish에 자동 반영)
+- 지표 #1/#6 (체감 레이턴시 / archive 파일 30일 내 재생성): 세션간 유지형 지표 — 30일(2026-05-22) 만료 시점 재평가
+
+**세션92 최종 커밋 3건**
+| 커밋 | 단계 | 요약 |
+|------|------|------|
+| e539b380 | IV-5 + IV-4 마무리 | Self-X Layer 1/4 원본 5건 archive 이동 + DISPOSITION 갱신 |
+| 60f76c9e | V-7 | notion_sync.py Self-X/Circuit Breaker 블록 제거 + snapshot 재생성 |
+| (이번 커밋) | VIII | 단계 VIII 관찰 지표 기록 + 세션92 완결 |
+
+**단계 VIII 관찰 기간**: 2026-04-22 ~ 2026-05-22 (30일 TTL). 만료 시점 재평가.
 
 ---
 

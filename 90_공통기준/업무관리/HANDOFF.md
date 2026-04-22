@@ -31,8 +31,16 @@
 - `notion_snapshot.json` offline 재생성 (hooks_active=31 유지)
 - 네트워크 push: 다음 `/finish` 또는 `--manual-sync` 수동 트리거 시 반영
 
-### 다음 액션 (이번 세션 내 연속 진행)
-1. 묶음 C — 단계 VIII 관찰 지표 기록 + 최종 세션92 완결 블록
+### 묶음 C 완료 — 단계 VIII 관찰 지표 기록 + 세션92 완결
+- 지표 기록: smoke_fast 11/11 / incident 24h 신규 0 / 재도입 방지 grep 의미상 0 / Notion parity 달성 (코드)
+- 세션92 커밋 3건: `e539b380` (IV 완결) → `60f76c9e` (V-7) → 이번 커밋 (VIII 지표)
+
+### 다음 세션 액션 (세션93~)
+1. **관찰 기간 유지**: 2026-04-22 ~ 2026-05-22 (30일 TTL). 신규 hook 추가 금지.
+2. **주 1회 수동 selfcheck**: `bash .claude/self/selfcheck.sh` — summary.txt / last_selfcheck.txt / HEALTH.md 갱신. 결과 세션 kick-off 시 확인.
+3. **render_hooks_readme.sh 수동 실행**: settings 변경 시 `bash .claude/hooks/render_hooks_readme.sh` 1회 수행 후 커밋 (드리프트 원천 차단).
+4. **5월 22일 만료 시점 재평가**: Whac-A-Mole 재발 / 체감 / incident 추세 평가 후 단계 IX 여부 결정.
+5. **Notion `--manual-sync`**: 다음 /finish 또는 네트워크 환경에서 수동 트리거 시 Auto 페이지 Self-X 서술 0건 육안 확인.
 
 ---
 
