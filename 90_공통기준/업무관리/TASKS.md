@@ -10,11 +10,11 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 — 세션91 (Plan 단계 III 2자 토론 합의 완료)
+최종 업데이트: 2026-04-22 — 세션91 (Plan 단계 III 구현 착수)
 
 ---
 
-## 세션91 (2026-04-22) — Plan 단계 III 2자 토론 (게이트 3종 재절단 합의)
+## 세션91 (2026-04-22) — Plan 단계 III 2자 토론 + 구현 (게이트 3종 재절단)
 
 **[완료] 2자 토론 4라운드 — 단계 III 설계 합의**
 - 로그: `90_공통기준/토론모드/logs/debate_20260422_stage3_2way/` (round1~4 + SUMMARY.md)
@@ -24,13 +24,12 @@
 - Round 4: Step 4b critic-reviewer WARN 제기(의제 4 "실증됨" 라벨 과대 부여) → GPT 실측 근거로 critic 지적 기각 + 사유 문구 교체 합의
 - 채택 누계: 11 / 보류 0 / 버림 0
 
-**[대기] 단계 III 구현 — 세션92 이후 4커밋 순차 착수**
-- 커밋 A: `.claude/hooks/commit_gate.sh` L81-98 제거
+**[진행중] 단계 III 구현 — 4커밋 순차 착수**
+- [진행] 커밋 A: `.claude/hooks/commit_gate.sh` L81-98 제거 (write_marker 동봉 강제 삭제) + `final_check.sh` registered_hook_names() statusLine 제외 버그 수정 + README.md 누락 hook 3개(skill_drift_check/debate_verify/permissions_sanity) 추가 + STATUS.md 드리프트 수치 정정 — 동반 정리
 - 커밋 B: `.claude/hooks/evidence_stop_guard.sh` L63-70 제거 (사유: tasks_handoff req producer 제거 이후 latent completion branch 정리 + completion 책임 단일화. 실측 grep `touch_req.*tasks_handoff` 0 matches)
 - 커밋 C: `.claude/hooks/evidence_gate.sh` suppress 라벨 hook_log/stderr에 `suppress_reason=evidence_recent` 고정
 - 커밋 D: `.claude/hooks/gate_boundary_check.sh` 신설 (standalone 1회 → 오탐 확인 + `# [gate-boundary-allow]` 화이트리스트 → smoke_fast 편입)
 - 각 커밋 직후 smoke_fast 10/10 PASS 검증, 실패 시 즉시 revert
-- 구현 전제: B4 Circuit Breaker T2 구조변경 상한(일 2건) 준수 + NEW_HOOK_CHECKLIST 증적 번들
 
 **계획 파일 갱신**: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 3 단계 III 세션91 합의 반영 완료
 

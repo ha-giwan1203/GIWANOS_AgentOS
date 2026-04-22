@@ -41,6 +41,9 @@
 | ⑪ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
 | ⑫ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
 | ⑬ | `skill_instruction_gate.sh` | Bash | 인라인 python MES/ZDM 접근 시 SKILL.md 읽기 강제 |
+| ⑭ | `skill_drift_check.sh` | Bash | 스킬 실행 시 최신 SKILL.md 읽기 드리프트 차단 |
+| ⑮ | `debate_verify.sh` | Bash | 토론 합의 서명 검증 (`[3way]` 태그 커밋 무결성) |
+| ⑯ | `permissions_sanity.sh` | Bash | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
 
 ### 추적층 (PostToolUse)
 
@@ -69,7 +72,7 @@
 | `completion_gate.sh` | (전체) | TASKS/HANDOFF 미갱신 시 Stop 차단 |
 | `evidence_stop_guard.sh` | (전체) | 증거 없는 실패/완료 결론 차단 |
 
-#### Stop hook 책임 매트릭스 (의제5 세션71 Phase 2-A 문서화)
+## 훅별 실패 책임 매트릭스 (Stop 층, 의제5 세션71 Phase 2-A 문서화)
 
 | 훅 | 책임 영역 | 독립 가치 | 통합 시 손실 |
 |---|---|---|---|
@@ -158,6 +161,7 @@
 ### Phase 2-B 적용 현황 (2026-04-19 세션72)
 
 - **소프트 블록 신설**: `completion_gate.sh` — 1회용 3회 누적 7일 내 감지 시 deny 1회 (60초 쿨다운)
+  - 세션86 관찰(2026-04-20): 발동 0건. 조건 자연 미충족(정책 gate 선제 차단으로 재발 3회 누적 미도달). **현 로직 유지**, 조건 완화·삭제 보류. 상세: `90_공통기준/업무관리/incident_audit_20260420_session86.md` §5.
 - **exit 2 전환 완료 (6종)**: `commit_gate.sh`, `block_dangerous.sh`, `date_scope_guard.sh`, `protect_files.sh`, `evidence_stop_guard.sh`(기존 유지), `stop_guard.sh`(기존 유지)
 - **timing 배선만**: `debate_verify.sh` — Phase 2 승격은 incident 18건 잔존으로 보류, Phase 2-C 재평가 조건 7일 연속 0건
 

@@ -42,6 +42,8 @@ fail() {
 
 registered_hook_names() {
   # 세션74: settings.json(TEAM) + settings.local.json(PERSONAL) 양쪽 union
+  # 세션91 단계 III-1 부속 버그 수정 (2026-04-22): statusLine 블록의 statusline.sh는
+  # hook이 아니라 status line 설정 커맨드라서 제외. 드리프트 31 vs 32 근본 원인.
   local f
   local any=0
   for f in "$SETTINGS_TEAM" "$SETTINGS_LOCAL" "$@"; do
@@ -50,7 +52,7 @@ registered_hook_names() {
         | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/'
       any=1
     fi
-  done | sort -u
+  done | sort -u | grep -v '^statusline\.sh$'
   if [ "$any" = "0" ]; then
     return 1
   fi
