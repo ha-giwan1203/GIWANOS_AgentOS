@@ -4,12 +4,42 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션90 (Plan 단계 0+I+II + origin push 복구 + gpt-read drift 수정)
+최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 2자 토론 4라운드 합의 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-22 세션90 — Plan glimmering-churning-reef 단계 0/I/II 실행)
+## 0. 최신 세션 (2026-04-22 세션91 — Plan 단계 III 2자 토론 합의)
+
+### 실행 경로
+세션 재시작 후 남은 안건 확인 → 사용자 "2자 토론으로 진행" 지시 → Plan 파일 cosmic-jingling-toast.md 승인 → debate-mode 스킬 진입 → Round 1(의제 제시) → Round 2(합의 확정) → Round 3(조건 수용 + 종결) → critic-reviewer WARN 발생 → Round 4(critic 지적 GPT 재판정 + 실측 검증) → GPT 최종 통과 + 사유 문구 교체 합의
+
+### 핵심 합의 (단계 III 4커밋)
+- 커밋 A: commit_gate.sh L81-98 제거 — write_marker 동봉 강제 삭제 (원칙 5 "Git/staging만")
+- 커밋 B: evidence_stop_guard.sh L63-70 제거 — 사유 "tasks_handoff req producer 제거 이후 남은 latent completion branch 정리 + completion 책임 단일화" (Round 4 문구 교체). 실측: risk_profile_prompt.sh L66-69 주석 + grep `touch_req.*tasks_handoff` 0 matches
+- 커밋 C: evidence_gate.sh suppress 라벨 hook_log/stderr에 `suppress_reason=evidence_recent` 고정 (incident_ledger row 생성 금지)
+- 커밋 D: gate_boundary_check.sh 신설 — standalone 1회 → 오탐 확인 + `# [gate-boundary-allow]` 화이트리스트 → smoke_fast 편입. 성격은 "회귀 트립와이어"
+
+### critic-reviewer WARN 해소 경로
+- 판정: WARN (독립성/하네스/0건감사/일방성 4축 전부)
+- 핵심 지적: 의제 4 "evidence_stop_guard와 completion_gate 완료축 중복" 주장이 실측 없이 "실증됨" 라벨로 통과
+- 해소: Round 4에서 GPT에 실측 근거 요청 → GPT가 risk_profile_prompt.sh producer 제거 + grep 0 matches 제시 → Claude 독립 재검증 → "보완 관계" 해석은 기각, "dead branch" 판정 고정
+- 결과: 커밋 B 유지 + 사유 문구 교체
+
+### 이번 세션 변경 파일 (커밋 전)
+- 신규: `90_공통기준/토론모드/logs/debate_20260422_stage3_2way/` (round1_claude/round1_gpt/round2_claude/round2_gpt/round3_claude/round3_gpt/round4_critic_and_gpt/SUMMARY.md)
+- 수정: `90_공통기준/업무관리/TASKS.md` (세션91 로그 추가)
+- 수정: `90_공통기준/업무관리/HANDOFF.md` (세션91 메모)
+- 수정 (Git 외부): `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 3 단계 III 세션91 합의 반영
+
+### 다음 세션 액션 (세션92 이후)
+1. 단계 III 구현 착수 — 커밋 A/B/C/D 순차 수행 + smoke_fast 10/10 PASS 검증
+2. 구현 전제: B4 Circuit Breaker T2 상한(일 2건) 준수 + NEW_HOOK_CHECKLIST 증적 번들 생성
+3. 구현 완료 후 단계 IV(뿌리 축소 + 수동화) 진입
+
+---
+
+## 1. 이전 세션 (2026-04-22 세션90 — Plan glimmering-churning-reef 단계 0/I/II 실행)
 
 ### 실행 경로
 사용자 체감 둔화 질문 → Claude 독립 진단(Whac-A-Mole 6근본원인) → GPT 2자 토론 5라운드 → 사용자 "안전안" 선택 → 단계 0+I+II 실행 (7커밋) → 단계 III 진입 전 세션 재시작 권장 대기
