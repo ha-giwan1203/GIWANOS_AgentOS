@@ -1,0 +1,5 @@
+[OK] commit_gate.sh — TASKS/HANDOFF/STATUS 경로 경계 침범 없음
+[OK] evidence_gate.sh — Git diff/staged 경계 침범 없음
+[OK] completion_gate.sh — evidence/근거 수집 경계 침범 없음
+
+=== gate_boundary_check: ALL PASS ===

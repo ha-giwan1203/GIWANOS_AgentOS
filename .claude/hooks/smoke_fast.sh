@@ -51,6 +51,10 @@ check $? "TASKS.md 존재"
 test -f "$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
 check $? "HANDOFF.md 존재"
 
+# 5. gate_boundary_check — 게이트 3종 경계 재절단 회귀 트립와이어 (세션91 단계 III-4)
+bash "$HOOKS_DIR/gate_boundary_check.sh" >/dev/null 2>&1
+check $? "gate_boundary_check PASS"
+
 # 결과 출력
 if [ "$FAIL" -gt 0 ]; then
   echo "[smoke_fast] $PASS/$TOTAL PASS, $FAIL FAIL — 세션 시작 전 확인 필요"
