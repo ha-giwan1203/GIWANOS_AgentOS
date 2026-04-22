@@ -33,10 +33,8 @@ STATE_DIR="$PROJECT_ROOT/.claude/state"
 rm -f "$STATE_DIR/gpt_skill_entry.ok" "$STATE_DIR/gemini_skill_entry.ok" 2>/dev/null
 hook_log "session_start_restore" "skill_entry markers cleared"
 
-# Self-X Layer 1 (B1 의제 통과 2026-04-21): health summary 첫 메시지 marker 무효화
-# 매 세션 첫 사용자 메시지 시점에 health summary 의무 리마인더 재주입.
-rm -f "$STATE_DIR/health_summary_first.ok" 2>/dev/null
-hook_log "session_start_restore" "health_summary_first marker cleared"
+# Self-X Layer 1 health_summary_first marker 제거됨 (Plan stage1-I5 2026-04-22).
+# health_summary_gate 폐기에 따라 해당 marker 의존 로직도 삭제.
 
 hook_log "session_start_restore" "source=$SOURCE"
 
@@ -182,6 +180,23 @@ if [ -n "$_TASKS_DATE" ] && [ -n "$_HANDOFF_DATE" ] && [ -n "$_STATUS_DATE" ]; t
     echo "[DRIFT] 상태 문서 날짜 불일치: TASKS=$_TASKS_DATE / HANDOFF=$_HANDOFF_DATE / STATUS=$_STATUS_DATE"
     hook_log "session_start_restore" "DRIFT detected: T=$_TASKS_DATE H=$_HANDOFF_DATE S=$_STATUS_DATE"
   fi
+fi
+
+# Plan glimmering-churning-reef Part 4-B: last_selfcheck freshness 표시 (정보만, 자동 조치 없음)
+LAST_SELFCHECK="$PROJECT_ROOT/.claude/self/last_selfcheck.txt"
+if [ -f "$LAST_SELFCHECK" ]; then
+  _LS_MTIME=$(file_mtime "$LAST_SELFCHECK")
+  _LS_NOW=$(date +%s)
+  _LS_AGE_D=$(( ( _LS_NOW - _LS_MTIME ) / 86400 ))
+  if [ "$_LS_AGE_D" -ge 14 ]; then
+    echo "--- selfcheck ${_LS_AGE_D}일 전 실행 (14일 초과 — 수동 bash .claude/self/selfcheck.sh 권장) ---"
+  elif [ "$_LS_AGE_D" -ge 7 ]; then
+    echo "--- selfcheck ${_LS_AGE_D}일 전 실행 (7일 초과) ---"
+  else
+    echo "--- selfcheck ${_LS_AGE_D}일 전 실행 ---"
+  fi
+else
+  echo "--- selfcheck 미실행 (bash .claude/self/selfcheck.sh 권장) ---"
 fi
 
 # Phase 3-1: 미해결 incident 요약 + 24h 신규 건수
