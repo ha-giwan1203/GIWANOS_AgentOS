@@ -157,3 +157,21 @@
 1. 세션 재시작 후 `mcp__notebooklm-mcp__get_health` → `authenticated=true` 확인
 2. 만료 시 `setup_auth` 재실행 (최초 127초)
 3. 사용: `Agent(subagent_type="settlement-domain-expert", prompt="{도메인 질문}")`
+
+### Known Issue: MCP 좀비 Chrome (세션57 확인 · 2026-04-17)
+**증상**: `ask_question` 호출 즉시 실패 — `browserType.launchPersistentContext: Target page, context or browser has been closed` / `exitCode=21`. `get_health`는 `authenticated=true` 반환하나 실제 질의 불가.
+
+**원인**: 이전 세션의 `setup_auth` 종료 후 MCP Chrome 프로세스(메인 + crashpad-handler + gpu-process 3개)가 살아남아 `%LOCALAPPDATA%\notebooklm-mcp\Data\chrome_profile\lockfile` 점유. Playwright persistentContext가 프로필 획득 불가.
+
+**식별 명령**:
+```powershell
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | Where-Object { $_.CommandLine -like '*notebooklm-mcp*' } | Select-Object ProcessId, CommandLine"
+```
+
+**복구 절차**:
+1. 식별된 PID 전부 `taskkill //F //PID {pid1} //PID {pid2} //PID {pid3}`
+2. `cleanup_data(confirm=true, preserve_library=true)` — `library.json` 보존됨
+3. `setup_auth(show_browser=true)` — 기존 쿠키 복구되면 사용자 로그인 없이 157초 내 자동 재인증 (Google SSO 토큰 재활용)
+4. `ask_question` 재시도 → 성공 시 27~30초 응답
+
+**후속 자동화 후보 (TASKS.md 안건)**: stop hook 또는 세션 시작 훅에서 notebooklm-mcp 프로필 사용 Chrome 좀비 탐지·정리 루틴 추가 검토.

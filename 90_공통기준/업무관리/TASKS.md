@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 — 세션90 (자기유지형 시스템 재설계 Plan 단계 0+I+II)
+최종 업데이트: 2026-04-22 — 세션90 (Plan 단계 0+I+II + origin push 복구 + gpt-read drift 수정)
 
 ---
 
@@ -44,6 +44,20 @@
 - III-1 commit_gate → Git/staging만 / III-2 evidence_gate → 사전 근거만 / III-3 completion_gate → 최종 완료 선언만
 - III-4 `gate_boundary_check.sh` 신설 (금지 토큰 검사)
 - III-5 write_marker / evidence_mark_read / evidence_stop_guard 동반 정리
+
+**[완료] origin/main push 복구 (c99c9a16)**
+- 배경: GPT Round 재검증 FAIL ("settings.json 여전히 옛 상태") 수령 후 로컬 Git 상태 점검에서 이상 발견
+- 진단: 로컬 `refs/heads/main`이 `0000...0000` null 손상 (reflog·HEAD는 정상)
+- 조치: `git update-ref refs/heads/main c99c9a16` loose ref 복원 → `git push origin main` 8커밋 일괄 반영 (`ddcb252a..c99c9a16`)
+- GPT 원격 재검증: 양측 통과 (SessionStart/UserPromptSubmit/PostToolUse/Stop 훅 unregister 전부 Git 실물 확인)
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260422_095321/`
+
+**[완료] gpt-read.md Step 1 drift 수정 (3497b42e)**
+- 배경: 세션90 작업 중 "gpt 대화방 입장" 지시에서 stale `debate_chat_url` ("토론모드 코드 분석") 재사용으로 잘못된 방 진입 사건
+- 원인: `gpt-read.md:10` "탭 없으면 debate_chat_url 직행" 구조. 토론모드 CLAUDE.md 27행 "매 세션 프로젝트 최상단 자동 탐지" 규칙 미반영
+- 조치: Step 1-A 신설(프로젝트 URL navigate → `main` 스코프 + slug 기반 최상단 href 탐지 → debate_chat_url 갱신), 1-B fallback 분리
+- GPT 2자 토론 Round 1 조건부 통과(slug 검증·fallback 지시) → Round 2 PASS (양측)
+- 하네스: 채택 4건 / 보류 0 / 버림 0
 
 ---
 
