@@ -3,10 +3,13 @@
 # 입력: JSON (stdin) — {model:{display_name,id}, workspace:{current_dir,project_dir}, cost:{total_cost_usd}}
 # 출력: 첫 줄만 표시됨
 # 2026-04-18 3자 토론 합의안 (우선순위 4)
+# 세션93 (2026-04-22 auto-fix A-2): python3 하드의존 → PY_CMD fallback
+
+PY_CMD="python"; command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
 
 # 2026-04-20 3자 토론 합의안: heredoc 인라인 삽입 패턴(json.loads('''$input''')) 제거 →
 # stdin 파이프(json.load(sys.stdin))로 전달. 입력 escape 문제 근본 해소.
-parsed=$(cat | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<'PY' 2>/dev/null
+parsed=$(cat | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 "$PY_CMD" <<'PY' 2>/dev/null
 import json, sys, os
 try:
     d = json.load(sys.stdin)

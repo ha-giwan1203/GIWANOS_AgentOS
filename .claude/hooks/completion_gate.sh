@@ -113,7 +113,7 @@ if [ $((_P2B_NOW - _P2B_LAST)) -lt 60 ] 2>/dev/null; then
 fi
 
 if [ -f "$PROJECT_ROOT/.claude/hooks/hook_log.jsonl" ]; then
-  REPEATED=$(PYTHONUTF8=1 python3 - "$PROJECT_ROOT/.claude/hooks/hook_log.jsonl" <<'PYEOF' 2>/dev/null
+  REPEATED=$(PYTHONUTF8=1 "$PY_CMD" - "$PROJECT_ROOT/.claude/hooks/hook_log.jsonl" <<'PYEOF' 2>/dev/null
 import json, re, sys
 from collections import Counter
 from datetime import datetime, timedelta, timezone

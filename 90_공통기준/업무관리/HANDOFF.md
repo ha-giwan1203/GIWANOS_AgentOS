@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1~4번 완료)
+최종 업데이트: 2026-04-22 KST — 세션93 (1주차 1~4 + /auto-fix A-1~3 + B-1 2자 토론 완료)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -52,6 +52,13 @@
 - 24h 전체 증가 주범: commit_gate 31건 (세션93 작업 중 커밋 시도 반복으로 누적), skill_instruction_gate 18건. 세션93 수술 자체가 원인 아님
 - 결론: GPT 우려(evidence_gate 24h 증가)는 실물 반박됨. evidence_gate는 이미 목표 초과 달성 추세 (136건/7일 목표 대비 10건/24h ≈ 70건/7일 추정)
 - 7일 실측은 예약된 scheduled-tasks session93-week1-checkpoint (2026-04-29 09:00 KST)에서 확인
+
+### /auto-fix 분석 + A-1/A-2/A-3 + B-1 2자 토론 완료 (세션93 후반)
+- **A-1**: incident_repair.py `send_block` next_action을 폐기된 `cdp_chat_send.py`에서 `Skill(debate-mode)`/`Skill(gpt-send)` 안내로 교체
+- **A-2**: hook_common.sh에 전역 `PY_CMD` fallback 선언 + 7개 파일(completion_gate/statusline/permissions_sanity/pruning_observe/debate_verify/skill_drift_check/hook_common) 교체. final_check `python3 의존 잔존 0건 [OK]`
+- **A-3**: commit_gate GRACE_WINDOW 60→300. 상위 fingerprint 8개 commit_gate 집중(15회/6회/5회 반복) suppress 효율 기대
+- **B-1**: 2자 토론 합의 옵션 B (제안 2+3+5) 채택, 1/4 제외. incident_repair.py auto_resolve 확장 — send_block .ok mtime 기반, python3_dependency 일괄, structural_intermediate 24h
+- **실측**: 미해결 **571 → 362** (-209건, -37%). 목표 136건까지 남은 공간은 2주차 관찰 후 판단
 2. **2주차 5번 — evidence 3종 contract형 재설계**: 1주차 관찰 7일 후 재평가. 미해결 감소 추세 확인 시 착수
 3. **2주차 6번 — state 복원 축 경량화** (state_rebind_check detect-only 전환)
 4. **2주차 7번 — boundary smoke 시나리오 승격** (6건 runtime 케이스 추가)

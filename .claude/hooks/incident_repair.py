@@ -44,7 +44,7 @@ def infer_next_action(entry: dict[str, Any]) -> str:
         "pre_commit_check": "./.claude/hooks/final_check.sh --fast 를 다시 실행해 FAIL 항목부터 정리",
         "scope_violation": "YYYY-MM-DD 절대날짜와 요일을 확인한 뒤 다시 실행",
         "dangerous_cmd": "사용자 직접 실행 또는 안전한 대안 명령 사용",
-        "send_block": "CDP 기본 경로(cdp_chat_send.py)로 전환하여 재전송",
+        "send_block": "토론모드 CLAUDE.md 읽기 후 Skill(skill=\"debate-mode\") 또는 Skill(skill=\"gpt-send\")로 재전송 (세션93 자동수리: cdp_chat_send.py 폐기 반영)",
         "stop_guard_block": "독립 견해(반론/대안/내 판단)를 포함하여 재작성",
         "compile_fail": "문법 오류를 수정한 뒤 py_compile로 재검증",
         "harness_missing": "독립 분석(반론/대안)을 포함하여 하네스 분석 보완",
@@ -172,7 +172,7 @@ def infer_verify_steps(entry: dict[str, Any]) -> list[str]:
         "evidence_missing": ["요구된 req/ok 증거 마커 충족 여부 재확인"],
         "scope_violation": ["date 명령으로 현재 날짜/요일 확인"],
         "dangerous_cmd": ["사용자에게 직접 실행 안내"],
-        "send_block": ["cdp_chat_send.py 경로로 재전송"],
+        "send_block": ["토론모드 CLAUDE.md 읽기", "Skill(skill=\"debate-mode\") 또는 Skill(skill=\"gpt-send\") 재호출"],
         "stop_guard_block": ["반론/대안/독립 판단 포함 여부 재확인"],
         "compile_fail": ["python -m py_compile <file> 재실행"],
     }
@@ -186,7 +186,7 @@ def infer_verify_steps(entry: dict[str, Any]) -> list[str]:
     if hook == "completion_gate":
         return ["./.claude/hooks/final_check.sh --fast"]
     if hook == "send_gate":
-        return ["cdp_chat_send.py 경로로 재전송"]
+        return ["토론모드 CLAUDE.md 읽기", "Skill(skill=\"gpt-send\") 재호출 (세션93: CDP 폐기 반영)"]
     if hook in ("evidence_gate", "evidence_stop_guard"):
         return ["요구된 req/ok 증거 마커 충족 여부 재확인"]
     return ["관련 파일 수정 후 가장 작은 검증부터 재실행"]
@@ -227,13 +227,74 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - evidence_missing: 대응 .ok 파일 존재 시에만 (시간 무관)
     - pre_commit_check: auto-resolve 대상 제외 (PASS 마커 체계 미비)
 
+    세션93 B-1 2자 토론 합의 (2026-04-22) — 확장 옵션 B (2+3+5):
+    - send_block (navigate_gate): debate_claude_read.ok / debate_entry_read.ok
+      mtime > incident ts 시 auto-resolve (상태 기반, 저위험)
+    - python3_dependency (warn_recorded): final_check --fast WARN "python3 의존 잔존"
+      현재 0건이면 일괄 auto-resolve (상태 기반, 저위험). A-2 반영으로 조건 충족
+    - structural_intermediate (completion_gate): 24h 경과 시 시간 기반 auto-resolve
+      (정보가치 소멸형, 과잉 정밀화 불필요)
+
+    제외 (GPT 반박):
+    - pre_commit_check: success marker 체계 미비 → 추후 별도 의제
+    - harness_missing: 시간 기반은 진짜 반복 패턴 지울 위험
+
     방식: resolved=false → resolved=true + resolved_by="auto" 로 덮어쓰기
     """
     import datetime
+    import os
 
     entries = load_jsonl(ledger_path)
     now = datetime.datetime.now(datetime.timezone.utc)
     count = 0
+
+    # 세션93 B-1 제안 3: python3_dependency 일괄 해소 조건 사전 판정
+    # final_check --fast가 현재 "python3 의존 잔존" WARN을 내지 않는다면 과거 기록 일괄 해소
+    # 직접 호출은 순환 의존 가능성 → 간이 검사: .claude/hooks/*.sh에서 python3 직접 호출 grep
+    py3_clean = True
+    try:
+        hooks_dir = ledger_path.parent / "hooks"
+        if hooks_dir.exists():
+            excluded = {"smoke_test.sh", "final_check.sh", "auto_compile.sh",
+                        "skill_instruction_gate.sh"}
+            for fn in hooks_dir.glob("*.sh"):
+                if fn.name in excluded:
+                    continue
+                try:
+                    content = fn.read_text(encoding="utf-8")
+                    # "python3 -c" / "python3 -" 패턴 (PY_CMD 미적용 신호)
+                    for line in content.splitlines():
+                        stripped = line.lstrip()
+                        if stripped.startswith("#"):
+                            continue
+                        if "python3 -c" in stripped or (" python3 -" in stripped and "PY_CMD" not in stripped):
+                            py3_clean = False
+                            break
+                    if not py3_clean:
+                        break
+                except Exception:
+                    pass
+    except Exception:
+        py3_clean = False  # 판정 실패 시 안전하게 해소 안 함
+
+    # 세션93 B-1 제안 2: send_block .ok 마커 존재 여부 (상태 기반)
+    project_root = ledger_path.parent.parent  # .claude/../ → 저장소 루트
+    instr_dir = project_root / ".claude" / "state" / "instruction_reads"
+    debate_claude_ok = instr_dir / "debate_claude_read.ok"
+    debate_entry_ok = instr_dir / "debate_entry_read.ok"
+
+    def ok_mtime_after(ts_str: str) -> bool:
+        """debate_claude_read.ok 또는 debate_entry_read.ok mtime이 incident ts 이후인지."""
+        try:
+            ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+            incident_epoch = ts.timestamp()
+            for ok_path in (debate_claude_ok, debate_entry_ok):
+                if ok_path.exists():
+                    if ok_path.stat().st_mtime > incident_epoch:
+                        return True
+        except Exception:
+            pass
+        return False
 
     for entry in entries:
         if entry.get("resolved"):
@@ -272,9 +333,29 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 except (ValueError, TypeError):
                     pass
 
-        # pre_commit_check: auto-resolve 대상 제외 (세션15 합의)
+        # pre_commit_check: auto-resolve 대상 제외 (세션15 합의, 세션93 B-1 재확인)
         # PASS 마커 체계 미비 → 수동 해소만 허용
-        # (이전: 24시간 경과 시 자동 해소)
+
+        # 세션93 B-1 제안 2: send_block (navigate_gate) — .ok 마커 mtime 기반
+        if reason == "send_block" or hook == "navigate_gate":
+            ts_str = entry.get("ts", "")
+            if ok_mtime_after(ts_str):
+                should_resolve = True
+
+        # 세션93 B-1 제안 3: python3_dependency (warn_recorded) — 현재 WARN 0 일괄 해소
+        if reason == "python3_dependency":
+            if py3_clean:
+                should_resolve = True
+
+        # 세션93 B-1 제안 5: structural_intermediate (completion_gate) — 24h 시간 기반
+        if reason == "structural_intermediate":
+            ts_str = entry.get("ts", "")
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 86400:
+                    should_resolve = True
+            except (ValueError, TypeError):
+                pass
 
         if should_resolve:
             entry["resolved"] = True

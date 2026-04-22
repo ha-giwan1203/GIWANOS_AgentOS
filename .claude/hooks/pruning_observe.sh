@@ -22,6 +22,10 @@ set -u
 export PYTHONIOENCODING=utf-8
 export LC_ALL=en_US.UTF-8
 
+# 세션93 (2026-04-22 auto-fix A-2): python3 fallback
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+
 DAYS=7
 for arg in "$@"; do
   case "$arg" in
@@ -55,7 +59,7 @@ echo ""
 
 # ------ 1. 격리 후보 섹션 목록 ------
 echo "--- 격리 후보 섹션 (quarantine_*) ---"
-python3 -c "
+"$PY_CMD" -c "
 import json
 with open('$CANDIDATES_FILE', encoding='utf-8') as f:
     data = json.load(f)
@@ -70,7 +74,7 @@ echo ""
 echo "--- nightly_capability_check 실행 이력 ---"
 if [ -f "$NIGHTLY_LOG" ]; then
   TOTAL_ENTRIES=$(wc -l < "$NIGHTLY_LOG")
-  python3 -c "
+  "$PY_CMD" -c "
 import json, datetime
 since_days = $DAYS
 now = datetime.datetime.utcnow()
@@ -106,7 +110,7 @@ echo ""
 # ------ 3. 관련 hook incident 집계 (최근 DAYS일) ------
 echo "--- 격리 후보 관련 incident (incident_ledger, 최근 ${DAYS}일) ---"
 if [ -f "$INCIDENT_FILE" ]; then
-  python3 -c "
+  "$PY_CMD" -c "
 import json, datetime
 from collections import Counter
 since_days = $DAYS

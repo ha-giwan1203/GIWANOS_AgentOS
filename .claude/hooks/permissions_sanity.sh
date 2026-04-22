@@ -37,7 +37,7 @@ if [ ! -f "$SETTINGS_TEAM" ] && [ ! -f "$SETTINGS_LOCAL" ]; then
   exit 0
 fi
 
-WARNINGS=$(PYTHONUTF8=1 python3 - <<'PYEOF' 2>/dev/null
+WARNINGS=$(PYTHONUTF8=1 "$PY_CMD" - <<'PYEOF' 2>/dev/null
 import json, re, sys
 from collections import Counter
 from pathlib import Path

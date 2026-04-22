@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 (Hook 시스템 개선 1주차 1~4번 완료, 2주차는 7일 관찰 후)
+최종 업데이트: 2026-04-22 KST — 세션93 (1주차 1~4번 + /auto-fix A-1~3 + B-1 2자 토론 완료)
 
 ---
 
@@ -56,7 +56,24 @@
 - 현재 세션 시작 시점 지표: 미해결 559건 / 최근 24h 신규 65건
 - 관찰 기간 중: selfcheck로 주간 추세 확인, 미달 시 2주차 5번(contract 재설계) 재검토
 
-**[예정] 2주차 5~7번** (1주차 관찰 데이터 수령 후)
+**[완료] /auto-fix 패턴 분석 + A-1/A-2/A-3 + B-1 2자 토론 반영**
+- **A-1** — `incident_repair.py` `send_block` next_action 교체 (폐기된 `cdp_chat_send.py` 경로 → `Skill(debate-mode)` / `Skill(gpt-send)` 안내)
+- **A-2** — python3 하드의존 잔존 7개 파일 → PY_CMD fallback 일괄 적용
+  - `hook_common.sh` 상단 전역 `PY_CMD` 선언 + `export` (모든 hook 상속)
+  - 교체: completion_gate / statusline / permissions_sanity / pruning_observe / debate_verify / skill_drift_check
+  - `final_check.sh:113` 정규식에서 skill_instruction_gate 제외 (사용자 command 탐지용, 실행 아님)
+  - 검증: `[OK] 운영 훅 python3 의존 0건 (PY_CMD 전역 fallback 적용)`
+- **A-3** — `commit_gate.sh:138` GRACE_WINDOW 60→300 (세션86 evidence_gate 동일 패턴. 상위 fingerprint 8개가 commit_gate, 15회/6회/5회 반복 → suppress 효율 기대)
+- **B-1** — `incident_repair.py:auto_resolve()` 확장 (2자 토론 합의: 옵션 B = 제안 2+3+5 채택, 1/4 제외)
+  - 제안 2 (send_block): `debate_claude_read.ok` / `debate_entry_read.ok` mtime > incident ts 시 해소 (상태 기반)
+  - 제안 3 (python3_dependency): 운영 훅 `python3 -c`/`python3 -` 0건 시 일괄 해소 (A-2 반영 조건 충족)
+  - 제안 5 (structural_intermediate): 24h 시간 기반 (정보가치 소멸형)
+  - 제외 이유 (GPT 반박 채택): 제안 1은 success marker 체계 미비, 제안 4는 시간 기반이 반복 패턴 지움
+  - Claude 잠정안(옵션 B + 방식 B + 72h) 철회 — GPT "원인-해소 연결 약함" 지적 수용
+- **실측 결과**: 미해결 **571 → 362건 (-209건, 37% 감소)**
+- 검증: smoke_test 211/211 / smoke_fast 11/11 / doctor_lite OK / final_check 31/31/31
+
+**[예정] 2주차 5~7번** (1주차 관찰 데이터 수령 후, 2026-04-29)
 
 ---
 

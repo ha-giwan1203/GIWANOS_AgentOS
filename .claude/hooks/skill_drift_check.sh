@@ -28,7 +28,7 @@ if [ ! -d "$COMMANDS_DIR" ]; then
 fi
 
 # 이관 대상 5종 매핑 (의제3 Phase A)
-WARNINGS=$(PYTHONUTF8=1 python3 - <<'PYEOF' 2>/dev/null
+WARNINGS=$(PYTHONUTF8=1 "$PY_CMD" - <<'PYEOF' 2>/dev/null
 import os, sys
 from pathlib import Path
 

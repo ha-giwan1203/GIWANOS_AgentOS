@@ -134,9 +134,14 @@ if [ "$EXIT_CODE" -ne 0 ]; then
   hook_log "PreToolUse/Bash" "commit_gate BLOCK: final_check $MODE FAIL | promoted=$PROMOTED | normal_flow=$NORMAL_FLOW | fails=$FAIL_KEYWORDS | warns=$WARN_KEYWORDS" 2>/dev/null
 
   # fingerprint 기반 incident suppress (GPT+Claude 합의 세션44, 세션46 2단 함수화):
+  # 세션93 (2026-04-22 auto-fix A-3): GRACE_WINDOW 60 → 300
+  #   실측 근거: incident_ledger fp 상위 8개가 commit_gate pre_commit_check.
+  #   동일 fp `cd129792fc8e4770` 15회 반복, `ae1d9d6036d129b8` 6회 등. 반복 간격 대부분 60초 초과.
+  #   evidence_gate와 동일한 GRACE 300 적용 (세션86 합의). 차단은 유지, 기록 중복만 억제.
+  _GRACE_WINDOW=300
   _fingerprint=$(build_fingerprint "$MODE" "$NORMAL_FLOW" "$FAIL_KEYWORDS")
-  if should_suppress_incident "$_fingerprint" 60; then
-    hook_log "PreToolUse/Bash" "commit_gate: incident suppress (fingerprint=$_fingerprint, grace=60s)" 2>/dev/null
+  if should_suppress_incident "$_fingerprint" "$_GRACE_WINDOW"; then
+    hook_log "PreToolUse/Bash" "commit_gate: incident suppress (fingerprint=$_fingerprint, grace=${_GRACE_WINDOW}s)" 2>/dev/null
   else
     hook_incident "gate_reject" "commit_gate" "" "final_check $MODE FAIL" "\"classification_reason\":\"pre_commit_check\",\"mode\":\"$MODE\",\"promoted_to_full\":$PROMOTED,\"normal_flow\":$NORMAL_FLOW,\"fail_keywords\":\"$FAIL_KEYWORDS\",\"warn_keywords\":\"$WARN_KEYWORDS\",\"fingerprint\":\"$_fingerprint\",\"next_action\":\"./.claude/hooks/final_check.sh $MODE 를 다시 실행해 FAIL 항목부터 정리\"" 2>/dev/null || true
   fi

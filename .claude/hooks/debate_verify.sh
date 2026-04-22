@@ -29,13 +29,13 @@ _DV_START=$(hook_timing_start)
 INPUT=$(cat)
 
 # Bash 매처에만 반응
-TOOL_NAME=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
+TOOL_NAME=$(printf '%s' "$INPUT" | "$PY_CMD" -c "import json,sys; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
 if [ "$TOOL_NAME" != "Bash" ]; then
   hook_timing_end "debate_verify" "$_DV_START" "skip_nonbash"
   exit 0
 fi
 
-COMMAND=$(printf '%s' "$INPUT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null)
+COMMAND=$(printf '%s' "$INPUT" | "$PY_CMD" -c "import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('command',''))" 2>/dev/null)
 
 # git commit 명령만 대상
 case "$COMMAND" in
@@ -92,7 +92,7 @@ else
     # 경로를 Windows 형식으로 사전 변환 (cygpath 우선 + 범용 sed fallback)
     RESULT_WIN=$(cygpath -w "$RESULT" 2>/dev/null || \
                  echo "$RESULT" | sed -E 's|^/([a-zA-Z])/|\1:/|')
-    VALIDATE=$(RESULT_ENV="$RESULT_WIN" PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 <<'PY' 2>&1
+    VALIDATE=$(RESULT_ENV="$RESULT_WIN" PYTHONIOENCODING=utf-8 PYTHONUTF8=1 "$PY_CMD" <<'PY' 2>&1
 import json, sys, os, re
 path = os.environ['RESULT_ENV']
 # Python 측 2차 안전망: POSIX /<letter>/ prefix 정규화 + normpath
@@ -186,7 +186,7 @@ echo "[debate_verify] Phase 2 전환 시 커밋 차단됨. 현재는 경고만."
 LEDGER="${PROJECT_ROOT:-.}/.claude/incident_ledger.jsonl"
 if [ -w "$(dirname "$LEDGER")" ]; then
   TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
-  ISSUES_JSON=$(printf '%s\n' "${ERRORS[@]}" | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python3 -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()], ensure_ascii=False))" 2>/dev/null || echo "[]")
+  ISSUES_JSON=$(printf '%s\n' "${ERRORS[@]}" | PYTHONIOENCODING=utf-8 PYTHONUTF8=1 "$PY_CMD" -c "import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()], ensure_ascii=False))" 2>/dev/null || echo "[]")
   echo "{\"ts\":\"$TS\",\"tag\":\"debate_verify\",\"phase\":1,\"count\":${#ERRORS[@]},\"issues\":$ISSUES_JSON,\"resolved\":false}" >> "$LEDGER"
 fi
 

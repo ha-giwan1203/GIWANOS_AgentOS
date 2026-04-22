@@ -109,13 +109,17 @@ fi
 echo ""
 
 # 2. python3 잔존 참조 확인
+# 세션93 (2026-04-22 auto-fix A-2): PY_CMD fallback 체계로 전환
+# - hook_common.sh에 전역 PY_CMD 선언 (python3 있으면 python3, 없으면 python)
+# - "python3 -c" 또는 "python3 -" 문자열은 PY_CMD 미적용 잔존 신호
+# - skill_instruction_gate.sh는 사용자 command 탐지용 정규식이라 제외 (실제 실행 아님)
 echo "--- 2. python3 잔존 참조 확인 ---"
-PY3_REFS=$(grep -l 'python3 -c\|python3 -' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | grep -v auto_compile.sh | grep -v _archive)
+PY3_REFS=$(grep -l 'python3 -c\|python3 -' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | grep -v auto_compile.sh | grep -v skill_instruction_gate.sh | grep -v _archive)
 if [ -n "$PY3_REFS" ]; then
   warn "python3 의존 잔존:"
   echo "$PY3_REFS" | while read f; do echo "    - $(basename $f)"; done
 else
-  echo "  [OK] 운영 훅 python3 의존 0건 (auto_compile 제외)"
+  echo "  [OK] 운영 훅 python3 의존 0건 (PY_CMD 전역 fallback 적용)"
 fi
 echo ""
 

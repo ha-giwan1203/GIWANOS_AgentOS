@@ -15,6 +15,13 @@ HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
 HOOK_LOG_MAX_SIZE=512000  # 500KB
 INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
 
+# 세션93 (2026-04-22 auto-fix A-2): 전역 PY_CMD fallback
+# python3가 없는 환경(win 일부)에서도 동일 코드 경로 유지.
+# hook_common.sh를 source하는 모든 훅에서 "$PY_CMD" 사용 가능.
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+export PY_CMD
+
 # 공통 경로 — 개별 훅에서 하드코딩 대신 이 변수 사용
 STATE_EVIDENCE="$PROJECT_ROOT/.claude/state/evidence"
 STATE_AGENT_CONTROL="$PROJECT_ROOT/90_공통기준/agent-control/state"
@@ -295,7 +302,7 @@ hook_user_correction() {
 # task_results 로그 경로: hook_config.json > 기본값
 _task_log_path=""
 if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
-  _task_log_path=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+  _task_log_path=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
     "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.log_path" "" 2>/dev/null)
 fi
 TASK_RESULTS_LOG="${_task_log_path:+$PROJECT_ROOT/$_task_log_path}"
@@ -340,10 +347,10 @@ hook_task_result() {
   # hook_config.json에서 per_task/default threshold 읽기
   if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
     local pt
-    pt=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+    pt=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
       "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.per_task.$task_id" "" 2>/dev/null)
     if [ -z "$pt" ]; then
-      pt=$(python3 "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+      pt=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
         "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.default_threshold" "3" 2>/dev/null)
     fi
     threshold="${pt:-3}"
@@ -379,8 +386,8 @@ HOOK_TIMING_LOG="$PROJECT_ROOT/.claude/hooks/hook_timing.jsonl"
 
 # 현재 시각을 밀리초 단위 정수로 반환 (Windows Git Bash 호환)
 _hook_ts_ms() {
-  if command -v python3 >/dev/null 2>&1; then
-    python3 -c 'import time; print(int(time.time()*1000))' 2>/dev/null
+  if command -v "$PY_CMD" >/dev/null 2>&1; then
+    "$PY_CMD" -c 'import time; print(int(time.time()*1000))' 2>/dev/null
   else
     # fallback: 초 단위
     date +%s 2>/dev/null
