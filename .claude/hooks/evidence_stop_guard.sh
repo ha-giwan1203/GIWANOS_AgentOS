@@ -60,14 +60,11 @@ if fresh_req "skill_read" || fresh_req "identifier_ref"; then
   fi
 fi
 
-# 3) 완료/반영 완료/PASS 주장
-if fresh_req "tasks_handoff"; then
-  if echo "$LAST_TEXT" | grep -qiE '(완료|반영 완료|수정 완료|PASS)'; then
-    if ! fresh_ok "tasks_updated" || ! fresh_ok "handoff_updated"; then
-      block "tasks_handoff.req 존재. TASKS/HANDOFF 갱신 없이 완료/PASS 결론 금지."
-    fi
-  fi
-fi
+# 3) 완료/반영 완료/PASS 주장 — 세션91 단계 III-5 (2026-04-22) 제거
+# 사유: tasks_handoff req producer 제거 (risk_profile_prompt.sh L66-69, 세션78 P2 재정의)
+#      이후 남은 latent completion branch 정리 + completion 책임 단일화.
+#      completion_gate.sh가 Git 실물 변경 + write_marker mtime 비교로 동일 정책 소유.
+#      근거: 90_공통기준/토론모드/logs/debate_20260422_stage3_2way/SUMMARY.md 커밋 B 섹션.
 
 hook_timing_end "evidence_stop_guard" "$_ESG_START" "pass"
 exit 0

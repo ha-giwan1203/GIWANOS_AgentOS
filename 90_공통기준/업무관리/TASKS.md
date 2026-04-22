@@ -25,7 +25,8 @@
 - 채택 누계: 11 / 보류 0 / 버림 0
 
 **[진행중] 단계 III 구현 — 4커밋 순차 착수**
-- [진행] 커밋 A: `.claude/hooks/commit_gate.sh` L81-98 제거 (write_marker 동봉 강제 삭제) + `final_check.sh` registered_hook_names() statusLine 제외 버그 수정 + README.md 누락 hook 3개(skill_drift_check/debate_verify/permissions_sanity) 추가 + STATUS.md 드리프트 수치 정정 — 동반 정리
+- [완료] 커밋 A (1935efd8): `commit_gate.sh` L81-98 제거 + `final_check.sh` statusLine 제외 + README/STATUS 드리프트 동기화
+- [진행] 커밋 B: `evidence_stop_guard.sh` L63-70 제거 (latent completion branch 정리)
 - 커밋 B: `.claude/hooks/evidence_stop_guard.sh` L63-70 제거 (사유: tasks_handoff req producer 제거 이후 latent completion branch 정리 + completion 책임 단일화. 실측 grep `touch_req.*tasks_handoff` 0 matches)
 - 커밋 C: `.claude/hooks/evidence_gate.sh` suppress 라벨 hook_log/stderr에 `suppress_reason=evidence_recent` 고정
 - 커밋 D: `.claude/hooks/gate_boundary_check.sh` 신설 (standalone 1회 → 오탐 확인 + `# [gate-boundary-allow]` 화이트리스트 → smoke_fast 편입)
