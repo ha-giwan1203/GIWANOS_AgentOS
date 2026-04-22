@@ -5,9 +5,33 @@ GPT 프로젝트방의 최신 응답을 읽어오는 단일 명령.
 
 ## 실행 순서
 
-### 1. 탭 확인
+### 1. 탭 확인 + 프로젝트 최상단 대화방 자동 탐지 (세션90 drift 수정)
 - `tabs_context_mcp` → 기존 ChatGPT 탭 확인
-- ChatGPT 탭이 없으면: `.claude/state/debate_chat_url` 읽기 → navigate
+- ChatGPT 탭이 없으면 아래 1-A 자동 탐지 수행
+- 탐지 실패 시에만 `.claude/state/debate_chat_url` fallback → navigate
+
+#### 1-A. 프로젝트 최상단 대화방 탐지 (세션90 신설 — Round 2 PASS)
+> 배경: 기존 "debate_chat_url 직행"은 stale URL 재사용 위험. 토론모드 CLAUDE.md 27행 "매 세션 시작 시 프로젝트 URL에서 최상단 채팅방 자동 탐지하여 debate_chat_url 갱신" 규칙을 gpt-read에서도 동일 적용.
+
+1. `.claude/state/gpt_project_url` 읽기 → navigate
+2. 4초 대기 (lazy-load 대응)
+3. 프로젝트 slug 기반 href 탐지 (사이드바 일반 `/c/` 제외):
+```javascript
+(() => {
+  const base = window.location.pathname.split('/project')[0];
+  const main = document.querySelector('main') || document.body;
+  const links = main.querySelectorAll(`a[href*="${base}/c/"]`);
+  if (links.length === 0) return null;
+  return links[0].getAttribute('href');
+})();
+```
+- `base`는 프로젝트 slug 경로(`/g/g-p-...`). `main` 스코프 한정으로 사이드바 오탐 제외
+4. href 반환 + 프로젝트 slug 포함 확인 → 해당 URL navigate + `.claude/state/debate_chat_url` 갱신
+5. null 반환 또는 slug 미포함 → **1-B fallback**으로 진입
+
+#### 1-B. Fallback (자동 탐지 실패 시만)
+1. `.claude/state/debate_chat_url` 읽기 → navigate
+2. debate_chat_url 파일 부재/손상 시 "프로젝트 대화방 진입 실패" 에러 반환 (사용자 수동 개입 필요)
 
 ### 2. 응답 완료 + 안정성 확인 (세션69 개선, 세션83 thinking 확장)
 
@@ -153,3 +177,9 @@ python3 .claude/hooks/record_incident.py \
   - isExtended=true 시 maxTimeout 300→600초 + 후기 30초 단계 도입
   - stop-button 단독 판정 금지 — 블록 안정 3회 연속 동일 종료 경로 추가 (stop-button 잔존 대비)
   - 세션82 실증: gpt-5-4-thinking 응답 중 stop 오클릭 사건 해소
+- 세션90 (2026-04-22): Step 1 drift 수정 — `debate_chat_url` 직행 → 프로젝트 최상단 자동 탐지
+  - 1-A 프로젝트 slug 기반 `main` 스코프 최상단 href 탐지 (사이드바 오탐 제외)
+  - 1-B fallback은 자동 탐지 실패 시만 debate_chat_url 사용
+  - CLAUDE.md 27행 "매 세션 debate_chat_url 갱신" 규칙을 gpt-read에도 적용
+  - 사유: 세션90 "토론모드 코드 분석" stale URL 재사용으로 잘못된 방 진입 사건
+  - GPT Round 1 조건부 통과 + Round 2 PASS 후 반영 (slug 검증 + fallback 포함)
