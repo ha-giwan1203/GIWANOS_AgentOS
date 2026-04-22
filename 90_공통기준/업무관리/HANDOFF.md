@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 구현 착수 — 커밋 A 진행)
+최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 구현 완료 — 4커밋 반영)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -26,16 +26,24 @@
 - 해소: Round 4에서 GPT에 실측 근거 요청 → GPT가 risk_profile_prompt.sh producer 제거 + grep 0 matches 제시 → Claude 독립 재검증 → "보완 관계" 해석은 기각, "dead branch" 판정 고정
 - 결과: 커밋 B 유지 + 사유 문구 교체
 
-### 이번 세션 변경 파일 (커밋 전)
-- 신규: `90_공통기준/토론모드/logs/debate_20260422_stage3_2way/` (round1_claude/round1_gpt/round2_claude/round2_gpt/round3_claude/round3_gpt/round4_critic_and_gpt/SUMMARY.md)
-- 수정: `90_공통기준/업무관리/TASKS.md` (세션91 로그 추가)
-- 수정: `90_공통기준/업무관리/HANDOFF.md` (세션91 메모)
-- 수정 (Git 외부): `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 3 단계 III 세션91 합의 반영
+### 이번 세션 구현 커밋 (c2b6d91c 토론 합의 + 4 구현 커밋)
+| 커밋 | 단계 | 변경 |
+|------|------|------|
+| c2b6d91c | docs | debate_20260422_stage3_2way 토론 로그 전체 + TASKS/HANDOFF 세션91 |
+| 1935efd8 | III-1 | commit_gate.sh L81-98 제거 + final_check.sh statusLine 제외 + README/STATUS 드리프트 동기화 |
+| 96b14617 | III-5 | evidence_stop_guard.sh L63-70 제거 (latent completion branch 정리) |
+| b5fe9ecb | III-2 | evidence_gate.sh suppress 라벨 suppress_reason=evidence_recent 고정 |
+| d7ee12f8 | III-4 | gate_boundary_check.sh 신설 (3/3 standalone PASS) + smoke_fast 11/11 편입 |
+
+### 회귀 검증 결과
+- smoke_fast: 10 → 11 (gate_boundary_check 편입) — ALL PASS
+- final_check --full: FAIL 0, WARN 2 (기존)
+- gate_boundary_check standalone: 3/3 ALL PASS (오탐 0, 화이트리스트 불필요)
 
 ### 다음 세션 액션 (세션92 이후)
-1. 단계 III 구현 착수 — 커밋 A/B/C/D 순차 수행 + smoke_fast 10/10 PASS 검증
-2. 구현 전제: B4 Circuit Breaker T2 상한(일 2건) 준수 + NEW_HOOK_CHECKLIST 증적 번들 생성
-3. 구현 완료 후 단계 IV(뿌리 축소 + 수동화) 진입
+1. 단계 IV 착수 — `.claude/self/selfcheck.sh` 신설 + disposition 표 + invariants.yaml archive
+2. 단계 V — Single Source 전환 (README/STATUS 자동 생성) → settings_drift WAIVER 해제 가능
+3. 단계 VI~VIII — 슬림화 · Dormant surface · 30일 TTL 관찰
 
 ---
 

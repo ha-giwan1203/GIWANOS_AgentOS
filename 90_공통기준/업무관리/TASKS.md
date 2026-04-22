@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 — 세션91 (Plan 단계 III 구현 착수)
+최종 업데이트: 2026-04-22 KST — 세션91 (Plan 단계 III 구현 완료 — 4커밋 전부 반영)
 
 ---
 
@@ -24,15 +24,15 @@
 - Round 4: Step 4b critic-reviewer WARN 제기(의제 4 "실증됨" 라벨 과대 부여) → GPT 실측 근거로 critic 지적 기각 + 사유 문구 교체 합의
 - 채택 누계: 11 / 보류 0 / 버림 0
 
-**[진행중] 단계 III 구현 — 4커밋 순차 착수**
-- [완료] 커밋 A (1935efd8): `commit_gate.sh` L81-98 제거 + `final_check.sh` statusLine 제외 + README/STATUS 드리프트 동기화
-- [완료] 커밋 B (96b14617): `evidence_stop_guard.sh` L63-70 제거 (latent completion branch 정리)
-- [완료] 커밋 C (b5fe9ecb): `evidence_gate.sh` suppress 라벨 `suppress_reason=evidence_recent` 고정
-- [진행] 커밋 D: `gate_boundary_check.sh` 신설 + standalone 1회 (3/3 ALL PASS, 오탐 0) → smoke_fast 11/11 편입
-- 커밋 B: `.claude/hooks/evidence_stop_guard.sh` L63-70 제거 (사유: tasks_handoff req producer 제거 이후 latent completion branch 정리 + completion 책임 단일화. 실측 grep `touch_req.*tasks_handoff` 0 matches)
-- 커밋 C: `.claude/hooks/evidence_gate.sh` suppress 라벨 hook_log/stderr에 `suppress_reason=evidence_recent` 고정
-- 커밋 D: `.claude/hooks/gate_boundary_check.sh` 신설 (standalone 1회 → 오탐 확인 + `# [gate-boundary-allow]` 화이트리스트 → smoke_fast 편입)
-- 각 커밋 직후 smoke_fast 10/10 PASS 검증, 실패 시 즉시 revert
+**[완료] 단계 III 구현 — 4커밋 순차 완료**
+- 커밋 A (1935efd8): `commit_gate.sh` L81-98 제거 + `final_check.sh` statusLine 제외 + README/STATUS 드리프트 동기화
+- 커밋 B (96b14617): `evidence_stop_guard.sh` L63-70 제거 (latent completion branch 정리)
+- 커밋 C (b5fe9ecb): `evidence_gate.sh` suppress 라벨 `suppress_reason=evidence_recent` 고정
+- 커밋 D (d7ee12f8): `gate_boundary_check.sh` 신설 (standalone 3/3 ALL PASS, 오탐 0) + smoke_fast 11/11 편입
+- 회귀: 각 커밋 smoke_fast ALL PASS + final_check --full FAIL 0
+
+**[대기] 다음 진입점 — 단계 IV (뿌리 축소 + 수동화)**
+- IV-2: `.claude/self/selfcheck.sh` 신설 / IV-4: disposition 표 / IV-5: invariants.yaml archive
 
 **계획 파일 갱신**: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` Part 3 단계 III 세션91 합의 반영 완료
 
