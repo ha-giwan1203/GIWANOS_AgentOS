@@ -99,14 +99,6 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/session_start_restore.sh"
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/health_check.sh"
-          },
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/circuit_breaker_check.sh"
           }
         ]
       }
