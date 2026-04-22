@@ -1,0 +1,20 @@
+=== smoke_fast.sh ===
+[smoke_fast] 10/10 ALL PASS
+
+=== doctor_lite.sh ===
+[doctor_lite] OK
+
+=== health_check summary.txt (after invariants.yaml waiver) ===
+
+=== [System Health] ===
+[health] 3 OK · 5 WARN
+  → 상세: .claude/self/HEALTH.md 참조
+  WARN: mes_last_upload_age - 289.3h 경과 (임계 business_days_7)
+  WARN: uncommitted_changes_age - 미커밋 20건 / 206.2h 경과
+  WARN: incident_unresolved - 494건 (임계 100)
+  ... +2 WARN (HEALTH.md 참조)
+=======================
+
+
+--- summary.txt ---
+[health] 3 OK · 5 WARN

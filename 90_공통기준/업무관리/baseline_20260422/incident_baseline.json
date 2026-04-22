@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-04-22T00:07:55.492945Z",
+  "ledger_path": ".claude\\incident_ledger.jsonl",
+  "total_records": 1195,
+  "unresolved": 516,
+  "resolved": 679,
+  "unresolved_by_type": {
+    "gate_reject": 376,
+    "warn_recorded": 54,
+    "hook_block": 47,
+    "instruction_read_gate": 24,
+    "unknown": 11,
+    "doc_drift": 2,
+    "gpt_verdict": 1,
+    "navigate_gate": 1
+  },
+  "unresolved_by_hook": {
+    "commit_gate": 246,
+    "navigate_gate": 89,
+    "completion_gate": 45,
+    "harness_gate": 45,
+    "instruction_not_read": 24,
+    "final_check": 23,
+    "skill_instruction_gate": 16,
+    "unknown": 11,
+    "evidence_gate": 11,
+    "send_gate": 2,
+    "token_threshold_check": 2,
+    "gpt-read": 1,
+    "gate_reject": 1
+  },
+  "unresolved_by_classification_reason": {
+    "pre_commit_check": 192,
+    "send_block": 90,
+    "evidence_missing": 51,
+    "structural_intermediate": 45,
+    "harness_missing": 45,
+    "python3_dependency": 42,
+    "meta_drift": 23,
+    "doc_drift": 14,
+    "legacy_unclassified": 12,
+    "true_positive": 1,
+    "gpt_verdict": 1
+  },
+  "top_suppress_fingerprints": [
+    {
+      "fingerprint": "gate_reject|commit_gate|pre_commit_check",
+      "count": 192
+    },
+    {
+      "fingerprint": "gate_reject|navigate_gate|send_block",
+      "count": 89
+    },
+    {
+      "fingerprint": "gate_reject|completion_gate|structural_intermediate",
+      "count": 45
+    },
+    {
+      "fingerprint": "hook_block|harness_gate|harness_missing",
+      "count": 45
+    },
+    {
+      "fingerprint": "warn_recorded|commit_gate|python3_dependency",
+      "count": 42
+    },
+    {
+      "fingerprint": "instruction_read_gate|instruction_not_read|evidence_missing",
+      "count": 24
+    },
+    {
+      "fingerprint": "gate_reject|final_check|meta_drift",
+      "count": 23
+    },
+    {
+      "fingerprint": "gate_reject|skill_instruction_gate|evidence_missing",
+      "count": 16
+    },
+    {
+      "fingerprint": "warn_recorded|commit_gate|doc_drift",
+      "count": 12
+    },
+    {
+      "fingerprint": "unknown|unknown|legacy_unclassified",
+      "count": 11
+    }
+  ],
+  "note": "Plan glimmering-churning-reef stage 0-1 baseline. VIII 에서 이 스냅샷과 비교해 효과 판정."
+}
