@@ -33,11 +33,11 @@ smoke 4건만으로는 약간 아쉽습니다. 200s suppress / 301s record / 독
 ### 라벨링 + 채택 판정
 - **채택 (실증됨) 3건**:
   1. A 단독 먼저, B/D 동시 묶기 금지 — 세션84 A안-1 원칙 부합 (ref: `90_공통기준/토론모드/CLAUDE.md:81-98`)
-  2. 경계쌍 299s/301s smoke 추가 — GRACE=300의 핵심이 120~300 회수라는 논리 직접 증명
-  3. 주석에 "세션86 실측 보고서 기준 120~300 구간 회수 목적" 한 줄 — 변경 근거 추적 가능성
+  2. 경계쌍 299s/301s smoke 추가 — 구현 완료 (ref: `.claude/hooks/smoke_test.sh` 섹션 51-3, 커밋 `620e6a7b`, smoke 6/6 PASS)
+  3. 주석에 "세션86 실측 보고서 기준 120~300 구간 회수 목적" 한 줄 — 구현 완료 (ref: `.claude/hooks/evidence_gate.sh:60-66`, 커밋 `620e6a7b`)
 - **보류 (일반론) 1건**:
   1. 90~119s 보조 검증 — GPT도 우선순위 낮다고 명시. 세션87+에서 재평가
-- **버림 0건**
+- **버림 0건** — 보충: GPT 역방향 리스크 지적("동일 fp 독립 이벤트 오억제")은 GPT 본문에서 "안전성보다 관측 해상도 손실 쪽 리스크. A만 먼저 넣는 게 맞다"로 자체 평가됐고, fingerprint 정의 불변(섹션 51-4 PASS)으로 동일성 판정 자체가 변하지 않으므로 별건 분류 없이 채택 본체 안으로 흡수. critic WARN(0건감사) 보완 1줄 명시.
 
 ### 수정 의무 2개 (조건부 통과 반영)
 1. smoke_test.sh 섹션 50에 **299s suppress / 301s record 경계쌍 추가** (기존 4건 → 6건)
@@ -46,5 +46,20 @@ smoke 4건만으로는 약간 아쉽습니다. 200s suppress / 301s record / 독
 ### 부록: "세션86 실측 보고서 파일은 main 실물에서 확인 못 함" 주의
 - GPT는 프로젝트 연결된 Git main을 스캔하지만, 본 세션 보고서는 아직 커밋 전
 - push 완료 후 Step 5-3 최종 검증 요청 시 보고서 경로 + SHA 포함해야 함
+- **소급 기재 (critic WARN 보완)**: 커밋 `620e6a7b`로 push 완료. 보고서 + 토론 로그 + evidence_gate.sh + smoke_test.sh 모두 main에 반영됨
 
-요약: **채택 3 / 보류 1 / 버림 0**
+### 변경 SHA 소급 기재 (Step 4b critic WARN 후속)
+- 커밋: `620e6a7bc760f5dfb1d2bb7f6e1fd1451350a15d`
+- 변경 파일 8개:
+  - `.claude/hooks/evidence_gate.sh` (GRACE 120→300 + 주석 7줄)
+  - `.claude/hooks/smoke_test.sh` (섹션 51 신설 + 섹션 48-1 회귀 연계)
+  - `90_공통기준/업무관리/incident_improvement_20260421_session86.md` (신규 245줄)
+  - `90_공통기준/업무관리/TASKS.md` 세션86 통합 블록
+  - `90_공통기준/업무관리/HANDOFF.md` 세션86 통합 블록
+  - `90_공통기준/업무관리/STATUS.md` (final_check --fix 자동 갱신)
+  - `90_공통기준/토론모드/logs/debate_20260421_082410/agenda.md`
+  - `90_공통기준/토론모드/logs/debate_20260421_082410/round1_gpt.md`
+- smoke_test 결과: 210/212 PASS (섹션 51 6/6 PASS, 섹션 48 5/5 PASS)
+- 남은 2 FAIL: README 활성 훅 개수 표기 / classify_feedback.py --validate (세션80부터 선행 이슈, 별건 이월)
+
+요약: **채택 3 / 보류 1 / 버림 0** (커밋 `620e6a7b` 반영)

@@ -169,10 +169,12 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 - 양측 최종 판정(통과/조건부/실패)은 웹 UI 수령만 인정
 - 단발 검증 외 일반 토론 API 호출 금지
 
-**구현 경로**:
-- `90_공통기준/토론모드/openai/openai_debate.py` 리팩터 (세션83 재사용)
-- Gemini API 클라이언트 신설
-- 2주 관찰 기간: 구현 후 incident 0건 확인 시 고정
+**구현 경로** (세션86 완료):
+- `90_공통기준/토론모드/openai/openai_debate.py:call_openai_parallel` (require_payload 강제 + ThreadPoolExecutor)
+- `90_공통기준/토론모드/gemini/gemini_debate.py:call_gemini_parallel` (단발 검증 모드 신설)
+- `90_공통기준/토론모드/bridge/log_bridge.py:write_cross_verification` (JSON 스키마 검증 + md/json 이중 기록)
+- `90_공통기준/토론모드/bridge/api_fallback.py:run_with_fallback` (1회 재시도 + rate limit 즉시 fallback)
+- 2주 관찰 기간: 구현 후 incident 0건 확인 시 고정 (세션86 착수, 세션87~96 누적)
 
 **로그**: `90_공통기준/토론모드/logs/debate_20260420_190020_beta_3way/round1_final.md`
 

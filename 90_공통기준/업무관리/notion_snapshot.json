@@ -1,25 +1,57 @@
 {
-  "generated_at": "2026-04-22 14:44 KST",
+  "generated_at": "2026-04-22 17:16 KST",
   "last_updated": "",
-  "github_sha": "a1a814963f2906cc9989797344dfda0f35d085b0",
-  "github_sha_short": "a1a81496",
+  "github_sha": "60f41f57aa74e1b299c29e4ec4217817c9fc4c7b",
+  "github_sha_short": "60f41f57",
   "hooks_raw": 45,
   "hooks_active": 31,
   "commands": 30,
   "smoke": "unknown",
   "recent_sessions": [
+    "세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)",
     "세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)",
     "세션91 (2026-04-22) — Plan 단계 III 2자 토론 + 구현 (게이트 3종 재절단)",
     "세션90 (2026-04-22) — 자기유지형 시스템 재설계 (Plan glimmering-churning-reef)",
     "세션89 (2026-04-21)"
   ],
   "all_sessions": [
+    "세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)",
     "세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)",
     "세션91 (2026-04-22) — Plan 단계 III 2자 토론 + 구현 (게이트 3종 재절단)",
     "세션90 (2026-04-22) — 자기유지형 시스템 재설계 (Plan glimmering-churning-reef)",
     "세션89 (2026-04-21)"
   ],
   "sessions_detail": [
+    {
+      "header": "세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)",
+      "body": [
+        "**[완료] 2차 진단 + 2자 토론 + 개선 계획 plan.md 작성**",
+        "- 2차 진단: GPT 2차 정밀진단 수령 → Claude 독립 검증 11/11 실증 + 등급 재조정 2건 제안",
+        "- 토론: 2자(Claude × GPT) 2라운드. 채택 11 / 보류 3 (해소 2, 잔존 1) / 버림 0",
+        "- 결론: \"전면 재설계 대신 evidence 축 coverage 축소 + 남는 핵심 3종 contract형 재설계 하이브리드\"",
+        "- 로그: `90_공통기준/토론모드/logs/debate_20260422_150445/plan.md` (1주차/2주차 + 검증 기준 + 롤백 조건)",
+        "**[완료] 1주차 1번 — hook_registry 격하 (Single Source of Truth 확정)**",
+        "- 변경 파일 (4개):",
+        "  - `.claude/scripts/hook_registry.sh` 상단 주석 [LEGACY / DEPRECATED] 표기 + 대체 경로 안내",
+        "  - `.claude/hooks/final_check.sh:139-149` `--fix` 경로 자동 sync 중단, list_active_hooks 기준 수동 갱신 안내로 전환",
+        "  - `.claude/hooks/README.md:6-12, 155-156` Single Source (list_active_hooks) 명시 + 보조 스크립트 표에 list_active_hooks 추가 + hook_registry legacy 표기",
+        "  - `90_공통기준/업무관리/STATUS.md:19` hooks 체계 기준축을 list_active_hooks로 명시",
+        "- 검증:",
+        "  - `list_active_hooks --count` = 31 (PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4)",
+        "  - `final_check --fast` 31/31/31 일치, exit 0",
+        "  - `smoke_fast` 11/11 ALL PASS",
+        "  - `doctor_lite` OK",
+        "- 소요: 약 30분",
+        "**[완료] 1주차 2번 — selfcheck 24h 정확 집계**",
+        "- `.claude/self/selfcheck.sh:75-97` CUTOFF prefix grep → python ISO8601 파싱 + datetime 비교로 교체",
+        "- 검증: 기존 prefix=0건(해당 시각 매칭 없음) vs 정확=74건(실제 24h 범위) — 실효성 확인",
+        "**[완료] 1주차 3번 — doctor_lite python/python3 fallback**",
+        "- `.claude/hooks/doctor_lite.sh:6-17` PY_CMD fallback 추가 (smoke_fast.sh:33 동일 패턴)",
+        "- 검증: `[doctor_lite] OK` 정상 출력",
+        "**[완료] 1주차 4번 — evidence coverage 축소 (본 수술)**",
+        "- (a) `evidence_gate.sh:127-139` tasks_handoff + tasks_updated/handoff_updated 검증 블록 제거 (commit_gate/final_check + completion_gate가 동일 책임 이미 수행)"
+      ]
+    },
     {
       "header": "세션92 (2026-04-22) — Plan 잔여 안건 마무리 (IV-5 · IV-4 마무리 · V-7)",
       "body": [

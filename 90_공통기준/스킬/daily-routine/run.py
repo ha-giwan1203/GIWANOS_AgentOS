@@ -1,6 +1,6 @@
 """매일 반복 업무 통합 실행 (일요일 자동 차단, KST 기준)
 1. ZDM 일상점검 (API 직호출)
-2. MES 생산실적 업로드 (직접 HTTP — Playwright/CDP 불필요)
+2. MES 생산실적 업로드 (직접 HTTP - Playwright/CDP 불필요)
 """
 import json
 import os
@@ -189,7 +189,7 @@ def mes_login():
         s.headers["X-XSRF-TOKEN"] = s.cookies.get("XSRF-TOKEN", "")
         return s
     except Exception as e:
-        print(f"  FAIL: 로그인 오류 — {e}")
+        print(f"  FAIL: 로그인 오류 - {e}")
         return None
 
 
@@ -263,7 +263,7 @@ def run_mes(today):
         rows = r.json().get("data", {}).get("list", [])
         mes_dates = {row["TRX_DA"] for row in rows if row.get("TRX_DA")}
     except Exception as e:
-        print(f"  FAIL: 기등록 조회 오류 — {e}")
+        print(f"  FAIL: 기등록 조회 오류 - {e}")
         return False
 
     # BI 데이터 날짜 수집 (check_range 범위)
@@ -297,7 +297,7 @@ def run_mes(today):
             # 공백 검사 (COL13 제외)
             blanks = mes_find_blanks(items)
             if blanks:
-                print(f"  {t}: 데이터 누락 — 업로드 금지")
+                print(f"  {t}: 데이터 누락 - 업로드 금지")
                 for row_idx, col, col_name in blanks:
                     print(f"    행{row_idx} {col}({col_name}) 공백")
                 incomplete.append(t)
@@ -310,7 +310,7 @@ def run_mes(today):
                 v = mes_upload_and_verify(s, items, t)
                 if v is not None:
                     break
-                print(f"    {t}: 시도 {attempt}/3 실패 — 재로그인 후 재시도")
+                print(f"    {t}: 시도 {attempt}/3 실패 - 재로그인 후 재시도")
                 time.sleep(2)
                 s = mes_login()
                 if not s:
@@ -333,7 +333,7 @@ def run_mes(today):
         print()
         print("  [!] 데이터 누락으로 업로드 보류된 날짜:")
         for t in incomplete:
-            print(f"      {t} — BI 파일 해당 날짜 공백 셀 확인 필요")
+            print(f"      {t} - BI 파일 해당 날짜 공백 셀 확인 필요")
         print("      (품질,설비 비가동(h) 공백은 제외하고 검사)")
 
     return not has_fail

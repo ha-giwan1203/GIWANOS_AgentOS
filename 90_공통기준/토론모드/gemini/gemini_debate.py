@@ -1,8 +1,20 @@
 """
-Gemini 토론 클라이언트 — API 기반 멀티턴 대화
-사용: python gemini_debate.py --topic "주제" --rounds 3
+Gemini 토론 클라이언트 — API 기반 (멀티턴 + β안-C 단발 검증)
+
+경로:
+- 멀티턴: `call_gemini(history, api_key)` — 기존 CLI 토론용 (run_debate)
+- β안-C 단발: `call_gemini_single(prompt, api_key, model)` — Step 6-2/6-4 교차 검증 전용
+- β안-C 병렬: `call_gemini_parallel(prompts, api_key, model)` — OpenAI 병렬 호출과 동시 실행
+
+β안-C 호출 규칙 (세션86 3자 만장일치 채택):
+- 원문 payload 동봉 필수 — call_gemini_single(require_payload=True) 강제
+- 본론(6-1, 6-3)·종합(6-5)·최종판정 API 호출 금지
+
+사용:
+  python gemini_debate.py --topic "주제" --rounds 3   # 멀티턴 CLI
+  python -c "from gemini_debate import call_gemini_parallel; ..."
 """
-import os, sys, json, argparse, datetime, pathlib, textwrap
+import os, sys, json, argparse, datetime, pathlib, textwrap, concurrent.futures
 import urllib.request, urllib.error
 
 API_KEY_FILE = pathlib.Path.home() / ".gemini" / "api_key.env"
@@ -11,6 +23,7 @@ LOG_DIR.mkdir(exist_ok=True)
 
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+PAYLOAD_MIN_LEN = 40  # β안-C 원문 동봉 강제 임계
 
 
 def load_api_key() -> str:
@@ -43,6 +56,93 @@ def call_gemini(history: list, api_key: str) -> str:
         raise RuntimeError(f"응답 없음: {data}")
     parts = cands[0].get("content", {}).get("parts", [])
     return "".join(p.get("text", "") for p in parts).strip()
+
+
+def _gemini_url_for(model: str) -> str:
+    return f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+
+
+def call_gemini_single(prompt: str, api_key: str, model: str = GEMINI_MODEL,
+                       system: str = "", max_tokens: int = 2000,
+                       require_payload: bool = False) -> dict:
+    """β안-C 단발 호출. history 없이 1턴. 원문 payload 강제 옵션.
+
+    반환: {"text": str, "model": str, "finish_reason": str|None, "usage": dict}
+    """
+    if require_payload and len(prompt.strip()) < PAYLOAD_MIN_LEN:
+        raise ValueError(
+            f"payload 원문 동봉 필수 (β안-C) — 현재 길이 {len(prompt.strip())} < {PAYLOAD_MIN_LEN}. "
+            "검증 대상 원문 전체를 payload에 포함해야 함 (요약·발췌·절삭 금지)."
+        )
+    contents = []
+    if system:
+        contents.append({"role": "user", "parts": [{"text": f"[시스템]\n{system}"}]})
+        contents.append({"role": "model", "parts": [{"text": "이해."}]})
+    contents.append({"role": "user", "parts": [{"text": prompt}]})
+
+    payload = {
+        "contents": contents,
+        "generationConfig": {"maxOutputTokens": max_tokens},
+    }
+    req = urllib.request.Request(
+        f"{_gemini_url_for(model)}?key={api_key}",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Gemini API HTTP {e.code}: {err_body}")
+
+    cands = data.get("candidates", [])
+    if not cands:
+        raise RuntimeError(f"응답 없음: {data}")
+    parts = cands[0].get("content", {}).get("parts", [])
+    text = "".join(p.get("text", "") for p in parts).strip()
+    return {
+        "text": text,
+        "model": data.get("modelVersion", model),
+        "finish_reason": cands[0].get("finishReason"),
+        "usage": data.get("usageMetadata", {}),
+    }
+
+
+def call_gemini_parallel(prompts: list, api_key: str, model: str = GEMINI_MODEL,
+                         system: str = "", max_tokens: int = 2000) -> list:
+    """β안-C 병렬 호출.
+
+    prompts: [{"label": "gemini_verifies_gpt", "prompt": "..."}, ...]
+    반환: [{"label": ..., "ok": bool, "result" or "error": ..., "model_id": ...}, ...]
+    """
+    results = [None] * len(prompts)
+
+    def _worker(idx: int, item: dict) -> None:
+        label = item.get("label", f"idx{idx}")
+        p_text = item.get("prompt", "")
+        try:
+            r = call_gemini_single(p_text, api_key, model=model, system=system,
+                                   max_tokens=max_tokens, require_payload=True)
+            results[idx] = {
+                "label": label,
+                "ok": True,
+                "result": r,
+                "model_id": r.get("model", model),
+            }
+        except Exception as e:
+            results[idx] = {
+                "label": label,
+                "ok": False,
+                "error": str(e),
+                "model_id": model,
+            }
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, len(prompts))) as ex:
+        futures = [ex.submit(_worker, i, item) for i, item in enumerate(prompts)]
+        concurrent.futures.wait(futures)
+    return results
 
 
 def harness_analyze(gemini_text: str) -> dict:

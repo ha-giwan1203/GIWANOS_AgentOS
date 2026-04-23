@@ -180,10 +180,12 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 - 주입 누락 시 Claude 종합 착수 금지 (가시 증거 단절 방지)
 
 **실행 모드 분기 (스킬 선택)**:
-- **기본값 (문서 반영만, 세션85 현재 상태)**: 웹 UI 멀티턴 유지 — `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 사용
-- **API 모드 활성 (세션86+ 구현 후)**: 
-  - `90_공통기준/토론모드/openai/openai_debate.py` (세션83 재사용 리팩터)
-  - `90_공통기준/토론모드/google/gemini_debate.py` (신설)
+- **기본값**: 웹 UI 멀티턴 유지 — `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 사용
+- **API 모드 (세션86 구현 완료)**:
+  - `90_공통기준/토론모드/openai/openai_debate.py:call_openai_parallel` (세션86 리팩터)
+  - `90_공통기준/토론모드/gemini/gemini_debate.py:call_gemini_parallel` (세션86 단발 모드 신설)
+  - `90_공통기준/토론모드/bridge/log_bridge.py:write_cross_verification` (JSON 스키마 검증 + md/json 이중 기록)
+  - `90_공통기준/토론모드/bridge/api_fallback.py:run_with_fallback` (1회 재시도 후 웹 UI 복귀, rate limit 즉시 fallback)
   - 활성 조건: 위 5개 전제 + 7개 보안 조건(`../CLAUDE.md` β안-C 예외 섹션) 모두 만족
 
 **2주 관찰 기간 (API 모드 구현 완료 후)**:

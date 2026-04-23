@@ -1,0 +1,171 @@
+---
+name: d0-production-plan
+description: >
+  ERP D0추가생산지시 생산계획 반영 자동화 (SP3M3 MAIN + SD9A01 OUTER).
+  "생산계획 반영", "D0 반영", "D0 업로드", "야간 계획 반영", "주간 계획 반영",
+  "아우터 계획", "SD9A01 계획", "생산지시 반영" 키워드 사용 시 이 스킬 사용.
+  Z 드라이브의 SP3M3 생산지시서 xlsm 파일을 읽어 라인별로 ERP에 자동 업로드하고
+  야간 서열 임시저장 + 최종 저장(MES 전송)까지 한 번에 수행한다.
+grade: B
+---
+
+# ERP D0추가생산지시 자동화 (SP3M3 / SD9A01)
+
+## 개요
+
+SP3M3 생산지시서 xlsm 단일 파일에서 라인별 계획을 추출해 ERP D0추가생산지시 화면에 업로드하고 서열 반영 + MES 전송까지 수행한다.
+
+## 운영 세션 (하루 2회)
+
+파일명 = OUTER 생산일 = D+1. SP3M3 야간은 시작일(오늘) 기준.
+
+| 세션 | 실행 시점 | 파일명 날짜 | 처리 내용 | ERP 생산일 |
+|------|---------|-----------|---------|-----------|
+| 저녁 | 17~19시 (확정계획 확인 후) | 내일 | ① SP3M3 야간 (출력용 야간 섹션) | **오늘** (야간 시작일) |
+|  |  |  | ② SD9A01 OUTER D+1 (OUTER 시트 SD9M01 블록) | **내일** (파일명 날짜) |
+| 아침 | 07:10경 (계획 확정 후) | 오늘 (어제 저녁 저장) | ③ SP3M3 주간 (출력용 주간 섹션, 누적 ≥ 3600 컷) | **오늘** (파일명 날짜) |
+
+## 사전 준비
+
+- Chrome 디버깅 세션: `--remote-debugging-port=9222`, 프로필 `C:\Users\User\.flow-chrome-debug`
+- ERP 로그인: 프로필에 저장된 자격증명(`0109`) 자동완성 (pyautogui)
+- Python 의존성: `pyautogui`, `playwright`, `openpyxl`
+- Z 드라이브 마운트: `\\210.216.217.180\zz-group`
+
+## 파일 경로 규칙
+
+```
+Z:\15. SP3 메인 CAPA점검\SP3M3\생산지시서\{YYYY}년 생산지시\{MM}월\SP3M3_생산지시서_({YY.MM.DD}).xlsm
+```
+
+- 저장 시점 **전일 오후** → 파일명 = **D+1 (내일 날짜)**
+- "수정본" 접미사 있으면 우선 (mtime 최신 기준)
+- 저녁 세션: target_date = tomorrow → 파일명 날짜 = tomorrow
+- 아침 세션: target_date = today → 파일명 날짜 = today (어제 저녁 생성)
+- 파일 내 헤더 `◀ D+1` = 파일명 날짜, `◀ D+2` = 파일명 날짜+1
+
+## 라인 설정
+
+| 라인 | ERP 코드 | LINE_DIV_CD | 시트 | 라인 필터 | 품번 컬럼 | 수량 컬럼 | 저장 URL |
+|------|---------|------------|------|----------|---------|---------|---------|
+| MAIN | SP3M3 | 02 | `출력용` | R1 `◀ D+1 야간계획`, R35 `◀ D+2 주간계획` | I (신MES 품번, 정제) | K (지시) | `/prdtPlanMng/multiListMainSubPrdtPlanRankDecideMng.do` |
+| OUTER | SD9A01 | 01 | `OUTER 생산계획` | B열 `== 'SD9M01'` (D+1 블록) | D (품번 그대로, 접미사 포함) | E (수량) | `/prdtPlanMng/multiListOuterPrdtPlanRankDecideMng.do` |
+
+## 사용법
+
+```bash
+# dry-run (추출 + 업로드 시뮬레이션, 서버 저장 안 함)
+python run.py --session evening --dry-run
+
+# 저녁 세션 (SP3M3 야간 + SD9A01 OUTER)
+python run.py --session evening
+
+# 아침 세션 (SP3M3 주간 3600컷)
+python run.py --session morning
+
+# 시간대 자동 판정
+python run.py --session auto
+
+# 대상 날짜 명시 (파일명 기준)
+python run.py --session evening --target-date 2026-04-24
+
+# 라인 제한
+python run.py --session evening --line SP3M3     # SP3M3만
+python run.py --session evening --line SD9A01    # SD9A01만
+```
+
+## 실행 절차
+
+### Phase 0: 환경 준비
+1. Z 드라이브 접근 확인
+2. Chrome CDP 9222 기동 (이미 있으면 재사용)
+3. ERP OAuth 자동 로그인 (pyautogui 저장 자격증명)
+4. D0추가생산지시 화면 진입: `http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do`
+
+### Phase 1: 파일 해석
+5. target_date 계산 (session + 현재시각 기반)
+6. SP3M3 생산지시서 xlsm 탐색 (수정본 우선)
+7. 세션별 시트 추출:
+   - 저녁: 출력용 야간 섹션 + OUTER 시트 SD9M01 D+1 블록
+   - 아침: 출력용 주간 섹션 (누적 ≥ 3600 도달 행까지 컷)
+
+### Phase 2: 업로드 파일 생성
+8. 라인별 임시 엑셀 생성 (생산일 | 제품번호 | 생산량)
+   - SP3M3: target_date
+   - SD9A01: target_date (저녁 세션), target_date+1 (아침 세션 해당 없음)
+9. 저장 경로: `06_생산관리/D0_업로드/d0_{line}_{date}.xlsx`
+
+### Phase 3: D0 업로드 (라인별)
+10. 엑셀업로드 팝업 오픈 (#btnExcelUpload)
+11. `jQuery.ajax` POST `/prdtPlanMng/selectListPmD0AddnUpload.do` (multipart, form `uploadfrm`, 파일 필드 `files`)
+12. 응답 data.list로 팝업 그리드 채우기 (excelUploadCallBack)
+13. 오류 행 검증 (ERROR_FLAG 확인)
+14. `POST /prdtPlanMng/multiListPmD0AddnUpload.do` JSON `{excelList, ADDN_PRDT_REASON_CD:"002"}` → DB 저장
+15. 상단 그리드 자동 반영 확인
+
+### Phase 4: 야간 서열 배치 (저녁 세션만)
+16. 엑셀 순서대로 상단 행 idx 매핑 (동일 품번 여러 건이면 REG_NO 최대값)
+17. 각 품번:
+    - rowClick 로직 재현 (totSelectRowData 세팅 + mGridList.searchListData)
+    - 좌하단 로드 대기 → 해당 라인 코드 선택 (SP3M3 또는 SD9A01)
+    - sGridList.searchListData → 우하단 로드 대기
+    - addRow 직접 호출 (내장 중복 체크 우회, 주간/야간 중복 허용)
+    - multiList API 임시저장 (sendMesFlag=N)
+18. 라인별 저장 URL 분기
+
+### Phase 5: 최종 저장 + MES 전송
+19. 라인별 sendMesFlag=Y로 multiList POST
+20. 응답 statusCode=200 + mesMsg statusCode=200 확인
+
+### Phase 6: 검증
+21. SmartMES API 조회: `POST http://lmes-dev.samsong.com:19220/v2/prdt/schdl/list.api`
+    - body: `{lineCd, prdtDa}` (lineCd="SP3M3" 또는 "SD9A01")
+22. rank 순서와 엑셀 순서 대조
+
+## 핵심 주의사항
+
+1. **jQuery.ajax 경로 필수** — fetch 직접 호출 시 500 에러 (XSRF 공통 설정 미상속)
+2. **파일 필드명 `files` (복수형)** — `fileHelper.js` allSave 규칙
+3. **EXT_PLAN_REG_NO 최대값 매핑** — 동일 품번 상단에 여러 건 (기존 주간 + 신규 야간) 시 최대값 선택
+4. **주간/야간 중복 품번** — 서버가 서로 다른 EXT_PLAN_REG_NO로 P + A 공존 허용. 반드시 신규 REG_NO 사용
+5. **s_grid 폴링 필수** — 기존 P/R 행 로드 완료 후 addRow (미완 상태에서 addRow하면 payload에 기존 행 유실)
+6. **OUTER 품번 접미사 포함** — G열 "품번정제" 사용 금지, D열 그대로 사용
+7. **OUTER 시트 7개 라인 혼재** — B열 정확 매칭 `== 'SD9M01'` (헤더 `◀ SD9M01 D+1` 등 제외)
+8. **주간 3600 컷 규칙** — 누적 ≥ 3600 되는 첫 행까지 포함 (초과 1건 포함)
+9. **중복 실행 방지** — 같은 날짜 이미 저장된 건 스킵 (EXT_PLAN_REG_NO 기준)
+
+## 실패 조건
+
+- Chrome CDP 9222 미응답
+- ERP OAuth 실패 (저장 자격증명 미사용 시 pyautogui 자동완성 불가)
+- Z 드라이브 미접근
+- 생산지시서 xlsm 파일 미존재
+- 출력용 시트 헤더 `◀ D+1 야간계획` / `◀ D+2 주간계획` 미발견
+- OUTER 시트 B열 `SD9M01` 행 0건
+- selectList 서버 500 에러
+- multiList 서버 에러
+- MES 전송 statusCode != 200
+
+## 중단 기준
+
+- 상단 그리드 등록 0건 (파싱 실패)
+- 서열 배치 중 임시저장 실패 (첫 실패 즉시 중단)
+- 최종 저장 실패
+
+## 검증 항목
+
+- 라인별 엑셀 건수 = ERP 상단 그리드 저장 건수
+- 야간 서열 A 행 수 = 엑셀 건수 (주간 중복 품번도 신규 REG_NO로 추가 확인)
+- SmartMES rank 순서 = 엑셀 순서
+- MES 응답 rsltCnt > 0
+
+## 되돌리기 방법
+
+- 서열 행 삭제 API: `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do` payload `{EXT_PLAN_REG_NO, STD_DA, PLAN_DA, PROD_NO, LINE_CD}`
+- `.claude/tmp/erp_d0_deleteA.py --all` 로 A 행 일괄 삭제 후 재업로드 가능
+
+## 변경 이력
+
+| 일자 | 버전 | 내용 |
+|------|------|------|
+| 2026-04-23 | v1 | 초기 스킬 패키징. 오늘 SP3M3 야간 실검증 완료. OUTER/주간은 구조 완비하되 실운영 검증 후 활성화 권장 |

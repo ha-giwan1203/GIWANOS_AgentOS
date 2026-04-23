@@ -10,7 +10,55 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 완전 종결 (/finish: 4커밋 + 부분PASS + Notion pending)
+최종 업데이트: 2026-04-23 KST — 세션95 /d0-plan 스킬 패키징 완료
+
+---
+
+## 세션95 (2026-04-23) — /d0-plan 스킬 패키징 완료
+
+**[완료] ERP D0추가생산지시 실 파이프라인 검증 + 스킬 배포**
+- 오늘 아침: SP3M3 야간 22건 전체 자동 처리 성공
+  - Chrome CDP 재기동 + OAuth 자동 로그인 ✅
+  - D0 엑셀 업로드(파싱+저장) 자동화 ✅ (`jQuery.ajax` 경로로 500 해소)
+  - 야간 서열 22건 엑셀 순서대로 추가 ✅ (중복 삭제→재생성으로 EXT_PLAN_REG_NO 최대값 매핑 버그 수정)
+  - 최종 저장 (sendMesFlag=Y) + MES 전송 성공 (rsltCnt=1100) ✅
+  - SmartMES rank 10~31 엑셀 순서 100% 일치 확인 ✅
+- 운영 규칙 확정 (사용자 설명 기반)
+  - 파일 경로: `Z:\15. SP3 메인 CAPA점검\SP3M3\생산지시서\{YYYY}년 생산지시\{MM}월\SP3M3_생산지시서_({YY.MM.DD})*.xlsm`
+  - 파일명 날짜 = OUTER 생산일 = D+1 (전일 오후 저장)
+  - 세션 3회: 저녁 SP3M3 야간(생산일=오늘) + SD9A01 OUTER(생산일=내일) / 아침 SP3M3 주간(생산일=오늘, 누적≥3600 컷)
+- 스킬 패키징
+  - `90_공통기준/스킬/d0-production-plan/SKILL.md` (grade B)
+  - `90_공통기준/스킬/d0-production-plan/run.py` (600줄 통합, Phase 0~6)
+  - `.claude/commands/d0-plan.md` — `/d0-plan` 등록 확인
+  - 업로드 엑셀 저장 경로: `06_생산관리/D0_업로드/d0_{line}_{YYYYMMDD}.xlsx`
+- 상세: `06_생산관리/서열정리/WORK_NOTE_20260423.md`
+
+**[대기] 2~3일 운영 안정화 관찰**
+- SD9A01 OUTER 실검증 (내일 저녁 첫 실행 `--dry-run` 권장)
+- SP3M3 주간 3600 컷 실검증 (아침 세션 `--dry-run`)
+- 안정되면 grade B → A 격상 검토
+
+---
+
+## 세션94 (2026-04-22) — ERP D0추가생산지시 + SmartMES 서열정리 자동화 탐색 [완료]
+
+**[완료] 탐색 범위 확정 + 공통 환경 확보**
+- ERP Chrome CDP(포트 9222, `.flow-chrome-debug`) + OAuth 자동 로그인 스크립트 동작 확인
+  - `.claude/tmp/erp_oauth_login.py` — 저장 자격증명(0109) pyautogui 자동완성 방식
+- D0추가생산지시 API 2단계 구조 확인(JS 소스 분석)
+  - 파싱: `POST /prdtPlanMng/selectListPmD0AddnUpload.do` (multipart, form=`uploadfrm`, 파일 필드 `files`)
+  - 저장: `POST /prdtPlanMng/multiListPmD0AddnUpload.do` (JSON `{excelList, ADDN_PRDT_REASON_CD:"002"}`)
+- SmartMES 서열정리 기존 스크립트(`06_생산관리/서열정리/smartmes_reorder.py`) shift 필터 버그 식별 + 패치(미커밋)
+  - `shift==02` 고정 → `status==R` 단독 조건으로 교체 (주간 작업분은 F/P라 자동 제외)
+
+**[미완] 내일 재개**
+- D0 자동 업로드 실검증 (오늘치는 사용자 수작업으로 저장 완료 → 내일 새 날짜 엑셀로 실행)
+- SmartMES 서열정리 캘리브레이션 + `--execute` 시범
+- 네트워크 감시 로거 재구현 (Playwright `new_cdp_session` → `Network.enable` 방식)
+- 최종 산출물: `90_공통기준/스킬/d0-production-plan/` 스킬 패키징 (sp3-production-plan 패턴 참조)
+
+**작업 노트**: `06_생산관리/서열정리/WORK_NOTE_20260422.md` (상세 체크리스트 + 보존 파일 맵)
 
 ---
 

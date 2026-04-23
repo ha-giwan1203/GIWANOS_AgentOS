@@ -4,12 +4,70 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-22 KST — 세션93 완전 종결 (/finish: 4커밋 + GPT 부분PASS + Notion pending)
+최종 업데이트: 2026-04-23 KST — 세션95 `/d0-plan` 스킬 패키징 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-22 세션93 — Hook 시스템 개선 1주차 1번)
+## 0. 최신 세션 (2026-04-23 세션95 — /d0-plan 스킬 배포)
+
+### 실행 경로
+세션 재개 → 어제 체크리스트 점검(Chrome 죽음) → CDP 재기동 + OAuth 자동 로그인 → D0 엑셀 자동 업로드 500 해소(jQuery.ajax 경로) → 야간 서열 22건 자동 추가 → 중복 삭제→재생성으로 EXT_PLAN_REG_NO 최대값 매핑 버그 수정 → 최종 저장 MES 전송 성공 → SmartMES 엑셀 순서 일치 확인 → 라인 구조(SP3M3/SD9A01) + 세션 규칙(저녁/아침 2회) + 생산일 매핑 확정 → 스킬 패키징 배포
+
+### 생성된 자산
+- `90_공통기준/스킬/d0-production-plan/SKILL.md` (grade B)
+- `90_공통기준/스킬/d0-production-plan/run.py` (Phase 0~6 통합)
+- `.claude/commands/d0-plan.md`
+- `06_생산관리/D0_업로드/` (업로드 엑셀 저장 경로, 운영 자료 위치)
+- `06_생산관리/서열정리/WORK_NOTE_20260423.md` (상세 작업 노트 + API 구조 표 + 운영 규칙)
+
+### 운영 규칙 (확정)
+| 세션 | 실행 시점 | 파일명 날짜 | ERP 생산일 |
+|------|---------|-----------|-----------|
+| 저녁 SP3M3 야간 | 17~19시 | 내일 | 오늘 (야간 시작일) |
+| 저녁 SD9A01 OUTER | 17~19시 | 내일 | 내일 (파일명 날짜) |
+| 아침 SP3M3 주간 | 07:10 | 오늘 (어제 저장) | 오늘 (파일명 날짜) |
+
+### 다음 AI 액션
+1. 내일 저녁 `/d0-plan --session evening --dry-run` 실행해 SD9A01 OUTER 추출 검증
+2. `/d0-plan --session morning --dry-run` 으로 SP3M3 주간 3600 컷 검증
+3. 실업로드 성공 시 grade B → A 격상
+4. 어제(4/22) 임시 스크립트 `.claude/tmp/erp_d0_*.py` 5종은 run.py로 대체됐으므로 `98_아카이브` 이동 검토
+
+---
+
+## 1. 이전 세션 (2026-04-22 세션94 — ERP D0추가생산지시 + SmartMES 서열정리 탐색)
+
+### 실행 경로
+세션 재시작 → ERP OAuth 자동 로그인 → D0추가생산지시 화면 진입 → 엑셀 업로드 API 2단계 구조 파악 → 자동 업로드 시도(500 → 필드명 `files`로 수정) → 사용자 수작업 저장 → SmartMES 서열 대조(shift 필터 버그 발견) → 패치 → 재조회 시 plan=0건 → 작업 메모 후 마무리
+
+### 오늘 확정된 것
+- **ERP OAuth 자동 로그인**: `.claude/tmp/erp_oauth_login.py` — pyautogui 저장 자격증명(0109) 자동완성 + 시스템 선택창 통과 + `/layout/layout.do` 진입
+- **D0 API 구조**(JS 소스 `popupPmD0AddnUpload.js` 분석)
+  - 파싱: `POST /prdtPlanMng/selectListPmD0AddnUpload.do` (multipart, form id `uploadfrm`, 파일 필드 **`files`** 복수형)
+  - 저장: `POST /prdtPlanMng/multiListPmD0AddnUpload.do` (JSON `{excelList:[{COL1:생산일, COL2:제품번호, COL3:생산량}], ADDN_PRDT_REASON_CD:"002"}`)
+- **SmartMES 서열정리**: `06_생산관리/서열정리/smartmes_reorder.py` shift 필터 패치 완료 (미커밋, 캘리브레이션 미수행)
+
+### 오늘치 실물 처리
+- `SSKR D+0 추가생산 Upload.xlsx` 26건 → D0에 **사용자 수작업으로 저장 완료** (ERP 그리드 43행 확인)
+- SmartMES 오늘 서열: 최종적으로 Excel 순서와 일치 (내가 서열 조작 이력 없음, `--execute` 미실행·config 부재)
+
+### 다음 AI 액션 (내일 2026-04-23)
+1. 새 날짜 엑셀 받아 `.claude/tmp/erp_d0_upload.py`로 자동 업로드 실검증 (`files` 필드 500 해소 여부)
+2. **중복 저장 방지 가드** 설계·구현 (이미 저장된 날짜 재실행 차단)
+3. `smartmes_reorder.py --calibrate` — 보조 모니터에서 좌표 6개 측정
+4. dry-run → `--execute` 시범
+5. 감시 로거 재구현: `new_cdp_session(page)` → `Network.enable` 명시 활성화 → iframe fetch까지 캡처
+6. 최종 목표: `90_공통기준/스킬/d0-production-plan/` 스킬 패키징 (sp3-production-plan 패턴)
+
+### 보존 상태
+- Chrome 디버깅 세션(`.flow-chrome-debug` / 포트 9222) — 종료하지 않으면 내일 바로 재사용 가능
+- 임시 스크립트 4종 `.claude/tmp/` 에 보존 (oauth_login / d0_upload / d0_monitor / verify_order)
+- 상세: `06_생산관리/서열정리/WORK_NOTE_20260422.md`
+
+---
+
+## 1. 이전 세션 (2026-04-22 세션93 — Hook 시스템 개선 1주차 1번)
 
 ### 실행 경로
 세션 재시작 → GPT 2차 진단 대화방 입장 → Claude 독립 검증 → 2자 토론(2라운드) → `plan.md` 작성 → 사용자 승인 → 1주차 1번(hook_registry 격하) 착수·완료

@@ -1,0 +1,23 @@
+# Google Drive 동기화 제외 대상
+# hook_log.jsonl, COMMIT_EDITMSG 등 동기화 오류 방지
+
+# Git 내부 파일
+.git
+
+# Claude Code 로컬 상태 (hooks 스크립트는 Git 추적, 나머지는 로컬 전용)
+.claude/hooks/hook_log.jsonl
+.claude/hooks/_archive
+.claude/logs
+.claude/state
+.claude/worktrees
+.claude/plans
+.claude/scheduled-tasks
+.claude/settings.local.json
+.claude/incident_ledger.jsonl
+
+# Python 캐시
+__pycache__
+*.pyc
+
+# 영상 캐시 (대용량)
+90_공통기준/스킬/youtube-analysis/cache
