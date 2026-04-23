@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 drift 감지 구조 보강
+최종 업데이트: 2026-04-23 KST — 세션96 M2 readme regex 정교화 + list_active_hooks 헬퍼 전환
 
 ---
 
@@ -58,6 +58,22 @@
   - `smoke_test.sh` 섹션 54 신설 (5건, regression): parse_helpers 실파일 존재 / hooks_from_settings total = list_active_hooks --count / shadow_diff match=True / doc_dates 파싱 / doc_session 파싱
 - 검증: smoke_test **216/216 ALL PASS** / smoke_fast 11/11 / doctor_lite OK
 - 다음 단계(M2 후속): shadow 1주 관찰 후 `list_active_hooks.sh` 헬퍼 호출 전환 + `final_check.sh` 파싱 전환 → M3 2축 분리 → M4 `risk_profile_prompt` 전환
+
+**[완료] M2 — README regex 정교화 + list_active_hooks 헬퍼 전환 (2자 토론 Round 2 통과)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/`
+- GPT 보정 2건 + Claude 독립 추가 1건 합의 (총 6건 채택)
+- **변경 파일 3건**:
+  - `.claude/scripts/parse_helpers.py`: `extract_readme_hook_names` 정규식 정교화 (블록쿼트 제외 + 테이블 행 전용 매칭) → 33→31 정정. `_shell_equivalent_readme_hook_names` 신설(final_check.sh L66-79 awk+grep 의미 절차적 재구현). `shadow_diff_readme` 신규 op (helper Python regex ↔ helper 내부 shell-equivalent 동등성)
+  - `.claude/hooks/list_active_hooks.sh`: 인라인 Python heredoc(약 65줄) → `parse_helpers.py --op hooks_from_settings` subprocess 호출. 출력 포맷팅(--count/--names/--by-event/--full) byte-exact 보존
+  - `.claude/hooks/smoke_test.sh` 섹션 54-6 신설: `shadow_diff_readme` match=true 회귀 (216→217)
+- **GPT 보정 채택**:
+  - 5-추가 A: `render_hooks_readme.sh --dry` 검증 추가 — 의존자 실증(`render_hooks_readme.sh:25-29` `bash list_active_hooks.sh --count/--by-event` 호출 후 `awk -F': '` 파싱 → EVENT_LINE 생성)
+  - 5-추가 B: shadow 기준을 README↔settings union이 아니라 helper Python regex ↔ helper 내부 shell-equivalent 동등성으로 변경. GPT 권고대로 subprocess 대신 헬퍼 내부 함수로 구현
+- **Claude 독립 추가 채택**:
+  - 5-추가 C: `list_active_hooks.sh` stdout 4모드(`--count`/`--names`/`--by-event`/`--full`) **byte-exact 회귀** — count·name 일치만으론 1바이트 변경 회귀 못 잡음. `awk -F': '` 파싱 정확성 보장
+- **검증 8단계 모두 PASS**: 헬퍼 단독 / 외부 계약 / smoke_test 217/217 / smoke_fast 11/11 / final_check --fast / drift 재현 / render_hooks_readme.sh --dry diff 0 / shadow_diff_readme match=true / 4모드 byte-exact diff 0 + (비차단) settings.local.json 부재 시 동일 동작 31
+- **명시적 비변경**: `final_check.sh:61-80` 셸 파서 — M3 이월 (헬퍼와 1주 안정 후 교체)
+- 다음 단계(M3): final_check.sh의 `readme_active_hook_count`/`readme_active_hook_names` 헬퍼 호출 전환
 
 ---
 

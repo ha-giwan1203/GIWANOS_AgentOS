@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 drift 감지 구조 보강
+최종 업데이트: 2026-04-23 KST — 세션96 M2 readme regex 정교화 + list_active_hooks 헬퍼 전환
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -54,11 +54,22 @@
 - 2자 토론 Round 2: **통과** + 3번(보수 경로 조정) **수용** (커밋 `3f1da2c7` 실물 검증). 의제 M1 종결
 - 다음 의제(M2): readme regex 정교화 → shadow mismatch 0 → list_active_hooks 실전환 (GPT 다음 행동 지정)
 
+### 파싱 헬퍼 M2 — README regex 정교화 + list_active_hooks 헬퍼 전환 (2자 토론 Round 2 통과)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/`
+- A 분류 자가판정 동의 (B 트리거 미해당). 합의 6건 채택 (GPT 5 + Claude 독립 1)
+- 구현 3건:
+  - `parse_helpers.py`: extract_readme_hook_names 정교화(블록쿼트 제외 + 테이블 행 전용) + `_shell_equivalent_readme_hook_names` 신설(셸 의미 절차적 재구현) + `shadow_diff_readme` 신규 op
+  - `list_active_hooks.sh`: 인라인 Python heredoc → 헬퍼 호출 위임 (4모드 stdout byte-exact 보존)
+  - `smoke_test.sh` 54-6 신설 (217/217 ALL PASS)
+- 검증 8단계 모두 PASS + 비차단 메모(settings.local.json 부재 시도 31) 통과
+- 명시적 비변경: `final_check.sh:61-80` 셸 파서 (M3 이월)
+
 ### 다음 AI 액션
-1. auto_resolve --apply 실행 → 규칙 6 활성 → ledger 잡음 대규모 해소
-2. GPT에 재판정 요청 ("조건부 통과" 조건 반영 완료 보고)
-3. `/daily` 또는 기타 일상 업무
-4. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
+1. M2 단일 커밋 + main 직행 + GPT 최종 보고
+2. (M3 후속) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
+3. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
+4. (별 의제) 미해결 incident 군집 정리: harness_missing 48 / evidence_missing 41 / meta_drift 28
+5. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
 
 ---
 

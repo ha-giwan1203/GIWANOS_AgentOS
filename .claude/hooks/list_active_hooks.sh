@@ -11,48 +11,40 @@
 #   bash .claude/hooks/list_active_hooks.sh --names      # 훅 이름만 (sort unique)
 #
 # 근거: C:/Users/User/.claude/plans/glimmering-churning-reef.md Part 2 원칙 7
+#
+# M2 (세션96 2자 토론 Round 2 통과 합의): 인라인 settings 파싱을 parse_helpers.py
+# `hooks_from_settings`에 위임. 출력 포맷팅은 byte-exact 보존(--count/--names/--by-event/--full
+# 4모드 stdout이 변경 전과 1바이트도 다르지 않아야 render_hooks_readme.sh:29 awk -F': '
+# 파싱이 깨지지 않음). Claude 독립 추가 5-추가 C 채택 결과.
 
 set -u
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 SETTINGS_TEAM="$PROJECT_DIR/.claude/settings.json"
 SETTINGS_LOCAL="$PROJECT_DIR/.claude/settings.local.json"
+HELPER="$PROJECT_DIR/.claude/scripts/parse_helpers.py"
 
 PY_CMD="python"
 command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
 
 MODE="${1:---full}"
 
-"$PY_CMD" - "$SETTINGS_TEAM" "$SETTINGS_LOCAL" "$MODE" <<'PY_END'
-import json, sys, os
-from collections import defaultdict
+"$PY_CMD" - "$HELPER" "$SETTINGS_TEAM" "$SETTINGS_LOCAL" "$MODE" <<'PY_END'
+import json, subprocess, sys
 
-mode = sys.argv[3] if len(sys.argv) > 3 else "--full"
-events = defaultdict(set)  # event -> set of hook filenames
+helper, team, local, mode = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+result = subprocess.run(
+    [sys.executable, helper, "--op", "hooks_from_settings",
+     "--path", team, "--path", local],
+    capture_output=True, text=True,
+)
+if result.returncode != 0:
+    sys.stderr.write(result.stderr)
+    sys.exit(result.returncode)
 
-for f in sys.argv[1:3]:
-    if not os.path.exists(f):
-        continue
-    try:
-        with open(f, encoding="utf-8") as fh:
-            data = json.load(fh)
-    except Exception:
-        continue
-    for evt, handlers in (data.get("hooks") or {}).items():
-        for h in handlers or []:
-            for hh in (h.get("hooks") or []):
-                if hh.get("type") != "command":
-                    continue
-                cmd = hh.get("command", "")
-                # bash .claude/hooks/NAME.sh 패턴만 추출 (statusLine 등 제외)
-                if "bash " in cmd and ".claude/hooks/" in cmd:
-                    name = cmd.split(".claude/hooks/")[-1].split()[0].strip()
-                    if name.endswith(".sh"):
-                        events[evt].add(name)
-
-all_names = set()
-for names in events.values():
-    all_names.update(names)
+data = json.loads(result.stdout)
+events = {evt: set(names) for evt, names in data["by_event"].items()}
+all_names = set(data["all_names"])
 
 if mode == "--count":
     print(len(all_names))

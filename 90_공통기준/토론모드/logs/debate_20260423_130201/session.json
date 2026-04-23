@@ -1,0 +1,11 @@
+{
+  "session_id": "debate_20260423_130201",
+  "mode": "2way",
+  "agenda": "세션96 M2 — README regex 정교화 + list_active_hooks 헬퍼 전환",
+  "agenda_class": "A",
+  "agenda_class_reason": "헬퍼 정규식 정교화(셸 파서와 동일 의미) + smoke_test 회귀 1건 추가 + list_active_hooks 인라인 Python을 헬퍼 호출로 위임(외부 stdout 계약 1:1 보존). 실행 흐름·판정·차단 정책 미변경. final_check.sh의 README count 비교 분기는 그대로 유지.",
+  "plan_file": "C:/Users/User/.claude/plans/melodic-meandering-lighthouse.md",
+  "chat_url": "",
+  "turn_number": 0,
+  "started_at": "2026-04-23T13:02:01+09:00"
+}

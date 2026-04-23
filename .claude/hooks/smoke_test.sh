@@ -1306,6 +1306,11 @@ TASKS_SESSION=$("$PY_CMD" "$PARSE_HELPERS" --op doc_session --path "$PROJECT_DIR
 [ -n "$TASKS_SESSION" ] && echo "$TASKS_SESSION" | grep -qE '^[0-9]+$'
 check $? "doc_session: TASKS.md 세션 번호 파싱 ($TASKS_SESSION)"
 
+# 54-6: shadow_diff_readme — helper Python regex ↔ helper 내부 shell-equivalent 동등성 (M2 합의)
+SHADOW_README_MATCH=$("$PY_CMD" "$PARSE_HELPERS" --op shadow_diff_readme --path "$PROJECT_DIR/.claude/hooks/README.md" 2>/dev/null | "$PY_CMD" -c "import sys,json; print(json.load(sys.stdin)['match'])" 2>/dev/null)
+[ "$SHADOW_README_MATCH" = "True" ]
+check $? "shadow_diff_readme: helper Python regex ↔ shell-equivalent 의미 동등성 (M2)"
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
