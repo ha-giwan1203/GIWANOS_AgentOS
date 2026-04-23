@@ -247,15 +247,15 @@ echo ""
 
 # 6. 상태 문서 3종 날짜 동기화 확인 (staged 우선, 없으면 working tree)
 echo "--- 6. TASKS/HANDOFF/STATUS 날짜 동기화 ---"
-# staged snapshot에서 날짜 추출 시도, 없으면 working tree fallback
+# working tree 우선(실시간 상태 반영), 없으면 git index fallback (세션96 수정: 기존 index 우선은 edit만 하고 git add 전이면 drift 미감지)
 _get_date() {
   local rel_path="$1"
-  local staged_content
-  staged_content=$(cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null)
-  if [ -n "$staged_content" ]; then
-    echo "$staged_content" | sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' | head -1
+  local wt_date
+  wt_date=$(sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$PROJECT_DIR/$rel_path" 2>/dev/null | head -1)
+  if [ -n "$wt_date" ]; then
+    echo "$wt_date"
   else
-    sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' "$PROJECT_DIR/$rel_path" 2>/dev/null | head -1
+    cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null | sed -n 's/.*최종 업데이트: \([0-9-]*\).*/\1/p' | head -1
   fi
 }
 
@@ -298,18 +298,37 @@ fi
 _get_session() {
   local rel_path="$1"
   local content
-  content=$(cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null)
-  [ -z "$content" ] && content=$(cat "$PROJECT_DIR/$rel_path" 2>/dev/null)
+  # working tree 우선(실시간 상태 반영, 세션96 수정), 없으면 git index fallback
+  content=$(cat "$PROJECT_DIR/$rel_path" 2>/dev/null)
+  [ -z "$content" ] && content=$(cd "$PROJECT_DIR" && git show :"$rel_path" 2>/dev/null)
   echo "$content" | grep -oE '세션[0-9]+' | head -1 | grep -oE '[0-9]+'
 }
 TASKS_SESSION=$(_get_session "90_공통기준/업무관리/TASKS.md")
 HANDOFF_SESSION=$(_get_session "90_공통기준/업무관리/HANDOFF.md")
-echo "  TASKS 세션: $TASKS_SESSION / HANDOFF 세션: $HANDOFF_SESSION"
+STATUS_SESSION=$(_get_session "90_공통기준/업무관리/STATUS.md")
+echo "  TASKS 세션: $TASKS_SESSION / HANDOFF 세션: $HANDOFF_SESSION / STATUS 세션: $STATUS_SESSION"
 if [ -n "$TASKS_SESSION" ] && [ -n "$HANDOFF_SESSION" ]; then
   if [ "$HANDOFF_SESSION" -lt "$TASKS_SESSION" ] 2>/dev/null; then
     warn "HANDOFF(세션$HANDOFF_SESSION) < TASKS(세션$TASKS_SESSION) — 세션 드리프트"
   else
     echo "  [OK] HANDOFF 세션 >= TASKS 세션"
+  fi
+fi
+# STATUS 세션 드리프트 검사 (세션96 추가: 같은 날 세션 진행 시 STATUS 세션번호 stale 감지)
+# 단, 날짜 드리프트가 이미 처리된 경우 위 L269-286에서 세션도 같이 갱신됨 → 동일 날짜일 때만 세션 단독 검사
+if [ -n "$TASKS_SESSION" ] && [ -n "$STATUS_SESSION" ] && [ "$STATUS_DATE" = "$TASKS_DATE" ]; then
+  if [ "$STATUS_SESSION" -lt "$TASKS_SESSION" ] 2>/dev/null; then
+    if $FIX_MODE; then
+      # 날짜는 유지하고 세션 번호만 갱신 (\1에 기존 날짜 캡처)
+      _tmp_status=$(mktemp)
+      sed "s/^\(최종 업데이트: [0-9-]*\) — 세션[0-9]\+.*/\1 — 세션$TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
+      echo "  [FIX] STATUS.md 세션 갱신: 세션$STATUS_SESSION → 세션$TASKS_SESSION"
+    else
+      fail "STATUS(세션$STATUS_SESSION) < TASKS(세션$TASKS_SESSION) — 세션 드리프트 (--fix로 자동 교정 가능)"
+      hook_incident "gate_reject" "final_check" "STATUS.md" "session_drift: STATUS(세션$STATUS_SESSION) < TASKS(세션$TASKS_SESSION)" '"classification_reason":"session_drift"'
+    fi
+  else
+    echo "  [OK] STATUS 세션 >= TASKS 세션"
   fi
 fi
 echo ""

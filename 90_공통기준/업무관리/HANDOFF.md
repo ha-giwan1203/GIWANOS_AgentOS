@@ -4,12 +4,39 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션95 `/d0-plan` 스킬 패키징 완료
+최종 업데이트: 2026-04-23 KST — 세션96 drift 감지 구조 보강
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-23 세션95 — /d0-plan 스킬 배포)
+## 0. 최신 세션 (2026-04-23 세션96 — STATUS drift 근본 원인 분석 + final_check 보강)
+
+### 실행 경로
+세션 재개 → daily-doc-check 자동 실행 → STATUS stale 감지(Slack 알림) → 근본 원인 1차 분석(날짜 비교 맹점) → `final_check --fix` 실행했으나 교정 실패 → 2차 분석으로 `_get_session`/`_get_date`의 git index 우선 조회 문제 발견 → STATUS.md 수동 교정 + 세션94~95 미커밋 35건 커밋(`ac8369ff`) → final_check drift 감지 강화 2건 → 테스트(drift 재현·감지·교정) → 다음 작업
+
+### 드리프트 감지 강화 구현
+1. **STATUS 세션 비교 블록 추가** (`.claude/hooks/final_check.sh` L305~)
+   - HANDOFF 세션 비교 패턴을 STATUS에도 복제
+   - `[ "$STATUS_DATE" = "$TASKS_DATE" ]` 조건으로 날짜 drift와 중복 방지
+   - `--fix` 모드: 날짜는 `\1`로 유지, 세션 번호만 갱신
+2. **`_get_session` / `_get_date` working tree 우선** (L251~, L298~)
+   - 기존: `git show :file` 우선 → `cat file` fallback
+   - 변경: `cat file` 우선 → `git show :file` fallback
+   - 효과: `git add` 전 상태도 실시간 drift 감지
+
+### 검증
+- drift 재현(STATUS 세션90 변경) → `[FAIL] session_drift`
+- `--fix` → `[FIX] 세션90 → 세션95` 자동 교정
+- smoke_fast 11/11 ALL PASS / doctor_lite OK
+
+### 다음 AI 액션
+1. `/auto-fix` — 미해결 incident 371건 분석 (세션93 이후 9건 신규)
+2. `/daily` 또는 기타 일상 업무
+3. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
+
+---
+
+## 1. 이전 세션 (2026-04-23 세션95 — /d0-plan 스킬 배포)
 
 ### 실행 경로
 세션 재개 → 어제 체크리스트 점검(Chrome 죽음) → CDP 재기동 + OAuth 자동 로그인 → D0 엑셀 자동 업로드 500 해소(jQuery.ajax 경로) → 야간 서열 22건 자동 추가 → 중복 삭제→재생성으로 EXT_PLAN_REG_NO 최대값 매핑 버그 수정 → 최종 저장 MES 전송 성공 → SmartMES 엑셀 순서 일치 확인 → 라인 구조(SP3M3/SD9A01) + 세션 규칙(저녁/아침 2회) + 생산일 매핑 확정 → 스킬 패키징 배포

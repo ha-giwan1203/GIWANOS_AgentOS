@@ -10,7 +10,26 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션95 /d0-plan 스킬 패키징 완료
+최종 업데이트: 2026-04-23 KST — 세션96 drift 감지 구조 보강
+
+---
+
+## 세션96 (2026-04-23) — STATUS drift 근본 원인 분석 + final_check 감지 강화
+
+**[완료] daily-doc-check 자동 실행 → STATUS stale 감지 → 근본 원인 2회 분석**
+- 자동 점검 결과: STATUS.md 세션90 표기, 실제 최신 세션95 (4세션 뒤처짐). Slack 알림 발송
+- 1차 원인: 같은 날 세션 진행 시 날짜(YYYY-MM-DD) 비교만으로는 drift 미감지 (세션91~94 모두 2026-04-22)
+- 2차 원인 (테스트 과정 발견): `_get_session`/`_get_date`가 git index 우선 조회 → 파일 edit만 하고 `git add` 전이면 working tree 변경 미반영
+
+**[완료] 세션94~95 미커밋 35건 커밋 (`ac8369ff`)**
+- /d0-plan 스킬 신규 (SKILL.md / run.py / D0_저녁.bat)
+- 서열정리 작업노트, 명찰 이동, 기타 정리 삭제, 토론모드 bridge 모듈 등 세션94~95 누락분 일괄 반영
+- STATUS.md 날짜 수동 교정: 세션90/2026-04-22 → 세션95/2026-04-23
+
+**[완료] final_check.sh drift 감지 강화 2건**
+- (a) **STATUS 세션 비교 블록 추가** (L305~): HANDOFF 패턴을 STATUS에도 복제. `[ "$STATUS_DATE" = "$TASKS_DATE" ]` 조건으로 날짜 drift와 중복 방지. `--fix` 시 날짜는 유지하고 세션 번호만 갱신 (`\1` 캡처)
+- (b) **`_get_session` / `_get_date` working tree 우선 조회**: 기존 `git show :file` 우선 → `cat file` 우선으로 swap. git add 전 상태도 drift 감지 가능
+- 검증: drift 재현(STATUS 세션90) → `[FAIL] session_drift` 감지 → `[FIX] 세션90→95` 교정 → smoke_fast 11/11 ALL PASS
 
 ---
 
