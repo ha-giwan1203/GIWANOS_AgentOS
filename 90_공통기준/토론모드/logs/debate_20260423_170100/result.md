@@ -25,13 +25,17 @@
 - Claude 독립 축 미흡: 파서 통일 우선순위 관점이 합의안에서 사라짐
 - "실증됨" 라벨을 미래 실행계획에 적용 — 라벨 오용
 
-## 즉시 실행안
+## 즉시 실행안 (GPT 조건부 통과 반영 — 보정 2건)
 
-1. `/auto-fix` 로 incident_ledger.jsonl 실분포 분석 진입
-2. TASKS.md 감량 실행 (완료/보류 이력 → 아카이브)
-3. `.claude/state/meta_freeze.md` 생성
+1. `incident_ledger.jsonl` 원본 직접 집계 → 상위 원인군 3개 확정
+2. `/auto-fix` 수리 루프 (집계 결과 기반)
+3. TASKS.md 감량 + `.claude/state/meta_freeze.md` 생성
+   - TASKS.md에 `meta_freeze.md` 링크 1줄 필수 포함 (다음 세션에서 무시 방지)
 
 ## 판정
-- GPT: 동의 (Round 1)
+- GPT Round 1: 동의
+- GPT 최종: 조건부 통과 (보정 2건 반영 후 통과)
+  - 보정1: /auto-fix 전 ledger 직접 집계 선행
+  - 보정2: TASKS에 meta_freeze 링크 1줄
 - Claude: 채택 3건 / 보류 0건 (WARN 수용)
 - critic-reviewer: WARN
