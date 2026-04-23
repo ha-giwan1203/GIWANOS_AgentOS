@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 M2 readme regex 정교화 + list_active_hooks 헬퍼 전환
+최종 업데이트: 2026-04-23 KST — 세션96 incident 군집 정리 (rule 7~10 신설, 미해결 175→124)
 
 ---
 
@@ -74,6 +74,27 @@
 - **검증 8단계 모두 PASS**: 헬퍼 단독 / 외부 계약 / smoke_test 217/217 / smoke_fast 11/11 / final_check --fast / drift 재현 / render_hooks_readme.sh --dry diff 0 / shadow_diff_readme match=true / 4모드 byte-exact diff 0 + (비차단) settings.local.json 부재 시 동일 동작 31
 - **명시적 비변경**: `final_check.sh:61-80` 셸 파서 — M3 이월 (헬퍼와 1주 안정 후 교체)
 - 다음 단계(M3): final_check.sh의 `readme_active_hook_count`/`readme_active_hook_names` 헬퍼 호출 전환
+
+**[완료] incident 군집 정리 — auto_resolve 규칙 7~10 신설 (2자 토론 Round 2 통과)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round3_gpt_incident.md`, `round4_gpt_incident.md`
+- A 분류 자가판정 (incident_repair.py auto_resolve() 분기 추가, hook 흐름·차단 정책 불변)
+- GPT 보정 4건 + Claude 독립 검증 모두 채택
+- **신설 규칙**:
+  - rule 7 (harness_missing): 72h + 무재발 (key=(reason, hook, normalized_detail), latest_ts_by_key)
+  - rule 8 (meta_drift): STATUS.md 현재 날짜 ≥ detail STATUS 날짜 (28건 100% 해소)
+  - rule 9 (doc_drift commit_gate WARN): 72h + 정확 일치 + 현재 final_check --fast doc_drift 미존재
+  - rule 10 (evidence_missing): 72h 항상 필수 + 무재발 (fingerprint 우선 / hook+normalized_detail fallback)
+- **GPT Round 2 보정 채택**:
+  - latest_ts_by_key 단순화 (list[ts] 대신 max(ts) 1개)
+  - synthetic negative test 6/6 ALL PASS (오래된+최근 동일 키는 미해소, 다른 키는 해소)
+- **적용 결과**: 175 → 124 (-51, -29%)
+  - rule 8: 28건 마킹 (meta_drift 전부 해소)
+  - rule 9: 12건 마킹 (commit_gate stale WARN 정리)
+  - rule 7: 4건 마킹 (harness_missing 무재발만 — 나머지 활성 학습 중)
+  - rule 10: 0건 마킹 (evidence_missing 4가지 패턴 모두 재발 중 → 보존, 정확 작동)
+- **잔존 미해결 124건**: harness_missing 44 / evidence_missing 43 / legacy_unclassified 12 / pre_commit_check 12 / 기타 13
+- **검증**: smoke_test 217/217 / smoke_fast 11/11 / synthetic negative test 6/6 / encoding fix(subprocess utf-8 강제)
+- 다음 단계: legacy_unclassified 12 backfill_classification → 분류 정상화 후 재평가, harness_missing/evidence_missing 활성 패턴 근본 원인 분석
 
 ---
 

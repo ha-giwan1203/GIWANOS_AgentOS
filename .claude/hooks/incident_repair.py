@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -245,8 +246,13 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - 마킹: resolved_by="auto_rule6" + resolved_reason="pre_commit_check_stale_fast|full"
     - 로그: debate_20260423_112214
 
-    제외 (GPT 반박):
-    - harness_missing: 시간 기반은 진짜 반복 패턴 지울 위험
+    세션96 incident 군집 정리 — 규칙 7~10 (2자 토론 Round 2 조건부 통과 반영):
+    - rule 7 (harness_missing): 72h + 무재발 (key=(reason, hook, normalized_detail), latest_ts_by_key)
+    - rule 8 (meta_drift): STATUS.md 현재 날짜 ≥ detail의 STATUS 날짜
+    - rule 9 (doc_drift commit_gate WARN): 72h + detail 정확 일치 + 현재 final_check --fast stdout에 "문서 드리프트" 미포함
+    - rule 10 (evidence_missing): 72h + 무재발 (key=fingerprint 우선 / fallback (hook, normalized_detail))
+    - GPT Round 2 보정: latest_ts_by_key 단순화 + synthetic negative test
+    - 로그: debate_20260423_130201/round3_gpt_incident.md, round4_gpt_incident.md
 
     방식: resolved=false → resolved=true + resolved_by 마킹으로 덮어쓰기
     """
@@ -327,6 +333,72 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             pass
         return False
 
+    # === 세션96 규칙 7~10 사전 캐시 (2자 토론 Round 2 통과 합의) ===
+    def normalize_detail(s: str) -> str:
+        """공백·개행 정규화. 백틱·따옴표는 보존 (의미 보존)."""
+        return ' '.join((s or '').strip().split())
+
+    # rule 7/10 무재발 검증용: latest_ts_by_key (GPT Round 2 보정 — list[ts] 대신 max(ts) 1개)
+    # key 종류 2개:
+    #   - rule 7: (classification_reason, hook, normalized_detail) tuple
+    #   - rule 10: fingerprint (있으면) / (hook, normalized_detail) tuple (없으면)
+    latest_ts_by_key_rule7: dict = {}
+    latest_ts_by_key_rule10_fp: dict = {}     # fingerprint 키
+    latest_ts_by_key_rule10_hd: dict = {}     # (hook, norm_detail) 키
+    for e in entries:
+        ts_e = e.get("ts", "")
+        if not ts_e:
+            continue
+        reason_e = e.get("classification_reason") or ""
+        hook_e = e.get("hook") or ""
+        nd_e = normalize_detail(e.get("detail") or "")
+        # rule 7 키
+        if reason_e == "harness_missing":
+            key7 = (reason_e, hook_e, nd_e)
+            prev = latest_ts_by_key_rule7.get(key7, "")
+            if ts_e > prev:
+                latest_ts_by_key_rule7[key7] = ts_e
+        # rule 10 키
+        if reason_e == "evidence_missing":
+            fp = e.get("fingerprint")
+            if fp:
+                prev = latest_ts_by_key_rule10_fp.get(fp, "")
+                if ts_e > prev:
+                    latest_ts_by_key_rule10_fp[fp] = ts_e
+            else:
+                key10 = (hook_e, nd_e)
+                prev = latest_ts_by_key_rule10_hd.get(key10, "")
+                if ts_e > prev:
+                    latest_ts_by_key_rule10_hd[key10] = ts_e
+
+    # rule 8: STATUS.md 현재 날짜 캐시
+    current_status_date = ""
+    try:
+        status_path = project_root / "90_공통기준" / "업무관리" / "STATUS.md"
+        if status_path.exists():
+            content = status_path.read_text(encoding="utf-8", errors="replace")
+            m = re.search(r"최종 업데이트:\s*(\d{4}-\d{2}-\d{2})", content)
+            if m:
+                current_status_date = m.group(1)
+    except Exception:
+        pass
+
+    # rule 9: 현재 final_check --fast stdout에 "문서 드리프트" 미포함 캐시
+    # Windows Python subprocess의 시스템 기본 디코딩(cp949)이 한글 stdout 처리 실패하므로 utf-8 강제
+    doc_drift_currently_clean = False
+    try:
+        fc_path = project_root / ".claude" / "hooks" / "final_check.sh"
+        if fc_path.exists():
+            r = subprocess.run(
+                ["bash", str(fc_path), "--fast"],
+                cwd=str(project_root), capture_output=True, timeout=60,
+                encoding="utf-8", errors="replace"
+            )
+            combined = (r.stdout or "") + (r.stderr or "")
+            doc_drift_currently_clean = ("문서 드리프트" not in combined)
+    except (subprocess.TimeoutExpired, OSError, FileNotFoundError):
+        pass  # 실패 시 비활성 (안전측)
+
     for entry in entries:
         if entry.get("resolved"):
             continue
@@ -402,12 +474,86 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             except (ValueError, TypeError):
                 pass
 
+        # === 세션96 규칙 7~10 (2자 토론 Round 2 통과 합의) ===
+        ts_str = entry.get("ts", "")
+        nd = normalize_detail(entry.get("detail") or "")
+
+        # rule 7 — harness_missing: 72h + 무재발 (key=(reason, hook, normalized_detail))
+        if reason == "harness_missing":
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 72 * 3600:
+                    key7 = (reason, hook, nd)
+                    latest = latest_ts_by_key_rule7.get(key7, "")
+                    # 이 incident가 같은 키의 최신 ts인 경우만 해소 (이후 재발 0)
+                    if ts_str >= latest:
+                        should_resolve = True
+                        entry["_rule7_marker"] = True
+            except (ValueError, TypeError):
+                pass
+
+        # rule 8 — meta_drift: STATUS.md 현재 날짜가 detail의 STATUS 날짜 이상
+        if reason == "meta_drift" and current_status_date:
+            detail = entry.get("detail") or ""
+            m = re.search(r"STATUS\((\d{4}-\d{2}-\d{2})\)\s*<\s*TASKS", detail)
+            if m:
+                detail_status_date = m.group(1)
+                if current_status_date >= detail_status_date:
+                    should_resolve = True
+                    entry["_rule8_marker"] = True
+
+        # rule 9 — doc_drift commit_gate WARN: 72h + 정확 일치 + 현재 final_check clean
+        if (reason == "doc_drift" and hook == "commit_gate"
+                and entry.get("type") == "warn_recorded"
+                and (entry.get("detail") or "").strip() == "문서 드리프트 감지"
+                and doc_drift_currently_clean):
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 72 * 3600:
+                    should_resolve = True
+                    entry["_rule9_marker"] = True
+            except (ValueError, TypeError):
+                pass
+
+        # rule 10 — evidence_missing: 72h 항상 필수 + 무재발
+        # key: fingerprint 우선 / 없으면 (hook, normalized_detail)
+        if reason == "evidence_missing":
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 72 * 3600:
+                    fp = entry.get("fingerprint")
+                    if fp:
+                        latest = latest_ts_by_key_rule10_fp.get(fp, "")
+                    else:
+                        latest = latest_ts_by_key_rule10_hd.get((hook, nd), "")
+                    if ts_str >= latest:
+                        should_resolve = True
+                        entry["_rule10_marker"] = True
+            except (ValueError, TypeError):
+                pass
+
         if should_resolve:
             entry["resolved"] = True
             variant = entry.pop("_rule6_variant", None)
+            r7 = entry.pop("_rule7_marker", False)
+            r8 = entry.pop("_rule8_marker", False)
+            r9 = entry.pop("_rule9_marker", False)
+            r10 = entry.pop("_rule10_marker", False)
             if reason == "pre_commit_check" and variant:
                 entry["resolved_by"] = "auto_rule6"
                 entry["resolved_reason"] = f"pre_commit_check_stale_{variant}"
+            elif r7:
+                entry["resolved_by"] = "auto_rule7"
+                entry["resolved_reason"] = "harness_block_no_recurrence"
+            elif r8:
+                entry["resolved_by"] = "auto_rule8"
+                entry["resolved_reason"] = "meta_drift_status_caught_up"
+            elif r9:
+                entry["resolved_by"] = "auto_rule9"
+                entry["resolved_reason"] = "doc_drift_currently_clean"
+            elif r10:
+                entry["resolved_by"] = "auto_rule10"
+                entry["resolved_reason"] = "evidence_block_no_recurrence"
             else:
                 entry["resolved_by"] = "auto"
             count += 1

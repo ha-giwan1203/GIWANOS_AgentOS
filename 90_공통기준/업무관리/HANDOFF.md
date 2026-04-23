@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 M2 readme regex 정교화 + list_active_hooks 헬퍼 전환
+최종 업데이트: 2026-04-23 KST — 세션96 incident 군집 정리 (rule 7~10, 미해결 175→124)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -64,12 +64,22 @@
 - 검증 8단계 모두 PASS + 비차단 메모(settings.local.json 부재 시도 31) 통과
 - 명시적 비변경: `final_check.sh:61-80` 셸 파서 (M3 이월)
 
+### incident 군집 정리 — auto_resolve 규칙 7~10 신설 (2자 토론 Round 2 통과)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round3_gpt_incident.md`, `round4_gpt_incident.md`
+- A 분류 자가판정 (incident_repair.py auto_resolve() 분기 추가, rule 6 선례 동일)
+- 신설 4종: rule 7(harness_missing 무재발) / rule 8(meta_drift STATUS catch-up) / rule 9(doc_drift currently clean) / rule 10(evidence_missing 무재발)
+- GPT Round 2 보정 채택: latest_ts_by_key 단순화 + synthetic negative test
+- 적용 결과: 미해결 175 → 124 (-51, -29%). rule 8:28 / rule 9:12 / rule 7:4 / rule 10:0(보존)
+- synthetic negative test 6/6 ALL PASS (무재발 로직 안전성 검증)
+- 추가 fix: incident_repair.py final_check subprocess 호출에 encoding="utf-8" 강제 (Windows cp949 디코딩 실패 회피)
+
 ### 다음 AI 액션
-1. M2 단일 커밋 + main 직행 + GPT 최종 보고
-2. (M3 후속) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
-3. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
-4. (별 의제) 미해결 incident 군집 정리: harness_missing 48 / evidence_missing 41 / meta_drift 28
-5. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
+1. incident 정리 단일 커밋 + main 직행 + GPT 최종 보고
+2. legacy_unclassified 12 backfill_classification 정규화 → 재평가
+3. harness_missing 44 / evidence_missing 43 활성 패턴 근본 원인 분석 (학습 미완 vs 시스템 결함)
+4. (M3) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
+5. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
+6. SD9A01 OUTER 실검증 — 사용자 별도 지시 대기
 
 ---
 
