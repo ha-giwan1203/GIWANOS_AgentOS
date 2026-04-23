@@ -226,6 +226,31 @@ else
 fi
 echo ""
 
+# 4.5. HANDOFF 헤더 vs 본문 판정 레이블 정합 (세션99 사용자 지시 — 레이블 지연 반영 감지)
+# 목적: L7 "최종 업데이트" 문구가 Round 1 "조건부 통과"로 남아있는데 본문엔 GPT 최종 PASS가
+# 기록된 경우처럼 헤더만 지연된 상태를 advisory로 경고.
+echo "--- 4.5. HANDOFF 헤더-본문 판정 레이블 정합 ---"
+HANDOFF_FILE="$PROJECT_DIR/90_공통기준/업무관리/HANDOFF.md"
+if [ -f "$HANDOFF_FILE" ]; then
+  _handoff_header=$(sed -n '1,15p' "$HANDOFF_FILE" | grep '^최종 업데이트:' | head -1)
+  # 본문 "## 0. 최신 세션" ~ 다음 "---" 구간 전체 추출
+  _handoff_body_sec0=$(awk '/^## 0\./,/^---$/' "$HANDOFF_FILE" 2>/dev/null)
+  # "GPT 최종 판정" 헤더 다음 5줄 이내에서 판정값 탐색 (섹션0 한정)
+  _handoff_body_verdict=$(echo "$_handoff_body_sec0" | grep -A5 -iE '^#{2,4} ?(GPT )?최종 판정' | head -10)
+  _header_has_conditional=$(echo "$_handoff_header" | grep -cE '조건부|Round 1|Round 2 전|보류')
+  _body_has_pass=$(echo "$_handoff_body_verdict" | grep -cE '\*\*통과\*\*|\*\*PASS\*\*|최종 PASS|최종 통과|통과 \(PASS\)')
+  if [ "$_header_has_conditional" -gt 0 ] && [ "$_body_has_pass" -gt 0 ]; then
+    warn "HANDOFF L7 헤더는 조건부/중간 상태인데 본문엔 최종 PASS 기록 — 헤더 문구 갱신 필요"
+    echo "    header: $_handoff_header" >&2
+    echo "    body  : $(echo "$_handoff_body_verdict" | grep -iE '\*\*통과\*\*|\*\*PASS\*\*|최종 PASS|최종 통과|통과 \(PASS\)' | head -1)" >&2
+  else
+    echo "  [OK] HANDOFF 헤더-본문 판정 레이블 정합"
+  fi
+else
+  echo "  [INFO] HANDOFF.md 미존재 — 건너뜀"
+fi
+echo ""
+
 # 5. settings 등록 hook 실존 여부 (team+local union)
 echo "--- 5. settings 등록 hook 실존 여부 ---"
 if [ -n "$REGISTERED_HOOKS" ]; then

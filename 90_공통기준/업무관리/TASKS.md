@@ -23,6 +23,13 @@
 - 보강 3건 실물 반영 확인 + 상태 원본 충돌 없음 + 회귀 PASS
 - 별건(README M5, SETTINGS dead assignment) PASS 막지 않음 확인. 세션99 종결
 
+**[완료] final_check 4.5 섹션 신설 — HANDOFF 헤더-본문 판정 레이블 정합 advisory**
+- 사용자 지시 예외(D안) 즉시 적용. B 분류 구조 변경이나 "지금바로 적용해라" 명시 지시로 A 강등
+- 증상: Round 1 "조건부 통과" 헤더가 Round 2 PASS 후에도 지연 반영되던 실제 사건(세션99 본건) 재발 방지
+- 구현: `final_check.sh` 4.5 섹션 신설 — L7 `최종 업데이트` 헤더에 "조건부/Round 1/보류" + 섹션0 본문 "최종 판정" 이후 5줄 내 "**통과**/PASS/통과 (PASS)" 둘 다 매칭 시 `warn`
+- 검증: 포지티브(정합) OK / 네거티브(헤더만 조건부로 재현) WARN 정상 감지 / smoke_fast 11/11 PASS
+- 훅 등급: advisory (차단 없음, stderr 경고만)
+
 
 **[완료] generate_agents_guide.sh hooks 파서 M3/M4 패턴 전환**
 - 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round1_gpt.md`
