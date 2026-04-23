@@ -51,7 +51,8 @@
   - 2축 경계: write_marker=runtime / skill_instruction_gate=별도
 - **산출물**: `.claude/scripts/parse_helpers.py` (7 op) + `smoke_test` 섹션 54 (5건 regression)
 - 검증: smoke_test **216/216 ALL PASS**
-- GPT 재판정 요청 예정 (M1 커밋 이후)
+- 2자 토론 Round 2: **통과** + 3번(보수 경로 조정) **수용** (커밋 `3f1da2c7` 실물 검증). 의제 M1 종결
+- 다음 의제(M2): readme regex 정교화 → shadow mismatch 0 → list_active_hooks 실전환 (GPT 다음 행동 지정)
 
 ### 다음 AI 액션
 1. auto_resolve --apply 실행 → 규칙 6 활성 → ledger 잡음 대규모 해소
