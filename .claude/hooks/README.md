@@ -3,14 +3,14 @@
 > 2026-04-20 갱신 — settings.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (31개 등록, settings.json 기준)
+## 활성 Hook (32개 등록, settings.json 기준)
 
 > **Single Source of Truth (세션93, 2026-04-22 2자 토론 합의)**: 활성 hook의 **유일한 기준축은 `list_active_hooks.sh`**. `final_check.sh`는 이 기준을 따르며, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
 > - 카운트: `bash .claude/hooks/list_active_hooks.sh --count`
 > - 이벤트별: `bash .claude/hooks/list_active_hooks.sh --by-event`
 > - `.claude/scripts/hook_registry.sh`는 **legacy 격하** (settings.local.json 전제만 참조). 자동 sync 중단.
 >
-> 이벤트별 등록 수: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4 = **31**
+> 이벤트별 등록 수: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 5 = **32**
 
 ### 이벤트층 (SessionStart / PreCompact)
 
@@ -75,6 +75,7 @@
 | `gpt_followup_stop.sh` | (전체) | GPT pending flag 존재 시 Stop 차단 |
 | `completion_gate.sh` | (전체) | TASKS/HANDOFF 미갱신 시 Stop 차단 |
 | `evidence_stop_guard.sh` | (전체) | 증거 없는 실패/완료 결론 차단 |
+| `auto_commit_state.sh` | (전체) | 하이브리드 자동 커밋 (세션101) — 상태문서 AUTO 커밋+푸시, 나머지 리마인더 |
 
 ## 훅별 실패 책임 매트릭스 (Stop 층, 의제5 세션71 Phase 2-A 문서화)
 

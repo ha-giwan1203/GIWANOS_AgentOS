@@ -42,6 +42,12 @@
 - 로그: `06_생산관리/D0_업로드/logs/morning_YYYYMMDD.log` (일자별 누적)
 - 첫 자동 실행: 2026-04-25 토요일 07:10
 
+**[완료 추가] 하이브리드 자동 커밋 hook 신설 (세션101)**
+- `.claude/hooks/auto_commit_state.sh` — Stop 이벤트 5번째 등록 (hooks 31→32)
+- AUTO: TASKS/HANDOFF/STATUS/notion_snapshot/finish_state/write_marker → 자동 커밋+푸시
+- MANUAL: 코드/스킬/설정 → stderr 리마인더만 (`/finish` 또는 수동 커밋 권장)
+- 안전장치: main 브랜치만, 민감패턴 스캔, push 60s timeout soft-fail
+
 **[대기] 후속**
 - 4/25~28 자동 실행 관찰 (성공률/로그 이상/중복 저장 등)
 - SD9A01 OUTER 저녁 세션 실 검증 (내일 저녁 `--dry-run` 먼저)

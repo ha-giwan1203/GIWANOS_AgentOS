@@ -24,11 +24,18 @@
 - Claude Code 세션에서만 `/d0-plan` 인식. Claude Desktop(computer-use)는 원천 불가.
 - Windows 작업 스케줄러는 사용자 로그온 시에만 실행 (pyautogui GUI 필요). PC 꺼져있으면 보정 실행 없음.
 
+### 추가 완료: 하이브리드 자동 커밋 hook
+- `.claude/hooks/auto_commit_state.sh` Stop 5번째 등록 (hooks 31→32)
+- AUTO(TASKS/HANDOFF/STATUS/notion_snapshot/finish_state/write_marker) 자동 커밋+푸시
+- MANUAL(코드/스킬/설정) stderr 리마인더, `/finish` 또는 수동 커밋
+- 안전: main 브랜치 한정, 민감패턴 스캔, push 60s timeout soft-fail
+
 ### 다음 AI 액션
 1. 4/25~28 자동 실행 로그 관찰 (`06_생산관리/D0_업로드/logs/morning_*.log`)
 2. 저녁 세션(SP3M3 야간 + SD9A01 OUTER) 첫 실 검증 — 오늘 저녁 또는 내일 저녁 `--dry-run` 먼저
 3. 저녁 세션도 안정화되면 `D0_SP3M3_Evening`, `D0_SD9A01_Evening` 스케줄 추가 검토
 4. 3~5일 운영 안정화 후 스킬 grade B → A 격상
+5. auto_commit_state 동작 관찰 — 세션 종료 시 상태문서 자동 커밋 확인, MANUAL 리마인더 잘 보이는지 검증
 
 ---
 

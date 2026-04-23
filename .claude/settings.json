@@ -368,6 +368,15 @@
             "command": "bash .claude/hooks/evidence_stop_guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/auto_commit_state.sh"
+          }
+        ]
       }
     ]
   },
