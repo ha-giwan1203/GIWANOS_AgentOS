@@ -4,12 +4,35 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션100 GPT 프로토콜 스킬 신설 (클로드코드 정밀평가)
+최종 업데이트: 2026-04-24 KST — 세션101 /d0-plan 실운영 검증 + 자동 스케줄링 등록
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-23 세션100 — GPT 프로토콜 스킬 "클로드코드 정밀평가" 신설)
+## 0. 최신 세션 (2026-04-24 세션101 — /d0-plan 실운영 + 자동 스케줄링)
+
+### 실행 경로
+세션 재개(어제 세션100 종결 뒤) → 사용자 "SP3M3 주간계획 반영" 요청 → `/d0-plan --session morning --xlsx ...` 첫 실행 → navigate_to_d0 네비게이션 충돌 → 리다이렉트 대기 패치 → 재실행 시 Phase 3 성공 but Phase 4 s_grid 대기(>=5) 실패 → s_grid 대기 완화 + `--skip-upload` 추가 → Phase 4~6 성공(서열 15건 + MES rsltCnt=750) → 다른 Claude 세션에서 스킬 미인식 사건 분석 → description 키워드 확장 + 금지사항 명시 → Windows 작업 스케줄러 `D0_SP3M3_Morning` 등록(월~토 07:10) → TASKS/HANDOFF 갱신
+
+### 오늘 확정된 것
+- **SP3M3 주간 15건 실 운영 반영 성공** — 오늘 첫 실 운영 데이터로 아침 세션 검증 완료
+- **스킬 버그 3건 수정** — navigate 리다이렉트, `--xlsx`, `--skip-upload`, s_grid 대기 완화
+- **자연어 트리거 확장 + 금지사항** — Claude Desktop/computer-use 세션의 엉뚱한 경로 탐색 방지용
+- **자동 스케줄링 등록** — 매일 아침 07:10 월~토 자동 실행, 일요일 제외
+
+### 시스템 경계
+- Claude Code 세션에서만 `/d0-plan` 인식. Claude Desktop(computer-use)는 원천 불가.
+- Windows 작업 스케줄러는 사용자 로그온 시에만 실행 (pyautogui GUI 필요). PC 꺼져있으면 보정 실행 없음.
+
+### 다음 AI 액션
+1. 4/25~28 자동 실행 로그 관찰 (`06_생산관리/D0_업로드/logs/morning_*.log`)
+2. 저녁 세션(SP3M3 야간 + SD9A01 OUTER) 첫 실 검증 — 오늘 저녁 또는 내일 저녁 `--dry-run` 먼저
+3. 저녁 세션도 안정화되면 `D0_SP3M3_Evening`, `D0_SD9A01_Evening` 스케줄 추가 검토
+4. 3~5일 운영 안정화 후 스킬 grade B → A 격상
+
+---
+
+## 1. 이전 세션 (2026-04-23 세션100 — GPT 프로토콜 스킬 "클로드코드 정밀평가" 신설)
 
 ### 실행 경로
 사용자 요청("GPT에게 매번 클로드코드 정밀평가 시키는 걸 스킬로 만들고 싶다") → Plan mode → AskUserQuestion 3회로 범위 확정 (분석 대상/구현 형태/출력 형식/입력 경로/커버리지) → 추가 요구: 大·中·小 계층 + 영향반경 5필드 의무 → 플랜 재편 (`.claude/plans/gpt-steady-wreath.md`) → 사용자 승인 → 3개 파일 작성

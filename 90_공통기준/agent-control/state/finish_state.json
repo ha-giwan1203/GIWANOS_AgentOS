@@ -2,19 +2,14 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "부분PASS",
+  "gpt_judgment": "PASS",
   "gemini_judgment": null,
-  "user_reported": true,
+  "user_reported": false,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "세션93",
-  "final_sha": "60f41f57",
-  "commits": [
-    "1b82392e",
-    "af3c892d",
-    "f8c1f642",
-    "60f41f57"
-  ],
+  "session": "세션100",
+  "final_sha": "f7a1b442",
+  "commits": ["f7a1b442"],
   "notion_sync": "pending_flag (인증 만료 추정, 다음 세션 재시도)",
-  "generated_at": "2026-04-22 KST"
+  "generated_at": "2026-04-23 KST"
 }

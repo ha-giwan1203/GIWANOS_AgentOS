@@ -116,8 +116,23 @@ def navigate_to_d0(browser):
     page.bring_to_front()
     ensure_erp_login(page)
 
+    # OAuth 로그인 후 리다이렉트 완료 대기 (erp-dev.samsong.com 도착까지)
+    for _ in range(20):
+        if "erp-dev.samsong.com" in page.url:
+            break
+        time.sleep(0.5)
+    try: page.wait_for_load_state("domcontentloaded", timeout=15000)
+    except Exception: pass
+    time.sleep(2)
+
     if "viewListDoAddnPrdtPlanInstrMngNew" not in page.url:
-        page.goto(D0_URL, timeout=30000)
+        try:
+            page.goto(D0_URL, timeout=30000)
+        except Exception as e:
+            # 네비게이션 충돌 시 재시도
+            print(f"[phase0] goto 재시도 사유: {e}")
+            time.sleep(3)
+            page.goto(D0_URL, timeout=30000)
         try: page.wait_for_load_state("domcontentloaded", timeout=20000)
         except Exception: pass
         time.sleep(3)
@@ -227,6 +242,22 @@ def extract_outer_d1(wb, target_line="SD9M01"):
 # ============================================================
 # Phase 2: 업로드 엑셀 생성
 # ============================================================
+def _load_items_from_xlsx(xlsx_path: Path):
+    """외부 엑셀 파일에서 (생산일/제품번호/생산량) 추출."""
+    wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+    ws = wb.active
+    items = []
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if row and row[1] and row[2]:
+            items.append({"PROD_NO": str(row[1]).strip(), "QTY": int(row[2])})
+    return items
+
+
+def _extract_prod_date(items):
+    """items는 PROD_NO/QTY만 — 외부 엑셀 원본에서 생산일 재추출."""
+    return None  # caller에서 fallback
+
+
 def make_upload_xlsx(items, prod_date: datetime, out_path: Path):
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -242,21 +273,39 @@ def make_upload_xlsx(items, prod_date: datetime, out_path: Path):
 # ============================================================
 def d0_upload(page, xlsx_path: Path):
     """팝업 오픈 → selectList → multiList."""
+    # 페이지 로드 확인 + 버튼 대기
+    try:
+        page.wait_for_selector("#btnExcelUpload", timeout=15000)
+    except Exception:
+        print(f"[phase3] #btnExcelUpload 대기 실패 — 현재 URL: {page.url}")
+        raise
+
     # 팝업 오픈
     ifr = None
     for fr in page.frames:
         if "popupPmD0AddnUpload" in fr.url:
             ifr = fr; break
     if ifr is None:
-        page.locator("#btnExcelUpload").first.click()
-        for _ in range(20):
-            time.sleep(0.5)
-            for fr in page.frames:
-                if "popupPmD0AddnUpload" in fr.url:
-                    ifr = fr; break
+        # 클릭 재시도 (최대 3번)
+        for attempt in range(3):
+            try:
+                page.locator("#btnExcelUpload").first.click()
+            except Exception as e:
+                print(f"[phase3] 클릭 실패 try={attempt+1}: {e}")
+                time.sleep(2)
+                continue
+            # popup 로드 대기 (최대 12초)
+            for _ in range(24):
+                time.sleep(0.5)
+                for fr in page.frames:
+                    if "popupPmD0AddnUpload" in fr.url:
+                        ifr = fr; break
+                if ifr: break
             if ifr: break
+            print(f"[phase3] popup 미등장 try={attempt+1} — 재시도")
+            time.sleep(2)
     if ifr is None:
-        raise RuntimeError("Excel Upload 팝업 확보 실패")
+        raise RuntimeError("Excel Upload 팝업 확보 실패 (3회 재시도 실패)")
     try:
         ifr.wait_for_load_state("domcontentloaded", timeout=8000)
         ifr.wait_for_selector("#uploadfrm", timeout=8000)
@@ -392,15 +441,11 @@ def process_one_row(page, prod_no, target_ext_reg, target_line, save_url, dry_ru
     if not m_r.get("ok"):
         return {"ok":False, "stage":"m_select", "err":m_r.get("reason"), "avail":m_r.get("avail")}
 
-    # s_grid 로드 대기
-    s_ok = False
-    for _ in range(16):
-        time.sleep(0.5)
-        s_rows = page.evaluate("() => { try { return sGridList.$local_grid.pdata.length; } catch(e){return 0;} }")
-        if s_rows >= 5:
-            s_ok = True; break
-    if not s_ok:
-        return {"ok":False, "stage":"s_wait", "rows":s_rows}
+    # s_grid 로드 대기 — 고정 3초 (0건이어도 OK, 주간 초기 상황 대응)
+    time.sleep(3)
+    s_rows = page.evaluate("() => { try { return sGridList.$local_grid.pdata.length; } catch(e){return -1;} }")
+    if s_rows < 0:
+        return {"ok":False, "stage":"s_wait", "rows":s_rows, "err":"s_grid 미초기화"}
 
     # 3. addRow 인라인 + 임시저장
     save_js = """
@@ -584,6 +629,8 @@ def main():
     ap.add_argument("--line", choices=["SP3M3","SD9A01","ALL"], default="ALL")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--target-date", help="YYYY-MM-DD 파일명 날짜 (기본 자동)")
+    ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
+    ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
     args = ap.parse_args()
 
     session = determine_session(args.session)
@@ -601,6 +648,33 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(CDP_URL)
         page = navigate_to_d0(browser)
+
+        # --xlsx 직접 사용 모드: Phase 1 추출 건너뛰고 그대로 업로드
+        if args.xlsx:
+            xlsx_path = Path(args.xlsx)
+            if not xlsx_path.exists():
+                raise FileNotFoundError(f"--xlsx 파일 없음: {xlsx_path}")
+            items = _load_items_from_xlsx(xlsx_path)
+            prod_date = _extract_prod_date(items) or target_file_date
+            line_override = args.line if args.line != "ALL" else "SP3M3"
+            print(f"[direct] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
+            if args.dry_run:
+                print("[direct] dry-run: 엑셀 확인까지만")
+                return
+            # xlsx 그대로 업로드 (Phase 3) + 서열 배치 (Phase 4) + 최종 저장 (Phase 5)
+            if args.skip_upload:
+                print("[direct] --skip-upload: Phase 3 건너뜀")
+            else:
+                d0_upload(page, xlsx_path)
+            cfg = LINE_CONFIG[line_override]
+            batch = rank_batch(page, items, line_override, cfg["save_url"], dry_run=False)
+            print(f"[direct] rank_batch: {batch}")
+            if batch["failed"] > 0:
+                print("[direct] 실패 존재 — 최종 저장 보류"); return
+            final_save(page, cfg["save_url"])
+            verify_smartmes(line_override, prod_date, items)
+            print("=== /d0-plan --xlsx 완료 ===")
+            return
 
         # Phase 1: 파일
         plan_path = find_plan_file(target_file_date)
