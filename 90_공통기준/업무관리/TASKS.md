@@ -57,6 +57,14 @@
 - dry-run 3건 + 기타 incident_repair 호출 6건 → `Bash(python3 .claude/hooks/incident_repair.py:*)` 1건으로 통합
 - 1회용 mkdir/rmdir/tmp py/worktree cleanup/chrome debug 다수 제거
 
+**[완료] GPT 최종 판정 후속 마무리 (실행 가능 항목 전부)**
+- GPT 지적: README smoke_fast "5~8건" 문구 잔존 → `.claude/hooks/README.md:149` "11건"으로 정정
+- GPT 지적: 도메인 STATUS 5개 실물 drift 잔존 → 02/04/06/05/10 헤더에 세션98 전역 점검 stamp 추가 ("도메인 내용 변경 없음" 명시로 정직성 유지)
+- `domain_status_sync.sh` 정규식 강화: 파일 내 모든 YYYY-MM-DD 중 최대값 선택으로 변경 (이전: 첫 매치만 → 헤더 포맷에 최신/구 날짜 혼재 시 오판). drift 0건 확인
+- AGENTS_GUIDE.md 재생성 (generate_agents_guide.sh 실행, skills 20개 반영. hooks=0 버그는 스크립트 별건)
+- `state/` 7일+ 마커 2건 정리 (debate_independent_review.ok / 구 세션 skill_read.ok)
+- 고아 폴더 5개 유지 결정 기록 (사용자 지시, 드리프트 재분류 금지)
+
 ---
 
 ## 세션96 (2026-04-23) — STATUS drift 근본 원인 분석 + final_check 감지 강화

@@ -146,7 +146,7 @@
 | `hook_common.sh` | 공통 함수 (hook_log, safe_json_get, evidence_init, 로그 로테이션) |
 | `incident_repair.py` | 최신 unresolved incident의 다음 행동 + 패치 후보 + 검증 단계 제안 |
 | `smoke_test.sh` | 전체 hooks 구조 검증 (수동 실행) |
-| `smoke_fast.sh` | SessionStart용 빠른 smoke (5~8건, 로컬/결정적만). session_start_restore.sh에서 호출 |
+| `smoke_fast.sh` | SessionStart용 빠른 smoke (11건, 로컬/결정적만). session_start_restore.sh에서 호출 |
 | `final_check.sh` | commit_gate용 자체검증 (--fast/--full). settings 미등록, commit_gate에서 호출 |
 | `e2e_test.sh` | E2E 테스트 (block_dangerous/protect_files/session_start/evidence_gate 10개 시나리오). 수동 실행 |
 | `doctor_lite.sh` | 경량 설정 드리프트 진단 (3자 토론 2026-04-18 합의). session_start_restore.sh에서 호출 |

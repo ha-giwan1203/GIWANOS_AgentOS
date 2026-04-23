@@ -89,8 +89,8 @@ Claude-GPT 공동작업 + 운영 원칙.
 | `gpt_followup_post.sh` | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 | `handoff_archive.sh` | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |
 | `debate_send_gate_mark.sh` | 토론모드 활성 시 GPT 응답 읽기 후 send_gate 마커 갱신 |
+| `post_commit_notify.sh` | git push 성공 시 Slack 자동 알림 발송 (event: PostToolUse) |
 | `notify_slack.sh` | Slack 채널 알림 발송 |
-| `post_commit_notify.sh` | git push 성공 시 Slack 자동 알림 발송 |
 | `stop_guard.sh` | 금지 문구 포함 시 Stop 차단 |
 | `gpt_followup_stop.sh` | GPT pending flag 존재 시 Stop 차단 |
 | `completion_gate.sh` | TASKS/HANDOFF 미갱신 시 Stop 차단 |

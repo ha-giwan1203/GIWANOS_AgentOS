@@ -1316,3 +1316,4 @@
 {"ts":"2026-04-23T09:24:44Z","type":"gate_reject","hook":"navigate_gate","file":"","detail":"ChatGPT 진입 차단: 토론모드 CLAUDE.md 미읽기","resolved":false,"classification_reason":"send_block"}
 {"ts":"2026-04-23T09:25:09Z","type":"gate_reject","hook":"navigate_gate","file":"","detail":"ChatGPT 진입 차단: 토론모드 CLAUDE.md 미읽기","resolved":false,"classification_reason":"send_block"}
 {"ts":"2026-04-23T09:34:20Z","type":"gate_reject","hook":"navigate_gate","file":"","detail":"ChatGPT 진입 차단: 토론모드 CLAUDE.md 미읽기","resolved":false,"classification_reason":"send_block"}
+{"ts":"2026-04-23T11:27:27Z","type":"hook_block","hook":"harness_gate","file":"","detail":"하네스 분석 미수행. 누락: 채택: 독립견해","resolved":false,"classification_reason":"harness_missing"}

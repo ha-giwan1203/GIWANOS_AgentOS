@@ -60,12 +60,10 @@ for domain in "${DOMAINS[@]}"; do
   STATUS_FILE="$PROJECT_ROOT/$domain/STATUS.md"
   [ ! -f "$STATUS_FILE" ] && continue
 
-  # 우선순위 1: "최종 업데이트: YYYY-MM-DD" 형식 (02/04/06)
-  DOMAIN_DATE=$(sed -n 's/.*최종 업데이트:[[:space:]]*\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1/p' "$STATUS_FILE" | head -1)
-  # 우선순위 2: "(YYYY-MM-DD ..." 헤더 형식 (05/10)
-  if [ -z "$DOMAIN_DATE" ]; then
-    DOMAIN_DATE=$(sed -n 's/.*(\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1/p' "$STATUS_FILE" | head -1)
-  fi
+  # 파일 내 모든 YYYY-MM-DD 중 최신(최대값) 선택.
+  # ISO-8601 문자열은 lexical sort가 chronological sort와 동일.
+  # "최종 업데이트: X / Y (세션98 점검 Z)" 같이 여러 날짜 혼재 시 Z를 우선.
+  DOMAIN_DATE=$(grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' "$STATUS_FILE" | sort -r | head -1)
   [ -z "$DOMAIN_DATE" ] && continue
 
   DOMAIN_EPOCH=$(to_epoch "$DOMAIN_DATE")
