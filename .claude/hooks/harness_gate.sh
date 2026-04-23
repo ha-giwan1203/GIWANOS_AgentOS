@@ -81,7 +81,7 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
   exit 0
 fi
 
-# 최근 assistant 발화 추출 (마지막 5000자)
+# 최근 assistant 발화 추출 (마지막 20000자)
 RECENT=$(tail -c 20000 "$TRANSCRIPT_PATH" 2>/dev/null || true)
 
 # 복합 조건 검사

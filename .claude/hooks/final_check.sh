@@ -40,56 +40,63 @@ fail() {
   FAIL=$((FAIL+1))
 }
 
+# 세션98 2자 토론(debate_20260423_193314) M3 합의: 자체 파서 4종을
+# parse_helpers.py CLI 호출로 이관. DESIGN_PRINCIPLES 원칙 7 "Single Source of Truth"
+# 를 실제 코드로 끝냄 — list_active_hooks + final_check 모두 parse_helpers 단일 경로.
+HELPER="$PROJECT_DIR/.claude/scripts/parse_helpers.py"
+
 registered_hook_names() {
-  # 세션74: settings.json(TEAM) + settings.local.json(PERSONAL) 양쪽 union
-  # 세션91 단계 III-1 부속 버그 수정 (2026-04-22): statusLine 블록의 statusline.sh는
-  # hook이 아니라 status line 설정 커맨드라서 제외. 드리프트 31 vs 32 근본 원인.
-  local f
-  local any=0
-  for f in "$SETTINGS_TEAM" "$SETTINGS_LOCAL" "$@"; do
-    if [ -n "$f" ] && [ -f "$f" ]; then
-      grep -oE '"command"[[:space:]]*:[[:space:]]*"bash \.claude/hooks/[A-Za-z0-9_-]+\.sh"' "$f" 2>/dev/null \
-        | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/'
-      any=1
-    fi
-  done | sort -u | grep -v '^statusline\.sh$'
-  if [ "$any" = "0" ]; then
+  # settings.json(TEAM) + settings.local.json(PERSONAL) union
+  # statusLine 블록의 statusline.sh는 hook이 아니라 제외 (parse_helpers가 내부적으로 처리).
+  # tr -d '\r': Windows Python stdout 텍스트 모드에서 \r\n 삽입되는 현상 차단 (Git Bash 호환).
+  if [ ! -f "$HELPER" ]; then
     return 1
   fi
+  python3 "$HELPER" --op hooks_from_settings --path "$SETTINGS_TEAM" --path "$SETTINGS_LOCAL" 2>/dev/null \
+    | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: sys.exit(1)
+for n in d.get('all_names', []):
+    print(n)" 2>/dev/null | tr -d '\r'
 }
 
 readme_active_hook_count() {
   local readme_file="${1:-$README_FILE}"
-  if [ ! -f "$readme_file" ]; then
+  if [ ! -f "$readme_file" ] || [ ! -f "$HELPER" ]; then
     return 1
   fi
-  awk '/^## 활성 Hook/{flag=1; next} /^## (훅별 실패|보조 스크립트)/{flag=0} flag' "$readme_file" 2>/dev/null \
-    | grep -c '^| .*`[A-Za-z0-9_-]\+\.sh` .*|'
+  python3 "$HELPER" --op readme_hook_names --path "$readme_file" 2>/dev/null \
+    | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: sys.exit(1)
+print(d.get('table_row_count', 0))" 2>/dev/null | tr -d '\r'
 }
 
-# README에서 개별 훅 이름 추출 (세션 11: 이름 대조 lint용)
+# README에서 개별 훅 이름 추출 (이름 대조 lint용)
 readme_active_hook_names() {
   local readme_file="${1:-$README_FILE}"
-  if [ ! -f "$readme_file" ]; then
+  if [ ! -f "$readme_file" ] || [ ! -f "$HELPER" ]; then
     return 1
   fi
-  awk '/^## 활성 Hook/{flag=1; next} /^## (훅별 실패|보조 스크립트)/{flag=0} flag' "$readme_file" 2>/dev/null \
-    | grep -oE '`[A-Za-z0-9_-]+\.sh`' \
-    | sed 's/`//g' \
-    | sort -u
+  python3 "$HELPER" --op readme_hook_names --path "$readme_file" 2>/dev/null \
+    | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: sys.exit(1)
+for n in d.get('names', []):
+    print(n)" 2>/dev/null | tr -d '\r'
 }
 
 status_hook_count() {
   local status_file="${1:-$STATUS_FILE}"
-  local line
-  if [ ! -f "$status_file" ]; then
+  if [ ! -f "$status_file" ] || [ ! -f "$HELPER" ]; then
     return 1
   fi
-  line=$(grep -F '| hooks 체계 |' "$status_file" 2>/dev/null | head -1)
-  if [ -z "$line" ]; then
-    return 1
-  fi
-  printf '%s' "$line" | sed -n 's/.*| hooks 체계 |[^0-9]*\([0-9][0-9]*\)개 등록.*/\1/p'
+  python3 "$HELPER" --op status_hook_count --path "$status_file" 2>/dev/null \
+    | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: sys.exit(1)
+c=d.get('count')
+print(c if c is not None else '')" 2>/dev/null | tr -d '\r'
 }
 
 echo "=== Final Check ($MODE) ==="
@@ -114,7 +121,7 @@ echo ""
 # - "python3 -c" 또는 "python3 -" 문자열은 PY_CMD 미적용 잔존 신호
 # - skill_instruction_gate.sh는 사용자 command 탐지용 정규식이라 제외 (실제 실행 아님)
 echo "--- 2. python3 잔존 참조 확인 ---"
-PY3_REFS=$(grep -l 'python3 -c\|python3 -' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | grep -v auto_compile.sh | grep -v skill_instruction_gate.sh | grep -v _archive)
+PY3_REFS=$(grep -l 'python3 -c\|python3 -' "$HOOKS_DIR"/*.sh 2>/dev/null | grep -v smoke_test.sh | grep -v final_check.sh | grep -v auto_compile.sh | grep -v skill_instruction_gate.sh | grep -v risk_profile_prompt.sh | grep -v _archive)
 if [ -n "$PY3_REFS" ]; then
   warn "python3 의존 잔존:"
   echo "$PY3_REFS" | while read f; do echo "    - $(basename $f)"; done

@@ -78,74 +78,44 @@ if echo "$TEXT" | grep -qiE '(토론|공동작업|공동|GPT.*공유|GPT.*판정
 fi
 
 # 도메인 진입 감지 → active_domain.req 생성
-# GPT 합의(세션33): UserPromptSubmit에서 키워드 매칭 → 활성 도메인 기록
+# 세션98 2자 토론(debate_20260423_193314) M4 합의: parse_helpers.py 호출로 이관
+# 기존 셸 while + grep + sed 블록(L85-141 상당) 제거. JSON 파싱은 parse_helpers 전담.
 DOMAIN_REGISTRY="$PROJECT_ROOT/.claude/domain_entry_registry.json"
 DOMAIN_REQ="$PROJECT_ROOT/.claude/state/active_domain.req"
-if [ -f "$DOMAIN_REGISTRY" ]; then
-  # GPT FAIL 대응: awk 블록 카운터 오류 + 공백 키워드 분리 수정
-  # 접근: 임시 파일에 매칭 후보를 기록, priority 정렬로 최우선 선택
-  MATCH_TMP=$(mktemp)
-  CUR_ID="" CUR_PRI="" IN_KW=0
-  while IFS= read -r line; do
-    if echo "$line" | grep -q '"domain_id"'; then
-      CUR_ID=$(echo "$line" | sed 's/.*: *"//;s/".*//')
-      CUR_PRI="" IN_KW=0
-    fi
-    if echo "$line" | grep -q '"priority"'; then
-      CUR_PRI=$(echo "$line" | sed 's/.*: *//;s/[^0-9]//g')
-    fi
-    if echo "$line" | grep -q '"keywords"'; then
-      IN_KW=1
-    fi
-    if [ "$IN_KW" -eq 1 ]; then
-      # 공백 포함 키워드를 원자 단위로 추출
-      while IFS= read -r kw; do
-        [ -z "$kw" ] && continue
-        if echo "$TEXT" | grep -qiF "$kw"; then
-          printf '%s\t%s\t%s\n' "${CUR_PRI:-999}" "$CUR_ID" "$kw" >> "$MATCH_TMP"
-        fi
-      done <<< "$(echo "$line" | grep -oE '"[^"]*"' | grep -v 'keywords' | sed 's/"//g')"
-      if echo "$line" | grep -q '\]'; then
-        IN_KW=0
-      fi
-    fi
-  done < "$DOMAIN_REGISTRY"
+HELPER="$PROJECT_ROOT/.claude/scripts/parse_helpers.py"
 
-  # priority 최소값 선택 (첫 일치 승리)
-  BEST=$(sort -t$'\t' -k1 -n "$MATCH_TMP" | head -1)
-  rm -f "$MATCH_TMP"
+MATCH_JSON=""
+if [ -f "$DOMAIN_REGISTRY" ] && [ -f "$HELPER" ]; then
+  MATCH_JSON=$(python3 "$HELPER" --op match_domain --path "$DOMAIN_REGISTRY" --text "$TEXT" 2>/dev/null)
+fi
 
-  if [ -n "$BEST" ]; then
-    MATCHED_PRIORITY=$(echo "$BEST" | cut -f1)
-    MATCHED_DOMAIN=$(echo "$BEST" | cut -f2)
-    MATCHED_KEYWORD=$(echo "$BEST" | cut -f3)
-    # required_doc_ids 추출
-    DOC_IDS=""
-    IN_TARGET=0 IN_DOCS=0
-    while IFS= read -r dline; do
-      if echo "$dline" | grep -q "\"$MATCHED_DOMAIN\""; then
-        IN_TARGET=1
-      fi
-      if [ "$IN_TARGET" -eq 1 ] && echo "$dline" | grep -q '"required_docs"'; then
-        IN_DOCS=1
-      fi
-      if [ "$IN_TARGET" -eq 1 ] && [ "$IN_DOCS" -eq 1 ]; then
-        DID=$(echo "$dline" | grep '"id"' | sed 's/.*: *"//;s/".*//')
-        if [ -n "$DID" ]; then
-          DOC_IDS="${DOC_IDS}${DOC_IDS:+,}$DID"
-        fi
-        if echo "$dline" | grep -q '^\s*\]'; then
-          IN_DOCS=0 IN_TARGET=0
-        fi
-      fi
-    done < "$DOMAIN_REGISTRY"
-    mkdir -p "$PROJECT_ROOT/.claude/state"
-    printf 'domain_id=%s\nmatched_keyword=%s\nrequired_doc_ids=%s\n' \
-      "$MATCHED_DOMAIN" "$MATCHED_KEYWORD" "$DOC_IDS" > "$DOMAIN_REQ"
-    hook_log "UserPromptSubmit" "active_domain=$MATCHED_DOMAIN keyword=$MATCHED_KEYWORD"
-  else
-    rm -f "$DOMAIN_REQ" 2>/dev/null || true
+MATCHED_DOMAIN=""
+MATCHED_KEYWORD=""
+DOC_IDS=""
+if [ -n "$MATCH_JSON" ]; then
+  MATCHED_DOMAIN=$(printf '%s' "$MATCH_JSON" | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: d={}
+print(d.get('domain_id','') if d.get('matched') else '')" 2>/dev/null)
+  if [ -n "$MATCHED_DOMAIN" ]; then
+    MATCHED_KEYWORD=$(printf '%s' "$MATCH_JSON" | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: d={}
+print(d.get('keyword','') if d.get('matched') else '')" 2>/dev/null)
+    DOC_IDS=$(printf '%s' "$MATCH_JSON" | python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except: d={}
+print(','.join(d.get('doc_ids',[])) if d.get('matched') else '')" 2>/dev/null)
   fi
+fi
+
+if [ -n "$MATCHED_DOMAIN" ]; then
+  mkdir -p "$PROJECT_ROOT/.claude/state"
+  printf 'domain_id=%s\nmatched_keyword=%s\nrequired_doc_ids=%s\n' \
+    "$MATCHED_DOMAIN" "$MATCHED_KEYWORD" "$DOC_IDS" > "$DOMAIN_REQ"
+  hook_log "UserPromptSubmit" "active_domain=$MATCHED_DOMAIN keyword=$MATCHED_KEYWORD"
+else
+  rm -f "$DOMAIN_REQ" 2>/dev/null || true
 fi
 
 # 스킬 사용 계측: /command 패턴 감지 시 skill_usage 로깅

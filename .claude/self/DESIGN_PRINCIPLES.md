@@ -7,7 +7,7 @@
 ## 원칙 1: Meta Depth = 0 (안전안)
 
 - 자기학습 포기, 자기유지만 보장.
-- 학습 루프 자동 hook 전부 제거. SessionStart는 정적 파일 출력만 허용.
+- 학습 루프 자동 hook 전부 제거. SessionStart는 정적 파일 출력 + 경량 advisory 보조 도구 호출만 허용 (smoke_fast / doctor_lite / token_threshold_check / drift 검사 / incident 요약 — 전부 fail-open, 세션 차단 없음).
 - `.claude/self/summary.txt` 갱신도 **수동 실행**으로만 (주 1회 사람이 `selfcheck.sh` 실행).
 - 이유: 자기학습 유지하면서 Whac-A-Mole 방지는 구조적으로 어려움. 야심안은 30일 안정화 후 재평가 여지로만 남김.
 

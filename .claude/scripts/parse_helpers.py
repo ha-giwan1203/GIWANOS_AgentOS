@@ -219,6 +219,67 @@ def load_domain_entries(json_path: str) -> dict[str, Any]:
         return {"error": f"json_decode: {e}"}
 
 
+# ── M4: domain_entry_registry 키워드 매칭 ─────────────────────
+# 세션98 2자 토론(debate_20260423_193314) Round 1 합의: M4 선행, M3 즉시 후속.
+# risk_profile_prompt.sh의 셸 파싱 블록(L82-139) 대체 경로.
+# 키워드 매칭(case-insensitive substring) + priority 최소값 선정 + required_docs ID 추출.
+def match_domain_by_keywords(registry_path: str, text: str) -> dict[str, Any]:
+    """text에 포함된 domain_entry_registry 키워드 중 priority 최소 도메인 1건 선정.
+
+    반환:
+      {
+        "matched": bool,
+        "domain_id": str | None,
+        "priority": int | None,
+        "keyword": str | None,   # 매칭된 키워드
+        "doc_ids": [str, ...],   # required_docs.id 리스트 (순서 보존)
+        "doc_paths": [str, ...]  # required_docs.path 리스트 (순서 보존)
+      }
+    """
+    pth = Path(registry_path)
+    if not pth.exists():
+        return {"matched": False, "error": f"registry_not_found: {registry_path}"}
+    try:
+        data = json.loads(pth.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return {"matched": False, "error": f"json_decode: {e}"}
+
+    if not isinstance(data, list):
+        return {"matched": False, "error": "registry_not_array"}
+
+    text_lower = text.lower()
+    best: dict[str, Any] | None = None
+
+    for entry in data:
+        did = entry.get("domain_id", "")
+        pri_raw = entry.get("priority", 999)
+        try:
+            pri = int(pri_raw)
+        except (TypeError, ValueError):
+            pri = 999
+        for kw in entry.get("keywords", []) or []:
+            if not kw:
+                continue
+            # 셸 원본 `grep -qiF` 동작: case-insensitive substring 매칭
+            if kw.lower() in text_lower:
+                candidate = {
+                    "matched": True,
+                    "domain_id": did,
+                    "priority": pri,
+                    "keyword": kw,
+                    "doc_ids": [d.get("id", "") for d in entry.get("required_docs", []) or []],
+                    "doc_paths": [d.get("path", "") for d in entry.get("required_docs", []) or []],
+                }
+                if best is None or pri < best["priority"]:
+                    best = candidate
+                break  # 동일 도메인 내 첫 매치만 기록
+
+    if best is None:
+        return {"matched": False, "domain_id": None, "priority": None,
+                "keyword": None, "doc_ids": [], "doc_paths": []}
+    return best
+
+
 # ── TASKS/HANDOFF/STATUS 최종 업데이트 날짜/세션 추출 ───────────
 def extract_doc_dates(md_path: str) -> dict[str, Any]:
     """'최종 업데이트: YYYY-MM-DD' 추출."""
@@ -341,6 +402,7 @@ OPS = {
     "doc_session": lambda args: extract_doc_session(args.path[0]),
     "shadow_diff_active_hooks": lambda args: shadow_diff_active_hooks(args.path),
     "shadow_diff_readme": lambda args: shadow_diff_readme(args.path),
+    "match_domain": lambda args: match_domain_by_keywords(args.path[0], args.text or ""),
 }
 
 
@@ -348,6 +410,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--op", required=True, choices=list(OPS.keys()))
     ap.add_argument("--path", action="append", default=[], help="파일 경로 (복수 가능)")
+    ap.add_argument("--text", default="", help="match_domain op에 사용할 사용자 텍스트")
     args = ap.parse_args()
 
     if args.op not in OPS:

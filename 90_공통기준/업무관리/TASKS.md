@@ -10,9 +10,52 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션97 meta_freeze 해제 (incident 52건 ≤ 100)
+최종 업데이트: 2026-04-23 KST — 세션98 시스템 드리프트 2자 토론 완료 (SSoT 종결 + C2 훅 신설 + permissions 55% 감축)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
+
+---
+
+## 세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행
+
+**[완료] GPT 시스템 평가 실물 대조 + Explore 3병렬 독립 스캔**
+- GPT 8건 중 7건 사실, 1건(post_commit_notify 배치) 반만 사실로 확인
+- Claude 독립 발견: 도메인 STATUS 5개 drift 12~23일(High), 고아 폴더 5개(Med), 정리대기_20260328(Med)
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260423_193314/`
+
+**[완료] 2자 토론 Round 1 합의 (3자 승격 불필요)**
+- 의제1 A안 채택: `DESIGN_PRINCIPLES.md:10` "정적 출력만" → "정적 + advisory 보조 허용" 문구 현실화
+- 의제1 부가: parse_helpers M4 선행, M3 지연 불가 (GPT 조건 수용)
+- 의제2 C2 채택: 신규 advisory 훅 `domain_status_sync.sh` 신설 (1 Problem ↔ 1 Hook)
+- 의제3 수정 채택: URL echo 7건·숫자 echo 8건 제거 (포괄 통합 아님), dry-run 3건 통합
+
+**[완료] 즉시 실행 4건**
+- `smoke_fast.sh` 주석 "5~8건" → "11건" (실제 검사 수와 일치)
+- `harness_gate.sh` 주석 "마지막 5000자" → "마지막 20000자" (실제 tail -c와 일치)
+- `README.md` `post_commit_notify.sh` Notification 층 → 추적층(PostToolUse) 이동 + event 명시
+- `DESIGN_PRINCIPLES.md` L10 A안 문구 수정
+
+**[완료] parse_helpers M4 — `risk_profile_prompt.sh` 셸 파서 이관**
+- 기존 셸 while + grep + sed 블록(L85-141) 제거 → `parse_helpers.py --op match_domain` 호출
+- `parse_helpers.py`에 `match_domain_by_keywords()` 신규 함수 + CLI op 추가
+- 회귀: smoke_fast 11/11 PASS, active_domain.req 정상 작성
+
+**[완료] parse_helpers M3 — `final_check.sh` 4개 자체 파서 이관 (SSoT 종결)**
+- `registered_hook_names` / `readme_active_hook_count` / `readme_active_hook_names` / `status_hook_count` 함수 내부를 parse_helpers CLI 호출로 대체
+- Windows Python stdout \r 삽입 이슈 발견 → `tr -d '\r'` 추가
+- DESIGN_PRINCIPLES 원칙 7 "Single Source of Truth" 실제 코드로 끝남
+
+**[완료] C2 `domain_status_sync.sh` 신규 advisory 훅**
+- 전역 TASKS 날짜 vs 도메인 STATUS.md 5개 날짜 비교 → 14일+ drift 감지 시 stderr 경고
+- 실측: 05 조립비정산 17일·10 라인배치 23일 drift 감지 확인
+- `session_start_restore.sh`에 호출 추가, fail-open / exit 0 강제
+- 30일 실측 후 gate 승격 여부 재평가 (2026-05-23)
+
+**[완료] permissions.local.json 정리 (63 → 27, 57% 감축)**
+- URL echo 7건 제거 (`Bash(echo:*)` 팀 포괄 이미 존재 — 중복 제거)
+- 숫자 echo 8건 제거 (대화방 ID 1회용 — 영구 허용 가치 없음)
+- dry-run 3건 + 기타 incident_repair 호출 6건 → `Bash(python3 .claude/hooks/incident_repair.py:*)` 1건으로 통합
+- 1회용 mkdir/rmdir/tmp py/worktree cleanup/chrome debug 다수 제거
 
 ---
 

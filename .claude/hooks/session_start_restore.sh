@@ -163,6 +163,13 @@ if [ -x "$TOKEN_CHK" ]; then
   [ -n "$TOKEN_RESULT" ] && echo "$TOKEN_RESULT"
 fi
 
+# domain_status_sync — 도메인 STATUS.md drift advisory (세션98 2자 토론 C2 합의)
+DOMAIN_SYNC="$(dirname "$0")/domain_status_sync.sh"
+if [ -x "$DOMAIN_SYNC" ]; then
+  DOMAIN_RESULT=$("$DOMAIN_SYNC" 2>&1)
+  [ -n "$DOMAIN_RESULT" ] && echo "$DOMAIN_RESULT"
+fi
+
 # 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교 (hook_config.json drift_check 연동)
 DRIFT_PATTERN="최종 업데이트"
 if [ -f "$CONFIG_FILE" ]; then

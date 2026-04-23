@@ -4,30 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션97 완료 + meta_freeze 해제 (incident 52건 ≤ 100)
+최종 업데이트: 2026-04-23 KST — 세션98 시스템 전체 드리프트 2자 토론 + 실행 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-23 세션97 — 저장소 병목 우선순위 2자 토론 + 완료)
+## 0. 최신 세션 (2026-04-23 세션98 — 시스템 전체 드리프트 2자 토론 + 실행)
 
 ### 실행 경로
-GPT 시스템 평가 검토 → 2자 토론 → Round 1 합의 → 합의 3건 이행 → meta_freeze 해제 → GPT 통과
+GPT 시스템 평가 8건 실물 대조 → Explore 3병렬 독립 스캔 (도메인 STATUS drift 5개 등 추가 발견) → 즉시 실행 4건 (주석·배치·A안 문구) → 2자 토론 Round 1 (GPT thinking 19분) → 의제1 A안/의제2 C2/의제3 URL·숫자 제거 합의 (3자 승격 불필요) → parse_helpers M4 (risk_profile_prompt) → parse_helpers M3 (final_check 4개 함수) → C2 domain_status_sync.sh 신설 → permissions.local.json 57% 감축
 
 ### 완료 결과
-1. incident 138건 → 52건 (-86건): bulk stale resolve (harness_missing 44 / evidence_missing 36 / pre_commit_check 10)
-2. TASKS.md 439줄 → 335줄 (-104줄): 세션89/91/92/94 아카이브·압축
-3. meta_freeze.md 생성 → 즉시 해제 (incident 52건 ≤ 100 달성)
+1. SSoT 종결: M3(final_check 4개 함수) + M4(risk_profile_prompt) 모두 parse_helpers 단일 경로 통합. DESIGN_PRINCIPLES 원칙 7 실제 코드 반영
+2. SessionStart 정책 현실화: DESIGN_PRINCIPLES L10 "정적 출력만" → "정적 + advisory 보조 허용"
+3. 새 advisory 훅 `domain_status_sync.sh` (도메인 STATUS drift 14일+ 경고): 05/10 즉시 감지 확인. 30일 실측 후 gate 승격 여부 재평가(2026-05-23)
+4. 주석·README 배치 drift 정리: smoke_fast 11건·harness_gate 20000자·post_commit_notify 추적층 이동+event 명시
+5. permissions.local.json 27건 (63→-36, 57% 감축): URL/숫자 echo 완전 제거, dry-run incident_repair 포괄 통합
+6. smoke_fast 11/11 PASS · final_check --fast 모두 OK (TASKS/HANDOFF/STATUS 미갱신 FAIL은 이 커밋에서 해소)
 
 ### 다음 AI 액션
-1. **E1 가설 검증**: 다음 D0 작업 시 evidence_missing 신규 발생 0건 확인. 발생 시 가설 기각 + 구조 개선 의제
-2. **(별 의제) debate_verify_block** 잔존 건 자동 해소 규칙 검토 (48h+무재발)
-3. **(M3) final_check.sh 헬퍼 전환**: parse_helpers 1주 안정 확인 후 셸 파서 전환 (meta_freeze 해제로 재개 가능)
-4. **(M4) risk_profile_prompt.sh / domain_entries 실 전환** (meta_freeze 해제로 재개 가능)
-5. **SD9A01 OUTER 실검증** — 사용자 별도 지시 대기
+1. **GPT 최종 판정 수령** (2way): 커밋 push 후 GPT에 변경 4건(A안/M4/M3/C2) 판정 요청 — 통과/조건부/실패
+2. **domain_status_sync 30일 실측**: 14일+ 감지된 05/10/02/04/06의 추세 관찰. 30일 후 advisory → gate 승격 검토 (2026-05-23)
+3. **E1 가설 검증**: 다음 D0 작업 시 evidence_missing 신규 발생 0건 확인 (세션97 이월)
+4. **고아 폴더 5개 처리 결정** (01_/03_상위/07_/08_/09_): 도메인 진입표 확장 vs 명시적 미문서화 마킹
+5. **98_아카이브/정리대기_20260328** 93개·26일 경과 — 30일 임박, 사용자 분류 확인 필요
 
 ### 로그
-`90_공통기준/토론모드/logs/debate_20260423_170100/`
+- 2자 토론: `90_공통기준/토론모드/logs/debate_20260423_193314/round1_gpt.md`
+- Plan: `C:/Users/User/.claude/plans/warm-drifting-porcupine.md`
 
 ---
 

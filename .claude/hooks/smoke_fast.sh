@@ -1,7 +1,7 @@
 #!/bin/bash
-# Fast Smoke Subset — SessionStart 시 자동 실행 (5~8건, 로컬·결정적만)
+# Fast Smoke Subset — SessionStart 시 자동 실행 (11건, 로컬·결정적만)
 # 네트워크/외부 API 검사 없음. 실패 시 경고만 (차단 아님)
-# Full smoke test: smoke_test.sh (105건)
+# Full smoke test: smoke_test.sh
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 HOOKS_DIR="$PROJECT_DIR/.claude/hooks"
