@@ -5,10 +5,15 @@
 # 세션52 GPT 합의: hooks목록 + skills목록 + grade 표만 자동화
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
-SETTINGS="$PROJECT_DIR/.claude/settings.local.json"
+SETTINGS_TEAM="$PROJECT_DIR/.claude/settings.json"
+SETTINGS_LOCAL="$PROJECT_DIR/.claude/settings.local.json"
 SKILL_DIR="$PROJECT_DIR/90_공통기준/스킬"
 GUIDE="$PROJECT_DIR/90_공통기준/업무관리/AGENTS_GUIDE.md"
 README="$PROJECT_DIR/.claude/hooks/README.md"
+
+# Python fallback (doctor_lite.sh 선례 — Windows/경량 환경 대응)
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
 
 if [ ! -f "$GUIDE" ]; then
   echo "[ERROR] AGENTS_GUIDE.md not found: $GUIDE"
@@ -16,10 +21,21 @@ if [ ! -f "$GUIDE" ]; then
 fi
 
 # --- hooks 목록 생성 ---
-HOOK_COUNT=$(grep -oE '"command"[[:space:]]*:[[:space:]]*"bash \.claude/hooks/[A-Za-z0-9_-]+\.sh"' "$SETTINGS" 2>/dev/null \
-  | sed -E 's/.*\/([A-Za-z0-9_-]+\.sh)".*/\1/' | sort -u | wc -l | tr -d ' ')
+# 파싱 SSoT: parse_helpers.py hooks_from_settings (team+local union)
+# 세션98 M3/M4 선례 재사용. Windows \r 이슈 대비 tr -d '\r '
+if [ ! -f "$SETTINGS_TEAM" ] && [ ! -f "$SETTINGS_LOCAL" ]; then
+  echo "[WARN] settings files missing: $SETTINGS_TEAM / $SETTINGS_LOCAL" >&2
+  HOOK_COUNT=0
+else
+  HOOK_COUNT=$("$PY_CMD" "$PROJECT_DIR/.claude/scripts/parse_helpers.py" --op hooks_from_settings \
+    --path "$SETTINGS_TEAM" \
+    --path "$SETTINGS_LOCAL" 2>/dev/null \
+    | "$PY_CMD" -c "import json,sys;print(json.load(sys.stdin).get('total',0))" 2>/dev/null \
+    | tr -d '\r ')
+  [ -z "$HOOK_COUNT" ] && HOOK_COUNT=0
+fi
 
-HOOKS_TABLE="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.local.json 기준)
+HOOKS_TABLE="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: \`.claude/hooks/README.md\` 참조. 아카이브: \`.claude/hooks/_archive/\`
 > 이 표는 \`generate_agents_guide.sh\`가 자동 생성. 수동 편집하지 마세요.
@@ -64,7 +80,7 @@ done < "$README"
 rm -f /tmp/hooks_table.tmp
 
 # README의 각 층별 표에서 .sh 행 추출 + 층 라벨 부착
-HOOKS_BLOCK="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.local.json 기준)
+HOOKS_BLOCK="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: \`.claude/hooks/README.md\` 참조. 아카이브: \`.claude/hooks/_archive/\`
 > 이 섹션은 \`generate_agents_guide.sh\`가 자동 갱신. 수동 편집 시 덮어쓰기됨.

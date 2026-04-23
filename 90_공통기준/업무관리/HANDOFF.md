@@ -4,12 +4,36 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션98 시스템 전체 드리프트 2자 토론 + 실행 완료
+최종 업데이트: 2026-04-23 KST — 세션99 AGENTS_GUIDE hooks 파서 M3/M4 전환 (2자 토론 조건부 통과 반영)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-23 세션98 — 시스템 전체 드리프트 2자 토론 + 실행)
+## 0. 최신 세션 (2026-04-23 세션99 — AGENTS_GUIDE hooks 파서 버그 수정)
+
+### 실행 경로
+HANDOFF 세션98 "[다음 세션 초반]" 항목 착수 → 버그 실측(HOOK_COUNT=0 vs parse_helpers 31) → 플랜 작성(`.claude/plans/resilient-zooming-snowflake.md`) → 2자 토론 Round 1 (GPT thinking 2m 55s) → 조건부 통과 + 보강 3건 수령 → 전부 반영 후 구현 → smoke_fast 11/11 PASS → final_check WARN 해소
+
+### 완료 결과
+1. `generate_agents_guide.sh` L7-38: grep 손파싱 → `parse_helpers.py --op hooks_from_settings` (team+local union) 호출. M3/M4 선례 재사용. Windows \r 이슈 `tr -d '\r '` 적용
+2. GPT 보강 3건 반영: (a) PY_CMD fallback (doctor_lite 선례) (b) 헤더 문구 "settings.json+settings.local.json 기준" 정합 (c) settings 둘 다 부재 시 `[WARN] settings files missing` stderr
+3. AGENTS_GUIDE.md "0개 활성" → "31개 활성" 자동 반영
+4. `final_check --fast` 3.5 섹션 WARN → `[OK] AGENTS_GUIDE hooks 개수 일치 (31개)`
+
+### 다음 AI 액션
+1. **domain_status_sync 30일 실측**: 2026-05-23 재평가 (세션98 이월)
+2. **incident_repair 경계 재정의 재평가**: 2026-05-23 (세션98 이월)
+3. **E1 가설 검증**: 다음 D0 작업 시 evidence_missing 신규 발생 0건 (세션98 이월)
+4. **M5 후보 (별건)**: generate_agents_guide.sh README 계층별 훅 테이블 파싱(L47-62) 재구성
+5. **SETTINGS dead assignment 정리 (별건)**: 코드 품질 작업 기회 시
+
+### 로그
+- 2자 토론: `90_공통기준/토론모드/logs/debate_20260423_212854/round1_gpt.md`
+- Plan: `C:/Users/User/.claude/plans/resilient-zooming-snowflake.md`
+
+---
+
+## 1. 이전 세션 (2026-04-23 세션98 — 시스템 전체 드리프트 2자 토론 + 실행)
 
 ### 실행 경로
 GPT 시스템 평가 8건 실물 대조 → Explore 3병렬 독립 스캔 (도메인 STATUS drift 5개 등 추가 발견) → 즉시 실행 4건 (주석·배치·A안 문구) → 2자 토론 Round 1 (GPT thinking 19분) → 의제1 A안/의제2 C2/의제3 URL·숫자 제거 합의 (3자 승격 불필요) → parse_helpers M4 (risk_profile_prompt) → parse_helpers M3 (final_check 4개 함수) → C2 domain_status_sync.sh 신설 → permissions.local.json 57% 감축

@@ -10,9 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션98 시스템 드리프트 2자 토론 완료 (SSoT 종결 + C2 훅 신설 + permissions 55% 감축)
+최종 업데이트: 2026-04-23 KST — 세션99 AGENTS_GUIDE hooks 파서 M3/M4 전환 (final_check WARN 해소)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
+
+---
+
+## 세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 조건부 통과 반영)
+
+**[완료] generate_agents_guide.sh hooks 파서 M3/M4 패턴 전환**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round1_gpt.md`
+- A 분류 자가판정 (버그 수정, 실행 흐름·판정 분기 불변). GPT 동의 — 3자 승격 불필요
+- **변경 파일 1건**: `90_공통기준/업무관리/generate_agents_guide.sh` L7-38
+  - `grep -oE "...\\.sh\"" ... | wc -l` 셸 손파싱 → `parse_helpers.py --op hooks_from_settings` (team+local union)
+  - Windows \r 이슈 대비 `tr -d '\r '`. M3/M4 선례 재사용
+- **GPT 조건부 통과 보강 3건 전부 반영**:
+  - PY_CMD fallback (`doctor_lite.sh:10-11` 선례) — Windows/경량 환경 Python 부재 대응
+  - 헤더 문구 `"settings.local.json 기준"` → `"settings.json+settings.local.json 기준"` (union 정합)
+  - settings 둘 다 부재 시 `[WARN] settings files missing` stderr 1줄 (원인 은닉 방지)
+- **증상 해소**:
+  - `AGENTS_GUIDE.md` "0개 활성" → "31개 활성"
+  - `final_check --fast` 3.5 섹션 WARN → `[OK] AGENTS_GUIDE hooks 개수 일치 (31개)`
+- **회귀**: smoke_fast 11/11 ALL PASS
+- **명시적 비변경**: README 계층별 훅 테이블 파싱(L47-62 별건 M5 후보), SETTINGS dead assignment 정리(별건)
 
 ---
 
