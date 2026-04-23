@@ -254,6 +254,16 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - GPT Round 2 보정: latest_ts_by_key 단순화 + synthetic negative test
     - 로그: debate_20260423_130201/round3_gpt_incident.md, round4_gpt_incident.md
 
+    세션96 활성 패턴 근본 원인 분석 — 규칙 11 (Wave 1, 2자 토론 Round 6 통과):
+    - rule 11 (D0 stale allowlist 전용): 48h + (hook, normalized_detail) ∈ 3 tuples + 무재발
+      - ("skill_instruction_gate", "MES access without SKILL.md read")
+      - ("evidence_gate", "identifier_ref.req 존재. 기준정보 대조(identifier_ref.ok) 없이 관련 도메인 수정 금지.")
+      - ("evidence_gate", "auth_diag.req 존재. auth_diag.ok 없이 MES/OAuth 관련 실행 금지.")
+    - 의도: D0 인라인 개발(.claude/tmp/erp_d0_*.py) 부산물 21건 자연 소거 (정식 d0-production-plan/run.py 사용 후 무재발 시)
+    - GPT Round 6 보정: detail-only 아닌 (hook, normalized_detail) 정확 쌍으로 좁혀 rule 10과 역할 분리
+    - 마킹: resolved_by="auto_rule11", resolved_reason="d0_stale_<mes|identifier_ref|auth_diag>"
+    - 로그: debate_20260423_130201/round5_claude_diagnosis.md, round6_gpt_incident.md
+
     방식: resolved=false → resolved=true + resolved_by 마킹으로 덮어쓰기
     """
     import datetime
@@ -338,13 +348,21 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
         """공백·개행 정규화. 백틱·따옴표는 보존 (의미 보존)."""
         return ' '.join((s or '').strip().split())
 
-    # rule 7/10 무재발 검증용: latest_ts_by_key (GPT Round 2 보정 — list[ts] 대신 max(ts) 1개)
-    # key 종류 2개:
+    # rule 7/10/11 무재발 검증용: latest_ts_by_key (GPT Round 2 보정 — list[ts] 대신 max(ts) 1개)
+    # key 종류:
     #   - rule 7: (classification_reason, hook, normalized_detail) tuple
     #   - rule 10: fingerprint (있으면) / (hook, normalized_detail) tuple (없으면)
+    #   - rule 11: (hook, normalized_detail) tuple, allowlist 3쌍에 한정
     latest_ts_by_key_rule7: dict = {}
     latest_ts_by_key_rule10_fp: dict = {}     # fingerprint 키
     latest_ts_by_key_rule10_hd: dict = {}     # (hook, norm_detail) 키
+    latest_ts_by_key_rule11: dict = {}        # (hook, norm_detail) 키, allowlist만
+    # rule 11 — D0 stale 패턴 allowlist (GPT Round 6 보정: detail-only 아닌 정확 쌍 3개)
+    rule11_allowlist = {
+        ("skill_instruction_gate", "MES access without SKILL.md read"): "mes",
+        ("evidence_gate", "identifier_ref.req 존재. 기준정보 대조(identifier_ref.ok) 없이 관련 도메인 수정 금지."): "identifier_ref",
+        ("evidence_gate", "auth_diag.req 존재. auth_diag.ok 없이 MES/OAuth 관련 실행 금지."): "auth_diag",
+    }
     for e in entries:
         ts_e = e.get("ts", "")
         if not ts_e:
@@ -370,6 +388,13 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 prev = latest_ts_by_key_rule10_hd.get(key10, "")
                 if ts_e > prev:
                     latest_ts_by_key_rule10_hd[key10] = ts_e
+        # rule 11 키 (allowlist 한정)
+        if reason_e == "evidence_missing":
+            key11 = (hook_e, nd_e)
+            if key11 in rule11_allowlist:
+                prev = latest_ts_by_key_rule11.get(key11, "")
+                if ts_e > prev:
+                    latest_ts_by_key_rule11[key11] = ts_e
 
     # rule 8: STATUS.md 현재 날짜 캐시
     current_status_date = ""
@@ -418,6 +443,8 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 pass
 
         # evidence_missing: .ok 증거 파일 존재 시에만 auto-resolve (세션15 합의)
+        # 세션96 rule 11 도입: allowlist (hook, normalized_detail) 쌍은 rule 11이 처리하므로
+        #   기존 24h fallback 비활성 (rule 11 48h + 무재발 안전장치 적용)
         if reason == "evidence_missing" or hook in ("evidence_gate", "evidence_stop_guard"):
             detail = entry.get("detail") or ""
             # detail에서 .req 파일 경로 추출 → 대응 .ok 파일 존재 여부 확인
@@ -427,14 +454,18 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 if Path(ok_file).exists():
                     should_resolve = True
             elif req_file == "" and detail:
-                # file 필드 없으면 시간 기반 fallback (하위 호환)
-                ts_str = entry.get("ts", "")
-                try:
-                    ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
-                    if (now - ts).total_seconds() > 86400:
-                        should_resolve = True
-                except (ValueError, TypeError):
+                # rule 11 allowlist 케이스는 rule 11에 위임 (기존 24h fallback 우회)
+                if (hook, normalize_detail(detail)) in rule11_allowlist:
                     pass
+                else:
+                    # file 필드 없으면 시간 기반 fallback (하위 호환)
+                    ts_str = entry.get("ts", "")
+                    try:
+                        ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                        if (now - ts).total_seconds() > 86400:
+                            should_resolve = True
+                    except (ValueError, TypeError):
+                        pass
 
         # 세션96 규칙 6: pre_commit_check 원인-해소 연결 (2자 토론 조건부 통과 반영)
         # detail 분기 — fast FAIL: final_check --fast PASS로 해소 / full FAIL: + smoke_test PASS 추가
@@ -532,6 +563,21 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             except (ValueError, TypeError):
                 pass
 
+        # rule 11 — D0 stale allowlist 전용 (GPT Round 6: (hook, normalized_detail) 정확 쌍)
+        # 의도: D0 인라인 개발 부산물 자연 소거. 즉시 효과 0건이 정상.
+        if reason == "evidence_missing":
+            key11 = (hook, nd)
+            if key11 in rule11_allowlist:
+                try:
+                    ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    if (now - ts).total_seconds() > 48 * 3600:
+                        latest = latest_ts_by_key_rule11.get(key11, "")
+                        if ts_str >= latest:
+                            should_resolve = True
+                            entry["_rule11_marker"] = rule11_allowlist[key11]
+                except (ValueError, TypeError):
+                    pass
+
         if should_resolve:
             entry["resolved"] = True
             variant = entry.pop("_rule6_variant", None)
@@ -539,6 +585,7 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             r8 = entry.pop("_rule8_marker", False)
             r9 = entry.pop("_rule9_marker", False)
             r10 = entry.pop("_rule10_marker", False)
+            r11 = entry.pop("_rule11_marker", None)  # str sub-id or None
             if reason == "pre_commit_check" and variant:
                 entry["resolved_by"] = "auto_rule6"
                 entry["resolved_reason"] = f"pre_commit_check_stale_{variant}"
@@ -554,6 +601,9 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             elif r10:
                 entry["resolved_by"] = "auto_rule10"
                 entry["resolved_reason"] = "evidence_block_no_recurrence"
+            elif r11:
+                entry["resolved_by"] = "auto_rule11"
+                entry["resolved_reason"] = f"d0_stale_{r11}"
             else:
                 entry["resolved_by"] = "auto"
             count += 1

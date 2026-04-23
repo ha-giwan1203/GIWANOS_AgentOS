@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 incident 군집 정리 (rule 7~10 신설, 미해결 175→124)
+최종 업데이트: 2026-04-23 KST — 세션96 활성 패턴 분석 + rule 11 (D0 stale allowlist 전용)
 
 ---
 
@@ -95,6 +95,27 @@
 - **잔존 미해결 124건**: harness_missing 44 / evidence_missing 43 / legacy_unclassified 12 / pre_commit_check 12 / 기타 13
 - **검증**: smoke_test 217/217 / smoke_fast 11/11 / synthetic negative test 6/6 / encoding fix(subprocess utf-8 강제)
 - 다음 단계: legacy_unclassified 12 backfill_classification → 분류 정상화 후 재평가, harness_missing/evidence_missing 활성 패턴 근본 원인 분석
+
+**[완료] 활성 패턴 근본 원인 분석 + Wave 1 — rule 11 D0 stale allowlist 전용 (2자 토론 Round 6 통과)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round5_claude_diagnosis.md`, `round6_gpt_incident.md`
+- A 분류 (rule 6/7~10 선례 동일, hook 흐름 불변)
+- **분석 결과**:
+  - evidence_missing 45건 시간 분포: instruction_not_read 24건은 04-21 마지막(학습 완료), 나머지 21건은 04-22~23 D0 자동화 작업 부산물(활성)
+  - harness_missing 44건은 04-13~22 분산, 04-19 이후 산발적(학습 진행 중)
+  - 21건 활성 패턴 분석: D0 인라인 스크립트(.claude/tmp/erp_d0_*.py) → MES 접근 시 SKILL.md 미읽기/identifier_ref/auth_diag 차단
+  - 가설 E1: 정식 d0-production-plan/run.py 사용 후 자연 감소 (세션95 패키징 완료)
+- **rule 11 신설** (Wave 1, 즉시):
+  - 조건 (AND): classification_reason="evidence_missing" + (hook, normalized_detail) ∈ allowlist 3쌍 + ts<now-48h + latest_ts_by_key 무재발
+  - allowlist 3쌍 (GPT Round 6 보정 — detail-only 아닌 정확 쌍):
+    - ("skill_instruction_gate", "MES access without SKILL.md read")
+    - ("evidence_gate", "identifier_ref.req 존재. 기준정보 대조(identifier_ref.ok) 없이 관련 도메인 수정 금지.")
+    - ("evidence_gate", "auth_diag.req 존재. auth_diag.ok 없이 MES/OAuth 관련 실행 금지.")
+  - 마킹: resolved_by="auto_rule11", resolved_reason="d0_stale_<mes|identifier_ref|auth_diag>"
+  - 기존 evidence_missing 24h fallback과 역할 분리 (allowlist 케이스는 rule 11 위임)
+- **검증**: synthetic test 6/6 ALL PASS / smoke_test 217/217 / smoke_fast 11/11
+- **즉시 효과 0건 (정상)**: 21건 모두 48h 미만, D0 작업 종료 후 자연 적용
+- Wave 2 (별 의제): harness_gate 트랜스크립트 윈도우 20000→50000 (A-1) / 라벨링 정규식 다변화 (A-2) / 마커 기반 (A-3, B 분류)
+- 다음 단계: E1 가설 검증 — 다음 D0 작업(/d0-plan run.py) 시 evidence_missing 신규 발생 0건 관찰
 
 ---
 

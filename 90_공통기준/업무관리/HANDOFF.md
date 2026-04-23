@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 incident 군집 정리 (rule 7~10, 미해결 175→124)
+최종 업데이트: 2026-04-23 KST — 세션96 활성 패턴 분석 + rule 11 (D0 stale allowlist 전용)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -73,13 +73,21 @@
 - synthetic negative test 6/6 ALL PASS (무재발 로직 안전성 검증)
 - 추가 fix: incident_repair.py final_check subprocess 호출에 encoding="utf-8" 강제 (Windows cp949 디코딩 실패 회피)
 
+### 활성 패턴 분석 + Wave 1 — rule 11 D0 stale allowlist (2자 토론 Round 6 통과)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round5_claude_diagnosis.md`, `round6_gpt_incident.md`
+- evidence_missing 21건이 04-22~23 D0 자동화 부산물로 확인 (E1 가설)
+- rule 11 (hook, normalized_detail) 정확 쌍 3개 allowlist + 48h + 무재발
+- 즉시 효과 0건 (정상, 지연 효과 의도). 기존 24h fallback과 역할 분리(allowlist 위임)
+- synthetic test 6/6 ALL PASS
+
 ### 다음 AI 액션
-1. incident 정리 단일 커밋 + main 직행 + GPT 최종 보고
-2. legacy_unclassified 12 backfill_classification 정규화 → 재평가
-3. harness_missing 44 / evidence_missing 43 활성 패턴 근본 원인 분석 (학습 미완 vs 시스템 결함)
-4. (M3) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
-5. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
-6. SD9A01 OUTER 실검증 — 사용자 별도 지시 대기
+1. rule 11 단일 커밋 + main 직행 + GPT 최종 보고
+2. **E1 가설 검증**: 다음 D0 작업(/d0-plan run.py) 시 evidence_missing 신규 발생 0건 확인. 발생 시 가설 기각 + 구조 개선 의제 승격
+3. (Wave 2 별 의제) harness_gate 트랜스크립트 윈도우 20000→50000 확장 (A-1)
+4. legacy_unclassified 12 backfill_classification 정규화 → 재평가
+5. (M3) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
+6. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
+7. SD9A01 OUTER 실검증 — 사용자 별도 지시 대기
 
 ---
 
