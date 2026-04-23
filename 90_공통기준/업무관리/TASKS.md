@@ -42,6 +42,23 @@
   - 사전 1회 subprocess 호출로 현재 PASS 여부 캐시 (루프 외부)
 - 독립 하네스: GPT 평가(A1 파싱/B1 gate 일관성/Pri4 final_check 분리) 채택 3건, (A3 incident_ledger/C1 debate_verify/Pri5) 보류 3건, (B2 selfcheck 깊이) 버림 1건 — smoke_test 계층 미반영으로 환경미스매치
 
+**[완료] 파싱 공통층 Python 헬퍼화 + final_check 2축 분리 묶음 — M1 (2자 토론 조건부 통과 반영, A-수정안)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_122413/`
+- 선행 3자 자동 승격 중단: `debate_20260423_122202_3way/abort.md` (사용자 지시 예외, D안)
+- GPT 조건부 통과 요구 전면 반영:
+  - domain_registry YAML → JSON (`.claude/domain_entry_registry.json`)
+  - count만 → count + 이름 리스트 병행 제공
+  - JSON 단일 출력 계약 (셸 재파싱 금지)
+  - M1에서 `risk_profile_prompt` / `domain_entries` 실제 전환 제외 (M4 이월)
+  - Shadow mode 1주 관찰 (현재 헬퍼 신설만, list_active_hooks 전환은 M2)
+  - `risk_profile_prompt` 캐시 금지 (UserPromptSubmit 고빈도 → 정확도 우선)
+  - 2축 경계: `write_marker` = runtime / `skill_instruction_gate` = 별도 축 유지
+- **M1 산출물**:
+  - `.claude/scripts/parse_helpers.py` 신설 — 7개 op (hooks_from_settings / readme_hook_names / status_hook_count / domain_entries / doc_dates / doc_session / shadow_diff_active_hooks) + JSON 단일 출력
+  - `smoke_test.sh` 섹션 54 신설 (5건, regression): parse_helpers 실파일 존재 / hooks_from_settings total = list_active_hooks --count / shadow_diff match=True / doc_dates 파싱 / doc_session 파싱
+- 검증: smoke_test **216/216 ALL PASS** / smoke_fast 11/11 / doctor_lite OK
+- 다음 단계(M2 후속): shadow 1주 관찰 후 `list_active_hooks.sh` 헬퍼 호출 전환 + `final_check.sh` 파싱 전환 → M3 2축 분리 → M4 `risk_profile_prompt` 전환
+
 ---
 
 ## 세션95 (2026-04-23) — /d0-plan 스킬 패키징 완료

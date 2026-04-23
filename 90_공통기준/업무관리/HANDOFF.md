@@ -41,6 +41,18 @@
 - 적용 결과: 미해결 375→161 (-57%), `auto_rule6` 마킹 192건 정확
 - 2자 토론 Round 2: **통과** (GPT가 커밋 `ac290a29` 실물 검증 + 분기 조건 충족 확인). 의제 종결
 
+### 파싱 헬퍼 + final_check 2축 분리 묶음 — M1 (2자 토론 조건부 통과 반영)
+- 3자 자동 승격 → 사용자 지시로 2자 모드 전환 (D안 예외, abort.md 기록)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_122413/`
+- GPT 조건부 통과 수정안 전면 반영 (A-수정안):
+  - M1: 헬퍼 도입 + shadow 검증만 (list_active_hooks 실전환 M2 이월)
+  - 헬퍼 시그니처: count + 이름 리스트 병행 (final_check의 이름 대조 니즈 반영)
+  - JSON 단일 출력 계약 + domain_registry JSON 확정
+  - 2축 경계: write_marker=runtime / skill_instruction_gate=별도
+- **산출물**: `.claude/scripts/parse_helpers.py` (7 op) + `smoke_test` 섹션 54 (5건 regression)
+- 검증: smoke_test **216/216 ALL PASS**
+- GPT 재판정 요청 예정 (M1 커밋 이후)
+
 ### 다음 AI 액션
 1. auto_resolve --apply 실행 → 규칙 6 활성 → ledger 잡음 대규모 해소
 2. GPT에 재판정 요청 ("조건부 통과" 조건 반영 완료 보고)

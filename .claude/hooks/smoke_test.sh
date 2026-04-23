@@ -1274,13 +1274,46 @@ EM_HITS=$(grep -v '^[[:space:]]*#' "$PROJECT_DIR/.claude/hooks/evidence_mark_rea
 [ "${EM_HITS:-0}" -eq 0 ]
 check $? "evidence_mark_read.sh: C분류 마커(tasks_read/handoff_read/status_read/domain_read/tasks_updated/handoff_updated/skill_read) 제거 유지"
 
+# === 섹션 54: 파싱 헬퍼 (parse_helpers.py) M1 shadow mode (세션96 /auto-fix 2자 토론 A-수정안) ===
+echo ""
+echo "=== 54. parse_helpers.py M1 — 헬퍼 신설 + shadow 검증 ==="
+PARSE_HELPERS="$PROJECT_DIR/.claude/scripts/parse_helpers.py"
+
+# 54-1: parse_helpers.py 실파일 존재
+[ -f "$PARSE_HELPERS" ]
+check $? "parse_helpers.py 실파일 존재 (.claude/scripts/parse_helpers.py)"
+
+# 54-2: hooks_from_settings total = list_active_hooks --count
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+HELPER_TOTAL=$("$PY_CMD" "$PARSE_HELPERS" --op hooks_from_settings --path "$SETTINGS_TEAM" --path "$SETTINGS_LOCAL" 2>/dev/null | "$PY_CMD" -c "import sys,json; print(json.load(sys.stdin)['total'])" 2>/dev/null)
+INLINE_TOTAL=$(bash "$PROJECT_DIR/.claude/hooks/list_active_hooks.sh" --count 2>/dev/null)
+[ -n "$HELPER_TOTAL" ] && [ -n "$INLINE_TOTAL" ] && [ "$HELPER_TOTAL" = "$INLINE_TOTAL" ]
+check $? "hooks_from_settings total ($HELPER_TOTAL) = list_active_hooks --count ($INLINE_TOTAL)"
+
+# 54-3: shadow_diff_active_hooks match=true (독립 재구현 일치)
+SHADOW_MATCH=$("$PY_CMD" "$PARSE_HELPERS" --op shadow_diff_active_hooks --path "$SETTINGS_TEAM" --path "$SETTINGS_LOCAL" 2>/dev/null | "$PY_CMD" -c "import sys,json; print(json.load(sys.stdin)['match'])" 2>/dev/null)
+[ "$SHADOW_MATCH" = "True" ]
+check $? "shadow_diff_active_hooks: helper vs inline 독립 재구현 match=True"
+
+# 54-4: doc_dates TASKS.md — 최종 업데이트 날짜 파싱
+TASKS_DATE=$("$PY_CMD" "$PARSE_HELPERS" --op doc_dates --path "$PROJECT_DIR/90_공통기준/업무관리/TASKS.md" 2>/dev/null | "$PY_CMD" -c "import sys,json; d=json.load(sys.stdin); print(d.get('date') or '')" 2>/dev/null)
+[ -n "$TASKS_DATE" ] && echo "$TASKS_DATE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+check $? "doc_dates: TASKS.md 날짜 파싱 ($TASKS_DATE)"
+
+# 54-5: doc_session TASKS.md — 세션 번호 파싱 (integer)
+TASKS_SESSION=$("$PY_CMD" "$PARSE_HELPERS" --op doc_session --path "$PROJECT_DIR/90_공통기준/업무관리/TASKS.md" 2>/dev/null | "$PY_CMD" -c "import sys,json; d=json.load(sys.stdin); print(d.get('session') or '')" 2>/dev/null)
+[ -n "$TASKS_SESSION" ] && echo "$TASKS_SESSION" | grep -qE '^[0-9]+$'
+check $? "doc_session: TASKS.md 세션 번호 파싱 ($TASKS_SESSION)"
+
 # === 라벨 분류 ===
 # regression: 항상 통과해야 하는 안정 검증 (실패 = 회귀)
 # capability: 아직 불안정하거나 신규 검증 (실패 = 개선 필요)
-REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30 53"
+REGRESSION_SECTIONS="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 25 26 27 28 29 30 53 54"
 CAPABILITY_SECTIONS="22 23 24 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 51 52"
 # 24b는 24 하위 — capability로 분류. 31은 circuit breaker, 32는 instruction_read_gate, 33-37은 세션40 학습 루프
 # 53: 세션93 evidence 축 경계 회귀 — regression으로 분류 (plan.md 1주차 4번)
+# 54: 세션96 parse_helpers.py M1 — regression으로 분류 (shadow mode 기본 동작 회귀 방지)
 
 echo ""
 echo "=== 라벨 분류 ==="
