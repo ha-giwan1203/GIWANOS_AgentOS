@@ -16,7 +16,13 @@
 
 ---
 
-## 세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 조건부 통과 반영)
+## 세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 통과 — GPT 최종 PASS)
+
+**[완료] GPT 최종 판정 PASS** (커밋 fa4face2 실물 대조)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round2_gpt_final.md`
+- 보강 3건 실물 반영 확인 + 상태 원본 충돌 없음 + 회귀 PASS
+- 별건(README M5, SETTINGS dead assignment) PASS 막지 않음 확인. 세션99 종결
+
 
 **[완료] generate_agents_guide.sh hooks 파서 M3/M4 패턴 전환**
 - 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round1_gpt.md`
