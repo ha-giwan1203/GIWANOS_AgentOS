@@ -9,24 +9,22 @@
 
 ---
 
-## 0. 최신 세션 (2026-04-23 세션97 — 저장소 병목 우선순위 2자 토론)
+## 0. 최신 세션 (2026-04-23 세션97 — 저장소 병목 우선순위 2자 토론 + 완료)
 
 ### 실행 경로
-GPT 시스템 평가 검토 → 2자 토론 진입 → Round 1 합의 달성 → critic-reviewer WARN 수용
+GPT 시스템 평가 검토 → 2자 토론 → Round 1 합의 → 합의 3건 이행 → meta_freeze 해제 → GPT 통과
 
-### 합의된 우선순위 3개
-1. `incident_ledger.jsonl` 실분포 확인 (선행) → `/auto-fix` 로 진입
-2. incident ≤ 100 달성까지 원인군 3개 직접 소거 (rule 추가 금지)
-3. TASKS.md 감량 + `.claude/state/meta_freeze.md` 조건부 억제 기준 저장
-
-### critic-reviewer WARN 사항
-- Claude 독립 축 미흡: 파서 통일 관점이 합의안에서 사라짐
-- "실증됨" 라벨을 미래 실행계획에 적용 — 라벨 오용
+### 완료 결과
+1. incident 138건 → 52건 (-86건): bulk stale resolve (harness_missing 44 / evidence_missing 36 / pre_commit_check 10)
+2. TASKS.md 439줄 → 335줄 (-104줄): 세션89/91/92/94 아카이브·압축
+3. meta_freeze.md 생성 → 즉시 해제 (incident 52건 ≤ 100 달성)
 
 ### 다음 AI 액션
-1. `/auto-fix` 로 incident 138건 실분포 분석
-2. TASKS.md 감량 (완료 이력·장기 보류 → 98_아카이브)
-3. `.claude/state/meta_freeze.md` 생성
+1. **E1 가설 검증**: 다음 D0 작업 시 evidence_missing 신규 발생 0건 확인. 발생 시 가설 기각 + 구조 개선 의제
+2. **(별 의제) debate_verify_block** 잔존 건 자동 해소 규칙 검토 (48h+무재발)
+3. **(M3) final_check.sh 헬퍼 전환**: parse_helpers 1주 안정 확인 후 셸 파서 전환 (meta_freeze 해제로 재개 가능)
+4. **(M4) risk_profile_prompt.sh / domain_entries 실 전환** (meta_freeze 해제로 재개 가능)
+5. **SD9A01 OUTER 실검증** — 사용자 별도 지시 대기
 
 ### 로그
 `90_공통기준/토론모드/logs/debate_20260423_170100/`
