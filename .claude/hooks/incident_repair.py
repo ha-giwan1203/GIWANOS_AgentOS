@@ -254,6 +254,14 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - GPT Round 2 보정: latest_ts_by_key 단순화 + synthetic negative test
     - 로그: debate_20260423_130201/round3_gpt_incident.md, round4_gpt_incident.md
 
+    세션96 debate_verify_block 정리 — 규칙 12 (2자 토론 통과, cluster 기준):
+    - rule 12 (debate_verify_block): cluster 기준 stale (entry 기준 아님)
+      key = (phase, tuple(sorted(issues)))
+      key의 latest_ts < now - 48h → 그 key 가진 모든 entry 해소
+    - GPT Round 9 보정: entry 단위 무재발은 같은 key N건 중 latest 1건만 해소되는 한계 있음.
+      cluster 단위로 "같은 토론의 동일 검증 실패가 stale"로 판정해야 같은 key 전체 일괄 해소.
+    - 마킹: resolved_by="auto_rule12", resolved_reason="debate_verify_stale"
+
     세션96 활성 패턴 근본 원인 분석 — 규칙 11 (Wave 1, 2자 토론 Round 6 통과):
     - rule 11 (D0 stale allowlist 전용): 48h + (hook, normalized_detail) ∈ 3 tuples + 무재발
       - ("skill_instruction_gate", "MES access without SKILL.md read")
@@ -363,6 +371,9 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
         ("evidence_gate", "identifier_ref.req 존재. 기준정보 대조(identifier_ref.ok) 없이 관련 도메인 수정 금지."): "identifier_ref",
         ("evidence_gate", "auth_diag.req 존재. auth_diag.ok 없이 MES/OAuth 관련 실행 금지."): "auth_diag",
     }
+    # rule 12 — debate_verify_block cluster 기준 (GPT Round 9 보정)
+    # key = (phase, tuple(sorted(issues))), key의 latest_ts → 그 key 모든 entry 해소
+    latest_ts_by_key_rule12: dict = {}
     for e in entries:
         ts_e = e.get("ts", "")
         if not ts_e:
@@ -395,6 +406,12 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 prev = latest_ts_by_key_rule11.get(key11, "")
                 if ts_e > prev:
                     latest_ts_by_key_rule11[key11] = ts_e
+        # rule 12 키 (debate_verify_block cluster)
+        if reason_e == "debate_verify_block":
+            key12 = (e.get("phase"), tuple(sorted(e.get("issues") or [])))
+            prev = latest_ts_by_key_rule12.get(key12, "")
+            if ts_e > prev:
+                latest_ts_by_key_rule12[key12] = ts_e
 
     # rule 8: STATUS.md 현재 날짜 캐시
     current_status_date = ""
@@ -578,6 +595,21 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 except (ValueError, TypeError):
                     pass
 
+        # rule 12 — debate_verify_block cluster stale (GPT Round 9: cluster 기준)
+        # entry 기준 무재발 X. 같은 (phase, issues) cluster의 latest_ts가 48h+ 경과하면
+        # 그 cluster의 모든 entry 해소.
+        if reason == "debate_verify_block":
+            key12 = (entry.get("phase"), tuple(sorted(entry.get("issues") or [])))
+            cluster_latest = latest_ts_by_key_rule12.get(key12, "")
+            if cluster_latest:
+                try:
+                    cluster_ts = datetime.datetime.fromisoformat(cluster_latest.replace("Z", "+00:00"))
+                    if (now - cluster_ts).total_seconds() > 48 * 3600:
+                        should_resolve = True
+                        entry["_rule12_marker"] = True
+                except (ValueError, TypeError):
+                    pass
+
         if should_resolve:
             entry["resolved"] = True
             variant = entry.pop("_rule6_variant", None)
@@ -586,6 +618,7 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             r9 = entry.pop("_rule9_marker", False)
             r10 = entry.pop("_rule10_marker", False)
             r11 = entry.pop("_rule11_marker", None)  # str sub-id or None
+            r12 = entry.pop("_rule12_marker", False)
             if reason == "pre_commit_check" and variant:
                 entry["resolved_by"] = "auto_rule6"
                 entry["resolved_reason"] = f"pre_commit_check_stale_{variant}"
@@ -604,6 +637,9 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
             elif r11:
                 entry["resolved_by"] = "auto_rule11"
                 entry["resolved_reason"] = f"d0_stale_{r11}"
+            elif r12:
+                entry["resolved_by"] = "auto_rule12"
+                entry["resolved_reason"] = "debate_verify_stale"
             else:
                 entry["resolved_by"] = "auto"
             count += 1

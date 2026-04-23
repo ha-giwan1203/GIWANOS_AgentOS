@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 backfill 매핑 확장 + legacy_unclassified 12 정규화 + write_marker 토론 로그 제외 (commit_gate root cause 해소)
+최종 업데이트: 2026-04-23 KST — 세션96 rule 12 신설 + 세션 마무리 (debate_verify_block cluster stale)
 
 ---
 
@@ -139,6 +139,15 @@
 - 보완: `.claude/hooks/write_marker.sh`에 `90_공통기준/토론모드/logs/` 제외 패턴 추가 (skip_debate_log)
 - GPT 의견: 옵션 A(토론 로그만 제외)가 정확. B(일반화 과잉) / C(안전장치 약화) / D(사람 기억 의존) 모두 부적절
 - 근본 원인 해소 후 backfill 매핑 확장 커밋과 함께 단일 커밋
+
+**[완료] rule 12 신설 — debate_verify_block cluster stale (2자 토론 통과)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round9_gpt_rule12.md`
+- A 분류 (rule 6/7~11 선례 동일)
+- GPT Round 9 보정 채택: entry 단위 무재발 X. **cluster 기준** stale (key=(phase, sorted(issues))). cluster latest_ts > 48h 시 같은 key 모든 entry 일괄 해소
+- 마킹: resolved_by="auto_rule12", resolved_reason="debate_verify_stale"
+- 적용 결과: 134→131 (-3건). rule 12 마킹 2건 (단일 entry cluster 49h+). 나머지 10건은 cluster latest 46-48h로 임계 미통과 → 시간 경과 후 자연 해소
+- 검증: smoke_test 217/217 / smoke_fast 11/11
+- 세션96 마무리
 
 ---
 
