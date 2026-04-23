@@ -31,6 +31,17 @@
 - (b) **`_get_session` / `_get_date` working tree 우선 조회**: 기존 `git show :file` 우선 → `cat file` 우선으로 swap. git add 전 상태도 drift 감지 가능
 - 검증: drift 재현(STATUS 세션90) → `[FAIL] session_drift` 감지 → `[FIX] 세션90→95` 교정 → smoke_fast 11/11 ALL PASS
 
+**[완료] /auto-fix 규칙 6 추가 — pre_commit_check 원인-해소 연결 (2자 토론 조건부 통과 반영)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_112214/`
+- GPT 판정: 조건부 통과 — fast/full 분기 조건 추가 요구
+- 실측: pre_commit_check 202건 = `final_check --fast FAIL` 166건 + `final_check --full FAIL` 36건 (100% 분류)
+- `incident_repair.py` auto_resolve() 확장:
+  - 조건 (AND): `classification_reason == "pre_commit_check"` + `ts < now - 72h`
+  - detail 분기: `--fast FAIL` → `final_check --fast` PASS로 해소 / `--full FAIL` → `final_check --fast` + `smoke_test.sh` 둘 다 PASS로 해소
+  - 마킹: `resolved_by="auto_rule6"` + `resolved_reason="pre_commit_check_stale_{fast|full}"`
+  - 사전 1회 subprocess 호출로 현재 PASS 여부 캐시 (루프 외부)
+- 독립 하네스: GPT 평가(A1 파싱/B1 gate 일관성/Pri4 final_check 분리) 채택 3건, (A3 incident_ledger/C1 debate_verify/Pri5) 보류 3건, (B2 selfcheck 깊이) 버림 1건 — smoke_test 계층 미반영으로 환경미스매치
+
 ---
 
 ## 세션95 (2026-04-23) — /d0-plan 스킬 패키징 완료

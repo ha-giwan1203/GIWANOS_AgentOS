@@ -29,10 +29,22 @@
 - `--fix` → `[FIX] 세션90 → 세션95` 자동 교정
 - smoke_fast 11/11 ALL PASS / doctor_lite OK
 
+### /auto-fix 규칙 6 추가 (2자 토론 조건부 통과 반영)
+- 대화방: `클로드코드 시스템 분석` (기존 대화 이어서)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_112214/`
+- 안건: `incident_repair.py` auto_resolve() 규칙 6 — pre_commit_check 원인-해소 연결 구조
+- GPT 판정: **조건부 통과** — fast/full 분기 조건 추가 요구
+- 실측 검증: pre_commit_check 202건 detail 필드 기준 100% 분류 (`--fast FAIL` 166 + `--full FAIL` 36)
+- 구현: `--fast FAIL` → `final_check --fast` PASS 해소 / `--full FAIL` → + `smoke_test.sh` PASS 추가
+- 72h 버퍼 조건: 최근 발생건(< 72h) 보존
+- 해소 대상 사전 추정: 192건 (fast 158 + full 34) — 실제 실행은 auto_resolve --apply 시점
+- 적용 결과: 미해결 375→161 (-57%), `auto_rule6` 마킹 192건 정확
+
 ### 다음 AI 액션
-1. `/auto-fix` — 미해결 incident 371건 분석 (세션93 이후 9건 신규)
-2. `/daily` 또는 기타 일상 업무
-3. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
+1. auto_resolve --apply 실행 → 규칙 6 활성 → ledger 잡음 대규모 해소
+2. GPT에 재판정 요청 ("조건부 통과" 조건 반영 완료 보고)
+3. `/daily` 또는 기타 일상 업무
+4. SD9A01 OUTER 실검증 — 내일 저녁 첫 실행 예정
 
 ---
 

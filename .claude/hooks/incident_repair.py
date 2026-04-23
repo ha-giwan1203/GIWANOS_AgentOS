@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -225,7 +226,6 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - scope_violation: 24시간 경과 시 (1회성 차단)
     - dangerous_cmd: 24시간 경과 시 (1회성 차단)
     - evidence_missing: 대응 .ok 파일 존재 시에만 (시간 무관)
-    - pre_commit_check: auto-resolve 대상 제외 (PASS 마커 체계 미비)
 
     세션93 B-1 2자 토론 합의 (2026-04-22) — 확장 옵션 B (2+3+5):
     - send_block (navigate_gate): debate_claude_read.ok / debate_entry_read.ok
@@ -235,11 +235,20 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     - structural_intermediate (completion_gate): 24h 경과 시 시간 기반 auto-resolve
       (정보가치 소멸형, 과잉 정밀화 불필요)
 
+    세션96 /auto-fix 규칙 6 — pre_commit_check 원인-해소 연결 (2자 토론 조건부 통과 반영):
+    - 조건 (AND):
+      1. classification_reason == "pre_commit_check"
+      2. ts < now - 72h (최근 발생건 보존)
+      3. detail 분기:
+         - "final_check --fast FAIL": 현재 final_check --fast exit 0
+         - "final_check --full FAIL": 현재 final_check --fast exit 0 + smoke_test.sh exit 0
+    - 마킹: resolved_by="auto_rule6" + resolved_reason="pre_commit_check_stale_fast|full"
+    - 로그: debate_20260423_112214
+
     제외 (GPT 반박):
-    - pre_commit_check: success marker 체계 미비 → 추후 별도 의제
     - harness_missing: 시간 기반은 진짜 반복 패턴 지울 위험
 
-    방식: resolved=false → resolved=true + resolved_by="auto" 로 덮어쓰기
+    방식: resolved=false → resolved=true + resolved_by 마킹으로 덮어쓰기
     """
     import datetime
     import os
@@ -282,6 +291,28 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
     instr_dir = project_root / ".claude" / "state" / "instruction_reads"
     debate_claude_ok = instr_dir / "debate_claude_read.ok"
     debate_entry_ok = instr_dir / "debate_entry_read.ok"
+
+    # 세션96 규칙 6: pre_commit_check 원인-해소 연결 (fast/full 분기)
+    # 사전 1회 실행으로 현재 final_check --fast + smoke_test 통과 여부 캐시
+    pre_commit_fast_pass = False
+    pre_commit_full_pass = False
+    try:
+        fc_path = project_root / ".claude" / "hooks" / "final_check.sh"
+        if fc_path.exists():
+            r_fast = subprocess.run(
+                ["bash", str(fc_path), "--fast"],
+                cwd=str(project_root), capture_output=True, timeout=60
+            )
+            pre_commit_fast_pass = (r_fast.returncode == 0)
+        st_path = project_root / ".claude" / "hooks" / "smoke_test.sh"
+        if pre_commit_fast_pass and st_path.exists():
+            r_full = subprocess.run(
+                ["bash", str(st_path)],
+                cwd=str(project_root), capture_output=True, timeout=180
+            )
+            pre_commit_full_pass = (r_full.returncode == 0)
+    except (subprocess.TimeoutExpired, OSError, FileNotFoundError):
+        pass  # 실행 실패 시 해당 규칙 비활성 (안전측)
 
     def ok_mtime_after(ts_str: str) -> bool:
         """debate_claude_read.ok 또는 debate_entry_read.ok mtime이 incident ts 이후인지."""
@@ -333,8 +364,22 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
                 except (ValueError, TypeError):
                     pass
 
-        # pre_commit_check: auto-resolve 대상 제외 (세션15 합의, 세션93 B-1 재확인)
-        # PASS 마커 체계 미비 → 수동 해소만 허용
+        # 세션96 규칙 6: pre_commit_check 원인-해소 연결 (2자 토론 조건부 통과 반영)
+        # detail 분기 — fast FAIL: final_check --fast PASS로 해소 / full FAIL: + smoke_test PASS 추가
+        if reason == "pre_commit_check":
+            ts_str = entry.get("ts", "")
+            detail = entry.get("detail") or ""
+            try:
+                ts = datetime.datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                if (now - ts).total_seconds() > 72 * 3600:  # 72h 버퍼
+                    if "final_check --fast FAIL" in detail and pre_commit_fast_pass:
+                        should_resolve = True
+                        entry["_rule6_variant"] = "fast"
+                    elif "final_check --full FAIL" in detail and pre_commit_fast_pass and pre_commit_full_pass:
+                        should_resolve = True
+                        entry["_rule6_variant"] = "full"
+            except (ValueError, TypeError):
+                pass
 
         # 세션93 B-1 제안 2: send_block (navigate_gate) — .ok 마커 mtime 기반
         if reason == "send_block" or hook == "navigate_gate":
@@ -359,7 +404,12 @@ def auto_resolve(ledger_path: Path, dry_run: bool = False) -> int:
 
         if should_resolve:
             entry["resolved"] = True
-            entry["resolved_by"] = "auto"
+            variant = entry.pop("_rule6_variant", None)
+            if reason == "pre_commit_check" and variant:
+                entry["resolved_by"] = "auto_rule6"
+                entry["resolved_reason"] = f"pre_commit_check_stale_{variant}"
+            else:
+                entry["resolved_by"] = "auto"
             count += 1
 
     if not dry_run and count > 0:
