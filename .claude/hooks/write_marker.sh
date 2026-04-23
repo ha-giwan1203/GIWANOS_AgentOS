@@ -56,6 +56,13 @@ if echo "$FILE_PATH" | grep -qE '\.claude/(memory|plans|state|settings)'; then
   exit 0
 fi
 
+# 세션96 (2자 토론 통과): 토론 로그(90_공통기준/토론모드/logs/)는 감사·기록용 산출물
+# 운영 영향 문서 아님. 새 마커로 source 덮어쓰면 commit_gate 차단 root cause.
+if echo "$FILE_PATH" | grep -qE '90_공통기준/토론모드/logs/'; then
+  hook_timing_end "write_marker" "$_WM_START" "skip_debate_log"
+  exit 0
+fi
+
 # source_class 분류
 SOURCE_CLASS="code"
 if echo "$FILE_PATH" | grep -qE '\.claude/(hooks|rules|commands|scripts)/'; then

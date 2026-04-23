@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 활성 패턴 분석 + rule 11 (D0 stale allowlist 전용)
+최종 업데이트: 2026-04-23 KST — 세션96 backfill 매핑 확장 + legacy_unclassified 12 정규화 + write_marker 토론 로그 제외
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -80,11 +80,19 @@
 - 즉시 효과 0건 (정상, 지연 효과 의도). 기존 24h fallback과 역할 분리(allowlist 위임)
 - synthetic test 6/6 ALL PASS
 
+### backfill 매핑 확장 + legacy_unclassified 12 정규화 (2자 토론 통과)
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round8_gpt_legacy.md`
+- A 분류 (매핑 확장만, hook 흐름 불변)
+- 매핑 추가: navigate_gate→send_block, gate_reject+type=navigate_gate→send_block, tag=debate_verify→debate_verify_block
+- --reclassify-legacy CLI 신설 (기본 동작 보존, 명시 옵션)
+- 적용: backfill 57건 정규화 + auto_resolve 2건 해소 (130→128)
+- legacy_unclassified 0건 / debate_verify_block 12건 (자동 해소 규칙 별 의제)
+
 ### 다음 AI 액션
-1. rule 11 단일 커밋 + main 직행 + GPT 최종 보고
+1. backfill+정규화 단일 커밋 + main 직행 + GPT 최종 보고
 2. **E1 가설 검증**: 다음 D0 작업(/d0-plan run.py) 시 evidence_missing 신규 발생 0건 확인. 발생 시 가설 기각 + 구조 개선 의제 승격
-3. (Wave 2 별 의제) harness_gate 트랜스크립트 윈도우 20000→50000 확장 (A-1)
-4. legacy_unclassified 12 backfill_classification 정규화 → 재평가
+3. (별 의제) debate_verify_block 12건 자동 해소 규칙 신설 (예: 48h+무재발)
+4. (Wave 2 별 의제) harness_gate 트랜스크립트 윈도우 20000→50000 확장 (A-1) — E1 검증 후 harness_missing 잔존 시
 5. (M3) 헬퍼와 final_check.sh 셸 파서 1주 일치 안정 확인 → final_check.sh 헬퍼 전환
 6. (M4) `risk_profile_prompt.sh` / `domain_entries` 실 전환
 7. SD9A01 OUTER 실검증 — 사용자 별도 지시 대기

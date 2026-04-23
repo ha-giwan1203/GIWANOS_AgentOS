@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-23 KST — 세션96 활성 패턴 분석 + rule 11 (D0 stale allowlist 전용)
+최종 업데이트: 2026-04-23 KST — 세션96 backfill 매핑 확장 + legacy_unclassified 12 정규화 + write_marker 토론 로그 제외 (commit_gate root cause 해소)
 
 ---
 
@@ -116,6 +116,29 @@
 - **즉시 효과 0건 (정상)**: 21건 모두 48h 미만, D0 작업 종료 후 자연 적용
 - Wave 2 (별 의제): harness_gate 트랜스크립트 윈도우 20000→50000 (A-1) / 라벨링 정규식 다변화 (A-2) / 마커 기반 (A-3, B 분류)
 - 다음 단계: E1 가설 검증 — 다음 D0 작업(/d0-plan run.py) 시 evidence_missing 신규 발생 0건 관찰
+
+**[완료] backfill_classification 매핑 확장 + legacy_unclassified 12 정규화 (2자 토론 통과)**
+- 로그: `90_공통기준/토론모드/logs/debate_20260423_130201/round8_gpt_legacy.md`
+- A 분류 (분류 매핑 확장만, hook 흐름 불변)
+- **분석**: legacy_unclassified 12건 = navigate_gate 1건 (잘못 기록된 hook="gate_reject"/type="navigate_gate") + debate_verify 11건 (hook=None, tag="debate_verify")
+- **GPT 보정 채택**: navigate_gate → instruction_not_read 틀림. **send_block** 정정 (실증: navigate_gate.sh:38 classification_reason="send_block")
+- **신설**:
+  - HOOK_TO_REASON에 "navigate_gate": "send_block" 추가
+  - hook="gate_reject" + type="navigate_gate" → "send_block" 보조 분기 (깨진 기록형식 복구)
+  - tag="debate_verify" + hook 없음 → "debate_verify_block" 분기
+  - `--reclassify-legacy` CLI 옵션 신설 (기본 동작 보존, 명시 옵션으로 legacy 12건 재분류)
+- **적용 결과**: backfill 57건 (legacy 12 + resolved 항목 빈 분류 45) → auto_resolve 추가 2건 해소
+- **잔존 분류 (130→128)**: evidence_missing 52 / harness_missing 44 / debate_verify_block 12 / pre_commit_check 12 / doc_drift 4 / 기타 4
+- **legacy_unclassified 0건** ✓
+- 검증: backfill_classification 함수에 reclassify_legacy 옵션 추가, smoke_test 217/217, smoke_fast 11/11
+- 다음 단계: debate_verify_block 12건 자동 해소 규칙 신설(별 의제), Wave 2 harness_gate 윈도우 확장(E1 검증 후), M3 final_check 헬퍼 전환(1주 안정 후)
+
+**[완료] write_marker 토론 로그 제외 — commit_gate root cause 해소 (2자 토론 통과)**
+- 문제: 토론 로그(`90_공통기준/토론모드/logs/round*.md`) 작성 시 write_marker가 새 마커 생성 + after_state_sync=false로 덮어씀 → final_check가 "TASKS/HANDOFF/STATUS 미갱신" FAIL → commit_gate 차단
+- A 분류 (write_marker 제외 패턴 1줄 추가, hook 흐름 불변)
+- 보완: `.claude/hooks/write_marker.sh`에 `90_공통기준/토론모드/logs/` 제외 패턴 추가 (skip_debate_log)
+- GPT 의견: 옵션 A(토론 로그만 제외)가 정확. B(일반화 과잉) / C(안전장치 약화) / D(사람 기억 의존) 모두 부적절
+- 근본 원인 해소 후 backfill 매핑 확장 커밋과 함께 단일 커밋
 
 ---
 

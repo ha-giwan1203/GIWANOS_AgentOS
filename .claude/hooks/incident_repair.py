@@ -690,11 +690,18 @@ def parse_test_output(output: str) -> list[dict[str, Any]]:
     return incidents
 
 
-def backfill_classification(ledger_path: Path, dry_run: bool = False) -> int:
+def backfill_classification(ledger_path: Path, dry_run: bool = False,
+                            reclassify_legacy: bool = False) -> int:
     """빈 classification_reason을 hook 필드 기반으로 소급 태깅.
 
     세션40 GPT 토론 합의: resolved로 덮지 말고 분류만 채운다.
     ts/detail/file/resolved 보존, classification_reason만 추가.
+
+    세션96 (2자 토론 통과): 매핑 확장 + reclassify_legacy 옵션.
+    - navigate_gate → send_block (실증: navigate_gate.sh:38 classification_reason="send_block")
+    - hook="gate_reject" + type="navigate_gate" → send_block (깨진 기록형식 복구)
+    - tag="debate_verify" + hook 없음 → debate_verify_block
+    - reclassify_legacy=True 시 기존 legacy_unclassified 항목도 매핑 재시도 (이번 12건 정리)
     """
     HOOK_TO_REASON: dict[str, str] = {
         "commit_gate": "pre_commit_check",
@@ -705,34 +712,52 @@ def backfill_classification(ledger_path: Path, dry_run: bool = False) -> int:
         "stop_guard": "stop_guard_block",
         "send_gate": "send_block",
         "harness_gate": "harness_missing",
+        "navigate_gate": "send_block",  # 세션96 추가 (실증: navigate_gate.sh:38)
     }
+
+    def classify_one(entry: dict) -> str | None:
+        """entry로부터 classification_reason 추론. 매핑 안 되면 None."""
+        hook = entry.get("hook", "") or ""
+        detail = entry.get("detail", "") or ""
+        tag = entry.get("tag", "") or ""
+        type_ = entry.get("type", "") or ""
+
+        if hook in HOOK_TO_REASON:
+            return HOOK_TO_REASON[hook]
+        if hook == "completion_gate":
+            fp = entry.get("false_positive")
+            if fp:
+                return "structural_intermediate"
+            if "Git" in detail or "commit" in detail or "push" in detail:
+                return "completion_before_git"
+            if "TASKS" in detail or "HANDOFF" in detail:
+                return "completion_before_state_sync"
+            return "legacy_unclassified"
+        if hook == "instruction_not_read":
+            return "evidence_missing"
+        # 세션96: hook="gate_reject" + type="navigate_gate" 깨진 기록형식 복구
+        if hook == "gate_reject" and type_ == "navigate_gate":
+            return "send_block"
+        # 세션96: tag="debate_verify" + hook 없음
+        if tag == "debate_verify" and not hook:
+            return "debate_verify_block"
+        return "legacy_unclassified"
+
     entries = load_jsonl(ledger_path)
     count = 0
     for entry in entries:
         reason = (entry.get("classification_reason") or "").strip()
-        if reason:
+        # 기본: 빈 분류만 채움
+        # reclassify_legacy=True: legacy_unclassified도 재시도
+        should_process = (not reason) or (reclassify_legacy and reason == "legacy_unclassified")
+        if not should_process:
             continue
-        hook = entry.get("hook", "")
-        detail = entry.get("detail", "")
-        # hook 기반 매핑
-        if hook in HOOK_TO_REASON:
-            entry["classification_reason"] = HOOK_TO_REASON[hook]
+        new_reason = classify_one(entry)
+        if new_reason and new_reason != reason:
+            entry["classification_reason"] = new_reason
             count += 1
-        elif hook == "completion_gate":
-            fp = entry.get("false_positive")
-            if fp:
-                entry["classification_reason"] = "structural_intermediate"
-            elif "Git" in detail or "commit" in detail or "push" in detail:
-                entry["classification_reason"] = "completion_before_git"
-            elif "TASKS" in detail or "HANDOFF" in detail:
-                entry["classification_reason"] = "completion_before_state_sync"
-            else:
-                entry["classification_reason"] = "legacy_unclassified"
-            count += 1
-        elif hook == "instruction_not_read":
-            entry["classification_reason"] = "evidence_missing"
-            count += 1
-        else:
+        elif not reason:
+            # 새 매핑도 못 잡으면 legacy_unclassified로 신규 마킹
             entry["classification_reason"] = "legacy_unclassified"
             count += 1
     if not dry_run and count > 0:
@@ -857,6 +882,11 @@ def main() -> int:
         action="store_true",
         help="빈 classification_reason을 hook 기반으로 소급 태깅",
     )
+    parser.add_argument(
+        "--reclassify-legacy",
+        action="store_true",
+        help="기존 legacy_unclassified 항목도 새 매핑으로 재분류 (--backfill-classification과 함께)",
+    )
     args = parser.parse_args()
 
     # Phase 3-1: smoke/e2e FAIL 파싱
@@ -888,7 +918,8 @@ def main() -> int:
         return 0
 
     if args.backfill_classification:
-        count = backfill_classification(Path(args.ledger), dry_run=args.dry_run)
+        count = backfill_classification(Path(args.ledger), dry_run=args.dry_run,
+                                        reclassify_legacy=args.reclassify_legacy)
         mode = "dry-run" if args.dry_run else "backfilled"
         print(f"backfill: {count}건 {mode}")
         return 0
