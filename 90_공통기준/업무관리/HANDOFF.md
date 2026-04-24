@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 + Q1 기타안 실행 완료 + Q3 auto-fix 분류 완료
+최종 업데이트: 2026-04-24 KST — 세션105 Q1/Q3/Q4 모두 완료 (Q4 A안 3자 만장일치)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -35,6 +35,13 @@
 - Round 2 Gemini: 기타안 동조 (TASKS 조건 tightening 1건)
 - Claude 종합: 기타안 + Gemini tightening 통합 → 양측 동의
 - 로그: `round2_gpt.md`, `round2_gemini.md`, `round2_claude_synthesis.md`, `round2_cross_verify.md`
+
+### Q4 navigate_gate 재검토 완료 (세션105 말미, 3자 토론 pass_ratio 4/4)
+- 로그: `90_공통기준/토론모드/logs/debate_20260424_230014_3way/`
+- A안 만장일치 (최소보강 — navigate_page/new_page 매처 확장, select_page 제외)
+- settings.json matcher 2개 추가 + navigate_gate.sh URL 파싱 확장
+- 회귀 테스트 5건 PASS (네거티브/포지티브/비대상/new_page/비chatgpt URL)
+- 효과성 평가: 7일간 send_block 0~2건 정상 / 부당 오탐 3건 이상 시 재상정
 
 ### Q3 auto-fix 1차 분류 완료 (세션105 말미)
 - 보고서: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/q3_auto_fix_classification.md`

@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 Round 1+2 합의 + Q1 기타안 실행 완료 + Q3 auto-fix 1차 분류 완료 (Q4 후보 식별)
+최종 업데이트: 2026-04-24 KST — 세션105 Round 1+2/Q1/Q3/Q4 모두 완료 (Q4 A안 3자 만장일치 pass_ratio 4/4)
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 
@@ -45,6 +45,21 @@
 **[진행중] Round 2 실운영 중 발견 이슈 2건 — 문서화·스킬 보강 필요**
 1. **Chrome CDP 바인딩 기본값이 IPv6** — `--remote-debugging-address=127.0.0.1` 플래그 없으면 chrome-devtools-mcp가 127.0.0.1:9222 fetch 실패. 문서 + launch 가이드에 명시 필요
 2. **Gemini Gem 채팅방 진입 시 모델 설정 고정 안 됨** — 매번 수동 모델 선택 필요. `gemini-send.md` 1-B에 "진입 후 모델 설정 확인/선택 단계 추가" 필요
+
+**[완료] Q4 navigate_gate 감지 기준 재검토 — 3자 토론 Round 1 만장일치**
+- 로그: `90_공통기준/토론모드/logs/debate_20260424_230014_3way/` (session_init, round1_gpt/gemini/claude_synthesis/cross_verify)
+- pass_ratio 4/4 — GPT/Gemini 모두 A안(최소보강) 동일 결론
+- 구현:
+  - `settings.json` PreToolUse matcher 2개 추가 (`mcp__chrome-devtools-mcp__navigate_page`, `mcp__chrome-devtools-mcp__new_page`)
+  - `navigate_gate.sh` URL 파싱 확장 — navigate_page는 `type="url"`일 때만 검사, 비URL 타입(reload/back/forward)은 통과
+  - select_page/evaluate_script/take_snapshot/click/fill 은 URL 진입 아니므로 gate 대상 제외
+- 회귀 테스트 5건 PASS:
+  1. 네거티브(marker 없음 + chatgpt URL) → DENY ✓
+  2. 포지티브(marker 있음) → PASS ✓
+  3. 비대상(navigate_page type=reload) → skip ✓
+  4. new_page chatgpt → DENY ✓
+  5. new_page gemini → skip ✓
+- 효과성 평가: 7일간 send_block 0~2건 정상 / 부당 오탐 3건 이상 시 Round 2 재검토
 
 **[완료] Q3 auto-fix 1차 분류 (세션105 말미, Round 1 Q3=A안 합의 후속)**
 - 미해결 80건 7개 카테고리로 분류 (보고서: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/q3_auto_fix_classification.md`)

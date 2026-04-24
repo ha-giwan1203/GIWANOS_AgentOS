@@ -257,6 +257,24 @@
             "command": "bash .claude/hooks/navigate_gate.sh"
           }
         ]
+      },
+      {
+        "matcher": "mcp__chrome-devtools-mcp__navigate_page",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/navigate_gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__chrome-devtools-mcp__new_page",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/navigate_gate.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
