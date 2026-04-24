@@ -1,17 +1,20 @@
 #!/bin/bash
-# debate_independent_gate.sh — 독립 의견 없이 GPT 응답 전달 차단 (PreToolUse)
+# debate_independent_gate.sh — 독립 의견 없이 GPT/Gemini 응답 전달 차단 (PreToolUse)
 #
-# 대상: mcp__Claude_in_Chrome__javascript_tool (insertText 포함 시)
-# 조건: ChatGPT prompt-textarea에 insertText 시 + 토론모드 활성
+# 대상:
+#   - mcp__Claude_in_Chrome__javascript_tool (구 MCP, 세션46)
+#   - mcp__chrome-devtools-mcp__evaluate_script (세션105 전환)
+# 조건: ChatGPT prompt-textarea 또는 Gemini ql-editor에 insertText 시 + 토론모드 활성
 #
 # 강제 규칙:
-# GPT 응답을 읽은 뒤(get_page_text) Claude가 독립 분석을 먼저 수행했는지 확인.
+# GPT/Gemini 응답을 읽은 뒤 Claude가 독립 분석을 먼저 수행했는지 확인.
 # debate_independent_review.ok 마커가 없으면 전송 차단.
 #
-# 마커 생성 조건: Claude가 GPT 응답에 대해 하네스 분석(채택/보류/버림)을
+# 마커 생성 조건: Claude가 응답에 대해 하네스 분석(채택/보류/버림)을
 # 사용자에게 보고한 후 수동으로 찍어야 함 → 이 hook이 1회용으로 소비.
 #
 # 세션46: GPT 프레임 종속 반복 → hook 강제로 전환
+# 세션105 2026-04-25: chrome-devtools-mcp evaluate_script 매처 확장 + Gemini ql-editor 셀렉터 병행 (사용자 지시 예외 적용)
 
 INPUT=$(cat)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -22,13 +25,20 @@ _DIG_START=$(hook_timing_start)
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 STATE_DIR="$PROJECT_DIR/.claude/state"
 
-# insertText + prompt-textarea 조합만 대상
-TEXT_CONTENT=$(echo "$INPUT" | safe_json_get "input" 2>/dev/null)
+# 도구 이름별 payload 필드 분기 (세션105 chrome-devtools-mcp 전환 대응)
+TOOL_NAME=$(echo "$INPUT" | safe_json_get "tool_name" 2>/dev/null)
+
+# 신/구 MCP 모두 커버 — 전체 tool_input JSON을 payload로 간주
+TEXT_CONTENT=$(echo "$INPUT" | safe_json_get "tool_input" 2>/dev/null)
+[ -z "$TEXT_CONTENT" ] && TEXT_CONTENT=$(echo "$INPUT" | safe_json_get "input" 2>/dev/null)
+
+# insertText 포함이 아니면 skip (전송이 아닌 일반 평가/읽기 스크립트는 제외)
 if ! echo "$TEXT_CONTENT" | grep -q 'insertText' 2>/dev/null; then
   hook_timing_end "debate_independent_gate" "$_DIG_START" "skip_noninsert"
   exit 0
 fi
-if ! echo "$TEXT_CONTENT" | grep -q 'prompt-textarea' 2>/dev/null; then
+# ChatGPT prompt-textarea 또는 Gemini ql-editor 중 하나라도 포함되면 전송으로 간주
+if ! echo "$TEXT_CONTENT" | grep -qE 'prompt-textarea|ql-editor' 2>/dev/null; then
   hook_timing_end "debate_independent_gate" "$_DIG_START" "skip_nontextarea"
   exit 0
 fi

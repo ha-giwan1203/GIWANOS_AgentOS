@@ -134,13 +134,21 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 > `/ask-gemini` (CLI 헤드리스 단발)는 3자 토론 안에서 사용 금지. 용도: WebFetch fallback · 대용량 · 멀티모달 · 토론 외 일반 질의 (본 스킬 밖).
 
-#### 라운드 루프 (매 라운드 6단계)
+#### 라운드 루프 (매 라운드 7단계 — 세션105 6-0 신설 후)
 
+0. **Claude 독자 답안 선행 작성 (NEVER 생략, 세션105 2026-04-25 신설)**
+   - 로그 디렉터리에 `round{N}_claude.md` 파일을 **먼저** 작성
+   - 필수 필드: 결론 1줄 / 주장 3~5개 + 라벨(실증됨·일반론·환경미스매치·과잉설계·구현경로미정) + 증거 / 반대 안 예상 약점 / 착수·완료·검증 조건
+   - 양측 본론 수령 전 작성 강제 — GPT·Gemini 답변에 종속되지 않은 독립 의견 확보
+   - **[NEVER]** round{N}_claude.md 없이 1단계(GPT 전송)로 진입 금지
+   - **WHY**: 메모리 `feedback_independent_gpt_review.md` + `feedback_harness_label_required.md` 이행. Round 2 Q1·Q4에서 Claude 답안 선행 없이 양측 답변 축약만으로 "3-way + Claude 축약자" 구조 실증(2026-04-25 사용자 지적). Claude 독자 답안이 없으면 `claude_delta="none"` 마감되어 3-way 기여 실증 불가능
 1. **GPT 답 수령** — `/gpt-send` + `/gpt-read` (토론 맥락 누적되는 동일 채팅방)
 2. **GPT 답 → Gemini 1줄 검증**: GPT 원문 전체를 payload로 `/gemini-send`에 동봉 + "다음 GPT 답변에 대해 '동의 / 이의 / 검증 필요' 중 하나로 1줄 답. 근거 1문장 포함" 요청 → `/gemini-read`
 3. **Gemini 본론 수령** — `/gemini-send`에 의제 본론 요청 (같은 Gem 채팅방, 맥락 유지) → `/gemini-read`
 4. **Gemini 답 → GPT 1줄 검증**: Gemini 원문 전체를 payload로 `/gpt-send`에 동봉 + 동일 1줄 답 요청 → `/gpt-read`
 5. **Claude 종합·설계안 작성** → 양측(GPT + Gemini) 채팅방에 설계안 원문 전체 동봉 1줄 검증 요청 → 양측 응답 수신
+   - 종합안은 **round{N}_claude.md(6-0)와 양측 답변 3건의 4-way 대조 기반**으로 작성
+   - claude_delta 계산 — 6-0 독자 답안 대비 최종 종합안의 변화량 (`none`/`partial`/`major`)
 6. **검증 결과 집계** → `pass_ratio` 계산 (채택 수 / 3) → 2/3 이상 시 채택, 미달 시 재라운드 (단, 누적 3회 초과 금지)
 
 #### 검증 1줄 payload 첨부 강제 (NEVER 생략 — GPT 지적 반영)

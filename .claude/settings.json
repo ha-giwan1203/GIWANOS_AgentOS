@@ -250,6 +250,15 @@
         ]
       },
       {
+        "matcher": "mcp__chrome-devtools-mcp__evaluate_script",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/debate_independent_gate.sh"
+          }
+        ]
+      },
+      {
         "matcher": "mcp__Claude_in_Chrome__navigate",
         "hooks": [
           {
