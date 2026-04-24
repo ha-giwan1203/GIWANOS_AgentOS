@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 chrome-devtools-mcp CDP 연결 완료, Round 2 준비됨
+최종 업데이트: 2026-04-24 KST — 세션105 chrome-devtools-mcp CDP 연결 + 4개 스킬 마이그레이션 완료, Round 2 준비됨
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -31,8 +31,14 @@
 
 ### 재개점 — Round 2 진행
 1. `list_pages`로 ChatGPT/Gemini 탭 확인 (양측 로그인 상태)
-2. debate-mode 스킬 또는 gpt-send/gemini-send로 Round 2 Q1 집중 재검증
+2. `/debate-mode` 호출 (내부에서 갱신된 `gpt-send`/`gemini-send` 스킬이 chrome-devtools-mcp 경로 사용)
 3. `select_page(bringToFront=true)`로 탭 전환 — throttling 우회
+
+### 4개 스킬 마이그레이션 (세션105 후반)
+- `.claude/commands/gpt-send.md`, `gpt-read.md`, `gemini-send.md`, `gemini-read.md` 전면 재작성
+- `90_공통기준/토론모드/CLAUDE.md` 탭 throttling 대응 + Chrome MCP 금지 범위 갱신
+- 상태 파일 `gpt_tab_id`·`gemini_tab_id` 의미 변경: tabId 문자열 → pageId 정수
+- 사용자 지시 예외(D안 선례) 적용 — B분류 구조변경이지만 사용자 "둘다" 명시 지시
 
 ---
 

@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 3자 토론 Round 1 + chrome-devtools-mcp CDP Chrome 연결 완료
+최종 업데이트: 2026-04-24 KST — 세션105 3자 토론 Round 1 + chrome-devtools-mcp CDP Chrome 연결 완료 + 4개 스킬 마이그레이션
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 
@@ -29,6 +29,16 @@
   - 기본 Chrome과 CDP Chrome 병행 기동 중
 - Step 3 ✅ chrome-devtools-mcp 도구 로드 + 포트 9222 연결 확인 (ToolSearch로 본 세션 로드 완료, 세션 재시작 불필요)
 - ChatGPT·Gemini 양측 CDP Chrome에서 로그인 완료 (재로그인 1회성 비용)
+
+**[완료] 4개 스킬 chrome-devtools-mcp 마이그레이션 (사용자 지시 예외 / D안 선례 준용)**
+- `.claude/commands/gpt-send.md`, `gpt-read.md`, `gemini-send.md`, `gemini-read.md` 전면 재작성
+- `90_공통기준/토론모드/CLAUDE.md` 탭 throttling 대응 섹션 + Chrome MCP 금지 범위 갱신
+- 핵심 변경:
+  - `tabs_context_mcp` → `list_pages` / `tabs_create_mcp` → `new_page`
+  - `navigate(url, tabId)` 재호출 hack → `select_page(pageId, bringToFront=true)` (CDP 네이티브)
+  - `javascript_tool` → `evaluate_script`
+  - `get_page_text`/`find`/`computer` → `take_snapshot`/`click`/`fill` (필요 시만)
+- 상태 파일 `gpt_tab_id`·`gemini_tab_id` 내용 의미 변경: 문자열 tabId → 정수 pageId
 
 
 

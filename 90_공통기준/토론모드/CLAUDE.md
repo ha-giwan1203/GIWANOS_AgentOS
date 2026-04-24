@@ -35,8 +35,10 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 4. 하네스 분석 → 반박 생성 → gpt-send → 반복
 
 > **[NEVER] debate-mode 안에서 Chrome MCP 도구 직접 호출 금지.**
-> tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer 등
-> 브라우저 조작은 전부 gpt-send/gpt-read 내부에서 처리한다.
+> claude-in-chrome 계열(tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer)
+> 및 chrome-devtools-mcp 계열(list_pages, select_page, navigate_page, evaluate_script, click, fill 등)
+> 모두 debate-mode에서 직접 호출 금지. 브라우저 조작은 전부 gpt-send/gpt-read/gemini-send/gemini-read 내부에서 처리한다.
+> (세션105 스킬 내부는 chrome-devtools-mcp 기반으로 전환됨)
 
 ## 고정 Selector (gpt-send/gpt-read 내부 참조용)
 ```
@@ -119,22 +121,27 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 
 **관련 규정**: `.claude/commands/share-result.md` 5단계, 메모리 `feedback_structural_change_auto_three_way.md`.
 
-## 백그라운드 탭 Throttling 대응 (세션70 실증 — NEVER 생략)
+## 백그라운드 탭 Throttling 대응 (세션70 실증, 세션105 CDP 네이티브 전환 — NEVER 생략)
 
 **증상**: Chrome은 백그라운드 탭의 JavaScript 타이머·네트워크·DOM 업데이트를 throttling한다. ChatGPT/Gemini 탭이 백그라운드일 때 응답 DOM 생성이 지연되거나 누락되어 감지 실패가 발생한다. 세션69 Gemini synthesis 미수령 원인이 이것이었다.
 
-**대응 (필수)**:
-1. **전송/읽기 직전 대상 탭 활성화**: `navigate(url=현재URL, tabId=대상_tabId)` 재호출로 해당 탭을 foreground로 올린다. 동일 URL navigate는 페이지 상태를 보존하면서 탭 포커스만 전환한다.
-2. Chrome MCP는 별도 tab activate/focus API를 제공하지 않는다. `navigate` 재호출이 유일한 회피 경로다.
-3. 응답 감지 적응형 polling(3/5/8초, 최대 300초)에서 stop-button·aria-disabled 상태 변화를 감지 못 하면 **navigate reload 1회 재시도** 후 다시 polling.
+**대응 (세션105 CDP 네이티브 — 필수)**:
+1. **전송/읽기 직전 대상 페이지 활성화**: `mcp__chrome-devtools-mcp__select_page(pageId, bringToFront=true)`가 CDP `Target.activateTarget`을 직접 호출해 탭을 foreground로 올린다. URL 재진입 불필요, 페이지 상태 완전 보존.
+2. 기존 claude-in-chrome 경로(`navigate(url, tabId)` 재호출 hack)는 폐기. chrome-devtools-mcp는 CDP 네이티브 activate API 제공.
+3. 응답 감지 적응형 polling(3/5/8초, 최대 300초)에서 stop-button·aria-disabled 상태 변화를 감지 못 하면 **`navigate_page(type="reload")` 1회 재시도** 후 다시 polling.
 4. 2회 연속 감지 실패 시 "탭 throttling 복구 실패 — 사용자 수동 활성화 필요" 보고.
 
 **3자 토론 특이사항**:
 - 양측 모델(GPT·Gemini) 중 한쪽은 항상 백그라운드가 된다.
-- 매 전송/읽기 전 대상 탭 navigate 재호출 필수. 병렬 폴링 금지(백그라운드 쪽 필연 지연).
-- GPT 전송 → GPT 수신 → Gemini 탭 activate navigate → Gemini 전송 → Gemini 수신 순으로 직렬 실행.
+- 매 전송/읽기 전 `select_page(bringToFront=true)` 필수. 병렬 폴링 금지(백그라운드 쪽 필연 지연).
+- GPT 전송 → GPT 수신 → Gemini `select_page` → Gemini 전송 → Gemini 수신 순으로 직렬 실행.
 
-**관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 Step에 탭 활성화 navigate 단계가 명시되어야 한다.
+**CDP Chrome 전제 조건 (세션105 필수)**:
+- Chrome M136+에서 기본 프로필은 `--remote-debugging-port` 사용 금지 (쿠키 탈취 방어).
+- 토론모드는 반드시 **별도 프로필** (`C:\temp\chrome-cdp`)에서 `--remote-debugging-port=9222`로 기동.
+- 기본 Chrome과 CDP Chrome 병행 기동 가능. chrome-devtools-mcp는 CDP 포트 9222에만 연결.
+
+**관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 Step 1-C에 `select_page(bringToFront=true)` 단계가 명시되어 있다.
 
 ## GPT 실물 검증 공유 (NEVER)
 구현 → `git commit` → `git push` → SHA + `git show --stat` 요약 포함 공유 (한 번에). 커밋 없이 먼저 공유 금지.
