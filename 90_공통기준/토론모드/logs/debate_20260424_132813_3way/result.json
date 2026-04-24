@@ -1,0 +1,68 @@
+{
+  "session_id": "debate_20260424_132813_3way",
+  "mode": "3way",
+  "gemini_substitute": "API gemini-2.5-pro (사용자 지시 예외)",
+  "agenda": "세션101 GPT 평가 후속 — auto_commit_state 운영 계약 보강 (P-1/P-2/hook_common wrapper)",
+  "rounds": 1,
+  "max_rounds": 3,
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "auto_commit_state 운영 계약 보강 (P-1/P-2/hook_common wrapper) 4개 협의 포인트 종합",
+      "gpt": "Q1 A안 / Q2 B안 / Q3 A안 / Q4 B안 + 종합안 동의",
+      "gemini": "Q1 A안 / Q2 B안 / Q3 C안 / Q4 A안 + 종합안 동의",
+      "harness": {
+        "summary_counts": {"채택": 4, "보류": 1, "버림": 0},
+        "채택": [
+          {"item": "Q1 A안", "label": "실증됨", "evidence": "3/3 만장일치", "ref": "round1_claude_synthesis.md"},
+          {"item": "Q2 B안", "label": "실증됨", "evidence": "3/3 만장일치 — incident 기록 추가", "ref": "round1_claude_synthesis.md"},
+          {"item": "Q3 A안", "label": "실증됨", "evidence": "2/3 — Stop hook advisory 등급 유지", "ref": "round1_claude_synthesis.md"},
+          {"item": "Q4 B안", "label": "실증됨", "evidence": "2/3 — Claude 입장 변경, 사용자 지침 반영", "ref": "round1_claude_synthesis.md"}
+        ],
+        "보류": [
+          {"item": "Q3 C안 hook_gate 격상", "label": "과잉설계", "evidence": "Stop hook 등급 체계 변경 = B 분류 별도 의제", "ref": "round1_gemini.md"}
+        ],
+        "버림": []
+      }
+    }
+  ],
+  "round1": {
+    "answers": {
+      "Q1_protected_assets_location": {"Claude": "A", "GPT": "A", "Gemini": "A", "consensus": "A (3/3)"},
+      "Q2_readme_failure_contract": {"Claude": "B", "GPT": "B", "Gemini": "B", "consensus": "B (3/3)"},
+      "Q3_hook_common_wrapper": {"Claude": "A", "GPT": "A", "Gemini": "C", "consensus": "A (2/3), Gemini C안 이월"},
+      "Q4_commit_bundling": {"Claude": "A→B", "GPT": "B", "Gemini": "A", "consensus": "B (2/3), Claude 입장 변경 (사용자 지침 반영)"}
+    },
+    "cross_verification": {
+      "gpt_verifies_claude": {"verdict": "동의", "reason": "문서 계약 보강과 실행 파일 변경 분리 B안 회귀 추적 유리, hook_advisory exit 0 유지로 Stop 순서·advisory 계약 불파괴"},
+      "gemini_verifies_claude": {"verdict": "동의", "reason": "시스템 영향도 분석과 변경사항 분리 원칙을 충실히 반영한 합리적 계획"}
+    },
+    "pass_ratio_numeric": 1.0,
+    "claude_delta": "partial",
+    "issue_class": "B"
+  },
+  "commits": [
+    {"sha": "556f240f", "type": "docs(hooks)", "desc": "protected_assets + README Failure Contract 등재"},
+    {"sha": "68c6cd3d", "type": "feat(hooks)", "desc": "hook_common 계측 적용"}
+  ],
+  "final_verdict": {
+    "gpt": "통과",
+    "gemini": "통과",
+    "consensus": "양측 통과 — 세션102 [3way] 종결"
+  },
+  "deferred_agenda": [
+    "Stop hook 등급 체계 재검토 (Gemini Q3 C안 hook_gate 격상)",
+    "P-4 wrapper drift 감시 구현 (세션101 이월)",
+    "D0 자동 실행 로그 누적 관찰 (4/25~28)"
+  ],
+  "user_directive_captured": {
+    "directive": "시스템 개선 시 전체 구조 영향 분석 필수 — 한 곳 수정이 다른 곳을 무너뜨림",
+    "applied_at": [
+      "전역 CLAUDE.md '작업 원칙' 섹션 명문화",
+      "memory/feedback_system_map_first.md 강화 (4단계 체크 필수화)",
+      "Round 1 Claude 종합 시 시스템 영향 4단계 분석 적용",
+      "Q4 Claude 입장 변경 (단일→분리 커밋) — wrapper 실행 파일 회귀 추적 단위 분리"
+    ]
+  }
+}
