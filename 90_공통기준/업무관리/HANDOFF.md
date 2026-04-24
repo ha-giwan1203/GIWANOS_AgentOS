@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 성립 (pass_ratio 4/4) + Gemini 모델 설정 + CDP launch 플래그 문서화 완료
+최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 성립 + Q1 기타안 Step 1~3 실행 완료 (audit / advisory 강화 / 재점화 4조건 등록)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -36,10 +36,11 @@
 - Claude 종합: 기타안 + Gemini tightening 통합 → 양측 동의
 - 로그: `round2_gpt.md`, `round2_gemini.md`, `round2_claude_synthesis.md`, `round2_cross_verify.md`
 
-### Q1 기타안 후속 실행 단위 (다음 AI 액션)
-1. auto_commit_state 태그 incident_ledger audit 1회 (최근 14일 grep)
-2. advisory 경고 문구 강화 (auto_commit_state.sh 실행 흐름 변경 없음)
-3. TASKS에 재점화 4조건 등록 (임계값 구현 없음)
+### Q1 기타안 후속 실행 완료 (세션105 말미)
+1. ✅ audit — 최근 14일 15건, 모두 2026-04-24 하루 집중, classification 단일(`completion_before_state_sync`). 격상 불필요 결론
+   - 보고서: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/audit_auto_commit_state.md`
+2. ✅ advisory 강화 — `auto_commit_state.sh` 차단 메시지에 미동기화 AUTO 파일 목록 + 최근 60분 중복 건수 + 재점화 조건 1 근접 경고 추가 (실행 흐름 변경 없음)
+3. ✅ TASKS.md에 재점화 4조건 공식 등록 (세션105 Q1 최종 정책 섹션)
 
 ### 4개 스킬 마이그레이션 (세션105 후반)
 - `.claude/commands/gpt-send.md`, `gpt-read.md`, `gemini-send.md`, `gemini-read.md` 전면 재작성

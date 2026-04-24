@@ -84,17 +84,52 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
     # commit_gate는 PreToolUse Bash 매처 전용이라 Stop hook 내부 git 호출을 잡지 못함.
     # 대신 final_check.sh --fast로 교차검증만 수행.
     if ! bash .claude/hooks/final_check.sh --fast >/dev/null 2>&1; then
+        # 세션105 Q1 기타안 Step 2: advisory 경고 문구 강화
+        # - 이전 60분 내 동일 원인 반복 건수 집계
+        # - AUTO 대상 파일 목록 표시 (미동기화 파일 가시성)
+        # incident_ledger에서 최근 60분 completion_before_state_sync 건수
+        RECENT_WINDOW_MIN=60
+        RECENT_COUNT=0
+        if [ -f ".claude/incident_ledger.jsonl" ]; then
+            # epoch 현재 시간
+            NOW_EPOCH=$(date -u +%s 2>/dev/null || echo 0)
+            CUTOFF_EPOCH=$((NOW_EPOCH - RECENT_WINDOW_MIN * 60))
+            RECENT_COUNT=$(grep '"hook":"auto_commit_state".*"classification_reason":"completion_before_state_sync"\|"hook": "auto_commit_state".*"classification_reason": "completion_before_state_sync"' \
+                .claude/incident_ledger.jsonl 2>/dev/null | \
+                awk -v cutoff="$CUTOFF_EPOCH" '{
+                    match($0, /"ts":"([^"]+)"/, a)
+                    if (a[1]) {
+                        cmd = "date -d \"" a[1] "\" -u +%s 2>/dev/null"
+                        cmd | getline ts_epoch
+                        close(cmd)
+                        if (ts_epoch+0 >= cutoff+0) count++
+                    }
+                }
+                END { print count+0 }')
+            [ -z "$RECENT_COUNT" ] && RECENT_COUNT=0
+        fi
+
         echo "" >&2
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
         echo "⛔  [auto_commit_state] final_check --fast 실패" >&2
         echo "    → 자동 커밋/푸시 차단 (AUTO 파일 ${#AUTO_FILES[@]}건)" >&2
+        echo "" >&2
+        echo "    미동기화 대상 AUTO 파일:" >&2
+        for f in "${AUTO_FILES[@]}"; do echo "      - $f" >&2; done
+        if [ "$RECENT_COUNT" -ge 3 ] 2>/dev/null; then
+            echo "" >&2
+            echo "    ⚠ 최근 ${RECENT_WINDOW_MIN}분 내 동일 원인(completion_before_state_sync) 중복: ${RECENT_COUNT}건" >&2
+            echo "      → TASKS/HANDOFF/STATUS 실제 내용 갱신 후 재시도 필요" >&2
+            echo "      → 세션105 재점화 조건 1 접근 (7일 3건 이상 AND final_check 실패 2건 이상)" >&2
+        fi
+        echo "" >&2
         echo "    → /finish 또는 수동 git commit 후 git push 필요" >&2
         echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
         # incident 기록 (세션102 [3way] 합의 — Q2 B안)
         hook_incident "hook_block" "auto_commit_state" "" \
-            "final_check --fast 실패로 자동 commit/push 차단 (AUTO 파일 ${#AUTO_FILES[@]}건)" \
-            "\"classification_reason\":\"completion_before_state_sync\"" 2>/dev/null || true
-        hook_log "auto_commit_blocked" "final_check fail — ${#AUTO_FILES[@]} files" 2>/dev/null || true
+            "final_check --fast 실패로 자동 commit/push 차단 (AUTO 파일 ${#AUTO_FILES[@]}건, recent_60m=${RECENT_COUNT})" \
+            "\"classification_reason\":\"completion_before_state_sync\",\"recent_60m\":${RECENT_COUNT}" 2>/dev/null || true
+        hook_log "auto_commit_blocked" "final_check fail — ${#AUTO_FILES[@]} files, recent_60m=${RECENT_COUNT}" 2>/dev/null || true
         hook_timing_end "auto_commit_state" "$HOOK_START_TS" "advisory_blocked" 2>/dev/null || true
         exit 0
     fi
