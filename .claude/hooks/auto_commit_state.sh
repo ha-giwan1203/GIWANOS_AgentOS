@@ -84,7 +84,12 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
     # commit_gate는 PreToolUse Bash 매처 전용이라 Stop hook 내부 git 호출을 잡지 못함.
     # 대신 final_check.sh --fast로 교차검증만 수행.
     if ! bash .claude/hooks/final_check.sh --fast >/dev/null 2>&1; then
-        echo "[auto_commit_state] ⛔ final_check --fast 실패 — 자동 커밋 중단, 수동 검토 필요" >&2
+        echo "" >&2
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+        echo "⛔  [auto_commit_state] final_check --fast 실패" >&2
+        echo "    → 자동 커밋/푸시 차단 (AUTO 파일 ${#AUTO_FILES[@]}건)" >&2
+        echo "    → /finish 또는 수동 git commit 후 git push 필요" >&2
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
         # incident 기록 (세션102 [3way] 합의 — Q2 B안)
         hook_incident "hook_block" "auto_commit_state" "" \
             "final_check --fast 실패로 자동 commit/push 차단 (AUTO 파일 ${#AUTO_FILES[@]}건)" \

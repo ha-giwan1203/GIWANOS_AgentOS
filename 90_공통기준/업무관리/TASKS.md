@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 전체 완료 + GPT 재평가 P-1 반영 (settings.local 1회성 permission 제거)
+최종 업데이트: 2026-04-24 KST — 세션103 Stop hook 등급 재검토 3자 토론 완료 (advisory 유지 + 가시성 강화)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
 
@@ -45,8 +45,20 @@
 - `.claude/settings.local.json:34` `Bash(python create_sp3m3_process_eval.py)` 제거 — SP3M3 평가서 생성 1회용, 재사용 근거 없음
 - GPT 재평가 판정: L-1 실증됨, 심각도 중
 
-**[이월] Stop hook 등급 체계 재검토 (Gemini Q3 C안)**
-- 별도 B 분류 의제 — final_check FAIL 시 hook_gate 격상 여부
+---
+
+## 세션103 (2026-04-24) — Stop hook 등급 체계 재검토 [3way]
+
+**[완료] advisory 유지 + stderr 가시성 강화**
+- 3자 토론 (GPT gpt-5-5-thinking + Gemini gemini-2.5-pro) Round 1 pass_ratio=0.75 합의
+- Q1: B안 채택 — 즉시 hook_gate 격상 반대. advisory 유지 + 경고 포맷 개선
+- Q2: B안 채택 — exit 2 부작용(일시 오류 무한 블록) > 이점. advisory + 가시성 우선
+- 변경: `auto_commit_state.sh:87` 박스형 ⛔ 경고 포맷 적용 (실행 흐름 미변경, A 분류)
+- 로그: `90_공통기준/토론모드/logs/debate_20260424_152100_3way/`
+
+**[이월] 조건부 격상 설계 (세션104+)**
+- 조건안: 동일 세션 FAIL 2회 이상 OR incident_ledger 3일 연속 → 임계값 기반 hook_gate 격상
+- GPT B안 제안, 양측 채택. 구현 설계는 별도 의제
 
 ---
 

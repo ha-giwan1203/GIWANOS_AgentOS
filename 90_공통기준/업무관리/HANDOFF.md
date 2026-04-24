@@ -4,12 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 전체 완료 + GPT 재평가 P-1 반영 (1회성 permission 제거)
+최종 업데이트: 2026-04-24 KST — 세션103 Stop hook 등급 재검토 3자 토론 완료 (advisory 유지 + 가시성 강화)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-24 세션102 — auto_commit_state 운영 계약 보강 [3way])
+## 0. 최신 세션 (2026-04-24 세션103 — Stop hook 등급 체계 재검토 [3way])
+
+### 실행 경로
+세션102 이월 의제(Gemini Q3 C안) → 사용자 "토론모드로 진행" + "Gemini는 API로 대체" 지시 → 3자 토론 (GPT gpt-5-5-thinking + Gemini gemini-2.5-pro API) → Round 1 pass_ratio=0.75 합의 → advisory 유지 + stderr 가시성 강화 즉시 반영
+
+### 오늘 확정된 것
+- **advisory 유지**: `auto_commit_state.sh` exit 0 유지. final_check FAIL 시 commit/push 차단은 이미 완전
+- **stderr 가시성 강화**: 박스형 ⛔ 경고 포맷 적용 (실행 흐름 미변경, A 분류 즉시 반영)
+- **조건부 격상 이월**: GPT B안 채택. 동일 세션 FAIL 2회 이상 OR 3일 연속 incident 임계값 기반 격상 설계 → 세션104+
+
+### 다음 세션 액션
+- **[이월] 조건부 격상 설계 구현** — 임계값 기반 hook_gate 격상 로직 (세션104+)
+- **[이월] P-4 wrapper drift 감시 구현** (세션101 이월 지속)
+- **[관찰] D0 자동 실행 관찰** (4/25~28 토/월/화/수)
+
+### 토론 로그
+- `90_공통기준/토론모드/logs/debate_20260424_152100_3way/`
+
+---
+
+## -1. 이전 세션 (2026-04-24 세션102 — auto_commit_state 운영 계약 보강 [3way])
 
 ### 실행 경로
 세션101 GPT 정밀평가 2회차에서 L-1(protected_assets 미등재), L-2(README Failure Contract 누락) 지적 수령 → Claude 추가 지적(hook_common wrapper 미적용) → 사용자 "토론모드로 협의해서 진행" 지시 → 3자 토론 (Gemini API 대체) → Round 1 양측 동의 (pass_ratio=1.0) → P-1+P-2 분리 커밋, hook_common wrapper 별도 커밋 합의
