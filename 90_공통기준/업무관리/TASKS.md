@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션101 /d0-plan 스킬 실운영 검증 + 자동 스케줄링 등록
+최종 업데이트: 2026-04-24 KST — 세션101 /d0-plan 스킬 실운영 검증 + 자동 스케줄링 등록 + GPT 정밀평가 3자 토론 반영 (P-1/P-2/P-3)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
 
@@ -47,6 +47,17 @@
 - AUTO: TASKS/HANDOFF/STATUS/notion_snapshot/finish_state/write_marker → 자동 커밋+푸시
 - MANUAL: 코드/스킬/설정 → stderr 리마인더만 (`/finish` 또는 수동 커밋 권장)
 - 안전장치: main 브랜치만, 민감패턴 스캔, push 60s timeout soft-fail
+
+**[완료 추가] GPT 정밀평가 3자 토론 반영 (세션101, 2026-04-24)**
+- 3자 토론 (Claude × GPT 웹 × Gemini API 2.5-pro) — `/debate-mode` 변형 (Gemini는 API 대체, 사용자 지시)
+- 합의 결과: 3건 채택 / 3건 반려(GPT 과잉 경보)
+- **P-1 (A-수정안 GPT 제안)**: `.claude/hooks/auto_commit_state.sh` git commit 직전 `final_check.sh --fast` 인라인 호출 추가 — Stop hook 자동 커밋도 교차검증 통과 시에만 진행 (commit_gate 우회 해소)
+- **P-2**: `.claude/settings.local.json` 절대경로 3건 (L21/L29/L32) → 상대경로화
+- **P-3**: `.claude/hooks/list_active_hooks.sh:9` 주석 "(31)" → "(32)" drift 정정
+- **반려**: A2-1(d0 SKILL ↔ /d0-plan command wrapper 정상), A2-5(6건 command+skill pair wrapper 정상), 리포트 "임시검토"(환경 한계)
+- **이월 (P-4 신규)**: slash 진입 vs 자연어 진입 drift 감시 — `.claude/hooks/skill_drift_check.sh` 기능 확장 또는 별도 `wrapper_consistency.py`
+- 플랜 파일: `C:/Users/User/.claude/plans/splendid-coalescing-snowflake.md` (보존)
+- 검증: smoke_fast 11/11 PASS, doctor_lite OK, hook count 32
 
 **[대기] 후속**
 - 4/25~28 자동 실행 관찰 (성공률/로그 이상/중복 저장 등)

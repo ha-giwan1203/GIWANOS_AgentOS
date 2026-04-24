@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션101 /d0-plan 실운영 검증 + 자동 스케줄링 등록
+최종 업데이트: 2026-04-24 KST — 세션101 /d0-plan 실운영 검증 + 자동 스케줄링 등록 + GPT 정밀평가 3자 토론 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -30,12 +30,26 @@
 - MANUAL(코드/스킬/설정) stderr 리마인더, `/finish` 또는 수동 커밋
 - 안전: main 브랜치 한정, 민감패턴 스캔, push 60s timeout soft-fail
 
+### 추가 완료: GPT 정밀평가 3자 토론 (2026-04-24 세션101 후속)
+
+- 사용자 피드백 "실검증·의견 분석 없이 GPT 요약만 전달" → 독립 검증 전환
+- 3자 토론 (Claude × GPT 웹 × Gemini API 2.5-pro) — 사용자 지시 "Gemini는 API 대체"
+- **채택 3건**:
+  - P-1 (A-수정안 GPT 제안): `auto_commit_state.sh` git commit 직전 `final_check.sh --fast` 인라인 호출 추가
+  - P-2: `settings.local.json` 절대경로 3건 상대경로화
+  - P-3: `list_active_hooks.sh:9` 주석 "(31)" → "(32)"
+- **반려 3건** (GPT 과잉 경보): A2-1(d0 wrapper), A2-5(6건 wrapper), 리포트 "임시검토"(환경 한계)
+- **이월 P-4**: command+skill wrapper drift 감시 (다음 세션 의제)
+- 플랜 파일: `C:/Users/User/.claude/plans/splendid-coalescing-snowflake.md`
+
 ### 다음 AI 액션
 1. 4/25~28 자동 실행 로그 관찰 (`06_생산관리/D0_업로드/logs/morning_*.log`)
 2. 저녁 세션(SP3M3 야간 + SD9A01 OUTER) 첫 실 검증 — 오늘 저녁 또는 내일 저녁 `--dry-run` 먼저
 3. 저녁 세션도 안정화되면 `D0_SP3M3_Evening`, `D0_SD9A01_Evening` 스케줄 추가 검토
 4. 3~5일 운영 안정화 후 스킬 grade B → A 격상
 5. auto_commit_state 동작 관찰 — 세션 종료 시 상태문서 자동 커밋 확인, MANUAL 리마인더 잘 보이는지 검증
+6. **P-4 구현** — command "스킬 원본:" 라벨 ↔ SKILL.md 실행 명령 일치 검사 스크립트 (GPT 제안)
+7. auto_commit_state의 final_check --fast 인라인 호출이 TASKS/HANDOFF/STATUS 미갱신 시 자동 커밋 차단되는지 실제 관찰 (현 P-1 설계 의도)
 
 ---
 
