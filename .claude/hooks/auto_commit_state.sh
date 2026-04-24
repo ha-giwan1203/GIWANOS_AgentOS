@@ -72,6 +72,14 @@ $(printf '  - %s\n' "${AUTO_FILES[@]}" | head -6)
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
+    # 커밋 전 자체검증 (GPT A-수정안, 3자 토론 2026-04-24 합의)
+    # commit_gate는 PreToolUse Bash 매처 전용이라 Stop hook 내부 git 호출을 잡지 못함.
+    # 대신 final_check.sh --fast로 교차검증만 수행.
+    if ! bash .claude/hooks/final_check.sh --fast >/dev/null 2>&1; then
+        echo "[auto_commit_state] ⛔ final_check --fast 실패 — 자동 커밋 중단, 수동 검토 필요" >&2
+        exit 0
+    fi
+
     if git commit -m "$MSG" >&2 2>&1; then
         echo "[auto_commit_state] 커밋 완료 — push 시도" >&2
         if timeout 60 git push origin main >&2 2>&1; then
