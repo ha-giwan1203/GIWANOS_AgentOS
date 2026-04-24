@@ -67,6 +67,32 @@ CDP Chrome(포트 9222) 기동 필수.
 - **[NEVER]** 매 세션 1-B 최소 1회 수행 금지 해제 금지
 - 같은 세션 2회차 이후 호출은 1-Z 빠른 경로로 1-A/1-B 스킵
 
+#### 1-B-1. 모델 설정 확인/선택 (세션105 Round 2 실증 — 생략 금지)
+
+**증상**: Gemini Gem 채팅방은 입장할 때마다 **모델 설정이 고정되지 않는다**. 기본값이 적용되거나 이전 선택이 풀려 있을 수 있어, 전송 전 매번 수동으로 모델을 선택해야 일관된 응답 품질이 보장된다. 세션105 Round 2 진행 중 사용자 지적으로 확인됨.
+
+**대응 (SEND GATE 전 필수)**:
+1. `evaluate_script`로 현재 선택된 모델 라벨 확인:
+```javascript
+() => {
+  // 모델 선택 버튼은 상단 toolbar 또는 composer 근처
+  const btn = document.querySelector('[data-test-id="bard-mode-menu-button"]') ||
+              document.querySelector('button[aria-label*="모델"]') ||
+              document.querySelector('button[jsname][aria-haspopup="menu"]');
+  return btn ? {label: btn.innerText.trim(), html: btn.outerHTML.slice(0, 300)} : null;
+}
+```
+2. 원하는 모델(기본: Pro/2.5 Pro 계열)과 다르면:
+   - `take_snapshot` → 모델 선택 버튼 uid 확인
+   - `click(uid)` → 드롭다운 열기
+   - `take_snapshot` → 대상 모델 옵션 uid 확인
+   - `click(uid)` → 모델 선택 확정
+3. 모델 설정 실패 시 "Gemini 모델 설정 실패 — 사용자 수동 선택 필요" 보고
+
+**[NEVER]**:
+- 모델 설정 단계 생략 금지 — 기본값 응답 품질이 토론에 부적합할 수 있음
+- 이전 세션의 모델 선택 상태를 재사용 금지 (Gem 채팅방 재진입 시 풀리는 증상)
+
 ### 1-C. 대상 페이지 활성화 (세션105 마이그레이션 — CDP 네이티브)
 
 Chrome 백그라운드 탭 throttling 회피. chrome-devtools-mcp의 `select_page(bringToFront=true)`가 CDP `Target.activateTarget` 직접 호출로 정식 해결.

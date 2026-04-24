@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 chrome-devtools-mcp CDP 연결 + 4개 스킬 마이그레이션 완료, Round 2 준비됨
+최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 성립 (pass_ratio 4/4) + Gemini 모델 설정 + CDP launch 플래그 문서화 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -29,16 +29,28 @@
 - 반드시 별도 `--user-data-dir` 필요 → 본 저장소는 `C:\temp\chrome-cdp` 사용
 - 향후 토론모드는 해당 프로필의 CDP Chrome에서 진행
 
-### 재개점 — Round 2 진행
-1. `list_pages`로 ChatGPT/Gemini 탭 확인 (양측 로그인 상태)
-2. `/debate-mode` 호출 (내부에서 갱신된 `gpt-send`/`gemini-send` 스킬이 chrome-devtools-mcp 경로 사용)
-3. `select_page(bringToFront=true)`로 탭 전환 — throttling 우회
+### Round 2 합의 성립 (2026-04-24 22:10 KST)
+- Q1 = 기타안 만장일치 (pass_ratio 4/4)
+- Round 2 GPT: 기타안 (B 실측 선행 + C 임계값 폐기)
+- Round 2 Gemini: 기타안 동조 (TASKS 조건 tightening 1건)
+- Claude 종합: 기타안 + Gemini tightening 통합 → 양측 동의
+- 로그: `round2_gpt.md`, `round2_gemini.md`, `round2_claude_synthesis.md`, `round2_cross_verify.md`
+
+### Q1 기타안 후속 실행 단위 (다음 AI 액션)
+1. auto_commit_state 태그 incident_ledger audit 1회 (최근 14일 grep)
+2. advisory 경고 문구 강화 (auto_commit_state.sh 실행 흐름 변경 없음)
+3. TASKS에 재점화 4조건 등록 (임계값 구현 없음)
 
 ### 4개 스킬 마이그레이션 (세션105 후반)
 - `.claude/commands/gpt-send.md`, `gpt-read.md`, `gemini-send.md`, `gemini-read.md` 전면 재작성
 - `90_공통기준/토론모드/CLAUDE.md` 탭 throttling 대응 + Chrome MCP 금지 범위 갱신
 - 상태 파일 `gpt_tab_id`·`gemini_tab_id` 의미 변경: tabId 문자열 → pageId 정수
 - 사용자 지시 예외(D안 선례) 적용 — B분류 구조변경이지만 사용자 "둘다" 명시 지시
+
+### Round 2 실운영 중 추가 보강 (세션105 후반, Round 2 직후)
+- **Chrome CDP launch 플래그 보강**: `--remote-debugging-address=127.0.0.1` 필수 명기 (IPv6 기본 바인딩 회피)
+- **Chrome taskkill 주의**: 강제 종료 시 쿠키 DB 미플러시 → 로그인 소실. 창 닫기 권장
+- **`gemini-send.md` Step 1-B-1 추가**: Gemini Gem 채팅방 진입 시 모델 설정이 고정되지 않음 → 전송 전 수동 확인/선택 단계 필수. `take_snapshot` + `click(uid)` fallback 명시
 
 ---
 

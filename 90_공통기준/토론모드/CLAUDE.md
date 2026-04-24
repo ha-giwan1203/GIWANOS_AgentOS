@@ -139,7 +139,13 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 **CDP Chrome 전제 조건 (세션105 필수)**:
 - Chrome M136+에서 기본 프로필은 `--remote-debugging-port` 사용 금지 (쿠키 탈취 방어).
 - 토론모드는 반드시 **별도 프로필** (`C:\temp\chrome-cdp`)에서 `--remote-debugging-port=9222`로 기동.
+- **[NEVER 생략]** `--remote-debugging-address=127.0.0.1` 플래그 필수 — 누락 시 Windows Chrome이 IPv6 `::1`에만 바인딩하여 chrome-devtools-mcp가 127.0.0.1:9222 fetch 실패. 세션105 Round 2 실증.
 - 기본 Chrome과 CDP Chrome 병행 기동 가능. chrome-devtools-mcp는 CDP 포트 9222에만 연결.
+- **정식 launch 커맨드**:
+  ```powershell
+  Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9222','--remote-debugging-address=127.0.0.1','--user-data-dir=C:\temp\chrome-cdp'
+  ```
+- **종료 시 주의**: `taskkill //F`로 강제 종료하면 쿠키 DB 미플러시로 로그인 세션 소실. 창 정상 닫기 권장.
 
 **관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 Step 1-C에 `select_page(bringToFront=true)` 단계가 명시되어 있다.
 
