@@ -38,7 +38,8 @@ SP3M3 생산지시서 xlsm 단일 파일에서 라인별 계획을 추출해 ERP
 
 - Chrome 디버깅 세션: `--remote-debugging-port=9222`, 프로필 `C:\Users\User\.flow-chrome-debug`
 - ERP 로그인: 프로필에 저장된 자격증명(`0109`) 자동완성 (pyautogui)
-- Python 의존성: `pyautogui`, `playwright`, `openpyxl`
+- Python 의존성: `pyautogui`, `playwright`, `openpyxl`, **`pywin32`** (Excel COM, 업로드 xlsx 생성용 필수)
+- Microsoft Excel 설치 필요 (업로드 xlsx 생성에 Excel.Application COM 호출)
 - Z 드라이브 마운트: `\\210.216.217.180\zz-group`
 
 ## 파일 경로 규칙
@@ -103,6 +104,14 @@ python run.py --session evening --line SD9A01    # SD9A01만
    - SP3M3: target_date
    - SD9A01: target_date (저녁 세션), target_date+1 (아침 세션 해당 없음)
 9. 저장 경로: `06_생산관리/D0_업로드/d0_{line}_{date}.xlsx`
+10. **⚠ 엑셀 생성은 반드시 `win32com.client`(Excel COM)으로 수행** (2026-04-24 세션104 실증)
+    - `openpyxl`로 새로 생성하거나 `load_workbook → save` 한 파일은 ERP 서버 파서가
+      **COL2(제품번호)를 빈값으로 파싱** (OOXML 내부 구조 호환 안 됨)
+    - Excel이 직접 저장한 xlsx만 서버 파서 통과
+    - 흐름: `shutil.copy(template, out)` → `Excel.Application` 열기 → R2~last
+      `ClearContents` → 새 데이터 R2부터 작성 → `wb.Save()` → `Excel.Quit()`
+    - 템플릿 경로: `90_공통기준/스킬/d0-production-plan/template/SSKR_D0_template.xlsx`
+      (ERP `/js/workspace/pm/prdtPlanMng/SSKR D+0 추가생산 Upload.xlsx` 양식 다운로드본)
 
 ### Phase 3: D0 업로드 (라인별)
 10. 엑셀업로드 팝업 오픈 (#btnExcelUpload)
@@ -133,6 +142,12 @@ python run.py --session evening --line SD9A01    # SD9A01만
 
 ## 핵심 주의사항
 
+0. **⚠ 업로드 xlsx는 Excel COM으로만 생성** (세션104 실증, 2026-04-24)
+   - openpyxl 생성 파일 → ERP 서버 파서가 COL2="" 반환, 15건 전부 ERROR_FLAG="Y"
+   - 증상: `[phase3 parse]` 응답의 listLen은 정상이지만 각 행 COL2 빈값 → multiList 저장 단계에서 `오류 행 N건 존재` 에러
+   - 원인: OOXML 내부 구조(sharedStrings.xml, cell type 속성, 시트 XML 네임스페이스) 차이
+   - **근본 해결**: `win32com.client.Dispatch("Excel.Application")`로 편집·저장
+   - 템플릿 `template/SSKR_D0_template.xlsx` 복사 후 Excel COM으로 데이터 덮어쓰기
 1. **jQuery.ajax 경로 필수** — fetch 직접 호출 시 500 에러 (XSRF 공통 설정 미상속)
 2. **파일 필드명 `files` (복수형)** — `fileHelper.js` allSave 규칙
 3. **EXT_PLAN_REG_NO 최대값 매핑** — 동일 품번 상단에 여러 건 (기존 주간 + 신규 야간) 시 최대값 선택
@@ -178,3 +193,4 @@ python run.py --session evening --line SD9A01    # SD9A01만
 | 일자 | 버전 | 내용 |
 |------|------|------|
 | 2026-04-23 | v1 | 초기 스킬 패키징. 오늘 SP3M3 야간 실검증 완료. OUTER/주간은 구조 완비하되 실운영 검증 후 활성화 권장 |
+| 2026-04-24 | v2 | SP3M3 주간/야간 실운영 검증 완료. 버그 수정: (a) make_upload_xlsx openpyxl→win32com(Excel COM) 교체 — openpyxl 생성 xlsx는 ERP 파서가 COL2 빈값 인식, (b) 팝업 재사용 로직 우선 배치(reload 분기보다 먼저), (c) run_session_line에 verify_prod_date 파라미터 추가 — SmartMES 검증 시 야간 생산일(target_file_date-1) 전달. Windows 작업 스케줄러 `D0_SP3M3_Morning` 자동 운영 개시 |

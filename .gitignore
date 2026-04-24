@@ -77,6 +77,9 @@
 *.csv
 *.pdf
 *.docx
+
+# 스킬 동작 필수 템플릿 예외 허용
+!90_공통기준/스킬/d0-production-plan/template/*.xlsx
 *.doc
 *.pptx
 *.ppt

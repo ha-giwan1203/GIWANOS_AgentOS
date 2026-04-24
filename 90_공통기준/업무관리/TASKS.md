@@ -10,9 +10,43 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션103 전체 (Stop hook 등급 재검토 3way + TASKS 감량 552→240줄)
+최종 업데이트: 2026-04-24 KST — 세션104 /d0-plan 야간 실운영 + openpyxl→Excel COM 근본 수정
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
+
+---
+
+## 세션104 (2026-04-24 저녁) — /d0-plan 야간 실운영 + xlsx 포맷 근본 수정
+
+**[완료] SP3M3 야간 15건 실운영 반영**
+- 파일: `SP3M3_생산지시서_(26.04.25).xlsm` 출력용 야간 섹션 → 15건 추출
+- Phase 3 업로드 → Phase 4 서열 배치 15건 → Phase 5 MES 전송 (rsltCnt=750) ✅
+
+**[완료] xlsx 포맷 버그 근본 해결 — openpyxl → Excel COM**
+- 증상: openpyxl로 생성한 xlsx 업로드 시 ERP 서버가 COL2(제품번호) 빈값으로 파싱, 15건 전부 ERROR_FLAG=Y
+- 원인: OOXML 내부 구조(sharedStrings, cell type 속성, 시트 XML 네임스페이스) 차이
+- 해결: `make_upload_xlsx`를 `win32com.client(Excel.Application)` 기반으로 교체. 템플릿 복사 후 Excel이 직접 저장
+- 템플릿: `90_공통기준/스킬/d0-production-plan/template/SSKR_D0_template.xlsx` (ERP 양식다운로드본)
+- `.gitignore`에 `!90_공통기준/스킬/d0-production-plan/template/*.xlsx` 예외 허용 추가
+
+**[완료] Phase 6 verify_smartmes 날짜 버그 수정**
+- 기존: `run_session_line`이 prod_date 단일로 검증
+- 수정: `verify_prod_date` 파라미터 추가 — SP3M3 야간은 야간 시작일(target_file_date-1)로 SmartMES 조회
+- main session 분기에서 각각 명시 전달
+
+**[완료] 팝업 재사용 로직 우선 배치**
+- 기존: overlay 감지 시 reload가 먼저 → 팝업 iframe이 사라져 매번 새로 오픈 시도
+- 수정: 팝업 iframe 검사를 앞에 배치 — 있으면 재사용, 없을 때만 overlay 체크/reload
+- 연속 실행 시(dry-run → live) Chrome이 팝업 열린 채 유지되어도 정상 동작
+
+**[완료] SKILL.md v2 갱신**
+- Python 의존성에 `pywin32` + Microsoft Excel 설치 필요 명시
+- Phase 2 10번 Excel COM 강제 경고 추가
+- 핵심 주의사항 0번(최상단)에 openpyxl 생성 금지 경고
+
+**[대기] 후속**
+- SD9A01 OUTER 저녁 세션 실 검증 (내일 저녁 `--dry-run` 먼저)
+- `D0_SP3M3_Evening` 스케줄 추가 검토 (SP3M3 저녁 세션도 자동화)
 
 ---
 

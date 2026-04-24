@@ -259,13 +259,56 @@ def _extract_prod_date(items):
 
 
 def make_upload_xlsx(items, prod_date: datetime, out_path: Path):
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.append(["생산일", "제품번호", "생산량"])
-    for it in items:
-        ws.append([prod_date.strftime("%Y-%m-%d"), it["PROD_NO"], it["QTY"]])
-    wb.save(out_path)
-    print(f"[phase2] 업로드 엑셀 생성: {out_path.name} ({len(items)}건)")
+    """ERP 양식을 Excel COM(win32com)으로 편집·저장.
+
+    왜 win32com인가:
+      openpyxl이 생성·저장한 xlsx는 ERP 서버 파서(아마 Apache POI 구버전)가
+      COL2(제품번호)를 빈값으로 파싱하는 이슈 있음 (2026-04-24 세션104 실증).
+      OOXML 내부 구조(shared strings, cell type 속성, 시트 XML 네임스페이스)
+      차이 때문이며, Microsoft Excel이 직접 저장한 파일만 서버가 정상 파싱.
+      → Excel COM으로 실제 Excel 프로세스가 저장해야 호환.
+
+    흐름:
+      1. 템플릿(ERP 양식 또는 SSKR 검증본) 복제
+      2. Excel COM 열어 R2~last 데이터 ClearContents
+      3. 새 데이터 R2부터 작성
+      4. Excel이 Save (Visible=False, DisplayAlerts=False로 조용히)
+    """
+    import shutil
+    template = Path(__file__).parent / "template" / "SSKR_D0_template.xlsx"
+    if not template.exists():
+        raise FileNotFoundError(f"ERP 양식 템플릿 없음: {template}")
+    shutil.copy(template, out_path)
+
+    try:
+        import win32com.client
+    except ImportError:
+        raise RuntimeError("win32com 필요 (pywin32 설치 필요). pip install pywin32")
+
+    xl = win32com.client.Dispatch("Excel.Application")
+    xl.Visible = False
+    xl.DisplayAlerts = False
+    try:
+        wb = xl.Workbooks.Open(str(out_path))
+        try:
+            ws = wb.Worksheets("Sheet1")
+        except Exception:
+            ws = wb.Worksheets(1)
+        # 기존 데이터 clear (헤더 R1 유지)
+        last = ws.Cells(ws.Rows.Count, 1).End(-4162).Row  # xlUp
+        if last > 1:
+            ws.Range(f"A2:C{last}").ClearContents()
+        # 새 데이터 R2부터 작성
+        date_str = prod_date.strftime("%Y-%m-%d")
+        for i, it in enumerate(items, start=2):
+            ws.Cells(i, 1).Value = date_str
+            ws.Cells(i, 2).Value = it["PROD_NO"]
+            ws.Cells(i, 3).Value = it["QTY"]
+        wb.Save()
+        wb.Close()
+    finally:
+        xl.Quit()
+    print(f"[phase2] 업로드 엑셀 생성: {out_path.name} ({len(items)}건) — Excel COM 저장 (서버 파서 호환)")
 
 
 # ============================================================
@@ -280,11 +323,28 @@ def d0_upload(page, xlsx_path: Path):
         print(f"[phase3] #btnExcelUpload 대기 실패 — 현재 URL: {page.url}")
         raise
 
-    # 팝업 오픈
+    # 팝업 iframe 먼저 검사 (이미 열려있으면 재사용, reload 생략)
     ifr = None
     for fr in page.frames:
         if "popupPmD0AddnUpload" in fr.url:
             ifr = fr; break
+
+    if ifr is not None:
+        print(f"[phase3] 기존 팝업 재사용: {ifr.url[:80]}")
+    else:
+        # 팝업 없음 — overlay 잔재만 있으면 reload 후 재오픈
+        has_overlay = page.evaluate("""() => {
+            return document.querySelectorAll('.ui-widget-overlay').length > 0
+                || Array.from(document.querySelectorAll('.ui-dialog')).some(d => d.offsetParent !== null);
+        }""")
+        if has_overlay:
+            print("[phase3] 팝업 없이 overlay만 잔존 — 페이지 reload")
+            try:
+                page.reload(timeout=30000, wait_until="domcontentloaded")
+                page.wait_for_selector("#btnExcelUpload", timeout=15000)
+                time.sleep(3)
+            except Exception as e:
+                print(f"[phase3] reload err: {e}")
     if ifr is None:
         # 클릭 재시도 (최대 3번)
         for attempt in range(3):
@@ -588,7 +648,7 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
 # ============================================================
 # 세션 실행
 # ============================================================
-def run_session_line(page, wb, line, items, prod_date, dry_run):
+def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None):
     if not items:
         print(f"[{line}] 추출 0건 — 스킵")
         return
@@ -608,7 +668,7 @@ def run_session_line(page, wb, line, items, prod_date, dry_run):
         print(f"[{line}] 실패 존재 — 최종 저장 보류")
         return
     final_save(page, cfg["save_url"])
-    verify_smartmes(target_line, prod_date, items)
+    verify_smartmes(target_line, verify_prod_date or prod_date, items)
 
 
 def determine_session(arg):
@@ -686,17 +746,17 @@ def main():
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_night(wb)
                 prod_date = target_file_date - timedelta(days=1)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date)
             if args.line in ("SD9A01","ALL"):
                 items = extract_outer_d1(wb, "SD9M01")
                 prod_date = target_file_date
-                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run)
+                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
             prod_date = target_file_date
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 

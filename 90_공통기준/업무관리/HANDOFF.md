@@ -4,12 +4,31 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션103 Stop hook 등급 재검토 3자 토론 완료 (advisory 유지 + 가시성 강화)
+최종 업데이트: 2026-04-24 KST — 세션104 /d0-plan 야간 실운영 + Excel COM 근본 수정
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-24 세션103 — Stop hook 등급 체계 재검토 [3way])
+## 0. 최신 세션 (2026-04-24 저녁 세션104 — /d0-plan 야간 실운영 + xlsx 포맷 근본 수정)
+
+### 실행 경로
+저녁 세션 시도 → 아침에 만든 스킬로 "SP3M3 야간 등록" → 업로드 단계에서 `COL2=""` 에러 15건 → 원인 추적(openpyxl이 생성한 xlsx 포맷이 ERP 서버 파서와 비호환) → 사용자가 "SSKR 파일 사용해서 작성하고 업로드" 지시 → win32com Excel COM 방식 적용 → Excel이 저장한 xlsx로 서버 수락 → 15건 반영 성공(MES rsltCnt=750) → run.py·SKILL.md 근본 수정
+
+### 확정된 버그·해결 (세션104)
+1. **openpyxl 생성 xlsx 비호환** → `win32com.client` Excel COM으로 교체
+2. **팝업 재사용 로직 잘못됨** → overlay 검사 앞에 팝업 iframe 검사 먼저 (dry-run→live 연속 실행 시 Chrome 팝업 잔존 대응)
+3. **Phase 6 검증 날짜 버그** → run_session_line에 verify_prod_date 파라미터 추가
+4. **template 파일 .gitignore 걸림** → 스킬 템플릿 xlsx 예외 허용 규칙 추가
+
+### 다음 AI 액션
+1. SD9A01 OUTER 저녁 세션 실 검증 (내일 저녁 `--dry-run` 먼저)
+2. 자동 스케줄러 `D0_SP3M3_Morning` 내일 07:10 실행 관찰 (Excel COM 교체 후 첫 자동 실행)
+3. 저녁 세션도 스케줄러 추가 검토 (`D0_SP3M3_Evening` 매일 18:00)
+4. openpyxl 사용 중인 다른 스킬(생산실적, 정산 등)에도 ERP 업로드 시 Excel COM 필요 여부 확인
+
+---
+
+## 1. 이전 세션 (2026-04-24 세션103 — Stop hook 등급 체계 재검토 [3way])
 
 ### 실행 경로
 세션102 이월 의제(Gemini Q3 C안) → 사용자 "토론모드로 진행" + "Gemini는 API로 대체" 지시 → 3자 토론 (GPT gpt-5-5-thinking + Gemini gemini-2.5-pro API) → Round 1 pass_ratio=0.75 합의 → advisory 유지 + stderr 가시성 강화 즉시 반영
