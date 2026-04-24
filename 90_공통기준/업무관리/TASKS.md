@@ -10,7 +10,30 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4/Q5 + Round 2 후속 이슈 2건(IPv6/Gemini 모델) 문서화 완료
+최종 업데이트: 2026-04-25 KST — 세션106 D0_SP3M3_Morning 스케줄러 batch 인코딩 수정 + ERR_BLOCKED 추적 미해결
+
+## 세션106 (2026-04-25 아침) — D0_SP3M3_Morning 스케줄러 LastResult=3 근본 해결
+
+**[완료] batch 파일 인코딩 수정 (LF→CRLF + UTF-8 BOM)** — 커밋 `84675727`
+- 증상: Windows 작업 스케줄러 `D0_SP3M3_Morning` 매주 월~토 07:10 트리거되지만 LastResult=3
+  - 토요일 07:10 실행 결과도 LastResult=3, LOGFILE 생성 단계조차 도달 못함
+- 근본 원인 2건:
+  1. 줄 끝(EOL)이 LF만 — Windows `cmd.exe`는 CRLF 필요. 라인 분리 실패로 모든 명령이 단일 라인으로 묶여 깨짐
+  2. UTF-8 BOM 없음 — `chcp 65001` 적용 전 한글 경로/주석을 ANSI(CP949)로 오해석
+- 수정: Python으로 `run_morning.bat` + `D0_저녁.bat` 두 파일 CRLF + UTF-8 BOM 재저장
+- 검증: 수동 재실행 → batch 정상 흐름 → LOGFILE 생성 → python run.py 진입 확인
+  - `06_생산관리/D0_업로드/logs/morning_20260425.log` (3076 bytes)
+  - LastResult 3 → 1 진전 (남은 1은 별건)
+
+**[미해결] ERR_BLOCKED_BY_CLIENT — ERP 페이지 진입 차단 (별건)**
+- 위치: `run.py` phase0 `page.goto(D0_URL)` (run.py:135)
+- URL: `http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do`
+- 에러: `playwright._impl._errors.Error: Page.goto: net::ERR_BLOCKED_BY_CLIENT`
+- 원인 후보:
+  1. CDP Chrome(`C:\temp\chrome-cdp`)에 광고 차단/보안 확장 설치됨
+  2. 토론모드용 CDP 프로필과 D0 자동화용 프로필 충돌 (포트 9222 동시 점유)
+  3. erp-dev.samsong.com URL 패턴이 Chrome 내장 차단 목록(예: 보안 정책)에 매칭
+- 다음 액션: CDP Chrome 확장 목록 점검 + run.py 진입 프로필 분리 검토
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 

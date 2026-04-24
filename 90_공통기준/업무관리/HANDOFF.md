@@ -4,8 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4/Q5 + Round 2 후속 이슈 2건(IPv6/Gemini 모델) 문서화 완료
+최종 업데이트: 2026-04-25 KST — 세션106 D0_SP3M3_Morning 스케줄러 batch 인코딩 수정 + ERR_BLOCKED 추적 미해결
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션106 (2026-04-25 아침) — D0_SP3M3_Morning 스케줄러 LastResult=3 근본 해결
+
+### 진행 상황
+- 사용자 질의: "7시 10분 스케줄러 작동하나?" → Windows 작업 스케줄러 점검
+- `D0_SP3M3_Morning` (월~토 07:10) 등록 활성, 오늘(토) 07:10 트리거됨, **LastResult=3 실패**
+- LOGFILE 미생성 → batch 자체 시작 실패 의심 → 직접 실행으로 인코딩 깨짐 확인
+- 수정 후 재실행: batch 정상 → python 진입 → ERP 접속에서 `ERR_BLOCKED_BY_CLIENT` 별건 확인
+
+### 다음 액션 (D0 스케줄러 완전 정상화)
+1. CDP Chrome 프로필 (`C:\temp\chrome-cdp`) 확장 목록 점검 (광고 차단/보안 확장 의심)
+2. D0 자동화가 사용하는 Chrome 프로필 식별 — `run.py`에서 connect over CDP인지 launch인지 확인
+3. 토론모드 CDP Chrome (포트 9222)과 D0 자동화 프로필 분리 가능성 검토
+4. 월요일 07:10 실 트리거 전까지 수동 검증 1회 더 권장
+
+### 다음 트리거 일정
+- D0_SP3M3_Morning 다음 실행: **2026-04-27 (월) 07:10:00** (Windows 작업 스케줄러)
+- 그 전까지 ERR_BLOCKED 미해결이면 다시 LastResult=1 발생 예상
 
 ---
 
