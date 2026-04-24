@@ -6,7 +6,7 @@
 #
 # 사용:
 #   bash .claude/hooks/list_active_hooks.sh              # 이벤트별 count + 훅 이름 리스트
-#   bash .claude/hooks/list_active_hooks.sh --count      # 총합 숫자만 (31)
+#   bash .claude/hooks/list_active_hooks.sh --count      # 총합 숫자만 (32)
 #   bash .claude/hooks/list_active_hooks.sh --by-event   # 이벤트별 count만
 #   bash .claude/hooks/list_active_hooks.sh --names      # 훅 이름만 (sort unique)
 #
