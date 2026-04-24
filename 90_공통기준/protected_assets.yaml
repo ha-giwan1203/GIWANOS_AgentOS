@@ -42,6 +42,11 @@ protected:
     reason: evidence 종료 가드 (세션91 III-5 완료축 블록 제거 후 auth_diag/skill_read 만 남음)
     removal_policy: replace-only
 
+  - path: .claude/hooks/auto_commit_state.sh
+    class: guard
+    reason: Stop hook 5번째 — 상태문서 자동 commit/push (세션101 d47f0515 final_check --fast 인라인). advisory 등급, AUTO 패턴 한정 (TASKS/HANDOFF/STATUS/state)
+    removal_policy: replace-only
+
   # === commit/evidence 계열 (guard) ===
   - path: .claude/hooks/commit_gate.sh
     class: guard

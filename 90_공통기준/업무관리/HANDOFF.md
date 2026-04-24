@@ -4,12 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 SP3M3 공정별 숙련도 평가서 신규 작성
+최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
 
-## 0. 최신 세션 (2026-04-24 세션102 — SP3M3 공정별 숙련도 평가서)
+## 0. 최신 세션 (2026-04-24 세션102 — auto_commit_state 운영 계약 보강 [3way])
+
+### 실행 경로
+세션101 GPT 정밀평가 2회차에서 L-1(protected_assets 미등재), L-2(README Failure Contract 누락) 지적 수령 → Claude 추가 지적(hook_common wrapper 미적용) → 사용자 "토론모드로 협의해서 진행" 지시 → 3자 토론 (Gemini API 대체) → Round 1 양측 동의 (pass_ratio=1.0) → P-1+P-2 분리 커밋, hook_common wrapper 별도 커밋 합의
+
+### 오늘 확정된 것
+- **P-1**: protected_assets.yaml Stop 블록에 auto_commit_state 등록
+- **P-2**: README Failure Contract 표에 auto_commit_state 등재 (advisory + final_check FAIL 시 incident + push 차단)
+- **사용자 새 지침 추가**: 전역 CLAUDE.md "작업 원칙"에 "시스템 개선 시 전체 구조 영향 분석 필수" 4단계 체크 명문화
+- **메모리 갱신**: feedback_system_map_first.md 강화 (회귀 시나리오 포함 4단계 필수화)
+
+### 다음 세션 액션
+- 커밋 2: hook_common wrapper 적용 (`hook_advisory` 래핑) — 실행 파일 변경 분리 커밋
+- 이월 의제: Stop hook 등급 체계 재검토 (Gemini Q3 C안, hook_gate 격상 여부)
+
+### 토론 로그
+- `90_공통기준/토론모드/logs/debate_20260424_132813_3way/`
+
+---
+
+## -1. 이전 세션 (2026-04-24 세션102 — SP3M3 공정별 숙련도 평가서)
 
 ### 실행 경로
 사용자 "작업자 숙련도 평가서 어디?" 위치 확인 → "공정 평가서표준_SP3M3_샘플.xlsx 복사해서 만들기" 지시 → 공정별 세부항목 추가 요구 → 초안(Python 신규생성)을 샘플 양식 기반으로 재작업 지시 → 공정명 기준 작업표준서 매핑(번호 매핑 오류 수정) → 관리계획서 누락 지적 수용 → 평가기준 Q/U/Y 열 의미 불일치 자진 고지 → 전체 항목별 평가기준 재작성 → 6개 파일 갱신 완료

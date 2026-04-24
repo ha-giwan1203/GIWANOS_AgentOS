@@ -10,9 +10,38 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 SP3M3 공정별 숙련도 평가서 신규 작성 완료
+최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영 (P-1/P-2 완료, hook_common wrapper 별도 커밋)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
+
+---
+
+## 세션102 (2026-04-24) — auto_commit_state 운영 계약 보강 (3자 토론 [3way])
+
+**[완료] P-1 protected_assets.yaml 등록**
+- `90_공통기준/protected_assets.yaml` Stop 계열 블록에 `auto_commit_state.sh` 추가
+- class: guard, removal_policy: replace-only
+- 사유: 세션101 GPT 평가 L-1 — 신규 Stop hook이 보호 레지스트리 미등재 (SPOF-4)
+
+**[완료] P-2 README Failure Contract 등재**
+- `.claude/hooks/README.md` Failure Contract 표에 `auto_commit_state.sh` 추가
+- 정책: fail-open (advisory) + AUTO 패턴 한정 + final_check FAIL 시 incident 기록 후 자동 commit/push 차단
+- 사유: 세션101 GPT 평가 L-2 — 운영 계약 문서화 누락
+
+**[진행 예정] hook_common wrapper 적용 (커밋 2 분리)**
+- `.claude/hooks/auto_commit_state.sh`에 `hook_advisory` 래핑
+- 사유: Claude 추가 지적 — 매 Stop마다 timing/incident 일관성 확보
+- 분리 사유: 사용자 지침 "한 곳 수정이 다른 곳을 무너뜨림" 반영. 실행 파일 변경은 회귀 추적 단위 분리
+
+**[합의 결과] 3자 토론 (Round 1, pass_ratio=1.0)**
+- Q1: A안 (3/3) — Stop 블록 추가
+- Q2: B안 (3/3) — incident 기록 + push 차단
+- Q3: A안 (2/3) — hook_advisory 래핑 (Gemini C안 hook_gate는 별도 의제 이월)
+- Q4: B안 (2/3) — 분리 커밋 (Claude 입장 변경, 사용자 지침 반영)
+- 로그: `90_공통기준/토론모드/logs/debate_20260424_132813_3way/`
+
+**[이월] Stop hook 등급 체계 재검토 (Gemini Q3 C안)**
+- 별도 B 분류 의제 — final_check FAIL 시 hook_gate 격상 여부
 
 ---
 

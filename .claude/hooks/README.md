@@ -125,6 +125,7 @@
 | `debate_send_gate_mark.sh` | fail-open + WARN | 없음 | 마커 생성 실패 시 WARN 로그 후 통과 (debate_gate가 2차 차단) |
 | `skill_drift_check.sh` | fail-open | 없음 | advisory. SKILL.md drift 감지 시 stderr 경고만, 차단 없음 |
 | `permissions_sanity.sh` | fail-open | 없음 | advisory. 1회용 패턴·완전 중복 탐지 시 stderr 경고만, 60분 캐시 |
+| `auto_commit_state.sh` | fail-open (advisory) | 없음 | advisory + 자동 push. AUTO 패턴(TASKS/HANDOFF/STATUS/state) 한정. final_check.sh --fast FAIL 시 incident 기록 후 자동 commit/push 차단 (세션102 [3way]) |
 | `domain_status_sync.sh` | fail-open | 없음 | advisory. 전역 TASKS 날짜 vs 도메인 STATUS.md 날짜 14일+ drift 탐지 시 stderr 경고만, 세션 차단 없음 (보조 스크립트, session_start_restore에서 호출, 세션98 C2 합의) |
 | `token_threshold_check.sh` | fail-open | 없음 | advisory. 문서 비대화 임계 초과 시 stderr 경고만, exit 0 강제 (보조 스크립트, session_start_restore에서 호출) |
 | `share_gate.sh` | fail-open | 없음 | advisory. 3way 감지 조건 미충족 시 stderr 경고만, 차단 없음 (보조 스크립트, share-result 수동 실행) |
