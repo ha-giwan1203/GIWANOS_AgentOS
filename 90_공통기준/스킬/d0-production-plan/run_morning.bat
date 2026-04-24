@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal
 chcp 65001 > nul
 title D0_SP3M3_Morning (auto)
