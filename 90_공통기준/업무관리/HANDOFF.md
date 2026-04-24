@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 성립 + Q1 기타안 Step 1~3 실행 완료 (audit / advisory 강화 / 재점화 4조건 등록)
+최종 업데이트: 2026-04-24 KST — 세션105 Round 2 합의 + Q1 기타안 실행 완료 + Q3 auto-fix 분류 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -35,6 +35,13 @@
 - Round 2 Gemini: 기타안 동조 (TASKS 조건 tightening 1건)
 - Claude 종합: 기타안 + Gemini tightening 통합 → 양측 동의
 - 로그: `round2_gpt.md`, `round2_gemini.md`, `round2_claude_synthesis.md`, `round2_cross_verify.md`
+
+### Q3 auto-fix 1차 분류 완료 (세션105 말미)
+- 보고서: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/q3_auto_fix_classification.md`
+- 미해결 80건 → 7개 카테고리
+- **Q1 재점화 조건 4** (auto_commit_state 상위 3개 진입): 수치 충족, 단 Q1 기타안 해석과 일치하여 재상정 불필요
+- 다음 Q4 후보: "navigate_gate 감지 기준 재검토" (11건)
+- Category D (session_drift 10건) `/finish` 자동 해소 시도 가능
 
 ### Q1 기타안 후속 실행 완료 (세션105 말미)
 1. ✅ audit — 최근 14일 15건, 모두 2026-04-24 하루 집중, classification 단일(`completion_before_state_sync`). 격상 불필요 결론

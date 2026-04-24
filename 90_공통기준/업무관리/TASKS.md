@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션105 Round 1+2 합의 성립 + Q1 기타안 Step 1~3 완료 (audit + advisory 강화 + 재점화 4조건 등록)
+최종 업데이트: 2026-04-24 KST — 세션105 Round 1+2 합의 + Q1 기타안 실행 완료 + Q3 auto-fix 1차 분류 완료 (Q4 후보 식별)
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 
@@ -45,6 +45,17 @@
 **[진행중] Round 2 실운영 중 발견 이슈 2건 — 문서화·스킬 보강 필요**
 1. **Chrome CDP 바인딩 기본값이 IPv6** — `--remote-debugging-address=127.0.0.1` 플래그 없으면 chrome-devtools-mcp가 127.0.0.1:9222 fetch 실패. 문서 + launch 가이드에 명시 필요
 2. **Gemini Gem 채팅방 진입 시 모델 설정 고정 안 됨** — 매번 수동 모델 선택 필요. `gemini-send.md` 1-B에 "진입 후 모델 설정 확인/선택 단계 추가" 필요
+
+**[완료] Q3 auto-fix 1차 분류 (세션105 말미, Round 1 Q3=A안 합의 후속)**
+- 미해결 80건 7개 카테고리로 분류 (보고서: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/q3_auto_fix_classification.md`)
+- 상위 1위: auto_commit_state completion_before_state_sync 15건 (19%) — **Q1 재점화 조건 4 수치상 충족**
+  - 단 Q1 기타안 audit 해석(단일 세션 burst)과 일치 → **재상정 불필요** (중복 의제 방지)
+- 상위 2위: commit_gate pre_commit_check 14건 — Category A 동근원, Q1 advisory 강화 효과 관찰(2주)
+- 상위 3위: navigate_gate send_block 11건 — **신규 Q4 의제 후보 "navigate_gate 감지 기준 재검토"**
+- Category D (session_drift 10건): `/finish` 또는 `final_check --fix`로 자동 해소 시도 가능
+- Category E (harness_missing 5건): Q2 정책 구현과 연계
+- Category F (2건): 개별 처리
+- Category G (미분류 23건): Phase 2 세부 조사 대상
 
 **[완료] Q1 기타안 실행 3단계 모두 완료**
 - Step 1 ✅ `auto_commit_state` audit — 최근 14일 15건, 전부 하루(2026-04-24) 집중, classification 단일(`completion_before_state_sync`)
