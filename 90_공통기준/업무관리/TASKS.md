@@ -60,6 +60,11 @@
 - 조건안: 동일 세션 FAIL 2회 이상 OR incident_ledger 3일 연속 → 임계값 기반 hook_gate 격상
 - GPT B안 제안, 양측 채택. 구현 설계는 별도 의제
 
+**[폐기] P-4 wrapper drift 감시** (세션101 이월 → 세션103 폐기)
+- 사유: hook_common wrapper 적용 hook 1개(debate_verify)뿐, 감시 대상 부재
+- 세션102 실적용에서 wrapper 대신 내부 함수 활용 방식 채택 (다단계 로직 보존)
+- 일괄 적용 계획 없이 drift 감시만 신설은 유효하지 않음
+
 ---
 
 ## 세션102 (2026-04-24) — SP3M3 공정별 숙련도 평가서 신규 작성
