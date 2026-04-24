@@ -30,8 +30,7 @@
       "Bash(bash .claude/hooks/final_check.sh --fix)",
       "mcp__Claude_in_Chrome__read_page",
       "mcp__Claude_in_Chrome__find",
-      "Bash(bash .claude/hooks/list_active_hooks.sh --count)",
-      "Bash(python create_sp3m3_process_eval.py)"
+      "Bash(bash .claude/hooks/list_active_hooks.sh --count)"
     ],
     "ask": [
       "Bash(python*:*)",

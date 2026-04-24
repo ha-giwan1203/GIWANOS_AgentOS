@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영 (P-1/P-2/hook_common wrapper 전체 완료)
+최종 업데이트: 2026-04-24 KST — 세션102 전체 완료 + GPT 재평가 P-1 반영 (settings.local 1회성 permission 제거)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
 
@@ -40,6 +40,10 @@
 - Q3: A안 (2/3) — hook_advisory 래핑 (Gemini C안 hook_gate는 별도 의제 이월)
 - Q4: B안 (2/3) — 분리 커밋 (Claude 입장 변경, 사용자 지침 반영)
 - 로그: `90_공통기준/토론모드/logs/debate_20260424_132813_3way/`
+
+**[완료] GPT 재평가 P-1 반영 (settings.local 1회성 제거)**
+- `.claude/settings.local.json:34` `Bash(python create_sp3m3_process_eval.py)` 제거 — SP3M3 평가서 생성 1회용, 재사용 근거 없음
+- GPT 재평가 판정: L-1 실증됨, 심각도 중
 
 **[이월] Stop hook 등급 체계 재검토 (Gemini Q3 C안)**
 - 별도 B 분류 의제 — final_check FAIL 시 hook_gate 격상 여부

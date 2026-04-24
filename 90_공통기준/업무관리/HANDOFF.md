@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 전체 완료 (P-1/P-2/hook_common 계측)
+최종 업데이트: 2026-04-24 KST — 세션102 전체 완료 + GPT 재평가 P-1 반영 (1회성 permission 제거)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
