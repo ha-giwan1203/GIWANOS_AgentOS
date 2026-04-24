@@ -10,7 +10,24 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션104 /d0-plan 야간 실운영 + openpyxl→Excel COM 근본 수정
+최종 업데이트: 2026-04-24 KST — 세션105 3자 토론 Round 1 + chrome-devtools-mcp 탭 전환 우회 설치 대기
+
+## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
+
+**[진행중] 3자 토론 Round 1 — 세션103 이월 의제 3건**
+- 로그: `90_공통기준/토론모드/logs/debate_20260424_195811_3way/`
+- Q1 조건부 격상: GPT=C(포기) / Gemini=B(실측) — 불일치, Round 2 재검증 예정
+- Q2 실증됨 라벨 엄격화: GPT=A / Gemini=A — 합의 (증거 필수 규칙)
+- Q3 incident 110건 대응: GPT=A / Gemini=A — 합의 (즉시 /auto-fix 1차 분류)
+- 다음: Chrome 재시작 후 Round 2 또는 Claude 종합
+
+**[진행중] 탭 전환 근본 해결 — chrome-devtools-mcp 병행 설치**
+- 원인: Claude in Chrome MCP가 CDP `Target.activateTarget` / `Page.bringToFront` 차단
+- Step 1 완료: `chrome-devtools-mcp` user scope 등록
+- Step 2 대기: 사용자가 Chrome을 `--remote-debugging-port=9222`로 재시작
+- Step 3 대기: Claude Code 세션 재시작
+
+
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
 

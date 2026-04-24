@@ -4,8 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — SD9A01 숙련도 평가서 작업계획 준비 완료 (다음 세션 이어서)
+최종 업데이트: 2026-04-24 KST — 세션105 3자 토론 Round 1 진행 중 + chrome-devtools-mcp 탭 전환 우회책 설치 대기
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
+
+### 진행 상황
+- 3자 토론 Round 1 GPT/Gemini 답변 수집 완료 (`90_공통기준/토론모드/logs/debate_20260424_195811_3way/`)
+- Q1 불일치 (GPT=C vs Gemini=B) / Q2·Q3 합의 (A안)
+- Gemini 백그라운드 탭 throttling으로 사용자 수동 전환 필요 → 근본 해결 착수
+
+### 탭 전환 해결 상태
+- 원인 확정: Claude in Chrome MCP가 CDP `Target.activateTarget` / `Page.bringToFront` 차단
+- 해결책: `chrome-devtools-mcp` (Google 공식) 병행 설치 — `list_pages` / `select_page` 사용
+- Step 1 완료: `claude mcp add chrome-devtools-mcp ...` 등록 (user scope)
+- Step 2 대기: 사용자가 Chrome을 `--remote-debugging-port=9222`로 재시작
+- Step 3 대기: Claude Code 세션 재시작 (MCP 도구 로드)
+
+### 재개점
+Chrome + 세션 재시작 후 "계속" 지시 받으면:
+1. `list_pages`로 탭 상태 확인
+2. `select_page` 실제 전환 테스트
+3. 통과 시 Round 2 진행 (불일치 쟁점 집중)
+
+---
 
 ---
 
