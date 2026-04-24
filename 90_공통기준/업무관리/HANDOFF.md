@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4 + Q5(Claude 독자 답안 선행 강제, 사용자 지시 예외) 완료
+최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4/Q5 + Round 2 후속 이슈 2건(IPv6/Gemini 모델) 문서화 완료
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---

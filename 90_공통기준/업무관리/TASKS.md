@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4 + Q5(Claude 독자 답안 선행 강제, 사용자 지시 예외) 완료
+최종 업데이트: 2026-04-25 KST — 세션105 Q1/Q3/Q4/Q5 + Round 2 후속 이슈 2건(IPv6/Gemini 모델) 문서화 완료
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 
@@ -42,9 +42,9 @@
 - 상태 파일 `gpt_tab_id`·`gemini_tab_id` 내용 의미 변경: 문자열 tabId → 정수 pageId
 - 실전 Round 2 검증 완료 (2026-04-24 22:00~22:10 KST, pass_ratio 4/4 실증)
 
-**[진행중] Round 2 실운영 중 발견 이슈 2건 — 문서화·스킬 보강 필요**
-1. **Chrome CDP 바인딩 기본값이 IPv6** — `--remote-debugging-address=127.0.0.1` 플래그 없으면 chrome-devtools-mcp가 127.0.0.1:9222 fetch 실패. 문서 + launch 가이드에 명시 필요
-2. **Gemini Gem 채팅방 진입 시 모델 설정 고정 안 됨** — 매번 수동 모델 선택 필요. `gemini-send.md` 1-B에 "진입 후 모델 설정 확인/선택 단계 추가" 필요
+**[완료] Round 2 실운영 중 발견 이슈 2건 — 문서화·스킬 보강**
+1. ✅ **Chrome CDP 바인딩 기본값이 IPv6** — `90_공통기준/토론모드/CLAUDE.md:142` "CDP Chrome 전제 조건"에 `--remote-debugging-address=127.0.0.1` 플래그 필수 명시 + 정식 launch 커맨드 등재
+2. ✅ **Gemini Gem 모델 설정 미고정** — `.claude/commands/gemini-send.md` 1-B-1 신설: SEND GATE 전 모델 라벨 확인 + 다르면 take_snapshot/click으로 재선택 강제 (생략 금지)
 
 **[완료] Q5 Claude 독자 답안 선행 강제 (세션105 말미, 사용자 지시 예외 D안 적용)**
 - 사용자 지적: Round 2 Q1·Q4에서 Claude 독자 답안 선행 없이 양측 답변 축약 → "3-way + Claude 축약자" 구조
