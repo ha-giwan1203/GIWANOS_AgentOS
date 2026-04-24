@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영 (P-1/P-2 완료, hook_common wrapper 별도 커밋)
+최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영 (P-1/P-2/hook_common wrapper 전체 완료)
 
 > **메타 억제 기준**: `.claude/state/meta_freeze.md` — **해제됨** (2026-04-23, incident 52건)
 
@@ -28,9 +28,10 @@
 - 정책: fail-open (advisory) + AUTO 패턴 한정 + final_check FAIL 시 incident 기록 후 자동 commit/push 차단
 - 사유: 세션101 GPT 평가 L-2 — 운영 계약 문서화 누락
 
-**[진행 예정] hook_common wrapper 적용 (커밋 2 분리)**
-- `.claude/hooks/auto_commit_state.sh`에 `hook_advisory` 래핑
-- 사유: Claude 추가 지적 — 매 Stop마다 timing/incident 일관성 확보
+**[완료] hook_common 계측 적용 (커밋 2 분리)**
+- `.claude/hooks/auto_commit_state.sh` source hook_common.sh + hook_timing_start/end + hook_log + hook_incident
+- 합의 본질 구현 (hook_advisory wrapper 직접 호출 대신 내부 함수 활용 — 다단계 로직 흐름 보존)
+- 기록 확인: timing/incident_ledger/hook_log 정상 동작 (final_check FAIL 테스트 PASS)
 - 분리 사유: 사용자 지침 "한 곳 수정이 다른 곳을 무너뜨림" 반영. 실행 파일 변경은 회귀 추적 단위 분리
 
 **[합의 결과] 3자 토론 (Round 1, pass_ratio=1.0)**

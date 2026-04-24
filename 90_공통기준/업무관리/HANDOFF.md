@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 3자 토론 반영
+최종 업데이트: 2026-04-24 KST — 세션102 auto_commit_state 운영 계약 보강 전체 완료 (P-1/P-2/hook_common 계측)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -21,8 +21,9 @@
 - **메모리 갱신**: feedback_system_map_first.md 강화 (회귀 시나리오 포함 4단계 필수화)
 
 ### 다음 세션 액션
-- 커밋 2: hook_common wrapper 적용 (`hook_advisory` 래핑) — 실행 파일 변경 분리 커밋
 - 이월 의제: Stop hook 등급 체계 재검토 (Gemini Q3 C안, hook_gate 격상 여부)
+- P-4 wrapper drift 감시 구현 (세션101 이월)
+- D0 자동 실행 관찰 (4/25~28 토/월/화/수)
 
 ### 토론 로그
 - `90_공통기준/토론모드/logs/debate_20260424_132813_3way/`

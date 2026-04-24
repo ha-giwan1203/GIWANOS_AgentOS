@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# auto_commit_state.sh — 하이브리드 자동 커밋 (세션101 2026-04-24 신설)
+# auto_commit_state.sh — 하이브리드 자동 커밋 (세션101 2026-04-24 신설, 세션102 hook_common 적용)
 #
 # 정책:
 #   - 상태 문서(AUTO)는 세션 종료 시 자동 커밋+푸시
@@ -11,10 +11,18 @@
 #   - 90_공통기준/agent-control/state/finish_state.json
 #   - 90_공통기준/agent-control/state/write_marker.json
 #
-# 등급: advisory (실패해도 세션 계속)
+# 등급: advisory (실패해도 세션 계속, exit 0 강제)
+# 계측: hook_common.sh의 timing/incident/log 함수 사용 (세션102 [3way] 합의)
 
 set +e
 cd "$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+
+# hook_common.sh 로드 (timing/incident/log 함수)
+if [ -f ".claude/hooks/hook_common.sh" ]; then
+    # shellcheck source=/dev/null
+    source .claude/hooks/hook_common.sh
+fi
+HOOK_START_TS=$(hook_timing_start 2>/dev/null || echo "")
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 [ "$BRANCH" = "main" ] || { echo "[auto_commit_state] main 브랜치만 동작 (현재: $BRANCH)" >&2; exit 0; }
@@ -77,6 +85,12 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
     # 대신 final_check.sh --fast로 교차검증만 수행.
     if ! bash .claude/hooks/final_check.sh --fast >/dev/null 2>&1; then
         echo "[auto_commit_state] ⛔ final_check --fast 실패 — 자동 커밋 중단, 수동 검토 필요" >&2
+        # incident 기록 (세션102 [3way] 합의 — Q2 B안)
+        hook_incident "hook_block" "auto_commit_state" "" \
+            "final_check --fast 실패로 자동 commit/push 차단 (AUTO 파일 ${#AUTO_FILES[@]}건)" \
+            "\"classification_reason\":\"completion_before_state_sync\"" 2>/dev/null || true
+        hook_log "auto_commit_blocked" "final_check fail — ${#AUTO_FILES[@]} files" 2>/dev/null || true
+        hook_timing_end "auto_commit_state" "$HOOK_START_TS" "advisory_blocked" 2>/dev/null || true
         exit 0
     fi
 
@@ -84,12 +98,23 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
         echo "[auto_commit_state] 커밋 완료 — push 시도" >&2
         if timeout 60 git push origin main >&2 2>&1; then
             echo "[auto_commit_state] ✅ push 완료" >&2
+            hook_log "auto_commit_pushed" "${#AUTO_FILES[@]} files" 2>/dev/null || true
+            hook_timing_end "auto_commit_state" "$HOOK_START_TS" "ok" 2>/dev/null || true
         else
             echo "[auto_commit_state] ⚠ push 실패 — 수동 재시도 필요 (git push origin main)" >&2
+            hook_incident "hook_block" "auto_commit_state" "" \
+                "git push 실패 (timeout 또는 네트워크) — ${#AUTO_FILES[@]} files staged" \
+                "\"classification_reason\":\"pre_commit_check\"" 2>/dev/null || true
+            hook_timing_end "auto_commit_state" "$HOOK_START_TS" "push_fail" 2>/dev/null || true
         fi
     else
         echo "[auto_commit_state] ⚠ 커밋 실패 — 상태문서 변경 없거나 hook 거부" >&2
+        hook_log "auto_commit_failed" "git commit failed" 2>/dev/null || true
+        hook_timing_end "auto_commit_state" "$HOOK_START_TS" "commit_fail" 2>/dev/null || true
     fi
+else
+    # AUTO 파일 없는 경우도 timing 기록 (정상 종료)
+    hook_timing_end "auto_commit_state" "$HOOK_START_TS" "no_auto_files" 2>/dev/null || true
 fi
 
 exit 0
