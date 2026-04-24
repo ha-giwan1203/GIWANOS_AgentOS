@@ -12,27 +12,39 @@
     "Q1": "B안 — advisory 유지 + 조건부 격상 설계 이월",
     "Q2": "B안 — advisory + 가시성 강화 우선"
   },
-  "cross_verification": {
-    "gpt_verifies_gemini": {"verdict": "이의", "reason": "commit/push 이미 차단, exit 2 무한 블록 위험"},
-    "gemini_verifies_gpt": {"verdict": "동의", "reason": "조건부 격상으로 균형적 해결책"},
-    "gpt_verifies_claude": {"verdict": "동의", "reason": "즉시 exit 2 과하고 단계적 접근 안전"},
-    "gemini_verifies_claude": {"verdict": "동의", "reason": "단계적 접근 안정성 합리적"},
-    "pass_ratio_numeric": 0.75,
-    "round_count": 1,
-    "max_rounds": 3,
-    "skip_65": false,
-    "claude_delta": "partial",
-    "issue_class": "B"
-  },
-  "harness": {
-    "채택": [
-      {"item": "GPT B안(조건부 격상)", "label": "실증됨", "evidence": "auto_commit_state.sh:86-95 commit/push 이미 차단", "ref": "2eeef367"},
-      {"item": "가시성 강화 B안", "label": "실증됨", "evidence": "advisory + 가시성 = exit 2 부작용 회피", "ref": ".claude/hooks/auto_commit_state.sh:87"}
-    ],
-    "버림": [
-      {"item": "Gemini C안(즉시 격상)", "label": "환경미스매치", "evidence": "일시 오류도 세션 블록 → 제조업 환경 리스크", "ref": "round1_gemini.md"}
-    ]
-  },
+  "turns": [
+    {
+      "turn": 1,
+      "mode": "3way",
+      "claude": "Stop hook 등급 체계 재검토 — auto_commit_state final_check FAIL 시 hook_gate 격상 여부",
+      "gpt": "Q1 B안(조건부 격상), Q2 B안(그렇지 않다)",
+      "gemini": "Q1 C안(hook_gate 격상), Q2 A안(그렇다)",
+      "harness": {
+        "summary_counts": {"채택": 2, "보류": 0, "버림": 1},
+        "채택": [
+          {"item": "GPT B안(조건부 격상)", "label": "실증됨", "evidence": "auto_commit_state.sh:86-95 commit/push 이미 차단", "ref": "2eeef367"},
+          {"item": "가시성 강화 B안", "label": "실증됨", "evidence": "advisory + 가시성 = exit 2 부작용 회피", "ref": ".claude/hooks/auto_commit_state.sh:87"}
+        ],
+        "보류": [],
+        "버림": [
+          {"item": "Gemini C안(즉시 격상)", "label": "환경미스매치", "evidence": "일시 오류도 세션 블록 → 제조업 환경 리스크", "ref": "round1_gemini.md"}
+        ]
+      },
+      "cross_verification": {
+        "gpt_verifies_gemini": {"verdict": "이의", "reason": "commit/push 이미 차단, exit 2 무한 블록 위험"},
+        "gemini_verifies_gpt": {"verdict": "동의", "reason": "조건부 격상으로 균형적 해결책"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "즉시 exit 2 과하고 단계적 접근 안전"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "단계적 접근 안정성 합리적"},
+        "pass_ratio_numeric": 0.75,
+        "round_count": 1,
+        "max_rounds": 3,
+        "skip_65": false,
+        "skip_65_reason": null,
+        "claude_delta": "partial",
+        "issue_class": "B"
+      }
+    }
+  ],
   "critic_review": {"verdict": "WARN", "reason": "실증됨 라벨 하드 근거 미제시"},
   "step5": {
     "commit": "2eeef367",
