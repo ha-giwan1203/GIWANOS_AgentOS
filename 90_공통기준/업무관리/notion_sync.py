@@ -1412,7 +1412,7 @@ def _parse_session_tag(repo_root: Path) -> str | None:
         return None
     try:
         for line in tasks_md.read_text(encoding="utf-8").splitlines()[:30]:
-            m = _re.match(r"^최종 업데이트:\s*(\d{4}-\d{2}-\d{2})\s*—\s*(세션\d+)", line)
+            m = _re.match(r"^최종 업데이트:\s*(\d{4}-\d{2}-\d{2})[^—]*—\s*(세션\d+)", line)
             if m:
                 return f"{m.group(2)} 갱신 {m.group(1)}"
     except Exception:

@@ -1,33 +1,90 @@
 {
-  "generated_at": "2026-04-24 08:18 KST",
-  "last_updated": "",
-  "github_sha": "e14a03e160a8bac4b1743687bdf195014d7cbc6d",
-  "github_sha_short": "e14a03e1",
-  "hooks_raw": 46,
-  "hooks_active": 31,
+  "generated_at": "2026-04-24 16:24 KST",
+  "last_updated": "세션103 갱신 2026-04-24",
+  "github_sha": "0541d37fc0ac08ab56a16a3921257a3444cbb5fd",
+  "github_sha_short": "0541d37f",
+  "hooks_raw": 47,
+  "hooks_active": 32,
   "commands": 31,
   "smoke": "unknown",
   "recent_sessions": [
+    "세션102 (2026-04-24) — auto_commit_state 운영 계약 보강 (3자 토론 [3way])",
+    "세션103 (2026-04-24) — Stop hook 등급 체계 재검토 [3way]",
+    "세션102 (2026-04-24) — SP3M3 공정별 숙련도 평가서 신규 작성",
     "세션101 (2026-04-24) — /d0-plan 스킬 실운영 검증 + 자동 스케줄링",
-    "세션100 (2026-04-23) — GPT 프로토콜 스킬 신설 (클로드코드 정밀평가)",
-    "세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 통과 — GPT 최종 PASS)",
-    "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행",
-    "세션96 (2026-04-23) — STATUS drift 근본 원인 분석 + final_check 감지 강화"
+    "세션100 (2026-04-23) — GPT 프로토콜 스킬 신설 (클로드코드 정밀평가)"
   ],
   "all_sessions": [
+    "세션102 (2026-04-24) — auto_commit_state 운영 계약 보강 (3자 토론 [3way])",
+    "세션103 (2026-04-24) — Stop hook 등급 체계 재검토 [3way]",
+    "세션102 (2026-04-24) — SP3M3 공정별 숙련도 평가서 신규 작성",
     "세션101 (2026-04-24) — /d0-plan 스킬 실운영 검증 + 자동 스케줄링",
     "세션100 (2026-04-23) — GPT 프로토콜 스킬 신설 (클로드코드 정밀평가)",
     "세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 통과 — GPT 최종 PASS)",
-    "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행",
-    "세션96 (2026-04-23) — STATUS drift 근본 원인 분석 + final_check 감지 강화",
-    "세션95 (2026-04-23) — /d0-plan 스킬 패키징 완료",
-    "세션94 (2026-04-22) — ERP D0추가생산지시 + SmartMES 서열정리 자동화 탐색 [완료]",
-    "세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)",
-    "세션92 (2026-04-22) — Plan IV-5/V-7/VIII [완료]",
-    "세션91 (2026-04-22) — Plan glimmering-churning-reef 단계 III~VII 완료",
-    "세션90 (2026-04-22) — 자기유지형 시스템 재설계 (Plan glimmering-churning-reef)"
+    "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행"
   ],
   "sessions_detail": [
+    {
+      "header": "세션102 (2026-04-24) — auto_commit_state 운영 계약 보강 (3자 토론 [3way])",
+      "body": [
+        "**[완료] P-1 protected_assets.yaml 등록**",
+        "- `90_공통기준/protected_assets.yaml` Stop 계열 블록에 `auto_commit_state.sh` 추가",
+        "- class: guard, removal_policy: replace-only",
+        "- 사유: 세션101 GPT 평가 L-1 — 신규 Stop hook이 보호 레지스트리 미등재 (SPOF-4)",
+        "**[완료] P-2 README Failure Contract 등재**",
+        "- `.claude/hooks/README.md` Failure Contract 표에 `auto_commit_state.sh` 추가",
+        "- 정책: fail-open (advisory) + AUTO 패턴 한정 + final_check FAIL 시 incident 기록 후 자동 commit/push 차단",
+        "- 사유: 세션101 GPT 평가 L-2 — 운영 계약 문서화 누락",
+        "**[완료] hook_common 계측 적용 (커밋 2 분리)**",
+        "- `.claude/hooks/auto_commit_state.sh` source hook_common.sh + hook_timing_start/end + hook_log + hook_incident",
+        "- 합의 본질 구현 (hook_advisory wrapper 직접 호출 대신 내부 함수 활용 — 다단계 로직 흐름 보존)",
+        "- 기록 확인: timing/incident_ledger/hook_log 정상 동작 (final_check FAIL 테스트 PASS)",
+        "- 분리 사유: 사용자 지침 \"한 곳 수정이 다른 곳을 무너뜨림\" 반영. 실행 파일 변경은 회귀 추적 단위 분리",
+        "**[합의 결과] 3자 토론 (Round 1, pass_ratio=1.0)**",
+        "- Q1: A안 (3/3) — Stop 블록 추가",
+        "- Q2: B안 (3/3) — incident 기록 + push 차단",
+        "- Q3: A안 (2/3) — hook_advisory 래핑 (Gemini C안 hook_gate는 별도 의제 이월)",
+        "- Q4: B안 (2/3) — 분리 커밋 (Claude 입장 변경, 사용자 지침 반영)",
+        "- 로그: `90_공통기준/토론모드/logs/debate_20260424_132813_3way/`",
+        "**[완료] GPT 재평가 P-1 반영 (settings.local 1회성 제거)**",
+        "- `.claude/settings.local.json:34` `Bash(python create_sp3m3_process_eval.py)` 제거 — SP3M3 평가서 생성 1회용, 재사용 근거 없음",
+        "- GPT 재평가 판정: L-1 실증됨, 심각도 중"
+      ]
+    },
+    {
+      "header": "세션103 (2026-04-24) — Stop hook 등급 체계 재검토 [3way]",
+      "body": [
+        "**[완료] advisory 유지 + stderr 가시성 강화**",
+        "- 3자 토론 (GPT gpt-5-5-thinking + Gemini gemini-2.5-pro) Round 1 pass_ratio=0.75 합의",
+        "- Q1: B안 채택 — 즉시 hook_gate 격상 반대. advisory 유지 + 경고 포맷 개선",
+        "- Q2: B안 채택 — exit 2 부작용(일시 오류 무한 블록) > 이점. advisory + 가시성 우선",
+        "- 변경: `auto_commit_state.sh:87` 박스형 ⛔ 경고 포맷 적용 (실행 흐름 미변경, A 분류)",
+        "- 로그: `90_공통기준/토론모드/logs/debate_20260424_152100_3way/`",
+        "**[폐기] 조건부 격상 설계** (세션103 3way 채택 → 세션103 폐기)",
+        "- 사유: advisory + commit/push 차단 + incident + stderr 박스 경고로 이미 실용적 보호 충분",
+        "- 반복 구조적 FAIL 실발생 빈도 낮음. 구현 복잡도(카운트 추적·세션 경계·임계값) > 실효",
+        "- 임계값 오설정 시 과도 차단 또는 유명무실. 제조업 세션 중단 리스크",
+        "**[폐기] P-4 wrapper drift 감시** (세션101 이월 → 세션103 폐기)",
+        "- 사유: hook_common wrapper 적용 hook 1개(debate_verify)뿐, 감시 대상 부재",
+        "- 세션102 실적용에서 wrapper 대신 내부 함수 활용 방식 채택 (다단계 로직 보존)",
+        "- 일괄 적용 계획 없이 drift 감시만 신설은 유효하지 않음"
+      ]
+    },
+    {
+      "header": "세션102 (2026-04-24) — SP3M3 공정별 숙련도 평가서 신규 작성",
+      "body": [
+        "**[완료] SP3M3 공정별 숙련도 평가서 6개 파일 생성**",
+        "- 위치: `01_인사근태/숙련도평가/SP3M3_공정별 평가서/`",
+        "- 파일: 공정10/11/91/140/340/430 각 개별 xlsx",
+        "- 샘플 양식(`공정 평가서표준_SP3M3_샘플.xlsx`) 레이아웃/스타일 유지",
+        "- 전문강화 섹션(행13~21) 재구성:",
+        "  - 작업표준서 기준 5항목 (행13~17) — 출처: `SP3M3_작업표준서_200730_R1.xlsx`",
+        "  - 관리계획서 기준 4항목 (행18~21) — 출처: `SP3M3_관리계획서_대원테크.xlsx`",
+        "- 평가기준 Q/U/Y 열(100%/80%/미달) 각 항목별 의미 맞게 재작성",
+        "- 생성 스크립트: `01_인사근태/숙련도평가/생성스크립트/create_sp3m3_v4.py`",
+        "- 공정명 기준 매핑(번호 기준 아님): 공정140→시트130, 공정340→시트330 등 확인"
+      ]
+    },
     {
       "header": "세션101 (2026-04-24) — /d0-plan 스킬 실운영 검증 + 자동 스케줄링",
       "body": [
@@ -51,10 +108,11 @@
         "- 래퍼: `90_공통기준/스킬/d0-production-plan/run_morning.bat`",
         "- 로그: `06_생산관리/D0_업로드/logs/morning_YYYYMMDD.log` (일자별 누적)",
         "- 첫 자동 실행: 2026-04-25 토요일 07:10",
-        "**[대기] 후속**",
-        "- 4/25~28 자동 실행 관찰 (성공률/로그 이상/중복 저장 등)",
-        "- SD9A01 OUTER 저녁 세션 실 검증 (내일 저녁 `--dry-run` 먼저)",
-        "- 안정화 후 grade B → A 격상"
+        "**[완료 추가] 하이브리드 자동 커밋 hook 신설 (세션101)**",
+        "- `.claude/hooks/auto_commit_state.sh` — Stop 이벤트 5번째 등록 (hooks 31→32)",
+        "- AUTO: TASKS/HANDOFF/STATUS/notion_snapshot/finish_state/write_marker → 자동 커밋+푸시",
+        "- MANUAL: 코드/스킬/설정 → stderr 리마인더만 (`/finish` 또는 수동 커밋 권장)",
+        "- 안전장치: main 브랜치만, 민감패턴 스캔, push 60s timeout soft-fail"
       ]
     },
     {
@@ -128,155 +186,6 @@
         "**[완료] C2 `domain_status_sync.sh` 신규 advisory 훅**",
         "- 전역 TASKS 날짜 vs 도메인 STATUS.md 5개 날짜 비교 → 14일+ drift 감지 시 stderr 경고",
         "- 실측: 05 조립비정산 17일·10 라인배치 23일 drift 감지 확인"
-      ]
-    },
-    {
-      "header": "세션96 (2026-04-23) — STATUS drift 근본 원인 분석 + final_check 감지 강화",
-      "body": [
-        "**[완료] daily-doc-check 자동 실행 → STATUS stale 감지 → 근본 원인 2회 분석**",
-        "- 자동 점검 결과: STATUS.md 세션90 표기, 실제 최신 세션95 (4세션 뒤처짐). Slack 알림 발송",
-        "- 1차 원인: 같은 날 세션 진행 시 날짜(YYYY-MM-DD) 비교만으로는 drift 미감지 (세션91~94 모두 2026-04-22)",
-        "- 2차 원인 (테스트 과정 발견): `_get_session`/`_get_date`가 git index 우선 조회 → 파일 edit만 하고 `git add` 전이면 working tree 변경 미반영",
-        "**[완료] 세션94~95 미커밋 35건 커밋 (`ac8369ff`)**",
-        "- /d0-plan 스킬 신규 (SKILL.md / run.py / D0_저녁.bat)",
-        "- 서열정리 작업노트, 명찰 이동, 기타 정리 삭제, 토론모드 bridge 모듈 등 세션94~95 누락분 일괄 반영",
-        "- STATUS.md 날짜 수동 교정: 세션90/2026-04-22 → 세션95/2026-04-23",
-        "**[완료] final_check.sh drift 감지 강화 2건**",
-        "- (a) **STATUS 세션 비교 블록 추가** (L305~): HANDOFF 패턴을 STATUS에도 복제. `[ \"$STATUS_DATE\" = \"$TASKS_DATE\" ]` 조건으로 날짜 drift와 중복 방지. `--fix` 시 날짜는 유지하고 세션 번호만 갱신 (`\\1` 캡처)",
-        "- (b) **`_get_session` / `_get_date` working tree 우선 조회**: 기존 `git show :file` 우선 → `cat file` 우선으로 swap. git add 전 상태도 drift 감지 가능",
-        "- 검증: drift 재현(STATUS 세션90) → `[FAIL] session_drift` 감지 → `[FIX] 세션90→95` 교정 → smoke_fast 11/11 ALL PASS",
-        "**[완료] /auto-fix 규칙 6 추가 — pre_commit_check 원인-해소 연결 (2자 토론 조건부 통과 반영)**",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260423_112214/`",
-        "- GPT 판정: 조건부 통과 — fast/full 분기 조건 추가 요구",
-        "- 실측: pre_commit_check 202건 = `final_check --fast FAIL` 166건 + `final_check --full FAIL` 36건 (100% 분류)",
-        "- `incident_repair.py` auto_resolve() 확장:",
-        "  - 조건 (AND): `classification_reason == \"pre_commit_check\"` + `ts < now - 72h`",
-        "  - detail 분기: `--fast FAIL` → `final_check --fast` PASS로 해소 / `--full FAIL` → `final_check --fast` + `smoke_test.sh` 둘 다 PASS로 해소",
-        "  - 마킹: `resolved_by=\"auto_rule6\"` + `resolved_reason=\"pre_commit_check_stale_{fast|full}\"`",
-        "  - 사전 1회 subprocess 호출로 현재 PASS 여부 캐시 (루프 외부)",
-        "- 독립 하네스: GPT 평가(A1 파싱/B1 gate 일관성/Pri4 final_check 분리) 채택 3건, (A3 incident_ledger/C1 debate_verify/Pri5) 보류 3건, (B2 selfcheck 깊이) 버림 1건 — smoke_test 계층 미반영으로 환경미스매치",
-        "**[완료] 파싱 공통층 Python 헬퍼화 + final_check 2축 분리 묶음 — M1 (2자 토론 조건부 통과 반영, A-수정안)**",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260423_122413/`",
-        "- 선행 3자 자동 승격 중단: `debate_20260423_122202_3way/abort.md` (사용자 지시 예외, D안)"
-      ]
-    },
-    {
-      "header": "세션95 (2026-04-23) — /d0-plan 스킬 패키징 완료",
-      "body": [
-        "**[완료] ERP D0추가생산지시 실 파이프라인 검증 + 스킬 배포**",
-        "- 오늘 아침: SP3M3 야간 22건 전체 자동 처리 성공",
-        "  - Chrome CDP 재기동 + OAuth 자동 로그인 ✅",
-        "  - D0 엑셀 업로드(파싱+저장) 자동화 ✅ (`jQuery.ajax` 경로로 500 해소)",
-        "  - 야간 서열 22건 엑셀 순서대로 추가 ✅ (중복 삭제→재생성으로 EXT_PLAN_REG_NO 최대값 매핑 버그 수정)",
-        "  - 최종 저장 (sendMesFlag=Y) + MES 전송 성공 (rsltCnt=1100) ✅",
-        "  - SmartMES rank 10~31 엑셀 순서 100% 일치 확인 ✅",
-        "- 운영 규칙 확정 (사용자 설명 기반)",
-        "  - 파일 경로: `Z:\\15. SP3 메인 CAPA점검\\SP3M3\\생산지시서\\{YYYY}년 생산지시\\{MM}월\\SP3M3_생산지시서_({YY.MM.DD})*.xlsm`",
-        "  - 파일명 날짜 = OUTER 생산일 = D+1 (전일 오후 저장)",
-        "  - 세션 3회: 저녁 SP3M3 야간(생산일=오늘) + SD9A01 OUTER(생산일=내일) / 아침 SP3M3 주간(생산일=오늘, 누적≥3600 컷)",
-        "- 스킬 패키징",
-        "  - `90_공통기준/스킬/d0-production-plan/SKILL.md` (grade B)",
-        "  - `90_공통기준/스킬/d0-production-plan/run.py` (600줄 통합, Phase 0~6)",
-        "  - `.claude/commands/d0-plan.md` — `/d0-plan` 등록 확인",
-        "  - 업로드 엑셀 저장 경로: `06_생산관리/D0_업로드/d0_{line}_{YYYYMMDD}.xlsx`",
-        "- 상세: `06_생산관리/서열정리/WORK_NOTE_20260423.md`",
-        "**[대기] 2~3일 운영 안정화 관찰**",
-        "- SD9A01 OUTER 실검증 (내일 저녁 첫 실행 `--dry-run` 권장)",
-        "- SP3M3 주간 3600 컷 실검증 (아침 세션 `--dry-run`)",
-        "- 안정되면 grade B → A 격상 검토"
-      ]
-    },
-    {
-      "header": "세션94 (2026-04-22) — ERP D0추가생산지시 + SmartMES 서열정리 자동화 탐색 [완료]",
-      "body": [
-        "**[완료] 탐색 범위 확정 + 공통 환경 확보**",
-        "- ERP Chrome CDP(포트 9222, `.flow-chrome-debug`) + OAuth 자동 로그인 스크립트 동작 확인",
-        "  - `.claude/tmp/erp_oauth_login.py` — 저장 자격증명(0109) pyautogui 자동완성 방식",
-        "- D0추가생산지시 API 2단계 구조 확인(JS 소스 분석)",
-        "  - 파싱: `POST /prdtPlanMng/selectListPmD0AddnUpload.do` (multipart, form=`uploadfrm`, 파일 필드 `files`)",
-        "  - 저장: `POST /prdtPlanMng/multiListPmD0AddnUpload.do` (JSON `{excelList, ADDN_PRDT_REASON_CD:\"002\"}`)",
-        "- SmartMES 서열정리 기존 스크립트(`06_생산관리/서열정리/smartmes_reorder.py`) shift 필터 버그 식별 + 패치(미커밋)",
-        "  - `shift==02` 고정 → `status==R` 단독 조건으로 교체 (주간 작업분은 F/P라 자동 제외)",
-        "**[미완] 내일 재개**",
-        "- D0 자동 업로드 실검증 (오늘치는 사용자 수작업으로 저장 완료 → 내일 새 날짜 엑셀로 실행)",
-        "- SmartMES 서열정리 캘리브레이션 + `--execute` 시범",
-        "- 네트워크 감시 로거 재구현 (Playwright `new_cdp_session` → `Network.enable` 방식)",
-        "- 최종 산출물: `90_공통기준/스킬/d0-production-plan/` 스킬 패키징 (sp3-production-plan 패턴 참조)"
-      ]
-    },
-    {
-      "header": "세션93 (2026-04-22) — Hook 시스템 개선 (2자 토론 합의 plan.md 1주차 1번)",
-      "body": [
-        "**[완료] 2차 진단 + 2자 토론 + 개선 계획 plan.md 작성**",
-        "- 2차 진단: GPT 2차 정밀진단 수령 → Claude 독립 검증 11/11 실증 + 등급 재조정 2건 제안",
-        "- 토론: 2자(Claude × GPT) 2라운드. 채택 11 / 보류 3 (해소 2, 잔존 1) / 버림 0",
-        "- 결론: \"전면 재설계 대신 evidence 축 coverage 축소 + 남는 핵심 3종 contract형 재설계 하이브리드\"",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260422_150445/plan.md` (1주차/2주차 + 검증 기준 + 롤백 조건)",
-        "**[완료] 1주차 1번 — hook_registry 격하 (Single Source of Truth 확정)**",
-        "- 변경 파일 (4개):",
-        "  - `.claude/scripts/hook_registry.sh` 상단 주석 [LEGACY / DEPRECATED] 표기 + 대체 경로 안내",
-        "  - `.claude/hooks/final_check.sh:139-149` `--fix` 경로 자동 sync 중단, list_active_hooks 기준 수동 갱신 안내로 전환",
-        "  - `.claude/hooks/README.md:6-12, 155-156` Single Source (list_active_hooks) 명시 + 보조 스크립트 표에 list_active_hooks 추가 + hook_registry legacy 표기",
-        "  - `90_공통기준/업무관리/STATUS.md:19` hooks 체계 기준축을 list_active_hooks로 명시",
-        "- 검증:",
-        "  - `list_active_hooks --count` = 31 (PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 4)",
-        "  - `final_check --fast` 31/31/31 일치, exit 0",
-        "  - `smoke_fast` 11/11 ALL PASS",
-        "  - `doctor_lite` OK",
-        "- 소요: 약 30분",
-        "**[완료] 1주차 2번 — selfcheck 24h 정확 집계**",
-        "- `.claude/self/selfcheck.sh:75-97` CUTOFF prefix grep → python ISO8601 파싱 + datetime 비교로 교체",
-        "- 검증: 기존 prefix=0건(해당 시각 매칭 없음) vs 정확=74건(실제 24h 범위) — 실효성 확인",
-        "**[완료] 1주차 3번 — doctor_lite python/python3 fallback**",
-        "- `.claude/hooks/doctor_lite.sh:6-17` PY_CMD fallback 추가 (smoke_fast.sh:33 동일 패턴)",
-        "- 검증: `[doctor_lite] OK` 정상 출력",
-        "**[완료] 1주차 4번 — evidence coverage 축소 (본 수술)**",
-        "- (a) `evidence_gate.sh:127-139` tasks_handoff + tasks_updated/handoff_updated 검증 블록 제거 (commit_gate/final_check + completion_gate가 동일 책임 이미 수행)"
-      ]
-    },
-    {
-      "header": "세션92 (2026-04-22) — Plan IV-5/V-7/VIII [완료]",
-      "body": [
-        "**[완료]** /finish 종료 (final_sha=a1a81496). 단계 IV~VII 전부 완결."
-      ]
-    },
-    {
-      "header": "세션91 (2026-04-22) — Plan glimmering-churning-reef 단계 III~VII 완료",
-      "body": [
-        "**[완료]** 단계 III~VII 전부 완결. 상세: `98_아카이브/session91_glimmering/TASKS_~session88.md`",
-        "**[진행중] 단계 VIII — 30일 TTL 관찰 (2026-04-22 ~ 2026-05-22)**",
-        "- smoke_fast 유지 / incident 신규 0 (24h) / Self-X 재도입 grep 0건",
-        "- 만료 시점(2026-05-22) 재평가"
-      ]
-    },
-    {
-      "header": "세션90 (2026-04-22) — 자기유지형 시스템 재설계 (Plan glimmering-churning-reef)",
-      "body": [
-        "**[진행중] 2자 토론 기반 Self-X 자동 개입 폐기 + 수동 selfcheck 전환**",
-        "- 계획 파일: `C:/Users/User/.claude/plans/glimmering-churning-reef.md` (Part 0~8 + 보강안 A~D)",
-        "- 2자 토론: Claude × GPT 5라운드 (Round 4에서 누락 14건 + Round 5에서 2건 추가 식별)",
-        "- 사용자 선택: 안전안 (자기학습 포기 + 자기유지 보장). 메타 깊이 = 0 엄격 해석",
-        "**[완료] 단계 0 — baseline + invariants waiver (8924431d)**",
-        "- 0-1: incident baseline snapshot (unresolved 516 / gate_reject 376) → `90_공통기준/업무관리/baseline_20260422/incident_baseline.json`",
-        "- 0-2: invariants.yaml settings_drift WARN 임시 비활성화 (단계 V 완료 시 복원)",
-        "- 0-A: 활성 훅 37개 dep graph matrix → `baseline_20260422/dep_graph.md`",
-        "- 0-C: smoke_fast 10/10 PASS, doctor_lite OK, health_check 3 OK·5 WARN",
-        "**[완료] 단계 I — leaf hook 등록 해제 (82be4ab0 → 2300ceb9)**",
-        "- I-1 `quota_advisory.sh` (PostToolUse) · I-2 `self_recovery_t1.sh` (Stop)",
-        "- I-3 `circuit_breaker_check.sh` · I-4 `health_check.sh` (SessionStart)",
-        "- I-5 `session_start_restore.sh` last_selfcheck freshness 표시 + Self-X marker cleanup",
-        "**[완료] 단계 II — 감시 게이트 + dead config 정리 (ddef9b77, 471c07a8)**",
-        "- II-1 `health_summary_gate.sh` (UserPromptSubmit) 등록 해제",
-        "- II-2 `project_keywords.txt` → `98_아카이브/session89_glimmering/project_keywords_20260422.txt`",
-        "**[대기] 다음 진입점 — 단계 III (게이트 3종 재절단)**",
-        "- 세션 재시작 후 체감 확인 선행 (권장 경로)",
-        "- III-1 commit_gate → Git/staging만 / III-2 evidence_gate → 사전 근거만 / III-3 completion_gate → 최종 완료 선언만",
-        "- III-4 `gate_boundary_check.sh` 신설 (금지 토큰 검사)",
-        "- III-5 write_marker / evidence_mark_read / evidence_stop_guard 동반 정리",
-        "**[완료] origin/main push 복구 (c99c9a16)**",
-        "- 배경: GPT Round 재검증 FAIL (\"settings.json 여전히 옛 상태\") 수령 후 로컬 Git 상태 점검에서 이상 발견",
-        "- 진단: 로컬 `refs/heads/main`이 `0000...0000` null 손상 (reflog·HEAD는 정상)",
-        "- 조치: `git update-ref refs/heads/main c99c9a16` loose ref 복원 → `git push origin main` 8커밋 일괄 반영 (`ddcb252a..c99c9a16`)"
       ]
     }
   ]
