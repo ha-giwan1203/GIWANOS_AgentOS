@@ -28,8 +28,6 @@
       "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-fetch",
       "Bash(python3 90_공통기준/스킬/daily-routine/run.py)",
       "Bash(bash .claude/hooks/final_check.sh --fix)",
-      "Bash(sort -k6,7)",
-      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/스킬/daily-routine/run.py)",
       "mcp__Claude_in_Chrome__read_page",
       "mcp__Claude_in_Chrome__find",
       "Bash(bash .claude/hooks/list_active_hooks.sh --count)"
