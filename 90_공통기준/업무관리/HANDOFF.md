@@ -34,9 +34,14 @@
 - HANDOFF "미해결" 섹션 사실관계 보정 (push 완료/L-5 처리 완료 반영)
 
 ### 다음 AI 액션 (세션108)
-1. **[최우선]** 2026-04-27 (월) 07:10 `D0_SP3M3_Morning` 자동 실행 결과 확인 — LastResult=0 + `06_생산관리/D0_업로드/logs/morning_20260427.log` 정상 생성 + ERR_BLOCKED_BY_CLIENT 미발생 (포트 9223 격리 효과 사후 검증)
+1. **[최우선]** 2026-04-27 (월) 07:10 `D0_SP3M3_Morning` 자동 실행 결과 확인 — LastResult=0 + `06_생산관리/D0_업로드/logs/morning_20260427.log` 정상 생성 + ERR_BLOCKED_BY_CLIENT 미발생 (포트 9223 격리 효과 사후 검증). **수동 사전 검증은 통과** (parse-only 모드, listLen=21, statusCode=200)
 2. session_kernel.md stale 갱신 메커니즘 점검 (현재 fallback 동작 정상)
 3. 신규 의제 발굴 또는 사용자 트리거 대기
+
+### D0 자동화 신규 자산 (세션107 말미)
+- `--parse-only` 옵션: Phase 3 selectList까지만(DB 저장 안 함). 검증 전용
+- `_wait_d0_popup_frame()` 헬퍼: iframe URL 늦게 set되는 경합 대응 (frame URL + DOM querySelector 이중 폴링, 25s)
+- `run_morning_verify.bat`: parse-only 호출 wrapper (향후 동일 검증 재사용)
 
 ---
 

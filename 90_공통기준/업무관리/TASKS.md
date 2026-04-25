@@ -128,6 +128,15 @@
 - 실패 시 후속: ① 옵션 A(Urban VPN 비활성) 사용자에게 안내 ② chrome-cdp 프로필 분리 추가 검토
 - 차주 영업일 시작 시 가장 먼저 확인할 것
 
+**[완료] D0 수동 사전 검증 — selectList 21건 통과 + iframe 폴링 픽스** — A 분류
+- 트리거: 사용자 "오늘 아침 작동 안된 부분 검증 방법 없나?"
+- run.py 신규 옵션 `--parse-only`: Phase 3 selectList(엑셀 첨부+서버 파싱)까지만 수행, multiList(DB 저장) 스킵
+- d0_upload 시그니처에 `parse_only=False` 매개변수 추가, run_session_line / main `--xlsx` 모드 모두 지원
+- 검증 batch 신설: `90_공통기준/스킬/d0-production-plan/run_morning_verify.bat` (`--parse-only`로 호출, CRLF + UTF-8 BOM)
+- iframe 폴링 버그 픽스: `_wait_d0_popup_frame(page, timeout_sec=25.0)` 헬퍼 신설 — frame URL 매칭 + DOM querySelector(`iframe[src*="popupPmD0AddnUpload"]`) 보강. iframe[name="ifr_user"] src URL이 about:blank → popupPmD0AddnUpload.do로 늦게 set되는 경합 대응 (12s → 25s 확장)
+- 검증 결과: ERP 파서 응답 `listLen=21, statusCode=200, "정상 완료되었습니다", ERROR_FLAG=Y 0건, COL2 빈값 0건` — 엑셀 파일(Excel COM 생성) 100% 정상
+- 진단 부산물(_diag_selectList.py) 삭제 완료. verify batch는 향후 재사용 위해 보존
+
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 
 **[완료] 3자 토론 Round 1+2 — 세션103 이월 의제 3건 합의 성립**

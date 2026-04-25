@@ -363,8 +363,38 @@ def make_upload_xlsx(items, prod_date: datetime, out_path: Path):
 # ============================================================
 # Phase 3: D0 업로드 (selectList + multiList)
 # ============================================================
-def d0_upload(page, xlsx_path: Path):
-    """팝업 오픈 → selectList → multiList."""
+def _wait_d0_popup_frame(page, timeout_sec: float = 25.0):
+    """D0 업로드 팝업 iframe 폴링 (frame URL 매칭 + DOM querySelector 보강).
+
+    iframe[name="ifr_user"]는 즉시 생성되지만 src URL이 about:blank → popupPmD0AddnUpload.do
+    로 늦게 set되는 경우가 있어, frame URL 매칭만으로는 놓칠 수 있다 (세션107 실증).
+    DOM 직접 조회를 보조 신호로 사용해 frame 객체가 반영될 때까지 추가 대기.
+    """
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline:
+        for fr in page.frames:
+            if "popupPmD0AddnUpload" in fr.url:
+                return fr
+        try:
+            has_iframe = page.evaluate(
+                "() => !!document.querySelector('iframe[src*=\"popupPmD0AddnUpload\"]')"
+            )
+            if has_iframe:
+                time.sleep(0.5)
+                for fr in page.frames:
+                    if "popupPmD0AddnUpload" in fr.url:
+                        return fr
+        except Exception:
+            pass
+        time.sleep(0.3)
+    return None
+
+
+def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
+    """팝업 오픈 → selectList → multiList.
+
+    parse_only=True: selectList(엑셀 첨부 + 서버 파싱 + 화면 표시)까지만 수행하고 multiList(DB 저장) 스킵.
+    검증 모드 전용 (Phase 4/5 미진행)."""
     # 페이지 로드 확인 + 버튼 대기
     try:
         page.wait_for_selector("#btnExcelUpload", timeout=15000)
@@ -395,7 +425,7 @@ def d0_upload(page, xlsx_path: Path):
             except Exception as e:
                 print(f"[phase3] reload err: {e}")
     if ifr is None:
-        # 클릭 재시도 (최대 3번)
+        # 클릭 재시도 (최대 3번) — 폴링은 _wait_d0_popup_frame (25초, DOM 보강)
         for attempt in range(3):
             try:
                 page.locator("#btnExcelUpload").first.click()
@@ -403,13 +433,7 @@ def d0_upload(page, xlsx_path: Path):
                 print(f"[phase3] 클릭 실패 try={attempt+1}: {e}")
                 time.sleep(2)
                 continue
-            # popup 로드 대기 (최대 12초)
-            for _ in range(24):
-                time.sleep(0.5)
-                for fr in page.frames:
-                    if "popupPmD0AddnUpload" in fr.url:
-                        ifr = fr; break
-                if ifr: break
+            ifr = _wait_d0_popup_frame(page, timeout_sec=25.0)
             if ifr: break
             print(f"[phase3] popup 미등장 try={attempt+1} — 재시도")
             time.sleep(2)
@@ -461,6 +485,10 @@ def d0_upload(page, xlsx_path: Path):
     err_check = ifr.evaluate("() => { try { return popupPmD0AddnUpload.$local_grid.getData().filter(r => r.ERROR_FLAG).length; } catch(e){ return -1; } }")
     if err_check > 0:
         raise RuntimeError(f"오류 행 {err_check}건 존재")
+
+    if parse_only:
+        print("[phase3 parse-only] selectList 완료 — multiList(DB 저장) 스킵 + 팝업 유지 (사용자 확인용)")
+        return
 
     # multiList (DB 저장)
     save_js = """
@@ -697,7 +725,7 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
 # ============================================================
 # 세션 실행
 # ============================================================
-def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None):
+def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None, parse_only=False):
     if not items:
         print(f"[{line}] 추출 0건 — 스킵")
         return
@@ -707,6 +735,11 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
 
     if dry_run:
         print(f"[{line}] dry-run: 엑셀 생성까지만 (추출 {len(items)}건)")
+        return
+
+    if parse_only:
+        d0_upload(page, xlsx, parse_only=True)
+        print(f"[{line}] parse-only: 업로드 창에 엑셀 첨부 + 서버 파싱까지만 (추출 {len(items)}건). Phase 4/5 미진행")
         return
 
     d0_upload(page, xlsx)
@@ -740,6 +773,7 @@ def main():
     ap.add_argument("--target-date", help="YYYY-MM-DD 파일명 날짜 (기본 자동)")
     ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
+    ap.add_argument("--parse-only", action="store_true", help="검증 모드: 엑셀 업로드창 첨부 + 서버 파싱(selectList)까지만. multiList(DB 저장)/Phase 4-5 모두 스킵")
     args = ap.parse_args()
 
     session = determine_session(args.session)
@@ -773,6 +807,10 @@ def main():
             # xlsx 그대로 업로드 (Phase 3) + 서열 배치 (Phase 4) + 최종 저장 (Phase 5)
             if args.skip_upload:
                 print("[direct] --skip-upload: Phase 3 건너뜀")
+            elif args.parse_only:
+                d0_upload(page, xlsx_path, parse_only=True)
+                print("[direct] parse-only: 엑셀 첨부 + 서버 파싱까지만. Phase 4/5 미진행")
+                return
             else:
                 d0_upload(page, xlsx_path)
             cfg = LINE_CONFIG[line_override]
@@ -795,17 +833,17 @@ def main():
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_night(wb)
                 prod_date = target_file_date - timedelta(days=1)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
             if args.line in ("SD9A01","ALL"):
                 items = extract_outer_d1(wb, "SD9M01")
                 prod_date = target_file_date
-                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date)
+                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
             prod_date = target_file_date
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
