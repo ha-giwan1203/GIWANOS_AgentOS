@@ -77,10 +77,16 @@
 - 신규 정책 아님 — 문서 곳곳에 분산된 기존 합의(README "훅별 실패 책임 매트릭스" + Phase 2-A 통합 평가 절차)를 PreToolUse 섹션에 명시.
 
 **[보류 — 권한 차단] L-4 settings.local.json 1회용/중복 permission 정리**
-- 사용자 지시 ("처리해라" + "1") 있었으나 권한 시스템이 settings 파일 편집을 2회 차단.
-- 차단 사유: "settings 구조 변경 금지"는 사용자 모드 boundary, "처리해라"가 settings 파일 수정의 명시적 승인 표현이 아니라고 시스템 판정.
+- 사용자 지시 ("처리해라" + "1") 있었으나 권한 시스템이 settings 파일 편집을 3회 차단.
+- 차단 사유: "settings 구조 변경 금지"는 사용자 모드 boundary, 일반 표현은 settings 파일 self-modification 승인으로 미인정.
 - 분석 완료 (즉시 적용 시 5건 제거 가능): 라인 9 `gemini -p:*`(라인 8 부분집합) / 라인 27 `python notion_sync.py --manual-sync` ENV 중복 / 라인 29 daily-routine 상대 PYTHONIOENCODING 부분집합 / 라인 34·35 daily-routine 절대경로 1회용 (상대경로 라인 14 상위 호환).
 - 진행하려면 사용자가 ".claude/settings.local.json 편집 승인"을 명시적으로 표현해야 함.
+- 사용자 최종 결정: **보류 확정**. 양측 판정도 보류 인정.
+
+**[3way 공유 PASS] 양측 판정 수령**
+- GPT: PASS (전 항목 실증됨, 추가제안 없음 — "추가 개선 금지, 실무 산출물 모드 유지")
+- Gemini: PASS (전 항목 동의, L-6 일반론 / L-4 환경미스매치, 추가제안 없음 — "시스템 개선 영구 중단 + 실무 산출물 모드 전환 승인")
+- 양측 합의로 시스템 개선 모드 영구 중단 확정.
 
 ---
 
