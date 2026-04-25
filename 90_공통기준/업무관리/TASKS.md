@@ -34,6 +34,12 @@
 - 3자 합의 로그: `90_공통기준/토론모드/logs/debate_20260425_115300_3way/`
 - ⚠️ **위험 명시 (양측 통합)**: ① "정책 레지스트리 등록이며 자동 수정 차단 기능은 아님" (GPT) ② "settings.json PreToolUse 바인딩 임의 삭제 시 게이트 무력화 위험 — 호출부 유지보수 의존성 동시 명시" (Gemini)
 
+**[완료] L-1 후속 final_check WARN 해소** — A 분류, 커밋 `aac8a9bf`
+- 증상: L-1 STATUS.md "32개 등록" 수동 표기 제거 후 `final_check.sh` STATUS_COUNT 정규식 매칭 실패 → WARN 1건 매번 발생
+- 수정: `final_check.sh:194` STATUS_COUNT가 비어있고 STATUS.md에 "list_active_hooks.sh --count" 키워드가 있으면 [OK] 처리 (Single Source of Truth 정책 일치)
+- 검증: smoke_fast 11/11 / doctor_lite OK / final_check WARN 0건
+- 3자 합의: GPT/Gemini 양측 "조건부 통과 → WARN 해소 후 PASS" 판정 → 본 커밋으로 PASS 조건 충족
+
 **[부분반영] L-5 incident 분석 + session_drift 27건 일괄 해소** — A 분류
 - 실측: 미해결 163건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 28 / final_check 27 / commit_gate 24 / navigate_gate 15
 - 처리: STATUS.md/HANDOFF.md 헤더 세션107 갱신 → 신규 session_drift 차단 + 기존 27건 `resolved_by: session107_status_handoff_sync` 일괄 해소
