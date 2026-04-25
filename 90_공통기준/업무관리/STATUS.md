@@ -31,7 +31,7 @@
 | 기능 활용 | 합의 완료 (GPT PASS). 별도 규칙 파일 폐기, CLAUDE.md 본문으로 흡수 | `CLAUDE.md` |
 | domain_guard | v3 구현 후 폐기 → _archive 이동. risk_profile_prompt로 대체 | `.claude/hooks/_archive/domain_guard.sh` |
 | evidence hook | 증거기반 위험실행 차단기 5개 구현 (GPT 부분반영) | `.claude/hooks/evidence_*.sh` |
-| 토론모드/게이트 보정 | Chrome MCP 단일화(세션32). CDP 폐기, send_gate→mcp_send_gate 교체, harness_gate 유지. idle composer 오탐 제거, completion gate 축소, 한국어-only, final_check settings 기준 재정렬 | `90_공통기준/토론모드/`, `.claude/hooks/` |
+| 토론모드/게이트 보정 | **현재 정책: chrome-devtools-mcp(CDP) 단독** (세션105 전환, 세션107 L-3 정합). 세션32 Chrome MCP 단일화 → 세션105 CDP 전환으로 갱신됨. send_gate→mcp_send_gate 교체, harness_gate 유지. idle composer 오탐 제거, completion gate 축소, 한국어-only, final_check settings 기준 재정렬 | `90_공통기준/토론모드/`, `.claude/hooks/` |
 | 토론모드 보류 안건 | → TASKS.md "진행중 / 보류" 참조 | `90_공통기준/업무관리/TASKS.md` |
 | GPT 전송 스킬 | /gpt-send, /gpt-read 실사용 PASS (세션36) | `.claude/commands/gpt-send.md` |
 | verify_xlsm | 1차 구조 검증 10/10 PASS, 2차 COM 불필요(결과 시트) | `90_공통기준/agent-control/verifiers/verify_xlsm.py` |

@@ -10,7 +10,25 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-25 KST — 세션107 GPT 시스템 정합성 검토 4건 반영(L-1·L-2·L-3 즉시) + L-4 3자 승격 + L-5 별 의제 등록
+최종 업데이트: 2026-04-25 KST — 세션107 GPT 시스템 정합성 검토 4건 반영(L-1·L-2·L-3 즉시) + L-4 3자 승격 + L-5 별 의제 등록 / 세션108 GPT 정밀평가 L-1·L-2 문서 드리프트 최소 보정 후 시스템 개선 모드 중단
+
+## 세션108 (2026-04-25) — GPT 정밀평가 검증 후 시스템 개선 모드 중단
+
+> 진입: GPT 정밀평가 리포트(L-1~L-7, P-1~P-5) 수령. 사용자 모드 전환 — "실무 산출물 우선, 시스템 개선 중단". 마지막 한 사이클로 근본 드리프트만 최소 보정.
+
+**[완료] L-1 STATUS.md 토론모드 정책 history 정합** — A 분류
+- `STATUS.md:34` 재개표 "Chrome MCP 단일화(세션32). CDP 폐기" → 현재 정책(chrome-devtools-mcp/CDP 단독, 세션105 전환) 명시. 세션32 표현은 history로 명시 보존.
+- 근거: 토론모드 `CLAUDE.md` 현재 정책과 정합. gpt-send/read·gemini-send/read 4개 command 모두 CDP `select_page(bringToFront=true)` 기반.
+
+**[완료] L-2 hooks/README.md 등록 순서 출처 정정** — A 분류
+- `.claude/hooks/README.md:29` "settings.local.json 배열 순서" → "settings.json(team+local union) 배열 순서". 문서 라인 8(SSoT=settings.json)과 자체 모순 해소.
+
+**[모드 전환] 시스템 개선 모드 중단**
+- 이후 작업: 실무 산출물 / 작업 차단 오류 최소 수정 / TASKS·HANDOFF 필수 기록 / final_check 1건 단위 보정.
+- 보류: P-1~P-5 잔여(L-3 incident 분석 추가 / L-4 local permission 정리 / L-5 runtime 검증 / L-6 PreToolUse 과밀 / L-7 CDP 강제 차단).
+- L-3은 드리프트 아님(분석 시점 47건 스냅샷 vs TASKS 누적 44건은 시점 차이) — 보정 불요.
+
+---
 
 ## 세션107 (2026-04-25) — GPT 시스템 정합성 검토 4건 반영
 
