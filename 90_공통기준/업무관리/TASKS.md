@@ -61,6 +61,16 @@
   - settings.json:262 `mcp__Claude_in_Chrome__navigate` 매처 제거 여부 (실행 차단 강제)
   - navigate_gate.sh에 claude-in-chrome 호출 차단 로직 추가 여부
 
+**[보류·취소] CDP 단독 사용 실 차단 강제 (B 분류, 옵션 2)** — 사용자 지시 예외 D안
+- 의제: 토론모드 외에서도 claude-in-chrome MCP 호출 자체 차단 (settings.json deny + navigate_gate fallback)
+- 진행 결과: Round 1까지 — GPT/Gemini 양측 조건부 통과 (A+B 조합 동의 / 매처 처리 단계 vs 일괄 차이)
+- 중단 사유: 사용자 명시 지시 ("그냥 취소 할까??" → "취소하자")
+  - 정책 명시(177d5160)만으로 Claude 행동 규범 작동 충분
+  - 세션107 BOM 사례 직접 경험 — settings.local.json 일괄 수정 위험 실증
+  - L-4 합의 패턴 일관 (보호자산도 "정책 선언만, 자동 차단 hook 미구현")
+- 로그: `90_공통기준/토론모드/logs/debate_20260425_134400_3way_cdp_only/`
+- 재진행 트리거: 정책 위반 실증 발생 또는 외부 보안 요구사항 변경 시 B 분류 재검토
+
 ## 세션106 (2026-04-25 아침) — D0_SP3M3_Morning 스케줄러 LastResult=3 근본 해결
 
 **[완료] batch 파일 인코딩 수정 (LF→CRLF + UTF-8 BOM)** — 커밋 `84675727`
