@@ -191,7 +191,13 @@ if [ -n "$STATUS_COUNT" ]; then
     echo "  [OK] STATUS hook 개수 일치"
   fi
 else
-  warn "STATUS hooks 체계 행에서 개수를 읽지 못함"
+  # 세션107 L-1 후속: STATUS.md가 list_active_hooks.sh 동적 참조로 전환된 경우 (단일 원본 정책 일치) → OK 처리
+  # DESIGN_PRINCIPLES Single Source of Truth: hook 카운트 수동 표기 금지 (세션107 [3way] 합의)
+  if [ -f "$STATUS_FILE" ] && grep -q 'list_active_hooks.sh --count' "$STATUS_FILE" 2>/dev/null; then
+    echo "  [OK] STATUS hook 카운트 동적 참조(list_active_hooks.sh --count) — 단일 원본 정책 일치"
+  else
+    warn "STATUS hooks 체계 행에서 개수를 읽지 못함"
+  fi
 fi
 echo ""
 
