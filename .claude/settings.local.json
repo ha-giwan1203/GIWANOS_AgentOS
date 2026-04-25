@@ -32,8 +32,7 @@
       "mcp__Claude_in_Chrome__find",
       "Bash(bash .claude/hooks/list_active_hooks.sh --count)",
       "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
-      "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
-      "Bash(git push:*)"
+      "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")"
     ],
     "ask": [
       "Bash(python*:*)",

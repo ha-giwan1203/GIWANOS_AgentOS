@@ -23,19 +23,20 @@
 - L-5 incident 158건 분석: session_drift 27건 전부 final_check "STATUS<TASKS" 드리프트 → STATUS.md/HANDOFF.md 헤더 세션107 갱신으로 신규 발생 차단
 
 ### 클로즈 상태 (세션107 잔여 정리 후)
-- **Push 완료**: e7a9afbb + 65efca24 + aac8a9bf + 후속 커밋 모두 origin/main 반영. `Bash(git push:*)` 권한 settings.local.json 등록으로 차단 해소
+- **Push 완료**: e7a9afbb + 65efca24 + aac8a9bf + 후속 커밋 모두 origin/main 반영. `Bash(git push:*)` 권한은 `.claude/settings.json:15`에 영구 등록(팀 공용)되어 있음 — settings.local.json 중복 entry 제거
 - **L-5 incident 처리 완료**: 의제 A~D 100건 일괄 해소 + 잔존 47→44건 추가 정리 → TASKS.md 세션107 항목으로 처리. 잔존 44건은 정당한 차단 기록(보존)
 - **B-2 완료**: hook_incident hook/type 필드 누락 추적 강화 (record_incident.py --hook required + hook_common.sh 빈 entry WARN)
 - **D-2 폐기**: navigate_gate trip은 정상 안전장치 동작, 신규 발생 자체가 정책 위반 아님
 
 ### 잔여 정리 (세션107 말미)
-- `.claude/settings.local.json` 한글 mojibake 12+/9- 복구 + 신규 entry 3건(git push, daily-routine 절대경로 2건) 보존
+- `.claude/settings.local.json` 한글 mojibake 12+/9- 복구 + daily-routine 절대경로 2건 보존 (`Bash(git push:*)`는 settings.json 영구 등록과 중복으로 제거)
 - `.gitignore`에 `*.bak_session107_pre_port9223` 추가 → 백업파일 9개 untracked 해소
 - HANDOFF "미해결" 섹션 사실관계 보정 (push 완료/L-5 처리 완료 반영)
 
 ### 다음 AI 액션 (세션108)
-1. session_kernel.md stale 갱신 메커니즘 점검 (현재 fallback 동작 정상)
-2. 신규 의제 발굴 또는 사용자 트리거 대기
+1. **[최우선]** 2026-04-27 (월) 07:10 `D0_SP3M3_Morning` 자동 실행 결과 확인 — LastResult=0 + `06_생산관리/D0_업로드/logs/morning_20260427.log` 정상 생성 + ERR_BLOCKED_BY_CLIENT 미발생 (포트 9223 격리 효과 사후 검증)
+2. session_kernel.md stale 갱신 메커니즘 점검 (현재 fallback 동작 정상)
+3. 신규 의제 발굴 또는 사용자 트리거 대기
 
 ---
 
