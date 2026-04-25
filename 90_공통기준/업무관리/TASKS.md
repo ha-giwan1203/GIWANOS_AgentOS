@@ -40,12 +40,20 @@
 - 검증: smoke_fast 11/11 / doctor_lite OK / final_check WARN 0건
 - 3자 합의: GPT/Gemini 양측 "조건부 통과 → WARN 해소 후 PASS" 판정 → 본 커밋으로 PASS 조건 충족
 
-**[부분반영] L-5 incident 분석 + session_drift 27건 일괄 해소** — A 분류
-- 실측: 미해결 163건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 28 / final_check 27 / commit_gate 24 / navigate_gate 15
-- 처리: STATUS.md/HANDOFF.md 헤더 세션107 갱신 → 신규 session_drift 차단 + 기존 27건 `resolved_by: session107_status_handoff_sync` 일괄 해소
-- 잔존: 139건 (auto_commit_state 28 / commit_gate 24 / navigate_gate 16 / evidence_gate 14 / skill_instruction_gate 11 / UNCLASSIFIED 28)
-- 분석 보고서: `90_공통기준/업무관리/incident_session107_analysis.md` (의제 A~D 후속 권고)
-- ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_drift_resolve`
+**[완료] L-5 incident 분석 + session_drift 27건 + 의제 A~D 100건 일괄 해소** — A 분류
+- 실측: 미해결 163건 (GPT 시점 80건 → 환경미스매치)
+- 1차 처리: session_drift 27건 일괄 해소 (`resolved_by: session107_status_handoff_sync`) → 139건 잔존
+- 2차 처리 (의제 A~D 100건 일괄 해소):
+  - A: auto_commit_state / completion_before_state_sync 30건 → `session107_l5_a_root_cause_cleared` (final_check ALL CLEAR로 원인 해소)
+  - B: UNCLASSIFIED (hook/type 빈 entry) 32건 → `session107_l5_b_invalid_entry_format` (형식 깨짐 데이터 가치 없음)
+  - C: commit_gate / pre_commit_check 21건 → `session107_l5_c_root_cause_cleared` (동 A)
+  - D: navigate_gate / send_block 17건 → `session107_l5_d_marker_present` (세션 진입 marker 정상)
+- **잔존: 47건** (evidence_missing 26 / harness_missing 7 / scope_violation 6 / doc_drift 5 / 기타 3 / 기타 hook 6 — 정당한 차단 기록, 개별 검토 필요)
+- 분석 보고서: `90_공통기준/업무관리/incident_session107_analysis.md`
+- ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_l5_resolve`
+- 신규 발생 방지 별 의제 (이월):
+  - **B-2**: record_incident 호출 시 hook/type 필드 누락 점검 (UNCLASSIFIED 재발 방지)
+  - **D-2**: 매 세션 첫 토론모드 진입 시 debate marker 자동 생성 (send_block trip 재발 방지)
 
 **[보류] P-5 navigate_gate / debate_independent_gate exit 2 격상**
 - GPT도 보류 권고. send_block 오탐/정탐 비율 확보 후 결정.

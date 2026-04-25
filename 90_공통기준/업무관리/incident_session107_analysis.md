@@ -48,5 +48,47 @@
 - **근본 원인**: ChatGPT URL 진입 시 debate CLAUDE.md 미읽기 marker (`debate_claude_read.ok`) 누락
 - **즉시 조치**: 매 세션 진입 시 토론모드 사용 전 CLAUDE.md 자동 읽기 hook 추가 검토 (별 의제)
 
-## 별 의제로 미분리 사유
+## 별 의제로 미분리 사유 (1차 분석 시점)
 잔존 139건은 5종 hook이 90%를 차지하므로 hook별 근본 원인 분석이 필요. 단일 incident_repair.py auto-resolve로 일괄 처리는 안전하지 않음 (실 차단 사유 vs 우발적 trip 구분 필요).
+
+---
+
+## 추가 처리 (세션107 후속, 2026-04-25 두 번째 — 사용자 지시)
+
+### 의제 A~D 일괄 resolved (139 → 47건)
+
+| 의제 | hook / classification | 처리 건수 | resolved_by | 근거 |
+|------|----------------------|----------|-------------|------|
+| A | auto_commit_state / completion_before_state_sync | 30 | session107_l5_a_root_cause_cleared | 본 세션 작업 중 final_check FAIL trip. 현재 ALL CLEAR 달성 |
+| B | UNCLASSIFIED (hook/type/detail 빈 entry) | 32 | session107_l5_b_invalid_entry_format | 데이터 가치 없는 형식 깨짐 entry |
+| C | commit_gate / pre_commit_check | 21 | session107_l5_c_root_cause_cleared | 동 A. push 차단 누적이 final_check 정상화로 해소 |
+| D | navigate_gate / send_block | 17 | session107_l5_d_marker_present | ChatGPT 진입 marker 누락 trip. 세션 진입 후 marker 정상 |
+| **합계** | — | **100** | — | — |
+
+ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_l5_resolve`
+
+### 잔존 47건 분포 (정당한 차단 기록 — 일괄 resolved 부적절, 개별 검토 필요)
+
+| classification_reason | 건수 | hook |
+|----------------------|------|------|
+| evidence_missing | 26 | evidence_gate 14 / skill_instruction_gate 12 |
+| harness_missing | 7 | harness_gate 7 |
+| scope_violation | 6 | date_scope_guard 6 |
+| doc_drift | 5 | (분포) |
+| 기타 (true_positive / gpt_verdict / debate_verify_block) | 3 | — |
+| 기타 hook | 6 | commit_gate 3 / token_threshold_check 2 / send_gate 1 / gpt-read 1 / ? 1 |
+
+### 신규 발생 방지 — 별 의제 (이월)
+
+**의제 B-2 — record_incident 호출 시 hook/type 필드 누락 점검**:
+- 32건의 UNCLASSIFIED 발생 코드 경로 추적
+- record_incident.py 또는 hook_common.sh hook_incident wrapper 호출 시 누락 위치 식별
+- 강제 필드 검증 추가 (필드 누락 시 호출 자체 거부)
+
+**의제 D-2 — 매 세션 첫 진입 시 debate marker 자동 생성**:
+- session_start_restore.sh가 debate_claude_read.ok marker 무효화 → 첫 토론모드 사용 시 매번 navigate_gate trip 발생
+- 토론모드 진입 자동 marker 생성 또는 trip 1회 후 silence 정책 검토
+
+**의제 A/C — auto_commit_state / commit_gate 정합 유지**:
+- 매 세션 STATUS/HANDOFF 갱신 정착으로 자연 감소
+- 별 처리 불요
