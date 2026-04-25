@@ -4,8 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-25 KST — 세션106 D0_SP3M3_Morning 스케줄러 batch 인코딩 수정 + ERR_BLOCKED 추적 미해결
+최종 업데이트: 2026-04-25 KST — 세션107 GPT 시스템 정합성 검토 4건 반영 (L-1·L-2·L-3 즉시 + L-4 [3way] 만장일치 + L-5 분석)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션107 (2026-04-25) — GPT 시스템 정합성 검토 + 3자 토론 L-4
+
+### 진행 상황
+- 사용자 트리거: "gpt토론방 내용 확인후 내 계획을 듣고 싶어" → GPT L-1~L-5 지적 5건 수령
+- 독립 라벨 부여(실증됨/일반론/환경미스매치/메타순환/구현경로미정) 후 A 분류 즉시 반영
+  - L-1 hook 32개 수동 표기 제거 (STATUS/README) — 커밋 e7a9afbb
+  - L-2 SKILL.md frontmatter β안-C 예외 명시 — 커밋 e7a9afbb
+  - L-3 SKILL.md 구 MCP 표기 → chrome-devtools-mcp 갱신 — 커밋 e7a9afbb
+- L-4 navigate_gate.sh 보호자산 등록 = B 분류 → 3자 토론 자동 승격 (만장일치 pass_ratio=1.0) — 커밋 65efca24
+  - 양측 추가 위험 통합: GPT(보호 착시) + Gemini(settings.json 우회 무력화)
+  - 로그: `90_공통기준/토론모드/logs/debate_20260425_115300_3way/`
+- L-5 incident 158건 분석: session_drift 27건 전부 final_check "STATUS<TASKS" 드리프트 → STATUS.md/HANDOFF.md 헤더 세션107 갱신으로 신규 발생 차단
+
+### 미해결
+- **main push 차단**: e7a9afbb + 65efca24 두 커밋 미푸시. Git Push to Default Branch rule 정책 + 사용자 명시 동의 필요. 현재 사용자 응답 "진행"만으로는 시스템이 통과 안 시킴
+- **L-5 incident 잔존**: 기존 session_drift 27건은 history로 남음 (incident_repair.py 전수 처리 별 의제). UNCLASSIFIED 25건은 hook/type 빈 항목(ledger 형식 깨짐) — 별 의제
+
+### 다음 AI 액션
+1. 사용자가 push 명시 허용 시 즉시 `git push origin main`
+2. L-5 잔존 incident 일괄 resolved 처리(incident_repair.py 또는 수동 marker)
+3. UNCLASSIFIED 25건 ledger 정합성 점검 (별 의제)
 
 ---
 

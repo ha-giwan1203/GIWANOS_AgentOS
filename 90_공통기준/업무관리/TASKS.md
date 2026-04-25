@@ -34,9 +34,12 @@
 - 3자 합의 로그: `90_공통기준/토론모드/logs/debate_20260425_115300_3way/`
 - ⚠️ **위험 명시 (양측 통합)**: ① "정책 레지스트리 등록이며 자동 수정 차단 기능은 아님" (GPT) ② "settings.json PreToolUse 바인딩 임의 삭제 시 게이트 무력화 위험 — 호출부 유지보수 의존성 동시 명시" (Gemini)
 
-**[별 의제] L-5 incident 미해결 158건 분류 + session_drift 자동수정 검증** — A 분류, 별 세션
-- 실측: 미해결 158건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 26 / final_check 25 / commit_gate 24 / navigate_gate 15.
-- 작업량 큼 → 별 의제로 분리. Q3 후속 분류 리포트 작성 + final_check --fix 검증.
+**[부분반영] L-5 incident 분석 + session_drift 27건 일괄 해소** — A 분류
+- 실측: 미해결 163건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 28 / final_check 27 / commit_gate 24 / navigate_gate 15
+- 처리: STATUS.md/HANDOFF.md 헤더 세션107 갱신 → 신규 session_drift 차단 + 기존 27건 `resolved_by: session107_status_handoff_sync` 일괄 해소
+- 잔존: 139건 (auto_commit_state 28 / commit_gate 24 / navigate_gate 16 / evidence_gate 14 / skill_instruction_gate 11 / UNCLASSIFIED 28)
+- 분석 보고서: `90_공통기준/업무관리/incident_session107_analysis.md` (의제 A~D 후속 권고)
+- ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_drift_resolve`
 
 **[보류] P-5 navigate_gate / debate_independent_gate exit 2 격상**
 - GPT도 보류 권고. send_block 오탐/정탐 비율 확보 후 결정.
