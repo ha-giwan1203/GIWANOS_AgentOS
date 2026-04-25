@@ -42,7 +42,7 @@
 
 ## 선결 조건
 
-- Chrome CDP 9222 (스킬이 없으면 자동 기동)
+- Chrome CDP 9223 (스킬이 없으면 자동 기동)
 - ERP OAuth 자동 로그인 (저장 자격증명 0109)
 - Z 드라이브 접근 (`\\210.216.217.180\zz-group`)
 - Python 의존성: pyautogui, playwright, openpyxl

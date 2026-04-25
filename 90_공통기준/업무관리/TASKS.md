@@ -84,15 +84,27 @@
   - `06_생산관리/D0_업로드/logs/morning_20260425.log` (3076 bytes)
   - LastResult 3 → 1 진전 (남은 1은 별건)
 
-**[미해결] ERR_BLOCKED_BY_CLIENT — ERP 페이지 진입 차단 (별건)**
-- 위치: `run.py` phase0 `page.goto(D0_URL)` (run.py:135)
-- URL: `http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do`
-- 에러: `playwright._impl._errors.Error: Page.goto: net::ERR_BLOCKED_BY_CLIENT`
-- 원인 후보:
-  1. CDP Chrome(`C:\temp\chrome-cdp`)에 광고 차단/보안 확장 설치됨
-  2. 토론모드용 CDP 프로필과 D0 자동화용 프로필 충돌 (포트 9222 동시 점유)
-  3. erp-dev.samsong.com URL 패턴이 Chrome 내장 차단 목록(예: 보안 정책)에 매칭
-- 다음 액션: CDP Chrome 확장 목록 점검 + run.py 진입 프로필 분리 검토
+**[완료] ERR_BLOCKED_BY_CLIENT — 근본 원인 진단 + 포트 분리 (세션107)**
+- 진단 결과 (실측):
+  - chrome-cdp 프로필(토론모드 전용)에 **Urban VPN Proxy** 확장(`eppiocemhmnlbhjplcgkofciiegomcon`) 설치됨 — `proxy` + `<all_urls>` 권한
+  - 토론모드 9222 점유 시 D0 자동화가 같은 9222 connect → chrome-cdp 프로필 재사용 → Urban VPN이 erp-dev.samsong.com:19100 트래픽 가로채기 → ERR_BLOCKED_BY_CLIENT
+- 옵션 A (사용자 작업): chrome-cdp 프로필에서 Urban VPN 비활성/제거 (chrome://extensions/)
+- 옵션 B (코드 변경, 완료): 업무 자동화 5개 포트 9222 → 9223 분리
+  - 변경 파일 9개 / 9222 occurrence 22곳 → 9223 일괄 치환:
+    - `d0-production-plan/run.py` (5곳)
+    - `d0-production-plan/SKILL.md` (3곳)
+    - `flow-chat-analysis/collector.py` (1곳)
+    - `flow-chat-analysis/login.bat` (1곳)
+    - `flow-chat-analysis/run.bat` (1곳)
+    - `flow-chat-analysis/research.md` (1곳)
+    - `production-result-upload/run.py` (1곳)
+    - `production-result-upload/SKILL.md` (4곳)
+    - `zdm-daily-inspection/SKILL.md` (4곳)
+    - `.claude/commands/d0-plan.md` (1곳)
+  - 백업: 각 파일 `.bak_session107_pre_port9223` 접미사 (git 제외)
+  - 검증: Python syntax OK 3건 (run.py 2종 + collector.py)
+- 분류: A (스크립트 코드 변경, 외부 인터페이스 미영향 — Chrome CDP 통신 포트만 변경, ERP/MES URL 동일) + 사용자 지시 예외 D안
+- 운영 영향: 토론모드(9222 + chrome-cdp) 사용 중에도 업무 자동화(9223 + flow-chrome-debug) 정상 작동. 환경 완전 격리
 
 ## 세션105 (2026-04-24 저녁) — 시스템 개선 3자 토론 + 탭 전환 근본 해결
 

@@ -122,9 +122,9 @@ assert_not_sunday(date(2026, 4, 5))               # 누락분 보정 시
 ## 실행 절차
 
 ### 사전 조건
-1. CDP 브라우저가 `http://localhost:9222`에서 실행 중 (없으면 자동 실행)
+1. CDP 브라우저가 `http://localhost:9223`에서 실행 중 (없으면 자동 실행)
 2. ZDM 시스템(`http://ax.samsong.com:34010/`)에 접속된 상태
-3. Chrome 프로필: `.flow-chrome-debug` (포트 9222, `--remote-debugging-port=9222`)
+3. Chrome 프로필: `.flow-chrome-debug` (포트 9223, `--remote-debugging-port=9223`)
 
 ### CDP 브라우저 실행/종료
 
@@ -132,7 +132,7 @@ assert_not_sunday(date(2026, 4, 5))               # 누락분 보정 시
 ```python
 subprocess.Popen([
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-    "--remote-debugging-port=9222",
+    "--remote-debugging-port=9223",
     r"--user-data-dir=C:\Users\User\.flow-chrome-debug",
     "http://ax.samsong.com:34010/",
     "--no-first-run", "--no-default-browser-check"
@@ -191,7 +191,7 @@ cdp.send("Browser.close")
 
 | 조건 | 판정 |
 |------|------|
-| CDP 브라우저 미연결 (`localhost:9222` 무응답) | FAIL |
+| CDP 브라우저 미연결 (`localhost:9223` 무응답) | FAIL |
 | ZDM 시스템 접속 불가 (`ax.samsong.com:34010`) | FAIL |
 | GET `/api/daily-inspection` 반환 점검표 < 19개 | FAIL |
 | POST 저장 후 records 재조회 시 입력 건수 ≠ 75 | FAIL |

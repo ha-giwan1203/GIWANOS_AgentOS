@@ -36,7 +36,7 @@ SP3M3 생산지시서 xlsm 단일 파일에서 라인별 계획을 추출해 ERP
 
 ## 사전 준비
 
-- Chrome 디버깅 세션: `--remote-debugging-port=9222`, 프로필 `C:\Users\User\.flow-chrome-debug`
+- Chrome 디버깅 세션: `--remote-debugging-port=9223`, 프로필 `C:\Users\User\.flow-chrome-debug`
 - ERP 로그인: 프로필에 저장된 자격증명(`0109`) 자동완성 (pyautogui)
 - Python 의존성: `pyautogui`, `playwright`, `openpyxl`, **`pywin32`** (Excel COM, 업로드 xlsx 생성용 필수)
 - Microsoft Excel 설치 필요 (업로드 xlsx 생성에 Excel.Application COM 호출)
@@ -88,7 +88,7 @@ python run.py --session evening --line SD9A01    # SD9A01만
 
 ### Phase 0: 환경 준비
 1. Z 드라이브 접근 확인
-2. Chrome CDP 9222 기동 (이미 있으면 재사용)
+2. Chrome CDP 9223 기동 (이미 있으면 재사용)
 3. ERP OAuth 자동 로그인 (pyautogui 저장 자격증명)
 4. D0추가생산지시 화면 진입: `http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do`
 
@@ -160,7 +160,7 @@ python run.py --session evening --line SD9A01    # SD9A01만
 
 ## 실패 조건
 
-- Chrome CDP 9222 미응답
+- Chrome CDP 9223 미응답
 - ERP OAuth 실패 (저장 자격증명 미사용 시 pyautogui 자동완성 불가)
 - Z 드라이브 미접근
 - 생산지시서 xlsm 파일 미존재

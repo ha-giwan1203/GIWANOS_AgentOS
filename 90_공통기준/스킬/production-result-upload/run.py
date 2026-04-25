@@ -99,7 +99,7 @@ def upload_via_cdp(items, target_date_str):
 
     with sync_playwright() as p:
         try:
-            browser = p.chromium.connect_over_cdp("http://localhost:9222")
+            browser = p.chromium.connect_over_cdp("http://localhost:9223")
         except Exception as e:
             print(f"FAIL: CDP 브라우저 연결 실패 — {e}")
             return False

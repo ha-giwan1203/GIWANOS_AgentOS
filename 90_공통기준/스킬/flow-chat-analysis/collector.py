@@ -37,7 +37,7 @@ SCRIPT_DIR = Path(__file__).parent
 OUTPUT_DIR = SCRIPT_DIR / "output"
 RAW_DIR = OUTPUT_DIR / "raw"
 DEBUG_DIR = OUTPUT_DIR / "debug"
-CDP_URL = "http://127.0.0.1:9222"
+CDP_URL = "http://127.0.0.1:9223"
 FLOW_URL = "https://flow.team"
 DEFAULT_ROOM_SRNO = "2938379"
 

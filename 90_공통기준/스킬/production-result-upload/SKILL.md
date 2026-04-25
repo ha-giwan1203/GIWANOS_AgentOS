@@ -38,7 +38,7 @@ from playwright.sync_api import sync_playwright
 import pyautogui, time
 
 with sync_playwright() as p:
-    browser = p.chromium.connect_over_cdp('http://localhost:9222')
+    browser = p.chromium.connect_over_cdp('http://localhost:9223')
     page = browser.contexts[0].pages[0]
     page.bring_to_front()
     time.sleep(0.5)
@@ -78,7 +78,7 @@ with sync_playwright() as p:
 ```python
 subprocess.Popen([
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-    "--remote-debugging-port=9222",
+    "--remote-debugging-port=9223",
     r"--user-data-dir=C:\Users\User\.flow-chrome-debug",
     "http://mes-dev.samsong.com:19200/layout/layout.do",
     "--no-first-run", "--no-default-browser-check"
@@ -179,7 +179,7 @@ if empty_qty:
 API 호출 전 반드시 iframe을 먼저 로드해야 한다. iframe이 없으면 jQuery 참조 에러 발생.
 
 ```
-1. CDP 연결: playwright connect_over_cdp('http://localhost:9222')
+1. CDP 연결: playwright connect_over_cdp('http://localhost:9223')
 2. 현재 URL 확인
    - auth-dev 로그인 페이지 → 자동 로그인 절차 먼저 수행
    - mes-dev 페이지 → 바로 진행
@@ -512,7 +512,7 @@ URL: /prdtstatus/selectPrdtRsltByLine.do
 
 | 조건 | 판정 |
 |------|------|
-| CDP 브라우저 연결 실패 (localhost:9222 미응답) | FAIL |
+| CDP 브라우저 연결 실패 (localhost:9223 미응답) | FAIL |
 | MES 세션 만료 후 자동 로그인 실패 (auth-dev 리다이렉트 탈출 불가) | FAIL |
 | BI 파일에 대상 날짜 데이터 0건 | FAIL |
 | 생산량(COL15) None/0 행 존재 — 데이터 미완성 | FAIL |

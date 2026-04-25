@@ -24,7 +24,7 @@ import pyautogui
 # ============================================================
 # 설정
 # ============================================================
-CDP_URL = "http://localhost:9222"
+CDP_URL = "http://localhost:9223"
 CHROME_PATH = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 CHROME_PROFILE = r"C:\Users\User\.flow-chrome-debug"
 ERP_LAYOUT = "http://erp-dev.samsong.com:19100/layout/layout.do"
@@ -54,18 +54,18 @@ LINE_CONFIG = {
 # Phase 0: 환경 준비
 # ============================================================
 def ensure_chrome_cdp():
-    """CDP 9222 기동 확인."""
+    """CDP 9223 기동 확인."""
     import urllib.request
     try:
         urllib.request.urlopen(f"{CDP_URL}/json/version", timeout=3)
-        print("[phase0] CDP 9222 alive")
+        print("[phase0] CDP 9223 alive")
         return True
     except Exception:
         print("[phase0] CDP dead — launching Chrome")
 
     subprocess.Popen([
         CHROME_PATH,
-        f"--remote-debugging-port=9222",
+        f"--remote-debugging-port=9223",
         f"--user-data-dir={CHROME_PROFILE}",
         "--no-first-run", "--no-default-browser-check",
         ERP_LAYOUT,
@@ -78,7 +78,7 @@ def ensure_chrome_cdp():
             return True
         except Exception:
             continue
-    raise RuntimeError("CDP 9222 기동 실패")
+    raise RuntimeError("CDP 9223 기동 실패")
 
 
 def ensure_erp_login(page):
