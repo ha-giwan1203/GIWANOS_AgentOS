@@ -126,18 +126,43 @@ def navigate_to_d0(browser):
     time.sleep(2)
 
     if "viewListDoAddnPrdtPlanInstrMngNew" not in page.url:
-        try:
-            page.goto(D0_URL, timeout=30000)
-        except Exception as e:
-            # 네비게이션 충돌 시 재시도
-            print(f"[phase0] goto 재시도 사유: {e}")
-            time.sleep(3)
-            page.goto(D0_URL, timeout=30000)
+        _safe_goto(page, D0_URL)
         try: page.wait_for_load_state("domcontentloaded", timeout=20000)
         except Exception: pass
         time.sleep(3)
     print(f"[phase0] D0 화면 진입: {page.url}")
     return page
+
+
+def _safe_goto(page, url, max_retries=3):
+    """page.goto 실패 시 단계적 재시도 + ERR_BLOCKED_BY_CLIENT 우회.
+
+    1차~N차: page.goto (timeout 30s, 간격 증가)
+    최종 fallback: JavaScript window.location.href 설정 (CDP 레벨 차단 우회)
+    """
+    last_err = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            page.goto(url, timeout=30000)
+            return
+        except Exception as e:
+            last_err = e
+            msg = str(e)
+            print(f"[phase0] goto 시도 {attempt}/{max_retries} 실패: {msg[:120]}")
+            if "ERR_BLOCKED_BY_CLIENT" in msg and attempt == max_retries:
+                # 마지막: JS navigation 우회
+                print("[phase0] ERR_BLOCKED_BY_CLIENT 감지 — JS window.location 우회 시도")
+                try:
+                    page.evaluate(f"() => {{ window.location.href = {url!r}; }}")
+                    time.sleep(5)
+                    page.wait_for_load_state("domcontentloaded", timeout=20000)
+                    if "viewListDoAddnPrdtPlanInstrMngNew" in page.url:
+                        print(f"[phase0] JS 우회 성공: {page.url}")
+                        return
+                except Exception as e2:
+                    print(f"[phase0] JS 우회도 실패: {e2}")
+            time.sleep(3 * attempt)
+    raise RuntimeError(f"goto {url} 실패 (전체 {max_retries}회 + JS 우회): {last_err}")
 
 
 # ============================================================
@@ -176,12 +201,17 @@ def _find_section_end(ws, start_row, next_header_keyword=None):
 
 
 def extract_sp3m3_night(wb):
-    """출력용 시트 야간 섹션."""
+    """출력용 시트 야간 섹션.
+
+    구조:
+      R1: `◀ D+1 야간계획`
+      R2: 데이터 헤더 (순서/신MES 품번/지시)
+      R3~: 실제 데이터
+      R?: `◀ D+2 주간계획` (종료 경계)
+    """
     ws = wb["출력용"]
-    # R1 헤더 '◀ D+1 야간계획', R35 근처 주간 헤더
-    start = 3  # R3부터 데이터
-    night_end = 34  # 보수적 (헤더 R35 전)
-    # 동적 탐지
+    start = 3
+    night_end = 34  # 보수적 default
     for r in range(2, ws.max_row+1):
         v = ws.cell(row=r, column=2).value
         if v and "주간계획" in str(v):
@@ -189,22 +219,36 @@ def extract_sp3m3_night(wb):
             break
     items = []
     for r in range(start, night_end+1):
-        part = ws.cell(row=r, column=9).value  # I
-        qty = ws.cell(row=r, column=11).value  # K
-        if part and qty:
-            items.append({"PROD_NO": str(part).strip(), "QTY": int(qty)})
+        part = ws.cell(row=r, column=9).value
+        qty = ws.cell(row=r, column=11).value
+        if not (part and qty):
+            continue
+        try:
+            qty_int = int(qty)
+        except (ValueError, TypeError):
+            continue  # 헤더 행 등 숫자 아닌 값 skip
+        items.append({"PROD_NO": str(part).strip(), "QTY": qty_int})
     print(f"[phase1] SP3M3 야간: {len(items)}건")
     return items
 
 
 def extract_sp3m3_day(wb, cut_threshold=DAY_CUT_THRESHOLD):
-    """출력용 시트 주간 섹션 — 누적 ≥ cut_threshold 첫 행까지 포함."""
+    """출력용 시트 주간 섹션 — 누적 ≥ cut_threshold 첫 행까지 포함.
+
+    구조 (2026-04-25 실증):
+      R32: `◀ D+2 주간계획` 섹션 헤더
+      R33: 데이터 헤더 (순서/신MES 품번/지시)
+      R34~: 실제 데이터
+
+    day_start = 주간계획 헤더 r + 2 (데이터 헤더 한 줄 skip).
+    방어: 헤더 행이 추가로 있어도 try/except로 숫자 아닌 K값은 skip.
+    """
     ws = wb["출력용"]
     day_start = None
     for r in range(2, ws.max_row+1):
         v = ws.cell(row=r, column=2).value
         if v and "주간계획" in str(v):
-            day_start = r + 1
+            day_start = r + 2  # 섹션 헤더 + 데이터 헤더 둘 다 skip
             break
     if day_start is None:
         raise ValueError("출력용 시트 주간 헤더 미발견")
@@ -215,8 +259,13 @@ def extract_sp3m3_day(wb, cut_threshold=DAY_CUT_THRESHOLD):
         qty = ws.cell(row=r, column=11).value
         if not (part and qty):
             continue
-        items.append({"PROD_NO": str(part).strip(), "QTY": int(qty)})
-        cumsum += int(qty)
+        try:
+            qty_int = int(qty)
+        except (ValueError, TypeError):
+            # 헤더 행이 더 있거나 이상값 — skip
+            continue
+        items.append({"PROD_NO": str(part).strip(), "QTY": qty_int})
+        cumsum += qty_int
         if cumsum >= cut_threshold:
             print(f"[phase1] SP3M3 주간 컷: 누적 {cumsum} ({len(items)}건)")
             break
