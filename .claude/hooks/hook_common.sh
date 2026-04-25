@@ -265,6 +265,11 @@ hook_incident() {
   local file="$3"    # 대상 파일 (없으면 "")
   local detail="$4"  # 상세 사유
   local extra_json="${5:-}"  # optional: '"key":"value"' 형태의 추가 필드
+  # 세션107 B-2: hook/type 필드 누락 추적 강화 (UNCLASSIFIED 재발 방지)
+  # entry 생성은 유지하되 hook_log에 호출자 경고 기록
+  if [ -z "$hook" ] || [ -z "$type" ]; then
+    hook_log "incident" "WARN: hook_incident 필수 필드 누락 — type='$type' hook='$hook' detail='${detail:0:50}' caller=${BASH_SOURCE[1]:-unknown}:${BASH_LINENO[0]:-0}" 2>/dev/null || true
+  fi
   local ts
   ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
   detail="${detail//\\/\\\\}"

@@ -77,8 +77,8 @@ def main():
                         help="incident ledger 경로")
     parser.add_argument("--type", type=str, required=True,
                         help="인시던트 유형 (gate_reject, gpt_verdict, user_correction 등)")
-    parser.add_argument("--hook", type=str, default="",
-                        help="트리거 hook 이름 (없으면 빈 문자열)")
+    parser.add_argument("--hook", type=str, required=True,
+                        help="트리거 hook 이름 (필수, 세션107 B-2 강화)")
     parser.add_argument("--file", type=str, default="",
                         help="관련 파일 경로 (없으면 빈 문자열)")
     parser.add_argument("--detail", type=str, required=True,

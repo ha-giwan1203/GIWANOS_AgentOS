@@ -52,9 +52,16 @@
 - 3차 처리 (잔존 47→44): token_threshold_check 2건(`session107_l5_round2_token_post_compact`) + debate_verify_block 빈 entry 1건(`session107_l5_round2_invalid_entry_format`) resolved
 - 분석 보고서: `90_공통기준/업무관리/incident_session107_analysis.md`
 - ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_l5_resolve`
-- 신규 발생 방지 별 의제 (이월):
-  - **B-2**: record_incident 호출 시 hook/type 필드 누락 점검 (UNCLASSIFIED 재발 방지)
-  - **D-2**: 매 세션 첫 토론모드 진입 시 debate marker 자동 생성 (send_block trip 재발 방지)
+- 신규 발생 방지 별 의제 처리 결과:
+  - **B-2 [완료]**: hook_incident hook/type 필드 누락 추적 강화 (A 분류)
+    - `.claude/hooks/record_incident.py:80` `--hook` argparse `required=True` (옵션 3)
+    - `.claude/hooks/hook_common.sh:262` `hook_incident()` 빈 hook/type 시 hook_log WARN 기록 (옵션 1, entry 생성은 유지하되 호출자 caller 추적)
+    - 외부 호출자: `gpt-read.md` 1곳만 사용 (--hook gpt-read 명시) → required=True 안전 검증
+    - 검증: `--hook` 누락 시 정상 거부 ✓ / 빈 hook 호출 시 hook_log WARN 기록 ✓ / smoke_fast 11/11 ALL PASS
+  - **D-2 [폐기]**: 분석 결과 변경 불요
+    - 매 세션 첫 토론모드 진입 시 navigate_gate trip은 **정상 안전장치 동작**
+    - 사용자가 토론모드 정상 사용 시 자동으로 토론모드 CLAUDE.md 읽기 → marker 생성 → 이후 통과
+    - "신규 발생 자체"가 정책 위반 아님. 의제 폐기.
 
 **[보류] P-5 navigate_gate / debate_independent_gate exit 2 격상**
 - GPT도 보류 권고. send_block 오탐/정탐 비율 확보 후 결정.
