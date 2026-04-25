@@ -84,6 +84,16 @@ protected:
     reason: 토론 송부 게이트 마커
     removal_policy: replace-only
 
+  - path: .claude/hooks/navigate_gate.sh
+    class: guard
+    reason: |
+      ChatGPT URL 진입 게이트 (chrome-devtools-mcp navigate_page type=url + new_page 매처).
+      토론모드 CLAUDE.md 미읽기 시 진입 차단. debate_gate.sh와 짝 게이트.
+      ※ 이 등록은 정책 선언만 — 자동 수정 차단 hook 미구현 (세션107 3자 합의 pass_ratio=1.0).
+      ※ 변경/이전 시 .claude/settings.json PreToolUse 호출부(matcher 3종) 동시 점검 필수.
+      등록 근거: Q3 incident send_block 11건(실측 시점 15건) 상위 4위 원인.
+    removal_policy: replace-only
+
   # === recovery / 재난 대응 ===
   - path: .claude/hooks/block_dangerous.sh
     class: guard

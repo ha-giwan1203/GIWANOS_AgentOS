@@ -27,9 +27,12 @@
 - `.claude/hooks/README.md:6` "활성 Hook (32개 등록)" → "활성 Hook (settings.json 기준)" 으로 변경. 이벤트별 분포(PreCompact 1 / SessionStart 1 / ...) 수동 표기 제거.
 - `AGENTS_GUIDE.md`는 `generate_agents_guide.sh` 자동생성으로 동적 산출 (parse_helpers.py) → 수동 표기 금지 원칙 위반 아님. 통과.
 
-**[승격 대기] L-4 navigate_gate.sh 보호 자산 등록** — 채택, B 분류 → debate-mode 자동 승격
-- 사유: `protected_assets.yaml`에 navigate_gate.sh 미등록(debate_gate / debate_independent_gate만 등록). Q3 incident 분류에서 navigate_gate send_block 11건(실측 시점 15건) 상위 원인. 보호 자산 정책 변경은 guard/policy 계층 = B 분류.
-- 다음 액션: debate-mode 3자 토론 1턴 (Claude 독자안 → GPT 검증 → Gemini 검증)
+**[완료] L-4 navigate_gate.sh 보호 자산 등록** — 채택, [3way] 만장일치 (pass_ratio=1.0)
+- `90_공통기준/protected_assets.yaml` debate 계열 블록(line 87~95) navigate_gate.sh 추가 (class: guard / removal_policy: replace-only)
+- yaml 인라인 reason에 한계 2건 명시: ① 정책 선언만 — 자동 수정 차단 hook 미구현 ② settings.json PreToolUse 호출부(matcher 3종) 동시 점검 필수
+- GPT 보완 검증: `.claude/settings.json` line 262/271/280에 navigate_gate.sh 바인딩 3종(`mcp__Claude_in_Chrome__navigate` / `mcp__chrome-devtools-mcp__navigate_page` / `mcp__chrome-devtools-mcp__new_page`) 모두 존재 확인
+- 3자 합의 로그: `90_공통기준/토론모드/logs/debate_20260425_115300_3way/`
+- ⚠️ **위험 명시 (양측 통합)**: ① "정책 레지스트리 등록이며 자동 수정 차단 기능은 아님" (GPT) ② "settings.json PreToolUse 바인딩 임의 삭제 시 게이트 무력화 위험 — 호출부 유지보수 의존성 동시 명시" (Gemini)
 
 **[별 의제] L-5 incident 미해결 158건 분류 + session_drift 자동수정 검증** — A 분류, 별 세션
 - 실측: 미해결 158건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 26 / final_check 25 / commit_gate 24 / navigate_gate 15.
