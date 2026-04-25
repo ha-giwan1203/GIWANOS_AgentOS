@@ -48,7 +48,8 @@
   - B: UNCLASSIFIED (hook/type 빈 entry) 32건 → `session107_l5_b_invalid_entry_format` (형식 깨짐 데이터 가치 없음)
   - C: commit_gate / pre_commit_check 21건 → `session107_l5_c_root_cause_cleared` (동 A)
   - D: navigate_gate / send_block 17건 → `session107_l5_d_marker_present` (세션 진입 marker 정상)
-- **잔존: 47건** (evidence_missing 26 / harness_missing 7 / scope_violation 6 / doc_drift 5 / 기타 3 / 기타 hook 6 — 정당한 차단 기록, 개별 검토 필요)
+- **잔존: 44건** (evidence_missing 26 / harness_missing 7 / scope_violation 6 / commit_gate doc_drift 3 / 기타 2 — 정당한 차단 기록, 보존 권고)
+- 3차 처리 (잔존 47→44): token_threshold_check 2건(`session107_l5_round2_token_post_compact`) + debate_verify_block 빈 entry 1건(`session107_l5_round2_invalid_entry_format`) resolved
 - 분석 보고서: `90_공통기준/업무관리/incident_session107_analysis.md`
 - ledger 백업: `.claude/incident_ledger.jsonl.bak_session107_pre_l5_resolve`
 - 신규 발생 방지 별 의제 (이월):
