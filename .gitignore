@@ -127,6 +127,7 @@ venv/
 # 임시 / 백업 파일
 # ==========================
 *.bak
+*.bak_session107_pre_port9223
 *.old
 *.swp
 *.swo
