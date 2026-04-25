@@ -131,7 +131,9 @@
 **[부분PASS·후속완료] D0 3자 토론 — #btnExcelUpload 30s 확장 추가 반영** — A 분류, [3way]
 - GPT 부분PASS / Gemini 부분PASS (양측 일치)
 - 채택: A1 `wait_for_selector("#btnExcelUpload", timeout=30000)` 두 곳 모두 15s→30s 확장 (Gemini 환경미스매치/동의 라벨, ERP 초기 로드 지연 실증)
-- 사용자 결정 필요: A2 일요일 심야 schtasks `--parse-only` 임시 모의 구동 (양측 동의, 무인 환경 사전 검증)
+- A2 등록 완료: `D0_SP3M3_Verify_Sunday` 일요일(2026-04-26) 22:00 ONCE 트리거 (Run As User=User, Schedule Type=One Time Only, run_morning_verify.bat 호출 = `--parse-only` 모의 구동)
+  - 검증 후 task 삭제 권장: `schtasks /Delete /TN "D0_SP3M3_Verify_Sunday" /F`
+  - 결과 로그: `06_생산관리/D0_업로드/logs/verify_20260426_220000.log`
 - 보류: A3 작업스케줄러 설정 조회 (이미 `schtasks /Query`로 확인됨)
 - 양측 합의 잔여: schtasks 자동 트리거 흐름 자체 미검증 / Phase 4~6 본체 무수정 회귀 위험 낮음
 

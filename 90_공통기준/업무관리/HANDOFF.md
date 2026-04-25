@@ -34,7 +34,8 @@
 - HANDOFF "미해결" 섹션 사실관계 보정 (push 완료/L-5 처리 완료 반영)
 
 ### 다음 AI 액션 (세션108)
-1. **[최우선]** 2026-04-27 (월) 07:10 `D0_SP3M3_Morning` 자동 실행 결과 확인 — LastResult=0 + `06_생산관리/D0_업로드/logs/morning_20260427.log` 정상 생성 + ERR_BLOCKED_BY_CLIENT 미발생 (포트 9223 격리 효과 사후 검증). **수동 사전 검증은 통과** (parse-only 모드, listLen=21, statusCode=200)
+1. **[최우선]** 2026-04-26 (일) 22:00 `D0_SP3M3_Verify_Sunday` 임시 모의 구동 결과 확인 (parse-only) — `verify_20260426_220000.log` LastResult=0 + selectList listLen=21 확인. 통과 시 task 삭제 (`schtasks /Delete /TN "D0_SP3M3_Verify_Sunday" /F`). 실패 시 월요일 07:10 트리거 전 즉시 대응
+2. **[최우선]** 2026-04-27 (월) 07:10 `D0_SP3M3_Morning` 자동 실행 결과 확인 — LastResult=0 + `morning_20260427.log` 정상 생성. 일요일 검증 통과 + #btnExcelUpload 30s 확장(3d516e22) 효과 종합 검증
 2. session_kernel.md stale 갱신 메커니즘 점검 (현재 fallback 동작 정상)
 3. 신규 의제 발굴 또는 사용자 트리거 대기
 
