@@ -3,14 +3,13 @@
 > 2026-04-20 갱신 — settings.json 등록 기준 (실제 활성 hook만 기재)
 > 아카이브된 hook은 `.claude/hooks/_archive/` 참조
 
-## 활성 Hook (32개 등록, settings.json 기준)
+## 활성 Hook (settings.json 기준)
 
-> **Single Source of Truth (세션93, 2026-04-22 2자 토론 합의)**: 활성 hook의 **유일한 기준축은 `list_active_hooks.sh`**. `final_check.sh`는 이 기준을 따르며, 이 문서와 `90_공통기준/업무관리/STATUS.md`의 개수 표기는 동기화 경고 용도로만 비교한다.
+> **Single Source of Truth (세션93, 2026-04-22 2자 토론 합의 / 세션107 수동 카운트 제거)**: 활성 hook의 **유일한 기준축은 `list_active_hooks.sh`**. 이 문서·STATUS.md·CLAUDE.md에 hook 개수를 수동 표기하지 않는다 (DESIGN_PRINCIPLES Single Source of Truth).
 > - 카운트: `bash .claude/hooks/list_active_hooks.sh --count`
 > - 이벤트별: `bash .claude/hooks/list_active_hooks.sh --by-event`
+> - `final_check.sh`는 이 기준을 따른다.
 > - `.claude/scripts/hook_registry.sh`는 **legacy 격하** (settings.local.json 전제만 참조). 자동 sync 중단.
->
-> 이벤트별 등록 수: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 16 / PostToolUse 7 / Notification 1 / Stop 5 = **32**
 
 ### 이벤트층 (SessionStart / PreCompact)
 

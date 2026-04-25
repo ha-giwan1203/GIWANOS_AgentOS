@@ -16,7 +16,7 @@
 | 활성 작업 원본 | `90_공통기준/업무관리/TASKS.md` |
 | 미완료 작업 수 | TASKS.md 참조 |
 | 자동화 체계 | **Claude hooks 일원화** (2026-04-11). 백그라운드 프로세스 체인(watch_changes→auto_commit→slack→notion) 폐기, Windows 스케줄러 제거 |
-| hooks 체계 | 32개 등록 + 스킬 19개. 세션101 auto_commit_state.sh 신설 (Stop 5번째, 하이브리드 자동 커밋: 상태문서 AUTO, 나머지 MANUAL 리마인더). **기준축: `bash .claude/hooks/list_active_hooks.sh --count` (Single Source, 세션93 2자 토론 합의)**. 세션93 hook_registry.sh legacy 격하. 세션91 final_check statusLine 버그 수정으로 32→31 정정. 세션76 commit_gate push 단독 final_check 스킵 근본 해결. 세션74 쟁점 G 실물 분리. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 + timing 배선. |
+| hooks 체계 | **활성 수 기준축: `bash .claude/hooks/list_active_hooks.sh --count` (Single Source, 세션93 2자 토론 합의 / 세션107 수동 카운트 표기 제거)**. 스킬 19개. 세션101 auto_commit_state.sh 신설 (Stop 5번째, 하이브리드 자동 커밋: 상태문서 AUTO, 나머지 MANUAL 리마인더). 세션93 hook_registry.sh legacy 격하. 세션91 final_check statusLine 버그 수정. 세션76 commit_gate push 단독 final_check 스킵 근본 해결. 세션74 쟁점 G 실물 분리. 세션72 Phase 2-B: 핵심 훅 6종 exit 2 전환 + completion_gate 소프트 블록 + timing 배선. |
 
 ---
 

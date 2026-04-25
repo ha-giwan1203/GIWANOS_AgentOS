@@ -6,7 +6,9 @@ description: >
   사용자가 "토론모드", "AI 토론", "GPT랑 토론해", "debate-mode", "ChatGPT에게 반박해", "GPT 의견 들어봐",
   "토론 시작", "GPT랑 싸워봐", "GPT한테 물어보고 반박해", "AI끼리 토론", "gpt한테 물어봐", "gpt한테 알려줘" 등을 언급하면 반드시 이 스킬을 사용할 것.
   "3자 토론", "Gemini도 포함", "Claude×GPT×Gemini", "3-party" 언급 시 3자 토론 모드로 전환.
-  API 없이 브라우저 자동화만으로 동작. 승인 없이 자동 진행.
+  브라우저 자동화 기반(세션105 chrome-devtools-mcp). 본론·종합은 웹 UI 멀티턴.
+  단발 교차 검증 API 허용은 β안-C 예외 1건만 (Step 6-2/6-4, 세션85 3자 만장일치). 상세는 `../CLAUDE.md` "β안-C 예외" 섹션.
+  승인 없이 자동 진행.
 ---
 
 # 토론모드 (debate-mode) 스킬 v2.11
@@ -17,7 +19,7 @@ description: >
 
 Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을 진행한다.
 
-- API 사용 금지 — 브라우저 자동화만
+- API 사용 원칙 — 브라우저 자동화만. **예외 1건**: Step 6-2/6-4 단발 교차 검증(β안-C, 세션85 3자 만장일치). 본론·종합 API 전환 금지. 상세는 `../CLAUDE.md` "β안-C 예외" 섹션
 - **승인 없이 자동 진행** — 반박문 작성 후 즉시 전송
 - **토론방 자연어는 한국어만 사용**
 - 지정 프로젝트방 전용 운영
@@ -92,13 +94,16 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 3. `chat_url`은 첫 gpt-send 호출 후 `.claude/state/debate_chat_url`에서 읽어 갱신
 
 > **[NEVER] debate-mode 안에서 Chrome MCP 도구를 직접 호출하지 않는다.**
-> tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer 등
-> 브라우저 조작은 전부 gpt-send/gpt-read 스킬이 내부에서 처리한다.
-> 탭 준비, 채팅방 진입, 셀렉터 확인, SEND GATE 모두 gpt-send/gpt-read 책임이다.
+> claude-in-chrome 계열(tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer)
+> 및 chrome-devtools-mcp 계열(list_pages, select_page, navigate_page, evaluate_script, click, fill 등) 모두 직접 호출 금지.
+> 브라우저 조작은 전부 gpt-send/gpt-read/gemini-send/gemini-read 스킬이 내부에서 처리한다.
+> 탭 준비, 채팅방 진입, 셀렉터 확인, SEND GATE 모두 전용 스킬 책임이다.
+> (세션105 스킬 내부는 chrome-devtools-mcp 기반으로 전환됨)
 
-> **[NEVER] 백그라운드 탭 throttling 대응 생략 금지 (세션70 실증)**
+> **[NEVER] 백그라운드 탭 throttling 대응 생략 금지 (세션70 실증, 세션105 CDP 네이티브 전환)**
 > gpt-send/gpt-read/gemini-send/gemini-read 내부 Step 1-C 또는 3-prep에
-> `navigate(url=대상URL, tabId=대상_tabId)` 탭 활성화 단계 반드시 포함.
+> `mcp__chrome-devtools-mcp__select_page(pageId, bringToFront=true)` 단계 반드시 포함.
+> CDP `Target.activateTarget` 네이티브 호출로 탭 foreground 전환. URL 재진입 hack 폐기.
 > 3자 토론은 GPT·Gemini 중 한쪽이 항상 백그라운드 → 매 전송/읽기 전 대상 탭 activate.
 > 상세: `../CLAUDE.md` "백그라운드 탭 Throttling 대응" 섹션
 

@@ -10,7 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-25 KST — 세션106 D0_SP3M3_Morning 스케줄러 batch 인코딩 수정 + ERR_BLOCKED 추적 미해결
+최종 업데이트: 2026-04-25 KST — 세션107 GPT 시스템 정합성 검토 4건 반영(L-1·L-2·L-3 즉시) + L-4 3자 승격 + L-5 별 의제 등록
+
+## 세션107 (2026-04-25) — GPT 시스템 정합성 검토 4건 반영
+
+> 진입: 사용자 "gpt토론방 내용 확인후 내 계획을 듣고 싶어" → GPT 토론방 응답 수령. 5개 지적·5개 개선안 수령. 독립 라벨링 후 A 분류만 즉시 반영.
+
+**[완료] L-3 SKILL.md 구 MCP 문구 정리** — 채택, A 분류
+- `90_공통기준/토론모드/debate-mode/SKILL.md:95-103` `tabs_context_mcp` / `navigate(url, tabId)` 구 MCP 표기 → chrome-devtools-mcp 계열(`select_page(pageId, bringToFront=true)`) 표기로 갱신. 세션105 전환 반영.
+
+**[완료] L-2 SKILL.md frontmatter β안-C 표현 보정** — 채택, A 분류
+- frontmatter "API 없이 브라우저 자동화만으로 동작" + 본문 "API 사용 금지" → β안-C 예외(Step 6-2/6-4 단발 교차 검증) 명시 + `../CLAUDE.md` 참조 안내.
+
+**[완료] L-1 hook 수동 카운트 표기 제거** — 채택, A 분류
+- `STATUS.md:19` "32개 등록" → list_active_hooks.sh 동적 참조 안내. 세션 변동 수치 제거.
+- `.claude/hooks/README.md:6` "활성 Hook (32개 등록)" → "활성 Hook (settings.json 기준)" 으로 변경. 이벤트별 분포(PreCompact 1 / SessionStart 1 / ...) 수동 표기 제거.
+- `AGENTS_GUIDE.md`는 `generate_agents_guide.sh` 자동생성으로 동적 산출 (parse_helpers.py) → 수동 표기 금지 원칙 위반 아님. 통과.
+
+**[승격 대기] L-4 navigate_gate.sh 보호 자산 등록** — 채택, B 분류 → debate-mode 자동 승격
+- 사유: `protected_assets.yaml`에 navigate_gate.sh 미등록(debate_gate / debate_independent_gate만 등록). Q3 incident 분류에서 navigate_gate send_block 11건(실측 시점 15건) 상위 원인. 보호 자산 정책 변경은 guard/policy 계층 = B 분류.
+- 다음 액션: debate-mode 3자 토론 1턴 (Claude 독자안 → GPT 검증 → Gemini 검증)
+
+**[별 의제] L-5 incident 미해결 158건 분류 + session_drift 자동수정 검증** — A 분류, 별 세션
+- 실측: 미해결 158건 (GPT 시점 80건 → 환경미스매치). 상위: auto_commit_state 26 / final_check 25 / commit_gate 24 / navigate_gate 15.
+- 작업량 큼 → 별 의제로 분리. Q3 후속 분류 리포트 작성 + final_check --fix 검증.
+
+**[보류] P-5 navigate_gate / debate_independent_gate exit 2 격상**
+- GPT도 보류 권고. send_block 오탐/정탐 비율 확보 후 결정.
 
 ## 세션106 (2026-04-25 아침) — D0_SP3M3_Morning 스케줄러 LastResult=3 근본 해결
 
