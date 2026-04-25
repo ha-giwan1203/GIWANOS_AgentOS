@@ -128,6 +128,13 @@
 - 실패 시 후속: ① 옵션 A(Urban VPN 비활성) 사용자에게 안내 ② chrome-cdp 프로필 분리 추가 검토
 - 차주 영업일 시작 시 가장 먼저 확인할 것
 
+**[부분PASS·후속완료] D0 3자 토론 — #btnExcelUpload 30s 확장 추가 반영** — A 분류, [3way]
+- GPT 부분PASS / Gemini 부분PASS (양측 일치)
+- 채택: A1 `wait_for_selector("#btnExcelUpload", timeout=30000)` 두 곳 모두 15s→30s 확장 (Gemini 환경미스매치/동의 라벨, ERP 초기 로드 지연 실증)
+- 사용자 결정 필요: A2 일요일 심야 schtasks `--parse-only` 임시 모의 구동 (양측 동의, 무인 환경 사전 검증)
+- 보류: A3 작업스케줄러 설정 조회 (이미 `schtasks /Query`로 확인됨)
+- 양측 합의 잔여: schtasks 자동 트리거 흐름 자체 미검증 / Phase 4~6 본체 무수정 회귀 위험 낮음
+
 **[완료] D0 수동 사전 검증 — selectList 21건 통과 + iframe 폴링 픽스** — A 분류
 - 트리거: 사용자 "오늘 아침 작동 안된 부분 검증 방법 없나?"
 - run.py 신규 옵션 `--parse-only`: Phase 3 selectList(엑셀 첨부+서버 파싱)까지만 수행, multiList(DB 저장) 스킵

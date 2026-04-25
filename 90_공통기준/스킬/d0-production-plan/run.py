@@ -395,11 +395,11 @@ def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
 
     parse_only=True: selectList(엑셀 첨부 + 서버 파싱 + 화면 표시)까지만 수행하고 multiList(DB 저장) 스킵.
     검증 모드 전용 (Phase 4/5 미진행)."""
-    # 페이지 로드 확인 + 버튼 대기
+    # 페이지 로드 확인 + 버튼 대기 (세션107 Gemini 지적: 15s → 30s, ERP 초기 로드 지연 대응)
     try:
-        page.wait_for_selector("#btnExcelUpload", timeout=15000)
+        page.wait_for_selector("#btnExcelUpload", timeout=30000)
     except Exception:
-        print(f"[phase3] #btnExcelUpload 대기 실패 — 현재 URL: {page.url}")
+        print(f"[phase3] #btnExcelUpload 대기 실패 (30s timeout) — 현재 URL: {page.url}")
         raise
 
     # 팝업 iframe 먼저 검사 (이미 열려있으면 재사용, reload 생략)
@@ -420,7 +420,7 @@ def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
             print("[phase3] 팝업 없이 overlay만 잔존 — 페이지 reload")
             try:
                 page.reload(timeout=30000, wait_until="domcontentloaded")
-                page.wait_for_selector("#btnExcelUpload", timeout=15000)
+                page.wait_for_selector("#btnExcelUpload", timeout=30000)
                 time.sleep(3)
             except Exception as e:
                 print(f"[phase3] reload err: {e}")
