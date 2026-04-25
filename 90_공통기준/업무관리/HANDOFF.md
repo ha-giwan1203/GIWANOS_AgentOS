@@ -43,7 +43,10 @@
 - **L-1 실증 (근본문제)**: `STATUS.md:34` "Chrome MCP 단일화. CDP 폐기" — 세션32 history가 현재 정책처럼 표기. 토론모드 CLAUDE.md(현 정책: CDP 단독)와 충돌 → **보정 완료**
 - **L-2 실증 (근본문제)**: `hooks/README.md:29` "settings.local.json 배열 순서" — 라인 8 SSoT(settings.json)과 자체 모순 → **보정 완료**
 - **L-3 드리프트 아님**: incident_session107_analysis.md(47건 스냅샷) vs TASKS(44건 누적) — 시점 차이. 보정 불요
-- **L-4~L-7 보류**: settings 변경/runtime 진단/구조 영역 — 사용자 모드 적용 안 함
+- **L-5 PASS (사용자 추가 지시)**: list_active_hooks --count=32, README/AGENTS_GUIDE 모두 일치, 등록훅 실존성 PASS. 추가 조치 불요
+- **L-6 명시 강화 완료 (사용자 추가 지시)**: hooks/README.md PreToolUse 섹션에 통합·삭제 금지 + 고정 순서 변경 금지 1줄 명시
+- **L-4 권한 차단 (보류)**: 사용자 지시 있었으나 권한 시스템이 settings.local.json 편집을 2회 차단. 진행하려면 명시적 settings 편집 승인 필요
+- **L-7 의도적 미해결**: 사용자 본인이 세션107에서 명시 취소
 - 실측 incident: total 1141 / unresolved 102 (TASKS 표기 44건 + 이후 신규 58건, 정상 누적)
 
 ### 다음 AI 액션

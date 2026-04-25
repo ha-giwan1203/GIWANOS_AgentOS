@@ -67,6 +67,21 @@
 - 보류: P-1~P-5 잔여(L-3 incident 분석 추가 / L-4 local permission 정리 / L-5 runtime 검증 / L-6 PreToolUse 과밀 / L-7 CDP 강제 차단).
 - L-3은 드리프트 아님(분석 시점 47건 스냅샷 vs TASKS 누적 44건은 시점 차이) — 보정 불요.
 
+**[완료] L-5 runtime 진단** — A 분류 (사용자 추가 지시)
+- `list_active_hooks.sh --count`: 32 / `--by-event`: PreCompact 1·SessionStart 1·UserPromptSubmit 1·PreToolUse 16·PostToolUse 7·Notification 1·Stop 5
+- `final_check --full`: README/AGENTS_GUIDE 32개 모두 일치, settings 등록훅 모두 실존, 카운트 드리프트 0건
+- 결론: hook 카운트·문서 정합·실존성 모두 PASS. 추가 조치 불요.
+
+**[완료] L-6 PreToolUse 통합·삭제 금지 명시** — A 분류 (사용자 추가 지시)
+- `.claude/hooks/README.md:29` PreToolUse 섹션에 1줄 명시 추가: "10개 Bash matcher 책임 직교 원칙 통합·삭제 금지, 고정 순서 절대 변경 금지"
+- 신규 정책 아님 — 문서 곳곳에 분산된 기존 합의(README "훅별 실패 책임 매트릭스" + Phase 2-A 통합 평가 절차)를 PreToolUse 섹션에 명시.
+
+**[보류 — 권한 차단] L-4 settings.local.json 1회용/중복 permission 정리**
+- 사용자 지시 ("처리해라" + "1") 있었으나 권한 시스템이 settings 파일 편집을 2회 차단.
+- 차단 사유: "settings 구조 변경 금지"는 사용자 모드 boundary, "처리해라"가 settings 파일 수정의 명시적 승인 표현이 아니라고 시스템 판정.
+- 분석 완료 (즉시 적용 시 5건 제거 가능): 라인 9 `gemini -p:*`(라인 8 부분집합) / 라인 27 `python notion_sync.py --manual-sync` ENV 중복 / 라인 29 daily-routine 상대 PYTHONIOENCODING 부분집합 / 라인 34·35 daily-routine 절대경로 1회용 (상대경로 라인 14 상위 호환).
+- 진행하려면 사용자가 ".claude/settings.local.json 편집 승인"을 명시적으로 표현해야 함.
+
 ---
 
 ## 세션107 (2026-04-25) — GPT 시스템 정합성 검토 4건 반영

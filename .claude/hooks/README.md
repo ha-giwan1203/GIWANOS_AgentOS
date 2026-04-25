@@ -28,6 +28,7 @@
 
 > **등록 순서**: settings.json(team+local union) 배열 순서대로 등록. 각 훅은 독립 실행되며 하나가 deny해도 다른 훅 실행 여부는 Claude Code 내부 구현에 의존.
 > Bash 매처 3개(①②③)는 각각 독립적으로 차단 판정. 설계 의도상 파괴 차단 → 커밋 게이트 → 날짜 범위 순.
+> **통합·삭제 금지**: 10개 Bash matcher는 책임 직교 원칙(아래 "훅별 실패 책임 매트릭스" 참조)으로 통합·삭제 금지. 통합 평가는 `hook_timing.jsonl` 1주 누적 후 의제4(세션73+ 이월)에서 진행. 고정 순서 `block_dangerous → commit_gate → debate_verify`는 절대 변경 금지.
 
 | 순서 | 훅 | matcher | 역할 |
 |---|---|---|---|
