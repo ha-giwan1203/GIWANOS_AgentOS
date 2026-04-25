@@ -4,7 +4,9 @@ Gemini 웹 UI (gemini.google.com)에 메시지를 입력하고 전송한 뒤 응
 웹 UI 우선 사용 원칙: API 호출 금지, chrome-devtools-mcp로만 조작한다.
 
 **2026-04-24 세션105 마이그레이션**: claude-in-chrome → chrome-devtools-mcp.
-CDP Chrome(포트 9222) 기동 필수.
+CDP Chrome(포트 9222, 프로필 `C:\temp\chrome-cdp`) 기동 필수.
+
+**2026-04-25 세션107 정책 강화 (사용자 지시)**: CDP Chrome 단독 사용. 일반 Chrome 프로필 / claude-in-chrome 계열 MCP 호출 금지. CDP 미기동 시 즉시 실패 보고.
 
 ## 인자
 - `$ARGUMENTS`: 전송할 메시지 텍스트 (필수)

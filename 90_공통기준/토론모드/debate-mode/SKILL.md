@@ -8,6 +8,7 @@ description: >
   "3자 토론", "Gemini도 포함", "Claude×GPT×Gemini", "3-party" 언급 시 3자 토론 모드로 전환.
   브라우저 자동화 기반(세션105 chrome-devtools-mcp). 본론·종합은 웹 UI 멀티턴.
   단발 교차 검증 API 허용은 β안-C 예외 1건만 (Step 6-2/6-4, 세션85 3자 만장일치). 상세는 `../CLAUDE.md` "β안-C 예외" 섹션.
+  **CDP Chrome 단독 사용** (포트 9222, 프로필 C:\temp\chrome-cdp). 일반 Chrome / claude-in-chrome 계열 MCP 사용 금지(세션107 사용자 지시).
   승인 없이 자동 진행.
 ---
 
@@ -20,6 +21,7 @@ description: >
 Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을 진행한다.
 
 - API 사용 원칙 — 브라우저 자동화만. **예외 1건**: Step 6-2/6-4 단발 교차 검증(β안-C, 세션85 3자 만장일치). 본론·종합 API 전환 금지. 상세는 `../CLAUDE.md` "β안-C 예외" 섹션
+- **CDP Chrome 단독 사용** (포트 9222, 프로필 `C:\temp\chrome-cdp`). 일반 Chrome / claude-in-chrome 계열 MCP 호출 금지 (세션107 사용자 지시). 상세는 `../CLAUDE.md` "CDP Chrome 단독 사용" 섹션
 - **승인 없이 자동 진행** — 반박문 작성 후 즉시 전송
 - **토론방 자연어는 한국어만 사용**
 - 지정 프로젝트방 전용 운영

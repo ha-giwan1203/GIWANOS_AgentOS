@@ -136,18 +136,28 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 - 매 전송/읽기 전 `select_page(bringToFront=true)` 필수. 병렬 폴링 금지(백그라운드 쪽 필연 지연).
 - GPT 전송 → GPT 수신 → Gemini `select_page` → Gemini 전송 → Gemini 수신 순으로 직렬 실행.
 
-**CDP Chrome 전제 조건 (세션105 필수)**:
+**CDP Chrome 단독 사용 (세션107 사용자 지시 — NEVER 생략)**:
+
+> 2자 / 3자 토론모드는 **CDP Chrome 단독 사용**만 허용. 사용자 명시 정책(2026-04-25 세션107).
+
+- **[NEVER]** 일반 Chrome 프로필(기본 사용자 프로필)에서 토론모드 진입 금지
+- **[NEVER]** claude-in-chrome 계열 MCP(`mcp__Claude_in_Chrome__*`) 토론모드 내 사용 금지 — chrome-devtools-mcp 단독 경로
+- **[NEVER]** CDP Chrome 미기동 상태에서 토론 시작 금지 — 즉시 실패 보고
+- **[MUST]** 토론 진입 전 CDP 연결 확인: `curl -s http://127.0.0.1:9222/json/version` 200 응답 필수
+- **[MUST]** 별도 프로필 `C:\temp\chrome-cdp` 만 사용. 다른 user-data-dir 금지
+
+**전제 조건 (기존)**:
 - Chrome M136+에서 기본 프로필은 `--remote-debugging-port` 사용 금지 (쿠키 탈취 방어).
 - 토론모드는 반드시 **별도 프로필** (`C:\temp\chrome-cdp`)에서 `--remote-debugging-port=9222`로 기동.
 - **[NEVER 생략]** `--remote-debugging-address=127.0.0.1` 플래그 필수 — 누락 시 Windows Chrome이 IPv6 `::1`에만 바인딩하여 chrome-devtools-mcp가 127.0.0.1:9222 fetch 실패. 세션105 Round 2 실증.
-- 기본 Chrome과 CDP Chrome 병행 기동 가능. chrome-devtools-mcp는 CDP 포트 9222에만 연결.
+- 기본 Chrome과 CDP Chrome 병행 기동 가능 (CDP는 별도 프로필이므로 충돌 없음). chrome-devtools-mcp는 CDP 포트 9222에만 연결.
 - **정식 launch 커맨드**:
   ```powershell
   Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9222','--remote-debugging-address=127.0.0.1','--user-data-dir=C:\temp\chrome-cdp'
   ```
 - **종료 시 주의**: `taskkill //F`로 강제 종료하면 쿠키 DB 미플러시로 로그인 세션 소실. 창 정상 닫기 권장.
 
-**관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 Step 1-C에 `select_page(bringToFront=true)` 단계가 명시되어 있다.
+**관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 chrome-devtools-mcp 기반. 모든 Step 1-C에 `select_page(bringToFront=true)` 단계 명시. claude-in-chrome 계열 MCP 호출 금지.
 
 ## GPT 실물 검증 공유 (NEVER)
 구현 → `git commit` → `git push` → SHA + `git show --stat` 요약 포함 공유 (한 번에). 커밋 없이 먼저 공유 금지.

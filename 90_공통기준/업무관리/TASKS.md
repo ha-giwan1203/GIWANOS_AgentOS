@@ -50,6 +50,17 @@
 **[보류] P-5 navigate_gate / debate_independent_gate exit 2 격상**
 - GPT도 보류 권고. send_block 오탐/정탐 비율 확보 후 결정.
 
+**[완료] 토론모드 CDP Chrome 단독 사용 정책 명시 (사용자 지시)** — A 분류
+- 사용자 지시: "2자/3자 토론모드 cdp단독브라우저 사용으로 제한한다"
+- 분류 근거: 토론모드 CLAUDE.md 자동 승격 트리거 "스킬 md의 주석·경고 문구·설명 추가" → A 분류 + 사용자 지시 예외 (D안)
+- 영향 파일 6건 (정책 명시 강화, 실행 흐름 미변경):
+  - `90_공통기준/토론모드/CLAUDE.md` "백그라운드 탭 Throttling 대응" → "CDP Chrome 단독 사용" 섹션 신설 ([NEVER] 일반 Chrome / claude-in-chrome 계열 MCP / CDP 미기동 진입 금지)
+  - `90_공통기준/토론모드/debate-mode/SKILL.md` frontmatter + 금지사항 본문에 CDP 단독 명시
+  - `.claude/commands/gpt-send.md`, `gpt-read.md`, `gemini-send.md`, `gemini-read.md` 각각 헤더에 세션107 정책 강화 명시
+- B 분류 검토 의제 (별도 사용자 결정 필요):
+  - settings.json:262 `mcp__Claude_in_Chrome__navigate` 매처 제거 여부 (실행 차단 강제)
+  - navigate_gate.sh에 claude-in-chrome 호출 차단 로직 추가 여부
+
 ## 세션106 (2026-04-25 아침) — D0_SP3M3_Morning 스케줄러 LastResult=3 근본 해결
 
 **[완료] batch 파일 인코딩 수정 (LF→CRLF + UTF-8 BOM)** — 커밋 `84675727`
