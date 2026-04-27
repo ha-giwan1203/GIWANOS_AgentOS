@@ -20,7 +20,7 @@ cd "$PROJECT_DIR" 2>/dev/null || exit 0
 HEAD_FILES=$(git show --pretty="" --name-only HEAD 2>/dev/null)
 [ -z "$HEAD_FILES" ] && exit 0
 
-TRIGGER_HITS=$(echo "$HEAD_FILES" | grep -E '^\.claude/(hooks|settings.*\.json|commands|agents)/|^90_공통기준/스킬/.+/SKILL\.md$|^CLAUDE\.md$|/CLAUDE\.md$' || true)
+TRIGGER_HITS=$(echo "$HEAD_FILES" | grep -E '^\.claude/(hooks|commands|agents)/|^\.claude/settings.*\.json$|^90_공통기준/스킬/.+/SKILL\.md$|^CLAUDE\.md$|/CLAUDE\.md$' || true)
 
 if [ -z "$TRIGGER_HITS" ]; then
   exit 0

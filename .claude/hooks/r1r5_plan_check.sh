@@ -22,7 +22,7 @@ STAGED=$(git diff --cached --name-only 2>/dev/null)
 [ -z "$STAGED" ] && exit 0
 
 # C 트리거 매칭
-TRIGGER_HITS=$(echo "$STAGED" | grep -E '^\.claude/(hooks|settings.*\.json|commands|agents)/|^90_공통기준/스킬/.+/SKILL\.md$|^CLAUDE\.md$|/CLAUDE\.md$' || true)
+TRIGGER_HITS=$(echo "$STAGED" | grep -E '^\.claude/(hooks|commands|agents)/|^\.claude/settings.*\.json$|^90_공통기준/스킬/.+/SKILL\.md$|^CLAUDE\.md$|/CLAUDE\.md$' || true)
 
 if [ -z "$TRIGGER_HITS" ]; then
   exit 0
