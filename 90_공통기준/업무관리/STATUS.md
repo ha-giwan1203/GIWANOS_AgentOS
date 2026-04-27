@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-27 — 세션118 (수동 갱신: publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵트인, HANDOFF 1번 강제 처리 + dry-run 위치 보정 fix-up)
+최종 업데이트: 2026-04-27 — 세션118 (publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵트인, HANDOFF 1번 강제 처리 + dry-run 위치 보정 fix-up + 3way 공유 양측 PASS 만장일치)
 
 ---
 

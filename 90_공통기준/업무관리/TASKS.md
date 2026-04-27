@@ -28,6 +28,10 @@
   - `bash -n` 문법 PASS
   - `--help` 출력에 `--auto-sync` 라인 노출 PASS
   - dry-run 위치 보정: 기존 `--dry-run` 종료 위치(반영 대상 커밋 표시 직후)를 stale 감지 블록 이후로 이동. plan 명시 "dry-run에서 fetch만 수행" 의도와 정합 (fix-up 커밋)
+- **3way 공유 PASS** (양측 만장일치):
+  - GPT: PASS — item 1~5 모두 실증됨·동의. 추가제안 없음
+  - Gemini: PASS — item 1·2·3·5 실증됨·동의 / item 4(fetch fail-safe) 환경미스매치·동의(제조 현장 네트워크 환경 고려). 추가제안 없음
+  - 하네스: 채택 5 / 보류 0 / 버림 0
 
 ### 세션117/116 별건 잔존 (우선순위 재정의)
 1. ~~세션117 별건 1번 (publish 스크립트 main stale 가드)~~ — 본 세션118에서 완료
