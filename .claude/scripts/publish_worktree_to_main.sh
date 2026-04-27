@@ -95,12 +95,6 @@ echo "=== 반영 대상 커밋 ==="
 git cherry -v main HEAD 2>/dev/null | grep '^+'
 echo ""
 
-# --- 드라이런 종료 ---
-if $DRY_RUN; then
-  echo "[드라이런] 실제 반영 없이 종료합니다."
-  exit 0
-fi
-
 # --- 메인 저장소 경로 확인 ---
 # 워크트리에서는 git checkout main이 불가(다른 워크트리가 main 사용 중)
 # 따라서 메인 저장소 경로에서 -C 옵션으로 cherry-pick 수행
@@ -157,6 +151,12 @@ if [ "$MAIN_BEHIND" != "0" ]; then
   fi
 else
   echo "  main 동기화 상태: OK (origin/main과 일치)"
+fi
+
+# --- 드라이런 종료 (stale 감지까지만 수행하고 반영 안 함) ---
+if $DRY_RUN; then
+  echo "[드라이런] 실제 반영 없이 종료합니다."
+  exit 0
 fi
 
 # --- 반영 실행 ---

@@ -27,7 +27,7 @@
 - 검증:
   - `bash -n` 문법 PASS
   - `--help` 출력에 `--auto-sync` 라인 노출 PASS
-  - dry-run은 워크트리 미커밋 변경으로 clean 검사 단계에서 차단 (기존 동작 정상, stale 가드는 본 커밋 후 재검증)
+  - dry-run 위치 보정: 기존 `--dry-run` 종료 위치(반영 대상 커밋 표시 직후)를 stale 감지 블록 이후로 이동. plan 명시 "dry-run에서 fetch만 수행" 의도와 정합 (fix-up 커밋)
 
 ### 세션117/116 별건 잔존 (우선순위 재정의)
 1. ~~세션117 별건 1번 (publish 스크립트 main stale 가드)~~ — 본 세션118에서 완료

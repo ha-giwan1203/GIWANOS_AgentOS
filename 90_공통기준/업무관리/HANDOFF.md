@@ -17,8 +17,9 @@
 - 플랜: `C:/Users/User/.claude/plans/eager-riding-kurzweil.md` (R1~R5 반증형, 사용자 ExitPlanMode 승인 → Auto mode 활성)
 - 합의 원본: `90_공통기준/토론모드/logs/debate_20260427_214726_3way/` Round 1 v2 (pass_ratio 1.0)
 
-### 변경 (Fast Lane, 1개 파일)
+### 변경 (Fast Lane, 1개 파일 + fix-up 1건)
 - `.claude/scripts/publish_worktree_to_main.sh` — `AUTO_SYNC=false` 변수 + usage `--auto-sync` 1줄 + 파싱 분기 1줄 + stale 감지 블록(약 33줄) 신규 삽입. 기존 라인 변경 0
+- fix-up: `--dry-run` 종료 위치를 stale 감지 블록 이후로 이동(기존 dry-run은 stale 가드 진입 전에 종료되어 plan "dry-run에서 fetch만 수행" 의도와 어긋남)
 - 동작:
   - **default**: stale(`HEAD..origin/main` count > 0) 감지 시 보고+exit 1 (자동 변경 없음)
   - **`--auto-sync`**: `git fetch origin main` → `merge --ff-only origin/main` 시도, 분기 시 수동 해결 메시지+exit 1
