@@ -4,8 +4,39 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21) / 세션110 D0 중복 정리
+최종 업데이트: 2026-04-27 KST — 세션113 [3way] 토론 만장일치 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션113 (2026-04-27) — [3way] self-audit 후속 토론 + P2-B 최소 수정
+
+### 진행 상황
+- 진입: 사용자 "토론 진행해서 근본 문제 마무리" → 3자 토론 Round 1 양측 만장일치
+- 토론 결과: **해석 C 채택** — P2-B 1건만 토론(Option B), P2-C·P3-E 동결 보류
+- 구현: `evidence_mark_read.sh` 단일 파일에 OAuth 정상 흐름 인정 패턴 2개 추가
+- 안전 조건 5가지: fixed-string 매칭 + error 부재 검증 + mtime ≥ 세션 시작 + 정규식 앵커링 + 단일 파일
+
+### 양측 cross_verification 4/4 = 100% (pass_ratio 채택 확정)
+- gemini_verifies_gpt: 동의
+- gpt_verifies_gemini: 동의
+- gpt_verifies_claude: 동의 + 구현 보강 (mtime/^...$)
+- gemini_verifies_claude: 동의
+
+### 다음 AI 액션
+- **이번 수정이 마지막 시스템 개입** (Gemini 명시 권고)
+- 7일 후 evidence_missing 건수 50% 이상 감소 확인 (incident_review --days 7)
+- P2-C/P3-E는 재논의 트리거 충족 시에만 재개 (실무 산출물 치명적 결함 + 해당 hook/agent 부재가 직접 원인 증명)
+- 그 외는 실무 산출물 모드 유지
+
+### 로그
+- `90_공통기준/토론모드/logs/debate_20260427_105243_3way/`
+  - round1_claude.md (6-0 독자 답안)
+  - round1_gpt.md (해석 C 채택)
+  - round1_gemini_verify.md (1줄 검증 동의)
+  - round1_gemini.md (Option B + 정규식 앵커링)
+  - round1_gpt_verify.md (1줄 검증 동의)
+  - round1_claude_synthesis.md (Claude 종합안)
 
 ---
 

@@ -97,6 +97,35 @@ echo "$TEXT" | grep -qE 'date_check(\.sh)?' && mark "date_check"
 echo "$TEXT" | grep -qE 'auth_diag(\.sh)?' && mark "auth_diag"
 echo "$TEXT" | grep -qE 'identifier_ref_check(\.sh)?|기준정보 대조|identifier_ref' && mark "identifier_ref"
 
+# 세션113 (3자 토론 만장일치, 2026-04-27, debate_20260427_105243_3way)
+# Option B 채택 — evidence_mark_read.sh 패턴 확장으로 정상 OAuth 작업 ok 인정
+# 양측(GPT/Gemini) 합의 안전 조건 (false ok 방지):
+#   1. 단순 스크립트명 매칭 금지 — 명령 + 명시적 성공 신호 + error 부재 3중 조건
+#   2. grep -qF fixed-string 매칭으로 정규식 메타문자 우회 차단 (Gemini 앵커링 강제)
+#   3. error/traceback/exception/failed 키워드 부재 추가 검증
+#   4. token 파일 mtime이 세션 시작 이후인지 검증 (GPT 추가 보강: "이번 실행에서 갱신된 파일")
+#   5. 단일 파일 최소 보정 — 신규 hook 금지, settings 변경 금지, evidence_gate 정책 변경 금지
+# 본 수정이 마지막 시스템 개입 (세션108 합의 일관성 유지). 향후 P2-C/P3-E 재논의는 트리거 충족 시만.
+
+# 패턴 1: erp_oauth_login.py 명령 + OAuth 성공 신호 + error 부재 (stdout 성공 텍스트 기반)
+if echo "$TEXT" | grep -qF 'erp_oauth_login.py' && \
+   echo "$TEXT" | grep -qF 'OAuth' && \
+   ! echo "$TEXT" | grep -qiE '(error|traceback|exception|failed)'; then
+  mark "auth_diag"
+  hook_log "PostToolUse/evidence_mark_read" "auth_diag_marked_via_oauth_normal_flow"
+fi
+
+# 패턴 2: ERP OAuth 토큰 파일이 세션 시작 이후 생성/갱신된 경우 (산출물 mtime 기반)
+SESSION_START_EPOCH=$(stat -c %Y "$START_FILE" 2>/dev/null || echo 0)
+ERP_TOKEN_FILE="$PROJECT_ROOT/.claude/state/erp_oauth_token.json"
+if [ -f "$ERP_TOKEN_FILE" ] && [ "$SESSION_START_EPOCH" -gt 0 ]; then
+  TOKEN_MTIME=$(stat -c %Y "$ERP_TOKEN_FILE" 2>/dev/null || echo 0)
+  if [ "$TOKEN_MTIME" -ge "$SESSION_START_EPOCH" ]; then
+    mark "auth_diag"
+    hook_log "PostToolUse/evidence_mark_read" "auth_diag_marked_via_token_mtime"
+  fi
+fi
+
 # 세션93 (2026-04-22 2자 토론 합의, plan.md 1주차 4번 (d)):
 #   tasks_updated / handoff_updated 마커 생성 제거.
 #   사유: evidence_gate에서 tasks_handoff 블록 제거됨 → 이 마커는 더 이상 참조되지 않음.

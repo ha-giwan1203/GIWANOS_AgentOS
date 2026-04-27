@@ -10,7 +10,52 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션112 weekly self-audit 결과 P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화 + 중복 7건 자동 정리(DELETE API 발견) + erp_d0_dedupe.py 신규 / 세션109 SD9A01 숙련도평가서 자동화 (Phase 1~5 완료, 35개 산출물)
+최종 업데이트: 2026-04-27 KST — 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화
+
+## 세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정
+
+> 진입: 사용자 "토론 진행해서 근본 문제 마무리" → 3자 토론(Claude×GPT×Gemini) Round 1 → 양측 만장일치 (pass_ratio=4/4=100%)
+> 로그: `90_공통기준/토론모드/logs/debate_20260427_105243_3way/`
+
+### 메타 의제0 — 해석 C 채택 (양측 만장일치)
+세션108 "시스템 개선 영구 중단"은 유효. 다만 예외 1건 — 실무 산출 막거나 정상 작업을 반복 차단·오염시키는 1건은 최소 수정 가능.
+- **P2-B 1건만 토론 대상** (필수 유지보수, 시스템 개선 모드 재진입 아님)
+- **P2-C / P3-E 동결 보류** (운영 경로 부여 금지, 폐기도 금지)
+- **이번 수정이 마지막 시스템 개입** (Gemini 명시 권고)
+
+### [완료] P2-B Option B 구현 — evidence_mark_read.sh 패턴 확장
+양측 합의 안전 조건 5가지 모두 반영:
+1. 단순 스크립트명 매칭 금지 — 명령 + 성공 신호 + error 부재 3중 조건
+2. `grep -qF` fixed-string 매칭으로 정규식 메타문자 우회 차단 (Gemini 앵커링 강제)
+3. error/traceback/exception/failed 키워드 부재 추가 검증 (false ok 방지)
+4. token 파일 mtime ≥ 세션 시작 시각 (GPT 추가 보강: "이번 실행에서 갱신된 파일")
+5. 단일 파일 최소 보정 — 신규 hook / settings / evidence_gate 정책 변경 모두 금지
+
+추가 패턴 2개:
+- 패턴 1: `erp_oauth_login.py` 명령 + `OAuth` 텍스트 + error 부재 → `auth_diag.ok` mark
+- 패턴 2: ERP OAuth 토큰 파일이 세션 시작 이후 생성/갱신 → `auth_diag.ok` mark
+
+### [영구 보류] P2-C — 죽은 보조 hook 4종 동결
+`e2e_test`, `nightly_capability_check`, `gate_boundary_check`, `render_hooks_readme` — 어떠한 운영 경로도 부여 금지, 삭제도 금지. 보조 수동 도구 상태 유지.
+- 세션77 nightly 합의와의 트레이드오프 명시: "당시는 안전망 부족이 핵심 리스크, 현재는 안전망 과다가 병목. 환경 적응으로서의 합리적 보류"
+- 재논의 트리거: 실무 작업을 실제로 막는 증거가 나오기 전까지 재논의 금지
+
+### [영구 보류] P3-E — agents 7종 동결
+`evidence-reader`, `debate-analyzer`, `artifact-validator`, `settlement-validator`, `code-reviewer`, `critic-reviewer`, `self-audit-agent` — AGENTS_GUIDE 추가/자동 호출/삭제/description 수정 모두 금지. 필요 시 수동 호출만.
+- **재논의 트리거 명문화 (Gemini 신규)**: "실무 산출물에 치명적 결함(잘못된 정산 엑셀, 코드 포맷 파괴 등) 발생 + 해당 agent(artifact-validator 등) 부재가 직접 원인으로 증명된 경우에 한해 재논의 허용"
+
+### 양측 검증 결과 (cross_verification 4/4 = 100%)
+- gemini_verifies_gpt: 동의 (해석 C 세션108 원칙 완벽 부합)
+- gpt_verifies_gemini: 동의 (필수 유지보수 + 물리 증거 + 앵커링 + 재논의 트리거 모두 인정)
+- gpt_verifies_claude: 동의 + 구현 보강 2건 (mtime 검증 / ^...$ 완전일치)
+- gemini_verifies_claude: 동의 (mtime 검증 채택 권장)
+
+### 운영 정합
+- bash syntax check: OK
+- smoke_fast: 11/11 ALL PASS
+- claude_delta: major (Claude 6-0 답안 → 양측 검증으로 세션108 합의 일관성 수렴 — 3-way 정합성 가치 실증)
+
+---
 
 ## 다음 세션 토론 안건 (2026-04-27 self-audit 결과)
 
