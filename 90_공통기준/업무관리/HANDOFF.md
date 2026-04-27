@@ -38,10 +38,10 @@
 5. ~~별건 4번 PLC·Staging 청소 (ERP-E-01)~~ — 본 세션118 추가 처리: `90_공통기준/erp-mes-recovery-protocol.md` 단일 원본 신설
 
 ### 본 세션 마무리 절차
-1. final_check `--full` 통과 확인 (settings 변경 자동 승격)
-2. [3way] 태그 커밋 + push
-3. /share-result 양측 공유 (별건 2/3/4번 통합)
-4. 양측 PASS 후 종료
+1. ~~final_check `--full` 통과 확인~~ — ALL CLEAR
+2. ~~[3way] 태그 커밋 + push~~ — b8249d10, df3faae2 (regex fix-up)
+3. ~~/share-result 양측 공유~~ — GPT 부분PASS → A 분기 즉시반영 → 사실상 PASS / Gemini PASS 5/5 ("최종 승인")
+4. ~~양측 PASS 후 종료~~ — 본 세션118 모든 별건(1+2+3+4) 종결. mode_c_log.jsonl 정리 정책만 향후 별건 잔존
 
 ### 3way 공유 결과 (양측 만장일치 PASS)
 - GPT: PASS — item 1~5 실증됨·동의 (default 안전 차단 / --auto-sync ff-only / dry-run 보정 / TASKS·HANDOFF·STATUS 반영 / 모드 C·R1~R5 준수). 추가제안 없음

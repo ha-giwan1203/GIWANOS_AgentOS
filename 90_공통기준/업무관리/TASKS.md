@@ -54,6 +54,10 @@
 - 활성 hook 수: 32 → 34 (AGENTS_GUIDE.md 자동 갱신 완료)
 - plan: `C:/Users/User/.claude/plans/heuristic-flowing-bagel.md` (R1~R5 반증형 작성)
 - **GPT 부분PASS A 분기 즉시반영**: settings*.json regex 누락 지적 채택 → 두 hook 모두 `^\.claude/settings.*\.json$`을 별도 OR로 분리. 검증: 가짜 입력 `settings.json`/`settings.local.json` 매칭 PASS
+- **3way 공유 PASS** (양측 만장일치 — df3faae2 기준):
+  - GPT (b8249d10 부분PASS → df3faae2 A 분기 즉시반영 후 종결): item 1·2 정정 채택, item 3·4·5 동의. 추가제안 본 fix-up으로 종결
+  - Gemini PASS (df3faae2): 5/5 동의 (item 1·2·3·5 실증됨, item 4 메타순환 라벨이지만 무한 루프 회피 동의). 추가제안 없음 — "최종 승인"
+  - 하네스: 채택 5 / 보류 0 / 버림 0
 
 ## 세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)
 
