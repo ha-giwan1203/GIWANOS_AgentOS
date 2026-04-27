@@ -35,9 +35,16 @@
 - registry.yaml v2 갱신 (primary + legacy 분리)
 - bridge.md 셀렉터 전체 확정 (생성 페이지·상세 페이지·소스 업로드 메뉴)
 
-### 후속 (사용자 액션 필요)
-- v2 노트북에 소스 업로드: legacy 노트북에서 소스 다운로드 → v2에 업로드 → 동기화 확인
-- 모든 소스 이전 후 legacy 폐기 (선택, NotebookLM 웹에서 삭제 + registry active=false)
+### [완료] v2 노트북 소스 업로드 + 동작 검증
+- 라인배치_v2: `10_라인배치/notebooklm_source_라인배치_v1.txt` 업로드 완료 (123KB)
+- 조립비정산_v2: `05_생산실적/조립비정산/06_스킬문서/notebooklm_source_조립비정산_v1.txt` 업로드 완료 (88KB)
+- **Gemini 메인 흐름 검증 PASS**: 조립비정산_v2 노트북에 "SD9A01 야간 가산 규칙" 질의 → 정확한 답변 (소스 인용 marker 포함)
+- 양방향 동기화 작동 확정 (UUID 공통 + 소스 인덱싱)
+- registry.yaml sources 필드 1로 갱신
+
+### 남은 후속 (선택)
+- legacy 노트북 폐기 (NotebookLM 웹에서 삭제 + registry active=false)
+- 도메인 문서 추가 시 v2 노트북에 추가 업로드 (Step 1~7 PDF·spec 문서 등)
 
 ### 설계 원칙
 - Gemini = 메인 채널 (사이드패널 노트북 활성화 후 질의)

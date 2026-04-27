@@ -39,7 +39,7 @@ notebooks:
       - 스킬 실행 계약
       - 재개 규칙
     primary_use: 라인배치 도메인 질의·검증 (Gemini 메인 채널)
-    sources: 0   # 신규 — 사용자 업로드 대기
+    sources: 1   # notebooklm_source_*_v1.txt 업로드 완료 (2026-04-27)
     active: true
 
   - name: 조립비정산_대원테크_v2
@@ -56,7 +56,7 @@ notebooks:
       - Known Exception
       - SP3M3 주간 정책
     primary_use: 월말 정산 규칙·예외 판정 (Gemini 메인 채널)
-    sources: 0   # 신규 — 사용자 업로드 대기
+    sources: 1   # notebooklm_source_*_v1.txt 업로드 완료 (2026-04-27)
     active: true
 
 # ─────────────────────────────────────────────────────

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-27 — 세션113 [3way] self-audit 후속 토론 만장일치(해석 C, pass_ratio=4/4) + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화 + 중복 7건 자동 정리
+최종 업데이트: 2026-04-27 — 세션114 (자동 갱신: final_check --fix)
 
 ---
 

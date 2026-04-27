@@ -21,11 +21,16 @@
 - MCP 인증: authenticated=false (사용자 액션 필요)
 
 ### 다음 AI 액션
-1. ✅ MCP 인증 완료 (`authenticated=true`)
-2. ✅ MCP 직접 질의 양 노트북 PASS (라인배치 / 조립비정산)
-3. ✅ Gemini 측 v2 노트북 2건 생성 (양방향 동기화 실증)
+1. ✅ MCP 인증 완료
+2. ✅ MCP 직접 질의 양 노트북 PASS
+3. ✅ Gemini v2 노트북 2건 생성 (양방향 동기화 실증)
 4. ✅ bridge.md 셀렉터 전체 확정 + registry.yaml v2 갱신
-5. **사용자 액션**: legacy 노트북에서 소스 다운로드 → v2에 업로드
+5. ✅ v2 노트북에 소스 자동 업로드 (chrome-devtools-mcp upload_file)
+6. ✅ Gemini 메인 흐름 검증 PASS (조립비정산_v2 질의·응답)
+
+### 남은 후속 (선택)
+- legacy 노트북 폐기 (NotebookLM 웹 삭제 + registry active=false)
+- 도메인 문서 추가 시 v2 노트북에 추가 업로드
 
 ### 구조
 - 단일 원본: `registry.yaml` — 노트북 추가는 이 파일만 수정
