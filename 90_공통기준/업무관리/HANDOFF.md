@@ -4,8 +4,44 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, 별건 의제 4건 등록) / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현
+최종 업데이트: 2026-04-27 KST — 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 1번 처리) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, 별건 의제 4건 등록) / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 모드 D 비대칭 정합화
+
+### 진행 상황
+- HANDOFF "다음 AI 액션 2번"(세션116 별건 1번) 진입 → 사용자 "이어서 진행하자" + AskUserQuestion 1번 선택
+- 사용자 명시 "토론모드 진행해서 플랜 보강후 해결" → D 모드 사용자 명시 호출 + 후속 C 강제 승격 구현
+- 플랜: `C:/Users/User/.claude/plans/lexical-exploring-pebble.md` (R1~R5 반증형 + 토론 안건 5건)
+- 3자 토론 Round 1 — pass_ratio 0.75 (3 동의 / 1 검증 필요), PASS
+- critic-reviewer **WARN** (라벨 불일치 + 0건감사·일방성 보조축) → v2 반영 (안건 3 조건부채택 재분류 + 보류 1건 등재 + cross-grep 실수행 evidence)
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260427_203835_3way/` (round1_claude/gpt/gemini + 검증 4건 + synthesis + cross_verification + result.json)
+
+### 변경 (Fast Lane, 2개 파일)
+- `90_공통기준/토론모드/CLAUDE.md` 줄 79-122 — 섹션명 "자동 승격 트리거" → "B 분류 감지 + 보고 (비대칭 전환)" + 자동 `Skill(debate-mode)` 호출 절차 → 1줄 라벨 표기 + 사용자 명시 호출 대기로 재기록
+- `.claude/commands/share-result.md` 줄 173-186 — 5단계 B 분기 자동 승격 → "라벨 표기 + 사용자 호출 대기 (즉시 반영 금지)" + HANDOFF 미결 1줄 수동 기록 권장 + `[NEVER] B 감지 라벨 없이 단독 반영 금지` 추가
+
+### 핵심 합의 (Round 1)
+- 안건 1 (누락 검토 cross-grep): 양측 동의 + 실수행 결과 `.claude/scripts/`·`.claude/agents/`·외부 CLI 매치 0건 → 누락 위치 없음 확정
+- 안건 2 (share_gate 정합): 양측 동의 — 분배(공유) vs 진입(다라운드 토론) 직교, 유지
+- 안건 3 (세션 캐싱): GPT 동의 / Gemini 반대(임시 가드 필수) — 조건부채택 + HANDOFF 메모 흡수, 보류 1건 등재
+- 안건 4 (NEVER 라인): GPT 표현 채택 ("수정·커밋 중단, 라벨 보고 후 대기")
+- 안건 5 (의제 표류): 사용자 책임 + Gemini HANDOFF 수동 기록 권고 흡수
+
+### 별건 등록 (세션116 별건과 통합)
+- ERP/MES 트랜잭션 롤백 NEVER 조항 (Gemini 추가제안) → 세션116 별건 4번 PLC와 통합
+- 임시 가드 hook 신설 검토 (Gemini 안건 3) → 세션116 별건 2번 R1~R5 Pre-commit hook과 통합 토론 시 재평가
+
+### 다음 AI 액션
+1. **다음 세션 첫 응답에서 모드 선언 + B 감지 자동 D 진입 미발생 확인** — 본 변경은 시스템 프롬프트 캐싱이라 다음 세션부터 활성
+2. **세션116 별건 2번 R1~R5 Pre-commit hook 토론** — 임시 가드 hook 통합 검토 시점에 진행 권장
+3. **세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook** — 본 세션에서 수동 기록 권장 라인은 추가, 자동 hook은 별건 유지
+4. **세션116 별건 4번 PLC 인터치·Staging Table** — Gemini 본 세션 추가제안(ERP 트랜잭션 롤백)과 통합 검토
+
+### 본 세션 임시 메모
+- 본 세션 종료 전까지 share-result 호출 시 (과거 캐싱된) 자동 D 승격 가능성 잔존 — 수동 모니터링 필요. 다음 세션 활성 후 본 라인 삭제.
 
 ---
 

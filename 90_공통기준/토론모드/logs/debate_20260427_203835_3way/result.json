@@ -1,0 +1,81 @@
+{
+  "session_id": "debate_20260427_203835_3way",
+  "mode": "3way",
+  "topic": "토론모드 CLAUDE.md '자동 승격 트리거' + share-result.md 5단계 B 분기 → 모드 D 비대칭 설계 정합 갱신",
+  "started_at": "2026-04-27T20:38:35+09:00",
+  "ended_at": "2026-04-27T20:50:00+09:00",
+  "user_session": 117,
+  "previous_debate": "debate_20260427_185903_3way",
+  "plan_file": "C:/Users/User/.claude/plans/lexical-exploring-pebble.md",
+  "round_count": 1,
+  "max_rounds": 3,
+  "agenda_count": 5,
+  "issue_class": "B",
+  "verdict": "PASS",
+  "claude_independent_first": true,
+  "claude_independent_path": "round1_claude.md",
+  "cross_verification": {
+    "gemini_verifies_gpt": {"verdict": "동의", "reason": "안건 4 보완책이 D 자동 진입 차단 원칙 실무적 뒷받침"},
+    "gpt_verifies_gemini": {"verdict": "검증 필요", "reason": "안건 3·4·추가제안 ERP 트랜잭션은 모드 E 영역, 별건 분리 정합"},
+    "gpt_verifies_claude": {"verdict": "동의", "reason": "모드 D 정합화 + 모드 E 별건 분리로 범위 오염 없이 핵심 충돌만 해결"},
+    "gemini_verifies_claude": {"verdict": "동의", "reason": "절차적 안전망 즉시 흡수 + ERP 롤백 모드 E 분리로 범위와 논리적 정합성 확보"},
+    "pass_ratio_numeric": 0.75,
+    "round_count": 1,
+    "max_rounds": 3,
+    "skip_65": false,
+    "skip_65_reason": null,
+    "claude_delta": "partial",
+    "issue_class": "B"
+  },
+  "harness": {
+    "summary_counts": {"채택": 4, "조건부채택": 1, "보류": 1, "버림": 0, "별건": 3},
+    "채택": [
+      {"item": "누락 검토 cross-grep", "label": "실증됨", "evidence": "양측 동의 + Gemini 권고 흡수 + cross-grep 실수행 결과 .claude/scripts/·.claude/agents/ 매치 0건", "ref": "round1_gemini.md / cross-grep 실행 결과"},
+      {"item": "share_gate.sh 분배 정책 유지", "label": "실증됨", "evidence": "양측 동의 + Claude 입장 정합", "ref": "round1_gpt.md / round1_gemini.md"},
+      {"item": "NEVER 라인 GPT 표현", "label": "실증됨", "evidence": "GPT 추가제안 + Gemini 동의(검증 단계)", "ref": "round1_gpt.md / round1_gemini_verify_gpt.md"},
+      {"item": "HANDOFF 미결 1줄 수동 기록 권장", "label": "메타순환→채택", "evidence": "Gemini 안건 5 채택", "ref": "round1_gemini.md"}
+    ],
+    "조건부채택": [
+      {"item": "안건 3 Claude 입장 + HANDOFF 메모 흡수", "label": "환경미스매치", "evidence": "GPT 동의 + Gemini 명시 반대(임시 가드 필수). HANDOFF 1줄 메모로 흡수 처리하나 Gemini 반대 의견 실증 해소 미완", "ref": "round1_gemini.md / critic-reviewer WARN", "조건": "다음 세션 활성 후 임시 가드 필요성 재검토 + 세션116 별건 2번(R1~R5 Pre-commit hook)과 통합 토론 시 재평가"}
+    ],
+    "보류": [
+      {"item": "Gemini 안건 3 임시 가드 필수 입장", "label": "환경미스매치", "evidence": "본 작업 hook 신설 금지 제약으로 즉시 반영 불가, 그러나 모드 E 영역으로 우회만 하지 말고 별건 토론 시 정합 재평가 필요", "ref": "round1_gemini.md", "재검토조건": "세션116 별건 2번 R1~R5 Pre-commit hook 토론 시 통합"}
+    ],
+    "버림": [],
+    "별건": [
+      {"item": "ERP/MES 트랜잭션 롤백 NEVER", "분리사유": "모드 E 정책 영역", "통합대상": "세션116 별건 4번"},
+      {"item": "임시 가드 hook 신설", "분리사유": "C 강제 승격 트리거 + hook 신설 금지", "통합대상": "세션116 별건 2번 R1~R5 Pre-commit"},
+      {"item": "외부 CLI 래퍼 cross-grep", "분리사유": "본 작업 직전 1회 수행 (별건 아님, 사전 작업)", "통합대상": "구현 직전 단계"}
+    ]
+  },
+  "logs": [
+    "round1_claude.md (6-0 Claude 독자)",
+    "round1_gpt.md (6-1 GPT 본론)",
+    "round1_gemini_verify_gpt.md (6-2 Gemini→GPT 검증)",
+    "round1_gemini.md (6-3 Gemini 본론)",
+    "round1_gpt_verify_gemini.md (6-4 GPT→Gemini 검증)",
+    "round1_claude_synthesis.md (6-5 Claude 종합)",
+    "round1_cross_verification.md (자동 게이트 4키)",
+    "result.json"
+  ],
+  "critic_review": {
+    "verdict": "WARN",
+    "axes": {
+      "독립성": "PASS",
+      "하네스": "WARN",
+      "0건감사": "WARN(보조)",
+      "일방성": "WARN(보조)"
+    },
+    "warn_reason": "안건 3 Gemini 명시 반대를 채택으로 분류한 라벨 불일치 + 보류 0건 + Gemini 독립 기여 미미 (모드 E 별건 분리는 Claude 단독 분류, Gemini는 종합안에 사후 동의)",
+    "v2_reflection": "안건 3을 '조건부채택'으로 재분류 + Gemini 반대 의견을 보류 1건으로 등재. cross-grep 실수행 결과 evidence에 추가. 세션116 별건 2번 R1~R5 Pre-commit hook 토론 시 안건 3 임시 가드 필요성 통합 재검토 명시",
+    "step5_proceed": true
+  },
+  "next_steps": [
+    "critic-reviewer 1회 (Step 4b)",
+    "외부 CLI 래퍼 cross-grep 사전 수행",
+    "plan.md 토론 결과 반영 자리 갱신",
+    "토론모드 CLAUDE.md + share-result.md Edit 구현",
+    "[3way] 커밋 + 양측 공유 + 양측 PASS",
+    "TASKS / HANDOFF / 메모리 갱신 + /finish"
+  ]
+}

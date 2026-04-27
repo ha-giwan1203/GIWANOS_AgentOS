@@ -10,7 +10,38 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+최종 업데이트: 2026-04-27 KST — 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+
+## 세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)
+
+### [완료] 토론모드 CLAUDE.md "자동 승격 트리거" + share-result.md 5단계 B 분기 → 모드 D 비대칭 설계 정합 갱신
+- 진입: HANDOFF "다음 AI 액션 2번" — 세션116 별건 의제 1번
+- 사용자 지시: "이어서 진행하자" → AskUserQuestion 1번 선택 → "토론모드 진행해서 플랜 보강후 해결"
+- 모드 판정: **C 강제 승격** (도메인 CLAUDE.md + `.claude/commands/` 수정, 루트 CLAUDE.md C 트리거 7개 중 2개)
+- 플랜: `C:/Users/User/.claude/plans/lexical-exploring-pebble.md` (R1~R5 반증형 작성)
+
+### Round 1 토론 결과 (pass_ratio 0.75, PASS)
+- 로그: `90_공통기준/토론모드/logs/debate_20260427_203835_3way/`
+- 안건 5건: 누락 검토·share_gate 정합·세션 캐싱·NEVER 라인 형식·의제 표류 보호
+- 채택 4건 + 조건부채택 1건 + 보류 1건 + 별건 3건
+- cross_verification 4키: 동의 3 / 검증 필요 1 (gpt_verifies_gemini = ERP 트랜잭션 모드 E 영역 별건 분리)
+- claude_delta: partial / issue_class: B / skip_65: false
+- critic-reviewer **WARN** (라벨 불일치 + 보조축 0건감사·일방성) → v2 반영: 안건 3을 "조건부채택"으로 재분류 + 보류 1건 등재 + cross-grep 실수행 결과 evidence 추가
+
+### 변경 파일 (2건, Fast Lane)
+1. `90_공통기준/토론모드/CLAUDE.md` 줄 79-122 — 섹션명 "자동 승격 트리거" → "B 분류 감지 + 보고 (비대칭 전환)" + 자동 `Skill(debate-mode)` 호출 절차 → 1줄 라벨 표기 + 사용자 명시 호출 대기로 재기록 + 세션117 토론 로그 참조 + `[NEVER] 자동 호출 금지` 추가
+2. `.claude/commands/share-result.md` 줄 173-186 — 5단계 B 분기 자동 승격 → "라벨 표기 + 사용자 호출 대기 (즉시 반영 금지)"로 변경 + HANDOFF 미결 1줄 수동 기록 권장 + `[NEVER] B 감지 라벨 없이 단독 반영 금지` 추가
+
+### 별건 등록 (세션116 별건과 통합)
+- ERP/MES 트랜잭션 롤백 NEVER 조항 → 세션116 별건 4번 PLC와 통합
+- 임시 가드 hook 신설 검토 → 세션116 별건 2번 R1~R5 Pre-commit hook과 통합 토론 시 재평가
+- HANDOFF 자동 에스컬레이션 로그 (세션116 별건 3번) — 본 세션 share-result에 수동 기록 권장 라인은 추가, 자동 hook은 별건 유지
+
+### 세션116 별건 잔존 (우선순위 재정의)
+1. ~~별건 1번 (토론모드 자동 승격 갱신)~~ — 본 세션117에서 완료
+2. R1~R5 Pre-commit hook 연동 — 임시 가드 hook과 통합 토론 후 진행
+3. HANDOFF 자동 에스컬레이션 로그 — 부분 반영(수동 기록 권장 라인). 자동 hook은 보류
+4. PLC 인터치·Staging Table 청소 (ERP-E-01) — Gemini 본 세션117 추가제안 흡수 후 통합 검토
 
 ## 세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건
 

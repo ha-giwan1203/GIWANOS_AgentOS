@@ -1,0 +1,20 @@
+{
+  "session_id": "debate_20260427_203835_3way",
+  "mode": "3way",
+  "topic": "토론모드 CLAUDE.md '자동 승격 트리거' + share-result.md 5단계 B 분기 → 모드 D 비대칭 설계 정합 갱신",
+  "started_at": "2026-04-27T20:38:35+09:00",
+  "user_session": 117,
+  "previous_debate": "debate_20260427_185903_3way",
+  "plan_file": "C:/Users/User/.claude/plans/lexical-exploring-pebble.md",
+  "chat_url": "",
+  "turn_number": 0,
+  "max_rounds": 3,
+  "round_count": 0,
+  "agenda_count": 5,
+  "issue_class": "B",
+  "claude_independent_first": true,
+  "claude_independent_path": "round1_claude.md",
+  "turns": [],
+  "result": null,
+  "critic_review": null
+}
