@@ -10,7 +10,37 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+최종 업데이트: 2026-04-28 KST — 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+
+## 세션119 (2026-04-28) — [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 회전 (세션118 잔존 별건 마무리)
+
+### [완료] mode_c_log.sh v2 (의제 2건 통합)
+- 진입: 사용자 "남은안건 전부 토론 모드 진행해서 마무리" → 모드 D (`/debate-mode`) 사용자 명시 호출
+- 의제 1: `mode_c_log.jsonl` 회전 정책 (HANDOFF "본 세션118 모든 별건 종결. mode_c_log.jsonl 정리 정책만 향후 별건 잔존")
+- 의제 2: `mode_c_log.sh:35` commit_subject 멀티바이트 cut 깨짐 (본 세션 점검 중 발견 — kind-williamson worktree 실측 line 1 끝 "프�", line 2 끝 "분기 �")
+- 모드 판정: D → 합의 후 C (`.claude/hooks/mode_c_log.sh` 수정)
+- plan: `C:/Users/User/.claude/plans/vast-questing-pebble.md` (R1~R5 반증형, 사용자 ExitPlanMode 승인)
+- 합의 원본: `90_공통기준/토론모드/logs/debate_20260428_080046_3way/` Round 1 v2 (pass_ratio 0.75, synthesis_only 1.0, critic WARN 보강 3건 반영)
+
+### 변경 (Fast Lane, 2개 파일)
+- `.claude/hooks/mode_c_log.sh` —
+  - line 35 `cut -c1-120` → `"${PY_CMD:-python}" -c "import sys; data=sys.stdin.buffer.read().decode('utf-8',errors='replace'); sys.stdout.buffer.write(data.strip()[:120].encode('utf-8'))"` (Python codepoint 슬라이스 + `.strip()` + Windows binary 모드 강제)
+  - 마지막에 회전 블록 ~14라인 신규: 256KB 임계 + oldest 50% → `mode_c_log.archive.jsonl` 분리 + 임시 파일 mv 원자적 교체 + hook_log 알림
+- `.claude/hooks/README.md` — failure contract 표 mode_c_log 비고 v2 1줄 추가
+
+### 3자 합의 (Round 1 PASS)
+- GPT (gpt-5-thinking): Step 6-4 동의 / Step 6-5 동의 — "mode_c_log.sh 1파일 한정, archive 보존형 회전, Python 문자 단위 절단, ${PY_CMD:-python} fallback Fast Lane 정합"
+- Gemini (2.5 Pro): Round 1 본론 통과 + Step 6-2 GPT에 이의(df3faae2 정정) + Step 6-5 동의 — "원자적 덮어쓰기, .strip(), PY_CMD fallback 3가지 보강안 정확히 흡수"
+- Claude 종합: claude_delta=partial (Gemini 보강 3건 흡수), issue_class=B, skip_65=false
+- critic-reviewer: WARN — 보강 3건 반영 v2 (GPT 묵시 동의 라벨 하향, 비표준 라벨 정형화, excluded_items 추가)
+
+### 검증 (모두 PASS)
+- bash -n 문법 PASS
+- 멀티바이트 cut: 한글 180자 입력 → 120 codepoint 정확 절단, U+FFFD 부재, 마지막 hex 완전 UTF-8
+- 회전 동작: 333KB/1500줄 입력 → log 166KB/750줄 + archive 166KB/750줄, 데이터 보존 1500=750+750, .tmp 잔존 없음 (원자성)
+
+### 잔존 별건 (다음 세션 후보)
+- `cut -c` 동일 패턴 다른 hook 사용처 검토 (본 의제 범위 밖 — Round 1 합의 시 분리)
 
 ## 세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)
 

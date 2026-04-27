@@ -4,8 +4,35 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 1번 처리) / 세션116 [3way] 작업 모드 5종 판정 도입 / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현
+최종 업데이트: 2026-04-28 KST — 세션119 [3way] mode_c_log.sh v2 (멀티바이트 cut + 256KB archive 회전, 세션118 잔존 별건 마무리) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 / 세션116 [3way] 작업 모드 5종 판정 도입 / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션119 (2026-04-28) — [3way] mode_c_log.sh v2 (잔존 별건 마무리)
+
+### 진행 상황
+- 진입: 사용자 "이전세션에서 모드c로그 확인하라고 했는대" → 점검 결과 kind-williamson worktree에 mode_c_log.jsonl 2줄 (b8249d10/df3faae2) + commit_subject 깨짐(`프�`/`분기 �`) 발견
+- 사용자 "남은안건 전부 토론 모드 진행해서 마무리" → 모드 D 명시 호출
+- 의제 2건: (1) mode_c_log.jsonl 회전 정책 (세션118 잔존), (2) commit_subject 멀티바이트 cut 깨짐 (본 세션 발견)
+- plan: `C:/Users/User/.claude/plans/vast-questing-pebble.md` (R1~R5 반증형, ExitPlanMode 승인)
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260428_080046_3way/` Round 1 PASS (pass_ratio 0.75 / synthesis_only 1.0)
+- critic WARN v2 보강 3건 반영
+
+### 변경 (Fast Lane, 2개 파일)
+- `.claude/hooks/mode_c_log.sh` — line 35 cut → Python codepoint 슬라이스(.strip() + UTF-8 binary) + 마지막에 256KB 임계 archive 분리 회전 블록 ~14라인 신규
+- `.claude/hooks/README.md` — mode_c_log 비고 v2 1줄
+
+### 검증 결과 (모두 PASS)
+- 문법: bash -n PASS
+- 멀티바이트 cut: 한글 180자 → 120 codepoint 정확 절단, U+FFFD 부재
+- 회전: 333KB/1500줄 → log 166KB/750줄 + archive 166KB/750줄, 데이터 보존 1500=750+750, .tmp 잔존 없음
+
+### 다음 AI 액션
+1. ~~본 커밋 push + 검증 재확인~~ — 본 세션 진행
+2. ~~/share-result로 양측 공유~~ — 본 세션 진행
+3. ~~/finish 9단계 마무리~~ — 본 세션 진행
+4. (별건 후보) `cut -c` 동일 패턴 다른 hook 사용처 검토 — 본 의제 범위 밖 분리됨
 
 ---
 
