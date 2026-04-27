@@ -42,6 +42,10 @@
 !.claude/scripts/
 !.claude/scripts/cdp/
 !.claude/scripts/cdp/cdp_chat_send.py
+# 세션110: D0 운영 도구 (SKILL.md "되돌리기 방법"에서 참조)
+!.claude/tmp/
+!.claude/tmp/erp_d0_deleteA.py
+!.claude/tmp/erp_d0_dedupe.py
 !.claude/rules/
 !.claude/rules/**
 !.claude/docs/

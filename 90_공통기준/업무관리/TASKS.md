@@ -24,6 +24,7 @@
 - 7건 일괄 DELETE 성공 (statusCode=200 × 7), ERP 그리드 11건만 잔존 검증 완료
 - 신규 도구: `.claude/tmp/erp_d0_dedupe.py --line SP3M3 --date YYYYMMDD [--execute]` (dry-run 기본, --execute로 실 삭제)
 - SKILL.md "되돌리기 방법" + 변경이력 v3 갱신
+- `.gitignore` 화이트리스트 추가: `.claude/tmp/erp_d0_deleteA.py` + `.claude/tmp/erp_d0_dedupe.py` (운영 도구 2종 git 추적)
 
 **[관찰·별 의제] morning batch 재실행 시 중복 발생 시나리오**
 - 시나리오: 자동 batch 1차 실패 → 사용자 수동 등록 → 자동 batch 재시도 → 중복 등록
