@@ -33,10 +33,9 @@
 - 수정 2: `_suppress_chrome_crash_restore()` 헬퍼 — Preferences `exit_type=Normal` 강제. launch 플래그에 `--disable-session-crashed-bubble` `--hide-crash-restore-bubble` `--remote-debugging-address=127.0.0.1` 추가
 - 검증: dry-run 2회 모두 exit 0 + 사용자 화면 복원 알림 미발생 확인 ("정상")
 
-**[관찰·별 의제] morning batch 재실행 시 중복 발생 시나리오**
-- 시나리오: 자동 batch 1차 실패 → 사용자 수동 등록 → 자동 batch 재시도 → 중복 등록
-- 방지책 후보: (a) ensure_chrome_cdp 직전 ERP 상태 확인 후 이미 등록된 동일 PROD_NO/PLAN_DA 있으면 스킵, (b) batch 시작 시 lock 파일 생성 (중복 실행 방지), (c) Phase 2 후 SmartMES 사전 조회로 같은 날 등록 여부 검증
-- 사용자 결정 후 진행 — 본 세션은 정리만
+**[폐기] morning 중복 발생 방지책 + SmartMES 동기화 등 4건 — 사용자 폐기 결정 (2026-04-27)**
+- 폐기 항목: ① morning + 수동 동시 실행 중복 방지책 ② SmartMES 잔존 7건 정리 (IT 영역) ③ 작업 기준 시스템 확인 ④ SAC 차단 (IT 영역)
+- 폐기 사유: 시스템 운영팀(IT/MES) 영역 또는 별 의제 우선순위 낮음. AI 추가 작업 없음.
 
 ## 세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화
 
