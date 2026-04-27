@@ -80,6 +80,14 @@
 - 정정: `create_sd9a01_v1.py` ERP_PROCESSES 매핑 변경 (001↔시트21 / 002↔시트20 / 003↔OVERRIDE) + `OVERRIDE_PROCESSES['003']` 신설 (리벳·릴 하단 브라켓 보수적 std·ctrl 9항목)
 - 양식 11 + 개인별 23 재생성 → 자체검증 **0 issues PASS**
 
+**[완료] 공정 번호 체계 변경 (사용자 결정, 2026-04-27 세션111)**
+- 사용자 지적: "공정 번호가 안 맞다" → ERP 표준공정원직(SD9A01_001~011) 대신 **라인별공정목록.xlsx 기준 10단위** 사용
+- 신규 번호 부여: **10/20/21/30/40/50/60/70/80/90/100** (11개)
+  - 21 = 신규 공정 "RETRACTOR MAIN FRAME 서브 앗세이 압입 & 리벳 & 릴 하단 브라켓" (작업표준서 통합본 '목록' 시트의 21="릴브라켓 리벳팅 공정"과 의미 일치)
+- 변경 범위: `create_sd9a01_v1.py` ERP_PROCESSES + MGRPLAN_PROC_NO_MAP + OVERRIDE_PROCESSES key, `create_sd9a01_personal.py` SD9M01_TO_ERP, `verify_sd9a01_outputs.py` ERP_NAMES + EXPECTED_CODES
+- 산출물 재생성: `SD9A01_공정{10/20/21/30/40/50/60/70/80/90/100} 숙련도 평가서.xlsx` × 11 + 개인별 23명 (시트명 `공정{NN}`, N5 셀값 `'10'~'100'`)
+- 박태순(10공정) 검증: 주공정=공정21(신규) + 9개 전환공정 ✓ / 자체검증 **0 issues PASS**
+
 
 
 ## 세션108 (2026-04-25) — GPT 정밀평가 검증 후 시스템 개선 모드 중단

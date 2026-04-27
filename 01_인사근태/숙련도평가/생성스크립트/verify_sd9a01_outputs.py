@@ -34,22 +34,23 @@ ROWS_CTRL = list(range(18, 22))
 PROC_COLS  = [14, 46, 78, 110, 142, 174, 206, 238, 270, 302, 334]
 TOTAL_COLS = [10, 42, 74, 106, 138, 170, 202, 234, 266, 298, 330]
 
-SD9M01_TO_ERP = {'10':'001','20':'002','21':'003','30':'004','40':'005',
-                 '50':'006','60':'007','70':'008','80':'009','90':'010','100':'011'}
+SD9M01_TO_ERP = {'10':'10','20':'20','21':'21','30':'30','40':'40',
+                 '50':'50','60':'60','70':'70','80':'80','90':'90','100':'100'}
 
 ERP_NAMES = {
-    '001': 'PACKAGE 바코드 부착',
-    '002': 'RETRACTOR MAIN FRAME 릴 상단 브라켓 압입 & WEBBING GUIDE',
-    '003': 'RETRACTOR MAIN FRAME 서브 앗세이 압입 & 리벳 & 릴 하단 브라켓',
-    '004': 'WEBBING 웨빙 서브 앗세이 로딩',
-    '005': '틸트락 작동 검사',
-    '006': 'TONGUE 레이저 마킹 조립 & D-RING 서브 앗세이',
-    '007': 'ANCHOR 서브 앗세이 조립 & ANCHOR 앵커 커버',
-    '008': 'WEBBING 실 미싱',
-    '009': 'TONGUE STOPPER 텅 스토퍼 조립',
-    '010': '최종 검사',
-    '011': 'PACKAGE 부품식별표 포장',
+    '10':  'PACKAGE 바코드 부착',
+    '20':  'RETRACTOR MAIN FRAME 릴 상단 브라켓 압입 & WEBBING GUIDE',
+    '21':  'RETRACTOR MAIN FRAME 서브 앗세이 압입 & 리벳 & 릴 하단 브라켓',
+    '30':  'WEBBING 웨빙 서브 앗세이 로딩',
+    '40':  '틸트락 작동 검사',
+    '50':  'TONGUE 레이저 마킹 조립 & D-RING 서브 앗세이',
+    '60':  'ANCHOR 서브 앗세이 조립 & ANCHOR 앵커 커버',
+    '70':  'WEBBING 실 미싱',
+    '80':  'TONGUE STOPPER 텅 스토퍼 조립',
+    '90':  '최종 검사',
+    '100': 'PACKAGE 부품식별표 포장',
 }
+EXPECTED_CODES = ['10','20','21','30','40','50','60','70','80','90','100']
 
 issues = []  # (severity, code, file, msg)
 
@@ -87,7 +88,7 @@ def check_a_structure():
 # ─── B/C. 공정별 양식 평가사항 + 메타 ──────────────────────────────────────
 def check_bc_forms(forms):
     print('\n=== B/C. 공정별 양식 평가사항 + 메타 ===')
-    expected_codes = [f'{i:03d}' for i in range(1, 12)]
+    expected_codes = EXPECTED_CODES
     found_codes = []
 
     for f in forms:
@@ -175,7 +176,7 @@ def check_def_personal(pers_d, pers_n):
     print('\n=== D/E/F. 개인별 검증 ===')
     erp_to_sd = {v: k for k, v in SD9M01_TO_ERP.items()}
 
-    has_003 = []  # SD9A01_003 시트 보유자 (박태순만 있어야 함)
+    has_21 = []  # 공정21 시트 보유자 (박태순만 있어야 함, 신규 공정)
 
     for path in pers_d + pers_n:
         shift = '주간' if path in pers_d else '야간'
@@ -194,9 +195,9 @@ def check_def_personal(pers_d, pers_n):
             if z3 != '전환공정':
                 add_issue('ERR', 'D2', path, f'{sn} Z3 {z3!r} ≠ 전환공정')
 
-        # SD9A01_003 노출 검증
-        if '공정003' in sheets:
-            has_003.append(name)
+        # 공정21(신규) 노출 검증
+        if '공정21' in sheets:
+            has_21.append(name)
 
         # 각 시트 검증
         for sn in sheets:
@@ -243,50 +244,49 @@ def check_def_personal(pers_d, pers_n):
 
         wb.close()
 
-    # F. SD9A01_003 노출 — 박태순만 가져야 함 (실측 분포에서 21번 보유자 1명)
-    expected_003_holders = ['박태순']
-    if sorted(has_003) != sorted(expected_003_holders):
+    # F. 공정21(신규) 노출 — 박태순만 가져야 함
+    expected_21_holders = ['박태순']
+    if sorted(has_21) != sorted(expected_21_holders):
         add_issue('ERR', 'F1', None,
-                  f'SD9A01_003 시트 보유자 {has_003} ≠ {expected_003_holders}')
-    print(f'  SD9A01_003(신규) 보유자: {has_003}')
+                  f'공정21(신규) 시트 보유자 {has_21} ≠ {expected_21_holders}')
+    print(f'  공정21(신규) 보유자: {has_21}')
 
 
 # ─── G. PROCESSES 데이터 의미 검증 ────────────────────────────────────────
 def check_g_processes(forms):
     print('\n=== G. PROCESSES 데이터 의미 검증 ===')
-    # SD9A01_001 = 바코드 키워드 포함 / SD9A01_002 = 바코드 제외
-    f001 = os.path.join(DIR_FORM, 'SD9A01_공정001 숙련도 평가서.xlsx')
-    f002 = os.path.join(DIR_FORM, 'SD9A01_공정002 숙련도 평가서.xlsx')
+    f10 = os.path.join(DIR_FORM, 'SD9A01_공정10 숙련도 평가서.xlsx')
+    f20 = os.path.join(DIR_FORM, 'SD9A01_공정20 숙련도 평가서.xlsx')
+    f21 = os.path.join(DIR_FORM, 'SD9A01_공정21 숙련도 평가서.xlsx')
 
-    # G1 — SD9A01_001 (시트 21 = 바코드 공정) 텍스트에 "바코드" 키워드 포함
-    wb1 = openpyxl.load_workbook(f001)
+    # G1 — 공정10 (PACKAGE 바코드, 시트 21 자주검사) "바코드" 키워드
+    wb1 = openpyxl.load_workbook(f10)
     ws1 = wb1[wb1.sheetnames[0]]
     std1_text = ' '.join(str(get_merged_value(ws1, r, COL_P1_ITEM) or '')
                          for r in ROWS_STD)
     if '바코드' not in std1_text:
-        add_issue('WARN', 'G1', f001, 'SD9A01_001 std에 "바코드" 키워드 없음 (시트 21 추출 실패 가능성)')
-    print(f'  SD9A01_001 std "바코드" 포함 {"OK" if "바코드" in std1_text else "MISS"}')
+        add_issue('WARN', 'G1', f10, '공정10 std에 "바코드" 키워드 없음 (시트 21 추출 실패 가능성)')
+    print(f'  공정10 std "바코드" 포함 {"OK" if "바코드" in std1_text else "MISS"}')
     wb1.close()
 
-    # G2 — SD9A01_002 (시트 20 = 어퍼스테이/실드/WEBBING GUIDE) — 시트 20 키워드 포함
-    wb2 = openpyxl.load_workbook(f002)
+    # G2 — 공정20 (RETRACTOR MAIN FRAME, 시트 20 자주검사) — 실드/스테이/WEBBING/어퍼 키워드
+    wb2 = openpyxl.load_workbook(f20)
     ws2 = wb2[wb2.sheetnames[0]]
     std2_text = ' '.join(str(get_merged_value(ws2, r, COL_P1_ITEM) or '')
                          for r in ROWS_STD)
     if not any(k in std2_text for k in ('실드', '스테이', 'WEBBING', '어퍼')):
-        add_issue('WARN', 'G2', f002, 'SD9A01_002 std에 시트 20 키워드(실드/스테이/WEBBING) 없음')
-    print(f'  SD9A01_002 std 시트20 키워드 {"OK" if any(k in std2_text for k in ("실드","스테이","WEBBING","어퍼")) else "MISS"}')
+        add_issue('WARN', 'G2', f20, '공정20 std에 시트 20 키워드(실드/스테이/WEBBING) 없음')
+    print(f'  공정20 std 시트20 키워드 {"OK" if any(k in std2_text for k in ("실드","스테이","WEBBING","어퍼")) else "MISS"}')
     wb2.close()
 
-    # G3 — SD9A01_003 = OVERRIDE_STD (작업표준서 미매핑) → "리벳/브라켓" 키워드 포함
-    f003 = os.path.join(DIR_FORM, 'SD9A01_공정003 숙련도 평가서.xlsx')
-    wb3 = openpyxl.load_workbook(f003)
+    # G3 — 공정21 (신규, OVERRIDE_STD) "리벳/브라켓/RETRACTOR" 키워드
+    wb3 = openpyxl.load_workbook(f21)
     ws3 = wb3[wb3.sheetnames[0]]
     std3_text = ' '.join(str(get_merged_value(ws3, r, COL_P1_ITEM) or '')
                          for r in ROWS_STD)
     if not any(k in std3_text for k in ('리벳','브라켓','릴 하단','RETRACTOR')):
-        add_issue('WARN', 'G3', f003, 'SD9A01_003 std에 리벳/브라켓 키워드 없음 (OVERRIDE 적용 실패 가능성)')
-    print(f'  SD9A01_003 std OVERRIDE 키워드 {"OK" if any(k in std3_text for k in ("리벳","브라켓","릴 하단","RETRACTOR")) else "MISS"}')
+        add_issue('WARN', 'G3', f21, '공정21 std에 리벳/브라켓 키워드 없음 (OVERRIDE 적용 실패 가능성)')
+    print(f'  공정21 std OVERRIDE 키워드 {"OK" if any(k in std3_text for k in ("리벳","브라켓","릴 하단","RETRACTOR")) else "MISS"}')
     wb3.close()
 
 
@@ -294,7 +294,7 @@ def check_g_processes(forms):
 def check_h_coord_compat():
     print('\n=== H. SP3M3 양식과 좌표 일관성 ===')
     sp_form = os.path.join(BASE, 'SP3M3_공정별 평가서', 'SP3M3_공정10 숙련도 평가서.xlsx')
-    sd_form = os.path.join(DIR_FORM, 'SD9A01_공정001 숙련도 평가서.xlsx')
+    sd_form = os.path.join(DIR_FORM, 'SD9A01_공정10 숙련도 평가서.xlsx')
 
     if not os.path.exists(sp_form):
         add_issue('INFO', 'H0', sp_form, 'SP3M3 비교 대상 미존재 (선택)')
