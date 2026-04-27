@@ -14,6 +14,7 @@ source "$SCRIPT_DIR/../hooks/hook_common.sh" 2>/dev/null || true
 # --- 옵션 파싱 ---
 MODE="ff-only"   # 기본값
 DRY_RUN=false
+AUTO_SYNC=false  # main stale 감지 시 ff-only 자동 동기화 (default OFF, 옵트인)
 
 usage() {
   cat <<EOF
@@ -25,6 +26,7 @@ usage() {
   --ff-only      fast-forward만 허용 (기본값)
   --cherry-pick  cherry-pick으로 반영
   --dry-run      검사만 수행, 실제 반영 안 함
+  --auto-sync    main 로컬이 origin/main 대비 stale 시 ff-only 자동 동기화 시도 (default: 끔)
   -h, --help     이 도움말 표시
 
 필수 조건:
@@ -39,6 +41,7 @@ while [[ $# -gt 0 ]]; do
     --ff-only)      MODE="ff-only"; shift ;;
     --cherry-pick)  MODE="cherry-pick"; shift ;;
     --dry-run)      DRY_RUN=true; shift ;;
+    --auto-sync)    AUTO_SYNC=true; shift ;;
     -h|--help)      usage ;;
     *)              echo "알 수 없는 옵션: $1"; usage ;;
   esac
@@ -119,6 +122,41 @@ MAIN_BRANCH=$(git -C "$MAIN_REPO" rev-parse --abbrev-ref HEAD 2>/dev/null)
 if [ "$MAIN_BRANCH" != "main" ]; then
   echo "오류: 메인 저장소가 main 브랜치가 아닙니다 ($MAIN_BRANCH)"
   exit 1
+fi
+
+# --- main stale 감지 (origin/main 동기화 가드) ---
+echo "=== main stale 감지 ==="
+if ! git -C "$MAIN_REPO" fetch origin main 2>&1; then
+  echo "  경고: origin fetch 실패 — 네트워크/원격 문제. stale 감지 스킵."
+  MAIN_BEHIND=0
+else
+  MAIN_BEHIND=$(git -C "$MAIN_REPO" rev-list --count HEAD..origin/main 2>/dev/null || echo "0")
+fi
+
+if [ "$MAIN_BEHIND" != "0" ]; then
+  echo "  main 로컬: origin/main 대비 ${MAIN_BEHIND} commit behind"
+  if $DRY_RUN; then
+    echo "  [드라이런] stale 상태만 보고. 동기화 시도 안 함."
+  elif $AUTO_SYNC; then
+    echo "  --auto-sync: ff-only 자동 동기화 시도"
+    if git -C "$MAIN_REPO" merge --ff-only origin/main 2>&1; then
+      NEW_MAIN_SHA=$(git -C "$MAIN_REPO" rev-parse --short HEAD)
+      echo "  동기화 완료: main → $NEW_MAIN_SHA"
+    else
+      echo "  오류: ff-only 동기화 실패 — main 로컬이 origin/main과 분기되었습니다."
+      echo "  수동 해결: cd \"$MAIN_REPO\" && git fetch origin && git reset --hard origin/main"
+      echo "  (분기 원인 점검 후 결정)"
+      exit 1
+    fi
+  else
+    echo "  오류: main 로컬 stale — cherry-pick 충돌 위험."
+    echo "  다음 중 선택:"
+    echo "    (A) --auto-sync 플래그로 재실행 (ff-only 자동 동기화 시도)"
+    echo "    (B) 수동: cd \"$MAIN_REPO\" && git fetch origin && git merge --ff-only origin/main"
+    exit 1
+  fi
+else
+  echo "  main 동기화 상태: OK (origin/main과 일치)"
 fi
 
 # --- 반영 실행 ---

@@ -10,7 +10,30 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+최종 업데이트: 2026-04-27 KST — 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+
+## 세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)
+
+### [완료] publish_worktree_to_main.sh main stale 가드 + --auto-sync 옵션 도입
+- 진입: HANDOFF "다음 AI 액션 1번" 최우선·강제 (세션117 마무리 토론 합의 `debate_20260427_214726_3way` Round 1 v2 pass_ratio 1.0)
+- 모드 판정: **C** (`.claude/scripts/` 운영 자동화 스크립트 수정)
+- 플랜: `C:/Users/User/.claude/plans/eager-riding-kurzweil.md` (R1~R5 반증형 작성, 사용자 승인)
+- 변경 파일 (Fast Lane, 1건):
+  - `.claude/scripts/publish_worktree_to_main.sh` — 옵션 변수 + usage + 파싱 분기 + stale 감지 블록 38줄 신규 삽입 (기존 라인 변경 0)
+- 동작:
+  - **default**: stale(`HEAD..origin/main` count > 0) 감지 시 보고+`exit 1` (자동 변경 없음, 안전 후퇴)
+  - **`--auto-sync`**: `git fetch origin main` → `merge --ff-only origin/main` 시도 → 성공 시 진행, 분기 시 수동 해결 메시지+`exit 1`
+  - **`--dry-run`**: stale 상태만 보고 (동기화 시도 안 함)
+- 검증:
+  - `bash -n` 문법 PASS
+  - `--help` 출력에 `--auto-sync` 라인 노출 PASS
+  - dry-run은 워크트리 미커밋 변경으로 clean 검사 단계에서 차단 (기존 동작 정상, stale 가드는 본 커밋 후 재검증)
+
+### 세션117/116 별건 잔존 (우선순위 재정의)
+1. ~~세션117 별건 1번 (publish 스크립트 main stale 가드)~~ — 본 세션118에서 완료
+2. 세션116 별건 2번 R1~R5 Pre-commit hook — 세션117 안건 3 Gemini 보류(임시 가드)와 통합 검토
+3. 세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook — 세션117에서 수동 기록 권장 라인은 반영, 자동 hook은 별건 유지
+4. 세션116 별건 4번 PLC 인터치·Staging Table 청소 (ERP-E-01) — 세션117 Gemini 추가제안(ERP 트랜잭션 롤백) 흡수 후 통합 검토
 
 ## 세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)
 

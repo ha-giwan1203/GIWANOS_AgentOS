@@ -4,8 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 1번 처리) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, 별건 의제 4건 등록) / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현
+최종 업데이트: 2026-04-27 KST — 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 1번 처리) / 세션116 [3way] 작업 모드 5종 판정 도입 / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (HANDOFF 1번 강제)
+
+### 진행 상황
+- 진입: 세션117 HANDOFF "다음 AI 액션 1번" 최우선·강제 (사용자 "이어서")
+- 모드 판정: **C** (`.claude/scripts/publish_worktree_to_main.sh` 운영 자동화 스크립트 수정)
+- 플랜: `C:/Users/User/.claude/plans/eager-riding-kurzweil.md` (R1~R5 반증형, 사용자 ExitPlanMode 승인 → Auto mode 활성)
+- 합의 원본: `90_공통기준/토론모드/logs/debate_20260427_214726_3way/` Round 1 v2 (pass_ratio 1.0)
+
+### 변경 (Fast Lane, 1개 파일)
+- `.claude/scripts/publish_worktree_to_main.sh` — `AUTO_SYNC=false` 변수 + usage `--auto-sync` 1줄 + 파싱 분기 1줄 + stale 감지 블록(약 33줄) 신규 삽입. 기존 라인 변경 0
+- 동작:
+  - **default**: stale(`HEAD..origin/main` count > 0) 감지 시 보고+exit 1 (자동 변경 없음)
+  - **`--auto-sync`**: `git fetch origin main` → `merge --ff-only origin/main` 시도, 분기 시 수동 해결 메시지+exit 1
+  - **`--dry-run`**: stale 상태만 보고
+
+### 핵심 합의 (Round 1 v2)
+- 본 세션 핫픽스는 별건 분리 + 다음 세션 첫 액션 우선순위 1번 강제 (HANDOFF·TASKS 등재) — Gemini 우려 흡수
+- stale 검사는 fetch 실패 시 스킵 (네트워크/원격 문제 시 차단 안 함)
+- 옵트인 default — Self-X·과잉설계 회피 (안전안 채택 이후 원칙)
+
+### 다음 AI 액션
+1. **본 커밋 push 완료 후 dry-run으로 stale 가드 동작 재검증** (워크트리 clean 상태에서)
+2. **`/share-result`로 GPT/Gemini 양측 공유** ([3way] 태그, share_gate hook 자동 강제 대상 — `.claude/scripts/` 변경)
+3. (별건) 세션116 별건 2번 R1~R5 Pre-commit hook 토론 — 세션117 안건 3 Gemini 보류와 통합
+4. (별건) 세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook
+5. (별건) 세션116 별건 4번 PLC 인터치·Staging Table 청소 (ERP-E-01)
 
 ---
 
