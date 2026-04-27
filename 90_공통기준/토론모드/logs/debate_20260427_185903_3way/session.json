@@ -1,0 +1,17 @@
+{
+  "session_id": "debate_20260427_185903_3way",
+  "mode": "3way",
+  "topic": "CLAUDE.md 사고 계층 보정 플랜 — 작업 모드 5종 판정 + 모드별 사전 절차",
+  "plan_file": "C:/Users/User/.claude/plans/swirling-marinating-music.md",
+  "agenda_groups": [
+    {"round": 1, "items": ["1. 모드 5종 분류의 완전성", "2. 모드 경계의 모호성 (A↔C, B↔E)"]},
+    {"round": 2, "items": ["3. 자동 승격 차단의 위험·보완책", "5. 응답 헤더 [모드] 표기의 노이즈 vs 효용"]},
+    {"round": 3, "items": ["4. R1~R5 형식주의 리스크·억제 장치", "6. 모드 E 정량 기준 명문화 가능 여부"]}
+  ],
+  "max_rounds_per_group": 1,
+  "labels": ["실증됨", "일반론", "환경미스매치", "메타순환", "구현경로미정"],
+  "chat_url": "",
+  "turn_number": 0,
+  "turns": [],
+  "result": null
+}

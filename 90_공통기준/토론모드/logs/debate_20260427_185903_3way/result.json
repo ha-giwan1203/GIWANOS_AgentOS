@@ -1,0 +1,87 @@
+{
+  "session_id": "debate_20260427_185903_3way",
+  "mode": "3way",
+  "topic": "CLAUDE.md 사고 계층 보정 플랜 (작업 모드 5종 판정 + 모드별 사전 절차)",
+  "plan_file": "C:/Users/User/.claude/plans/swirling-marinating-music.md",
+  "rounds": [
+    {
+      "round": 1,
+      "agenda": ["1. 모드 5종 분류의 완전성", "2. 모드 경계의 모호성"],
+      "files": ["round1_claude.md", "round1_gpt.md", "round1_gemini.md", "round1_claude_synthesis.md"],
+      "cross_verification": {
+        "gemini_verifies_gpt": {"verdict": "검증 필요", "reason": "SKILL.md 무조건 C 고정은 실무 자동화 자산화와 충돌 소지"},
+        "gpt_verifies_gemini": {"verdict": "검증 필요", "reason": "Gemini의 D > E > C > A > B 우선순위는 D 자동승격 차단 목표와 충돌 — 사용자 명시 D와 자동 D 분리 필요"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "5종 유지·메타 Pre/Post Task 흡수·E 최소복구·D 자동승격 차단·SKILL.md 분류 기준까지 핵심 충돌점을 가장 적게 늘리며 정리"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "메타 작업 전/후 프로토콜 강제 + SKILL.md 기술 변경 C 명확 분리로 운영 일관성 확보"},
+        "pass_ratio_numeric": 1.0,
+        "pass_ratio_basis": "Claude 종합안 양측 동의 2/2",
+        "round_count": 1,
+        "skip_65": false,
+        "claude_delta": "partial",
+        "issue_class": "B"
+      },
+      "verdict": "채택"
+    },
+    {
+      "round": 2,
+      "agenda": ["3. 자동 승격 차단 위험·보완책", "4. R1~R5 형식주의 억제", "5. 응답 헤더 [모드] 표기", "6. 모드 E 정량 기준"],
+      "files": ["round2_claude.md", "round2_gpt.md", "round2_gemini.md", "round2_claude_synthesis.md"],
+      "cross_verification": {
+        "gemini_verifies_gpt": {"verdict": "검증 필요", "reason": "건수 불일치 즉시 E는 입력 오류·필터링 차이일 가능성 배제·과잉 판정 위험"},
+        "gpt_verifies_gemini": {"verdict": "검증 필요", "reason": "단순 건수 불일치를 E에서 너무 늦추면 ERP/MES 잔존 사고 대응 지연 — 'E 후보 → 즉시 확인 → 잔존 시 E'가 더 안전"},
+        "gpt_verifies_claude": {"verdict": "동의", "reason": "B 감지 ON/D 자동 OFF, C 전환 헤더, R1~R5 반증형, E 조건에 잔존·입력충돌·고착·마스터 불일치까지 포함 — 제조 ERP/MES 리스크와 실무 흐름 균형"},
+        "gemini_verifies_claude": {"verdict": "동의", "reason": "데이터 정합성·프로세스 고착 E 핵심 수용 + 2단 판정으로 과잉 장애 판정과 잔존 사고 대응 지연 균형"},
+        "pass_ratio_numeric": 1.0,
+        "pass_ratio_basis": "Claude 종합안 양측 동의 2/2",
+        "round_count": 2,
+        "skip_65": false,
+        "claude_delta": "partial",
+        "issue_class": "B"
+      },
+      "verdict": "채택"
+    }
+  ],
+  "consensus": {
+    "round1_adopted": [
+      "5종 유지 (F 모드 신설 폐기)",
+      "A↔C: 현장 산출물 vs Claude Code 동작·규칙 변경",
+      "B↔E: 현재 실무/에이전트 가동 중단 여부",
+      "E 최소 복구 + 재발방지는 B/C 분리",
+      "D 자동 승격 차단 (사용자 명시 호출만)",
+      "우선순위 사다리: 명시 > E > C > D > B > A",
+      "메타작업 = 각 모드의 Pre/Post Task (보조 태그 X)",
+      "SKILL.md Step 절차 분기 변경은 C, 문구·주석 추가는 A"
+    ],
+    "round2_adopted": [
+      "B 감지 ON, D 자동 진입 OFF (비대칭)",
+      "시스템 파일 경로 수정 시 C 강제 승격 (D 아님)",
+      "C 강제 승격 시 응답 첫 줄 모드 전환 헤더 + 사용자 인지 라인",
+      "R1~R5는 C 전용. 반증 질문형 재정의",
+      "R5 필수: ERP/MES/SmartMES/Z드라이브 잔존 + dry-run + 건수 + 논리적 롤백 스크립트",
+      "헤더 표기 조건: B/C/D/E OR ERP/MES 외부반영 A OR 모드 전환 발생",
+      "헤더 형식: 1줄 [모드: <코드> / 대상 또는 위험 / 다음 액션]",
+      "E 정량: '이미 시작' AND ('시간 임계 차등' OR '외부 응답 부재' OR '잔존 데이터 위험' OR '입력 소스 충돌' OR '프로세스 고착' OR '마스터 정보 불일치')",
+      "단순 건수 불일치 2단 판정 (1차 E 후보 + 경고 → 2차 입력 오류 명백 아니면 E)"
+    ],
+    "deferred_to_separate_agenda": [
+      "R1~R5 Pre-commit hook 연동",
+      "HANDOFF 자동 에스컬레이션 로그",
+      "PLC 인터치·Staging Table 잔존 청소"
+    ]
+  },
+  "critic_review": {
+    "verdict": "WARN",
+    "axes": {
+      "independence": "WARN — GPT/Gemini 5종 유지 방향으로 공동 진입, Claude F 모드 신설 압박 폐기. 라벨 부착은 일관",
+      "harness_rigor": "WARN — 실증됨 라벨에 커밋 SHA·incident_ledger 번호 인용 부족, 서사 인용에 그침. 버림 항목 3건은 '범위 외' 스코프 회피로 처리",
+      "zero_audit": "WARN — Round 1·2 모두 GPT↔Gemini 상호 '검증 필요' 미해소 상태에서 Claude 종합안에 양측 동의. 충돌 수렴이 아니라 우회",
+      "result_bias": "WARN — Claude 초안 골격(E·C·D 상위 배치)은 유지, F 모드만 폐기. Gemini 구현 제안 3건만 별건 분리"
+    },
+    "key_issues": [
+      "Round 2 단순 건수 불일치 2단 판정의 2차 기준('입력 오류 명백 아니면 E')에 정량화 없음 — 자의적 해석 위험",
+      "HANDOFF 자동 로그가 '채택'(헤더 사용자 인지 라인)과 '별건'(자동 갱신) 동시 기록 — 분리 기준 불일치 1건",
+      "별건 등록 3건이 모두 Gemini 제안 — Gemini 구현 수반 항목만 집중 분리"
+    ],
+    "recommendation": "보강판에 (1) 2단 판정 2차 기준 정량화, (2) HANDOFF 분리 기준 명시, (3) 별건 의제 TASKS 등록 시 분리 사유 1줄 추가 후 진행"
+  }
+}

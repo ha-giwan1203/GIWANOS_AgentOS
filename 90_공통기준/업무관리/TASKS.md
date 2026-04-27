@@ -10,7 +10,36 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션115 d0-plan 첨부 파일 가드 추가 (사용자 첨부 xlsx 무시 사고 재발 방지) + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 (89870CU100 4건 오조립 리스크 정리, xlsx + 영상 하이퍼링크) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재
+최종 업데이트: 2026-04-27 KST — 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
+
+## 세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건
+
+### [완료] CLAUDE.md 사고 계층 신설 (작업 모드 A/B/C/D/E + 모드별 사전 절차)
+- 진입: 사용자 "규칙 + 사고 구조 보정 — 작업 모드 판정 + 모드별 사고 절차 추가"
+- 플랜 작성 → 3자 토론(Round 1+2 pass_ratio 1.0) → critic WARN 3건 v2 반영 → CLAUDE.md 수정
+- 신규 섹션: "## 작업 모드 판정 (실행 전 필수)" — 6행 아래, 도메인 진입표 위
+- 합의: 5종 유지(F 모드 폐기), 우선순위 사다리 명시>E>C>D>B>A, R1~R5 반증형, 모드 E 정량 OR 6조건, 단순 건수 불일치 2단 판정
+- 메모리: `feedback_work_mode_taxonomy.md` 신설, `feedback_structural_change_auto_three_way.md` 갱신(자동 D 진입 차단)
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260427_185903_3way/`
+
+### [신규/대기] 별건 의제 4건 (본 보정 범위 외 — critic WARN "분리 사유 명기" 권고 반영)
+
+**1. 토론모드 CLAUDE.md "자동 승격 트리거" 섹션 → 모드 D 정책으로 갱신**
+- 분리 사유: 본 보정 범위는 "루트 CLAUDE.md 1개 섹션 추가". 토론모드 CLAUDE.md 정책 갱신은 토론모드 도메인 별건. 단 문서 모순 잔존이므로 다음 작업 우선순위 1.
+- 변경 대상: `90_공통기준/토론모드/CLAUDE.md` "## 자동 승격 트리거 (세션78 실증 후 신설)" 섹션
+- 변경 방향: B 분류 자동 D 승격 → "B 분류 감지 라벨만 표기, D 자동 진입 차단" 비대칭 설계로 재기록
+
+**2. R1~R5 Pre-commit hook 연동 (Gemini Round 2 제안)**
+- 분리 사유: 본 보정은 hook 신설 금지가 명시 제약. 향후 hook 신설 별건 의제로 분리.
+- 검토 항목: plan.md에 R1~R5 채워졌는지 자동 검증 hook 가능성. 등급 advisory 후보.
+
+**3. HANDOFF 자동 에스컬레이션 로그 (Gemini Round 2 제안)**
+- 분리 사유: 본 보정은 응답 첫 줄 수동 인지 라인(`[모드 전환: A → C]`)만 채택. HANDOFF 자동 갱신 hook 신설은 본 범위 초과.
+- 검토 항목: C 강제 승격 시 HANDOFF.md에 1줄 자동 기록 hook 가능성.
+
+**4. PLC 인터치·Staging Table 잔존 청소 프로토콜 (Gemini Round 2 제안 — ERP-E-01)**
+- 분리 사유: 도메인 04_생산계획·05_생산실적 수준의 운영 프로토콜. 루트 CLAUDE.md 범위 초과.
+- 검토 위치: `04_생산계획/CLAUDE.md`, `05_생산실적/조립비정산/CLAUDE.md` 또는 신규 `90_공통기준/erp-mes-recovery-protocol.md`
 
 ## 세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향
 
