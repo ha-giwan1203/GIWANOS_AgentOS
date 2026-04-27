@@ -43,6 +43,11 @@
 2. **별건 의제 4건 우선순위 1번 (토론모드 CLAUDE.md "자동 승격 트리거" 섹션 갱신)** — 본 보정과 토론모드 CLAUDE.md 사이 정책 모순 잔존, 다음 세션 우선 처리
 3. (선택) 시나리오 워크스루 5+1 케이스 — MES 업로드/hook 분석/completion_gate 수정/구조 지적/ERP 미동작/MEMORY 정리
 
+### /finish 마무리
+- final_check --full --fix ALL CLEAR (smoke_fast 11/11 PASS)
+- Notion 수동 동기화 성공 (pending flag 없음)
+- finish_state.json terminal_state=done
+
 ---
 
 ## 세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향
