@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설(registry.yaml + /notebooklm + bridge.md, Gemini 메인 채널) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화
+최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설 + Gemini 측 v2 노트북 2건 생성(양방향 동기화 실증, shared 제약 우회) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화
 
 ## 세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설
 
@@ -26,10 +26,18 @@
 - 헬스 스크립트: `health.sh` (정적 자산 5/5 PASS)
 - 루트 CLAUDE.md 도메인 진입 라우팅에 NotebookLM 키워드 추가
 
+### [완료] MCP 인증 + 양방향 동기화 실증 + v2 노트북 2건 생성
+- MCP 인증: `setup_auth` 성공 (60.91초)
+- MCP 직접 질의 양 노트북 PASS (라인배치 / 조립비정산)
+- **shared 제약 실증**: 기존 noun이 `public` 마크 → Gemini에 노출 안 됨 (Google 공식 정책)
+- **우회**: Gemini에서 v2 노트북 2건 생성 (라인배치_대원테크_v2 / 조립비정산_대원테크_v2)
+- **양방향 동기화 실증**: UUID 공통 (`515e5104-...`, `b49dc000-...`), Gemini→NotebookLM 즉시 노출
+- registry.yaml v2 갱신 (primary + legacy 분리)
+- bridge.md 셀렉터 전체 확정 (생성 페이지·상세 페이지·소스 업로드 메뉴)
+
 ### 후속 (사용자 액션 필요)
-- MCP 인증: `mcp__notebooklm-mcp__get_health` → `authenticated=false` → 사용자가 `setup_auth` 1회 실행 필요
-- Gemini 사이드패널 셀렉터 실측: 첫 `/notebooklm ask` 실행 시 take_snapshot으로 채움 → bridge.md 갱신
-- 새 노트북 추가 시: registry.yaml에 항목 추가 → `/notebooklm sync`로 차이 보고
+- v2 노트북에 소스 업로드: legacy 노트북에서 소스 다운로드 → v2에 업로드 → 동기화 확인
+- 모든 소스 이전 후 legacy 폐기 (선택, NotebookLM 웹에서 삭제 + registry active=false)
 
 ### 설계 원칙
 - Gemini = 메인 채널 (사이드패널 노트북 활성화 후 질의)

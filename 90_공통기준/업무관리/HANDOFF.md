@@ -21,11 +21,11 @@
 - MCP 인증: authenticated=false (사용자 액션 필요)
 
 ### 다음 AI 액션
-1. **사용자가 NotebookLM MCP 인증** (`mcp__notebooklm-mcp__setup_auth` — 사용자 로그인 필요) 후
-2. `/notebooklm health` 재실행 → MCP authenticated=true 확인
-3. `/notebooklm ask line-batch <테스트 질문>` 첫 실행 시 Gemini 사이드패널 셀렉터 실측
-4. 셀렉터 `bridge.md`에 채워 넣기 (현재 "미확정" 4개)
-5. 새 노트북 필요 시: NotebookLM 웹에서 생성 → registry.yaml에 추가 → `/notebooklm sync`
+1. ✅ MCP 인증 완료 (`authenticated=true`)
+2. ✅ MCP 직접 질의 양 노트북 PASS (라인배치 / 조립비정산)
+3. ✅ Gemini 측 v2 노트북 2건 생성 (양방향 동기화 실증)
+4. ✅ bridge.md 셀렉터 전체 확정 + registry.yaml v2 갱신
+5. **사용자 액션**: legacy 노트북에서 소스 다운로드 → v2에 업로드
 
 ### 구조
 - 단일 원본: `registry.yaml` — 노트북 추가는 이 파일만 수정

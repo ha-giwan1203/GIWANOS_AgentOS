@@ -4,23 +4,32 @@
 # `/notebooklm sync`가 이 파일과 MCP 라이브러리를 비교해 차이를 보고한다.
 #
 # 스키마 (필드별 의미):
-#   name              — NotebookLM 표시명 (MCP `list_notebooks`의 name과 일치 필수)
-#   url               — NotebookLM 노트북 URL (https://notebooklm.google.com/notebook/<UUID>)
-#   gemini_label      — Gemini 사이드패널에서의 노출 라벨 (보통 name과 동일)
+#   name              — 노트북 표시명 (사용자 정의)
+#   gemini_url        — Gemini 노트북 페이지 URL (메인 채널)
+#   notebooklm_url    — NotebookLM 페이지 URL (백엔드)
+#   uuid              — 노트북 고유 ID (Gemini·NotebookLM 공통)
+#   status            — primary | legacy
+#                       primary: Gemini에서 만들어 양쪽에 표시되는 활성 노트북
+#                       legacy:  MCP에 등록된 shared 노트북 (Gemini 미노출, MCP 직접 호출만 가능)
 #   domain            — 업무 도메인 키 (line-batch, settlement, etc.) — 라우팅용
 #   agent             — 연결된 도메인 전문가 에이전트 (선택)
 #   topics            — 주제 키워드 (질문 라우팅 힌트)
 #   primary_use       — 주된 활용 시점
-#   sources           — 등록된 소스 종류 메모 (실제 소스는 NotebookLM 웹에서 관리)
+#   sources           — 소스 종류 메모 (실제 소스는 NotebookLM/Gemini 웹에서 관리)
 #   active            — true이면 활성, false이면 등록은 유지하되 자동 라우팅 제외
 
-version: 1
-default_route: gemini   # gemini | mcp — Gemini 사이드패널 우선, fallback MCP 직접 호출
+version: 2
+default_route: gemini   # gemini | mcp — 기본은 Gemini 노트북 페이지 직접 진입
 
+# ─────────────────────────────────────────────────────
+# Primary 노트북 (Gemini-NotebookLM 양쪽 동기화 활성)
+# ─────────────────────────────────────────────────────
 notebooks:
-  - name: 라인배치_대원테크
-    url: https://notebooklm.google.com/notebook/ff23f265-2211-4722-b5fa-d0cdfae73928
-    gemini_label: 라인배치_대원테크
+  - name: 라인배치_대원테크_v2
+    gemini_url: https://gemini.google.com/notebook/notebooks/515e5104-12c0-4900-892f-f19a570edd92
+    notebooklm_url: https://notebooklm.google.com/notebook/515e5104-12c0-4900-892f-f19a570edd92
+    uuid: 515e5104-12c0-4900-892f-f19a570edd92
+    status: primary
     domain: line-batch
     agent: line-batch-domain-expert
     topics:
@@ -29,13 +38,15 @@ notebooks:
       - 라인 매핑 규칙
       - 스킬 실행 계약
       - 재개 규칙
-    primary_use: 라인배치 도메인 질의·검증
-    sources: documentation, examples
+    primary_use: 라인배치 도메인 질의·검증 (Gemini 메인 채널)
+    sources: 0   # 신규 — 사용자 업로드 대기
     active: true
 
-  - name: 조립비정산_대원테크
-    url: https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c
-    gemini_label: 조립비정산_대원테크
+  - name: 조립비정산_대원테크_v2
+    gemini_url: https://gemini.google.com/notebook/notebooks/b49dc000-49cc-4cb1-9eb2-2a3a3abb028f
+    notebooklm_url: https://notebooklm.google.com/notebook/b49dc000-49cc-4cb1-9eb2-2a3a3abb028f
+    uuid: b49dc000-49cc-4cb1-9eb2-2a3a3abb028f
+    status: primary
     domain: settlement
     agent: settlement-domain-expert
     topics:
@@ -44,20 +55,48 @@ notebooks:
       - 야간 계산식
       - Known Exception
       - SP3M3 주간 정책
-    primary_use: 월말 정산 규칙·예외 판정
-    sources: documentation, examples
+    primary_use: 월말 정산 규칙·예외 판정 (Gemini 메인 채널)
+    sources: 0   # 신규 — 사용자 업로드 대기
     active: true
 
-# 확장 예시 (주석 — 실제 추가 시 주석 해제 + name/url 채우기):
+# ─────────────────────────────────────────────────────
+# Legacy 노트북 (MCP 등록 — shared 상태로 Gemini 미노출)
+# 소스 자료 보유. MCP 직접 호출(/notebooklm query)만 가능.
+# 신규 v2에 소스 이전 후 단계적 폐기 권장.
+# ─────────────────────────────────────────────────────
+  - name: 라인배치_대원테크
+    notebooklm_url: https://notebooklm.google.com/notebook/ff23f265-2211-4722-b5fa-d0cdfae73928
+    uuid: ff23f265-2211-4722-b5fa-d0cdfae73928
+    status: legacy
+    domain: line-batch
+    agent: line-batch-domain-expert
+    topics:
+      - ERP 라인배치 (legacy)
+    primary_use: MCP 직접 질의용 (소스 1개 보유)
+    sources: 1   # 기존 소스 (NotebookLM 웹에서 다운로드 → v2로 이전 권장)
+    active: true
+
+  - name: 조립비정산_대원테크
+    notebooklm_url: https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c
+    uuid: dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c
+    status: legacy
+    domain: settlement
+    agent: settlement-domain-expert
+    topics:
+      - 조립비 정산 (legacy)
+    primary_use: MCP 직접 질의용 (소스 1개 보유)
+    sources: 1
+    active: true
+
+# ─────────────────────────────────────────────────────
+# 라우팅 규칙
+# ─────────────────────────────────────────────────────
+# - /notebooklm ask <domain> → status=primary 우선 (Gemini 메인 채널)
+# - /notebooklm query <domain> → status=primary 비활성 시 legacy fallback (MCP 직접 호출)
+# - 동일 domain 내 primary가 존재하면 legacy는 자동 라우팅 제외 (sync 보고서에서만 표시)
 #
-# - name: 생산계획_샘플
-#   url: https://notebooklm.google.com/notebook/<UUID>
-#   gemini_label: 생산계획_샘플
-#   domain: production-plan
-#   agent: null
-#   topics:
-#     - SP3 생산계획
-#     - D0 추가지시
-#   primary_use: 생산계획 규칙 조회
-#   sources: documentation
-#   active: true
+# 새 노트북 추가 시:
+#   1. NotebookLM 웹 또는 Gemini 노트북 페이지에서 새 노트북 생성
+#   2. UUID 추출 (URL `/notebook/notebooks/<UUID>` 또는 `/notebook/<UUID>`)
+#   3. 본 파일에 위 패턴으로 항목 추가
+#   4. /notebooklm sync 로 MCP 라이브러리 차이 점검
