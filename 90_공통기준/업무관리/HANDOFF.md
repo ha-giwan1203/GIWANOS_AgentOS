@@ -31,11 +31,17 @@
 - 옵트인 default — Self-X·과잉설계 회피 (안전안 채택 이후 원칙)
 
 ### 다음 AI 액션
-1. ~~본 커밋 push + dry-run 재검증~~ — 완료 (b017fd40 push, dry-run에서 stale 가드 도달 + fail-safe 동작 PASS)
-2. ~~/share-result로 양측 공유~~ — 완료 (GPT PASS + Gemini PASS, 양측 만장일치, 추가제안 없음)
-3. (별건) 세션116 별건 2번 R1~R5 Pre-commit hook 토론 — 세션117 안건 3 Gemini 보류와 통합
-4. (별건) 세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook
-5. (별건) 세션116 별건 4번 PLC 인터치·Staging Table 청소 (ERP-E-01)
+1. ~~본 커밋 push + dry-run 재검증~~ — 완료
+2. ~~/share-result로 양측 공유~~ — 완료 (GPT/Gemini 만장일치 PASS)
+3. ~~별건 2번 R1~R5 Pre-commit hook~~ — 본 세션118 추가 처리: `.claude/hooks/r1r5_plan_check.sh` advisory 신설
+4. ~~별건 3번 HANDOFF 자동 에스컬레이션 hook~~ — 본 세션118 추가 처리: `.claude/hooks/mode_c_log.sh` advisory 신설 (HANDOFF 직접 수정 회피, state 파일 기록 우회)
+5. ~~별건 4번 PLC·Staging 청소 (ERP-E-01)~~ — 본 세션118 추가 처리: `90_공통기준/erp-mes-recovery-protocol.md` 단일 원본 신설
+
+### 본 세션 마무리 절차
+1. final_check `--full` 통과 확인 (settings 변경 자동 승격)
+2. [3way] 태그 커밋 + push
+3. /share-result 양측 공유 (별건 2/3/4번 통합)
+4. 양측 PASS 후 종료
 
 ### 3way 공유 결과 (양측 만장일치 PASS)
 - GPT: PASS — item 1~5 실증됨·동의 (default 안전 차단 / --auto-sync ff-only / dry-run 보정 / TASKS·HANDOFF·STATUS 반영 / 모드 C·R1~R5 준수). 추가제안 없음

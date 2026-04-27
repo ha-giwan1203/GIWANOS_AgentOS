@@ -232,6 +232,15 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/r1r5_plan_check.sh"
+          }
+        ]
+      },
+      {
         "matcher": "mcp__Claude_in_Chrome__javascript_tool",
         "hooks": [
           {
@@ -348,6 +357,15 @@
             "type": "command",
             "command": "bash .claude/hooks/post_commit_notify.sh",
             "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/mode_c_log.sh"
           }
         ]
       }

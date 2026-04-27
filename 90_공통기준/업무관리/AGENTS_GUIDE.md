@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 32개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 34개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
@@ -85,6 +85,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 | `permissions_sanity.sh` | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
 | `auto_compile.sh` | 파일 수정 후 자동 컴파일/변환 |
 | `write_marker.sh` | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
+| `mode_c_log.sh` | C 트리거 커밋 후 .claude/state/mode_c_log.jsonl 기록 advisory (세션118 별건 3번 신설) |
 | `evidence_mark_read.sh` | 문서 읽기/갱신 → .ok 증거 마커 적립 |
 | `gpt_followup_post.sh` | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 | `handoff_archive.sh` | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |

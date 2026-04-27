@@ -35,9 +35,24 @@
 
 ### 세션117/116 별건 잔존 (우선순위 재정의)
 1. ~~세션117 별건 1번 (publish 스크립트 main stale 가드)~~ — 본 세션118에서 완료
-2. 세션116 별건 2번 R1~R5 Pre-commit hook — 세션117 안건 3 Gemini 보류(임시 가드)와 통합 검토
-3. 세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook — 세션117에서 수동 기록 권장 라인은 반영, 자동 hook은 별건 유지
-4. 세션116 별건 4번 PLC 인터치·Staging Table 청소 (ERP-E-01) — 세션117 Gemini 추가제안(ERP 트랜잭션 롤백) 흡수 후 통합 검토
+2. ~~세션116 별건 2번 R1~R5 Pre-commit hook~~ — 본 세션118에서 완료 (`.claude/hooks/r1r5_plan_check.sh` advisory 신설)
+3. ~~세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook~~ — 본 세션118에서 완료 (`.claude/hooks/mode_c_log.sh` advisory 신설, HANDOFF 직접 수정 무한 루프 위험 회피로 `.claude/state/mode_c_log.jsonl` 기록 + stderr 알림 우회 채택)
+4. ~~세션116 별건 4번 PLC 인터치·Staging Table 청소 (ERP-E-01)~~ — 본 세션118에서 완료 (`90_공통기준/erp-mes-recovery-protocol.md` 단일 원본 신설 + 도메인 라우팅)
+
+### [완료] 별건 4번 — ERP/MES 잔존 청소 프로토콜 신설 (세션118)
+- 신규 단일 원본: `90_공통기준/erp-mes-recovery-protocol.md`
+- 도메인 라우팅: 루트 `CLAUDE.md` 도메인 진입표 + `04_생산계획/CLAUDE.md` 1줄 추가
+- Known cases: 세션110 SmartMES dedupe 도구 / 세션115 사용자 첨부 무시 사고 / 세션107 OAuth 자동완성 잔존
+- PLC 인터치는 현재 직접 호출 없음 → 장래 도입 시 안전 기준 4종 보관
+
+### [완료] 별건 2+3번 통합 — R1~R5 Pre-commit hook + 모드 C 에스컬레이션 로그 (세션118)
+- 신규: `.claude/hooks/r1r5_plan_check.sh` (advisory, PreToolUse/Bash) — C 트리거 staged + plan 흔적 미발견 시 stderr 권장
+- 신규: `.claude/hooks/mode_c_log.sh` (advisory, PostToolUse/Bash) — C 트리거 커밋 후 `.claude/state/mode_c_log.jsonl` 1줄 기록 + stderr 알림
+- HANDOFF.md 자동 직접 수정은 hook 무한 루프 위험으로 **회피** — state 파일 기록 + 사용자 시각 알림으로 Gemini 권고 흡수
+- settings.json PreToolUse + PostToolUse matcher 1건씩 등록
+- README.md 등급 표 advisory 라인 2건 추가
+- 활성 hook 수: 32 → 34 (AGENTS_GUIDE.md 자동 갱신 완료)
+- plan: `C:/Users/User/.claude/plans/heuristic-flowing-bagel.md` (R1~R5 반증형 작성)
 
 ## 세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)
 
