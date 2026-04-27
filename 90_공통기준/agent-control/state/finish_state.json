@@ -2,15 +2,20 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "PASS",
-  "user_reported": true,
+  "gpt_judgment": "부분PASS",
+  "user_reported": false,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "session113",
-  "commits": ["25b0887e", "5c1f77ba", "e0472cfb"],
+  "session": "session114",
+  "commits": ["80b0dba8", "541e2c10", "5333c6a6"],
+  "topic": "NotebookLM control layer + Gemini v2 notebooks + sync verified + A-class fixes",
   "verdict": {
-    "gpt": "PASS",
-    "gemini": "PASS"
+    "gpt": "부분PASS → A분류 즉시반영 완료",
+    "gemini": "부분PASS → A분류 즉시반영 완료"
   },
-  "timestamp": "2026-04-27 11:55 KST"
+  "a_class_fixes": [
+    ".claude/commands/notebooklm.md (v2 schema 정합)",
+    "90_공통기준/notebooklm/health.sh (status별 카운트 + sources=0 경고)"
+  ],
+  "timestamp": "2026-04-27 KST"
 }

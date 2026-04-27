@@ -1,20 +1,21 @@
 {
-  "generated_at": "2026-04-27 11:49 KST",
-  "last_updated": "세션113 갱신 2026-04-27",
-  "github_sha": "e0472cfb497d1074e1384b26a3a4a99b112b8b55",
-  "github_sha_short": "e0472cfb",
+  "generated_at": "2026-04-27 13:08 KST",
+  "last_updated": "세션114 갱신 2026-04-27",
+  "github_sha": "5333c6a670aca328245eba349b753489df721d7b",
+  "github_sha_short": "5333c6a6",
   "hooks_raw": 47,
   "hooks_active": 32,
-  "commands": 31,
+  "commands": 32,
   "smoke": "unknown",
   "recent_sessions": [
+    "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
     "세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정",
     "세션112 (2026-04-27) — weekly self-audit 결과 반영 (P3 5건)",
     "세션110 (2026-04-27) — D0 morning 실패 + 중복 7건 자동 정리 + 신규 운영 도구",
-    "세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화",
-    "세션108 (2026-04-25) — GPT 정밀평가 검증 후 시스템 개선 모드 중단"
+    "세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화"
   ],
   "all_sessions": [
+    "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
     "세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정",
     "세션112 (2026-04-27) — weekly self-audit 결과 반영 (P3 5건)",
     "세션110 (2026-04-27) — D0 morning 실패 + 중복 7건 자동 정리 + 신규 운영 도구",
@@ -33,6 +34,36 @@
     "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행"
   ],
   "sessions_detail": [
+    {
+      "header": "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
+      "body": [
+        "- 위치: `90_공통기준/notebooklm/`",
+        "- 단일 원본: `registry.yaml` (현재 노트북 2건 등록 — 라인배치/조립비정산, 확장 가능)",
+        "- 도메인 진입: `90_공통기준/notebooklm/CLAUDE.md`",
+        "- Gemini 통합 절차: `bridge.md` (사이드패널 셀렉터는 첫 사용 시 take_snapshot 실측 후 채움)",
+        "- 슬래시: `.claude/commands/notebooklm.md` (list/health/query/ask/sync/register)",
+        "- 헬스 스크립트: `health.sh` (정적 자산 5/5 PASS)",
+        "- 루트 CLAUDE.md 도메인 진입 라우팅에 NotebookLM 키워드 추가",
+        "- MCP 인증: `setup_auth` 성공 (60.91초)",
+        "- MCP 직접 질의 양 노트북 PASS (라인배치 / 조립비정산)",
+        "- **shared 제약 실증**: 기존 noun이 `public` 마크 → Gemini에 노출 안 됨 (Google 공식 정책)",
+        "- **우회**: Gemini에서 v2 노트북 2건 생성 (라인배치_대원테크_v2 / 조립비정산_대원테크_v2)",
+        "- **양방향 동기화 실증**: UUID 공통 (`515e5104-...`, `b49dc000-...`), Gemini→NotebookLM 즉시 노출",
+        "- registry.yaml v2 갱신 (primary + legacy 분리)",
+        "- bridge.md 셀렉터 전체 확정 (생성 페이지·상세 페이지·소스 업로드 메뉴)",
+        "- 라인배치_v2: `10_라인배치/notebooklm_source_라인배치_v1.txt` 업로드 완료 (123KB)",
+        "- 조립비정산_v2: `05_생산실적/조립비정산/06_스킬문서/notebooklm_source_조립비정산_v1.txt` 업로드 완료 (88KB)",
+        "- **Gemini 메인 흐름 검증 PASS**: 조립비정산_v2 노트북에 \"SD9A01 야간 가산 규칙\" 질의 → 정확한 답변 (소스 인용 marker 포함)",
+        "- 양방향 동기화 작동 확정 (UUID 공통 + 소스 인덱싱)",
+        "- registry.yaml sources 필드 1로 갱신",
+        "- legacy 노트북 폐기 (NotebookLM 웹에서 삭제 + registry active=false)",
+        "- 도메인 문서 추가 시 v2 노트북에 추가 업로드 (Step 1~7 PDF·spec 문서 등)",
+        "- Gemini = 메인 채널 (사이드패널 노트북 활성화 후 질의)",
+        "- NotebookLM MCP = 백엔드 (인증·라이브러리·소스 근거 인용 fallback)",
+        "- 도메인 한정 질의는 도메인 에이전트 경유 (line-batch-domain-expert / settlement-domain-expert) — 메인 컨텍스트 보호",
+        "- 노트북 URL 하드코딩 금지 — 항상 registry에서 조회"
+      ]
+    },
     {
       "header": "세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정",
       "body": [

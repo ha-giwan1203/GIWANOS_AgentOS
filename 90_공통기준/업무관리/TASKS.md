@@ -35,6 +35,12 @@
 - registry.yaml v2 갱신 (primary + legacy 분리)
 - bridge.md 셀렉터 전체 확정 (생성 페이지·상세 페이지·소스 업로드 메뉴)
 
+### [완료] 3way 공유 + A분류 즉시반영 (양측 만장일치)
+- GPT 부분PASS / Gemini 부분PASS — item 2 동일 지적 (스키마 불일치)
+- A 분류 즉시반영:
+  - `.claude/commands/notebooklm.md` v2 스키마로 정합 (gemini_url/notebooklm_url/status/uuid 필드, primary/legacy 라우팅 명시)
+  - `90_공통기준/notebooklm/health.sh` 출력에 status별 카운트 + sources=0 경고 추가
+
 ### [완료] v2 노트북 소스 업로드 + 동작 검증
 - 라인배치_v2: `10_라인배치/notebooklm_source_라인배치_v1.txt` 업로드 완료 (123KB)
 - 조립비정산_v2: `05_생산실적/조립비정산/06_스킬문서/notebooklm_source_조립비정산_v1.txt` 업로드 완료 (88KB)

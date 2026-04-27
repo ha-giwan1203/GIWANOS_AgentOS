@@ -27,6 +27,7 @@
 4. ✅ bridge.md 셀렉터 전체 확정 + registry.yaml v2 갱신
 5. ✅ v2 노트북에 소스 자동 업로드 (chrome-devtools-mcp upload_file)
 6. ✅ Gemini 메인 흐름 검증 PASS (조립비정산_v2 질의·응답)
+7. ✅ 3way 공유 (GPT·Gemini 부분PASS 만장일치) + A분류 즉시반영 (notebooklm.md/health.sh v2 정합)
 
 ### 남은 후속 (선택)
 - legacy 노트북 폐기 (NotebookLM 웹 삭제 + registry active=false)

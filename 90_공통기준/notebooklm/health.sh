@@ -52,14 +52,21 @@ check "line-batch 에이전트"   "$AGENT_LB"  optional
 check "settlement 에이전트"   "$AGENT_ST"  optional
 
 echo
-echo "[registry.yaml 요약]"
+echo "[registry.yaml 요약 — v2 스키마]"
 if [ -f "$REG" ]; then
   TOTAL=$(grep -cE '^\s*-\s*name:' "$REG" || echo 0)
   ACTIVE=$(grep -cE '^\s*active:\s*true' "$REG" || echo 0)
-  echo "  등록 노트북: $TOTAL건"
+  PRIMARY=$(grep -cE '^\s*status:\s*primary' "$REG" || echo 0)
+  LEGACY=$(grep -cE '^\s*status:\s*legacy' "$REG" || echo 0)
+  echo "  등록 노트북: $TOTAL건 (primary=$PRIMARY / legacy=$LEGACY)"
   echo "  활성 노트북: $ACTIVE건"
   echo "  도메인 목록:"
   grep -E '^\s*domain:' "$REG" | sed 's/^/    /'
+  # primary 노트북 sources=0 경고
+  ZERO_SRC=$(awk '/status:\s*primary/{p=1} /sources:\s*0\b/{if(p)print}; /^\s*-\s*name:/{p=0}' "$REG" | wc -l)
+  if [ "$ZERO_SRC" -gt 0 ] 2>/dev/null; then
+    echo "  [WARN] sources=0 인 primary 노트북 $ZERO_SRC건 — 업로드 필요"
+  fi
 fi
 
 echo
