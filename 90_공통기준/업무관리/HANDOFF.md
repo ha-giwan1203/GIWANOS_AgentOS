@@ -35,13 +35,18 @@
 - 임시 가드 hook 신설 검토 (Gemini 안건 3) → 세션116 별건 2번 R1~R5 Pre-commit hook과 통합 토론 시 재평가
 
 ### 다음 AI 액션
-1. **다음 세션 첫 응답에서 모드 선언 + B 감지 자동 D 진입 미발생 확인** — 본 변경은 시스템 프롬프트 캐싱이라 다음 세션부터 활성
-2. **세션116 별건 2번 R1~R5 Pre-commit hook 토론** — 임시 가드 hook 통합 검토 시점에 진행 권장
-3. **세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook** — 본 세션에서 수동 기록 권장 라인은 추가, 자동 hook은 별건 유지
-4. **세션116 별건 4번 PLC 인터치·Staging Table** — Gemini 본 세션 추가제안(ERP 트랜잭션 롤백)과 통합 검토
+1. **[최우선·강제] publish_worktree_to_main.sh main stale 자동 동기화 옵션 도입 — 모드 C, R1~R5 plan-first**
+   - 사유: 본 세션 마무리 시점에 main 로컬 ↔ origin/main 분기로 cherry-pick 충돌 발생. 사용자 옵션 A(`git reset --hard origin/main`) 명시 승인으로 회복했으나, 다음 세션도 main fetch 누락 시 동일 충돌 재발 위험 (Gemini 안건 2 우려 흡수)
+   - 변경 후보: cherry-pick 직전 `git fetch origin && git merge --ff-only origin/main` 시도 + ff 실패 시 사용자 보고 + 중단. 또는 `--auto-sync` 플래그 추가
+   - 합의 원본: `90_공통기준/토론모드/logs/debate_20260427_214726_3way/` Round 1 v2 (pass_ratio 1.0)
+2. **다음 세션 첫 응답에서 모드 선언 + B 감지 자동 D 진입 미발생 확인** — 본 변경(세션117)은 시스템 프롬프트 캐싱이라 다음 세션부터 활성
+3. **세션116 별건 2번 R1~R5 Pre-commit hook 토론** — 임시 가드 hook(세션117 안건 3 Gemini 보류 항목)과 통합 토론
+4. **세션116 별건 3번 HANDOFF 자동 에스컬레이션 hook** — 본 세션에서 수동 기록 권장 라인은 추가, 자동 hook은 별건 유지
+5. **세션116 별건 4번 PLC 인터치·Staging Table** — Gemini 본 세션 추가제안(ERP 트랜잭션 롤백)과 통합 검토
 
 ### 본 세션 임시 메모
 - 본 세션 종료 전까지 share-result 호출 시 (과거 캐싱된) 자동 D 승격 가능성 잔존 — 수동 모니터링 필요. 다음 세션 활성 후 본 라인 삭제.
+- 다음 세션 시작 시 `git fetch origin` 누락하면 main 로컬 stale로 publish 충돌 재발 — 다음 AI 액션 1번 핫픽스 우선 처리 권장 (Gemini 명시 우려).
 
 ---
 
