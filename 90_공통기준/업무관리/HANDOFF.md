@@ -23,10 +23,14 @@
 - `.claude/tmp/erp_d0_dedupe.py`: SmartMES rank 기준 자동 중복 식별 + 안전 삭제 (dry-run 기본, --execute로 실행)
 - D0 SKILL.md "되돌리기 방법" + 변경이력 v3 갱신
 
+### 후속 완료 (세션110 말미)
+- **morning OAuth 안정화 패치** — `_wait_oauth_complete()` 신설 (oauth2/sso 부분 매칭 버그 수정). dry-run 2회 exit 0 검증
+- **Chrome 복원 알림 차단** — Preferences exit_type 정리 + 3개 launch 플래그 추가. 사용자 화면 검증 "정상"
+
 ### 다음 AI 액션 (세션111)
 1. **[관찰·별 의제]** morning batch 자동 + 사용자 수동 동시 실행 시 중복 방지책 검토 (lock 파일 / SmartMES 사전 조회 / ERP 상태 확인)
 2. SmartMES 동기화 지연 — Client 새로고침 후 11건 반영 확인 권장
-3. ensure_erp_login OAuth 안정화 (오늘 morning 1차 실패 원인은 직전 세션107 분석 미해결)
+3. **[검증대기]** 2026-04-28 (화) 07:10 morning 자동 트리거 — OAuth 안정화 + 복원 알림 차단 효과 종합 검증
 
 ---
 

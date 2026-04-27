@@ -26,6 +26,13 @@
 - SKILL.md "되돌리기 방법" + 변경이력 v3 갱신
 - `.gitignore` 화이트리스트 추가: `.claude/tmp/erp_d0_deleteA.py` + `.claude/tmp/erp_d0_dedupe.py` (운영 도구 2종 git 추적)
 
+**[완료] morning OAuth 안정화 + Chrome 복원 알림 차단** — A 분류 (세션110)
+- 원인 1: navigate_to_d0 line 119-126 `"erp-dev.samsong.com" in url` 부분 매칭 → OAuth 콜백 중간 단계 `oauth2/sso` URL도 잘못 break → D0_URL goto → login 페이지 redirect → btnExcelUpload timeout
+- 수정 1: `_wait_oauth_complete()` 헬퍼 신설 — `erp-dev` AND NOT `auth-dev` AND NOT `oauth2/sso` AND NOT `/login` 조건. login 재도달 시 1회 재로그인 시도
+- 원인 2: Chrome taskkill 후 재기동 시 "페이지 복원" 알림 표시 — 무인 morning 트리거에서 화면 거슬림
+- 수정 2: `_suppress_chrome_crash_restore()` 헬퍼 — Preferences `exit_type=Normal` 강제. launch 플래그에 `--disable-session-crashed-bubble` `--hide-crash-restore-bubble` `--remote-debugging-address=127.0.0.1` 추가
+- 검증: dry-run 2회 모두 exit 0 + 사용자 화면 복원 알림 미발생 확인 ("정상")
+
 **[관찰·별 의제] morning batch 재실행 시 중복 발생 시나리오**
 - 시나리오: 자동 batch 1차 실패 → 사용자 수동 등록 → 자동 batch 재시도 → 중복 등록
 - 방지책 후보: (a) ensure_chrome_cdp 직전 ERP 상태 확인 후 이미 등록된 동일 PROD_NO/PLAN_DA 있으면 스킵, (b) batch 시작 시 lock 파일 생성 (중복 실행 방지), (c) Phase 2 후 SmartMES 사전 조회로 같은 날 등록 여부 검증

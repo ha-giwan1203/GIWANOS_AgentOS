@@ -53,6 +53,28 @@ LINE_CONFIG = {
 # ============================================================
 # Phase 0: 환경 준비
 # ============================================================
+def _suppress_chrome_crash_restore(profile_dir: str):
+    """Chrome 비정상 종료 후 "페이지 복원" 알림 차단.
+
+    세션110 보강: taskkill로 강제 종료된 Chrome을 다시 launch하면 Preferences의
+    exit_type이 "Crashed"로 남아 자동 복원 다이얼로그 표시 → 무인 트리거에서 화면 거슬림.
+    Preferences 파일의 exit_type / exited_cleanly 정리로 복원 알림 차단.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+    prefs_path = _Path(profile_dir) / "Default" / "Preferences"
+    if not prefs_path.exists():
+        return
+    try:
+        data = _json.loads(prefs_path.read_text(encoding="utf-8"))
+        prof = data.setdefault("profile", {})
+        prof["exit_type"] = "Normal"
+        prof["exited_cleanly"] = True
+        prefs_path.write_text(_json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        print(f"[phase0] Preferences 정리 실패 (무시): {e}")
+
+
 def ensure_chrome_cdp():
     """CDP 9223 기동 확인."""
     import urllib.request
@@ -63,11 +85,18 @@ def ensure_chrome_cdp():
     except Exception:
         print("[phase0] CDP dead — launching Chrome")
 
+    # Chrome 비정상 종료 잔재 정리 (세션110 — 복원 알림 차단)
+    _suppress_chrome_crash_restore(CHROME_PROFILE)
+
     subprocess.Popen([
         CHROME_PATH,
         f"--remote-debugging-port=9223",
+        f"--remote-debugging-address=127.0.0.1",  # 세션105 — IPv6 기본 바인딩 회피
         f"--user-data-dir={CHROME_PROFILE}",
         "--no-first-run", "--no-default-browser-check",
+        "--disable-session-crashed-bubble",  # 세션110 — 복원 다이얼로그 차단
+        "--hide-crash-restore-bubble",
+        "--no-default-browser-check",
         ERP_LAYOUT,
     ])
     for i in range(10):
@@ -99,6 +128,25 @@ def ensure_erp_login(page):
         time.sleep(5)
 
 
+def _wait_oauth_complete(page, timeout_sec: float = 30.0):
+    """OAuth 완료 대기 — auth-dev 떠나고 erp-dev 본 페이지(oauth2/sso 콜백 제외) 도달까지.
+
+    세션110 보강: 기존 `"erp-dev.samsong.com" in url` 조건은 OAuth 콜백 중간 단계
+    `oauth2/sso` URL도 매칭되어 잘못 break 발생 → 미완료 상태에서 D0_URL 시도 →
+    auth-dev/login 페이지 redirect → btnExcelUpload timeout 실패 시나리오.
+    """
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline:
+        url = page.url
+        if ("erp-dev.samsong.com" in url
+                and "auth-dev" not in url
+                and "oauth2/sso" not in url
+                and "/login" not in url):
+            return True
+        time.sleep(0.5)
+    return False
+
+
 def navigate_to_d0(browser):
     """D0추가생산지시 화면 탭 확보."""
     ctx = browser.contexts[0]
@@ -116,11 +164,18 @@ def navigate_to_d0(browser):
     page.bring_to_front()
     ensure_erp_login(page)
 
-    # OAuth 로그인 후 리다이렉트 완료 대기 (erp-dev.samsong.com 도착까지)
-    for _ in range(20):
-        if "erp-dev.samsong.com" in page.url:
-            break
-        time.sleep(0.5)
+    # OAuth 완료 명시 대기 (세션110 보강 — oauth2/sso 콜백 부분 매칭 버그 수정)
+    if not _wait_oauth_complete(page, timeout_sec=30.0):
+        print(f"[phase0] OAuth 완료 대기 30s 실패 — 현재 URL: {page.url}")
+        # login 페이지 다시 도달 시 1회 재시도
+        if "auth-dev.samsong.com" in page.url and "/login" in page.url:
+            print("[phase0] login 페이지 재도달 — 재로그인 1회 시도")
+            ensure_erp_login(page)
+            if not _wait_oauth_complete(page, timeout_sec=30.0):
+                raise RuntimeError(f"OAuth 완료 2회 실패: {page.url}")
+        else:
+            raise RuntimeError(f"OAuth 완료 실패 (login 페이지 아님): {page.url}")
+
     try: page.wait_for_load_state("domcontentloaded", timeout=15000)
     except Exception: pass
     time.sleep(2)
