@@ -107,9 +107,16 @@ echo "$TEXT" | grep -qE 'identifier_ref_check(\.sh)?|기준정보 대조|identif
 #   5. 단일 파일 최소 보정 — 신규 hook 금지, settings 변경 금지, evidence_gate 정책 변경 금지
 # 본 수정이 마지막 시스템 개입 (세션108 합의 일관성 유지). 향후 P2-C/P3-E 재논의는 트리거 충족 시만.
 
-# 패턴 1: erp_oauth_login.py 명령 + OAuth 성공 신호 + error 부재 (stdout 성공 텍스트 기반)
+# 패턴 1: erp_oauth_login.py 명령 + 명시적 성공 텍스트 + error 부재
+# GPT 조건부 지적 반영 (세션113 양측 재검증):
+#   "OAuth" 단어만 매칭은 약함 → "OAuth 200 OK" / "Login Success" / "로그인 성공" 등
+#   명시적 성공 phrase fixed-string로 좁힘 (false ok 방지 강화)
 if echo "$TEXT" | grep -qF 'erp_oauth_login.py' && \
-   echo "$TEXT" | grep -qF 'OAuth' && \
+   ( echo "$TEXT" | grep -qF 'OAuth 200 OK' || \
+     echo "$TEXT" | grep -qF 'OAuth 200' || \
+     echo "$TEXT" | grep -qF 'Login Success' || \
+     echo "$TEXT" | grep -qF '로그인 성공' || \
+     echo "$TEXT" | grep -qF 'auth_diag.ok' ) && \
    ! echo "$TEXT" | grep -qiE '(error|traceback|exception|failed)'; then
   mark "auth_diag"
   hook_log "PostToolUse/evidence_mark_read" "auth_diag_marked_via_oauth_normal_flow"

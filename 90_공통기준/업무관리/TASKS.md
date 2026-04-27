@@ -23,7 +23,11 @@
 - **P2-C / P3-E 동결 보류** (운영 경로 부여 금지, 폐기도 금지)
 - **이번 수정이 마지막 시스템 개입** (Gemini 명시 권고)
 
-### [완료] P2-B Option B 구현 — evidence_mark_read.sh 패턴 확장
+### [완료 + 조건부 보강] P2-B Option B 구현 — evidence_mark_read.sh 패턴 확장
+
+**조건부 보강 (GPT 양측 검증 지적 반영, 25b0887e → 후속 커밋)**: 패턴 1을 `OAuth` 단어 매칭 → `OAuth 200 OK / OAuth 200 / Login Success / 로그인 성공 / auth_diag.ok` 명시적 성공 phrase fixed-string로 좁힘 (false ok 방지 강화).
+
+
 양측 합의 안전 조건 5가지 모두 반영:
 1. 단순 스크립트명 매칭 금지 — 명령 + 성공 신호 + error 부재 3중 조건
 2. `grep -qF` fixed-string 매칭으로 정규식 메타문자 우회 차단 (Gemini 앵커링 강제)
