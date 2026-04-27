@@ -2,17 +2,26 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "PASS",
+  "gpt_judgment": "PASS (publish 만장일치 + 별건 통합 GPT 부분PASS → A분기 즉시반영 → df3faae2 사실상 PASS)",
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
-  "session": "session116",
-  "commits": ["00d74273", "2a4df2d4"],
-  "topic": "[3way] CLAUDE.md 작업 모드 5종 판정 사고 계층 신설 + 별건 의제 4건 등재",
+  "session": "session118",
+  "commits": [
+    "4091419c",
+    "b017fd40",
+    "8e0b70b9",
+    "b8249d10",
+    "df3faae2",
+    "ad2060c1"
+  ],
+  "topic": "[3way] 세션116/117 별건 1+2+3+4 모두 종결 (publish stale 가드 + R1~R5 plan check hook + mode C 에스컬레이션 로그 hook + ERP/MES 잔존 청소 프로토콜)",
   "verdict": {
-    "gpt": "PASS (5/5 실증됨, 추가제안 없음)",
-    "gemini": "PASS (5/5 동의, item5 환경미스매치, 추가제안 없음)"
+    "gpt_publish": "PASS (5/5 실증됨·동의, 추가제안 없음)",
+    "gemini_publish": "PASS (5/5 동의, 추가제안 없음)",
+    "gpt_byeolgeon": "부분PASS → A 분기 즉시반영(settings*.json regex 정정) → 사실상 PASS",
+    "gemini_byeolgeon": "PASS (5/5 동의, 최종 승인)"
   },
-  "next_session_priority_1": "토론모드 CLAUDE.md '자동 승격 트리거' 섹션 → 모드 D 정책으로 갱신 (정책 모순 잔존)",
-  "timestamp": "2026-04-27 KST"
+  "next_session_priority_1": "mode_c_log.jsonl 정리 정책(rotation/cap) — 향후 별건. 다음 세션 시작 시 mode_c_log.sh + r1r5_plan_check.sh 활성화 동작 1회 확인",
+  "timestamp": "2026-04-28 KST"
 }

@@ -1,20 +1,24 @@
 {
-  "generated_at": "2026-04-27 13:08 KST",
-  "last_updated": "세션114 갱신 2026-04-27",
-  "github_sha": "5333c6a670aca328245eba349b753489df721d7b",
-  "github_sha_short": "5333c6a6",
-  "hooks_raw": 47,
-  "hooks_active": 32,
+  "generated_at": "2026-04-28 07:13 KST",
+  "last_updated": "세션118 갱신 2026-04-27",
+  "github_sha": "ad2060c10f76ae0b199ea06c3244470af6ce68cf",
+  "github_sha_short": "ad2060c1",
+  "hooks_raw": 49,
+  "hooks_active": 34,
   "commands": 32,
   "smoke": "unknown",
   "recent_sessions": [
-    "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
-    "세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정",
-    "세션112 (2026-04-27) — weekly self-audit 결과 반영 (P3 5건)",
-    "세션110 (2026-04-27) — D0 morning 실패 + 중복 7건 자동 정리 + 신규 운영 도구",
-    "세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화"
+    "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
+    "세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)",
+    "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건",
+    "세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향",
+    "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설"
   ],
   "all_sessions": [
+    "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
+    "세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)",
+    "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건",
+    "세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향",
     "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
     "세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정",
     "세션112 (2026-04-27) — weekly self-audit 결과 반영 (P3 5건)",
@@ -35,6 +39,86 @@
   ],
   "sessions_detail": [
     {
+      "header": "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
+      "body": [
+        "- 진입: HANDOFF \"다음 AI 액션 1번\" 최우선·강제 (세션117 마무리 토론 합의 `debate_20260427_214726_3way` Round 1 v2 pass_ratio 1.0)",
+        "- 모드 판정: **C** (`.claude/scripts/` 운영 자동화 스크립트 수정)",
+        "- 플랜: `C:/Users/User/.claude/plans/eager-riding-kurzweil.md` (R1~R5 반증형 작성, 사용자 승인)",
+        "- 변경 파일 (Fast Lane, 1건):",
+        "  - `.claude/scripts/publish_worktree_to_main.sh` — 옵션 변수 + usage + 파싱 분기 + stale 감지 블록 38줄 신규 삽입 (기존 라인 변경 0)",
+        "- 동작:",
+        "  - **default**: stale(`HEAD..origin/main` count > 0) 감지 시 보고+`exit 1` (자동 변경 없음, 안전 후퇴)",
+        "  - **`--auto-sync`**: `git fetch origin main` → `merge --ff-only origin/main` 시도 → 성공 시 진행, 분기 시 수동 해결 메시지+`exit 1`",
+        "  - **`--dry-run`**: stale 상태만 보고 (동기화 시도 안 함)",
+        "- 검증:",
+        "  - `bash -n` 문법 PASS",
+        "  - `--help` 출력에 `--auto-sync` 라인 노출 PASS",
+        "  - dry-run 위치 보정: 기존 `--dry-run` 종료 위치(반영 대상 커밋 표시 직후)를 stale 감지 블록 이후로 이동. plan 명시 \"dry-run에서 fetch만 수행\" 의도와 정합 (fix-up 커밋)",
+        "- **3way 공유 PASS** (양측 만장일치):",
+        "  - GPT: PASS — item 1~5 모두 실증됨·동의. 추가제안 없음",
+        "  - Gemini: PASS — item 1·2·3·5 실증됨·동의 / item 4(fetch fail-safe) 환경미스매치·동의(제조 현장 네트워크 환경 고려). 추가제안 없음",
+        "  - 하네스: 채택 5 / 보류 0 / 버림 0",
+        "- 신규 단일 원본: `90_공통기준/erp-mes-recovery-protocol.md`",
+        "- 도메인 라우팅: 루트 `CLAUDE.md` 도메인 진입표 + `04_생산계획/CLAUDE.md` 1줄 추가",
+        "- Known cases: 세션110 SmartMES dedupe 도구 / 세션115 사용자 첨부 무시 사고 / 세션107 OAuth 자동완성 잔존",
+        "- PLC 인터치는 현재 직접 호출 없음 → 장래 도입 시 안전 기준 4종 보관",
+        "- 신규: `.claude/hooks/r1r5_plan_check.sh` (advisory, PreToolUse/Bash) — C 트리거 staged + plan 흔적 미발견 시 stderr 권장",
+        "- 신규: `.claude/hooks/mode_c_log.sh` (advisory, PostToolUse/Bash) — C 트리거 커밋 후 `.claude/state/mode_c_log.jsonl` 1줄 기록 + stderr 알림",
+        "- HANDOFF.md 자동 직접 수정은 hook 무한 루프 위험으로 **회피** — state 파일 기록 + 사용자 시각 알림으로 Gemini 권고 흡수",
+        "- settings.json PreToolUse + PostToolUse matcher 1건씩 등록"
+      ]
+    },
+    {
+      "header": "세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)",
+      "body": [
+        "- 진입: HANDOFF \"다음 AI 액션 2번\" — 세션116 별건 의제 1번",
+        "- 사용자 지시: \"이어서 진행하자\" → AskUserQuestion 1번 선택 → \"토론모드 진행해서 플랜 보강후 해결\"",
+        "- 모드 판정: **C 강제 승격** (도메인 CLAUDE.md + `.claude/commands/` 수정, 루트 CLAUDE.md C 트리거 7개 중 2개)",
+        "- 플랜: `C:/Users/User/.claude/plans/lexical-exploring-pebble.md` (R1~R5 반증형 작성)",
+        "- 로그: `90_공통기준/토론모드/logs/debate_20260427_203835_3way/`",
+        "- 안건 5건: 누락 검토·share_gate 정합·세션 캐싱·NEVER 라인 형식·의제 표류 보호",
+        "- 채택 4건 + 조건부채택 1건 + 보류 1건 + 별건 3건",
+        "- cross_verification 4키: 동의 3 / 검증 필요 1 (gpt_verifies_gemini = ERP 트랜잭션 모드 E 영역 별건 분리)",
+        "- claude_delta: partial / issue_class: B / skip_65: false",
+        "- critic-reviewer **WARN** (라벨 불일치 + 보조축 0건감사·일방성) → v2 반영: 안건 3을 \"조건부채택\"으로 재분류 + 보류 1건 등재 + cross-grep 실수행 결과 evidence 추가",
+        "- ERP/MES 트랜잭션 롤백 NEVER 조항 → 세션116 별건 4번 PLC와 통합",
+        "- 임시 가드 hook 신설 검토 → 세션116 별건 2번 R1~R5 Pre-commit hook과 통합 토론 시 재평가",
+        "- HANDOFF 자동 에스컬레이션 로그 (세션116 별건 3번) — 본 세션 share-result에 수동 기록 권장 라인은 추가, 자동 hook은 별건 유지"
+      ]
+    },
+    {
+      "header": "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건",
+      "body": [
+        "- 진입: 사용자 \"규칙 + 사고 구조 보정 — 작업 모드 판정 + 모드별 사고 절차 추가\"",
+        "- 플랜 작성 → 3자 토론(Round 1+2 pass_ratio 1.0) → critic WARN 3건 v2 반영 → CLAUDE.md 수정",
+        "- 신규 섹션: \"## 작업 모드 판정 (실행 전 필수)\" — 6행 아래, 도메인 진입표 위",
+        "- 합의: 5종 유지(F 모드 폐기), 우선순위 사다리 명시>E>C>D>B>A, R1~R5 반증형, 모드 E 정량 OR 6조건, 단순 건수 불일치 2단 판정",
+        "- 메모리: `feedback_work_mode_taxonomy.md` 신설, `feedback_structural_change_auto_three_way.md` 갱신(자동 D 진입 차단)",
+        "- 토론 로그: `90_공통기준/토론모드/logs/debate_20260427_185903_3way/`",
+        "- 커밋: `00d74273` (push: fa0fa8a7..00d74273 -> main)",
+        "- **공유 PASS**: GPT 5/5 실증됨 PASS + Gemini 5/5 동의 PASS (양측 만장일치, 추가제안 없음). GPT 추가 코멘트: \"토론모드 CLAUDE.md 모순은 TASKS 별건 1번으로 이미 등재됨\" 확인.",
+        "- 분리 사유: 본 보정 범위는 \"루트 CLAUDE.md 1개 섹션 추가\". 토론모드 CLAUDE.md 정책 갱신은 토론모드 도메인 별건. 단 문서 모순 잔존이므로 다음 작업 우선순위 1.",
+        "- 변경 대상: `90_공통기준/토론모드/CLAUDE.md` \"## 자동 승격 트리거 (세션78 실증 후 신설)\" 섹션",
+        "- 변경 방향: B 분류 자동 D 승격 → \"B 분류 감지 라벨만 표기, D 자동 진입 차단\" 비대칭 설계로 재기록",
+        "- 분리 사유: 본 보정은 hook 신설 금지가 명시 제약. 향후 hook 신설 별건 의제로 분리.",
+        "- 검토 항목: plan.md에 R1~R5 채워졌는지 자동 검증 hook 가능성. 등급 advisory 후보.",
+        "- 분리 사유: 본 보정은 응답 첫 줄 수동 인지 라인(`[모드 전환: A → C]`)만 채택. HANDOFF 자동 갱신 hook 신설은 본 범위 초과.",
+        "- 검토 항목: C 강제 승격 시 HANDOFF.md에 1줄 자동 기록 hook 가능성.",
+        "- 분리 사유: 도메인 04_생산계획·05_생산실적 수준의 운영 프로토콜. 루트 CLAUDE.md 범위 초과.",
+        "- 검토 위치: `04_생산계획/CLAUDE.md`, `05_생산실적/조립비정산/CLAUDE.md` 또는 신규 `90_공통기준/erp-mes-recovery-protocol.md`"
+      ]
+    },
+    {
+      "header": "세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향",
+      "body": [
+        "- 사고: 사용자가 중복 정리한 SSKR D+0 Upload xlsx를 첨부했으나 스킬이 무시하고 Z 드라이브 원본(중복 포함 30건) 자동 추출 → ERP 등록 + MES 1500건 전송. MES 잔존 특성상 정정 불가",
+        "- 가드: `.claude/commands/d0-plan.md` \"⛔ 첨부 파일 가드\" 섹션 신설, `90_공통기준/스킬/d0-production-plan/SKILL.md` description + 핵심 주의사항 최상단에 가드 블록",
+        "- 동작: 사용자 메시지에 xlsx/xlsm 첨부 감지 시 자동 실행 차단, (A) `--xlsx <경로>` (B) Z 드라이브 자동 탐색 명시 확인 강제",
+        "- 잔존 처리: 중복 30건은 사용자 결정 \"그대로 두기\"",
+        "- 추가: `run.py` selectList ajax timeout 20s → 60s (저녁 시간대 ERP 서버 응답 지연 대응)"
+      ]
+    },
+    {
       "header": "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설",
       "body": [
         "- 위치: `90_공통기준/notebooklm/`",
@@ -51,17 +135,17 @@
         "- **양방향 동기화 실증**: UUID 공통 (`515e5104-...`, `b49dc000-...`), Gemini→NotebookLM 즉시 노출",
         "- registry.yaml v2 갱신 (primary + legacy 분리)",
         "- bridge.md 셀렉터 전체 확정 (생성 페이지·상세 페이지·소스 업로드 메뉴)",
+        "- GPT 부분PASS / Gemini 부분PASS — item 2 동일 지적 (스키마 불일치)",
+        "- A 분류 즉시반영:",
+        "  - `.claude/commands/notebooklm.md` v2 스키마로 정합 (gemini_url/notebooklm_url/status/uuid 필드, primary/legacy 라우팅 명시)",
+        "  - `90_공통기준/notebooklm/health.sh` 출력에 status별 카운트 + sources=0 경고 추가",
         "- 라인배치_v2: `10_라인배치/notebooklm_source_라인배치_v1.txt` 업로드 완료 (123KB)",
         "- 조립비정산_v2: `05_생산실적/조립비정산/06_스킬문서/notebooklm_source_조립비정산_v1.txt` 업로드 완료 (88KB)",
         "- **Gemini 메인 흐름 검증 PASS**: 조립비정산_v2 노트북에 \"SD9A01 야간 가산 규칙\" 질의 → 정확한 답변 (소스 인용 marker 포함)",
         "- 양방향 동기화 작동 확정 (UUID 공통 + 소스 인덱싱)",
         "- registry.yaml sources 필드 1로 갱신",
         "- legacy 노트북 폐기 (NotebookLM 웹에서 삭제 + registry active=false)",
-        "- 도메인 문서 추가 시 v2 노트북에 추가 업로드 (Step 1~7 PDF·spec 문서 등)",
-        "- Gemini = 메인 채널 (사이드패널 노트북 활성화 후 질의)",
-        "- NotebookLM MCP = 백엔드 (인증·라이브러리·소스 근거 인용 fallback)",
-        "- 도메인 한정 질의는 도메인 에이전트 경유 (line-batch-domain-expert / settlement-domain-expert) — 메인 컨텍스트 보호",
-        "- 노트북 URL 하드코딩 금지 — 항상 registry에서 조회"
+        "- 도메인 문서 추가 시 v2 노트북에 추가 업로드 (Step 1~7 PDF·spec 문서 등)"
       ]
     },
     {
@@ -434,36 +518,6 @@
         "  - `final_check --fast` 3.5 섹션 WARN → `[OK] AGENTS_GUIDE hooks 개수 일치 (31개)`",
         "- **회귀**: smoke_fast 11/11 ALL PASS",
         "- **명시적 비변경**: README 계층별 훅 테이블 파싱(L47-62 별건 M5 후보), SETTINGS dead assignment 정리(별건)"
-      ]
-    },
-    {
-      "header": "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행",
-      "body": [
-        "**[완료] GPT 시스템 평가 실물 대조 + Explore 3병렬 독립 스캔**",
-        "- GPT 8건 중 7건 사실, 1건(post_commit_notify 배치) 반만 사실로 확인",
-        "- Claude 독립 발견: 도메인 STATUS 5개 drift 12~23일(High), 고아 폴더 5개(Med), 정리대기_20260328(Med)",
-        "- 토론 로그: `90_공통기준/토론모드/logs/debate_20260423_193314/`",
-        "**[완료] 2자 토론 Round 1 합의 (3자 승격 불필요)**",
-        "- 의제1 A안 채택: `DESIGN_PRINCIPLES.md:10` \"정적 출력만\" → \"정적 + advisory 보조 허용\" 문구 현실화",
-        "- 의제1 부가: parse_helpers M4 선행, M3 지연 불가 (GPT 조건 수용)",
-        "- 의제2 C2 채택: 신규 advisory 훅 `domain_status_sync.sh` 신설 (1 Problem ↔ 1 Hook)",
-        "- 의제3 수정 채택: URL echo 7건·숫자 echo 8건 제거 (포괄 통합 아님), dry-run 3건 통합",
-        "**[완료] 즉시 실행 4건**",
-        "- `smoke_fast.sh` 주석 \"5~8건\" → \"11건\" (실제 검사 수와 일치)",
-        "- `harness_gate.sh` 주석 \"마지막 5000자\" → \"마지막 20000자\" (실제 tail -c와 일치)",
-        "- `README.md` `post_commit_notify.sh` Notification 층 → 추적층(PostToolUse) 이동 + event 명시",
-        "- `DESIGN_PRINCIPLES.md` L10 A안 문구 수정",
-        "**[완료] parse_helpers M4 — `risk_profile_prompt.sh` 셸 파서 이관**",
-        "- 기존 셸 while + grep + sed 블록(L85-141) 제거 → `parse_helpers.py --op match_domain` 호출",
-        "- `parse_helpers.py`에 `match_domain_by_keywords()` 신규 함수 + CLI op 추가",
-        "- 회귀: smoke_fast 11/11 PASS, active_domain.req 정상 작성",
-        "**[완료] parse_helpers M3 — `final_check.sh` 4개 자체 파서 이관 (SSoT 종결)**",
-        "- `registered_hook_names` / `readme_active_hook_count` / `readme_active_hook_names` / `status_hook_count` 함수 내부를 parse_helpers CLI 호출로 대체",
-        "- Windows Python stdout \\r 삽입 이슈 발견 → `tr -d '\\r'` 추가",
-        "- DESIGN_PRINCIPLES 원칙 7 \"Single Source of Truth\" 실제 코드로 끝남",
-        "**[완료] C2 `domain_status_sync.sh` 신규 advisory 훅**",
-        "- 전역 TASKS 날짜 vs 도메인 STATUS.md 5개 날짜 비교 → 14일+ drift 감지 시 stderr 경고",
-        "- 실측: 05 조립비정산 17일·10 라인배치 23일 drift 감지 확인"
       ]
     }
   ]

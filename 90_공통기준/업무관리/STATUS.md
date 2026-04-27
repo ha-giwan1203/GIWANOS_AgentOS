@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-28 — 세션118 (별건 1+2+3+4 모두 종결: publish stale 가드 + --auto-sync · R1~R5 plan check hook · mode C 에스컬레이션 로그 hook · ERP/MES 잔존 청소 프로토콜. hooks 32 → 34. 3way 공유 양측 PASS, GPT A 분기 regex 정정 즉시반영. 다음 세션 잔존: mode_c_log.jsonl 정리 정책만)
+최종 업데이트: 2026-04-28 — 세션118 /finish 마무리 (terminal_state=done, Notion 수동 동기화 성공). 별건 1+2+3+4 모두 종결: publish stale 가드 + --auto-sync · R1~R5 plan check hook · mode C 에스컬레이션 로그 hook · ERP/MES 잔존 청소 프로토콜. hooks 32 → 34. 3way 공유 양측 PASS, GPT A 분기 regex 정정 즉시반영. 다음 세션 잔존: mode_c_log.jsonl 정리 정책만
 
 ---
 
