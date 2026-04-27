@@ -90,10 +90,16 @@ Claude가 브라우저에서 ChatGPT 화면을 직접 읽고 반자동 토론을
 
 ## 실행 절차
 
-### Step 1. 세션 초기화 (로그만 — 브라우저 조작 금지)
-1. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
-2. JSON 로그 초기화: `{"session_id":"...","chat_url":"","turn_number":0}` 저장
-3. `chat_url`은 첫 gpt-send 호출 후 `.claude/state/debate_chat_url`에서 읽어 갱신
+### Step 1. 세션 초기화 (로그 + CDP 자동 기동)
+1. **CDP 연결 확인 + 자동 기동** (세션112 사용자 지시 2026-04-27 — 사용자 결정 묻지 않음)
+   - `curl -s http://127.0.0.1:9222/json/version` HTTP 200 확인
+   - 미수신 시 즉시 PowerShell `Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9222','--remote-debugging-address=127.0.0.1','--user-data-dir=C:\temp\chrome-cdp'` 실행
+   - `Start-Sleep -Seconds 4` 후 HTTP 200 재확인
+   - 2회 연속 200 미수신 시에만 사용자 보고 (그때만 [실패 보고])
+   - 상세: `../CLAUDE.md` "CDP Chrome 단독 사용" 섹션 [MUST] 자동 기동 절차
+2. 로그 경로 설정: `90_공통기준/토론모드/logs/debate_YYYYMMDD_HHMMSS`
+3. JSON 로그 초기화: `{"session_id":"...","chat_url":"","turn_number":0}` 저장
+4. `chat_url`은 첫 gpt-send 호출 후 `.claude/state/debate_chat_url`에서 읽어 갱신
 
 > **[NEVER] debate-mode 안에서 Chrome MCP 도구를 직접 호출하지 않는다.**
 > claude-in-chrome 계열(tabs_context_mcp, navigate, javascript_tool, get_page_text, find, computer)

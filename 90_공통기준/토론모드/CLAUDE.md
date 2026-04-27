@@ -142,8 +142,11 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 
 - **[NEVER]** 일반 Chrome 프로필(기본 사용자 프로필)에서 토론모드 진입 금지
 - **[NEVER]** claude-in-chrome 계열 MCP(`mcp__Claude_in_Chrome__*`) 토론모드 내 사용 금지 — chrome-devtools-mcp 단독 경로
-- **[NEVER]** CDP Chrome 미기동 상태에서 토론 시작 금지 — 즉시 실패 보고
 - **[MUST]** 토론 진입 전 CDP 연결 확인: `curl -s http://127.0.0.1:9222/json/version` 200 응답 필수
+- **[MUST]** CDP 미기동 시 **즉시 자동 기동 후 진입** (사용자 결정 묻지 않음, 세션112 사용자 지시 2026-04-27). 가역·로컬·승인 불요 작업으로 분류. 절차:
+  1. PowerShell `Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9222','--remote-debugging-address=127.0.0.1','--user-data-dir=C:\temp\chrome-cdp'`
+  2. `Start-Sleep -Seconds 4` 후 HTTP 200 재확인
+  3. 200 미수신 2회 연속 시에만 사용자 보고 (그때만 [실패 보고])
 - **[MUST]** 별도 프로필 `C:\temp\chrome-cdp` 만 사용. 다른 user-data-dir 금지
 
 **전제 조건 (기존)**:
