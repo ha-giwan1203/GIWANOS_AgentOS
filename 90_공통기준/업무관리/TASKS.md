@@ -42,6 +42,12 @@
 ### 잔존 별건 (다음 세션 후보)
 - `cut -c` 동일 패턴 다른 hook 사용처 검토 (본 의제 범위 밖 — Round 1 합의 시 분리)
 
+### [완료] /finish 9단계 마무리
+- 양측 PASS 만장일치: GPT 5/5 실증됨·동의 (추가제안 없음) / Gemini 5/5 실증됨·동의 (추가제안 없음, "최종 승인")
+- Notion 수동 동기화: 성공
+- final_check --full --fix: ALL CLEAR (smoke_fast 11/11)
+- finish_state.json: terminal_state=done
+
 ## 세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)
 
 ### [완료] publish_worktree_to_main.sh main stale 가드 + --auto-sync 옵션 도입
