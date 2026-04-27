@@ -35,7 +35,6 @@
       "Bash(PYTHONIOENCODING=utf-8 python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(git -C \"C:/Users/User/Desktop/업무리스트\" rev-parse HEAD)",
       "Bash(bash \"C:/Users/User/Desktop/업무리스트/.claude/hooks/list_active_hooks.sh\" --names)",
-      "Bash(bash \"C:/Users/User/Desktop/업무리스트/.claude/hooks/list_active_hooks.sh\" --count)",
       "Bash(bash \"C:/Users/User/Desktop/업무리스트/.claude/hooks/list_active_hooks.sh\" --by-event)",
       "Bash(python3 \"C:/Users/User/Desktop/업무리스트/.claude/hooks/incident_review.py\" --days 7 --threshold 3)"
     ],

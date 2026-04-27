@@ -4,8 +4,22 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21) / 세션110 D0 중복 정리 / 세션109 SD9A01 자동화
+최종 업데이트: 2026-04-27 KST — 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21) / 세션110 D0 중복 정리
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션112 (2026-04-27) — weekly self-audit 결과 반영
+
+### 진행 상황
+- 진입: scheduled-task `weekly-self-audit` 자동 실행 → /self-audit-agent 4축 진단 → 사용자 "개선 진행해라" → 차단된 settings 변경에 대해 A·C 안건 명시 승인
+- 자체 처리(P3) 5건: TASKS/STATUS 헤더 + hooks/README.md 단서·보조표 + settings.local.json --count 중복 제거
+- 토론 분리(P2-B/P2-C/P3-E) 3건: TASKS.md "다음 세션 토론 안건" 섹션 등재
+- 진단 시점 P1(auto_commit_state 차단 12회 누적)은 사용자가 D0 작업 중 자체 해소 (final_check ALL CLEAR 상태로 진단 진입)
+
+### 다음 AI 액션
+- 다음 세션 진입 시 TASKS.md "다음 세션 토론 안건" 3건 처리 (3자 토론 라우팅)
+- 안건1 evidence_gate ok 발급 절차 / 안건2 죽은 hook 4종 / 안건3 agents 7종 진입 경로
 
 ---
 

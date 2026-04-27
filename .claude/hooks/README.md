@@ -93,6 +93,7 @@
 > 각 훅이 내부 오류(파싱 실패, 파일 미존재 등)를 만났을 때의 동작 정책.
 > **fail-open**: 오류 시 통과 (exit 0). **fail-closed**: 오류 시 차단 (deny/block).
 > **detect-only**: 로그만 남기고 통과.
+> **수록 범위**: settings 등록 활성 hook 전체(이벤트/프롬프트/차단/추적/알림/종료층 32개) + advisory 보조 hook(`auto_commit_state`, `domain_status_sync`, `permissions_sanity`, `token_threshold_check`, `share_gate`, `doctor_lite`).
 
 | 훅 | 정책 | stdout intent | 비고 |
 |---|---|---|---|
@@ -157,6 +158,7 @@
 | `nightly_capability_check.sh` | Silent Failure 방지용 야간 capability 점검. Windows schtasks 수동 등록 필요 (세부 절차 별도 안내) |
 | `pruning_observe.sh` | MEMORY/TASKS 항목 pruning 관찰 리포트 (수동 실행) |
 | `list_active_hooks.sh` | 활성 hook 단일 원본 (Single Source). settings.json(team+local union) 파싱, --count/--by-event/--names/--full 모드 (세션93 SSoT 확정) |
+| `domain_status_sync.sh` | 전역 TASKS 날짜 vs 도메인 STATUS 14일+ drift 탐지 advisory. session_start_restore.sh에서 호출 (세션98 C2 합의) |
 | `../scripts/hook_registry.sh` | **[LEGACY, 세션93]** settings.local.json 전제. truth chain에서 제외. 대체: `list_active_hooks.sh` |
 
 ## 훅 등급 분류 (2026-04-19 의제5 3자 토론 합의, Phase 2-B 일부 반영)

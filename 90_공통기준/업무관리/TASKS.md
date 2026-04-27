@@ -10,7 +10,47 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-25 KST — 세션109 SD9A01 숙련도평가서 자동화 (Phase 1~5 완료, 35개 산출물) / 세션108 GPT 정밀평가 L-1·L-2 문서 드리프트 최소 보정 후 시스템 개선 모드 중단 / 세션107 GPT 시스템 정합성 검토 4건 반영
+최종 업데이트: 2026-04-27 KST — 세션112 weekly self-audit 결과 P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화 + 중복 7건 자동 정리(DELETE API 발견) + erp_d0_dedupe.py 신규 / 세션109 SD9A01 숙련도평가서 자동화 (Phase 1~5 완료, 35개 산출물)
+
+## 다음 세션 토론 안건 (2026-04-27 self-audit 결과)
+
+> /self-audit (weekly scheduled task) 결과 단독 결정 금지 항목. `feedback_structural_change_auto_three_way` 정책에 따라 GPT/Gemini 3자 토론 후 결정.
+
+**[안건1] P2-B — evidence_gate auth_diag.req / identifier_ref.req ok 발급 절차 명문화**
+- 근거: 7일 incident_ledger `evidence_missing` 35건 중 동일 fingerprint(`383f406a5519717b` auth_diag.req 등) 다회 반복 카운트
+- 쟁점: req 발급 트리거는 정의됐으나 ok 발급의 정상 경로가 명문화되지 않아 동일 req가 ok로 전환되지 못한 채 누적
+- 토론 포인트: req-ok 비대칭 정책 설계 vs MES/OAuth 진단 자체 차단이 정상 동작인지
+
+**[안건2] P2-C — 죽은 보조 hook 4종 운영 경로 결정**
+- 대상: `e2e_test.sh`, `nightly_capability_check.sh`, `gate_boundary_check.sh`, `render_hooks_readme.sh`
+- 근거: settings 미등록 + Grep 결과 호출 흔적 부재. 특히 `nightly_capability_check`는 세션77 Round 2 Gemini 최우선 안전망으로 도입(Silent Failure 방지)됐으나 schtasks 미등록 — 도입 합의 무력화 위험
+- 결정 사항: schtasks 등록 vs 수동 절차 명문화 vs 폐기
+
+**[안건3] P3-E — agents 7종 진입 경로 명문화 vs 폐기**
+- 대상: `evidence-reader`, `debate-analyzer`, `artifact-validator`, `settlement-validator`, `code-reviewer`, `critic-reviewer`, `self-audit-agent`
+- 근거: CLAUDE.md / 도메인 CLAUDE.md / AGENTS_GUIDE.md 어디서도 참조 미발견. 활성 호출 경로 부재
+- 결정 사항: 진입 트리거 명문화 vs 사용 도메인 CLAUDE에 분산 등재 vs 일부 폐기
+
+---
+
+## 세션112 (2026-04-27) — weekly self-audit 결과 반영 (P3 5건)
+
+> 진입: scheduled-task `weekly-self-audit` 자동 실행 → 진단 리포트 → 사용자 "개선 진행해라" → A·C 안건 승인
+
+**[완료] P3 자체 처리 5건** — A 분류
+- TASKS.md 헤더: 세션110/111/112 정보 반영 (이전 헤더 세션109/108/107)
+- STATUS.md 헤더: 세션111/110 정보 반영 (이전 헤더 세션109/108/107)
+- `.claude/hooks/README.md` 실패계약 표 위 "수록 범위" 단서 1줄 추가 (활성 32 + advisory 보조 hook 6 명시)
+- `.claude/hooks/README.md` 보조 스크립트 표에 `domain_status_sync.sh` 1줄 추가 (실패계약 표에는 있었으나 보조 스크립트 표 누락)
+- `.claude/settings.local.json` `list_active_hooks.sh --count` 절대 경로 중복 1건 제거 (L33 상대 경로 보존, L38 절대 경로 삭제)
+
+**[보류 → 토론 안건 등재]** — 위 "다음 세션 토론 안건" 섹션 참조
+
+**진단 결과 요약**:
+- P1(auto_commit_state 차단 12회 누적): 사용자가 D0 작업 중 자체 해소 (final_check ALL CLEAR 확인)
+- P2 evidence_missing 35건 / 죽은 hook 4종: 토론 안건1·2로 분리
+- P3 헤더 드리프트·README 누락·settings 중복: 자체 처리 완료 (5건)
+- P3 agents 진입 경로: 토론 안건3으로 분리
 
 ## 세션110 (2026-04-27) — D0 morning 실패 + 중복 7건 자동 정리 + 신규 운영 도구
 
