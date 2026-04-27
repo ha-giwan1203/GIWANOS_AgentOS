@@ -515,7 +515,7 @@ def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
         const fd = new FormData(form);
         fd.append('files', file);
         const out = await new Promise((resolve) => {
-            const to = setTimeout(() => resolve({ok:false, err:'timeout 20s'}), 20000);
+            const to = setTimeout(() => resolve({ok:false, err:'timeout 60s'}), 60000);
             jQuery.ajax({
                 type:'POST', url:'/prdtPlanMng/selectListPmD0AddnUpload.do',
                 data:fd, processData:false, contentType:false, cache:false,

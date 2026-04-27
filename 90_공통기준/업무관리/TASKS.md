@@ -10,7 +10,16 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 (89870CU100 4건 오조립 리스크 정리, xlsx + 영상 하이퍼링크) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21)
+최종 업데이트: 2026-04-27 KST — 세션115 d0-plan 첨부 파일 가드 추가 (사용자 첨부 xlsx 무시 사고 재발 방지) + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 (89870CU100 4건 오조립 리스크 정리, xlsx + 영상 하이퍼링크) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재
+
+## 세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향
+
+### [완료] d0-plan 스킬 사고 재발 방지 가드
+- 사고: 사용자가 중복 정리한 SSKR D+0 Upload xlsx를 첨부했으나 스킬이 무시하고 Z 드라이브 원본(중복 포함 30건) 자동 추출 → ERP 등록 + MES 1500건 전송. MES 잔존 특성상 정정 불가
+- 가드: `.claude/commands/d0-plan.md` "⛔ 첨부 파일 가드" 섹션 신설, `90_공통기준/스킬/d0-production-plan/SKILL.md` description + 핵심 주의사항 최상단에 가드 블록
+- 동작: 사용자 메시지에 xlsx/xlsm 첨부 감지 시 자동 실행 차단, (A) `--xlsx <경로>` (B) Z 드라이브 자동 탐색 명시 확인 강제
+- 잔존 처리: 중복 30건은 사용자 결정 "그대로 두기"
+- 추가: `run.py` selectList ajax timeout 20s → 60s (저녁 시간대 ERP 서버 응답 지연 대응)
 
 ## 세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설
 

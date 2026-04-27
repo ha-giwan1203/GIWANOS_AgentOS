@@ -4,8 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 분석(89870CU100 4건 오조립 리스크) / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21)
+최종 업데이트: 2026-04-27 KST — 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 분석 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향
+
+### 진행 상황
+- 사용자 "@SSKR D+0 추가생산 Upload.xlsx SP3M3 야간계획 넣어줘" — 사용자가 중복 정리한 첨부 파일 제공
+- 사고: 스킬이 첨부 무시 + Z 드라이브 원본(중복 포함 30건) 자동 추출 → ERP 등록(ext_no 318138~318167) + MES 1500건 전송 (selectList timeout 20s 1차 실패 후 60s 상향 통과)
+- 사용자 지적: "내가 중복된거 정리해서 준건대" + "ERP에서 삭제해도 스마트MES는 삭제 안되는거 증명됐는데"
+- 처리: 잔존 30건 "그대로 두기" 결정. 스킬 영구 수정 진행
+- 가드 추가:
+  - `.claude/commands/d0-plan.md` — "⛔ 첨부 파일 가드" 섹션 신설
+  - `90_공통기준/스킬/d0-production-plan/SKILL.md` — description + 핵심 주의사항 최상단에 가드 블록
+  - `run.py:518` — selectList ajax timeout 20s → 60s
+
+### 다음 AI 액션
+1. 가드는 다음 세션부터 슬래시/스킬 캐시 갱신으로 강제됨 — 이번 세션 종료 후 새 세션에서 첨부 동반 호출 시 자동 차단 동작 확인
+2. (선택) `--xlsx` 인자 사용 케이스 실증 1회 (사용자 첨부 파일 직접 업로드 경로)
 
 ---
 
