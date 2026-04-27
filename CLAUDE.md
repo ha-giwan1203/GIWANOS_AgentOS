@@ -10,6 +10,7 @@
 | 키워드 | 도메인 문서 |
 |--------|-----------|
 | 토론 / 토론모드 / 3자 토론 / 3-way / Claude×GPT×Gemini / 공동작업 / 공유 | `90_공통기준/토론모드/CLAUDE.md` → `/debate-mode` 스킬 |
+| NotebookLM / 노트북 / 노트북lm / 사이드패널 노트북 | `90_공통기준/notebooklm/CLAUDE.md` → `/notebooklm` 스킬 |
 | 정산 / 조립비 / settlement | `05_생산실적/조립비정산/CLAUDE.md` |
 | 라인배치 / OUTER / ERP 라인배정 | `10_라인배치/CLAUDE.md` |
 | MES 업로드 / 실적 올려 | `90_공통기준/스킬/production-result-upload/SKILL.md` |

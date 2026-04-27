@@ -10,7 +10,35 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-27 KST — 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화
+최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설(registry.yaml + /notebooklm + bridge.md, Gemini 메인 채널) / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현(evidence_mark_read OAuth 패턴 확장) / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위 + 신규 21) / 세션110 D0 morning OAuth 안정화
+
+## 세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설
+
+> 진입: 사용자 "제미나이를 주로 사용하니까 메인은 제미나이다" + "로컬 컨트롤해서 셋팅해바"
+> 배경: Google이 2026-04-08부터 Gemini 앱에 NotebookLM 통합. 사이드패널에서 노트북 직접 호출 + 양방향 동기화.
+
+### [완료] NotebookLM 컨트롤 레이어 신설
+- 위치: `90_공통기준/notebooklm/`
+- 단일 원본: `registry.yaml` (현재 노트북 2건 등록 — 라인배치/조립비정산, 확장 가능)
+- 도메인 진입: `90_공통기준/notebooklm/CLAUDE.md`
+- Gemini 통합 절차: `bridge.md` (사이드패널 셀렉터는 첫 사용 시 take_snapshot 실측 후 채움)
+- 슬래시: `.claude/commands/notebooklm.md` (list/health/query/ask/sync/register)
+- 헬스 스크립트: `health.sh` (정적 자산 5/5 PASS)
+- 루트 CLAUDE.md 도메인 진입 라우팅에 NotebookLM 키워드 추가
+
+### 후속 (사용자 액션 필요)
+- MCP 인증: `mcp__notebooklm-mcp__get_health` → `authenticated=false` → 사용자가 `setup_auth` 1회 실행 필요
+- Gemini 사이드패널 셀렉터 실측: 첫 `/notebooklm ask` 실행 시 take_snapshot으로 채움 → bridge.md 갱신
+- 새 노트북 추가 시: registry.yaml에 항목 추가 → `/notebooklm sync`로 차이 보고
+
+### 설계 원칙
+- Gemini = 메인 채널 (사이드패널 노트북 활성화 후 질의)
+- NotebookLM MCP = 백엔드 (인증·라이브러리·소스 근거 인용 fallback)
+- 도메인 한정 질의는 도메인 에이전트 경유 (line-batch-domain-expert / settlement-domain-expert) — 메인 컨텍스트 보호
+- 노트북 URL 하드코딩 금지 — 항상 registry에서 조회
+
+---
+
 
 ## 세션113 (2026-04-27) — [3way] self-audit 후속 토론 결과 + P2-B 최소 수정
 

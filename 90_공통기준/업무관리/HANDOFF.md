@@ -4,8 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-27 KST — 세션113 [3way] 토론 만장일치 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21)
+최종 업데이트: 2026-04-27 KST — 세션114 NotebookLM 컨트롤 레이어 신설 / 세션113 [3way] 토론 만장일치 + P2-B Option B 구현 / 세션112 weekly self-audit P3 5건 반영 + 토론 안건 3건 등재 / 세션111 SD9A01 공정 번호 체계 변경(10단위+신규 21)
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설
+
+### 진행 상황
+- 진입: 사용자 "제미나이를 주로 사용하니까 메인은 제미나이다" + "로컬 컨트롤해서 셋팅해바"
+- 배경 확인: 2026-04-08부터 Gemini 앱에 NotebookLM 통합 (양방향 동기화)
+- 신설: `90_공통기준/notebooklm/` (registry.yaml + CLAUDE.md + bridge.md + health.sh)
+- 슬래시 신설: `/notebooklm` (list/health/query/ask/sync/register)
+- 루트 CLAUDE.md 도메인 진입 라우팅에 NotebookLM 키워드 추가
+- health.sh: 정적 자산 5/5 PASS
+- MCP 인증: authenticated=false (사용자 액션 필요)
+
+### 다음 AI 액션
+1. **사용자가 NotebookLM MCP 인증** (`mcp__notebooklm-mcp__setup_auth` — 사용자 로그인 필요) 후
+2. `/notebooklm health` 재실행 → MCP authenticated=true 확인
+3. `/notebooklm ask line-batch <테스트 질문>` 첫 실행 시 Gemini 사이드패널 셀렉터 실측
+4. 셀렉터 `bridge.md`에 채워 넣기 (현재 "미확정" 4개)
+5. 새 노트북 필요 시: NotebookLM 웹에서 생성 → registry.yaml에 추가 → `/notebooklm sync`
+
+### 구조
+- 단일 원본: `registry.yaml` — 노트북 추가는 이 파일만 수정
+- 메인 채널: Gemini 사이드패널 (사용자 주력 채널)
+- 백엔드: NotebookLM MCP (인증·라이브러리·소스 근거)
+- 도메인 한정 질의: line-batch-domain-expert / settlement-domain-expert 경유 (메인 컨텍스트 보호)
 
 ---
 

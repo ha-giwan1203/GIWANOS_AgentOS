@@ -1,0 +1,63 @@
+# NotebookLM 노트북 레지스트리
+#
+# 단일 원본. 노트북 추가/삭제는 이 파일만 수정하면 된다.
+# `/notebooklm sync`가 이 파일과 MCP 라이브러리를 비교해 차이를 보고한다.
+#
+# 스키마 (필드별 의미):
+#   name              — NotebookLM 표시명 (MCP `list_notebooks`의 name과 일치 필수)
+#   url               — NotebookLM 노트북 URL (https://notebooklm.google.com/notebook/<UUID>)
+#   gemini_label      — Gemini 사이드패널에서의 노출 라벨 (보통 name과 동일)
+#   domain            — 업무 도메인 키 (line-batch, settlement, etc.) — 라우팅용
+#   agent             — 연결된 도메인 전문가 에이전트 (선택)
+#   topics            — 주제 키워드 (질문 라우팅 힌트)
+#   primary_use       — 주된 활용 시점
+#   sources           — 등록된 소스 종류 메모 (실제 소스는 NotebookLM 웹에서 관리)
+#   active            — true이면 활성, false이면 등록은 유지하되 자동 라우팅 제외
+
+version: 1
+default_route: gemini   # gemini | mcp — Gemini 사이드패널 우선, fallback MCP 직접 호출
+
+notebooks:
+  - name: 라인배치_대원테크
+    url: https://notebooklm.google.com/notebook/ff23f265-2211-4722-b5fa-d0cdfae73928
+    gemini_label: 라인배치_대원테크
+    domain: line-batch
+    agent: line-batch-domain-expert
+    topics:
+      - ERP 라인배치
+      - OUTER/MAIN/SUB 절차
+      - 라인 매핑 규칙
+      - 스킬 실행 계약
+      - 재개 규칙
+    primary_use: 라인배치 도메인 질의·검증
+    sources: documentation, examples
+    active: true
+
+  - name: 조립비정산_대원테크
+    url: https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c
+    gemini_label: 조립비정산_대원테크
+    domain: settlement
+    agent: settlement-domain-expert
+    topics:
+      - 조립비 정산
+      - Step1~7 파이프라인
+      - 야간 계산식
+      - Known Exception
+      - SP3M3 주간 정책
+    primary_use: 월말 정산 규칙·예외 판정
+    sources: documentation, examples
+    active: true
+
+# 확장 예시 (주석 — 실제 추가 시 주석 해제 + name/url 채우기):
+#
+# - name: 생산계획_샘플
+#   url: https://notebooklm.google.com/notebook/<UUID>
+#   gemini_label: 생산계획_샘플
+#   domain: production-plan
+#   agent: null
+#   topics:
+#     - SP3 생산계획
+#     - D0 추가지시
+#   primary_use: 생산계획 규칙 조회
+#   sources: documentation
+#   active: true
