@@ -9,6 +9,27 @@
 
 ---
 
+## 세션110 (2026-04-27) — D0 중복 7건 자동 정리 + 신규 운영 도구
+
+### 진행 상황
+- 사용자 트리거: "스케줄러 작동 안된 거 같은대" → morning batch 자동 재실행 중 사용자 중지
+- 사고: 사용자 수동 등록 + 자동 batch 재시도로 ERP D0에 18건 등록 (정상 11 + 중복 7)
+- 진단: ERP `totGridList.deleteRow` 함수 코드 dump → 숨겨진 DELETE API 발견 (UI 미노출)
+- 식별: SmartMES rank 순으로 중복 7건 정확히 분류 (rank 12~18, REG_NO 7개)
+- 사용자 명시 동의 후 7건 일괄 DELETE → 모두 성공 (statusCode=200 × 7)
+- ERP 그리드 11건만 잔존 검증 완료. SmartMES는 캐시 동기화 지연(1~5분)
+
+### 신규 자산
+- `.claude/tmp/erp_d0_dedupe.py`: SmartMES rank 기준 자동 중복 식별 + 안전 삭제 (dry-run 기본, --execute로 실행)
+- D0 SKILL.md "되돌리기 방법" + 변경이력 v3 갱신
+
+### 다음 AI 액션 (세션111)
+1. **[관찰·별 의제]** morning batch 자동 + 사용자 수동 동시 실행 시 중복 방지책 검토 (lock 파일 / SmartMES 사전 조회 / ERP 상태 확인)
+2. SmartMES 동기화 지연 — Client 새로고침 후 11건 반영 확인 권장
+3. ensure_erp_login OAuth 안정화 (오늘 morning 1차 실패 원인은 직전 세션107 분석 미해결)
+
+---
+
 ## 세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화
 
 ### 진행 상황

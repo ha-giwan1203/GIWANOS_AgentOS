@@ -12,6 +12,24 @@
 
 최종 업데이트: 2026-04-25 KST — 세션109 SD9A01 숙련도평가서 자동화 (Phase 1~5 완료, 35개 산출물) / 세션108 GPT 정밀평가 L-1·L-2 문서 드리프트 최소 보정 후 시스템 개선 모드 중단 / 세션107 GPT 시스템 정합성 검토 4건 반영
 
+## 세션110 (2026-04-27) — D0 morning 실패 + 중복 7건 자동 정리 + 신규 운영 도구
+
+> 진입: 사용자 "스케줄러 작동 안된 거 같은대" → morning 자동 batch 재시도 중 사용자 중지 → 수동 등록과 자동 재실행 중복으로 18건(정상 11 + 중복 7) 등록 → 사용자 "ERP에서 삭제 가능한지 직접 확인"
+
+**[완료] D0 등록 삭제 API 발견 + 중복 7건 정리** — A 분류, [3way 미해당, 단순 발견]
+- 발견: `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngNew.do` payload `{REG_NO: <번호>}` — UI 미노출, 사용자도 모름
+- 발견 경로: ERP D0 화면의 `totGridList.deleteRow.toString()` 코드 dump
+- SmartMES `sewmacLabelScanQty` 필드 = ERP `REG_NO` 매핑 식별 (필드명 misleading)
+- 자동 식별 기준: SmartMES rank 작은 쪽(위) 보존 / rank 큰 쪽(아래) 삭제
+- 7건 일괄 DELETE 성공 (statusCode=200 × 7), ERP 그리드 11건만 잔존 검증 완료
+- 신규 도구: `.claude/tmp/erp_d0_dedupe.py --line SP3M3 --date YYYYMMDD [--execute]` (dry-run 기본, --execute로 실 삭제)
+- SKILL.md "되돌리기 방법" + 변경이력 v3 갱신
+
+**[관찰·별 의제] morning batch 재실행 시 중복 발생 시나리오**
+- 시나리오: 자동 batch 1차 실패 → 사용자 수동 등록 → 자동 batch 재시도 → 중복 등록
+- 방지책 후보: (a) ensure_chrome_cdp 직전 ERP 상태 확인 후 이미 등록된 동일 PROD_NO/PLAN_DA 있으면 스킵, (b) batch 시작 시 lock 파일 생성 (중복 실행 방지), (c) Phase 2 후 SmartMES 사전 조회로 같은 날 등록 여부 검증
+- 사용자 결정 후 진행 — 본 세션은 정리만
+
 ## 세션109 (2026-04-25) — SD9A01 공정별·개인별 숙련도평가서 자동화
 
 > 진입: 사용자 "SD9A01 라인 안건 진행하자" + ERP 표준공정관리 화면(11공정) 캡처 제공 → 작업계획.md 10공정 정정 + Phase 2~4 11공정 기준 재설계. Plan mode → 사용자 승인 → auto-mode 실행.

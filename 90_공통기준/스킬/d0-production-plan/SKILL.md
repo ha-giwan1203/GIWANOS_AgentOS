@@ -185,8 +185,15 @@ python run.py --session evening --line SD9A01    # SD9A01만
 
 ## 되돌리기 방법
 
-- 서열 행 삭제 API: `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do` payload `{EXT_PLAN_REG_NO, STD_DA, PLAN_DA, PROD_NO, LINE_CD}`
-- `.claude/tmp/erp_d0_deleteA.py --all` 로 A 행 일괄 삭제 후 재업로드 가능
+- **서열 행 삭제 API** (야간 A 행): `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do` payload `{EXT_PLAN_REG_NO, STD_DA, PLAN_DA, PROD_NO, LINE_CD}`
+  - `.claude/tmp/erp_d0_deleteA.py --all` 로 A 행 일괄 삭제 후 재업로드 가능
+- **D0 등록 삭제 API** (상단 그리드 1건, 세션110 발견 — UI 미노출): `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngNew.do` payload `{REG_NO: <번호>}`
+  - 호출처: `totGridList.deleteRow(rowData)` (코드에는 있으나 UI 버튼 미노출)
+  - 식별: SmartMES `sewmacLabelScanQty` 필드 = ERP `REG_NO` 매핑 (필드명 misleading)
+  - **중복 등록 자동 정리 도구**: `.claude/tmp/erp_d0_dedupe.py --line SP3M3 --date YYYYMMDD [--execute]`
+    - SmartMES rank 작은 쪽(위) 보존 / rank 큰 쪽(아래) 삭제 자동 식별
+    - 기본 dry-run, `--execute`로 실 DELETE
+    - 세션110 실증: 7건 중복 1분 내 깨끗하게 정리 완료 (2026-04-27)
 
 ## 변경 이력
 
@@ -194,3 +201,4 @@ python run.py --session evening --line SD9A01    # SD9A01만
 |------|------|------|
 | 2026-04-23 | v1 | 초기 스킬 패키징. 오늘 SP3M3 야간 실검증 완료. OUTER/주간은 구조 완비하되 실운영 검증 후 활성화 권장 |
 | 2026-04-24 | v2 | SP3M3 주간/야간 실운영 검증 완료. 버그 수정: (a) make_upload_xlsx openpyxl→win32com(Excel COM) 교체 — openpyxl 생성 xlsx는 ERP 파서가 COL2 빈값 인식, (b) 팝업 재사용 로직 우선 배치(reload 분기보다 먼저), (c) run_session_line에 verify_prod_date 파라미터 추가 — SmartMES 검증 시 야간 생산일(target_file_date-1) 전달. Windows 작업 스케줄러 `D0_SP3M3_Morning` 자동 운영 개시 |
+| 2026-04-27 | v3 | 세션110: (1) 숨겨진 D0 등록 삭제 API 발견 (`deleteDoAddnPrdtPlanInstrMngNew.do`, payload `{REG_NO}`), (2) SmartMES `sewmacLabelScanQty` ↔ ERP `REG_NO` 매핑 식별, (3) 신규 도구 `.claude/tmp/erp_d0_dedupe.py` (SmartMES rank 기준 자동 중복 식별 + 안전 삭제 dry-run/execute 모드), (4) 7건 중복 1분 내 깨끗 정리 실증. **morning batch는 OAuth 자동완성 잔존 위험 — 수동 등록 후 batch 자동 재실행 시 중복 발생 시나리오 주의** |
