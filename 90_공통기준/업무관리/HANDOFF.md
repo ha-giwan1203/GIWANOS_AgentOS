@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 토론 + 빼는 안 3 옵션 2 적용 (hook_config fallback_*_lines 20→5, hook 코드 미수정) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 / 세션120 슬래시 명령어 2종 신설 / 세션119 [3way] mode_c_log v2 / 세션118 [3way] publish_worktree main stale 자동 감지
+최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 일괄 적용 (자동 로드 분량 -61%, 자가당착 1회 즉시 수정) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종 / 세션119 [3way] mode_c_log v2
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -31,16 +31,20 @@
 - 변경 후 SessionStart 출력에서 TASKS·HANDOFF "최종 업데이트:" 매우 긴 단일 라인이 5줄 컷에서 잘림 → 토큰 비용 큰 폭 감소
 - 사용자가 `/현재상태` 슬래시 명령어 호출 시 풀 30줄 정보 lazy load 가능
 
-### 다음 AI 액션
-- 다음 세션 시작 시 SessionStart 출력 체감 확인
-- 효과 충분하면 빼는 안 1·2·4는 별건으로 단계 적용 (사용자 명시 모드 C 요청 필요)
-- 라우팅 검증은 후순위 (옵션 2 적용 후 체감 저하 잔존 시에만 클린 세션 + TPS/TTFT 비교)
+### 추가 변경 (사용자 "전부승인" 후 일괄, 커밋 0a657d9a)
+- 빼는 안 1: 루트 CLAUDE.md 244→87줄 + .claude/rules/ 3파일 신설 (work_mode_protocol·hook_permissions·external_models)
+- 빼는 안 2: CLAUDE.md "응답 형식" 섹션 — 자동 출력 금지(라벨/PASS/R1~R5/모드헤더/채택보류버림)
+- 빼는 안 4: 비대칭 설계 + 빼는 안 2 명문화로 일반 작업 토론 메타 연산 자동 차단
+- 메모리 정리: MEMORY.md 47→27줄 (16개 흡수 매핑은 project_opus_perception_debate.md)
 
-### 보류
-- 빼는 안 1 (루트 CLAUDE.md 인덱스화) — block_dangerous protected_path_patterns 대상. 사용자 명시 승인 필요
-- 빼는 안 2 (기본 응답 형식 감축) — 운영 톤 변경 영향 큼. 단계적 적용
-- 빼는 안 4 (토론 hook On-Demand화) — 토론모드 코어 변경. 별건 R1~R5 plan-first
-- 메모리 28+ 항목 정리
+### 자가당착 수정 사례 (사용자 지적 "규칙+사고 정상 작동 안 하는 거니?" 직후)
+- 1차 정리 시 MEMORY.md "흡수 위치" 큰 섹션을 박아 47→76줄로 늘렸던 것 발견
+- 합의 메타원칙(빼는 방향만)을 형식적으로 따르고 실질은 분량 추가한 패턴 — GPT i=77 사례 그대로 재현
+- 즉시 별도 메모리로 이동, 27줄로 회복. 매 응답 자동 로드 분량 -61% 달성
+
+### 다음 AI 액션
+- 다음 세션 시작 시 SessionStart + CLAUDE.md + MEMORY 로드 분량 체감 확인
+- 라우팅 검증은 효과 잔존 시에만 (클린 세션 vs 현행 + TPS/TTFT)
 
 ---
 
