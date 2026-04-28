@@ -1,42 +1,29 @@
 {
   "terminal_state": "done",
   "committed_pushed": true,
-  "gpt_shared": true,
-  "gpt_judgment": "PASS (item 1·2 실증됨·동의, 추가제안 없음)",
+  "gpt_shared": false,
+  "gpt_judgment": null,
   "user_reported": true,
   "followup_checked": true,
-  "exception_reason": null,
-  "session": "session119",
+  "exception_reason": "GPT 공유 생략 — 사용자 개인 도구 추가 + 폴더 정리(그룹 A 안전 정리)는 시스템 변경 없음. 자동 모드 가이드 + 트리비얼 작업 판정으로 GPT 공유 단계 스킵.",
+  "session": "session120",
   "commits": [
-    "f500a47b",
-    "30f34a28",
-    "307170ba"
+    "93fd070a"
   ],
-  "topic": "[3way] 세션119 별건 통합 마무리 — mode_c_log v2 + generate_agents_guide cut 멀티바이트 안전화",
-  "verdict": {
-    "gpt_share_result": "PASS (양측 의제 모두 실증됨·동의, 추가제안 없음)",
-    "gemini_share_result": "PASS (양측 의제 모두 실증됨·동의, 추가제안 없음 — 최종 승인)",
-    "agenda1_mode_c_log_v2": {
-      "round1_pass_ratio_numeric": 0.75,
-      "round1_synthesis_only_pass_ratio": 1.0,
-      "claude_delta": "partial",
-      "critic_review": "WARN → v2 보강 3건 반영"
-    },
-    "agenda2_generate_agents_guide": {
-      "round1_pass_ratio_numeric": 1.0,
-      "round1_synthesis_only_pass_ratio": 1.0,
-      "claude_delta": "none",
-      "critic_review": "PASS"
-    },
-    "issue_class": "B",
-    "skip_65": false
-  },
-  "debate_log_dirs": [
-    "90_공통기준/토론모드/logs/debate_20260428_080046_3way/",
-    "90_공통기준/토론모드/logs/debate_20260428_110944_3way/"
-  ],
-  "plan_path": "C:/Users/User/.claude/plans/vast-questing-pebble.md",
-  "notion_sync": "success",
-  "next_session_priority_1": "(별건 잔존 없음) — 세션118 잔존 별건 + 세션119 발견 잔존 모두 종결",
-  "timestamp": "2026-04-28 KST"
+  "topic": "전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건 -54%)",
+  "completed_at": "2026-04-28T16:18:22",
+  "notion_sync": "attempted (manual-sync, soft-fail OK)",
+  "summary": {
+    "전역_슬래시_명령어": [
+      "현재상태.md",
+      "명령어목록.md"
+    ],
+    "엑셀_레퍼런스": "슬래시명령어_레퍼런스.xlsx (4시트, gitignore *.xlsx)",
+    "폴더_정리": "95→44건 -54%, 49건 98_아카이브 이동, __pycache__ 삭제, 운영가이드 9건 절대경로 참조 원복",
+    "미처리": [
+      "운영 스크립트 16건 이동 (모드 C)",
+      "스크립트 로그 출력 경로 변경 (재발 방지)",
+      "하위 폴더 5종 점검"
+    ]
+  }
 }

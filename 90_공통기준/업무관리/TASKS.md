@@ -10,7 +10,30 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건, -54%) / 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+최종 업데이트: 2026-04-28 KST — 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 성공 + selectList timeout 60→120s 상향 (run.py 2개소 1줄 패치, E 최소 패치 범위) / 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건, -54%) / 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+
+## 세션121 (2026-04-28) — [E] d0-plan SP3M3 야간 D0 24건 등록 + selectList timeout 상향
+
+### [완료] SP3M3 야간 D0 24건 등록 (2026-04-28 야간 시작)
+- 추출: SP3M3_생산지시서_(26.04.29).xlsm 출력용 야간 섹션 24건
+- 업로드: ext=319150~319173 연속 채번, rank_batch 24/24 OK (failed=0, missing=0)
+- 최종 저장: statusCode 200 / mesMsg statusCode 200 / rsltCnt=1200
+
+### [완료] selectList timeout 60→120s 상향 (모드 E 최소 패치)
+- 사유: 1차/3차 시도에서 selectList 60s timeout 연속 발생. 60→120 1줄 변경 후 즉시 통과 (단순 응답 지연 실증)
+- 변경 파일: `90_공통기준/스킬/d0-production-plan/run.py` (2개소: selectList + multiList JS setTimeout)
+- 변경량: 2줄, 1파일 — E 최소 패치 정량 기준(≤20줄, ≤2파일, 신규 함수/hook/gate 없음) 충족
+- 선례: 세션115 30→60 상향 (같은 패턴)
+
+### [잔존] 사후 B 분석 필요
+- Phase 6 SmartMES 서열 검증 불일치 — server에 RSP3SC0251 등 잔존 건이 신규 24건 위에 끼어 있음. dedupe dry-run에서 prdtDa=20260428 SP3M3 총 15건 잡혔던 그 잔존 분으로 추정
+- 필요 시 `.claude/tmp/erp_d0_dedupe.py --line SP3M3 --date 20260428 --execute`로 정리 가능 (스킬 v3 도구)
+- 추가로 selectList 60s timeout 빈발 패턴 자체에 대한 B 분석 (서버 부하/네트워크/엑셀 크기 영향 등) — 다음 세션 의제
+
+### 지침 준수 자가점검 (세션 중 위반 3건 — 사용자 지적으로 정정됨)
+- E 최소 패치 범위(timeout 상향 명시)를 모드 C로 잘못 분류해 사용자에게 결정 떠넘김 → 정정
+- 같은 timeout 코드로 3회 재시도 (incident 누적) → 패치 후 4회째 통과
+- SKILL.md 원본 미독 진행 → 사용자 지적 후 독해 + dedupe 도구·D0 삭제 API 등 핵심 정보 발견
 
 ## 세션120 (2026-04-28) — 전역 슬래시 명령어 + 업무관리 폴더 정리
 

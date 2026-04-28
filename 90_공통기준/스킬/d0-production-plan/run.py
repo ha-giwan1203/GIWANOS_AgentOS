@@ -515,7 +515,7 @@ def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
         const fd = new FormData(form);
         fd.append('files', file);
         const out = await new Promise((resolve) => {
-            const to = setTimeout(() => resolve({ok:false, err:'timeout 60s'}), 60000);
+            const to = setTimeout(() => resolve({ok:false, err:'timeout 120s'}), 120000);
             jQuery.ajax({
                 type:'POST', url:'/prdtPlanMng/selectListPmD0AddnUpload.do',
                 data:fd, processData:false, contentType:false, cache:false,
@@ -729,7 +729,7 @@ def final_save(page, save_url):
         const dataList = sGridList.$local_grid.getData();
         const param = JSON.stringify({dataList, PARENT_PROD_ID: totSelectRowData.PROD_ID, sendMesFlag:'Y'});
         return await new Promise((resolve) => {
-            const to = setTimeout(() => resolve({ok:false, err:'timeout 60s'}), 60000);
+            const to = setTimeout(() => resolve({ok:false, err:'timeout 120s'}), 120000);
             jQuery.ajax({
                 url: args.saveUrl, type:'post', data: param,
                 success: r => { clearTimeout(to); resolve({ok:true, r}); },

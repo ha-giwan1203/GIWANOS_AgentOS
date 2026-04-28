@@ -1,20 +1,22 @@
 {
-  "generated_at": "2026-04-28 07:13 KST",
-  "last_updated": "세션118 갱신 2026-04-27",
-  "github_sha": "ad2060c10f76ae0b199ea06c3244470af6ce68cf",
-  "github_sha_short": "ad2060c1",
+  "generated_at": "2026-04-28 16:16 KST",
+  "last_updated": "세션120 갱신 2026-04-28",
+  "github_sha": "93fd070ab7194c592179107fbc9b6d13a25417d4",
+  "github_sha_short": "93fd070a",
   "hooks_raw": 49,
   "hooks_active": 34,
   "commands": 32,
   "smoke": "unknown",
   "recent_sessions": [
+    "세션120 (2026-04-28) — 전역 슬래시 명령어 + 업무관리 폴더 정리",
+    "세션119 (2026-04-28) — [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 회전 (세션118 잔존 별건 마무리)",
     "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
     "세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)",
-    "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건",
-    "세션115 (2026-04-27) — d0-plan 첨부 파일 가드 + ERP timeout 상향",
-    "세션114 (2026-04-27) — NotebookLM 컨트롤 레이어 신설"
+    "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건"
   ],
   "all_sessions": [
+    "세션120 (2026-04-28) — 전역 슬래시 명령어 + 업무관리 폴더 정리",
+    "세션119 (2026-04-28) — [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 회전 (세션118 잔존 별건 마무리)",
     "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
     "세션117 (2026-04-27) — [3way] 토론모드 자동 승격 → 비대칭 정합화 (세션116 별건 1번)",
     "세션116 (2026-04-27) — 작업 모드 판정 도입 + 별건 의제 4건",
@@ -38,6 +40,56 @@
     "세션98 (2026-04-23) — 시스템 전체 드리프트 2자 토론 + 실행"
   ],
   "sessions_detail": [
+    {
+      "header": "세션120 (2026-04-28) — 전역 슬래시 명령어 + 업무관리 폴더 정리",
+      "body": [
+        "- 위치: `C:/Users/User/.claude/commands/` (전역, 모든 세션·워크트리에서 사용)",
+        "- `/현재상태` — TASKS/HANDOFF/git log 기반 현재 상태 5줄 보고",
+        "- `/명령어목록` — 전역+프로젝트 슬래시 명령어 전체 표시",
+        "- 활성화: 다음 세션 시작 시 자동완성 노출 (캐싱 정책)",
+        "- `90_공통기준/업무관리/슬래시명령어_레퍼런스.xlsx` (4시트, 11.9KB)",
+        "- 사용자정의(34) / CLI내장(18) / 플러그인스킬(9) / 사용가이드",
+        "- *.xlsx gitignore 적용",
+        "- Before: 95건 / 1.9MB → After: 44건 / 380KB (-54%)",
+        "- 98_아카이브/정리대기_20260428/_업무관리/로 이동 49건 (_분석 6 + _백업 1 + _로그 42)",
+        "- __pycache__ 삭제 (Python 자동 재생성)",
+        "- 원복 9건 (절대경로 참조 발견): 운영가이드 v1.0 7종 + gpt-instructions/fallback + skill_guide",
+        "- Git 영향: 7건 삭제만 추적 (98_아카이브는 gitignore)",
+        "- 운영 스크립트 16건 — 작업 스케줄러 절대경로 호출 가능성",
+        "- 스크립트 로그 출력 경로 변경 (재발 방지)",
+        "- 하위 폴더 5종 (_플랜, 운영검증, gpt-skills, baseline_20260422, _로그) 내용 점검"
+      ]
+    },
+    {
+      "header": "세션119 (2026-04-28) — [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 회전 (세션118 잔존 별건 마무리)",
+      "body": [
+        "- 진입: 사용자 \"남은안건 전부 토론 모드 진행해서 마무리\" → 모드 D (`/debate-mode`) 사용자 명시 호출",
+        "- 의제 1: `mode_c_log.jsonl` 회전 정책 (HANDOFF \"본 세션118 모든 별건 종결. mode_c_log.jsonl 정리 정책만 향후 별건 잔존\")",
+        "- 의제 2: `mode_c_log.sh:35` commit_subject 멀티바이트 cut 깨짐 (본 세션 점검 중 발견 — kind-williamson worktree 실측 line 1 끝 \"프�\", line 2 끝 \"분기 �\")",
+        "- 모드 판정: D → 합의 후 C (`.claude/hooks/mode_c_log.sh` 수정)",
+        "- plan: `C:/Users/User/.claude/plans/vast-questing-pebble.md` (R1~R5 반증형, 사용자 ExitPlanMode 승인)",
+        "- 합의 원본: `90_공통기준/토론모드/logs/debate_20260428_080046_3way/` Round 1 v2 (pass_ratio 0.75, synthesis_only 1.0, critic WARN 보강 3건 반영)",
+        "- `.claude/hooks/mode_c_log.sh` —",
+        "  - line 35 `cut -c1-120` → `\"${PY_CMD:-python}\" -c \"import sys; data=sys.stdin.buffer.read().decode('utf-8',errors='replace'); sys.stdout.buffer.write(data.strip()[:120].encode('utf-8'))\"` (Python codepoint 슬라이스 + `.str",
+        "  - 마지막에 회전 블록 ~14라인 신규: 256KB 임계 + oldest 50% → `mode_c_log.archive.jsonl` 분리 + 임시 파일 mv 원자적 교체 + hook_log 알림",
+        "- `.claude/hooks/README.md` — failure contract 표 mode_c_log 비고 v2 1줄 추가",
+        "- GPT (gpt-5-thinking): Step 6-4 동의 / Step 6-5 동의 — \"mode_c_log.sh 1파일 한정, archive 보존형 회전, Python 문자 단위 절단, ${PY_CMD:-python} fallback Fast Lane 정합\"",
+        "- Gemini (2.5 Pro): Round 1 본론 통과 + Step 6-2 GPT에 이의(df3faae2 정정) + Step 6-5 동의 — \"원자적 덮어쓰기, .strip(), PY_CMD fallback 3가지 보강안 정확히 흡수\"",
+        "- Claude 종합: claude_delta=partial (Gemini 보강 3건 흡수), issue_class=B, skip_65=false",
+        "- critic-reviewer: WARN — 보강 3건 반영 v2 (GPT 묵시 동의 라벨 하향, 비표준 라벨 정형화, excluded_items 추가)",
+        "- bash -n 문법 PASS",
+        "- 멀티바이트 cut: 한글 180자 입력 → 120 codepoint 정확 절단, U+FFFD 부재, 마지막 hex 완전 UTF-8",
+        "- 회전 동작: 333KB/1500줄 입력 → log 166KB/750줄 + archive 166KB/750줄, 데이터 보존 1500=750+750, .tmp 잔존 없음 (원자성)",
+        "- 양측 PASS 만장일치: GPT 5/5 실증됨·동의 (추가제안 없음) / Gemini 5/5 실증됨·동의 (추가제안 없음, \"최종 승인\")",
+        "- Notion 수동 동기화: 성공",
+        "- final_check --full --fix: ALL CLEAR (smoke_fast 11/11)",
+        "- finish_state.json: terminal_state=done",
+        "- 진입: 사용자 \"잔존 안건도 토론해서 마무리 지어라\" → 모드 D 명시 호출",
+        "- 토론 로그: `90_공통기준/토론모드/logs/debate_20260428_110944_3way/` Round 1 (pass_ratio_numeric 1.0, claude_delta=none, issue_class=B)",
+        "- 실측 결과: `cut -c` 4건 중 1건만 멀티바이트 위험 (3건은 hex digest ASCII 한정)",
+        "- 수정: `90_공통기준/업무관리/generate_agents_guide.sh:101` 1라인 (mode_c_log.sh v2 동일 Python codepoint slice 패턴)"
+      ]
+    },
     {
       "header": "세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)",
       "body": [
@@ -475,49 +527,6 @@
         "- AUTO: TASKS/HANDOFF/STATUS/notion_snapshot/finish_state/write_marker → 자동 커밋+푸시",
         "- MANUAL: 코드/스킬/설정 → stderr 리마인더만 (`/finish` 또는 수동 커밋 권장)",
         "- 안전장치: main 브랜치만, 민감패턴 스캔, push 60s timeout soft-fail"
-      ]
-    },
-    {
-      "header": "세션100 (2026-04-23) — GPT 프로토콜 스킬 신설 (클로드코드 정밀평가)",
-      "body": [
-        "**[완료] `90_공통기준/업무관리/gpt-skills/` 신설 + 프로토콜 1건 등록**",
-        "- 배경: 사용자가 GPT에게 매번 장문으로 \"클로드코드 전체 상태 정밀평가\"를 입력 → 평가 깊이 불일치, 개선안이 전체 구조를 안 봐서 수정하면 다른 곳이 터지는 반복 문제",
-        "- 신규 파일 3건:",
-        "- 설계 원칙: 大→中→小 계층 순서 고정 + 각 개선안에 R1~R5 영향반경 의무 첨부 (누락 시 자동 강등)",
-        "- Claude Code 쪽 hook/skill/settings/CLAUDE.md 변경 **없음** (B분류 구조 변경 아님, 2자 종결 경로)",
-        "- 플랜: `.claude/plans/gpt-steady-wreath.md` (사용자 승인 후 구현)",
-        "- 검증: 커밋 푸시 후 ChatGPT에서 \"클로드코드 정밀평가\" 실입력 테스트 예정",
-        "- GPT 프로젝트 업로드: 사용자 지시로 ChatGPT 프로젝트에 직접 업로드 (세션 내 후속 작업)"
-      ]
-    },
-    {
-      "header": "세션99 (2026-04-23) — AGENTS_GUIDE hooks 파서 버그 수정 (2자 토론 통과 — GPT 최종 PASS)",
-      "body": [
-        "**[완료] GPT 최종 판정 PASS** (커밋 fa4face2 실물 대조)",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round2_gpt_final.md`",
-        "- 보강 3건 실물 반영 확인 + 상태 원본 충돌 없음 + 회귀 PASS",
-        "- 별건(README M5, SETTINGS dead assignment) PASS 막지 않음 확인. 세션99 종결",
-        "**[완료] final_check 4.5 섹션 신설 — HANDOFF 헤더-본문 판정 레이블 정합 advisory**",
-        "- 사용자 지시 예외(D안) 즉시 적용. B 분류 구조 변경이나 \"지금바로 적용해라\" 명시 지시로 A 강등",
-        "- 증상: Round 1 \"조건부 통과\" 헤더가 Round 2 PASS 후에도 지연 반영되던 실제 사건(세션99 본건) 재발 방지",
-        "- 구현: `final_check.sh` 4.5 섹션 신설 — L7 `최종 업데이트` 헤더에 \"조건부/Round 1/보류\" + 섹션0 본문 \"최종 판정\" 이후 5줄 내 \"**통과**/PASS/통과 (PASS)\" 둘 다 매칭 시 `warn`",
-        "- 검증: 포지티브(정합) OK / 네거티브(헤더만 조건부로 재현) WARN 정상 감지 / smoke_fast 11/11 PASS",
-        "- 훅 등급: advisory (차단 없음, stderr 경고만)",
-        "**[완료] generate_agents_guide.sh hooks 파서 M3/M4 패턴 전환**",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260423_212854/round1_gpt.md`",
-        "- A 분류 자가판정 (버그 수정, 실행 흐름·판정 분기 불변). GPT 동의 — 3자 승격 불필요",
-        "- **변경 파일 1건**: `90_공통기준/업무관리/generate_agents_guide.sh` L7-38",
-        "  - `grep -oE \"...\\\\.sh\\\"\" ... | wc -l` 셸 손파싱 → `parse_helpers.py --op hooks_from_settings` (team+local union)",
-        "  - Windows \\r 이슈 대비 `tr -d '\\r '`. M3/M4 선례 재사용",
-        "- **GPT 조건부 통과 보강 3건 전부 반영**:",
-        "  - PY_CMD fallback (`doctor_lite.sh:10-11` 선례) — Windows/경량 환경 Python 부재 대응",
-        "  - 헤더 문구 `\"settings.local.json 기준\"` → `\"settings.json+settings.local.json 기준\"` (union 정합)",
-        "  - settings 둘 다 부재 시 `[WARN] settings files missing` stderr 1줄 (원인 은닉 방지)",
-        "- **증상 해소**:",
-        "  - `AGENTS_GUIDE.md` \"0개 활성\" → \"31개 활성\"",
-        "  - `final_check --fast` 3.5 섹션 WARN → `[OK] AGENTS_GUIDE hooks 개수 일치 (31개)`",
-        "- **회귀**: smoke_fast 11/11 ALL PASS",
-        "- **명시적 비변경**: README 계층별 훅 테이블 파싱(L47-62 별건 M5 후보), SETTINGS dead assignment 정리(별건)"
       ]
     }
   ]
