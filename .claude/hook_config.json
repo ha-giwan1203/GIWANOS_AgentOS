@@ -13,9 +13,10 @@
     "danger_commands": ["rm ", "rm -f ", "rm -rf ", "del ", "Remove-Item ", "mv ", "cp ", "sed -i ", "tee ", "cat >", "cat >>"]
   },
   "session_startup": {
+    "_comment": "fallback_*_lines 20→5: SessionStart 출력 컨텍스트 폭증 감축 (debate_20260428_201108_3way 빼는 안 3 옵션 2 적용). 상세는 /현재상태 슬래시 명령어로 lazy load.",
     "kernel_stale_threshold_hours": 24,
-    "fallback_tasks_lines": 20,
-    "fallback_handoff_lines": 20
+    "fallback_tasks_lines": 5,
+    "fallback_handoff_lines": 5
   },
   "drift_check": {
     "state_files": ["TASKS.md", "HANDOFF.md", "STATUS.md"],

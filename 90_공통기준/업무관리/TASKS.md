@@ -10,7 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 성공 + selectList timeout 60→120s 상향 (run.py 2개소 1줄 패치, E 최소 패치 범위) / 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건, -54%) / 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 4.7→Sonnet 체감 진단 토론 + 빼는 안 3(SessionStart 컨텍스트 폭증 감축) 옵션 2 적용 (hook_config.json fallback_*_lines 20→5, hook 코드 미수정, Round 1 pass_ratio 0.75) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 성공 + selectList timeout 60→120s 상향 / 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 업무관리 폴더 정리(95→44건) / 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut
+
+## 세션122 (2026-04-28) — [3way] Opus 4.7→Sonnet 체감 진단 + 빼는 안 3 옵션 2 적용
+
+### [완료] 3자 토론 Round 1 합의 (pass_ratio 0.75)
+- 의제: "Opus 4.7을 사용 중인데 Sonnet 같은 추론 느낌이 드는 체감의 원인"
+- 합의: 모델 다운그레이드가 아니라 본 저장소 운영이 Opus 추론 자유도를 95% 침식 (라우팅 5%는 분리 트랙)
+- 채택 가설 9개: 컨텍스트 폭증 / 형식 강제 / 메모리 누적 / 자기 메타화 / 톤 부작용 / 라우팅(분리) / 목표 함수 오염(GPT 신설) / Attention Sink(Gemini 신설) / Safety Negative Transfer(Gemini 신설)
+- 비율 합의: A 35% + B 30% + 7번 25% + 9번 5% + 6번 5%
+- 빼는 안 4종 채택 (감산 원칙): 루트 CLAUDE.md 인덱스화 / 기본 응답 형식 감축 / 세션 초기 강제 로드 제거 / 토론 hook On-Demand화
+- 외부 자료: Lost in the Middle (Liu TACL 2024) · Context Rot (Chroma 2025) · Goal Drift (arxiv 2505.02709) · Many-shot jailbreaking (Anthropic 2024) · Inherited Goal Drift (arxiv 2603.03258 — R1~R5 hierarchy로 drift 못 막음 실증) 등
+- 로그: `90_공통기준/토론모드/logs/debate_20260428_201108_3way/`
+- 형식 함정 회피 메타원칙: 합의안 자체도 새 hook·새 라벨·새 슬롯 추가 금지. 빼는 방향에만 한정
+
+### [완료] 빼는 안 3 옵션 2 적용 — SessionStart 컨텍스트 감축
+- 사유: SessionStart hook 직접 수정은 Self-Modification 권한 차단 → 옵션 2 (설정값/데이터 정리)로 전환
+- 변경: `.claude/hook_config.json` `session_startup.fallback_tasks_lines` 20→5, `fallback_handoff_lines` 20→5
+- 효과: TASKS·HANDOFF "최종 업데이트:" 한 줄(매우 긴 단일 라인 ~1000+ 토큰)이 5줄 컷에서 잘려 SessionStart 컨텍스트 비용 큰 폭 감소
+- 하위 호환: 사용자가 `/현재상태` 슬래시 명령어로 풀 정보 lazy load 가능 (이미 신설됨)
+- 회귀 위험: 없음. 변경 1파일·4줄(설정값+주석). hook 코드 미수정. side effect 모두 유지. 롤백 = `git revert <SHA>` 1줄
+
+### [잔존] 빼는 안 1·2·4 적용 보류
+- 빼는 안 1 (루트 CLAUDE.md 30~50줄 인덱스화 + 세부 분리): 사용자 명시 승인 필요. CLAUDE.md는 block_dangerous protected_path_patterns
+- 빼는 안 2 (기본 응답 형식 감축): 운영 톤 변경 영향 큼. 단계적 적용 권장
+- 빼는 안 4 (토론 hook On-Demand화): 토론모드 코어 변경. 별건 R1~R5 plan-first 필요
+- 메모리 정리: feedback 28+ 항목 분리 — 별건
+- 라우팅 검증: 옵션 2 적용 후 1~2 세션 체감 확인 후 필요 시 클린 세션 + TPS/TTFT 비교
 
 ## 세션121 (2026-04-28) — [E] d0-plan SP3M3 야간 D0 24건 등록 + selectList timeout 상향
 

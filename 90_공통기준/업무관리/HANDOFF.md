@@ -4,8 +4,43 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-28 KST — 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 성공 + selectList timeout 60→120s 상향 (run.py 1줄 패치, 모드 E 최소 패치 범위) / 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건) / 세션119 [3way] generate_agents_guide.sh cut 멀티바이트 안전화 (잔존 별건 마무리, Round 1 PASS 1.0) / 세션119 [3way] mode_c_log.sh v2 (멀티바이트 cut + 256KB archive 회전) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 / 세션116 [3way] 작업 모드 5종 판정 도입
+최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 토론 + 빼는 안 3 옵션 2 적용 (hook_config fallback_*_lines 20→5, hook 코드 미수정) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 / 세션120 슬래시 명령어 2종 신설 / 세션119 [3way] mode_c_log v2 / 세션118 [3way] publish_worktree main stale 자동 감지
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션122 (2026-04-28) — [3way] Opus 4.7→Sonnet 체감 진단 + 빼는 안 3 옵션 2 적용
+
+### 진행 상황
+- 진입: 사용자 "Opus를 사용 중인데 Sonnet을 사용하는 느낌"이라고 체감 진단
+- 모드: B (시스템 분석) → D (3자 토론, 사용자 명시) → C (시스템 수정 일부, 빼는 안 3 옵션 2)
+- 토론: GPT 본론 + Gemini 본론 + 양측 외부 자료 검색 + 교차 검증 + Claude 종합
+
+### 합의 결론
+- 진단: 본 저장소 운영이 Opus 추론 자유도를 95% 침식 (라우팅 5%는 분리 트랙)
+- 채택 가설 9개 (1·2·3·7·8·9 핵심 + 4·5 보조 + 6 분리)
+- 비율: A 컨텍스트 폭증 35% / B 형식 강제 30% / 7 목표 함수 오염 25% / 9 Safety Negative Transfer 5% / 6 라우팅 5%
+- 빼는 안 4종 채택 (감산 원칙)
+- 형식 함정 회피 메타원칙: 새 hook·새 라벨 추가 금지
+
+### 변경
+- `.claude/hook_config.json`: `session_startup.fallback_tasks_lines` 20→5, `fallback_handoff_lines` 20→5 (4줄 변경, 1파일)
+- 사유: 빼는 안 3 본래 적용은 SessionStart hook 코드 수정인데 Self-Modification 권한 차단 → 옵션 2(설정값/데이터 정리)로 전환
+
+### 효과 검증
+- 변경 후 SessionStart 출력에서 TASKS·HANDOFF "최종 업데이트:" 매우 긴 단일 라인이 5줄 컷에서 잘림 → 토큰 비용 큰 폭 감소
+- 사용자가 `/현재상태` 슬래시 명령어 호출 시 풀 30줄 정보 lazy load 가능
+
+### 다음 AI 액션
+- 다음 세션 시작 시 SessionStart 출력 체감 확인
+- 효과 충분하면 빼는 안 1·2·4는 별건으로 단계 적용 (사용자 명시 모드 C 요청 필요)
+- 라우팅 검증은 후순위 (옵션 2 적용 후 체감 저하 잔존 시에만 클린 세션 + TPS/TTFT 비교)
+
+### 보류
+- 빼는 안 1 (루트 CLAUDE.md 인덱스화) — block_dangerous protected_path_patterns 대상. 사용자 명시 승인 필요
+- 빼는 안 2 (기본 응답 형식 감축) — 운영 톤 변경 영향 큼. 단계적 적용
+- 빼는 안 4 (토론 hook On-Demand화) — 토론모드 코어 변경. 별건 R1~R5 plan-first
+- 메모리 28+ 항목 정리
 
 ---
 
