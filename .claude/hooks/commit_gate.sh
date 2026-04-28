@@ -83,9 +83,10 @@ hook_log "PreToolUse/Bash" "commit_gate: git commit/push 감지" 2>/dev/null
 # 제거 전 로직은 90_공통기준/토론모드/logs/debate_20260422_stage3_2way/SUMMARY.md 커밋 A 섹션 참조.
 
 # Circuit breaker: 동일 hook에서 연속 3건 이상 unresolved → 경고
+# 세션124: 사용자 가시 echo 제거 — Claude Code PreToolUse hook이 stdout/stderr 출력을 block 응답으로 오인하는 문제 해결.
+# hook_log 기록은 유지 (필요 시 .claude/hooks/hook_log.jsonl 또는 /현재상태 슬래시 명령어로 확인 가능).
 if circuit_breaker_tripped "commit_gate" 3 2>/dev/null; then
   hook_log "PreToolUse/Bash" "commit_gate: ⚠ circuit breaker — 연속 3회 이상 unresolved incident. 이전 실패 원인 해결 후 커밋 권장"
-  echo "⚠ [CIRCUIT BREAKER] commit_gate 연속 3회+ unresolved incident 감지. 이전 실패 원인(.claude/incident_ledger.jsonl)을 먼저 확인하세요."
 fi
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
