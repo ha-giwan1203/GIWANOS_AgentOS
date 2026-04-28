@@ -141,6 +141,13 @@ fi
 
 hook_log "session_start_restore" "kernel 출력 완료 source=$SOURCE age=${AGE}s"
 
+# folder_map: 신규 파일 화이트리스트 (write_router_gate.sh 정책 — plan polymorphic-prancing-allen)
+# 모델이 세션 시작 시 폴더 정책을 컨텍스트로 갖게 해 위반 자체를 줄인다 (재발 방지의 절반).
+echo "[folder_map] 신규 파일 화이트리스트:"
+echo "  실무: 01_인사근태 / 02_급여단가 / 03_품번관리 / 04_생산계획 / 05_생산실적 / 06_생산관리 / 07_라인정지비용 / 08_공정개선이슈 / 09_외주발주납품 / 10_라인배치"
+echo "  공통: 90_공통기준 / 98_아카이브 / 99_임시수집(default) / .claude"
+echo "  임시·검토 파일은 99_임시수집/ 강제. 워크트리 루트에 새 파일 금지(CLAUDE.md/README.md/.gitignore 외)."
+
 # Fast smoke subset — 로컬·결정적 검증만 (차단 아님, 경고만)
 FAST_SMOKE="$(dirname "$0")/smoke_fast.sh"
 if [ -x "$FAST_SMOKE" ]; then

@@ -10,7 +10,24 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 토론 + 빼는 안 4종 일괄 적용 (Round 1 pass_ratio 0.75, 자동 로드 분량 -61%) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 / 세션120 슬래시 명령어 2종 신설 / 세션119 [3way] mode_c_log v2
+최종 업데이트: 2026-04-28 KST — 세션123 [C] 폴더 화이트리스트 라우팅 gate 도입 (write_router_gate.sh 신규, advisory→gate 단계 운영) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종
+
+## 세션123 (2026-04-28) — [C] 폴더 화이트리스트 라우팅 gate 도입
+
+### [완료] 신규 파일 위치 sprawl 차단 시스템
+- 의제: 사용자 두 달간 Claude Code가 세션마다 파일을 임의 위치에 생성하는 sprawl 문제
+- 모드: C (시스템 수정) — plan-first + R1~R5 (plan: `.claude/plans/polymorphic-prancing-allen.md`)
+- 외부 의견: Gemini CLI minion + WebSearch 2건 (FareedKhan-dev/agentic-guardrails, roboticforce/agent-guardrails)
+- Gemini WARN 반영: 도메인 폴더 안 임시 패턴은 advisory(권고만)로 다운그레이드 — 정상 작업 흐름 차단 위험 회피
+- 변경 파일:
+  - `.claude/hooks/write_router_gate.sh` (신규, 약 110줄, 4-Layer 검증)
+  - `.claude/hook_config.json` write_router 섹션 추가 (mode 토글 + 화이트리스트)
+  - `.claude/settings.json` PreToolUse Write|Edit|MultiEdit에 등록
+  - `.claude/hooks/session_start_restore.sh` folder_map 4줄 출력 추가 (세션 시작 시 폴더 정책 컨텍스트)
+  - `90_공통기준/protected_assets.yaml` write_router_gate.sh 등록 (class: guard, replace-only)
+- 검증: smoke_fast 11/11 PASS, advisory 7건 + gate 4건 수동 테스트 모두 의도대로 동작
+- 운영: Day 1~7 advisory(경고만) → Day 8+ gate(deny+exit 2). hook_config.json `write_router.mode` 토글 1줄. GPT 검증 라운드는 Day 8+ 전환 시.
+- 후속: `.claude/hooks/README.md` 차단층 ⑱로 등록 완료, hook 카운트 35개 일치
 
 ## 세션122 (2026-04-28) — [3way] Opus 4.7→Sonnet 체감 진단 + 빼는 안 3 옵션 2 적용
 

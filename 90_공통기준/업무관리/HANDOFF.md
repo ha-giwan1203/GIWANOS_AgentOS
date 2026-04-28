@@ -4,8 +4,47 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 일괄 적용 (자동 로드 분량 -61%, 자가당착 1회 즉시 수정) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종 / 세션119 [3way] mode_c_log v2
+최종 업데이트: 2026-04-28 KST — 세션123 [C] 폴더 화이트리스트 라우팅 gate 도입 (sprawl 차단, advisory 1주→gate 전환) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션123 (2026-04-28) — [C] 폴더 화이트리스트 라우팅 gate 도입
+
+### 진입
+- 사용자 진단: 두 달간 Claude Code가 세션마다 파일을 임의 위치에 생성하는 sprawl 패턴
+- 본 응답에서 자기검증 0비트 함정(인지과학·정보이론·진화론 3관점 동형성) → 외부 비트(gate hook) 주입만이 돌파구라는 결론
+
+### 모드 흐름
+- 분석 B → 사용자 "업무리스트 폴더 전체대상으로 적용해바" → plan mode 진입 → C 시스템 수정
+- 사용자 "GPT랑 제미나이도 외부자료 검색해서 의견 받아 플랜보강" → Gemini CLI + WebSearch 통합 (GPT는 chrome-devtools-mcp 부담으로 Day 8+ 전환 시 후속 라운드 진행)
+
+### 합의·외부 의견
+- Anthropic 공식: PreToolUse + Write|Edit|MultiEdit + permissionDecision deny + exit 2 표준
+- FareedKhan-dev/agentic-guardrails: MCP server가 file edit 사전 검증 — 본 plan PreToolUse hook이 같은 역할
+- roboticforce/agent-guardrails: hard policy enforcement before shell execution — 본 plan은 Write 사전 차단으로 동일 줄기
+- Gemini WARN 4건: 심볼릭링크 우회(추적만 ROI 낮아 차단 안 함) / .md 덮어쓰기(별도 항목) / 도메인 폴더 안 임시 차단 짜증(advisory 다운그레이드 채택) / 신규 1단계 폴더 추가 부담(hook_config 1줄 추가)
+- Gemini 보류: 확장자 화이트리스트(이중 운영) / 파일 크기 제한(정상 작업 차단 위험)
+
+### 변경
+- 신규 hook: `.claude/hooks/write_router_gate.sh` (4-Layer: 루트 직속 + 1단계 화이트리스트 + 임시 패턴 advisory + .claude 통과)
+- 인프라 4파일: hook_config.json / settings.json / session_start_restore.sh / protected_assets.yaml
+- SessionStart에 folder_map 4줄 — 모델이 세션 시작 시 폴더 정책 컨텍스트 보유
+
+### 검증
+- smoke_fast 11/11 PASS
+- advisory 모드 7건 + gate 모드 4건 수동 테스트 모두 의도대로
+  - 양성: 루트 직속/신규 폴더/임시 패턴 → deny(gate) or stderr(advisory)
+  - 음성: 도메인 정식/시스템 경로/99_임시수집/기존 파일 → silent pass
+
+### 다음 AI 액션
+- 첫 1주(~2026-05-05) advisory 운영 → `.claude/hooks/hook_log.jsonl`에 위반 빈도 수집
+- Day 8+(2026-05-06) `mode: "gate"` 전환 결정 시 GPT 검증 라운드 (advisory 결과 분석 + gate 안전성)
+- main 폴더의 `hook_config.json` 변경(write_router 섹션)은 별도 — 사용자가 main 워크트리에서 직접 commit하거나 worktree merge 시 자동 정리됨
+- `protect_files.sh` `log_paths`에 `CLAUDE.md`, `README.md` 추가 권고 (Gemini "기존 화이트리스트 파일 덮어쓰기" 지적 대응 — 별도 작업 항목)
+
+### settings.json 변경 주의
+- PreToolUse 객체 1건 신규 추가 — 다음 세션부터 적용. 현재 세션은 이미 캐싱된 설정으로 동작 중이므로 이번 세션에서는 hook이 트리거 안 됨
 
 ---
 

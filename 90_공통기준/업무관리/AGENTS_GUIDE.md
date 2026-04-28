@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 34개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 35개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.

@@ -49,6 +49,7 @@
 | ⑮ | `debate_verify.sh` | Bash | 토론 합의 서명 검증 (`[3way]` 태그 커밋 무결성) |
 | ⑯ | `permissions_sanity.sh` | Bash | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
 | ⑰ | `r1r5_plan_check.sh` | Bash | C 트리거 staged 시 R1~R5 plan 흔적 권장 advisory (세션118 별건 2번 신설) |
+| ⑱ | `write_router_gate.sh` | Write\|Edit\|MultiEdit | 신규 파일 위치 화이트리스트 라우팅 gate — 4-Layer(루트/도메인/임시/시스템). advisory↔gate 모드 토글 (세션123 신설) |
 
 ### 추적층 (PostToolUse)
 

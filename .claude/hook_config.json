@@ -6,6 +6,15 @@
     "deny_path_patterns": ["98_아카이브", "기준정보.*최종"],
     "log_paths": ["TASKS.md", "HANDOFF.md", "STATUS.md"]
   },
+  "write_router": {
+    "_comment": "신규 파일 위치 화이트리스트 라우팅 gate (debate_20260428 폴더 라우팅 plan / polymorphic-prancing-allen). 모드: advisory(stderr 경고만) | gate(deny+exit 2). 첫 1주 advisory 운영 후 gate 전환 권장.",
+    "mode": "advisory",
+    "allow_root_files": ["CLAUDE.md", "README.md", ".gitignore", ".gdignore", ".claudeignore", ".git"],
+    "allow_first_level_dirs": ["01_인사근태", "02_급여단가", "03_품번관리", "04_생산계획", "05_생산실적", "06_생산관리", "07_라인정지비용", "08_공정개선이슈", "09_외주발주납품", "10_라인배치", "90_공통기준", "98_아카이브", "99_임시수집", ".claude"],
+    "temp_name_patterns": ["^tmp_", "^test_", "^draft_", "^scratch", "^temp_", "^wip_", "_temp\\.", "_draft\\.", "_review\\.", "_wip\\.", "임시", "검토중"],
+    "temp_allowed_first_dirs": ["99_임시수집", "98_아카이브"],
+    "system_passthrough_dirs": [".claude"]
+  },
   "block_dangerous": {
     "extreme_commands": ["rm -rf /", "git reset --hard", "git clean -fd", "git push.*--force.*main"],
     "destructive_patterns": ["truncate\\s", "find\\s.*-delete", "xargs\\s+rm"],
