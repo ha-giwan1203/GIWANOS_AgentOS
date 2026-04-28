@@ -173,6 +173,12 @@ def navigate_to_d0(browser):
             ensure_erp_login(page)
             if not _wait_oauth_complete(page, timeout_sec=30.0):
                 raise RuntimeError(f"OAuth 완료 2회 실패: {page.url}")
+        elif "auth-dev.samsong.com" in page.url:
+            # 세션124 [3way] 보강: 비login auth-dev 정착(클라이언트 선택 화면 등) 시 D0_URL 직접 이동 1회 시도
+            print("[phase0] auth-dev 비login 정착 — D0_URL 직접 이동 1회 시도")
+            _safe_goto(page, D0_URL)
+            if not _wait_oauth_complete(page, timeout_sec=30.0):
+                raise RuntimeError(f"OAuth 완료 실패: auth-dev 클라이언트 선택 화면에서 D0_URL 직접 이동 1회 시도 후에도 erp-dev 미도달 — 현재 URL: {page.url}")
         else:
             raise RuntimeError(f"OAuth 완료 실패 (login 페이지 아님): {page.url}")
 
