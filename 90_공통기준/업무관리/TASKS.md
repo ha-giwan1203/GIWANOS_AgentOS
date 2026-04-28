@@ -10,7 +10,32 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+최종 업데이트: 2026-04-28 KST — 세션120 전역 슬래시 명령어 2종 신설(/현재상태, /명령어목록) + 슬래시명령어 레퍼런스 엑셀 + 업무관리 폴더 정리(95→44건, -54%) / 세션119 [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리, Round 1 pass_ratio 0.75 PASS, critic WARN v2 권고 3건 반영) / 세션118 /finish 마무리 (terminal_state=done, Notion sync 성공) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync 옵션 도입 (HANDOFF 1번 강제, 모드 C, R1~R5 plan-first) / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 (별건 의제 1번 처리, Round 1 pass_ratio 0.75, critic WARN v2 반영) / 세션116 [3way] 작업 모드 5종 판정 도입 (CLAUDE.md 사고 계층 신설, Round 1+2 pass_ratio 1.0, critic-reviewer WARN 3건 v2 반영) / 세션115 d0-plan 첨부 파일 가드 추가 + selectList timeout 60s 상향 / 세션114 NotebookLM 컨트롤 레이어 신설 + 센스커버 조립공정 부적합 가능성 분석 / 세션113 [3way] 토론 안건 3건 결론 + P2-B Option B 구현
+
+## 세션120 (2026-04-28) — 전역 슬래시 명령어 + 업무관리 폴더 정리
+
+### [완료] 전역 슬래시 명령어 2종 신설
+- 위치: `C:/Users/User/.claude/commands/` (전역, 모든 세션·워크트리에서 사용)
+- `/현재상태` — TASKS/HANDOFF/git log 기반 현재 상태 5줄 보고
+- `/명령어목록` — 전역+프로젝트 슬래시 명령어 전체 표시
+- 활성화: 다음 세션 시작 시 자동완성 노출 (캐싱 정책)
+
+### [완료] 슬래시명령어 레퍼런스 엑셀 신설
+- `90_공통기준/업무관리/슬래시명령어_레퍼런스.xlsx` (4시트, 11.9KB)
+- 사용자정의(34) / CLI내장(18) / 플러그인스킬(9) / 사용가이드
+- *.xlsx gitignore 적용
+
+### [완료] 업무관리 폴더 정리 (그룹 A 안전 정리)
+- Before: 95건 / 1.9MB → After: 44건 / 380KB (-54%)
+- 98_아카이브/정리대기_20260428/_업무관리/로 이동 49건 (_분석 6 + _백업 1 + _로그 42)
+- __pycache__ 삭제 (Python 자동 재생성)
+- 원복 9건 (절대경로 참조 발견): 운영가이드 v1.0 7종 + gpt-instructions/fallback + skill_guide
+- Git 영향: 7건 삭제만 추적 (98_아카이브는 gitignore)
+
+### 미처리 (모드 C 영역, 추후 결정)
+- 운영 스크립트 16건 — 작업 스케줄러 절대경로 호출 가능성
+- 스크립트 로그 출력 경로 변경 (재발 방지)
+- 하위 폴더 5종 (_플랜, 운영검증, gpt-skills, baseline_20260422, _로그) 내용 점검
 
 ## 세션119 (2026-04-28) — [3way] mode_c_log.sh v2 — 멀티바이트 안전 cut + 회전 (세션118 잔존 별건 마무리)
 
