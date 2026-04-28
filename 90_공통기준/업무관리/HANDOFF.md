@@ -4,8 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 일괄 적용 (자동 로드 분량 -61%, 자가당착 1회 즉시 수정) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종 / 세션119 [3way] mode_c_log v2
+최종 업데이트: 2026-04-29 KST — 세션124 [E] SP3M3 주간 D0 14건 등록 (auto-run OAuth 실패 → 수동 복구) / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션124 (2026-04-29) — [E] SP3M3 주간 D0 14건 등록 + auto-run OAuth 실패 복구
+
+### 진행 상황
+- 진입: 사용자 "spm3주간계획 반영 되었는지 확인" → 로그 확인 → 미반영 발견 → 사용자 "진행" → E 모드 복구
+- 모드: E (장애 복구 — OAuth 자동실행 실패 차단)
+
+### 자동실행 실패 원인 (실증)
+- `06_생산관리/D0_업로드/logs/morning_20260429.log`: 07:10 시작, 07:11 OAuth 완료 2회 실패로 종료
+- URL 정착: `auth-dev.samsong.com:18100/login?error` → `auth-dev.samsong.com:18100/` (클라이언트 선택 화면, title="SAMSONG | OAuth", BOM/ERP/MES/SCM/PMS/DXMS 메뉴)
+- run.py `ensure_erp_login`(:115)은 `auth-dev/login` URL에서만 작동 → 클라이언트 선택 화면 무인식 → `_wait_oauth_complete` 30s timeout
+- `navigate_to_d0`(:154-160)는 첫 http 탭 우선 선택 → auth-dev 탭부터 잡음
+
+### 복구 조치
+- playwright CDP 9223 접속 → auth-dev 탭을 D0 URL(`/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do`)로 직접 navigate
+- 재실행: `python run.py --session morning --line SP3M3` → Phase 0~6 전 통과
+- 결과: 14건 등록 / rank_batch 14/14 / mesMsg statusCode=200 / SmartMES 검증 ✅
+- 코드 변경 0줄, 외부 상태(브라우저 탭 navigate) 1회만 — E 최소 패치 정량 충족
+
+### 지침 준수 자가점검
+- 초기 실수: SKILL.md 미독 상태에서 dry-run 2회 시도 + 탭 닫기 권한 거부 → 사용자 "스킬과 지침 확인 안하나?" 지적
+- 정정: SKILL.md / d0-plan.md 독해 → 옵션 4안 정리 후 사용자에게 선택 위임
+- 세션121 "SKILL.md 원본 미독 진행" 재발 — 같은 사고 패턴 1회 더
+
+### 다음 AI 액션
+1. **사후 B 분석 (다음 세션)**: auto-run OAuth 클라이언트 선택 정착 시나리오 재발 방지
+   - 후보 (a) `_wait_oauth_complete`에 클라이언트 선택 화면 감지 + ERP 자동 클릭 추가
+   - 후보 (b) `navigate_to_d0`에서 `auth-dev` 탭 자동 스킵 필터
+   - 후보 (c) (a)+(b) 결합
+2. 결정 후 모드 C로 패치 (≤20줄 ≤2파일)
+3. 다음 morning 자동실행(2026-04-30 07:10) LastResult=0 검증
 
 ---
 

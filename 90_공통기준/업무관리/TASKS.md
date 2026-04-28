@@ -10,7 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-28 KST — 세션122 [3way] Opus 체감 진단 토론 + 빼는 안 4종 일괄 적용 (Round 1 pass_ratio 0.75, 자동 로드 분량 -61%) / 세션121 [E] d0-plan SP3M3 야간 D0 24건 등록 / 세션120 슬래시 명령어 2종 신설 / 세션119 [3way] mode_c_log v2
+최종 업데이트: 2026-04-29 KST — 세션124 [E] SP3M3 주간 D0 14건 등록 (auto-run OAuth 실패 → 수동 복구) / 세션123 [C] write-router 화이트리스트 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종
+
+## 세션124 (2026-04-29) — [E] SP3M3 주간 D0 14건 등록 + auto-run OAuth 실패 복구
+
+### [완료] SP3M3 주간 D0 14건 등록 (2026-04-29 아침)
+- 파일: SP3M3_생산지시서_(26.04.29).xlsm 출력용 주간 섹션 (누적 컷 3,695개)
+- 업로드: 14/14 OK (ext=319231~319244)
+- 최종 저장: statusCode 200 / mesMsg statusCode 200 / rsltCnt=700
+- Phase 6 SmartMES 검증: 서열 순서 엑셀 일치 ✅
+- 품번: RSP3SC0383, 0384, 0382, 0642, 0590, 0584 / RSP3PC0143, 0144, 0054 / RSP3SC0666, 0665, 0362, 0251, 0249
+- 로그: `06_생산관리/D0_업로드/logs/morning_20260429_manual.log`
+
+### [복구] 07:10 자동실행 OAuth 실패 — 수동 복구
+- 자동실행 로그 `morning_20260429.log`: OAuth 완료 2회 실패 (`auth-dev.samsong.com:18100/login?error`) → exit 1
+- 원인: OAuth 콜백 후 클라이언트 선택 화면(`auth-dev/`)에 정착. `ensure_erp_login`은 `auth-dev/login` URL에서만 작동 → 30s timeout
+- 수동 조치: playwright CDP 9223 접속 → auth-dev 탭을 D0 URL로 직접 navigate → 재실행 통과
+- 잔존 데이터 위험: 0 (자동실행은 Phase 0 종료, 수동실행만 등록)
+- 모드 E 최소 패치 정량: 코드 변경 0줄, 외부 상태(브라우저 탭 navigate)만
+
+### [잔존] 사후 B 분석 필요 — auto-run OAuth 실패 패턴
+- 클라이언트 선택 화면 정착 시나리오 재발 가능 (오늘 1회 발생)
+- 해결안 후보: (a) `_wait_oauth_complete`에 클라이언트 선택 화면(`auth-dev` root + title="SAMSONG | OAuth") 감지 시 ERP 클릭 자동화, (b) `navigate_to_d0`에서 `auth-dev` 탭 자동 스킵 필터, (c) 두 안 결합
+- 다음 세션에서 모드 C 또는 D로 결정
 
 ## 세션122 (2026-04-28) — [3way] Opus 4.7→Sonnet 체감 진단 + 빼는 안 3 옵션 2 적용
 
