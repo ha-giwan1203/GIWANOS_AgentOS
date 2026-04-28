@@ -2,28 +2,41 @@
   "terminal_state": "done",
   "committed_pushed": true,
   "gpt_shared": true,
-  "gpt_judgment": "PASS (5/5 실증됨·동의, 추가제안 없음)",
+  "gpt_judgment": "PASS (item 1·2 실증됨·동의, 추가제안 없음)",
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
   "session": "session119",
   "commits": [
-    "f500a47b"
+    "f500a47b",
+    "30f34a28",
+    "307170ba"
   ],
-  "topic": "[3way] mode_c_log v2 — 멀티바이트 안전 cut + 256KB archive 분리 회전 (세션118 잔존 별건 마무리)",
+  "topic": "[3way] 세션119 별건 통합 마무리 — mode_c_log v2 + generate_agents_guide cut 멀티바이트 안전화",
   "verdict": {
-    "gpt_share_result": "PASS (5/5 실증됨·동의, 추가제안 없음)",
-    "gemini_share_result": "PASS (5/5 실증됨·동의, 추가제안 없음 — 최종 승인)",
-    "round1_pass_ratio_numeric": 0.75,
-    "round1_synthesis_only_pass_ratio": 1.0,
-    "claude_delta": "partial",
+    "gpt_share_result": "PASS (양측 의제 모두 실증됨·동의, 추가제안 없음)",
+    "gemini_share_result": "PASS (양측 의제 모두 실증됨·동의, 추가제안 없음 — 최종 승인)",
+    "agenda1_mode_c_log_v2": {
+      "round1_pass_ratio_numeric": 0.75,
+      "round1_synthesis_only_pass_ratio": 1.0,
+      "claude_delta": "partial",
+      "critic_review": "WARN → v2 보강 3건 반영"
+    },
+    "agenda2_generate_agents_guide": {
+      "round1_pass_ratio_numeric": 1.0,
+      "round1_synthesis_only_pass_ratio": 1.0,
+      "claude_delta": "none",
+      "critic_review": "PASS"
+    },
     "issue_class": "B",
-    "skip_65": false,
-    "critic_review": "WARN → v2 보강 3건 반영"
+    "skip_65": false
   },
-  "debate_log_dir": "90_공통기준/토론모드/logs/debate_20260428_080046_3way/",
+  "debate_log_dirs": [
+    "90_공통기준/토론모드/logs/debate_20260428_080046_3way/",
+    "90_공통기준/토론모드/logs/debate_20260428_110944_3way/"
+  ],
   "plan_path": "C:/Users/User/.claude/plans/vast-questing-pebble.md",
   "notion_sync": "success",
-  "next_session_priority_1": "(별건 후보) cut -c 동일 패턴 다른 hook 사용처 검토 — 본 의제 범위 밖 분리됨",
+  "next_session_priority_1": "(별건 잔존 없음) — 세션118 잔존 별건 + 세션119 발견 잔존 모두 종결",
   "timestamp": "2026-04-28 KST"
 }
