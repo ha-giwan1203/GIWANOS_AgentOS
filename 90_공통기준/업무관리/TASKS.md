@@ -39,14 +39,20 @@
 - 멀티바이트 cut: 한글 180자 입력 → 120 codepoint 정확 절단, U+FFFD 부재, 마지막 hex 완전 UTF-8
 - 회전 동작: 333KB/1500줄 입력 → log 166KB/750줄 + archive 166KB/750줄, 데이터 보존 1500=750+750, .tmp 잔존 없음 (원자성)
 
-### 잔존 별건 (다음 세션 후보)
-- `cut -c` 동일 패턴 다른 hook 사용처 검토 (본 의제 범위 밖 — Round 1 합의 시 분리)
-
-### [완료] /finish 9단계 마무리
+### [완료] /finish 9단계 마무리 (mode_c_log v2)
 - 양측 PASS 만장일치: GPT 5/5 실증됨·동의 (추가제안 없음) / Gemini 5/5 실증됨·동의 (추가제안 없음, "최종 승인")
 - Notion 수동 동기화: 성공
 - final_check --full --fix: ALL CLEAR (smoke_fast 11/11)
 - finish_state.json: terminal_state=done
+
+### [완료] 잔존 별건 마무리 — generate_agents_guide.sh:101 cut 멀티바이트 안전화 (3자 토론 PASS 1.0)
+- 진입: 사용자 "잔존 안건도 토론해서 마무리 지어라" → 모드 D 명시 호출
+- 토론 로그: `90_공통기준/토론모드/logs/debate_20260428_110944_3way/` Round 1 (pass_ratio_numeric 1.0, claude_delta=none, issue_class=B)
+- 실측 결과: `cut -c` 4건 중 1건만 멀티바이트 위험 (3건은 hex digest ASCII 한정)
+- 수정: `90_공통기준/업무관리/generate_agents_guide.sh:101` 1라인 (mode_c_log.sh v2 동일 Python codepoint slice 패턴)
+- 무수정 (3건): commit_gate.sh:24,26,28 / evidence_gate.sh:72,74,76 / smoke_test.sh:51 — sha1sum/md5sum/cksum hex digest는 ASCII 한정
+- critic-reviewer: PASS (관찰 1건, 판정 번복 미달)
+- 검증: bash -n PASS / AGENTS_GUIDE.md 자동 갱신 1회 정상 (hooks 34, skills 20) / skill 표 description 컬럼 U+FFFD 0건
 
 ## 세션118 (2026-04-27) — [3way] publish 스크립트 main stale 자동 감지·동기화 옵션 (세션117 별건 1번)
 

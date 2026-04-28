@@ -98,7 +98,8 @@ for skill_md in "$SKILL_DIR"/*/SKILL.md; do
   name=$(basename "$dir")
   grade=$(grep -m1 'grade:' "$skill_md" 2>/dev/null | sed 's/.*grade:[[:space:]]*//' | tr -d ' ')
   # description 첫 줄만 (멀티라인 > 제거)
-  desc=$(grep -m1 'description:' "$skill_md" 2>/dev/null | sed 's/.*description:[[:space:]]*>*[[:space:]]*//' | sed 's/"//g' | cut -c1-60)
+  # v2 (debate_20260428_110944_3way Round 1 PASS): 멀티바이트 안전 cut — Python codepoint slice (mode_c_log.sh v2 동일 패턴)
+  desc=$(grep -m1 'description:' "$skill_md" 2>/dev/null | sed 's/.*description:[[:space:]]*>*[[:space:]]*//' | sed 's/"//g' | "${PY_CMD:-python}" -c "import sys; data=sys.stdin.buffer.read().decode('utf-8',errors='replace'); sys.stdout.buffer.write(data.strip()[:60].encode('utf-8'))" 2>/dev/null)
   [ -z "$grade" ] && grade="-"
   [ -z "$desc" ] && desc="-"
   SKILL_ROWS="${SKILL_ROWS}| ${name} | ${grade} | ${desc} |

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-28 KST — 세션119 [3way] mode_c_log.sh v2 (멀티바이트 cut + 256KB archive 회전, 세션118 잔존 별건 마무리) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 / 세션116 [3way] 작업 모드 5종 판정 도입 / 세션115 d0-plan 첨부 파일 가드 + ERP timeout 60s / 세션114 NotebookLM 컨트롤 레이어 신설
+최종 업데이트: 2026-04-28 KST — 세션119 [3way] generate_agents_guide.sh cut 멀티바이트 안전화 (잔존 별건 마무리, Round 1 PASS 1.0) / 세션119 [3way] mode_c_log.sh v2 (멀티바이트 cut + 256KB archive 회전) / 세션118 [3way] publish_worktree_to_main.sh main stale 자동 감지 + --auto-sync / 세션117 [3way] 토론모드 자동 승격 → 비대칭 정합화 / 세션116 [3way] 작업 모드 5종 판정 도입
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
