@@ -189,6 +189,52 @@ python run.py --session evening --line SD9A01    # SD9A01만
 - SmartMES rank 순서 = 엑셀 순서
 - MES 응답 rsltCnt > 0
 
+## Phase 7 — 사후 검증 + 자동 재실행 (verify_run.py, debate_20260429_121732_3way 합의)
+
+> **목적**: D0_SP3M3_Morning(07:10) / Night Windows 작업 스케줄러 실행 후 결과 자동 검증.
+> 실패 감지 시 원인 분류 → RETRY_OK 백오프 / RETRY_BLOCK·RETRY_NO 즉시 알림.
+
+### 호출 (사용자 작업 스케줄러 등록 후 자동)
+```
+python verify_run.py --session morning --line SP3M3
+python verify_run.py --session night --line SP3M3
+python verify_run.py --session morning --line SP3M3 --dry-run    # 점검만
+```
+
+### 원인 분류
+- **RETRY_OK**: timeout / 5xx / 네트워크 / Chrome CDP 미기동 / OAuth 정착 — Phase 0/1/2(로그인·xlsx 로드·dedupe) 한정
+- **RETRY_BLOCK**: timeout이 Phase 3+(업로드·rank_batch·mesMsg)에 발생, 또는 dedupe 결과 N건 정리 시 (이미 등록 의심)
+- **RETRY_NO**: xlsx 미존재 / 권한 / 마스터 정보 불일치 — 즉시 알림 + 재시도 0회
+- **UNKNOWN**: 분류 실패 — 1회 재시도 후 알림
+
+### 백오프 정책 (RETRY_OK)
+- **1분 / 5분 / 15분 / 30분** — 누적 51분 한계
+- 매 시도 전 dedupe 선행 (`erp_d0_dedupe.py --execute`) — N건 정리 시 RETRY_BLOCK 트리거
+- schtasks 상태 확인 — Running 시 5분 대기 후 Phase 분석:
+  - Phase 0/1/2 → `schtasks /end` 강제 종료 OK
+  - Phase 3+ → 종료 금지 + 알림 즉시 종결
+
+### 안전장치 (R5)
+- **lock 파일** atomic — `os.O_EXCL` + JSON `{pid, started, session}` + 60분 stale 정리
+- **누적 시간 한계**: 51분 도달 시 자동 재시도 종료
+- **dedupe 선행**: 매 시도 — 기존 등록 의심 시 RETRY_BLOCK
+- **Phase 3+ 강제 종료 금지**: ERP 트랜잭션 단절 방지
+- **롤백 도구**: `erp_d0_dedupe.py --execute` 즉시 실행 가능
+
+### 알림 (Slack — 현재 stub: `.claude/state/d0_verify_notify.jsonl`에 기록, MCP 통합은 Phase 2 이월)
+- 성공: 무알림
+- 재시도 후 성공: 1건 알림 (재시도 N회, 누적 M초)
+- RETRY_BLOCK / RETRY_NO / UNKNOWN 실패: 즉시 + 로그 끝 30줄
+- 누적 한계 도달: 즉시 + 로그 끝 30줄
+
+### Windows 작업 스케줄러 등록 (사용자 수동, admin 권한 필요할 수 있음)
+```
+schtasks /create /TN "D0_SP3M3_Morning_Recover" /TR "C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan\run_morning_recover.bat" /SC DAILY /ST 07:30 /RU <USER>
+```
+
+> **기존 `run_morning_verify.bat`(Phase 3까지 parse-only 사전 점검)와 별개**.
+> 본 verify_run.py는 morning 종료 후 사후 검증·재실행이며 wrapper는 `run_morning_recover.bat`.
+
 ## 되돌리기 방법
 
 - **서열 행 삭제 API** (야간 A 행): `DELETE /prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do` payload `{EXT_PLAN_REG_NO, STD_DA, PLAN_DA, PROD_NO, LINE_CD}`

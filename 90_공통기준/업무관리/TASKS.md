@@ -39,6 +39,25 @@
 - incident 133건 분류 + 본 토론 result.json/step5_final_verification.md 작성으로 debate_verify 1건 보강. 정상 안전장치 발화 28건 = 시스템 정상 작동 증거
 - 라벨 엄밀성 보강(critic-reviewer WARN 후속)은 토론모드 CLAUDE.md 변경(B 분류) — **사용자 명시 호출 시 별도 진행**
 
+### [완료] D0 스케줄러 사후 검증 + 자동 재실행 (debate_20260429_121732_3way Round 1, pass_ratio 1.00)
+- 의제: 사용자 명시 모드 C — "스케줄러 실패 시 자동 재실행, 중복 스스로 체크, 원인 판단해서 성공할 때까지"
+- 채택안 6대 단위 (양측 양측 통과):
+  1. **원인 분류 4종**: RETRY_OK (timeout/5xx/네트워크/CDP/OAuth — Phase 0/1/2 한정) / RETRY_BLOCK (Phase 3+ timeout 또는 dedupe N건 정리) / RETRY_NO (xlsx/권한/마스터 불일치) / UNKNOWN (1회만)
+  2. **백오프** 1/5/15/30분, 누적 51분 (Gemini 채택)
+  3. **schtasks Phase 분석**: Phase 0/1/2 강제 종료 OK / Phase 3+ 종료 금지 + 알림
+  4. **dedupe 매 시도 선행** (`erp_d0_dedupe.py --execute`) — N건 정리 시 RETRY_BLOCK 트리거
+  5. **lock atomic** (os.O_EXCL + JSON {pid, started, session} + 60분 stale)
+  6. **DOM/스크린샷 저장** (Gemini 신규, Phase 2 이월 — 현재 알림은 jsonl stub)
+- 산출물:
+  - `90_공통기준/스킬/d0-production-plan/verify_run.py` (신규 ~290줄, Python)
+  - `run_morning_recover.bat` (신규 wrapper)
+  - `90_공통기준/스킬/d0-production-plan/SKILL.md` Phase 7 verify 섹션 추가
+  - `06_생산관리/D0_업로드/README.md` schtasks 등록 안내 (사용자 수동)
+- 검증: ast.parse OK, --help OK, --dry-run OK
+- critic-reviewer WARN (cross_verify 4키 긍정 일색 + 보류→채택 경위 명시 부족 — 결론 영향 없음)
+- **사용자 작업 필요**: schtasks /create로 D0_SP3M3_Morning_Recover 07:30 등록 (admin 권한)
+- Phase 2 이월: Slack MCP 통합, 야간 verify wrapper, 1주 운영 후 분류기 정합성 보고
+
 ## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
 
 ### [완료] SP3M3 주간 D0 14건 등록 (2026-04-29 아침)
