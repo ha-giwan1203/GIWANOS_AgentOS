@@ -36,6 +36,12 @@
 2. 2026-05-06 1주 후 ROI 결과 보고
 3. 잔존: 2026-04-30 07:10 morning auto-run LastResult=0 검증 (세션124 D0 OAuth 패치 실증)
 
+### [완료] 즉시 처리 안건 1 — TASKS.md 1104→833줄 감축 (271줄)
+- 98_아카이브/TASKS_archive_세션98-104_20260429.md로 분리 (로컬 전용 gitignored)
+- TASKS.md 본문에서 세션98~104 항목 제거 + 안내 라인 1줄 추가
+- 권장 감축 282줄에 부합 (271줄 = 96%)
+- SessionStart STRONG 경고 해소 예정
+
 ---
 
 ## 세션124 (2026-04-29) — [E] SP3M3 주간 D0 14건 등록 + auto-run OAuth 실패 복구

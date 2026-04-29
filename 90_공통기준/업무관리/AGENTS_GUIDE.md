@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 35개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 36개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
@@ -83,9 +83,11 @@ Claude-GPT 공동작업 + 운영 원칙.
 | `skill_drift_check.sh` | 스킬 실행 시 최신 SKILL.md 읽기 드리프트 차단 |
 | `debate_verify.sh` | 토론 합의 서명 검증 (`[3way]` 태그 커밋 무결성) |
 | `permissions_sanity.sh` | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
+| `write_router_gate.sh` | 신규 파일 위치 화이트리스트 라우팅 gate — 4-Layer(루트/도메인/임시/시스템). advisory↔gate 모드 토글 (세션123 신설) |
 | `auto_compile.sh` | 파일 수정 후 자동 컴파일/변환 |
 | `write_marker.sh` | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
 | `mode_c_log.sh` | C 트리거 커밋 후 .claude/state/mode_c_log.jsonl 기록 advisory (세션118 별건 3번 신설) |
+| `share_after_push.sh` | git push 직후 share-result 필요 advisory 알림 (debate_20260429_103117_3way Phase B, advisory only, 자동 호출 금지) |
 | `evidence_mark_read.sh` | 문서 읽기/갱신 → .ok 증거 마커 적립 |
 | `gpt_followup_post.sh` | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 | `handoff_archive.sh` | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |
