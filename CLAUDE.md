@@ -26,6 +26,7 @@
 - **시스템 개선은 모드 E 또는 사용자 명시 모드 C 요청에 한정** (glimmering-churning-reef 안전안).
 - **외부 ERP/MES 반영은 실행 전 대상/일자/라인/건수 1줄 확인**.
 - **Git이 기준 원본**. 미푸시 상태를 완료로 간주 금지.
+- **Git 워크플로우 (durable authorization)**: 본 저장소는 워크트리+머지 모델 운영 중. 사용자가 "푸시해라"·"push해라"·"main에 푸시해라"·"머지하고 푸시" 등 push 발화 시 `git push origin main` 즉시 허용 (머지 commit 포함, 별도 재확인 단계 생략). PR 워크플로우 의무 아님.
 
 ## 도메인 진입
 
