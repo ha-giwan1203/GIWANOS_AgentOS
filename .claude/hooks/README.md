@@ -58,6 +58,7 @@
 | `auto_compile.sh` | Write\|Edit | 파일 수정 후 자동 컴파일/변환 |
 | `write_marker.sh` | Write\|Edit | 파일 변경 마커 생성, 상태문서 수정 시 삭제 |
 | `mode_c_log.sh` | Bash | C 트리거 커밋 후 .claude/state/mode_c_log.jsonl 기록 advisory (세션118 별건 3번 신설) |
+| `share_after_push.sh` | Bash | git push 직후 share-result 필요 advisory 알림 (debate_20260429_103117_3way Phase B, advisory only, 자동 호출 금지) |
 | `evidence_mark_read.sh` | Read\|Grep\|Glob\|Bash\|Write\|Edit\|MultiEdit | 문서 읽기/갱신 → .ok 증거 마커 적립 |
 | `gpt_followup_post.sh` | mcp__Claude_in_Chrome\|Bash\|Edit\|Write | GPT 읽기/전송/후속작업 감지 → pending flag 관리 |
 | `handoff_archive.sh` | Write\|Edit | HANDOFF.md 갱신 시 이전 세션 기록 아카이브 |

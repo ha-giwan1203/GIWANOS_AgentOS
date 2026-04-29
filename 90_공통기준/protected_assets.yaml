@@ -114,6 +114,16 @@ protected:
       ※ 변경/이전 시 .claude/settings.json PreToolUse Write|Edit|MultiEdit 호출부 동시 점검 필수.
     removal_policy: replace-only
 
+  - path: .claude/hooks/share_after_push.sh
+    class: guard
+    reason: |
+      git push 직후 share-result 필요 advisory 알림 (debate_20260429_103117_3way Phase B, pass_ratio 1.00).
+      등급: advisory only. exit 0 강제, 차단 없음. 자동 share-result 호출 금지(양측 합의 — 무한 루프·토큰 낭비 회피).
+      트리거: PostToolUse Bash + git push 패턴 + 직전 commit 메시지 [3way]/docs(state)/feat/fix/refactor/chore(state).
+      gate 전환은 7일 ROI 검증 후 결정 — 1주 미실행률 50%+이면 효과 부족 판정.
+      ※ 변경 시 .claude/settings.json PostToolUse Bash 호출부 동시 점검 필수.
+    removal_policy: replace-only
+
   - path: .claude/hooks/date_scope_guard.sh
     class: guard
     reason: 날짜 범위 가드

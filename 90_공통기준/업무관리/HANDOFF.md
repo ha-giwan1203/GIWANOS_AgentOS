@@ -4,8 +4,37 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션125 (2026-04-29) — [3way] 알잘딱깔센 미달 진단 + 개선 방향 결정·구현
+
+### 진입
+- 사용자: "알잘딱깔센이 잘 안되는 근본적인 이유가 뭐니? 외부 자료를 찾아야 하나? 시스템의 한계인가?"
+- Claude 1차 진단 (모드 B): drift 50% / instruction-bias 20% / hook 미구현 30%
+- 사용자: "토론해서 개선 방향을 정하고 진행해바" → 3자 토론 진입
+
+### 토론 합의 (Round 1 pass_ratio 1.00)
+- 비중 재합의: hook 미구현이 본질 (40~70%)
+- GPT 추가 후보: 목표 함수 오염 10% (drift 35%, bias 15%, hook 40%)
+- Gemini: hook 미구현 70%+ (지시 종료 후 대기 상태 전환이 본질)
+- 외부 자료: GPT는 Anthropic Claude Code 공식 hook 문서·LangGraph 체크포인트 인용 가치 / Gemini는 ReAct 패턴 인용 / 양측 모두 "추가 일반 조사는 불필요, 현재 이벤트 활용이 시급"
+
+### 채택안 4건 (실행 완료)
+- **Phase A**: memory 4건 통합 (no_approval_prompts / no_idle_report / post_completion_routine / auto_update_on_completion → feedback_post_push_share.md 단일 ECA "WHEN post-event THEN 자동 진행"). MEMORY.md 인덱스 11→8건. 기존 4건은 deprecated 표기 + 본문 보존
+- **Phase B**: `.claude/hooks/share_after_push.sh` 신설 (23줄, advisory only, PostToolUse Bash + git push 패턴 + 직전 commit이 [3way]/docs(state)/feat/fix/refactor일 때 stderr 경고 + hook_log 기록, exit 0 강제, 자동 share-result 호출 금지). settings.json/README.md/protected_assets.yaml 동시 갱신. hook 35→36, smoke 11/11 PASS
+- **Phase C**: 7일 ROI 검증 이월 (~2026-05-06). gate 전환 보류 (양측 합의 — 과잉)
+- **이월 의제**: attention drift 정확 비중 클린 세션 vs 현행 실증 비교 (debate_20260428 [잔존]에 동일 항목)
+
+### 자기 점검 (사용자 체감 짚음)
+- 본 세션 share-result 자체도 사용자가 "공유 안하나?"라고 짚어야 시작 — 메모리 11건(추정) 누적인데 미발화. 토론 결론대로 Phase A+B로 보완. 다음 git push부터 hook이 stderr로 직접 경고
+
+### 다음 AI 액션
+1. Phase B hook 동작 1주 모니터링 (hook_log.jsonl 발화 횟수 + 후속 share-result 실행 비율)
+2. 2026-05-06 1주 후 ROI 결과 보고
+3. 잔존: 2026-04-30 07:10 morning auto-run LastResult=0 검증 (세션124 D0 OAuth 패치 실증)
 
 ---
 

@@ -10,7 +10,29 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 (Phase A+B) / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션125 (2026-04-29) — [3way] 알잘딱깔센 미달 진단 + share_after_push hook + 메모리 4건 통합
+
+### [완료] 3자 토론 Round 1 — 알잘딱깔센 미달 근본 원인 + 개선 방향 (pass_ratio 1.00)
+- 의제: 변경 작업 후 자동 routine(GPT 공유)이 사용자가 짚어야 시작되는 패턴 진단 + 개선 방향
+- 합의 비중: hook 미구현이 본질이며 단일 가장 큰 비중(40~70%). attention drift 정확 비중은 클린 세션 비교 실증 별도 의제 이월
+- 채택안 4건:
+  1. **Phase A** — memory 4건 통합 (no_approval_prompts/no_idle_report/post_completion_routine/auto_update_on_completion → feedback_post_push_share.md 단일 ECA 명제)
+  2. **Phase B** — `share_after_push.sh` advisory hook 신설 (PostToolUse Bash + git push 패턴, exit 0 강제, 자동 share-result 호출 금지)
+  3. **Phase C** — 7일 ROI 검증 이월 (~2026-05-06)
+  4. **이월** — attention drift 비중 클린 세션 실증 비교
+- cross_verification 4키 모두 동의, claude_delta partial, issue_class B
+- critic-reviewer WARN 1건 (라벨 엄밀성 — 결론 영향 없음, Step 5 진행 허용 등급)
+- hook 카운트: 35 → 36 / smoke_fast 11/11 PASS
+- 로그: `90_공통기준/토론모드/logs/debate_20260429_103117_3way/`
+- 양측 최종 검증: GPT 통과 / Gemini 통과
+
+### [잔존] Phase C ROI 검증
+- 1주(2026-04-29 ~ 2026-05-06) advisory 운영
+- hook_log.jsonl 발화 횟수 + 그 후 share-result 실행 비율 측정
+- gate 전환 보류 (양측 합의)
+- 1주 후 미실행률 50%+이면 hook 효과 부족 → 다른 안 검토
 
 ## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
 

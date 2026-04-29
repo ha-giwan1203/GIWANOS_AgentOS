@@ -377,6 +377,15 @@
             "command": "bash .claude/hooks/mode_c_log.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/share_after_push.sh"
+          }
+        ]
       }
     ],
     "Notification": [
