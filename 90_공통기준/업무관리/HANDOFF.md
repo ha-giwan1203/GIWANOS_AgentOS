@@ -34,6 +34,12 @@
 - 9222: `C:/temp/chrome-debug` (ZDM 진단용)
 - 9223: `C:/temp/chrome-mes` (MES OAuth용)
 
+### TASKS.md 아카이브 분리 (사용자 명시 1번 옵션, daily-doc-check 후속)
+- 사용자: STRONG 임계(800줄) 초과 → "지금 정리" 옵션 선택
+- 세션105~108 (4개 가장 오래된 세션, 약 278줄) → `98_아카이브/TASKS_archive_세션105-108_20260429.md` 분리
+- 결과: TASKS.md 874→598줄 (-276줄). 임계 [STRONG] → [WARN]
+- 백업: `TASKS.md.bak_session128` (gitignore)
+
 ### 다음 AI 액션
 - ZDM 서버 복구 확인 후 daily-routine 재실행 → 4/29 + 4/29 ZDM 누락 보정 동시 처리
 - 다음 MES 업로드 시 1차 시도 성공 여부 로그 확인 → 패치 효과 검증
