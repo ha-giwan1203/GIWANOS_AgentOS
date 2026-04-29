@@ -4,8 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
+최종 업데이트: 2026-04-29 KST — 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)
+
+### 진입
+- 사용자: "이전세션 이어서 진행하자" → 세션128 잔존 항목 중 **정량 신호 측정 시작** 선택
+- plan-first: `C:/Users/User/.claude/plans/virtual-bouncing-crab.md` 작성 + 사용자 승인
+
+### 처리
+- 측정 로그 신설: `90_공통기준/토론모드/logs/quant_signal_log.md`
+- 신호 정의 + 1주(2026-05-06)·7세션 종료 조건 + 결정 규칙 명시
+- 본 세션129 자기 측정 1행 기록: S1 60% / S2 PASS / S3 1건 → 부분 PASS
+- 신규 hook/skill/command 0개 (S3 위반 회피 설계)
+
+### 다음 AI 액션
+- 다음 일반 세션 종료 시 quant_signal_log.md 1행 추가 (S1/S2/S3 정직 기록)
+- 7세션 누적 또는 2026-05-06 도달 시 결정 분기:
+  - ALL ≥ 5/7 → 옵션B(구조 다이어트) 보류
+  - ALL ≤ 2/7 → 옵션B 즉시 활성
 
 ---
 
