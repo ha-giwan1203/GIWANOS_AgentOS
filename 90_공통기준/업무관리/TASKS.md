@@ -55,6 +55,7 @@
   - `06_생산관리/D0_업로드/README.md` schtasks 등록 안내 (사용자 수동)
 - 검증: ast.parse OK, --help OK, --dry-run OK
 - critic-reviewer WARN (cross_verify 4키 긍정 일색 + 보류→채택 경위 명시 부족 — 결론 영향 없음)
+- **양측 부분PASS 후속 보강 (실증 결함 3건)**: classify_failure 모든 RETRY_OK 패턴 Phase 3+ → RETRY_BLOCK / Phase unknown 강제 종료 차단 / SKILL DOM 저장 stub 정확화
 - **사용자 작업 필요**: schtasks /create로 D0_SP3M3_Morning_Recover 07:30 등록 (admin 권한)
 - Phase 2 이월: Slack MCP 통합, 야간 verify wrapper, 1주 운영 후 분류기 정합성 보고
 

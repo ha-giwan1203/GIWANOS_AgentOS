@@ -61,6 +61,7 @@
   - DOM/스크린샷 저장 (Gemini 신규)
 - 산출물: verify_run.py(290줄) + run_morning_recover.bat + SKILL.md Phase 7 + README schtasks 안내
 - critic WARN: 4키 긍정 일색 + 보류→채택 경위 부족 (결론 영향 없음)
+- **양측 부분PASS 후속 보강 commit (실증 결함 3건)**: classify_failure 모든 RETRY_OK Phase 3+ → RETRY_BLOCK / Phase unknown 강제 종료 차단 / SKILL DOM stub 정확화
 - **사용자 작업 필요**: schtasks /create로 D0_SP3M3_Morning_Recover 07:30 등록 (README에 명령 안내)
 
 ### 다음 AI 액션 (재정리)

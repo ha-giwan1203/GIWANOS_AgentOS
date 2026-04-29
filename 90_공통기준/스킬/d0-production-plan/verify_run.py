@@ -128,8 +128,11 @@ def classify_failure(log_path):
     last_phase = analyze_phase(tail)
     for pat, label in RETRY_OK_PATTERNS:
         if re.search(pat, tail, re.IGNORECASE):
-            if label == "timeout" and last_phase in PHASE_BLOCK_KILL:
-                return "RETRY_BLOCK", f"timeout_at_{last_phase.replace(' ', '')}"
+            # GPT/Gemini 양측 합의 (debate_20260429_121732_3way 후속 보강):
+            # 모든 RETRY_OK 원인(timeout/5xx/network/CDP/OAuth)이 Phase 3+ 발생 시
+            # 이미 일부 등록 의심으로 RETRY_BLOCK 처리. 데이터 무결성 우선.
+            if last_phase in PHASE_BLOCK_KILL:
+                return "RETRY_BLOCK", f"{label}_at_{last_phase.replace(' ', '')}"
             return "RETRY_OK", label
     return "UNKNOWN", "unmatched"
 
@@ -258,12 +261,14 @@ def main():
             status2, _ = schtasks_status(task_name)
             if status2 in ("실행 중",) or status2.lower() == "running":
                 last_phase = analyze_phase((log_path.read_text(encoding="utf-8", errors="replace") if log_path else ""))
-                if last_phase in PHASE_ALLOW_KILL or last_phase == "unknown":
+                # GPT/Gemini 양측 합의 후속 보강: Phase unknown은 강제 종료 금지.
+                # Phase 0/1/2(등록 전 단계)임이 로그로 확인될 때만 schtasks /end 허용.
+                if last_phase in PHASE_ALLOW_KILL:
                     log(f"Phase {last_phase}: 강제 종료 시도", "WARN")
                     schtasks_end(task_name)
                 else:
                     notify_slack(f"D0 {task_name} Phase {last_phase} 진행 중 — 종료 금지",
-                                 f"verify가 강제 종료를 차단했습니다. 사용자 수동 결정 필요.\n\n{get_log_tail(log_path)}")
+                                 f"Phase 0/1/2 등록 전 단계 확인 불가. 강제 종료 차단 + 사용자 수동 결정 필요.\n\n{get_log_tail(log_path)}")
                     sys.exit(3)
 
         ok, marker = check_log_success(log_path)

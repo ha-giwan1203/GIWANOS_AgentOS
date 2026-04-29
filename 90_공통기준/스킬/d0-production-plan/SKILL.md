@@ -221,7 +221,12 @@ python verify_run.py --session morning --line SP3M3 --dry-run    # 점검만
 - **Phase 3+ 강제 종료 금지**: ERP 트랜잭션 단절 방지
 - **롤백 도구**: `erp_d0_dedupe.py --execute` 즉시 실행 가능
 
-### 알림 (Slack — 현재 stub: `.claude/state/d0_verify_notify.jsonl`에 기록, MCP 통합은 Phase 2 이월)
+### 알림 (현재 stub — Slack MCP 통합은 Phase 2 이월)
+- **현재**: `.claude/state/d0_verify_notify.jsonl`에 알림 레코드만 기록 (jsonl append)
+- **DOM/스크린샷 저장**: 미구현 — Phase 2 이월 (chrome-devtools-mcp CDP 9222 의존)
+- **Phase 2 통합 예정**: Slack `mcp__8d2abc6d-...__slack_send_message` + DOM snapshot + 스크린샷 첨부
+
+### 알림 정책
 - 성공: 무알림
 - 재시도 후 성공: 1건 알림 (재시도 N회, 누적 M초)
 - RETRY_BLOCK / RETRY_NO / UNKNOWN 실패: 즉시 + 로그 끝 30줄
