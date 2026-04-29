@@ -10,7 +10,37 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 (Phase A+B) / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-29 KST — 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 (Phase A+B) / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션126 (2026-04-29) — [C] jobsetup-auto 신규 스킬 + d0-production-plan 야간 dedupe
+
+### [완료] 신규 스킬 `/jobsetup-auto` v0.3 (SmartMES 첫 서열 잡셋업 자동 입력)
+- plan: `C:\Users\User\.claude\plans\splendid-roaming-quilt.md`
+- 신규: `90_공통기준/스킬/jobsetup-auto/SKILL.md` (v0.3, 무인 자동 실행 + fail-fast 4종)
+- 신규: `90_공통기준/스킬/jobsetup-auto/state/screen_analysis_20260429.md` (선행 분석 — 11공정 17검사항목 + 좌표 + 스펙 6종 패턴)
+- 신규: `.claude/commands/jobsetup-auto.md` (슬래시 래퍼)
+- 분포 정책: 정규분포 `random.gauss(center, σ=오차/3)`, 시드 미고정 → 매일 다른 값. 균등분포 사용 금지·시드 고정 금지 명문화
+- 검사항목 분류: (A) 측정값형 A1/A2/A3 + (B) OK/NG 체크형 B1/B2/B3/B4 — 6종 정규식 박음
+- R5 롤백: 재입력 + 재저장으로 정정 (별도 삭제 API 불필요, 사용자 답변 확정)
+- 책임 경고: SmartMES 실측값을 난수로 대체 = 사용자 본인 책임 운영
+
+### [완료] `/d0-plan` SP3M3 morning hand-off 자동화
+- 수정: `.claude/commands/d0-plan.md` Step 5 — 사용자 확인 단계 제거 → 검증 PASS 직후 즉시 `/jobsetup-auto --commit` 자동 호출
+- 끄기 옵션: `--no-jobsetup` / dry-run 옵션: `--jobsetup-dry-run`
+
+### [완료] d0-production-plan v3.1 야간 1~5행 dedupe (사용자 요청)
+- 수정: `90_공통기준/스킬/d0-production-plan/run.py` — `dedupe_night_first_5()` 함수 신설 + main() evening+SP3M3 분기에서 호출 (40줄 신규)
+- 수정: `90_공통기준/스킬/d0-production-plan/SKILL.md` — Phase 4 step 16.5 + 핵심 주의사항 10 + 변경 이력 v3.1
+- 매칭 기준: REG_DT=오늘 AND PROD_NO 일치 AND 수량 일치 (`PRDT_QTY \|\| ADD_PRDT_QTY \|\| PRDT_PLAN_QTY` 3 키 OR)
+- AST 검증 PASS
+
+### [잔존] 첫 실행 검증 (학습 데이터 수집)
+- 2026-04-30 07:05 SP3M3 morning D0 → 자동 hand-off → `/jobsetup-auto --commit` 첫 실 가동
+- 저장 단위 (검사항목/공정/일괄) 첫 실행에서 관찰 → SKILL.md Step 8 v1.0 확정
+- 오늘 저녁 17~19시 evening 세션 첫 dedupe 로그 검증 (수량 키 매칭 정상 동작 확인)
+
+### 메모리 갱신
+- 신규: `project_jobsetup_skill.md` + MEMORY.md 인덱스 추가
 
 ## 세션125 (2026-04-29) — [3way] 알잘딱깔센 미달 진단 + share_after_push hook + 메모리 4건 통합
 

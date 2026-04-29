@@ -36,6 +36,8 @@
 /d0-plan --line SP3M3               # SP3M3만
 /d0-plan --line SD9A01               # SD9A01만 (저녁 세션)
 /d0-plan --target-date 2026-04-24   # 파일명 날짜 명시
+/d0-plan --session morning --no-jobsetup       # SP3M3 morning + 잡셋업 자동 실행 끄기
+/d0-plan --session morning --jobsetup-dry-run  # SP3M3 morning + 잡셋업 dry-run으로
 ```
 
 ## 인수
@@ -52,6 +54,17 @@
    python run.py --session <session> [--line <line>] [--dry-run] [--target-date <yyyy-mm-dd>]
    ```
 4. 결과 보고: 라인별 업로드/서열 배치 건수, MES 전송 결과, SmartMES 검증 결과
+5. **잡셋업 자동 실행** (조건: `session=morning` AND `line ⊇ SP3M3` AND `--dry-run` 아님 AND `--no-jobsetup` 아님 AND SmartMES 검증 PASS):
+   - **사용자 확인 없이 즉시** `/jobsetup-auto --commit` 자동 호출 (사용자 답변 2026-04-29: "계획 반영 완료 판정 후 바로 실행되는 구조")
+   - 1줄 인지 라인만 출력: `[auto] SP3M3 D0 morning PASS → /jobsetup-auto --commit 자동 실행 (약 2분, SmartMES 화면 점유)`
+   - 잡셋업 스킬 자체 가드:
+     - SmartMES (mesclient.exe) 미실행 → 자체 fail-fast + jsonl 알림
+     - 좌표 캘리브레이션 실패(해상도 변경 의심) → fail-fast
+     - 스펙 매칭 실패율 > 50% → 부분 처리 + 알림
+   - 잡셋업 결과 jsonl: `90_공통기준/스킬/jobsetup-auto/state/run_<YYYYMMDD>.json` 자동 기록
+   - **끄기**: `/d0-plan --session morning --no-jobsetup`
+   - **dry-run**: `/d0-plan --session morning --jobsetup-dry-run` (→ `/jobsetup-auto --dry-run` 호출)
+   - 잡셋업 자동화는 별도 스킬 책임 — 본 d0-plan 본체 동작에 영향 없음.
 
 ## 선결 조건
 

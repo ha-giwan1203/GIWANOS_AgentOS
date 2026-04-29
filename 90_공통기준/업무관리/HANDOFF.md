@@ -4,8 +4,50 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션126 (2026-04-29) — [C] SmartMES 잡셋업 자동화 + 야간 dedupe
+
+### 진입
+- 사용자: "샌산계획 반영후 후속작업 루틴 만들거야" → 후속작업 = "잡셋업 항목 입력 자동화"
+- 트리거: 매일 아침 SP3M3 D0 morning 반영 완료 후 (하이브리드 = `/d0-plan` 끝부분 자동 호출)
+
+### 결정 흐름 (사용자 답변)
+1. **트리거 방식**: 하이브리드 (`/d0-plan` 끝부분 분기 신설)
+2. **자동화 범위**: 측정값 = 허용오차 내 난수 / 이상유무 = OK 자동
+3. **자동화 경로**: SmartMES UI computer-use (잡셋업 API 미공개)
+4. **공정 범위**: 모든 공정 자동 순회
+5. **저장 단위**: 첫 실행 관찰 후 확정 (Q2 "모름")
+6. **작업자 인증**: 별도 (잡셋업 단독 처리 가능, [91] 진입 시 자동 매핑 확인)
+7. **분포 정책 강화** (사용자 우려 반영): 균등 → 정규분포 (σ=오차/3, 시드 미고정)
+8. **R5 롤백**: 재입력 + 재저장으로 정정 (별도 삭제 API 불필요)
+9. **분기 시점 변경**: hand-off → 무인 자동 실행 (사용자 명시 승인)
+10. **야간 dedupe**: 1~5행만 검사 + PROD_NO+수량 일치 시 제외
+
+### 산출물 (신규 4 + 수정 4 = 8건)
+- **신규**: `90_공통기준/스킬/jobsetup-auto/SKILL.md` (v0.3)
+- **신규**: `90_공통기준/스킬/jobsetup-auto/state/screen_analysis_20260429.md` (선행 분석)
+- **신규**: `.claude/commands/jobsetup-auto.md`
+- **신규**: 메모리 `project_jobsetup_skill.md`
+- **수정**: `.claude/commands/d0-plan.md` (Step 5 자동 호출)
+- **수정**: `90_공통기준/스킬/d0-production-plan/run.py` (`dedupe_night_first_5` 함수)
+- **수정**: `90_공통기준/스킬/d0-production-plan/SKILL.md` (Phase 4 step 16.5 + v3.1)
+- **수정**: 메모리 `MEMORY.md` 인덱스 + plan `splendid-roaming-quilt.md`
+
+### 선행 분석 결과 (제품 1.RSP3SC0383_A 기준)
+- 11개 공정 + 17개 검사항목
+- 측정값형(A) 6개 (A1 4건, A2 1건, A3 1건)
+- OK/NG형(B) 11개
+- 좌표 캘리브레이션 1456×819 모두 확정
+
+### 다음 AI 액션
+1. 오늘 저녁 17~19시 evening 세션 첫 실행 → `[dedupe]` 로그 검증 (수량 키 매칭 정상 동작)
+2. 2026-04-30 07:05 morning D0 → 07:15+ 자동 `/jobsetup-auto --commit` 첫 실 가동
+3. 첫 실행 결과로 저장 단위 확정 → SKILL.md Step 8 v1.0 승격
+4. 매칭 키 미스매치 시 정확한 ERP 필드명으로 `dedupe_night_first_5` 재패치
 
 ---
 
