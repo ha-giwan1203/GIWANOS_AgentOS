@@ -4,8 +4,39 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션128 (2026-04-29) — [E+C] ZDM DB 다운 + MES 단독 + mes_login() XSRF 패치
+
+### 진입
+- 자동 trigger: scheduled-task `daily-routine`
+- 1차 실행: ZDM `/api/daily-inspection` HTTP 500 → daily-routine 통합 스크립트 중단
+- 2차 실행: 포트 자체 Connection Refused (서버 추가 악화)
+- 3차 실행: HTTP 500 복귀 + 응답 본문 `{"success":false,"error":"Connection terminated due to connection timeout"}`
+- 사용자 지적 "브라우저는 접속됨" → chrome-devtools-mcp로 직접 확인: 페이지 무한 busy, 네트워크 XHR 비어있음, 스크린샷 timeout. **페이지 껍데기만 200, 데이터 API 모두 죽음** 확정
+
+### 처리
+- ZDM: 차단 (정보팀 호출 필요. 복구 후 daily-routine 재실행으로 누락 보정 자동)
+- MES 단독 진행 (사용자 명시 "mes만 진행"):
+  - daily-routine `run_mes()` 단독 호출 (production-result-upload/run.py는 9223 CDP 의존 + 자동 로그인 미구현이라 daily-routine 측 직접 HTTP OAuth 사용)
+  - 누락일 2026-04-28 (1건) 업로드 성공: 15/15건, qty 45,381/45,381 BI 일치
+
+### [C] mes_login() 패치
+- 원인 가설: 1차 POST 매번 500 → cookies.get("XSRF-TOKEN") 빈 값 의심
+- 패치 1줄: `mes_login()` return 직전 `layout.do` GET 1회 추가
+- 검증: 다음 daily-routine 실행 시 1차 시도 성공 여부 추적
+- 가설 미통과 시 `git revert` 1회로 즉시 롤백 가능 (read-only GET 추가만)
+
+### Chrome 디버그 포트 켜둠 (다음 세션 재사용 가능)
+- 9222: `C:/temp/chrome-debug` (ZDM 진단용)
+- 9223: `C:/temp/chrome-mes` (MES OAuth용)
+
+### 다음 AI 액션
+- ZDM 서버 복구 확인 후 daily-routine 재실행 → 4/29 + 4/29 ZDM 누락 보정 동시 처리
+- 다음 MES 업로드 시 1차 시도 성공 여부 로그 확인 → 패치 효과 검증
 
 ---
 

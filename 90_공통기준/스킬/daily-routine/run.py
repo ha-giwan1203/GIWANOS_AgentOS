@@ -185,6 +185,8 @@ def mes_login():
         if "layout.do" not in r3.url:
             print(f"  FAIL: 로그인 후 URL={r3.url}")
             return None
+        # MES 본체 진입 1회 (XSRF-TOKEN 발급 보장 — 1차 POST 500 대응, 세션128)
+        s.get("http://mes-dev.samsong.com:19200/layout/layout.do", timeout=10)
         # XSRF 헤더 설정 (POST 요청에 필요)
         s.headers["X-XSRF-TOKEN"] = s.cookies.get("XSRF-TOKEN", "")
         return s

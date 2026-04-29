@@ -10,7 +10,23 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 (Phase A+B) / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-29 KST — 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행(2026-04-28 15건/45,381 OK) + mes_login() XSRF-TOKEN 발급 보장 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 (Phase A+B) / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션128 (2026-04-29) — [E+C] ZDM 서버 DB 다운 + MES 단독 업로드 + 1차 POST 500 패치
+
+### [완료/차단] daily-routine 분리 처리
+- ZDM 일상점검: 차단 (서버 측 DB 다운 — `Connection terminated due to connection timeout`)
+  - 진단: `/api/daily-inspection` HTTP 500 / 페이지 무한 busy / 5회 연속 일관 500 → 일시 장애 아님
+  - 정보팀 호출 필요. 복구 후 daily-routine 재실행 시 누락 보정 자동 수행
+- MES 생산실적 업로드: 완료 (사용자 명시 승인 후 단독 실행)
+  - 누락일 2026-04-28 (1건). 1차 500 → 재로그인 후 성공: 15/15건, qty 45,381/45,381 (BI 일치)
+
+### [완료] mes_login() XSRF-TOKEN 발급 보장 패치 ([C] 모드)
+- 원인 가설: OAuth 로그인 직후 `cookies.get("XSRF-TOKEN")` 빈 값 → 첫 SaveExcelData.do POST 매번 500
+- 패치: `mes_login()` return 직전 `layout.do` GET 1회 추가 → XSRF 쿠키 발급 보장
+- 파일: `90_공통기준/스킬/daily-routine/run.py:188`
+- 검증: 다음 daily-routine 실행 시 1차 시도 성공 여부 추적. 가설 미통과 시 `git revert` 1회 롤백
+- 영향 범위: `mes_login()` 호출처 daily-routine/run.py 내부 2곳만 (외부 import 없음)
 
 ## 세션125 (2026-04-29) — [3way] 알잘딱깔센 미달 진단 + share_after_push hook + 메모리 4건 통합
 
