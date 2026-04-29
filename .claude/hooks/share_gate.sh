@@ -1,11 +1,46 @@
 #!/bin/bash
-# share_gate — share-result 0단계 3way 감지 조건 자동 검증
+# share_gate — share-result 0단계 환경 + 3way 감지 통합 게이트
 # 세션79 실증 (2026-04-20): "hook/settings 신설 커밋인데 2자 경로 선택" 우회 차단
-# 등급: advisory (차단은 하지 않음, stderr 경고 + hook_log 기록)
-# 호출: share-result 스킬 진입 시 수동 실행 (또는 /share-result 커스텀 hook에서)
+# 세션126 추가 (2026-04-29): CDP Chrome 9222 헬스체크 통합 — 사용자 반복 지적 정착
+# 등급: 혼합 (CDP 미기동 = hard gate exit 2 / 3way 감지 = soft advisory)
+# 호출: share-result 스킬 진입 시 수동 실행
 
 source "$(dirname "$0")/hook_common.sh"
 _SG_START=$(hook_timing_start)
+
+# ─────────────────────────────────────────────────────────
+# Phase 0 [세션126 신설/정정]: CDP Chrome 9222 자동 기동 + 헬스체크
+# 외부 공유는 chrome-devtools-mcp(포트 9222) 단독 사용 (세션107 정책).
+# 미기동 시 자동으로 백그라운드 기동 → 8초 대기 → 헬스체크. 사용자 수동 개입 불요.
+# 사용자 정책 (세션126 정정): "브라우저 꺼져 있으면 켜서 진행" = Claude 자동 기동.
+# 자동 기동 실패한 경우에만 사용자에게 안내.
+# ─────────────────────────────────────────────────────────
+CHROME_EXE="C:/Program Files/Google/Chrome/Application/chrome.exe"
+CDP_PROFILE="C:\\temp\\chrome-cdp"
+
+if ! curl -sf --max-time 2 http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+  echo "[share_gate] CDP 9222 미기동 감지 → 자동 기동 시도" >&2
+  if [ -x "$CHROME_EXE" ] || [ -f "$CHROME_EXE" ]; then
+    "$CHROME_EXE" --remote-debugging-port=9222 --user-data-dir="$CDP_PROFILE" --no-first-run --no-default-browser-check >/dev/null 2>&1 &
+    disown 2>/dev/null
+    sleep 8
+    if curl -sf --max-time 3 http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+      echo "[share_gate] ✅ CDP 9222 자동 기동 성공" >&2
+      hook_log "share_gate" "CDP 9222 auto-started"
+    else
+      echo "[share_gate] ⛔ CDP 9222 자동 기동 실패 — 수동 기동 후 재시도 필요" >&2
+      echo "[share_gate]   \"$CHROME_EXE\" --remote-debugging-port=9222 --user-data-dir=$CDP_PROFILE" >&2
+      hook_log "share_gate" "CDP 9222 auto-start failed"
+      hook_timing_end "share_gate" "$_SG_START" "cdp_autostart_failed"
+      exit 2
+    fi
+  else
+    echo "[share_gate] ⛔ Chrome 실행 파일 미발견: $CHROME_EXE" >&2
+    hook_log "share_gate" "chrome.exe not found"
+    hook_timing_end "share_gate" "$_SG_START" "chrome_missing"
+    exit 2
+  fi
+fi
 
 # 공유 대상 커밋: 기본 HEAD (share-result는 최신 커밋을 공유)
 COMMIT="${SHARE_GATE_COMMIT:-HEAD}"

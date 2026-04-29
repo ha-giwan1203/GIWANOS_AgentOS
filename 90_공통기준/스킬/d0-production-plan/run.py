@@ -688,6 +688,48 @@ def process_one_row(page, prod_no, target_ext_reg, target_line, save_url, dry_ru
     return r
 
 
+def dedupe_night_first_5(page, items, check_count=5):
+    """야간 추출 결과의 첫 N행(기본 5)을 ERP 상단 grid 기등록분과 비교해 중복 제외.
+
+    매칭 기준: REG_DT=오늘 AND **PROD_NO 일치만** (수량 무관, 2026-04-29 사용자 결정 v3.2).
+    매칭된 행만 items에서 제외. N+1번째 이후는 그대로.
+
+    2026-04-29 사용자 요청 — SP3M3 야간 1~5행이 주간 등록분과 2중 등록되는 현상 방지.
+    초기 v3.1은 PROD_NO+수량 동시 매칭이었으나, 같은 품번이면 수량 다르더라도 작업자 입장에서
+    중복 작업 위험 동일하므로 PROD_NO만으로 매칭하도록 정책 단순화.
+    """
+    if not items:
+        return items
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    grid = page.evaluate("""(today) => {
+        try {
+            const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
+            return d.filter(r => r.REG_DT === today).map(r => ({
+                PROD_NO: r.PROD_NO,
+                QTY: Number(r.PRDT_QTY || r.ADD_PRDT_QTY || r.PRDT_PLAN_QTY || 0)
+            }));
+        } catch(e) { return []; }
+    }""", today_str)
+
+    if not grid:
+        print(f"[dedupe] 상단 grid REG_DT={today_str} 등록분 0건 — 야간 dedupe 스킵 (전량 진행)")
+        return items
+
+    skipped, kept = [], []
+    for i, it in enumerate(items):
+        if i < check_count:
+            # 수량 무관, PROD_NO만 매칭 (v3.2)
+            match = next((g for g in grid if g["PROD_NO"] == it["PROD_NO"]), None)
+            if match:
+                skipped.append(it)
+                # 로그에는 야간 qty + 주간 등록 qty 둘 다 표시 (참고용)
+                print(f"[dedupe] 야간 {i+1}행 PROD_NO={it['PROD_NO']} 야간qty={it['QTY']} 주간qty={match['QTY']} → 품번 일치, 제외")
+                continue
+        kept.append(it)
+    print(f"[dedupe] 야간 추출 {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건 (1~{check_count}행만 검사, 품번 일치 기준)")
+    return kept
+
+
 def rank_batch(page, items, target_line, save_url, dry_run=False):
     """엑셀 순서대로 상단 idx 매핑 → process_one_row 반복."""
     # 상단 grid REG_NO 최대 매핑
@@ -893,6 +935,8 @@ def main():
             # SD9A01 OUTER: ERP 생산일 = 파일명 날짜 (내일)
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_night(wb)
+                # Phase 1.5: 야간 1~5행 dedupe (주간 등록분과 PROD_NO+수량 일치 시 제외)
+                items = dedupe_night_first_5(page, items)
                 prod_date = target_file_date - timedelta(days=1)
                 run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
             if args.line in ("SD9A01","ALL"):
