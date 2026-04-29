@@ -39,6 +39,16 @@
 - 저장 단위 (검사항목/공정/일괄) 첫 실행에서 관찰 → SKILL.md Step 8 v1.0 확정
 - 오늘 저녁 17~19시 evening 세션 첫 dedupe 로그 검증 (수량 키 매칭 정상 동작 확인)
 
+### [완료] 3way 공유 — GPT/Gemini 양측 판정 (커밋 f793fce9 + d85f1e1d)
+- **GPT 판정**: 부분PASS (item 1·2·3 동의 / item 3 균등분포 잔재 보류 / item 4 d0-plan vs 스케줄러 분리 위험 보류 / item 5 저장 단위 잔존 보류 / item 6 main 머지 보류 반대)
+- **Gemini 판정**: PASS (item 1·2·3 모두 실증됨·동의 / 추가제안 없음 / 잔존 관찰 후 해제 권장)
+- **즉시 반영**: A 분류 1건 — SKILL.md description+결정표 균등분포→정규분포 정정 (commit d85f1e1d)
+- **잔존 사유**: main 머지 보류·저장 단위 잔존·d0-plan 스케줄러 분리는 모두 첫 실행 검증 후 해소 가능. 운영 기준 최종 PASS는 첫 실 가동 후 재공유
+
+### [메타] 자기 보고 — 세션 내 발생 실수 2건
+1. share_gate.sh 첫 작성 시 "사용자 발언 정반대 해석 (Claude 자동 기동 금지)" → 사용자 강한 재지적 후 정정. feedback_cdp_health_check_first.md에 "한국어 모호 발언은 자동화 우선 + 자연스러운 해석 원칙" 박음
+2. SKILL.md description+결정표에 균등분포 잔재 → GPT가 발견, 사용자 짚기 전에 정정 못 함. 토론모드 상호 감시 프로토콜이 잡아준 사례
+
 ### 메모리 갱신
 - 신규: `project_jobsetup_skill.md` + MEMORY.md 인덱스 추가
 
