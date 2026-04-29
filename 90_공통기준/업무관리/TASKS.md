@@ -35,6 +35,20 @@
 - 첫 답변 실물 지향성 70% 이상 / PASS 도달률 1건 이상 / Meta-Loop 탈출 (메타 커밋 0~1회)
 - 1주 관찰 후 옵션 B(구조 다이어트 토론) 진입 여부 판단
 
+## 세션128 (2026-04-29) — [C] block_dangerous false positive + config awk 파싱 버그 패치
+
+### [완료] block_dangerous.sh 2b 블록 false positive 해소 + 잠재 버그 동시 수정
+- 1차 발견: 직전 share-result `cat > /tmp/share_msg.txt << EOF ... settings.local.json ... EOF` 차단 — 본문에 보호 파일명 인용만으로 false positive
+- 토론 진입 시도(round1_claude.md 작성) → 사용자 중지 요청 → Claude 단독 패치 결정
+- 2차 발견 (디버그 trace): `hook_config.json` awk 파싱이 한 줄 JSON 배열에서 `]` 인식 실패 → `PROTECTED_PATTERNS=(,)` 같은 잘못된 값으로 hardcoded fallback 무력화 (block_dangerous + protect_files 동일 버그)
+- 패치 3건:
+  1. `block_dangerous.sh` 2b — `$COMMAND` 전체 grep 폐기 → REDIRECT_TARGETS 토큰 추출 후 그 토큰만 PROTECTED_PATTERNS 매칭 (`>&2` fd 리다이렉션 제외, 다중 redirect 모두 검사)
+  2. `hook_config.json` danger_commands에서 `cat >`, `cat >>` 제거 — redirect는 2b가 처리 (60-67줄 블록 false positive 제거)
+  3. `block_dangerous.sh` + `protect_files.sh` config 파싱을 awk → python3 안전 파싱 교체 (python3 미가용 시 hardcoded fallback)
+- 검증 14/14 PASS: block_dangerous 10케이스(DENY 5 + ALLOW 5) + protect_files 4케이스
+- 회귀 영향 0: PreToolUse(Bash/Write) gate 단계, 외부 ERP/MES 영향 없음, 기존 차단 시나리오 모두 보존
+- 부수 정리: 미완료 토론 로그 `debate_20260429_214057_3way` + 임시 메시지 `99_임시수집/debate_msg_gpt.txt` 폐기
+
 ## 세션128 (2026-04-29) — [E+C] ZDM 서버 DB 다운 + MES 단독 업로드 + 1차 POST 500 패치
 
 ### [완료/차단] daily-routine 분리 처리

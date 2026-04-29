@@ -19,13 +19,23 @@ fi
 CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 DENY_EXT_PATTERN='\.(xlsx|xls|xlsm|csv|docx|pdf)$'
 DENY_PATH_PATTERN='(98_아카이브|기준정보.*최종)'
-if [ -f "$CONFIG_FILE" ]; then
-  # deny_extensions: JSON 배열에서 확장자만 추출 (awk로 배열 경계 안전 파싱)
-  _exts=$(awk '/"deny_extensions"/{found=1;next} found && /\]/{exit} found && /"\.[^"]*"/{gsub(/.*"\./, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
-  [ -n "$_exts" ] && DENY_EXT_PATTERN="\\.($_exts)$"
-  # deny_path_patterns: JSON 배열에서 패턴만 추출
-  _paths=$(awk '/"deny_path_patterns"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
-  [ -n "$_paths" ] && DENY_PATH_PATTERN="($_paths)"
+# 세션128: awk 한 줄 배열 파싱 버그 → python3 안전 파싱으로 교체
+if [ -f "$CONFIG_FILE" ] && command -v python3 >/dev/null 2>&1; then
+  _cfg=$(python3 -c "
+import json,sys
+try:
+    d=json.load(open(sys.argv[1]))['protect_files']
+    exts=[e.lstrip('.') for e in d.get('deny_extensions',[])]
+    print('|'.join(exts))
+    print('|'.join(d.get('deny_path_patterns',[])))
+except Exception: pass
+" "$CONFIG_FILE" 2>/dev/null)
+  if [ -n "$_cfg" ]; then
+    _exts=$(printf '%s\n' "$_cfg" | sed -n '1p')
+    _paths=$(printf '%s\n' "$_cfg" | sed -n '2p')
+    [ -n "$_exts" ] && DENY_EXT_PATTERN="\\.($_exts)$"
+    [ -n "$_paths" ] && DENY_PATH_PATTERN="($_paths)"
+  fi
 fi
 
 # Layer 1: 즉시 차단 (deny) — config 기반

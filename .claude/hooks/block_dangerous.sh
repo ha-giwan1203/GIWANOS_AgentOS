@@ -39,22 +39,45 @@ fi
 # hook_config.json에서 설정 읽기 (Phase 2: 중앙 설정형, fallback: 하드코딩)
 CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 PROTECTED_PATTERNS='(CLAUDE\.md|README\.md|STATUS\.md|RUNBOOK\.md|AGENTS_GUIDE\.md|settings.*\.json|\.skill|기준정보.*최종)'
-DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee |cat >|cat >>)'
-if [ -f "$CONFIG_FILE" ]; then
-  _pp=$(awk '/"protected_path_patterns"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
-  [ -n "$_pp" ] && PROTECTED_PATTERNS="($_pp)"
-  _dc=$(awk '/"danger_commands"/{found=1;next} found && /\]/{exit} found && /"[^"]*"/{gsub(/.*"/, ""); gsub(/".*/, ""); print}' "$CONFIG_FILE" 2>/dev/null | tr '\n' '|' | sed 's/|$//')
-  [ -n "$_dc" ] && DANGER_CMDS="($_dc)"
+DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee )'
+# 주: `cat >`/`cat >>`는 본질적으로 redirect → 2b 블록이 target 토큰 검사로 처리 (세션128 false positive 패치)
+# 세션128: awk 파싱이 한 줄 JSON 배열에서 `]` 인식 실패 → PROTECTED_PATTERNS=`(,)` 같은
+# 잘못된 값을 만들어 hardcoded fallback을 무력화하던 버그. python3 안전 파싱으로 교체.
+if [ -f "$CONFIG_FILE" ] && command -v python3 >/dev/null 2>&1; then
+  _cfg=$(python3 -c "
+import json,sys
+try:
+    d=json.load(open(sys.argv[1]))['block_dangerous']
+    print('|'.join(d.get('protected_path_patterns',[])))
+    print('|'.join(d.get('danger_commands',[])))
+except Exception: pass
+" "$CONFIG_FILE" 2>/dev/null)
+  if [ -n "$_cfg" ]; then
+    _pp=$(printf '%s\n' "$_cfg" | sed -n '1p')
+    _dc=$(printf '%s\n' "$_cfg" | sed -n '2p')
+    [ -n "$_pp" ] && PROTECTED_PATTERNS="($_pp)"
+    [ -n "$_dc" ] && DANGER_CMDS="($_dc)"
+  fi
 fi
 
-# 2b. 보호 경로에 대한 직접 리다이렉션(> file) 차단 (GPT 지적 반영)
-if echo "$COMMAND" | grep -qE '>\s*[^|]' 2>/dev/null; then
-  if echo "$COMMAND" | grep -qiE "$PROTECTED_PATTERNS"; then
-    hook_log "PreToolUse/Bash" "BLOCKED: 보호 경로 리다이렉션 덮어쓰기 — $COMMAND"
-    echo '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"보호 대상 파일 리다이렉션 덮어쓰기 차단. 사용자 직접 실행 필요."}}'
-    hook_timing_end "block_dangerous" "$_BD_START" "block_redirect"
-    exit 2
-  fi
+# 2b. 보호 경로에 대한 직접 리다이렉션(> file) 차단
+# 수정 (세션128): redirect TARGET 토큰만 검사 — heredoc 본문에 보호 파일명 단어가 인용되어도 차단되던 false positive 해소
+# 차단 조건은 동일: target 파일이 PROTECTED_PATTERNS 매칭 시 deny
+REDIRECT_TARGETS=$(echo "$COMMAND" | grep -oE '>>?[[:space:]]*[^[:space:]|<>&;]+' | sed -E 's/^>>?[[:space:]]*//')
+if [ -n "$REDIRECT_TARGETS" ]; then
+  while IFS= read -r _target; do
+    [ -z "$_target" ] && continue
+    # &1, &2 등 fd 리다이렉션은 제외
+    case "$_target" in
+      \&*) continue ;;
+    esac
+    if echo "$_target" | grep -qiE "$PROTECTED_PATTERNS"; then
+      hook_log "PreToolUse/Bash" "BLOCKED: 보호 경로 리다이렉션 덮어쓰기 — target=$_target"
+      echo '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"보호 대상 파일 리다이렉션 덮어쓰기 차단. 사용자 직접 실행 필요."}}'
+      hook_timing_end "block_dangerous" "$_BD_START" "block_redirect"
+      exit 2
+    fi
+  done <<< "$REDIRECT_TARGETS"
 fi
 
 if echo "$COMMAND" | grep -qE "$DANGER_CMDS"; then

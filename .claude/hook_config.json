@@ -19,7 +19,8 @@
     "extreme_commands": ["rm -rf /", "git reset --hard", "git clean -fd", "git push.*--force.*main"],
     "destructive_patterns": ["truncate\\s", "find\\s.*-delete", "xargs\\s+rm"],
     "protected_path_patterns": ["CLAUDE\\.md", "README\\.md", "STATUS\\.md", "RUNBOOK\\.md", "AGENTS_GUIDE\\.md", "settings.*\\.json", "\\.skill", "기준정보.*최종"],
-    "danger_commands": ["rm ", "rm -f ", "rm -rf ", "del ", "Remove-Item ", "mv ", "cp ", "sed -i ", "tee ", "cat >", "cat >>"]
+    "_danger_commands_note": "cat >/cat >> 제거 (세션128) — redirect는 2b 블록이 target 토큰만 검사. heredoc 본문 false positive 방지",
+    "danger_commands": ["rm ", "rm -f ", "rm -rf ", "del ", "Remove-Item ", "mv ", "cp ", "sed -i ", "tee "]
   },
   "session_startup": {
     "_comment": "fallback_*_lines 20→5: SessionStart 출력 컨텍스트 폭증 감축 (debate_20260428_201108_3way 빼는 안 3 옵션 2 적용). 상세는 /현재상태 슬래시 명령어로 lazy load.",

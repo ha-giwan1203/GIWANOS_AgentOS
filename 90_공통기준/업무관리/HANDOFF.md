@@ -4,8 +4,22 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션128 (2026-04-29) — [C] block_dangerous false positive + config awk 파싱 버그 패치
+
+### 처리
+- block_dangerous.sh 2b 블록: `$COMMAND` 전체 grep → REDIRECT_TARGETS 토큰만 검사로 교체 (heredoc 본문 false positive 해소)
+- hook_config.json danger_commands: `cat >`, `cat >>` 제거 (redirect는 2b가 처리)
+- block_dangerous + protect_files config 파싱: awk → python3 안전 파싱 (한 줄 JSON 배열 인식 실패 버그 동시 수정)
+- 검증 14/14 PASS, 회귀 영향 0
+
+### 다음 AI 액션
+- share-result 재시도 시 본문에 보호 파일명 인용 있어도 차단되지 않음 — 정상 작동 확인
+- 다른 hook의 awk JSON 파싱 패턴 점검 (현재 block_dangerous + protect_files 외에는 없음)
 
 ---
 
