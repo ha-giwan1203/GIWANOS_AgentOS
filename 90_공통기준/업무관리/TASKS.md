@@ -10,7 +10,31 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-29 KST — 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)
+
+### [완료] 측정 인프라 셋업 + 양측 PASS
+- 합의: 세션128 `debate_20260429_202801_3way` Round 1 pass_ratio 1.0 옵션C 채택
+- 신호: S1 첫 답변 실물 지향성 ≥70% / S2 PASS 도달 ≥1 / S3 메타 커밋 0~1
+- 로그: `90_공통기준/토론모드/logs/quant_signal_log.md` (append-only)
+- plan: `C:/Users/User/.claude/plans/virtual-bouncing-crab.md`
+- 신규 hook/skill/command 0개 (S3 위반 회피 설계)
+- 본 세션129 자기 측정: S1 60% (3/5라인) / S2 PASS / S3 1건 → 부분 PASS
+
+### [완료] 양측 PASS (GPT + Gemini)
+- GPT: PASS / item 1·2·3 모두 실증됨·동의 / 추가제안 A분류 1건
+- Gemini: PASS / item 1·2·3 모두 실증됨·동의 / GPT 판정 교차검증 동의 / 추가제안 A분류 1건 (구체화)
+- 라벨링 종합: 채택 3 / 보류 0 / 버림 0
+
+### [완료] A분류 추가제안 즉시 반영 (양측 합의)
+- S1 측정 정량화: "전체 N줄 중 실행 M줄" 근거 비고 명시 의무 추가
+- 본 세션129 자기 측정 1행에 정량 근거 (3/5) 추가 기록
+- 변경 파일: `quant_signal_log.md` 1건만 — S3 시그널 유지
+
+### [잔존] 종료 조건 후 결정
+- ALL≥5/7 → 옵션B 보류 / ALL≤2/7 → 옵션B 즉시 활성
+- 다음 일반 세션 종료 시 1행 추가 (S1/S2/S3 정직 기록)
 
 ## 세션128 (2026-04-29) — [3way+A] 성능 실망 진단 + 운영 위생 1회 정리
 
