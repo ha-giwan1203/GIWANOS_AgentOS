@@ -9,19 +9,37 @@ source "$(dirname "$0")/hook_common.sh"
 _SG_START=$(hook_timing_start)
 
 # ─────────────────────────────────────────────────────────
-# Phase 0 [세션126 신설]: CDP Chrome 9222 헬스체크 (hard gate)
+# Phase 0 [세션126 신설/정정]: CDP Chrome 9222 자동 기동 + 헬스체크
 # 외부 공유는 chrome-devtools-mcp(포트 9222) 단독 사용 (세션107 정책).
-# 미기동 시 GPT/Gemini 진입 자체가 불가 → 즉시 차단.
-# 사용자 정책: Claude 자동 기동 금지 — 사용자가 직접 기동.
+# 미기동 시 자동으로 백그라운드 기동 → 8초 대기 → 헬스체크. 사용자 수동 개입 불요.
+# 사용자 정책 (세션126 정정): "브라우저 꺼져 있으면 켜서 진행" = Claude 자동 기동.
+# 자동 기동 실패한 경우에만 사용자에게 안내.
 # ─────────────────────────────────────────────────────────
+CHROME_EXE="C:/Program Files/Google/Chrome/Application/chrome.exe"
+CDP_PROFILE="C:\\temp\\chrome-cdp"
+
 if ! curl -sf --max-time 2 http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
-  echo "[share_gate] ⛔ CDP Chrome 포트 9222 미기동 — 외부 공유 진행 불가" >&2
-  echo "[share_gate] → 사용자: 아래 명령으로 CDP Chrome 기동 후 재시도해주세요." >&2
-  echo "[share_gate]   \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --remote-debugging-port=9222 --user-data-dir=C:\\temp\\chrome-cdp" >&2
-  echo "[share_gate] (프로필 C:\\temp\\chrome-cdp는 ChatGPT/Gemini 로그인 상태 유지용 — 일반 Chrome 프로필 사용 금지, 세션107 정책)" >&2
-  hook_log "share_gate" "CDP 9222 down — abort gate"
-  hook_timing_end "share_gate" "$_SG_START" "cdp_down"
-  exit 2
+  echo "[share_gate] CDP 9222 미기동 감지 → 자동 기동 시도" >&2
+  if [ -x "$CHROME_EXE" ] || [ -f "$CHROME_EXE" ]; then
+    "$CHROME_EXE" --remote-debugging-port=9222 --user-data-dir="$CDP_PROFILE" --no-first-run --no-default-browser-check >/dev/null 2>&1 &
+    disown 2>/dev/null
+    sleep 8
+    if curl -sf --max-time 3 http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+      echo "[share_gate] ✅ CDP 9222 자동 기동 성공" >&2
+      hook_log "share_gate" "CDP 9222 auto-started"
+    else
+      echo "[share_gate] ⛔ CDP 9222 자동 기동 실패 — 수동 기동 후 재시도 필요" >&2
+      echo "[share_gate]   \"$CHROME_EXE\" --remote-debugging-port=9222 --user-data-dir=$CDP_PROFILE" >&2
+      hook_log "share_gate" "CDP 9222 auto-start failed"
+      hook_timing_end "share_gate" "$_SG_START" "cdp_autostart_failed"
+      exit 2
+    fi
+  else
+    echo "[share_gate] ⛔ Chrome 실행 파일 미발견: $CHROME_EXE" >&2
+    hook_log "share_gate" "chrome.exe not found"
+    hook_timing_end "share_gate" "$_SG_START" "chrome_missing"
+    exit 2
+  fi
 fi
 
 # 공유 대상 커밋: 기본 HEAD (share-result는 최신 커밋을 공유)
