@@ -21,8 +21,13 @@
 - 본 세션129 자기 측정 1행 기록: S1 60% / S2 PASS / S3 1건 → 부분 PASS
 - 신규 hook/skill/command 0개 (S3 위반 회피 설계)
 
+### 양측 PASS 확정 (3way 강제)
+- GPT: PASS / item 1·2·3 모두 실증됨·동의 / 추가제안 A분류 1건 (S1 근거 보강)
+- Gemini: PASS / item 1·2·3 모두 실증됨·동의 / GPT 판정 교차검증 동의 / 추가제안 A분류 1건 (S1 N/M 정량화)
+- A분류 즉시 반영: quant_signal_log.md S1 측정 가이드에 "N줄 중 M줄" 정량 근거 의무 추가 + 본 세션 1행 (3/5) 기록
+
 ### 다음 AI 액션
-- 다음 일반 세션 종료 시 quant_signal_log.md 1행 추가 (S1/S2/S3 정직 기록)
+- 다음 일반 세션 종료 시 quant_signal_log.md 1행 추가 (S1/S2/S3 정직 기록 + N/M 정량 근거)
 - 7세션 누적 또는 2026-05-06 도달 시 결정 분기:
   - ALL ≥ 5/7 → 옵션B(구조 다이어트) 보류
   - ALL ≤ 2/7 → 옵션B 즉시 활성
