@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-29 — 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운으로 일상점검 차단 + MES 단독 4/28 15건 OK + mes_login XSRF 패치)
+최종 업데이트: 2026-04-29 — 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS, 양측 PASS [GPT+Gemini 실증됨·동의] / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운 + MES 단독 4/28 15건 OK)
 
 ---
 
