@@ -34,6 +34,11 @@
 - gate 전환 보류 (양측 합의)
 - 1주 후 미실행률 50%+이면 hook 효과 부족 → 다른 안 검토
 
+### [완료] 즉시 처리 안건 1·2 (토론 후속)
+- TASKS.md 1104→833줄 감축 (271줄, 권장 282 부합) — 98_아카이브/TASKS_archive_세션98-104_20260429.md (gitignored)
+- incident 133건 분류 + 본 토론 result.json/step5_final_verification.md 작성으로 debate_verify 1건 보강. 정상 안전장치 발화 28건 = 시스템 정상 작동 증거
+- 라벨 엄밀성 보강(critic-reviewer WARN 후속)은 토론모드 CLAUDE.md 변경(B 분류) — **사용자 명시 호출 시 별도 진행**
+
 ## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
 
 ### [완료] SP3M3 주간 D0 14건 등록 (2026-04-29 아침)

@@ -42,6 +42,13 @@
 - 권장 감축 282줄에 부합 (271줄 = 96%)
 - SessionStart STRONG 경고 해소 예정
 
+### [완료] 즉시 처리 안건 2 — incident 분석 + debate_verify 1건 보강
+- 미해결 incident 133건 (보고된 122건과 약간 차이) 분류:
+  - 28건은 **정상 안전장치 발화**(completion_before_state_sync 14 / pre_commit_check 7 / evidence_missing 4 / harness_missing 4) — 시스템 정상 작동 증거. 토론 합의대로 hook으로 외부 비트 주입 효과로 해석
+  - 9건 session_drift / 9건 debate_verify / 4건 기타 — 별도 분석 의제
+- 본 세션125 토론(`debate_20260429_103117_3way`) result.json + step5_final_verification.md 작성 → debate_verify hook 미래 통과 보강 (1건 해소)
+- 자동 일괄 수리는 안 함 (auto-fix는 분석+제안 전용, SKILL.md 규정)
+
 ---
 
 ## 세션124 (2026-04-29) — [E] SP3M3 주간 D0 14건 등록 + auto-run OAuth 실패 복구
