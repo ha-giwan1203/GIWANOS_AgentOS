@@ -1,11 +1,28 @@
 #!/bin/bash
-# share_gate — share-result 0단계 3way 감지 조건 자동 검증
+# share_gate — share-result 0단계 환경 + 3way 감지 통합 게이트
 # 세션79 실증 (2026-04-20): "hook/settings 신설 커밋인데 2자 경로 선택" 우회 차단
-# 등급: advisory (차단은 하지 않음, stderr 경고 + hook_log 기록)
-# 호출: share-result 스킬 진입 시 수동 실행 (또는 /share-result 커스텀 hook에서)
+# 세션126 추가 (2026-04-29): CDP Chrome 9222 헬스체크 통합 — 사용자 반복 지적 정착
+# 등급: 혼합 (CDP 미기동 = hard gate exit 2 / 3way 감지 = soft advisory)
+# 호출: share-result 스킬 진입 시 수동 실행
 
 source "$(dirname "$0")/hook_common.sh"
 _SG_START=$(hook_timing_start)
+
+# ─────────────────────────────────────────────────────────
+# Phase 0 [세션126 신설]: CDP Chrome 9222 헬스체크 (hard gate)
+# 외부 공유는 chrome-devtools-mcp(포트 9222) 단독 사용 (세션107 정책).
+# 미기동 시 GPT/Gemini 진입 자체가 불가 → 즉시 차단.
+# 사용자 정책: Claude 자동 기동 금지 — 사용자가 직접 기동.
+# ─────────────────────────────────────────────────────────
+if ! curl -sf --max-time 2 http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
+  echo "[share_gate] ⛔ CDP Chrome 포트 9222 미기동 — 외부 공유 진행 불가" >&2
+  echo "[share_gate] → 사용자: 아래 명령으로 CDP Chrome 기동 후 재시도해주세요." >&2
+  echo "[share_gate]   \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --remote-debugging-port=9222 --user-data-dir=C:\\temp\\chrome-cdp" >&2
+  echo "[share_gate] (프로필 C:\\temp\\chrome-cdp는 ChatGPT/Gemini 로그인 상태 유지용 — 일반 Chrome 프로필 사용 금지, 세션107 정책)" >&2
+  hook_log "share_gate" "CDP 9222 down — abort gate"
+  hook_timing_end "share_gate" "$_SG_START" "cdp_down"
+  exit 2
+fi
 
 # 공유 대상 커밋: 기본 HEAD (share-result는 최신 커밋을 공유)
 COMMIT="${SHARE_GATE_COMMIT:-HEAD}"
