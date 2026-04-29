@@ -105,6 +105,15 @@ protected:
     reason: 보호 파일 차단
     removal_policy: never
 
+  - path: .claude/hooks/write_router_gate.sh
+    class: guard
+    reason: |
+      신규 파일 위치 화이트리스트 라우팅 gate (debate_20260428 / plan polymorphic-prancing-allen).
+      4-Layer: 워크트리 루트 직속 + 1단계 폴더 화이트리스트 + 임시 이름 advisory + .claude 통과.
+      모드: hook_config.json write_router.mode = advisory(첫 1주) | gate(Day 8+).
+      ※ 변경/이전 시 .claude/settings.json PreToolUse Write|Edit|MultiEdit 호출부 동시 점검 필수.
+    removal_policy: replace-only
+
   - path: .claude/hooks/date_scope_guard.sh
     class: guard
     reason: 날짜 범위 가드

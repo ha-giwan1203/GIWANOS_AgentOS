@@ -10,9 +10,9 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션124 [E] SP3M3 주간 D0 14건 등록 (auto-run OAuth 실패 → 수동 복구) / 세션123 [C] write-router 화이트리스트 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건 / 세션120 슬래시 명령어 2종
+최종 업데이트: 2026-04-29 KST — 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건
 
-## 세션124 (2026-04-29) — [E] SP3M3 주간 D0 14건 등록 + auto-run OAuth 실패 복구
+## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
 
 ### [완료] SP3M3 주간 D0 14건 등록 (2026-04-29 아침)
 - 파일: SP3M3_생산지시서_(26.04.29).xlsm 출력용 주간 섹션 (누적 컷 3,695개)
@@ -21,18 +21,45 @@
 - Phase 6 SmartMES 검증: 서열 순서 엑셀 일치 ✅
 - 품번: RSP3SC0383, 0384, 0382, 0642, 0590, 0584 / RSP3PC0143, 0144, 0054 / RSP3SC0666, 0665, 0362, 0251, 0249
 - 로그: `06_생산관리/D0_업로드/logs/morning_20260429_manual.log`
+- commit: 4ba79abe
 
 ### [복구] 07:10 자동실행 OAuth 실패 — 수동 복구
 - 자동실행 로그 `morning_20260429.log`: OAuth 완료 2회 실패 (`auth-dev.samsong.com:18100/login?error`) → exit 1
 - 원인: OAuth 콜백 후 클라이언트 선택 화면(`auth-dev/`)에 정착. `ensure_erp_login`은 `auth-dev/login` URL에서만 작동 → 30s timeout
 - 수동 조치: playwright CDP 9223 접속 → auth-dev 탭을 D0 URL로 직접 navigate → 재실행 통과
-- 잔존 데이터 위험: 0 (자동실행은 Phase 0 종료, 수동실행만 등록)
-- 모드 E 최소 패치 정량: 코드 변경 0줄, 외부 상태(브라우저 탭 navigate)만
 
-### [잔존] 사후 B 분석 필요 — auto-run OAuth 실패 패턴
-- 클라이언트 선택 화면 정착 시나리오 재발 가능 (오늘 1회 발생)
-- 해결안 후보: (a) `_wait_oauth_complete`에 클라이언트 선택 화면(`auth-dev` root + title="SAMSONG | OAuth") 감지 시 ERP 클릭 자동화, (b) `navigate_to_d0`에서 `auth-dev` 탭 자동 스킵 필터, (c) 두 안 결합
-- 다음 세션에서 모드 C 또는 D로 결정
+### [완료] 3자 토론 Round 1 — `_wait_oauth_complete` 비login auth-dev 정착 fallback (commit b4ab2fea)
+- 후보 (a)(b)(c) 보류/버림. (d) 단독 채택
+- (d) = `_wait_oauth_complete` 30s 실패 + 비login auth-dev URL일 때 raise 대신 `_safe_goto(D0_URL)` 1회 시도 + 재대기. ~5줄 elif 추가
+- cross_verification 4키 모두 동의, pass_ratio 1.00, claude_delta partial, issue_class B
+- critic-reviewer WARN 1건 (하네스 (a) 라벨 병합 근거 보강 후 진행)
+- 로그: `90_공통기준/토론모드/logs/debate_20260429_075455_3way/`
+- 양측 최종 검증: Gemini 통과 / GPT 실패 (push 안 된 시점 SHA 못 찾음 — push 후 재판정)
+
+### [완료] commit_gate.sh 근본 패치 — circuit breaker echo 제거 (commit 0c81d1fb)
+- 사유: commit_gate.sh:88 `echo` stdout/stderr 출력이 Claude Code PreToolUse hook 프로토콜에서 block 응답으로 오인 → false-block 반복
+- 변경: echo 라인 1줄 제거 (hook_log 기록은 유지). 사용자 명시 모드 C 승인
+- 효과: 다음 세션 재시작 후 Bash git commit 정상화 예상 (현재 세션은 캐싱)
+
+### [잔존] 검증 조건
+- 2026-04-30 07:10 D0_SP3M3_Morning LastResult=0 + morning_20260430.log 정상 종료 + exit code 0
+
+## 세션123 (2026-04-28) — [C] 폴더 화이트리스트 라우팅 gate 도입
+
+### [완료] 신규 파일 위치 sprawl 차단 시스템
+- 의제: 사용자 두 달간 Claude Code가 세션마다 파일을 임의 위치에 생성하는 sprawl 문제
+- 모드: C (시스템 수정) — plan-first + R1~R5 (plan: `.claude/plans/polymorphic-prancing-allen.md`)
+- 외부 의견: Gemini CLI minion + WebSearch 2건 (FareedKhan-dev/agentic-guardrails, roboticforce/agent-guardrails)
+- Gemini WARN 반영: 도메인 폴더 안 임시 패턴은 advisory(권고만)로 다운그레이드 — 정상 작업 흐름 차단 위험 회피
+- 변경 파일:
+  - `.claude/hooks/write_router_gate.sh` (신규, 약 110줄, 4-Layer 검증)
+  - `.claude/hook_config.json` write_router 섹션 추가 (mode 토글 + 화이트리스트)
+  - `.claude/settings.json` PreToolUse Write|Edit|MultiEdit에 등록
+  - `.claude/hooks/session_start_restore.sh` folder_map 4줄 출력 추가 (세션 시작 시 폴더 정책 컨텍스트)
+  - `90_공통기준/protected_assets.yaml` write_router_gate.sh 등록 (class: guard, replace-only)
+- 검증: smoke_fast 11/11 PASS, advisory 7건 + gate 4건 수동 테스트 모두 의도대로 동작
+- 운영: Day 1~7 advisory(경고만) → Day 8+ gate(deny+exit 2). hook_config.json `write_router.mode` 토글 1줄. GPT 검증 라운드는 Day 8+ 전환 시.
+- 후속: `.claude/hooks/README.md` 차단층 ⑱로 등록 완료, hook 카운트 35개 일치
 
 ## 세션122 (2026-04-28) — [3way] Opus 4.7→Sonnet 체감 진단 + 빼는 안 3 옵션 2 적용
 
