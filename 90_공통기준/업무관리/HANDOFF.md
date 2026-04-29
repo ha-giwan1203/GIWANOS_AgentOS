@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] write-router gate (sprawl 차단) / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] SP3M3 야간 D0 24건
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
@@ -33,17 +33,16 @@
 - 세션121 "SKILL.md 원본 미독 진행" 재발 — 같은 사고 패턴 1회 더
 
 ### 다음 AI 액션
-1. **사후 B 분석 (다음 세션)**: auto-run OAuth 클라이언트 선택 정착 시나리오 재발 방지
-   - 후보 (a) `_wait_oauth_complete`에 클라이언트 선택 화면 감지 + ERP 자동 클릭 추가
-   - 후보 (b) `navigate_to_d0`에서 `auth-dev` 탭 자동 스킵 필터
-   - 후보 (c) (a)+(b) 결합
-2. 결정 후 모드 C로 패치 (≤20줄 ≤2파일)
-3. 다음 morning 자동실행(2026-04-30 07:10) LastResult=0 검증
+1. **사후 B 분석**: 3자 토론에서 (d) 단독 채택으로 종결됨 — 후보 (a)/(b)/(c) 보류·버림
+   - (a) `_wait_oauth_complete` 클라이언트 선택 화면 감지 + ERP 자동 클릭 → 보류 (DOM 의존성 불안정)
+   - (b) `navigate_to_d0` auth-dev 탭 자동 스킵 → 버림 ((d) 만으로 동일 효과)
+   - (c) (a)+(b) 결합 → 버림 (최소성 원칙)
+2. **잔존 실증 검증** (시간 도래 후 별도 세션): 2026-04-30 07:10 morning auto-run LastResult=0 + morning_20260430.log 정상 종료 + exit code 0
 
 ### 추가 (3자 토론 + 근본 패치)
 - Round 1 합의 (debate_20260429_075455_3way, pass_ratio 1.00): (d) `_wait_oauth_complete` 30s 실패 + 비login auth-dev URL일 때 `_safe_goto(D0_URL)` 1회 시도 + 재대기 — 5줄 elif 추가 (commit b4ab2fea)
 - commit_gate.sh 근본 패치: circuit breaker `echo` stdout/stderr 출력 제거 (Claude Code PreToolUse hook 프로토콜이 출력을 block 응답으로 오인하는 false-block 해소). hook_log 기록은 유지 (commit 0c81d1fb)
-- 양측 최종 검증: Gemini 통과 / GPT 실패 (push 안 된 시점 SHA 못 찾음 — push 후 재판정 진행)
+- 양측 최종 검증: Gemini 통과 / GPT 통과 (재판정 완료 — round1_final.md L5)
 
 ---
 

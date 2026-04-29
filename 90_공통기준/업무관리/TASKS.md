@@ -10,7 +10,7 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건
+최종 업데이트: 2026-04-29 KST — 세션124 [3way] GPT 재판정 통과 — 토론 close / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate stdout 정리 / 세션124 [E] SP3M3 주간 D0 14건 등록 / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종 / 세션121 [E] d0-plan SP3M3 야간 D0 24건
 
 ## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
 
@@ -34,7 +34,7 @@
 - cross_verification 4키 모두 동의, pass_ratio 1.00, claude_delta partial, issue_class B
 - critic-reviewer WARN 1건 (하네스 (a) 라벨 병합 근거 보강 후 진행)
 - 로그: `90_공통기준/토론모드/logs/debate_20260429_075455_3way/`
-- 양측 최종 검증: Gemini 통과 / GPT 실패 (push 안 된 시점 SHA 못 찾음 — push 후 재판정)
+- 양측 최종 검증: Gemini 통과 / GPT 통과 (재판정 완료 — round1_final.md 기준, b4ab2fea+0c81d1fb push 후)
 
 ### [완료] commit_gate.sh 근본 패치 — circuit breaker echo 제거 (commit 0c81d1fb)
 - 사유: commit_gate.sh:88 `echo` stdout/stderr 출력이 Claude Code PreToolUse hook 프로토콜에서 block 응답으로 오인 → false-block 반복
