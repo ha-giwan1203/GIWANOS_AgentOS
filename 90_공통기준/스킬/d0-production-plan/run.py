@@ -691,10 +691,12 @@ def process_one_row(page, prod_no, target_ext_reg, target_line, save_url, dry_ru
 def dedupe_night_first_5(page, items, check_count=5):
     """야간 추출 결과의 첫 N행(기본 5)을 ERP 상단 grid 기등록분과 비교해 중복 제외.
 
-    매칭 기준: REG_DT=오늘 AND PROD_NO 일치 AND 수량 일치 (PRDT_QTY 또는 ADD_PRDT_QTY).
+    매칭 기준: REG_DT=오늘 AND **PROD_NO 일치만** (수량 무관, 2026-04-29 사용자 결정 v3.2).
     매칭된 행만 items에서 제외. N+1번째 이후는 그대로.
 
     2026-04-29 사용자 요청 — SP3M3 야간 1~5행이 주간 등록분과 2중 등록되는 현상 방지.
+    초기 v3.1은 PROD_NO+수량 동시 매칭이었으나, 같은 품번이면 수량 다르더라도 작업자 입장에서
+    중복 작업 위험 동일하므로 PROD_NO만으로 매칭하도록 정책 단순화.
     """
     if not items:
         return items
@@ -716,14 +718,15 @@ def dedupe_night_first_5(page, items, check_count=5):
     skipped, kept = [], []
     for i, it in enumerate(items):
         if i < check_count:
-            match = next((g for g in grid
-                          if g["PROD_NO"] == it["PROD_NO"] and g["QTY"] == it["QTY"]), None)
+            # 수량 무관, PROD_NO만 매칭 (v3.2)
+            match = next((g for g in grid if g["PROD_NO"] == it["PROD_NO"]), None)
             if match:
                 skipped.append(it)
-                print(f"[dedupe] 야간 {i+1}행 PROD_NO={it['PROD_NO']} qty={it['QTY']} 주간과 동일 → 제외")
+                # 로그에는 야간 qty + 주간 등록 qty 둘 다 표시 (참고용)
+                print(f"[dedupe] 야간 {i+1}행 PROD_NO={it['PROD_NO']} 야간qty={it['QTY']} 주간qty={match['QTY']} → 품번 일치, 제외")
                 continue
         kept.append(it)
-    print(f"[dedupe] 야간 추출 {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건 (1~{check_count}행만 검사, 6행 이후는 그대로)")
+    print(f"[dedupe] 야간 추출 {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건 (1~{check_count}행만 검사, 품번 일치 기준)")
     return kept
 
 
