@@ -34,7 +34,7 @@
 ### 다음 AI 액션
 1. Phase B hook 동작 1주 모니터링 (hook_log.jsonl 발화 횟수 + 후속 share-result 실행 비율)
 2. 2026-05-06 1주 후 ROI 결과 보고
-3. 잔존: 2026-04-30 07:10 morning auto-run LastResult=0 검증 (세션124 D0 OAuth 패치 실증)
+3. 잔존: 2026-04-30 07:05 morning auto-run LastResult=0 검증 (세션124 D0 OAuth 패치 실증, 시간 07:10→07:05 사용자 결정 변경)
 
 ### [완료] 즉시 처리 안건 1 — TASKS.md 1104→833줄 감축 (271줄)
 - 98_아카이브/TASKS_archive_세션98-104_20260429.md로 분리 (로컬 전용 gitignored)
@@ -62,10 +62,12 @@
 - 산출물: verify_run.py(290줄) + run_morning_recover.bat + SKILL.md Phase 7 + README schtasks 안내
 - critic WARN: 4키 긍정 일색 + 보류→채택 경위 부족 (결론 영향 없음)
 - **양측 부분PASS 후속 보강 commit (실증 결함 3건)**: classify_failure 모든 RETRY_OK Phase 3+ → RETRY_BLOCK / Phase unknown 강제 종료 차단 / SKILL DOM stub 정확화
-- **사용자 작업 필요**: schtasks /create로 D0_SP3M3_Morning_Recover 07:30 등록 (README에 명령 안내)
+- **사용자 작업 필요 (시간 사용자 결정 반영)**:
+  - 기존 `D0_SP3M3_Morning` 시간 변경: `schtasks /change /TN "D0_SP3M3_Morning" /ST 07:05` (07:10 → 07:05)
+  - 신규 `D0_SP3M3_Morning_Recover` 등록 (07:15, morning 10분 후): README에 명령 안내
 
 ### 다음 AI 액션 (재정리)
-1. 사용자가 schtasks 등록 후 다음 morning(2026-04-30 07:10) 발화 + 07:30 recover 발화 검증
+1. 사용자가 schtasks 등록 후 다음 morning(2026-04-30 07:05) 발화 + 07:15 recover 발화 검증
 2. 1주 운영 후 hook_log·incident_ledger 누적 분석 → 분류기 정합성 보고
 3. Phase 2 이월: Slack MCP 통합 / 야간 verify wrapper / 분류기 개선
 

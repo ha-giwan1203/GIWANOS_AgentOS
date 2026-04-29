@@ -191,7 +191,7 @@ python run.py --session evening --line SD9A01    # SD9A01만
 
 ## Phase 7 — 사후 검증 + 자동 재실행 (verify_run.py, debate_20260429_121732_3way 합의)
 
-> **목적**: D0_SP3M3_Morning(07:10) / Night Windows 작업 스케줄러 실행 후 결과 자동 검증.
+> **목적**: D0_SP3M3_Morning(07:05) / Night Windows 작업 스케줄러 실행 후 결과 자동 검증 (verify는 07:15, morning 10분 후).
 > 실패 감지 시 원인 분류 → RETRY_OK 백오프 / RETRY_BLOCK·RETRY_NO 즉시 알림.
 
 ### 호출 (사용자 작업 스케줄러 등록 후 자동)
@@ -234,7 +234,7 @@ python verify_run.py --session morning --line SP3M3 --dry-run    # 점검만
 
 ### Windows 작업 스케줄러 등록 (사용자 수동, admin 권한 필요할 수 있음)
 ```
-schtasks /create /TN "D0_SP3M3_Morning_Recover" /TR "C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan\run_morning_recover.bat" /SC DAILY /ST 07:30 /RU <USER>
+schtasks /create /TN "D0_SP3M3_Morning_Recover" /TR "C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan\run_morning_recover.bat" /SC DAILY /ST 07:15 /RU <USER>
 ```
 
 > **기존 `run_morning_verify.bat`(Phase 3까지 parse-only 사전 점검)와 별개**.

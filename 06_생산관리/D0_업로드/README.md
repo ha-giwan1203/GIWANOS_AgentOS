@@ -3,22 +3,32 @@
 > 본 폴더는 D0_SP3M3 Morning/Night 자동 실행 로그 저장소.
 > Phase 7 사후 검증·자동 재실행 wrapper(`run_morning_recover.bat`)는 사용자가 Windows 작업 스케줄러로 직접 등록.
 
+## 시간 정책 (세션125 사용자 결정 2026-04-29)
+- **D0_SP3M3_Morning**: 매일 **07:05** 실행 (이전 07:10 → 변경)
+- **D0_SP3M3_Morning_Recover (verify)**: 매일 **07:15** 실행 (morning 10분 후, 빠른 인지 우선)
+
+## 기존 morning 작업 시간 변경 (07:10 → 07:05)
+관리자 PowerShell:
+```powershell
+schtasks /change /TN "D0_SP3M3_Morning" /ST 07:05
+```
+
 ## 의제 합의
 - 토론: `90_공통기준/토론모드/logs/debate_20260429_121732_3way/` (Round 1 pass_ratio 1.00, 양측 통과)
 - 채택안 6대 단위: 원인 분류 4종 + 백오프 1/5/15/30분 + Phase 0/1/2 한정 강제 종료 + dedupe 매번 + lock os.O_EXCL + DOM 저장
 
 ## 신규 등록 작업 스케줄러
 
-### 1. D0_SP3M3_Morning_Recover (07:30, morning 20분 후)
+### 1. D0_SP3M3_Morning_Recover (07:15, morning 10분 후)
 관리자 PowerShell:
 ```powershell
 schtasks /create `
   /TN "D0_SP3M3_Morning_Recover" `
   /TR "C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan\run_morning_recover.bat" `
-  /SC DAILY /ST 07:30 /F
+  /SC DAILY /ST 07:15 /F
 ```
 또는 GUI 작업 스케줄러:
-- 트리거: 매일 07:30
+- 트리거: 매일 07:15
 - 동작: `C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan\run_morning_recover.bat`
 - 시작 위치: `C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\d0-production-plan`
 - 권한: 가장 높은 권한으로 실행
@@ -29,9 +39,9 @@ schtasks /create `
 야간 wrapper(`run_night_recover.bat`)는 morning wrapper 복제 후 `--session night`로 변경하면 즉시 사용 가능. 야간 시간대는 사용자 야간 작업 스케줄러 시간 + 30분.
 
 ## 동작 요약
-1. morning 07:10 실행 (기존 `D0_SP3M3_Morning`)
+1. morning 07:05 실행 (기존 `D0_SP3M3_Morning`, 시간 변경됨)
 2. morning_<today>.log 작성
-3. **07:30 verify 발화** (신규)
+3. **07:15 verify 발화** (신규)
    - 로그 파일 존재 + 종료 마커 검증
    - 실패 시 원인 분류 → RETRY_OK 백오프(1/5/15/30분) / RETRY_BLOCK·RETRY_NO 즉시 알림
    - 매 재시도 전 dedupe 선행

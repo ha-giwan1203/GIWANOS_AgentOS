@@ -56,7 +56,7 @@
 - 검증: ast.parse OK, --help OK, --dry-run OK
 - critic-reviewer WARN (cross_verify 4키 긍정 일색 + 보류→채택 경위 명시 부족 — 결론 영향 없음)
 - **양측 부분PASS 후속 보강 (실증 결함 3건)**: classify_failure 모든 RETRY_OK 패턴 Phase 3+ → RETRY_BLOCK / Phase unknown 강제 종료 차단 / SKILL DOM 저장 stub 정확화
-- **사용자 작업 필요**: schtasks /create로 D0_SP3M3_Morning_Recover 07:30 등록 (admin 권한)
+- **사용자 작업 필요 (시간 사용자 결정 반영)**: 기존 D0_SP3M3_Morning 시간 변경(`/ST 07:05`) + 신규 D0_SP3M3_Morning_Recover 등록(`/ST 07:15`) (admin)
 - Phase 2 이월: Slack MCP 통합, 야간 verify wrapper, 1주 운영 후 분류기 정합성 보고
 
 ## 세션124 (2026-04-29) — [3way] SP3M3 D0 OAuth 비login 정착 fallback + commit_gate 근본 패치
