@@ -49,6 +49,21 @@
 1. share_gate.sh 첫 작성 시 "사용자 발언 정반대 해석 (Claude 자동 기동 금지)" → 사용자 강한 재지적 후 정정. feedback_cdp_health_check_first.md에 "한국어 모호 발언은 자동화 우선 + 자연스러운 해석 원칙" 박음
 2. SKILL.md description+결정표에 균등분포 잔재 → GPT가 발견, 사용자 짚기 전에 정정 못 함. 토론모드 상호 감시 프로토콜이 잡아준 사례
 
+### [실 운영] SP3M3 야간 D0 18건 등록 (저녁 18:30~19:00 KST)
+- Phase 3 업로드 18건 / Phase 4 rank_batch done=18 failed=0 / Phase 5 mesMsg statusCode=200 rsltCnt=850
+- 야간 등록 ext: 319742~319759 (319751, 319752 일부 중복 제외 → 17 unique)
+- 1차 실행 시 사용자가 브라우저 닫아 12건만 임시저장 후 중단 → 사용자 ERP 직접 12건 삭제 → 2차 재실행 18건 정상 완료
+- erp_d0_deleteA.py 9222 → 9223 포트 정정 패치 (.claude/tmp/ — 별도 commit 필요)
+
+### [잔존 신규 — 다음 세션] dedupe 버그 + 잘못 등록 5건
+- **dedupe_night_first_5() 함수 미동작 확정** — 야간 1~5행이 모두 주간 PROD_NO 중복(RSP3SC0362/0251/0249/0752/PC0144)인데 dedupe 못 잡고 18건 그대로 등록. `[dedupe]` 로그 출력 0줄 = print 자체 누락
+- **잘못 등록된 5건** (ext 319742~319746) — 사용자가 ERP에서 직접 삭제 결정. 또는 SmartMES 작업자 처리 위임
+- **다음 진단 항목**:
+  1. dedupe 함수 시작점에 unconditional print 추가 → 호출 여부 확인
+  2. page.evaluate grid 평가 시점이 상단 grid 비동기 로드 전인지 — 함수 진입 직후 1~2초 wait 추가 검토
+  3. erp_d0_deleteA.py가 사용자 수동 row 선택 의존 → 자동 row 선택 + 라인 선택 추가 검토
+- **Phase 6 SmartMES 검증 rank 불일치** — 동기화 시점차 가능성, 다음날 morning 후 재확인
+
 ### 메모리 갱신
 - 신규: `project_jobsetup_skill.md` + MEMORY.md 인덱스 추가
 

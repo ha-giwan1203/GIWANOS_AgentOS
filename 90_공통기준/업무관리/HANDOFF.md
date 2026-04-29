@@ -49,6 +49,14 @@
 3. 첫 실행 결과로 저장 단위 확정 → SKILL.md Step 8 v1.0 승격
 4. 매칭 키 미스매치 시 정확한 ERP 필드명으로 `dedupe_night_first_5` 재패치
 
+### 18:30~19:00 evening 1차 실행 결과 + 잔존
+- **결과**: SP3M3 야간 18건 등록 완료 + MES 전송 PASS (rsltCnt 850). ext 319742~319759 (17 unique)
+- **dedupe 미동작 확정**: 야간 1~5행 PROD_NO 5개 모두 주간 중복인데 그대로 등록. `[dedupe]` 로그 출력 0줄 = 함수 호출 여부 자체 추적 불가. 다음 세션에서 unconditional print + grid 비동기 wait 추가 진단
+- **잘못 등록 5건** (ext 319742~319746 RSP3SC0362/0251/0249/0752/PC0144) — 사용자 ERP에서 직접 삭제 또는 SmartMES 작업자 처리 위임
+- **erp_d0_deleteA.py 9222→9223 포트 정정** 적용 (`.claude/tmp/erp_d0_deleteA.py`)
+- **세션 내 메타 실수 2건** TASKS [메타] 섹션 자기 보고
+- **사용자 스트레스 상태로 종료** — 마무리 명시 후 commit + push만 처리
+
 ---
 
 ## 세션125 (2026-04-29) — [3way] 알잘딱깔센 미달 진단 + 개선 방향 결정·구현
