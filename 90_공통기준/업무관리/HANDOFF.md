@@ -4,8 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-30 KST — 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 안1+안3 채택, 안2 보류) — incident_quote.md 신설 + finish/daily/d0-plan 사전 점검. 새 hook 0개 / 세션131 [E] SP3M3 morning OAuth 콜백 정체 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
+최종 업데이트: 2026-04-30 KST — 세션132 [E+C] 잡셋업 v0.3 결함 5종 정정 + v1.0 baseline (어제 약속 미검증 → 오늘 실측 재설계 + run_jobsetup.py 230줄 신설 + 입력 메커니즘 numpad/minus 검증 + 좌표 1456→1920 스케일 1.319 변환 + 매일 1번 품번 변경 발견 + run_morning.bat chain 미활성 명시) / 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 안1+안3 채택, 안2 보류) — incident_quote.md 신설 + finish/daily/d0-plan 사전 점검. 새 hook 0개 / 세션131 [E] SP3M3 morning OAuth 콜백 정체 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션132 (2026-04-30) — [E+C] 잡셋업 v1.0 baseline 정정
+
+### 진입
+- 사용자: "스마트 mes 잡셋업 작업 이어서 할거애" → 모드 A 시작 → 어제 v0.3 자동화 미동작 빡침 → 모드 E 분석 → 모드 C 재설계
+- 사용자 결정: run.py에 잡셋업 호출 박기 / D0 OAuth는 명일 별도
+
+### 처리
+- **결함 5종 식별 (v0.3 약속 vs 실측 대조)**:
+  1. triple_click/pyautogui.type 미작동 (X1/X2/X3 표준 textbox 아님 — WPF 커스텀)
+  2. 정상 입력 = C 버튼 + 우측 numpad 클릭 시퀀스, 음수 = 키보드 minus 키
+  3. /d0-plan Step 5 hand-off는 슬래시 가이드 — 무인 schtasks 경로(.bat→python run.py)에 호출 0줄
+  4. 매일 1번 품번 변경 (어제 RSP3SC0383_A → 오늘 RSP3PC0129_A) — 어제 17개 hardcode 품번 전용
+  5. 좌표 스케일 결정적 발견 — Claude screenshot 1456×819, 실제 1920×1080. ratio 1.319 변환 필수
+- **v1.0 baseline 신설**:
+  - run_jobsetup.py (230줄): pyautogui + numpad 시퀀스 + 해상도 가드 + MESClient.exe 가드 + 정규분포 random.gauss + jsonl 결과
+  - state/input_mechanism_20260430.md: 검증된 입력 시퀀스 baseline
+  - state/run_20260430_*.json: 1차 단독 호출 검증 (jsonl OK, 입력값 [0.01, -0.01, 0.02])
+- **정정**:
+  - SKILL.md v1.0 변경이력 (결함 5종 + 미해결 명시)
+  - screen_analysis A3 표기 통일 (교집합) + 품번 일반성 명시
+
+### 미해결 (v1.x)
+- 좌표 정확도 미보장 (1차 시도 후 화면 [60]에 떨어짐 — 결과 검증 단계 부재)
+- B형 검사항목 OK/NG 분기 부재
+- OCR 동적 처리 부재 (매일 첫 서열 변경 대응 불가)
+- run_morning.bat chain 미활성 = 명일(2026-05-01) 무인 호출 0% (어제 약속은 애초에 0%)
+
+### 다음 AI 액션
+- 명일 morning D0 OAuth erp-dev:19100 케이스 보강 (별도 세션, splendid-roaming-quilt.md 잔존)
+- 잡셋업 v1.1: 좌표 정밀화 + B형 분기 + OCR 검토 + chain 활성
 
 ---
 

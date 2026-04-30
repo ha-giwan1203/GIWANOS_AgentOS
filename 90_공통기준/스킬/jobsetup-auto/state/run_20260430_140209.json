@@ -1,0 +1,21 @@
+{
+  "ts_start": "2026-04-30T14:02:09.978490",
+  "mode": "dry-run",
+  "max_items": 1,
+  "items_processed": [
+    {
+      "process": "[40] 베어링 부시 조립",
+      "item": "스플 베어링 부시 \"0\"점 MASTER GAGE",
+      "spec": "0 ± 0.05",
+      "values": [
+        0.01,
+        -0.01,
+        0.02
+      ]
+    }
+  ],
+  "save_clicked": false,
+  "note": "dry-run — 저장 미클릭. SmartMES 메모리에는 입력값 잔존 (재진입 시 사라짐).",
+  "ts_end": "2026-04-30T14:02:19.361055",
+  "ok": true
+}

@@ -10,7 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-30 KST — 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-30 KST — 세션132 [E+C] 잡셋업 v0.3 결함 5종 정정 + v1.0 baseline (run_jobsetup.py 230줄 신설 + 입력 메커니즘 numpad/minus/C 실측 검증 + 좌표 1456→1920 스케일 1.319 변환 + 매일 1번 품번 변경 발견 + chain 미활성 명시 / v1.x 미해결: 좌표 정확도·B형 분기·OCR·chain 활성) / 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션132 (2026-04-30) — [E+C] 잡셋업 v1.0 baseline 정정
+
+### [완료] 어제 v0.3 결함 5종 정정
+- 입력 메커니즘 결함: triple_click/type 미작동 → numpad 클릭 시퀀스 + 키보드 minus 검증
+- 무인 chain 결함: /d0-plan Step 5는 슬래시 가이드 (무인 경로 0줄) → SKILL.md 표기 정정
+- 품번 일반성 결함: 어제 17개 hardcode는 RSP3SC0383_A 전용 → 오늘 RSP3PC0129_A 다른 품번
+- 좌표 스케일 결함: Claude 1456×819 ≠ 실제 1920×1080 → ratio 1.319 변환 박음
+- "무인 자동 실행 허용" 약속: 미검증 → v1.0 baseline 한계 명시
+
+### [완료] run_jobsetup.py baseline (230줄)
+- pyautogui + numpad 시퀀스 + 해상도 가드(1920×1080) + MESClient.exe 가드
+- 정규분포 random.gauss(σ=오차/3) + jsonl 결과 기록
+- 1차 단독 호출 PASS: state/run_20260430_140209.json (입력값 [0.01, -0.01, 0.02] 0±0.05 범위)
+
+### [미해결 — v1.x]
+- 좌표 정확도 미보장: 1차 시도 후 화면이 [40] 아닌 [60]에 떨어짐. 결과 검증 단계 부재
+- B형 검사항목 OK/NG 분기 부재 (X1/X2/X3 비우고 OK만 체크 로직)
+- OCR 동적 처리 부재 — 매일 첫 서열 변경 대응 불가
+- run_morning.bat chain 미활성 — 명일(2026-05-01) 07:05 morning 무인 호출 0%
+- D0 OAuth erp-dev:19100 케이스 보강 (splendid-roaming-quilt.md 잔존, 별도 세션)
+
+### 다음 AI 액션
+- 명일 morning D0 결과 확인 + 잡셋업 v1.1 (좌표 정밀화 + B형 분기 + OCR + chain 활성)
+
+---
 
 ## 세션131 (2026-04-30) — [B+C] 실패 대응 자동 진단 인용 개선
 

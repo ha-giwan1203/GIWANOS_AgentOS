@@ -12,8 +12,8 @@ description: >
   ❌ 무인 자동 실행 금지 — 사용자가 화면에서 진행 시각 확인 가능할 때만 실행.
   기본값 dry-run (저장 버튼 미클릭).
 grade: B
-last_updated: 2026-04-29
-status: v0.1 dry-run only — 첫 실행 학습 후 v1.0 commit
+last_updated: 2026-04-30
+status: v1.0 baseline (단일 케이스 [40] 1건 dry-run만) — 실측 검증 완료. 다중 검사항목/OCR 동적 처리는 v1.x
 ---
 
 # SmartMES 잡셋업 자동 입력 스킬
@@ -24,9 +24,9 @@ status: v0.1 dry-run only — 첫 실행 학습 후 v1.0 commit
 
 - 자동차 부품 제조의 첫 셋업 검사 데이터를 자동 생성하는 것에 해당
 - 사내 품질/감사 정책상 허용된 범위인지 **사용자 본인 책임 하에 운영**
-- 잘못 저장 시 **재입력 → 재저장**으로 정정 가능 (사용자 확인 2026-04-29). 별도 삭제 API 불필요
-- `/d0-plan` SP3M3 morning hand-off에서 **무인 자동 실행됨** (사용자 명시 승인 2026-04-29)
-- 끄려면: `/d0-plan --session morning --no-jobsetup` 또는 `/d0-plan --session morning --jobsetup-dry-run`
+- 잘못 저장 시 **재입력 → 재저장**으로 정정 가능 (실측 확인 2026-04-30). 별도 삭제 API 불필요
+- ❌ **v0.3까지의 "무인 자동 실행" 약속은 미검증 가정** — 2026-04-30 실측에서 입력 메커니즘 결함 발견 (어제 가정 `triple_click`/`type` 모두 미작동). v1.0 baseline은 단일 케이스 dry-run만 보장
+- 끄려면 (chain 활성 후): `/d0-plan --session morning --no-jobsetup` 또는 `/d0-plan --session morning --jobsetup-dry-run`
 
 ---
 
@@ -291,6 +291,7 @@ dry-run 첫 실행 후 사용자와 함께 다음을 확정 → 본 SKILL.md에 
 | 2026-04-29 | v0.2 | **선행 분석 완료** — 제품 1번(`1.RSP3SC0383_A`) 11개 공정 + 17개 검사항목 + 좌표 캘리브레이션 + 스펙 6종 패턴(A1·A2·A3·B1·B2·B3·B4) 학습. 분석 원본: `state/screen_analysis_20260429.md`. v1.0 commit 모드 진입 가능 (저장 단위만 첫 dry-run에서 확정 후 v1.0) |
 | 2026-04-29 | v0.2.1 | **분포 정책 강화** (사용자 우려 반영): 균등분포 → **정규분포** (`random.gauss`, σ=허용오차/3) 변경. 시드 미고정으로 매일 다른 값 보장. 셋 모두 같은 값 회피 1회 재추첨 추가. 균등분포 사용 금지·동일 시드 고정 금지 명문화 (품질 감사 통계 분석 부자연 패턴 회피) |
 | 2026-04-29 | v0.3 | **무인 자동 실행 정책 변경** (사용자 명시 요청): `/d0-plan` SP3M3 morning hand-off에서 사용자 확인 단계 제거 → 검증 PASS 직후 즉시 `/jobsetup-auto --commit` 자동 호출. fail-fast 가드 4종 강화 (SmartMES 미실행 / 좌표 캘리브레이션 실패 / 스펙 매칭 50% 미만 / 빨간 에러 다이얼로그). 끄기 옵션 `--no-jobsetup`, dry-run 옵션 `--jobsetup-dry-run` 추가 |
+| 2026-04-30 | v1.0 baseline | **결정적 결함 발견 + 실측 재설계**: (1) v0.3까지의 입력 가정 (`triple_click` 전체선택, `pyautogui.type` 덮어쓰기) **모두 미작동** — SmartMES X1/X2/X3는 표준 textbox 아닌 WPF 커스텀 컨트롤. (2) 정상 입력 = **C 버튼 + 우측 numpad 클릭 시퀀스**, 음수 부호는 **키보드 `-` 키**. (3) 무인 morning 자동 호출 약속도 미구현 — `run_morning.bat → run.py`에 잡셋업 호출 0줄. (4) 매일 1번 품번이 바뀜 (어제 `1.RSP3SC0383_A` → 오늘 `1.RSP3PC0129_A`) — 어제 17개 검사항목 hardcode는 단일 품번 전용. SP3 RETRACTOR 카테고리는 공정 11개 구조 동일. (5) **좌표 스케일 결정적 발견**: Claude screenshot 좌표 = 1456×819, 실제 화면 = 1920×1080. ratio 1.319 변환 필수. (6) 신규 `run_jobsetup.py` baseline = 검증된 단일 케이스 ([40] 1건, A1 `0±0.05`)만 처리. 다중 검사항목/스펙 OCR 동적 처리는 v1.x. (7) **단독 호출 1차 검증 결과**: jsonl 정상 작성 (입력값 정규분포 [0.01, -0.01, 0.02]), 시퀀스 실행됨. 그러나 **화면 결과는 [60] B형으로 떨어짐** — 좌표 정확도 또는 드롭다운 응답 딜레이 부족 의심. **결과 검증 단계 미구현** = jsonl OK가 화면 OK를 보장 안 함. v1.x에서 화면 OCR 검증 추가 필요. (8) **run_morning.bat chain 미활성** — baseline 정확도 PASS 후 v1.1에서 활성. 즉 명일 무인 morning에서 자동 호출은 일어나지 않음. (9) 검증 원본: `state/input_mechanism_20260430.md`, 1차 실행 jsonl: `state/run_20260430_140209.json` |
 
 ## 관련 문서
 

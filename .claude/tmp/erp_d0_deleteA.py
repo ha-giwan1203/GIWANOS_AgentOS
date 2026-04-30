@@ -73,7 +73,7 @@ def main():
     args = ap.parse_args()
 
     with sync_playwright() as p:
-        browser = p.chromium.connect_over_cdp("http://localhost:9222")
+        browser = p.chromium.connect_over_cdp("http://localhost:9223")
         page = None
         for pg in browser.contexts[0].pages:
             if MAIN_MARK in pg.url:
