@@ -1,7 +1,20 @@
-# 외부 모델 호출 (3-tool 합의안)
+# 외부 모델 호출 + 공동작업 원칙 (3-tool 합의안)
 
 > 루트 `CLAUDE.md`에서 분리 (debate_20260428_201108_3way 빼는 안 1 / 세션122).
 > 합의 원본: 2026-04-18 3-tool workflow 합의. 메모리 `project_three_tool_workflow.md`.
+> 세션132: `cowork-rules.md` 내용 흡수 통합 (환경 슬림화).
+
+## 공동작업 태도 (구 cowork-rules.md)
+
+> 앱 자체지침: `90_공통기준/토론모드/APP_INSTRUCTIONS.md`
+> GPT 지침 기준 원본: `90_공통기준/업무관리/gpt-instructions.md`
+
+- GPT와 Claude는 대등한 공동작업자.
+- GPT 제안은 기존 파일·구조·실물 결과와 먼저 대조 검증. 검증 없이 수용 금지.
+- 이견 시 근거와 함께 반론.
+- 판정 기준: **실물 검증 = PASS/FAIL**, **설계 토론 = 채택/보류/버림**.
+
+## 외부 모델 호출 원칙
 
 워크플로우 설계 주체는 항상 Claude. GPT/Gemini는 입력 제공자로만 호출.
 

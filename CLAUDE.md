@@ -1,6 +1,5 @@
 # 업무리스트 프로젝트
 
-@.claude/rules/cowork-rules.md
 @.claude/rules/data-and-files.md
 
 자동차 부품 제조업(삼송 G-ERP) 업무 자동화 저장소.
@@ -13,10 +12,9 @@
 |------|------|
 | 작업 모드 5종 + 우선순위 + R1~R5 + E 정량 | [.claude/rules/work_mode_protocol.md](.claude/rules/work_mode_protocol.md) |
 | hook vs permissions 경계 + 훅 등급 | [.claude/rules/hook_permissions.md](.claude/rules/hook_permissions.md) |
-| 외부 모델 호출 + /rewind 한계 + 문서 조회 + 운영 안정성 | [.claude/rules/external_models.md](.claude/rules/external_models.md) |
+| 외부 모델 호출 + 공동작업 원칙 + /rewind 한계 + 문서 조회 + 운영 안정성 | [.claude/rules/external_models.md](.claude/rules/external_models.md) |
 | 토론모드 코어 | `90_공통기준/토론모드/CLAUDE.md` |
 | 데이터 처리·파일 정리 | `.claude/rules/data-and-files.md` |
-| 공동작업 원칙 | `.claude/rules/cowork-rules.md` |
 | 미해결 incident 자동 인용 규칙 | [.claude/rules/incident_quote.md](.claude/rules/incident_quote.md) |
 
 ## 핵심 원칙 (요약)
