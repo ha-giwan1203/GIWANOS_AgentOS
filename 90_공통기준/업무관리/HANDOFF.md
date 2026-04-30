@@ -51,6 +51,11 @@
 - `final_check --fast`: 상태 동기화 후 재확인
 
 ### 다음 AI 액션
+- 사용자 CDP 9223 launch + OAuth 통과 후 `python auth_extract.py` 재실행 → P1 verdict 확정
+- P1 결과를 `PLAN_API_HYBRID.md` Step 3 섹션에 반영
+- verdict별 후속:
+  - `P1_PASS_GET_200`: P2 진입 후보 (단 시스템팀 답변 + 측정 종료 후)
+  - `P1_REDIRECT_AUTH_NEEDED` / `P1_AUTH_REJECTED` / `P1_SERVER_500_LIKELY_XSRF`: 옵션 A 자체 재검토
 - 본 세션 종결. 다음 세션부터 실무(D0/MES 등) 복귀하며 정량 신호(S1~S3) 측정 누적
 - **[잔존 1순위]** auto_commit_state.sh 수동 커밋 의도 선점 문제 — 7세션 측정 종료 후 옵션 B 진입 시 최우선 타겟. 본 세션 SHA `d59d844b`에서 실증 + `quant_signal_log.md` 세션130 행 비고 기록
 - (별건) 보류 후보 3건 매처 동등성 실측 검증은 사용자 명시 시 별도 세션

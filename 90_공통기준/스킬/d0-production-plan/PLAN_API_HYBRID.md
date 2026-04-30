@@ -1,12 +1,49 @@
 # Plan: 옵션 A 하이브리드 — ERP D0 API 직접 호출 전환
 
 ## Status (2026-04-30)
-- **현재 상태**: 초안 (P1 미진입). 사용자 결정 α (P1 보류, plan만).
-- **선행 조건**:
-  1. 2026-05-01 morning auto 로그 확인 (`1812603c` 패치 PASS/FAIL)
-  2. fallback 발화 여부 확인 (3 케이스 분류)
-  3. 시스템팀 ERP API 명세 + Service Account 가능 여부 답변
-- **위 3건 미충족 시 P1 진입 금지**.
+- **현재 상태**: P1 코드 작성 완료, 실측 진행 대기 (CDP 9223 launch 필요).
+- **결정 변경 이력**: 초기 α (P1 보류) → 사용자 명시 P1 진입. `798a119d` 합의 사용자 본인 변경.
+- **다음 단계**: 사용자가 dev CDP 9223 launch + OAuth 통과 → `python auth_extract.py` 재실행 → 본 문서 P1 결과 섹션 갱신.
+
+## P1 결과 (실측 진행 중 — 2026-04-30)
+
+### Step 1: 코드 작성 ✅ 완료
+- 파일: `auth_extract.py` (~190줄)
+- 사용자 명시 안전장치 준수 검증:
+  - POST/multiList/rank/MES/DELETE 코드 호출 0건 (grep)
+  - GET 1회 + timeout 10s + 재시도 루프 없음
+  - 쿠키 이름·도메인 목록만 기록, 값 미출력
+  - XSRF 마스킹 `앞4...뒤4 (len=N)`
+  - dev 환경(`erp-dev`) 한정
+  - `dry_run = True`, `post_blocked = True` 메타플래그
+- run.py / bat 미수정 (git diff 0)
+
+### Step 2: 실측 — CDP_DEAD 종료 (사용자 액션 대기)
+- 첫 실행 결과: `{"status": "CDP_DEAD", "error": "127.0.0.1:9223 미응답"}`
+- 안전 fallthrough 동작 확인 — 코드는 retry 안 함
+- 사용자 액션 필요:
+  ```powershell
+  Start-Process -FilePath 'C:\Program Files\Google\Chrome\Application\chrome.exe' -ArgumentList '--remote-debugging-port=9223','--remote-debugging-address=127.0.0.1','--user-data-dir=C:\Users\User\.flow-chrome-debug'
+  # OAuth 통과 후
+  python 90_공통기준/스킬/d0-production-plan/auth_extract.py
+  ```
+
+### Step 3: 결과 분석 (실측 후 본 섹션 갱신)
+- [ ] cookie_count + cookie_names 기록
+- [ ] XSRF 후보 4개 중 어디서 발견됐는지 (xsrf_chosen_source)
+- [ ] http_status (200 / 302 / 401 / 403 / 500 / 기타)
+- [ ] verdict 라벨:
+  - `P1_PASS_GET_200` → API화 가능성 높음 → P2 진입 후보
+  - `P1_REDIRECT_AUTH_NEEDED` → 쿠키 부족 (XSRF만으론 부족)
+  - `P1_AUTH_REJECTED` → 사내 보안 정책 차단 가능성
+  - `P1_SERVER_500_LIKELY_XSRF` → SKILL.md 라인 168 실증 (jQuery prefilter 내부 헤더 추가 의심)
+- [ ] P2 진입 여부 결정 (사용자 결정 + 시스템팀 답변 종합)
+
+## 선행 조건 (P2 이후 적용)
+1. 2026-05-01 morning auto 로그 확인 (`1812603c` 패치 PASS/FAIL)
+2. fallback 발화 여부 확인 (3 케이스 분류)
+3. 시스템팀 ERP API 명세 + Service Account 가능 여부 답변
+4. P1 verdict 확정
 
 ## Context
 SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.

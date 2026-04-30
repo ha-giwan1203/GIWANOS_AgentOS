@@ -47,7 +47,7 @@
 - 현재 구조: ERP 저장은 jQuery.ajax 내부 호출, MES 검증은 이미 urllib.request 직접 호출
 - **장벽 실측**: SKILL.md 라인 168 — `jQuery.ajax 경로 필수, fetch 직접 호출 시 500 에러 (XSRF 공통 설정 미상속)`. 옵션 A 하이브리드도 XSRF 토큰 직접 추출+동봉 필요
 - **plan 초안 작성 완료**: `90_공통기준/스킬/d0-production-plan/PLAN_API_HYBRID.md` (P1~P6 단계 분해 + endpoint 10건 실측 정리 + auth_extract.py 설계안 추정 + XSRF 추출 후보 4개 + P1 안전조건 + 시스템팀 문의 5건). `.claude/plans/`는 gitignore 대상이라 도메인 영역에 보관.
-- **P1 진입 보류 (사용자 본인 + GPT α 채택, Gemini γ 권장 — 사용자 명시 지시 우선)**: `798a119d` 합의 일관성 유지
+- **P1 코드 작성 완료 (사용자 명시 P1 진입 — α 결정 변경)**: `auth_extract.py` 신설 (~190줄). POST/multiList/rank/MES/DELETE 코드 0건 grep 검증. CDP_DEAD 안전 fallthrough 확인. **실측 진행 대기 — 사용자가 CDP 9223 manual launch 후 OAuth 통과 + 재실행 필요**. 결과는 `PLAN_API_HYBRID.md` Step 3 섹션에 반영 예정
 - **사용자 오프라인 액션 (Gemini 권장)**: 사내 IT/보안팀에 ERP D0 API 명세 + Service Account 발급 가능 여부 타진
 - 문의 항목 5개:
   1. D0 추가생산지시 등록 API 명세 제공 가능 여부
