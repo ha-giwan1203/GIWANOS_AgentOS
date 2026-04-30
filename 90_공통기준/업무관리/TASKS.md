@@ -47,7 +47,8 @@
 - 현재 구조: ERP 저장은 jQuery.ajax 내부 호출, MES 검증은 이미 urllib.request 직접 호출
 - **장벽 실측**: SKILL.md 라인 168 — `jQuery.ajax 경로 필수, fetch 직접 호출 시 500 에러 (XSRF 공통 설정 미상속)`. 옵션 A 하이브리드도 XSRF 토큰 직접 추출+동봉 필요
 - **plan 초안 작성 완료**: `90_공통기준/스킬/d0-production-plan/PLAN_API_HYBRID.md` (P1~P6 단계 분해 + endpoint 10건 실측 정리 + auth_extract.py 설계안 추정 + XSRF 추출 후보 4개 + P1 안전조건 + 시스템팀 문의 5건). `.claude/plans/`는 gitignore 대상이라 도메인 영역에 보관.
-- **P1 코드 작성 완료 (사용자 명시 P1 진입 — α 결정 변경)**: `auth_extract.py` 신설 (~190줄). POST/multiList/rank/MES/DELETE 코드 0건 grep 검증. CDP_DEAD 안전 fallthrough 확인. **실측 진행 대기 — 사용자가 CDP 9223 manual launch 후 OAuth 통과 + 재실행 필요**. 결과는 `PLAN_API_HYBRID.md` Step 3 섹션에 반영 예정
+- **P1 PASS 실증 완료** (2026-04-30 10:46): `auth_extract.py` + `ensure_erp_login`/`_wait_oauth_complete` import 보강. 자동 OAuth 통과 + cookies/XSRF 추출 + requests GET → `http://erp-dev.samsong.com:19100/layout/layout.do` 200 (218KB layout, redirect 0건). XSRF 출처 cookie + meta 양쪽 확보. **옵션 A 하이브리드 GET 흐름 실증** ✅
+- **잔존 (P2)**: POST 호출 미검증 — SKILL.md 라인 168 "fetch 직접 호출 시 500" 위험 잔존. P2 PoC `selectListPmD0AddnUpload.do` 엑셀 파싱 호출로 POST 가능 여부 검증 필요. 시스템팀 답변 + 옵션 C 측정 종료 후 진입 결정
 - **사용자 오프라인 액션 (Gemini 권장)**: 사내 IT/보안팀에 ERP D0 API 명세 + Service Account 발급 가능 여부 타진
 - 문의 항목 5개:
   1. D0 추가생산지시 등록 API 명세 제공 가능 여부

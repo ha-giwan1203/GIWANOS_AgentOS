@@ -39,6 +39,14 @@ except Exception as e:
     print(f"[FAIL] dependency import: {e}", file=sys.stderr)
     sys.exit(2)
 
+# run.py의 OAuth 자동 로그인 함수 재사용 (SKILL.md Phase 0 절차 준수, 세션131 보강)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from run import ensure_erp_login, _wait_oauth_complete, _safe_goto, D0_URL as RUN_D0_URL
+except Exception as e:
+    print(f"[FAIL] run.py import: {e}", file=sys.stderr)
+    sys.exit(2)
+
 # ===== 설정 (run.py와 동일 — dev 환경만) =====
 CDP_URL = "http://127.0.0.1:9223"
 ERP_LAYOUT = "http://erp-dev.samsong.com:19100/layout/layout.do"  # GET 대상
@@ -143,6 +151,21 @@ def main():
                 time.sleep(2)
 
             page.bring_to_front()
+            result["page_url_initial"] = page.url
+
+            # SKILL.md Phase 0 절차 준수: ensure_erp_login + _wait_oauth_complete (세션131 보강)
+            try:
+                ensure_erp_login(page)
+                oauth_ok = _wait_oauth_complete(page, timeout_sec=60.0)
+                result["oauth_completed"] = oauth_ok
+                if not oauth_ok and "auth-dev.samsong.com" in page.url:
+                    # 1회 재시도 + D0_URL 직접 이동
+                    _safe_goto(page, RUN_D0_URL)
+                    oauth_ok = _wait_oauth_complete(page, timeout_sec=60.0)
+                    result["oauth_completed_retry"] = oauth_ok
+            except Exception as e:
+                result["oauth_error"] = f"{type(e).__name__}: {str(e)[:200]}"
+
             result["page_url_before_extract"] = page.url
 
             # cookies 추출 (이름 목록만 — 사용자 명시 마스킹 준수)

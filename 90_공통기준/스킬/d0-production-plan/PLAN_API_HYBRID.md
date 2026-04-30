@@ -28,16 +28,34 @@
   python 90_공통기준/스킬/d0-production-plan/auth_extract.py
   ```
 
-### Step 3: 결과 분석 (실측 후 본 섹션 갱신)
-- [ ] cookie_count + cookie_names 기록
-- [ ] XSRF 후보 4개 중 어디서 발견됐는지 (xsrf_chosen_source)
-- [ ] http_status (200 / 302 / 401 / 403 / 500 / 기타)
-- [ ] verdict 라벨:
-  - `P1_PASS_GET_200` → API화 가능성 높음 → P2 진입 후보
-  - `P1_REDIRECT_AUTH_NEEDED` → 쿠키 부족 (XSRF만으론 부족)
-  - `P1_AUTH_REJECTED` → 사내 보안 정책 차단 가능성
-  - `P1_SERVER_500_LIKELY_XSRF` → SKILL.md 라인 168 실증 (jQuery prefilter 내부 헤더 추가 의심)
-- [ ] P2 진입 여부 결정 (사용자 결정 + 시스템팀 답변 종합)
+### Step 3: 결과 분석 (2026-04-30 10:46 실측 완료) ✅
+
+**Claude 재판정**: `P1_PASS_GET_200` (진짜 PASS)
+
+| 필드 | 값 |
+|---|---|
+| http_status | 200 |
+| http_final_url | `erp-dev.samsong.com:19100/layout/layout.do` (ERP 내부) |
+| http_redirect_chain | `[]` (redirect 0건) |
+| http_html_length | 218,774 bytes (정상 layout) |
+| xsrf_chosen_source | cookie (`XSRF-TOKEN`, len=36) |
+| meta_xsrf | 발견 (`d548...ec66`, len=36) |
+| 1차 verdict | `P1_PASS_GET_200` (Claude 재판정 일치) |
+
+**보강 사항 (세션131 사용자 명시 SKILL.md 안 읽음 정정)**:
+- `auth_extract.py`에 `ensure_erp_login` + `_wait_oauth_complete` import + 호출 추가
+- run.py 본체는 수정 0 (사용자 명시 금지 준수)
+- pyautogui 자동완성으로 OAuth 통과 검증
+
+**의의**:
+- 옵션 A 하이브리드 GET 흐름 실증 ✅
+- XSRF 추출 위치 2곳 확보 (cookie + meta) — cookie 우선
+- requests에 cookie/XSRF 동봉 시 ERP 내부 접근 가능
+
+**잔존 (P2 이후)**:
+- POST 호출은 미검증 — SKILL.md 라인 168 "fetch 직접 호출 시 500 에러" 위험 잔존
+- P2 PoC = `selectListPmD0AddnUpload.do` 엑셀 파싱 (read-only에 가까움) 호출로 POST 가능 여부 검증
+- P2 진입 시점은 시스템팀 답변 + 옵션 C 측정 종료 후 결정
 
 ## 선행 조건 (P2 이후 적용)
 1. 2026-05-01 morning auto 로그 확인 (`1812603c` 패치 PASS/FAIL)
