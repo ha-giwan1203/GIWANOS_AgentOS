@@ -1,0 +1,121 @@
+# Plan: 옵션 A 하이브리드 — ERP D0 API 직접 호출 전환
+
+## Status (2026-04-30)
+- **현재 상태**: 초안 (P1 미진입). 사용자 결정 α (P1 보류, plan만).
+- **선행 조건**:
+  1. 2026-05-01 morning auto 로그 확인 (`1812603c` 패치 PASS/FAIL)
+  2. fallback 발화 여부 확인 (3 케이스 분류)
+  3. 시스템팀 ERP API 명세 + Service Account 가능 여부 답변
+- **위 3건 미충족 시 P1 진입 금지**.
+
+## Context
+SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.
+
+하이브리드 = OAuth 로그인만 Playwright로 1회 → 세션 cookie + XSRF 토큰 추출 → 이후 모든 처리는 `requests` 직접 POST. "redirect 멍때림" 자체 제거.
+
+## Phase 분해
+
+| Phase | 내용 | 산출 | 검증 기준 | 위험도 |
+|---|---|---|---|---|
+| **P1** | OAuth 1회 → cookie/XSRF 추출 + dev 환경 단순 GET 200 | `auth_extract.py` 신설 (예상 ~150줄) | requests로 `/layout/layout.do` GET 200 응답 | 낮음 (read-only) |
+| **P2** | XSRF 동봉 POST PoC — `selectListPmD0AddnUpload.do` 엑셀 파싱 호출 | parsed JSON | listLen이 manual 결과와 일치 | 중간 (server parse) |
+| **P3** | `multiListMainSubPrdtPlanRankDecideMng.do` save — **dry-run 분기 강제** | save response | dry-run OK 후 사용자 검토 | 높음 (DB 저장) |
+| **P4** | rank batch 개별 ext 등록 API화 | rank 결과 | manual 14건과 동일 결과 | 높음 (DB 저장) |
+| **P5** | `run.py` `--api-mode` 플래그 추가, 기존 화면 경로 dual-mode 보존 | run.py 분기 추가 | 양쪽 동일 결과 비교 | 중간 |
+| **P6** | morning bat에 `--api-mode` 적용 | bat 1줄 변경 | 1주 morning auto PASS | 낮음 |
+
+## Endpoint 목록 (실측 — run.py + SKILL.md)
+
+| 분류 | URL | Method | Payload | 출처 |
+|---|---|---|---|---|
+| OAuth | `auth-dev.samsong.com:18100/login` | (browser) | OAuth flow | run.py:32 |
+| ERP 진입 | `erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do` | GET | — | run.py:31 |
+| ERP layout | `erp-dev.samsong.com:19100/layout/layout.do` | GET | — | run.py:30 |
+| **엑셀 파싱** | `/prdtPlanMng/selectListPmD0AddnUpload.do` | POST | multipart `uploadfrm`, 파일 `files` | SKILL.md:119 |
+| **D0 저장** | `/prdtPlanMng/multiListPmD0AddnUpload.do` | POST | JSON `{excelList, ADDN_PRDT_REASON_CD:"002"}` | SKILL.md:122 |
+| **MAIN 서열** | `/prdtPlanMng/multiListMainSubPrdtPlanRankDecideMng.do` | POST | (런타임) | SKILL.md:62, run.py:44 |
+| **OUTER 서열** | `/prdtPlanMng/multiListOuterPrdtPlanRankDecideMng.do` | POST | (런타임) | SKILL.md:63, run.py:48 |
+| 서열 행 삭제 | `/prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do` | DELETE | `{EXT_PLAN_REG_NO, STD_DA, PLAN_DA, PROD_NO, LINE_CD}` | SKILL.md:257 |
+| D0 등록 삭제 | `/prdtPlanMng/deleteDoAddnPrdtPlanInstrMngNew.do` | DELETE | `{REG_NO}` | SKILL.md:259 |
+| MES 검증 | `lmes-dev.samsong.com:19220/v2/prdt/schdl/list.api` | POST | `{tid, token, ...}` (이미 API) | run.py:819 |
+
+## auth_extract.py 설계안 (추정 — 미실측)
+
+```python
+# 신설 예정 — 본 plan 단계에서 미생성
+"""auth_extract.py — Playwright OAuth 1회 → cookie + XSRF 추출."""
+
+def extract_auth_session() -> dict:
+    """
+    Playwright로 ERP OAuth 통과 → cookie/XSRF 토큰 추출.
+    return {
+        "cookies": {ERP_SESSION_ID: "...", XSRF-TOKEN: "...", ...},
+        "xsrf": "...",
+        "expires_at": "..."
+    }
+    """
+    # 1. CDP launch / connect
+    # 2. _safe_goto(D0_URL)
+    # 3. ensure_erp_login + _wait_oauth_complete (기존 함수 재사용)
+    # 4. context.cookies() — 모든 도메인 cookie 추출
+    # 5. XSRF 토큰 추출 — 후보 위치 (실측 미수행):
+    #    (a) cookie key "XSRF-TOKEN" 직접 값
+    #    (b) page.evaluate로 jQuery $.ajaxSetup 등록된 기본 헤더 추출
+    #    (c) page DOM <meta name="XSRF-TOKEN">
+    #    (d) hidden input <input name="_csrf">
+    # 6. dict 반환
+```
+
+## XSRF / Cookie 추출 후보 위치 (실측 보류)
+
+| 후보 | 추출 방법 | 실측 필요 |
+|---|---|---|
+| (a) Cookie `XSRF-TOKEN` | `context.cookies()`에서 key 검색 | P1 단계 |
+| (b) jQuery `$.ajaxSetup` | `page.evaluate("() => $.ajaxSettings.headers")` | P1 단계 |
+| (c) Page meta tag | `page.evaluate("() => document.querySelector('meta[name=XSRF-TOKEN]')?.content")` | P1 단계 |
+| (d) Hidden input | `page.locator('input[name=_csrf]').input_value()` | P1 단계 |
+
+P1 진입 시 4개 후보 모두 실측 → 가장 안정적인 위치 채택.
+
+## P1 안전조건
+
+1. **dev 환경만**: `erp-dev.samsong.com` / `auth-dev` / `lmes-dev` 한정. 운영 환경(`erp.samsong.com` 등) 호출 금지.
+2. **Read-only만**: GET 또는 read-only API. POST/DELETE 호출 금지.
+3. **dry-run 분기 강제**: P2 이후에도 dry-run 옵션 기본값.
+4. **로그 격리**: PoC 로그는 `06_생산관리/D0_업로드/logs/api_poc_*.log` 별도 디렉토리.
+5. **타임아웃**: 모든 requests 호출 timeout=10s. 무한 hang 방지.
+6. **잔존 데이터 정리**: P3+ 단계에서 등록 발생 시 `erp_d0_dedupe.py` 자동 호출 검증 후 진입.
+
+## 시스템팀 문의 문안 (5건 — 사용자 오프라인 액션)
+
+```
+ERP D0 추가생산지시 생산계획 등록을 현재 화면 자동화로 처리 중인데,
+화면 redirect/OAuth 불안정 때문에 공식 API 연동 가능 여부를 확인하고 싶습니다.
+
+확인 요청:
+1. D0 추가생산지시 등록 API 명세 제공 가능 여부
+2. 엑셀 업로드 파싱 API + 저장 API 공식 사용 가능 여부
+3. Service Account 또는 API 전용 인증 방식 제공 여부
+4. CSRF/XSRF 토큰 처리 공식 방식
+5. 테스트 서버에서 API 호출 검증 가능 여부
+```
+
+## 진입 선행 조건 (체크리스트)
+
+- [ ] 2026-05-01 morning auto 로그 확인 — `1812603c` 패치 PASS
+- [ ] fallback 발화 여부 확인 (a/b/c 케이스 분류)
+- [ ] 시스템팀 답변 수령 (사용자 오프라인)
+- [ ] 옵션 C 측정 7세션 누적 또는 1주 종료
+- [ ] 위 4건 모두 충족 시 P1 진입 재결정
+
+## 메타 위반 회피
+
+- 본 plan 자체는 코드 미생성 / ERP 미호출 / run.py·bat 미수정. 단순 문서.
+- S3 메타 커밋: 본 plan + TASKS 1줄 추가 = 1건 (정직 기록).
+- 옵션 C measurement NEVER 위반 0.
+
+## 합의 추적성
+
+- 세션131 본 대화에서 사용자 본인 + GPT(라벨1) α 채택 / Gemini(라벨2) γ 채택 권장 (양측 갈림).
+- 사용자 명시 지시 우선 원칙으로 α 채택 (`798a119d` 합의 일관성 유지).
+- 시스템팀 답변 + 내일 morning 결과 후 α/γ 재판단 가능.
