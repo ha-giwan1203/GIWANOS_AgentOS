@@ -57,11 +57,72 @@
 - P2 PoC = `selectListPmD0AddnUpload.do` 엑셀 파싱 (read-only에 가까움) 호출로 POST 가능 여부 검증
 - P2 진입 시점은 시스템팀 답변 + 옵션 C 측정 종료 후 결정
 
-## 선행 조건 (P2 이후 적용)
+## P2 결과 (2026-04-30 11:14 실측 완료) ✅
+
+**사용자 명시 P2 진입** — "오늘 주간 서열 반영한거 확인해서 그다음 품번 하나만 적용해서 실제 테스트". 1건 신규 등록 + 즉시 정리 패턴.
+
+### 후보 식별
+- ERP 등록 16건 ↔ xlsm 주간 26건 매칭 → 첫 미등록 **R55 RSP3SC0665 qty=1500** 선택
+
+### 단계별 결과
+| 단계 | URL | Method | 결과 |
+|---|---|---|---|
+| Step 1: 엑셀 1행 생성 | `template/SSKR_D0_template.xlsx` Excel COM | — | xlsx 10,415 bytes |
+| Step 2: selectList | `/prdtPlanMng/selectListPmD0AddnUpload.do` | POST multipart | 200, listLen 1, ERROR_FLAG 빈값 |
+| Step 3: multiList (DB INSERT) | `/prdtPlanMng/multiListPmD0AddnUpload.do` | POST JSON | **200, REG_NO 319941 발급** |
+| Step 4: ERP 그리드 검증 | `totGridList.searchListData()` | — | 17건 (16+1) ✅ |
+| Step 5: DELETE 정리 | `/prdtPlanMng/deleteDoAddnPrdtPlanInstrMngNew.do` | **DELETE** | 200 |
+| Step 6: 최종 검증 | ERP 그리드 + SmartMES | — | ERP 16건 / MES RSP3SC0665 0건 ✅ |
+
+### 🔑 발견 (옵션 A 하이브리드 완전 가능 입증)
+
+**1. `ajax: true` custom header 필수**
+- jQuery prefilter가 모든 ajax 요청에 자동 추가하는 비표준 커스텀 헤더
+- 서버측이 이 헤더로 ajax 요청 식별
+- 누락 시 multiList 500 / 8ms 즉시 거부 (payload 처리 들어가지도 않음)
+- 발견 방법: Playwright `page.route` + `route.abort` 패턴으로 jQuery.ajax 실제 헤더 캡처
+
+**2. XSRF 토큰 매 요청마다 갱신**
+- 서버가 selectList 응답에 `Set-Cookie: XSRF-TOKEN=새값; Max-Age=0; ..., XSRF-TOKEN=새값; ...` 형태로 새 토큰 발급
+- Spring Security default 동작 — write 직전 토큰 회전
+- header `X-XSRF-TOKEN`을 매 호출 직전에 cookie에서 다시 읽어 갱신해야 통과
+- Stale 토큰 그대로 쓰면 multiList 500
+
+**3. HTTP method 차이**
+- `multiListPmD0AddnUpload`: POST
+- `deleteDoAddnPrdtPlanInstrMngNew`: **DELETE** (POST 시 statusCode -9999 "Request method 'POST' not supported")
+- SKILL.md 라인 259 명시 그대로
+
+### 헤더 레시피 (P3+ 재사용)
+```python
+sess.headers.update({
+    "ajax": "true",
+    "X-Requested-With": "XMLHttpRequest",
+    "Referer": D0_URL,
+    "Origin": "http://erp-dev.samsong.com:19100",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "User-Agent": "Mozilla/5.0 ... Chrome/...",
+    "Accept-Language": "ko-KR,ko;q=0.9",
+})
+
+# 매 write 호출 직전:
+def refresh_xsrf(sess):
+    for c in sess.cookies:
+        if c.name.upper() in ("XSRF-TOKEN", "X-XSRF-TOKEN"):
+            sess.headers["X-XSRF-TOKEN"] = c.value
+            return c.value
+```
+
+### 운영 안전 검증 ✅
+- ERP DB INSERT → 즉시 DELETE → 16건 복원
+- SmartMES 영향 0 (multiList만 호출, rank/MES 전송 미실행 → MES 동기화 트리거 안 됨)
+- SKILL.md 라인 159 "MES 잔존 위험" 회피
+
+## 선행 조건 (P3 이후 적용)
 1. 2026-05-01 morning auto 로그 확인 (`1812603c` 패치 PASS/FAIL)
 2. fallback 발화 여부 확인 (3 케이스 분류)
 3. 시스템팀 ERP API 명세 + Service Account 가능 여부 답변
-4. P1 verdict 확정
+4. P3 = rank 저장 (`multiListMainSubPrdtPlanRankDecideMng`) — `sendMesFlag=N` dry-run + `sendMesFlag=Y` MES 전송. **MES 잔존 위험 본질** 단계
 
 ## Context
 SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.

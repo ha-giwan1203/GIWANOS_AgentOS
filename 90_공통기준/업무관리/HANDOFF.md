@@ -51,9 +51,11 @@
 - `final_check --fast`: 상태 동기화 후 재확인
 
 ### 다음 AI 액션
-- **P1 PASS 실증 완료** (2026-04-30 10:46): GET 흐름 200 + cookie/XSRF 추출 + ERP 내부 layout 218KB 도달
-- **잘못한 부분 정정 기록**: 본 세션에서 SKILL.md 안 읽고 P1 코드 작성 → 사용자 지적 후 정독 → ensure_erp_login + _wait_oauth_complete import 보강. 다음 도메인 작업 전 SKILL.md 무조건 선행 필수
-- **P2 진입 보류**: POST 호출 미검증 (SKILL.md 라인 168 fetch 500 위험). 시스템팀 답변 + 옵션 C 측정 종료 후 결정
+- **P1 PASS** (10:46): GET 200, ERP layout 218KB, OAuth 자동 통과
+- **P2 PASS** (11:14): 사용자 명시 진입 — RSP3SC0665 1500 1건 신규 등록 + 즉시 정리. selectList → multiList(REG_NO 319941) → DELETE → ERP 16건 복원 + SmartMES 0 영향
+- **🔑 발견**: (1) `ajax: true` custom header 필수, (2) XSRF 매 요청 갱신, (3) DELETE method
+- **잘못한 부분 정정**: SKILL.md 안 읽고 코드 작성 → 사용자 지적 → 정독 후 보강. 결정 떠넘기기 반복 → 즉시 진행으로 전환
+- **P3 잔존**: rank 저장 + MES 전송 (`sendMesFlag=Y`) — MES 잔존 위험 본질 단계. 시스템팀 답변 후 신중 진입
 - 본 세션 종결. 다음 세션부터 실무(D0/MES 등) 복귀하며 정량 신호(S1~S3) 측정 누적
 - **[잔존 1순위]** auto_commit_state.sh 수동 커밋 의도 선점 문제 — 7세션 측정 종료 후 옵션 B 진입 시 최우선 타겟. 본 세션 SHA `d59d844b`에서 실증 + `quant_signal_log.md` 세션130 행 비고 기록
 - (별건) 보류 후보 3건 매처 동등성 실측 검증은 사용자 명시 시 별도 세션

@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-30 — 세션131 (SP3M3 morning 자동화 모드 E 패치 / 검증은 2026-05-01 07:10 auto-run / **옵션 A 하이브리드 P1 PASS 실증 완료** — GET 흐름 200 + ERP 내부 layout 218KB + cookie/XSRF 추출 / P2 POST 검증은 시스템팀 답변 + 측정 종료 후 결정) / 세션130 (hook 부하 B-mode 진단 + settings.local allow 41→23 1회용 정리 + README PreToolUse 표 번호 정합화 / settings.json·hook 스크립트 무수정 / list_active_hooks --count 36 변동 없음) / 세션129 (정량 신호 3개 측정 시작, 옵션C 1주/7세션 / quant_signal_log.md 신설) / 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS, 양측 PASS [GPT+Gemini 실증됨·동의] / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운 + MES 단독 4/28 15건 OK)
+최종 업데이트: 2026-04-30 — 세션131 (SP3M3 morning 자동화 모드 E 패치 / 검증은 2026-05-01 07:10 auto-run / **옵션 A 하이브리드 P1+P2 PASS 실증 완료** — P1 GET 200 / P2 사용자 명시 진입 RSP3SC0665 1건 selectList → multiList(REG_NO 319941) → DELETE → 16건 복원 + SmartMES 0 영향. 발견: ajax:true custom header + XSRF 매 요청 갱신 + DELETE method / P3 rank+MES는 시스템팀 답변 후) / 세션130 (hook 부하 B-mode 진단 + settings.local allow 41→23 1회용 정리 + README PreToolUse 표 번호 정합화 / settings.json·hook 스크립트 무수정 / list_active_hooks --count 36 변동 없음) / 세션129 (정량 신호 3개 측정 시작, 옵션C 1주/7세션 / quant_signal_log.md 신설) / 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS, 양측 PASS [GPT+Gemini 실증됨·동의] / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운 + MES 단독 4/28 15건 OK)
 
 ---
 
