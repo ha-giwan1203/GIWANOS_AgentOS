@@ -28,6 +28,12 @@
      --no-first-run --no-default-browser-check
    ```
    - 3초 대기 후 재확인
+4. **incident 사전 점검 (advisory)**
+   ```bash
+   python .claude/hooks/incident_repair.py --json --limit 5
+   ```
+   - **응답 시 필터링**: 출력 중 `ts` 필드가 당일(KST `date +%Y-%m-%d`) 시작인 항목만 인용 (Claude가 JSON 보고 자체 필터). incident_repair.py가 이미 unresolved만 반환.
+   - 결과 인용 후 ZDM/MES 작업 진행. 차단 없음. (incident_quote.md 규칙 참조)
 
 ### Phase 1: 날짜 자동 감지
 인수 미지정 시:

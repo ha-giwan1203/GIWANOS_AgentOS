@@ -17,6 +17,7 @@
 | 토론모드 코어 | `90_공통기준/토론모드/CLAUDE.md` |
 | 데이터 처리·파일 정리 | `.claude/rules/data-and-files.md` |
 | 공동작업 원칙 | `.claude/rules/cowork-rules.md` |
+| 미해결 incident 자동 인용 규칙 | [.claude/rules/incident_quote.md](.claude/rules/incident_quote.md) |
 
 ## 핵심 원칙 (요약)
 

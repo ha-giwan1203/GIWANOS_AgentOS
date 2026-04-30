@@ -10,7 +10,28 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-30 KST — 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-30 KST — 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션131 (2026-04-30) — [B+C] 실패 대응 자동 진단 인용 개선
+
+### [완료] 진단 (모드 B)
+- 사용자 요청: "Claude Code 실패 대응 구조를 진단해라" — 수정 금지, 새 hook 금지
+- 결론 3줄: 데이터(incident_ledger/hook_timing/classification_reason/next_action)는 적재되나 Claude가 자동 인용하지 않음. session_start는 "12건 + /auto-fix 가능" 한 줄만. /auto-fix는 사용자 타이핑 의존. **자동 수리 부재가 아니라 자동 진단 인용 부재가 진짜 빈칸.**
+- 안 되는 이유 5건 + D0/commit/auto_commit_state 사례별 늦은 이유 정리
+
+### [완료] 3자 토론 (Claude·GPT·Gemini)
+- 안1 (CLAUDE.md/rules 응답 진입 규칙): 3자 합의 채택
+- 안3 (finish/daily/d0-plan 진입 점검 도메인 필터): 3자 합의 채택 (Claude 보강: 도메인별 카테고리 필터)
+- 안2 (auto-fix Step 0 자동 트리거): 2:1 보류 — Step 1이 smoke_test+e2e_test 실행 포함이라 트리거 발화 시 매 세션 무거운 회전. 안1+3 적용 후 incident 감소 추이 보고 별건 결정
+
+### [완료] 구현 (모드 C)
+- 신규: `.claude/rules/incident_quote.md` (60줄, 적용 절차 + D0/commit 적용 예시)
+- 수정: `CLAUDE.md` 인덱스 1줄, `.claude/commands/finish.md` Phase 0 신설, `daily.md` 항목4 추가, `d0-plan.md` 사전 점검 블록
+- jq 의존성 발견 → 즉시 제거 (Windows Git Bash에 jq 부재 실측, raw `--json --limit 5` 출력 + Claude 응답 시 자체 필터로 대체)
+- plan: `90_공통기준/업무관리/_플랜/incident_quote_plan_20260430.md`
+- 새 hook/gate 0개, settings 무수정. ERP/MES/SmartMES 외부 호출 0.
+
+---
 
 ## 세션131 (2026-04-30) — [E] SP3M3 morning 자동화 OAuth 콜백 정체 패치
 

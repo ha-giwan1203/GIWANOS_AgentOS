@@ -4,8 +4,26 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-30 KST — 세션131 [E] SP3M3 morning OAuth 콜백 정체 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
+최종 업데이트: 2026-04-30 KST — 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 안1+안3 채택, 안2 보류) — incident_quote.md 신설 + finish/daily/d0-plan 사전 점검. 새 hook 0개 / 세션131 [E] SP3M3 morning OAuth 콜백 정체 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
+
+---
+
+## 세션131 (2026-04-30) — [B+C] 실패 대응 자동 진단 인용 개선
+
+### 진입
+- 사용자: "Claude Code 실패 대응 구조를 진단해라" (모드 B) → 안1+안3 채택 (모드 C)
+
+### 처리
+- 모드 B: hook/command/incident 4 데이터셋 증거 수집, 결론 3줄 + 안 되는 이유 5건 + 최소 개선안 3건 + 사용자 채택 가이드
+- 3자 토론: GPT 1번/Gemini 2번 응답 독립 검증 라벨링. 안1+3 합의, 안2 보류 (2:1)
+- 모드 C: incident_quote.md 신설 (60줄), CLAUDE.md 인덱스 +1, finish/daily/d0-plan 진입 점검 블록 추가
+- 결함 발견 후 즉시 fix: jq 부재 실측 → raw JSON 출력 + Claude 자체 필터로 의존성 제거
+- plan 파일: `90_공통기준/업무관리/_플랜/incident_quote_plan_20260430.md`
+
+### 다음 AI 액션
+- (없음) 본 작업 완료. 다음 세션 첫 응답부터 incident_quote.md 규칙에 따라 미해결 incident ≥1건 시 자동 인용 시작
+- 보류 안2(/auto-fix Step 0 자동 트리거)는 incident 감소 추이 보고 별건 결정
 
 ---
 

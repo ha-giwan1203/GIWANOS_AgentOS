@@ -28,6 +28,15 @@
 
 ## 실행 순서 (9단계 — 세션86 3자 토론 4.5 신설 반영)
 
+### Phase 0: incident 사전 점검 (advisory)
+
+```bash
+python .claude/hooks/incident_repair.py --json --limit 5
+```
+- **응답 시 필터링**: 출력 중 `hook` 필드가 `commit_gate` / `auto_commit_state` / `final_check` 계열인 항목만 인용 (Claude가 JSON 보고 자체 필터).
+- 결과 1~3줄(classification_reason / inferred_next_action / 재시도 가능성) 인용 후 본문 진행.
+- 차단 없음, 자동 수정 금지. (incident_quote.md 규칙 참조)
+
 ### 1~3단계: 상태 문서 갱신
 - TASKS.md 완료 이력 추가
 - HANDOFF.md 세션 변경사항 갱신

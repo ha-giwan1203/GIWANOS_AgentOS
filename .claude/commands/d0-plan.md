@@ -13,6 +13,15 @@
 
 **금지**: Excel 파일 직접 열기, 모니터 전환, ERPSet Client(javaw.exe) 조작, computer-use로 마우스/키보드 조작.
 
+## ⚠ incident 사전 점검 (advisory)
+
+D0/OAuth/evidence_gate 미해결 건이 있으면 D0 흐름 진입 전 인용:
+```bash
+python .claude/hooks/incident_repair.py --json --limit 5
+```
+- **응답 시 필터링**: 출력 중 `classification_reason`이 `evidence_missing` / `auth_diag` / `oauth` / `D0` 이거나 `hook`이 `evidence_gate` / `scheduler` 인 항목만 인용 (Claude가 JSON 보고 자체 필터).
+- 결과 인용 후 첨부 파일 가드로 진행. 차단 없음, 자동 수정 금지. (incident_quote.md 규칙 참조)
+
 ## ⛔ 첨부 파일 가드 (필수, 자동 실행 차단)
 
 > 배경: 2026-04-27 사고 — 사용자가 중복 정리한 xlsx를 첨부했는데 스킬이 그걸 무시하고 Z 드라이브 원본(중복 포함)을 자동 추출 → ERP+MES에 중복 등록 발생. MES는 삭제 불가라 정정 어려움.
