@@ -27,29 +27,29 @@
 ### 차단층 (PreToolUse)
 
 > **등록 순서**: settings.json(team+local union) 배열 순서대로 등록. 각 훅은 독립 실행되며 하나가 deny해도 다른 훅 실행 여부는 Claude Code 내부 구현에 의존.
-> Bash 매처 3개(①②③)는 각각 독립적으로 차단 판정. 설계 의도상 파괴 차단 → 커밋 게이트 → 날짜 범위 순.
-> **통합·삭제 금지**: 10개 Bash matcher는 책임 직교 원칙(아래 "훅별 실패 책임 매트릭스" 참조)으로 통합·삭제 금지. 통합 평가는 `hook_timing.jsonl` 1주 누적 후 의제4(세션73+ 이월)에서 진행. 고정 순서 `block_dangerous → commit_gate → debate_verify`는 절대 변경 금지.
+> Bash 매처 훅은 각각 독립적으로 차단 판정. 설계 의도상 `block_dangerous` → `commit_gate` → `date_scope_guard` 순으로 파괴 차단 → 커밋 게이트 → 날짜 범위 흐름.
+> **통합·삭제 금지**: 10개 Bash matcher는 책임 직교 원칙(아래 "훅별 실패 책임 매트릭스" 참조)으로 통합·삭제 금지. 통합 평가는 `hook_timing.jsonl` 1주 누적 후 의제4(세션73+ 이월)에서 진행. 고정 순서 `block_dangerous → commit_gate → debate_verify`는 **상대 순서 유지** 의미(인접 위치 강제 아님 — 세 훅 사이 다른 Bash matcher가 끼어드는 것은 허용)로 절대 변경 금지. settings.json 자체는 본 정합화 작업에서 수정하지 않음(세션130 C 진입 결정).
 
 | 순서 | 훅 | matcher | 역할 |
 |---|---|---|---|
 | ① | `block_dangerous.sh` | Bash | 극단 파괴 명령 + 보호 경로 삭제/이동 차단 |
 | ② | `commit_gate.sh` | Bash | git commit/push 전 final_check 강제 (--fast/--full 자동 판정) |
-| ③ | `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
-| ④ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
-| ⑤ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
-| ⑥ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
-| ⑦ | `mcp_send_gate.sh` | mcp__Claude_in_Chrome__form_input | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
-| ⑧ | `harness_gate.sh` | Bash | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
-| ⑨ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 |
-| ⑩ | `debate_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
-| ⑪ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
-| ⑫ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
+| ③ | `skill_drift_check.sh` | Bash | 스킬 실행 시 최신 SKILL.md 읽기 드리프트 차단 |
+| ④ | `debate_verify.sh` | Bash | 토론 합의 서명 검증 (`[3way]` 태그 커밋 무결성) |
+| ⑤ | `date_scope_guard.sh` | Bash | ZDM/일상점검 일요일·일괄범위·MM/DD 차단 |
+| ⑥ | `evidence_gate.sh` | Bash\|Write\|Edit\|MultiEdit | req있고 ok없으면 위험 실행 deny |
+| ⑦ | `protect_files.sh` | Write\|Edit\|MultiEdit | 원본 엑셀/아카이브/기준정보 수정 차단 |
+| ⑧ | `write_router_gate.sh` | Write\|Edit\|MultiEdit | 신규 파일 위치 화이트리스트 라우팅 gate — 4-Layer(루트/도메인/임시/시스템). advisory↔gate 모드 토글 (세션123 신설) |
+| ⑨ | `state_rebind_check.sh` | Write\|Edit\|MultiEdit | 상태 바인딩 정합성 검사 |
+| ⑩ | `mcp_send_gate.sh` | mcp__Claude_in_Chrome__form_input | Chrome MCP 토론모드 전송 전 지침 읽기 강제 (SEND GATE) |
+| ⑪ | `harness_gate.sh` | Bash | 토론모드 GPT 응답 후 하네스 분석 없이 행동 차단 (채택/보류/버림 + 독립 견해 + 실물 근거 복합 조건) |
+| ⑫ | `instruction_read_gate.sh` | Bash | GPT 전송 전 ENTRY.md+토론모드 CLAUDE.md 읽기 강제 |
 | ⑬ | `skill_instruction_gate.sh` | Bash | 인라인 python MES/ZDM 접근 시 SKILL.md 읽기 강제 |
-| ⑭ | `skill_drift_check.sh` | Bash | 스킬 실행 시 최신 SKILL.md 읽기 드리프트 차단 |
-| ⑮ | `debate_verify.sh` | Bash | 토론 합의 서명 검증 (`[3way]` 태그 커밋 무결성) |
-| ⑯ | `permissions_sanity.sh` | Bash | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
-| ⑰ | `r1r5_plan_check.sh` | Bash | C 트리거 staged 시 R1~R5 plan 흔적 권장 advisory (세션118 별건 2번 신설) |
-| ⑱ | `write_router_gate.sh` | Write\|Edit\|MultiEdit | 신규 파일 위치 화이트리스트 라우팅 gate — 4-Layer(루트/도메인/임시/시스템). advisory↔gate 모드 토글 (세션123 신설) |
+| ⑭ | `permissions_sanity.sh` | Bash | settings.local.json 1회용 permissions 패턴·중복 탐지 advisory |
+| ⑮ | `r1r5_plan_check.sh` | Bash | C 트리거 staged 시 R1~R5 plan 흔적 권장 advisory (세션118 별건 2번 신설) |
+| ⑯ | `debate_gate.sh` | mcp__Claude_in_Chrome__javascript_tool | 토론모드 활성 시 GPT 직접 JS 조작 전 지침 읽기·debate_preflight 확인 차단 |
+| ⑰ | `debate_independent_gate.sh` | mcp__Claude_in_Chrome__javascript_tool / mcp__chrome-devtools-mcp__evaluate_script | 토론모드 활성 시 독립 견해 없이 GPT 응답 전송 차단 |
+| ⑱ | `navigate_gate.sh` | mcp__Claude_in_Chrome__navigate / mcp__chrome-devtools-mcp__navigate_page / mcp__chrome-devtools-mcp__new_page | 토론모드 활성 시 ChatGPT 직접 navigate 차단 (debate_mode 맥락 외 navigate는 통과) |
 
 ### 추적층 (PostToolUse)
 

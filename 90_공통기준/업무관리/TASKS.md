@@ -10,7 +10,27 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-29 KST — 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-30 KST — 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리
+
+### [완료] B-mode 진단
+- 트리거: Claude Code 체감 저하 원인 정밀 분석 요청 (수정 금지·감산 중심·Git 실물 근거)
+- 실측: `hook_timing.jsonl` tail -100 상위 10개 집계, gate(차단성) 훅이 비용 상위 점유 (block_dangerous 2,900ms 평균 등)
+- 재검증: README PreToolUse 표 번호 vs settings.json 실배열 — 4건 어긋남 확인 (③·⑭·⑮·⑱)
+
+### [완료] C-mode 정합화 (범위 제한 단일 PR)
+- settings.local.json `permissions.allow` 41 → 23 (포괄 패턴 흡수·완전 중복·1회용 18건 제거)
+- ask 블록 8건 무수정
+- README PreToolUse 표 ①~⑱ 실배열 순서로 재기재
+- "고정 순서 block_dangerous → commit_gate → debate_verify" 문구 = **상대 순서 유지** 의미 명문화 (인접 위치 강제 아님)
+- settings.json·hook 스크립트·debate_verify·harness_gate·Stop hook 무수정
+- 보류 후보 3건(python -c 따옴표 차이 등) 무수정
+
+### 검증 결과
+- `list_active_hooks --count`: 36 (변동 없음)
+- `list_active_hooks --by-event`: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 18 / PostToolUse 9 / Notification 1 / Stop 5 (변동 없음)
+- `final_check --fast`: TASKS/HANDOFF/STATUS 갱신 후 PASS 재확인 예정
 
 ## 세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)
 

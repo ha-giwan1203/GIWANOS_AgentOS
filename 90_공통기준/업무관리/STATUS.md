@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-04-29 — 세션129 (정량 신호 3개 측정 시작, 옵션C 1주/7세션 / quant_signal_log.md 신설) / 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS, 양측 PASS [GPT+Gemini 실증됨·동의] / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운 + MES 단독 4/28 15건 OK)
+최종 업데이트: 2026-04-30 — 세션130 (hook 부하 B-mode 진단 + settings.local allow 41→23 1회용 정리 + README PreToolUse 표 번호 정합화 / settings.json·hook 스크립트 무수정 / list_active_hooks --count 36 변동 없음) / 세션129 (정량 신호 3개 측정 시작, 옵션C 1주/7세션 / quant_signal_log.md 신설) / 세션128 (block_dangerous false positive + config awk 파싱 버그 패치 14/14 PASS, 양측 PASS [GPT+Gemini 실증됨·동의] / 옵션A 위생 정리 TASKS 598→157·incident 122→0 / ZDM DB 다운 + MES 단독 4/28 15건 OK)
 
 ---
 

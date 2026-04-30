@@ -4,10 +4,34 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-29 KST — 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
+최종 업데이트: 2026-04-30 KST — 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
+
+## 세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리
+
+### 진입
+- 사용자: "Claude Code 체감 저하 원인 정밀 분석" → B-mode (수정 금지·감산 중심·Git 실물 근거)
+- B 분석 후 사용자 재검증 요청(③안: 표 순서 + timing 실측 + permissions 재분류)
+- 사용자 명시 C 진입 + 범위 제한 (settings.local 18건 + README 표 번호만)
+
+### 처리
+- settings.local.json `permissions.allow` 41 → 23 (포괄 흡수·완전 중복·1회용 18건 제거, ask 8건 무수정)
+- README PreToolUse 표 ①~⑱ 실배열 순서 재기재
+- "고정 순서 block_dangerous → commit_gate → debate_verify" 문구 상대 순서 유지 의미 명문화
+- settings.json / hook 스크립트 / debate_verify / harness_gate / Stop hook 무수정 (사용자 강제 제약)
+- 보류 후보 3건(python -c 따옴표 차이 등) 무수정
+
+### 검증
+- `list_active_hooks --count`: 36 변동 없음
+- `list_active_hooks --by-event`: PreToolUse 18 / PostToolUse 9 / Stop 5 변동 없음
+- `final_check --fast`: 상태 동기화 후 재확인
+
+### 다음 AI 액션
+- 본 변경 반영 SHA push 후 보고
+- (별건) 보류 후보 3건 매처 동등성 실측 검증은 사용자 명시 시 별도 세션
+- (별건) hook timing 1주 추가 측정 후 advisory 강등 후보 재논의
 
 ## 세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)
 
