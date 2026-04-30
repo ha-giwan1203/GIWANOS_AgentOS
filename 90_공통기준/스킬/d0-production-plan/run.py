@@ -128,12 +128,16 @@ def ensure_erp_login(page):
         time.sleep(5)
 
 
-def _wait_oauth_complete(page, timeout_sec: float = 30.0):
+def _wait_oauth_complete(page, timeout_sec: float = 60.0):
     """OAuth 완료 대기 — auth-dev 떠나고 erp-dev 본 페이지(oauth2/sso 콜백 제외) 도달까지.
 
     세션110 보강: 기존 `"erp-dev.samsong.com" in url` 조건은 OAuth 콜백 중간 단계
     `oauth2/sso` URL도 매칭되어 잘못 break 발생 → 미완료 상태에서 D0_URL 시도 →
     auth-dev/login 페이지 redirect → btnExcelUpload timeout 실패 시나리오.
+
+    세션131 [E] 보강: default 30→60s. 5일 중 4일 morning 자동화 OAuth timeout 실패
+    실측 (4/27 4/29 4/30). 7시 ERP 부하 + cold start fresh launch에서 OAuth 콜백 redirect
+    chain이 30s를 넘어가는 케이스 흡수.
     """
     deadline = time.time() + timeout_sec
     while time.time() < deadline:
@@ -164,23 +168,30 @@ def navigate_to_d0(browser):
     page.bring_to_front()
     ensure_erp_login(page)
 
-    # OAuth 완료 명시 대기 (세션110 보강 — oauth2/sso 콜백 부분 매칭 버그 수정)
-    if not _wait_oauth_complete(page, timeout_sec=30.0):
-        print(f"[phase0] OAuth 완료 대기 30s 실패 — 현재 URL: {page.url}")
+    # OAuth 완료 명시 대기 (세션110 보강 — oauth2/sso 콜백 부분 매칭 버그 수정 / 세션131 [E] 60s 상향)
+    if not _wait_oauth_complete(page, timeout_sec=60.0):
+        print(f"[phase0] OAuth 완료 대기 60s 실패 — 현재 URL: {page.url}")
         # login 페이지 다시 도달 시 1회 재시도
         if "auth-dev.samsong.com" in page.url and "/login" in page.url:
             print("[phase0] login 페이지 재도달 — 재로그인 1회 시도")
             ensure_erp_login(page)
-            if not _wait_oauth_complete(page, timeout_sec=30.0):
+            if not _wait_oauth_complete(page, timeout_sec=60.0):
                 raise RuntimeError(f"OAuth 완료 2회 실패: {page.url}")
         elif "auth-dev.samsong.com" in page.url:
             # 세션124 [3way] 보강: 비login auth-dev 정착(클라이언트 선택 화면 등) 시 D0_URL 직접 이동 1회 시도
             print("[phase0] auth-dev 비login 정착 — D0_URL 직접 이동 1회 시도")
             _safe_goto(page, D0_URL)
-            if not _wait_oauth_complete(page, timeout_sec=30.0):
+            if not _wait_oauth_complete(page, timeout_sec=60.0):
                 raise RuntimeError(f"OAuth 완료 실패: auth-dev 클라이언트 선택 화면에서 D0_URL 직접 이동 1회 시도 후에도 erp-dev 미도달 — 현재 URL: {page.url}")
         else:
-            raise RuntimeError(f"OAuth 완료 실패 (login 페이지 아님): {page.url}")
+            # 세션131 [E]: OAuth 콜백 URL(oauth2/sso 등) 정체 — D0_URL 직접 navigate fallback
+            # 사용자 실측 관찰(2026-04-30): 로그인 성공 후 생산계획 탭 redirect 못 받고 멍때리다 실패.
+            # ERP 서버가 OAuth 콜백 후 redirect 누락 의심. 4/29 auth-dev 비login 분기와 동일 패턴 —
+            # 클라이언트가 능동 navigate로 우회. 4/27·4/29·4/30 3건 동일 증상 흡수.
+            print(f"[phase0] OAuth 콜백 정체 ({page.url}) — D0_URL 직접 이동 1회 시도")
+            _safe_goto(page, D0_URL)
+            if not _wait_oauth_complete(page, timeout_sec=60.0):
+                raise RuntimeError(f"OAuth 완료 실패 (D0_URL 직접 이동 후에도 미완료): {page.url}")
 
     try: page.wait_for_load_state("domcontentloaded", timeout=15000)
     except Exception: pass

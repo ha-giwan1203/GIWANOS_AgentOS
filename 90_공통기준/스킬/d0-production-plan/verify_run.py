@@ -30,6 +30,14 @@ import sys, os, json, time, subprocess, argparse, re
 from datetime import datetime
 from pathlib import Path
 
+# 세션131 [E]: cp949 콘솔(Windows 작업 스케줄러 호출)에서 em dash(—) 등 출력 시 UnicodeEncodeError로 즉시 종료되던 버그.
+# 4/30 recover_20260430_071502.log 실측: verify_run.py:62 print() cp949 incompatible. PYTHONIOENCODING=utf-8 우회 대신 코드 측 reconfigure.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 PROJECT_ROOT = Path(r"C:\Users\User\Desktop\업무리스트")
 LOG_DIR = PROJECT_ROOT / "06_생산관리" / "D0_업로드" / "logs"
 STATE_DIR = PROJECT_ROOT / ".claude" / "state"
