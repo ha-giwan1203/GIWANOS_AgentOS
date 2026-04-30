@@ -30,7 +30,13 @@
 ### 검증 결과
 - `list_active_hooks --count`: 36 (변동 없음)
 - `list_active_hooks --by-event`: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 18 / PostToolUse 9 / Notification 1 / Stop 5 (변동 없음)
-- `final_check --fast`: TASKS/HANDOFF/STATUS 갱신 후 PASS 재확인 예정
+- `final_check --fast`: FAIL 0 / WARN 1 (기존 python3 의존, 본 작업 무관)
+- 3자 합의 PASS (GPT + Gemini + 사용자 본인) — α 채택: 옵션 C 측정 지속 + 실무 복귀
+
+### 잔존 (옵션 C 측정 종료 후 처리)
+- **[1순위]** auto_commit_state.sh가 수동 commit/push 의도를 가로채 메시지를 `[auto]`로 덮은 사건 — 본 세션 d59d844b에서 실증. 7세션 측정 종료 후 옵션 B 진입 시 최우선 타겟. 측정 로그 비고에 기록됨 (`quant_signal_log.md` 세션130 행).
+- **[2순위]** hook_timing 1주 추가 측정 결과 기반 advisory 강등/매처 축소 후보 재논의 (debate_verify·harness_gate·Stop hook 포함).
+- **[3순위]** final_check WARN 1건(block_dangerous·protect_files python3 의존) + settings.local 보류 후보 3건(python -c 따옴표 차이 등) 별도 정리.
 
 ## 세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)
 
