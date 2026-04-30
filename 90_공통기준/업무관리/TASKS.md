@@ -33,6 +33,11 @@
 ### [검증 예정]
 - 내일(2026-05-01) morning 07:10 auto-run 로그 + recover 로그 비교 필요
 - D0 화면 진입 OK + recover 정상 실행 확인 시 PASS
+- **fallback 발화 교차 검증** (Gemini A분류 추가제안 / GPT 6번 기준 일치):
+  - `[phase0] OAuth 콜백 정체 ... D0_URL 직접 이동 1회 시도` 로그 라인 검색
+  - (a) 미발화 + 성공 → timeout 60s 상향만으로 해결 (redirect 정상 도달)
+  - (b) 발화 + 성공 → 능동 navigate 우회 효과 실증
+  - (c) 발화 + 실패 → 인증 자체 무효 (별도 진단 필요)
 
 ### [잔존] morning auto fresh launch 구조 자체
 - 매일 cookie 없는 fresh profile launch → cold OAuth 강제. manual 9223 alive 방식과 비대칭
