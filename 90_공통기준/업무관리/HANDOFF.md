@@ -4,10 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-04-30 KST — 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
+최종 업데이트: 2026-04-30 KST — 세션131 [E] SP3M3 morning OAuth 콜백 정체 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 1주/7세션) / 세션128 [C] block_dangerous false positive + config awk 파싱 버그 패치 / 세션128 [3way+A] 성능 실망 진단 + 옵션A 위생 정리 / 세션128 [E+C] ZDM DB 다운 → MES 단독 진행 + mes_login XSRF 패치 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook + 메모리 4건 통합 / 세션124 [3way] GPT 재판정 통과 / 세션123 [C] write-router gate / 세션122 [3way] Opus 체감 진단
 읽기 순서: **TASKS.md → STATUS.md → HANDOFF.md** → CLAUDE.md → 도메인 CLAUDE.md
 
 ---
+
+## 세션131 (2026-04-30) — [E] SP3M3 morning OAuth 콜백 정체 패치
+
+### 진입
+- 사용자: "오늘도 SP3M3 주간계획 반영 스케줄러 실패" → B 분석 후 "안되면 되게 만들어라" 명시 → 모드 E
+- 정량 판정: 5일 중 4일 morning 자동화 실패 = 실무 차단
+
+### 처리
+- 5일 morning 로그 패턴 비교 (4/25~4/30): 매번 다른 redirect 분기에서 실패 — 부분적 분기 핸들링이 반복 실패 구조
+- 사용자 실측 관찰("로그인 후 생산계획 탭 redirect 못 받고 멍때림") 반영
+- 기존 timeout 추가 대기 패치 → D0_URL 능동 navigate fallback으로 본질 변경
+- run.py: _wait_oauth_complete 30→60s + else 분기 D0_URL 능동 navigate
+- verify_run.py: cp949 reconfigure (em dash UnicodeEncodeError 해결)
+
+### 검증
+- 내일(2026-05-01) morning 07:10 auto-run 로그 확인 필요
+- recover 정상 실행 확인 (UnicodeEncodeError 미발생)
+
+### 다음 AI 액션
+- 내일 morning 결과 확인 후 PASS 판정
+- 실패 시 morning auto 구조 자체 재검토 (cookie 보존 프로필 — 모드 C, 옵션 B 다이어트 시점)
+- (별건) hook 비용 측정 옵션 C 7세션 누적 지속
 
 ## 세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리
 

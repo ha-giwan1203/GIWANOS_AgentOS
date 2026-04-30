@@ -10,7 +10,33 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-04-30 KST — 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-04-30 KST — 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+
+## 세션131 (2026-04-30) — [E] SP3M3 morning 자동화 OAuth 콜백 정체 패치
+
+### [완료] 5일 패턴 분석
+- 4/25: ERR_BLOCKED_BY_CLIENT (CDP 9222 alive)
+- 4/27: oauth2/sso 정체 (당시 _wait_oauth_complete 미보강)
+- 4/28: 정상 ✅
+- 4/29: auth-dev login?error → 재로그인 → 또 실패
+- 4/30: erp-dev oauth2/sso 정체 → else 분기 즉시 raise (재시도 없음)
+
+### [완료] 근본 원인 식별 (사용자 실측 관찰 핵심)
+- 사용자 관찰: 로그인 성공 후 생산계획 탭 redirect 못 받고 멍때리다 실패
+- ERP 서버가 OAuth 콜백 후 redirect 누락 — timeout 늘려도 redirect 안 오면 영원히 안 옴
+- 기존 navigate_to_d0 else 분기는 재시도 없이 즉시 raise → 부분적 분기 핸들링이 5일 반복 실패의 구조
+
+### [완료] 패치 (모드 E ≤20줄·2파일)
+- `run.py`: `_wait_oauth_complete` default 30→60s + else 분기에 D0_URL 능동 navigate fallback (4/29 auth-dev 분기와 동일 패턴)
+- `verify_run.py`: `sys.stdout/stderr.reconfigure(utf-8)` 추가 (cp949 콘솔 em dash UnicodeEncodeError → recover 무력화 해결)
+
+### [검증 예정]
+- 내일(2026-05-01) morning 07:10 auto-run 로그 + recover 로그 비교 필요
+- D0 화면 진입 OK + recover 정상 실행 확인 시 PASS
+
+### [잔존] morning auto fresh launch 구조 자체
+- 매일 cookie 없는 fresh profile launch → cold OAuth 강제. manual 9223 alive 방식과 비대칭
+- 옵션 B 다이어트 시점에 morning auto도 cookie 보존 프로필 사용 검토 (구조 변경, 모드 C)
 
 ## 세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리
 
