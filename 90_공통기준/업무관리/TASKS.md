@@ -34,9 +34,20 @@
 - `CLAUDE.md` `@import` 2 → 1 (cowork-rules import 제거), 인덱스 7 → 6 (외부 모델·공동작업 원칙 통합 표기)
 - incident 미해결 55건 분포 분석 (자동 resolve 미수행 — `incident_quote.md` L70 룰 준수): 47건이 동일 뿌리 (auto_commit_state completion_before_state_sync 33 + commit_gate python3_dependency 14)
 
+### GPT 판정 (2026-04-30) — 부분PASS
+- verdict: **부분PASS** (커밋 09689098 + fa16a2cc 자동 동기화)
+- item 1 D0 evening: 실증됨/동의 (MES 원자료 Git 외라 보조 검증 부족)
+- item 2 가설 위계 H11>H10>H1: 실증됨/동의
+- item 3 환경 슬림화: 실증됨/동의 (메모리는 저장소 외라 최종 검증 제외)
+- item 4 자기참조 loop: 메타순환/동의
+- H1~H6: 일반론/동의 (모델 기본 성향) / H7: 메타순환/동의 / H8·H9·H10·H11: 실증됨/동의
+- 부분PASS 사유: H11 routine 룰 분리 미실행
+- **[B 감지]** 추가제안 (routine A/E는 확인금지·즉시실행, 시스템 C/D는 현행 B게이트 유지) — 토론모드 CLAUDE.md / work_mode_protocol.md / SKILL.md 규칙 수정 필요. 게이트·정책 재정의 = B 분류. **사용자가 /debate-mode 또는 "3자 토론" 명시하면 진입**, 단독 수정 금지
+
 ### 다음 AI 액션
 - routine 업무 진입 시 옵션 던지기 재발 여부 자체 점검 (H1 검증)
 - final_check.sh python3→python 1줄 패치 (incident 12건 신규 발생 차단 — 사용자 결정 시)
+- B 감지 항목(routine A/E vs 시스템 C/D 분리) 사용자 명시 호출 대기
 
 ---
 
