@@ -27,6 +27,7 @@
 |------|------|------|--------|----|----|------|------|
 | 129 | 2026-04-29 | 인프라셋업 | 60 (3/5) | PASS | 1 | 부분 | 첫 응답 5라인 중 (a)잔존 항목 표 3줄 + (b)AskUserQuestion·확인질문 2줄 = 3/5=60%. 양측 PASS (GPT+Gemini 실증됨·동의 / 교차검증 동의) |
 | 130 | 2026-04-30 | B+C 정합화 | 100 (5/5) | PASS | 1 | ALL | 첫 B 응답 결론 3줄+원인 첫 2줄 = (a)실물 hook timing/배열/permissions 누적 분석 5줄 = 5/5=100%. PASS: SHA d59d844b 3자 합의(GPT/Gemini/사용자 본인). 메타 커밋 1건(settings.local + README + state docs 통합). **비고: auto_commit_state.sh 선행 발화로 수동 커밋 메시지가 `[auto]`로 덮임 — 7세션 측정 종료 후 옵션 B 진입 시 최우선 타겟** |
+| 131 | 2026-04-30 | E OAuth 패치 + B API 가능성 | 100 (5/5) | PASS | 2 | 부분 | 첫 B 응답 "[모드:B] SP3M3 주간계획 스케줄러 실패 원인 분석. 우선 스킬·로그·스케줄 위치 파악" 1줄 + 후속 5일 로그 실측·코드 실측 5/5=100%. PASS: SHA 1812603c 코어 패치 + 1f65fb56 검증 보강, 3자 합의. **메타 커밋 2건** (d635f18d staged 풀림 우발 + 1f65fb56 Gemini A분류). 부분 PASS — S3 0~1 기준 살짝 위반. **비고: commit_gate 차단 후 staged 풀림 신규 발견 (auto_commit_state와 별건 — 옵션 B 분석 후보 추가). API 직접 호출 검토 결과: jQuery.ajax 경로 필수 (fetch 시 XSRF 미상속 500) — 옵션 A 하이브리드도 단순 아님. 시스템팀 문의 병행** |
 
 ## 측정 NEVER
 

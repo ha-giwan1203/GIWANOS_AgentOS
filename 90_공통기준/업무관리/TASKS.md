@@ -43,6 +43,22 @@
 - 매일 cookie 없는 fresh profile launch → cold OAuth 강제. manual 9223 alive 방식과 비대칭
 - 옵션 B 다이어트 시점에 morning auto도 cookie 보존 프로필 사용 검토 (구조 변경, 모드 C)
 
+### [잔존] API 직접 호출 가능성 (3자 합의 1+2 병행)
+- 현재 구조: ERP 저장은 jQuery.ajax 내부 호출, MES 검증은 이미 urllib.request 직접 호출
+- **장벽 실측**: SKILL.md 라인 168 — `jQuery.ajax 경로 필수, fetch 직접 호출 시 500 에러 (XSRF 공통 설정 미상속)`. 옵션 A 하이브리드도 XSRF 토큰 직접 추출+동봉 필요
+- **사용자 오프라인 액션 (Gemini 권장)**: 사내 IT/보안팀에 ERP D0 API 명세 + Service Account 발급 가능 여부 타진
+- 문의 항목 5개:
+  1. D0 추가생산지시 등록 API 명세 제공 가능 여부
+  2. 엑셀 업로드 파싱 API + 저장 API 공식 사용 가능 여부
+  3. Service Account / API 전용 인증 방식 제공 여부
+  4. CSRF/XSRF 토큰 처리 공식 방식
+  5. 테스트 서버 API 호출 검증 가능 여부
+- **즉시 구현 금지**: 측정 종료 + 시스템팀 답변 후 옵션 A 하이브리드 진입 여부 재판단
+
+### [잔존] commit_gate 차단 후 staged 풀림
+- 세션131 신규 발견. d635f18d → 1812603c 분리 commit 원인
+- auto_commit_state(세션130 발견)와 별건 — 옵션 B 다이어트 분석 대상에 추가
+
 ## 세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리
 
 ### [완료] B-mode 진단
