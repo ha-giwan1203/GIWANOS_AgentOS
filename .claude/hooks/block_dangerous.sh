@@ -43,8 +43,9 @@ DANGER_CMDS='(rm |rm -f |rm -rf |del |Remove-Item |mv |cp |sed -i |tee )'
 # 주: `cat >`/`cat >>`는 본질적으로 redirect → 2b 블록이 target 토큰 검사로 처리 (세션128 false positive 패치)
 # 세션128: awk 파싱이 한 줄 JSON 배열에서 `]` 인식 실패 → PROTECTED_PATTERNS=`(,)` 같은
 # 잘못된 값을 만들어 hardcoded fallback을 무력화하던 버그. python3 안전 파싱으로 교체.
-if [ -f "$CONFIG_FILE" ] && command -v python3 >/dev/null 2>&1; then
-  _cfg=$(python3 -c "
+# 세션132: PY_CMD fallback 적용 (Windows Git Bash python3 부재 환경 대응) — incident python3_dependency 12건 차단
+if [ -f "$CONFIG_FILE" ] && command -v "${PY_CMD:-python}" >/dev/null 2>&1; then
+  _cfg=$("${PY_CMD:-python}" -c "
 import json,sys
 try:
     d=json.load(open(sys.argv[1]))['block_dangerous']

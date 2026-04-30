@@ -20,8 +20,9 @@ CONFIG_FILE="$(dirname "$0")/../hook_config.json"
 DENY_EXT_PATTERN='\.(xlsx|xls|xlsm|csv|docx|pdf)$'
 DENY_PATH_PATTERN='(98_아카이브|기준정보.*최종)'
 # 세션128: awk 한 줄 배열 파싱 버그 → python3 안전 파싱으로 교체
-if [ -f "$CONFIG_FILE" ] && command -v python3 >/dev/null 2>&1; then
-  _cfg=$(python3 -c "
+# 세션132: PY_CMD fallback 적용 (Windows Git Bash python3 부재 환경 대응) — incident python3_dependency 12건 차단
+if [ -f "$CONFIG_FILE" ] && command -v "${PY_CMD:-python}" >/dev/null 2>&1; then
+  _cfg=$("${PY_CMD:-python}" -c "
 import json,sys
 try:
     d=json.load(open(sys.argv[1]))['protect_files']

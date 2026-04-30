@@ -70,6 +70,13 @@
 
 **미해결 — 검증 신호 대기**: 다음 routine 업무 진입 시 옵션 4지선다 재발 여부 = H1 검증
 
+### Round 3 — 근본 해결 1단계 (2026-04-30 사용자 "근본 해결 원함" 지시)
+- ✅ block_dangerous.sh + protect_files.sh: python3 직접 호출 → PY_CMD fallback 적용 (1줄씩, hook_common.sh L21-22 PY_CMD 정의 활용)
+- 효과: incident `python3_dependency` WARN 12건 신규 발생 차단
+- 검증: final_check.sh --fast WARN 0건 (이전 1건 → 0건)
+- R5: git revert 가역, 동작 변경 0 (PY_CMD가 python3 또는 python으로 동일 결과)
+- 다음 단계: 1주 hook_timing 데이터 누적 후 다른 hook 영향 정량 측정 (decision_avoidance plan 일정대로)
+
 ### GPT 판정 (2026-04-30) — 부분PASS
 - verdict: **부분PASS** (커밋 09689098 + fa16a2cc 자동 동기화)
 - item 1 D0 evening: 실증됨/동의 (MES 원자료 Git 외라 보조 검증 부족)
