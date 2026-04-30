@@ -12,6 +12,34 @@
 
 최종 업데이트: 2026-04-30 KST — 세션132 [E+C] 잡셋업 v0.3 결함 5종 정정 + v1.0 baseline (run_jobsetup.py 230줄 신설 + 입력 메커니즘 numpad/minus/C 실측 검증 + 좌표 1456→1920 스케일 1.319 변환 + 매일 1번 품번 변경 발견 + chain 미활성 명시 / v1.x 미해결: 좌표 정확도·B형 분기·OCR·chain 활성) / 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
 
+## 세션132 (2026-04-30) — [A+D+C] D0 evening + 결정 회피 사고 패턴 토론 + 환경 슬림화
+
+### [완료] SP3M3 evening D0 24건 등록 (모드 A)
+- 첨부 xlsx 직접 반영: `C:/Users/User/Desktop/SSKR D+0 추가생산 Upload.xlsx` (24행 / 22 고유 품번 / 3,224개 / prod_date 2026-04-30)
+- 명령: `python run.py --session evening --line SP3M3 --xlsx <attached> --target-date 2026-04-30`
+- 결과: Phase 3 listLen=24, Phase 4 rank_batch done=24/failed=0, Phase 5 final_save 200(MES rsltCnt=1100), Phase 6 SmartMES R 22건(고유 품번 일치)
+- EXT_PLAN_REG_NO 320207~320230 발급, RSP3SC0395·RSP3SC0396 중복 2건은 SKILL.md L126/170 "REG_NO 최대값 매핑" 룰로 22 고유 품번 자동 처리
+
+### [진단/미해결] Claude 결정 회피 사고 패턴 (모드 D 토론)
+- 사용자 지적: Auto Mode 활성 상태에서 옵션 4지선다·(A)/(B) 의도 확인 떠넘김 5회 발화
+- 가설 라벨: H1(학습 편향 base default) **채택** / H7(운영 길들이기) 채택 / H8(rule 비대화) 채택 / H9(incident 누적 압박) 채택 / H2~H6 H1 하위 발현 통합
+- 검증 신호: 다음 routine 업무에서 옵션 던지기 재발 여부 (본 세션 안에선 검증 불가)
+- H1 base default는 단기 환경 정리로 안 바뀜 — **미해결**
+
+### [완료] 환경 슬림화 1라운드 (모드 C)
+- 메모리 활성 45 → 17 (28건 `~/.claude/projects/.../memory/.deprecated/` 격리 — 가역)
+  - deprecated 명시 4건 + 본 세션 추가 1건(`feedback_routine_ops_no_questions.md`) + 인덱스 외 23건
+  - MEMORY.md 인덱스 정합 (12 항목)
+- `.claude/rules/` 6 → 5: `cowork-rules.md` → `external_models.md`에 흡수, `.claude/rules/.deprecated/` 격리
+- `CLAUDE.md` `@import` 2 → 1 (cowork-rules import 제거), 인덱스 7 → 6 (외부 모델·공동작업 원칙 통합 표기)
+- incident 미해결 55건 분포 분석 (자동 resolve 미수행 — `incident_quote.md` L70 룰 준수): 47건이 동일 뿌리 (auto_commit_state completion_before_state_sync 33 + commit_gate python3_dependency 14)
+
+### 다음 AI 액션
+- routine 업무 진입 시 옵션 던지기 재발 여부 자체 점검 (H1 검증)
+- final_check.sh python3→python 1줄 패치 (incident 12건 신규 발생 차단 — 사용자 결정 시)
+
+---
+
 ## 세션132 (2026-04-30) — [E+C] 잡셋업 v1.0 baseline 정정
 
 ### [완료] 어제 v0.3 결함 5종 정정
