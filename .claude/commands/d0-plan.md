@@ -38,16 +38,37 @@ python .claude/hooks/incident_repair.py --json --limit 5
 ## 사용법
 
 ```
+# 기본값 = 옵션 A 하이브리드 (세션133, --api-mode default=True)
 /d0-plan                            # 현재 시간대로 세션 자동 판정
 /d0-plan --session evening          # 저녁 세션 (SP3M3 야간 + SD9A01 OUTER)
 /d0-plan --session morning          # 아침 세션 (SP3M3 주간 3600 컷)
-/d0-plan --dry-run                  # 추출+엑셀 생성까지만, 서버 저장 안 함
+/d0-plan --session auto             # 시간대 자동 판정
+
+# 모드 분기
+/d0-plan --legacy-mode              # 화면 모드 강제 (회귀 fallback)
+/d0-plan --no-mes-send              # Phase 5 final_save 차단 (PoC/검증)
+/d0-plan --dry-run                  # 추출+엑셀 생성까지만 (서버 저장 0)
+/d0-plan --parse-only               # selectList까지만 (multiList 0)
+
+# 라인/날짜
 /d0-plan --line SP3M3               # SP3M3만
-/d0-plan --line SD9A01               # SD9A01만 (저녁 세션)
+/d0-plan --line SD9A01              # SD9A01만 (저녁 세션)
 /d0-plan --target-date 2026-04-24   # 파일명 날짜 명시
-/d0-plan --session morning --no-jobsetup       # SP3M3 morning + 잡셋업 자동 실행 끄기
-/d0-plan --session morning --jobsetup-dry-run  # SP3M3 morning + 잡셋업 dry-run으로
+/d0-plan --xlsx <path>              # 외부 1건 xlsx 직접 (PoC 또는 사용자 첨부)
+
+# 잡셋업 chain (morning만)
+/d0-plan --session morning --no-jobsetup       # 잡셋업 자동 실행 끄기
+/d0-plan --session morning --jobsetup-dry-run  # 잡셋업 dry-run
 ```
+
+## 동작 모드 (세션133)
+
+| 옵션 | Phase 4 (rank) | Phase 5 (final_save) | 용도 |
+|------|---------------|---------------------|------|
+| 기본 | requests 직접 POST (하이브리드) | 화면 jQuery.ajax (sendMesFlag='Y' MES 전송) | 운영 |
+| `--legacy-mode` | 화면 jQuery.ajax | 화면 jQuery.ajax | 회귀 fallback |
+| `--no-mes-send` | (모드 그대로) | **차단** | PoC/사고 재발 방지 |
+| `--dry-run` | 미실행 | 미실행 | 추출 검증 |
 
 ## 인수
 
@@ -57,12 +78,14 @@ python .claude/hooks/incident_repair.py --json --limit 5
 
 1. 현재 날짜/시간 확인 (`date "+%Y-%m-%d %A %H:%M KST"`)
 2. 세션 판정 (auto 시 06~10시=morning, 15~22시=evening)
-3. 스킬 실행:
+3. 스킬 실행 (기본 = 하이브리드):
    ```bash
    cd "C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/d0-production-plan"
-   python run.py --session <session> [--line <line>] [--dry-run] [--target-date <yyyy-mm-dd>]
+   python run.py --session <session> [--line <line>] [--dry-run] [--target-date <yyyy-mm-dd>] [--legacy-mode|--no-mes-send|--xlsx <path>]
    ```
-4. 결과 보고: 라인별 업로드/서열 배치 건수, MES 전송 결과, SmartMES 검증 결과
+4. 결과 보고: 라인별 업로드/서열 배치 건수 (Phase 4 hybrid OK 표시), MES 전송 결과, SmartMES 검증 결과
+5. 해당일 파일 없으면 자동 작업 패스 (`[skip] 해당일 파일 없음 — 작업 패스` exit 0)
+6. dedupe로 등록 가능 후보 0건이면 업로드 스킵 정상 종료
 5. **잡셋업 자동 실행** (조건: `session=morning` AND `line ⊇ SP3M3` AND `--dry-run` 아님 AND `--no-jobsetup` 아님 AND SmartMES 검증 PASS):
    - **사용자 확인 없이 즉시** `/jobsetup-auto --commit` 자동 호출 (사용자 답변 2026-04-29: "계획 반영 완료 판정 후 바로 실행되는 구조")
    - 1줄 인지 라인만 출력: `[auto] SP3M3 D0 morning PASS → /jobsetup-auto --commit 자동 실행 (약 2분, SmartMES 화면 점유)`

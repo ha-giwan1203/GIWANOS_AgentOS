@@ -27,6 +27,8 @@
 - **P6 chain 활성 (사용자 명시 "y")** — `run_morning.bat`에 `--api-mode` 추가. 매일 morning 자동 실행이 옵션 A 하이브리드 진입 (rank 호출은 requests 직접 POST, final_save는 화면 모드). OAuth redirect 멍때림 위험 본질 해소. 회귀 시 1줄 제거로 즉시 화면 모드 fallback. 1주 모니터링 후 정착 결정
 - **compare_modes 폐기 (사용자 명시 "기존 스케줄러를 하이브리드로 대체")** — 별도 PoC 스케줄 불필요. 매일 morning 자체가 자연 검증. `compare_modes.py` + `run_morning_api_compare.bat` 삭제. PoC 자산은 보존 (auth_extract.py / api_p4_capture.py / api_p4_replay.py / state/compare_*.json)
 - **하이브리드 기본화 (사용자 명시 "기존꺼는 보관만 하고 이제 실제 작업은 하이브리드로 진행")** — `run.py argparse --api-mode default=True` + `--legacy-mode` 신설 (회귀 fallback). `run_morning.bat`에서 `--api-mode` 제거 (기본값이라 불필요). 매일 morning + 향후 evening 모두 자동 하이브리드 진입. 기존 화면 모드 코드 보존 — `--legacy-mode` 명시 시만 활성
+- **하이브리드 1건 PoC PASS (5/1 14:50)** — xlsm 21번째(컷 다음) RSP3PC0054 950EA 자동 picking + `python run.py --xlsx`. Phase 0 OAuth 자동 통과 + Phase 1.5 dedupe + Phase 3 selectList/multiList REG_NO=320599 + Phase 4 api_rank_batch (하이브리드) ext=320599 OK + Phase 5 final_save sendMesFlag='Y' MES 전송 + Phase 6 SmartMES 검증 ✅. 5/1 운영에 RSP3PC0054 950EA 추가 등록됨 (실제 운영 영향). 하이브리드 운영 chain 첫 PASS 검증
+- **문서/스킬 정합화** — SKILL.md(v4.0 변경 이력) + .claude/commands/d0-plan.md + erp-mes-recovery-protocol.md(세션133 known case) 갱신. 모드 분기 표 + dedupe + 파일 skip + --no-mes-send + --legacy-mode 명시
 
 
 
