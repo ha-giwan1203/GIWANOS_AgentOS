@@ -21,7 +21,8 @@
 - **P4 단계 3 PASS** — `run.py` `api_rank_batch` 함수 본체 + `build_requests_session_from_page` + `refresh_xsrf_from_cookies` 헬퍼 / 1 item smoke done=1 failed=0 + mesMsg 빈 문자열 + DELETE 정리
 - **P5 PASS** — `run.py --api-mode` dual-mode 플래그 / run_session_line + --xlsx direct 모든 분기 적용 / 화면 모드 회귀 0 (api-mode=False 기본)
 - **P6 PoC 1회 PASS** — `compare_modes.py` + `run_morning_api_compare.bat` 신설. RSP3SC0665 1건 api 모드 처리 + verdict=PASS + DELETE 200 정리. 1주 누적(7회) 후 chain 적용 결정
-- **P6 보강 (사용자 지적 반영)** — 22번 행 화면 잔존 보고 후 잔존 가드 추가: ① compare_modes 시작 시 후보 PROD_NO 잔존 확인 → 있으면 PoC skip ② cleanup DELETE 응답 body 출력 + post-DELETE 그리드 잔존 재검증. 2차 smoke에서 DELETE 정상 작동 확인 (이전 22번 행은 stale pqGrid 캐시 추정). schtasks 등록은 사용자 명시 후
+- **P6 보강 1차 (잔존 가드 + DELETE body)** — compare_modes 시작 시 후보 PROD_NO 잔존 확인 + cleanup DELETE 응답 body 출력 + post-DELETE 검증
+- **P6 보강 2차 (사용자 재지적 — "처음부터 등록 확인 왜 안 함")** — compare_modes에 `dedupe_existing_registrations` 호출 누락이 진짜 결함. ① dedupe 호출 추가 (좌측 grid_body 기준) ② 우측 sGridList rank 잔존 PROD_NO 추가 dedupe ③ RSP3SC0665 fallback 제거 (후보 0건이면 SKIPPED 정상 종료). smoke PASS — 오늘 morning 20건 등록 마쳤으니 후보 0건 SKIP, 잔존 0. schtasks 등록은 사용자 명시 후
 
 
 
