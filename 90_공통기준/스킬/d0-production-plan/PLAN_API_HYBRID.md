@@ -469,6 +469,34 @@ exit 0. 잔존 0.
 
 P6 chain 적용 결정 근거는 별도 — 사용자가 morning 자동 실행 결과 + P5 dual-mode 수동 호출 검증으로 충분히 신뢰 쌓은 후 결정.
 
+## P6 chain 활성 + compare_modes 폐기 (2026-05-01 사용자 명시)
+
+### 사용자 결정
+- "y" — chain 활성
+- "기존 스케줄러들을 하이브리드로 대체하면 되잖아" — 별도 PoC 스케줄 불필요
+
+### 변경
+1. `run_morning.bat` 27행: `python run.py --session morning --line SP3M3` → `... --api-mode`
+2. `compare_modes.py` 삭제 (PoC용. 자연 검증으로 대체)
+3. `run_morning_api_compare.bat` 삭제 (별도 스케줄 불필요)
+4. schtasks `D0_SP3M3_API_Compare` 등록 안 함
+
+### 자연 검증 흐름
+- 매일 07:11 `D0_SP3M3_Morning` → `run_morning.bat --api-mode` → 옵션 A 하이브리드 진입
+- 매일 07:20 `D0_SP3M3_Morning_Recover` → `verify_run.py` → 성공 마커 / 재시도 분류
+- 1주 morning_*.log 누적이 곧 P6 비교 검증
+
+### Fallback (회귀 시)
+- 세션133 후속 변경: `run.py argparse --api-mode default=True` + `--legacy-mode` fallback 신설
+- `run_morning.bat`은 `python run.py --session morning --line SP3M3` (--api-mode 명시 불필요, 기본값)
+- 회귀 시: `run_morning.bat`에 `--legacy-mode` 추가 → 즉시 화면 모드 복귀
+
+### 보존 자산
+- `auth_extract.py` (P1 PoC)
+- `api_p4_capture.py` / `api_p4_replay.py` (P4 PoC — 재현 검증용)
+- `state/compare_*.json` (검증 기록)
+- `run.py` `api_rank_batch` / `build_requests_session_from_page` / `refresh_xsrf_from_cookies` 함수 본체
+
 ## Context
 SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.
 

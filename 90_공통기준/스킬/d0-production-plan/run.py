@@ -1137,8 +1137,16 @@ def main():
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
     ap.add_argument("--parse-only", action="store_true", help="검증 모드: 엑셀 업로드창 첨부 + 서버 파싱(selectList)까지만. multiList(DB 저장)/Phase 4-5 모두 스킵")
     ap.add_argument("--no-mes-send", action="store_true", help="Phase 5 final_save(sendMesFlag='Y') 차단 — MES 전송 미발생. P3 PoC/검증용. rank 임시저장(sendMesFlag='N')까지는 발생 — ERP DB 등록분 정리 필요할 수 있음")
-    ap.add_argument("--api-mode", action="store_true", help="옵션 A 하이브리드: rank 호출(Phase 4)을 jQuery.ajax 대신 requests 직접 POST로 처리. final_save(Phase 5)는 화면 모드 유지. P4 단계 3 검증된 흐름. 회귀 안전 — 화면 모드와 dual.")
+    # 세션133 사용자 명시 "기존꺼는 보관만 하고 이제 실제 작업은 하이브리드로 진행" — 기본값 = 하이브리드
+    # --legacy-mode 명시 시만 화면 모드(jQuery.ajax) 진입. fallback 보존.
+    ap.add_argument("--api-mode", action="store_true", default=True, help="옵션 A 하이브리드 (기본값 활성): rank 호출(Phase 4)을 requests 직접 POST. final_save(Phase 5)는 화면 모드 유지. 세션133 사용자 명시 — 매일 morning 자동 실행이 자연 검증")
+    ap.add_argument("--legacy-mode", action="store_true", help="화면 모드 강제 (회귀 fallback). --api-mode를 끄고 jQuery.ajax 흐름 사용. 운영 chain 회귀 시만 사용")
     args = ap.parse_args()
+
+    # --legacy-mode 명시 시 api_mode를 False로 강제 (화면 모드 fallback)
+    if args.legacy_mode:
+        args.api_mode = False
+        print("[mode] --legacy-mode 활성 — 화면 모드(jQuery.ajax) 강제. 하이브리드 미사용")
 
     session = determine_session(args.session)
     print(f"=== /d0-plan session={session} line={args.line} dry_run={args.dry_run} ===")
