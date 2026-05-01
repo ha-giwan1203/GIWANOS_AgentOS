@@ -128,6 +128,7 @@
 | `debate_independent_gate.sh` | fail-closed | deny JSON | 독립견해 마커 미존재 시 전송 차단 |
 | `navigate_gate.sh` | conditional fail-closed | deny JSON | debate_mode 활성 시 fail-closed, 그 외 fail-open |
 | `debate_send_gate_mark.sh` | fail-open + WARN | 없음 | 마커 생성 실패 시 WARN 로그 후 통과 (debate_gate가 2차 차단) |
+| `share_after_push.sh` | fail-open | 없음 | advisory. git push 직후 share-result 필요 알림 (debate_20260429_103117_3way Phase B). 자동 호출 금지, 실패해도 통과 |
 | `skill_drift_check.sh` | fail-open | 없음 | advisory. SKILL.md drift 감지 시 stderr 경고만, 차단 없음 |
 | `permissions_sanity.sh` | fail-open | 없음 | advisory. 1회용 패턴·완전 중복 탐지 시 stderr 경고만, 60분 캐시 |
 | `r1r5_plan_check.sh` | fail-open | 없음 | advisory. C 트리거 staged + plan 미참조 시 stderr 권장만, 차단 없음 (세션118 별건 2번) |
