@@ -1,0 +1,27 @@
+{
+  "ts": "20260501_125614",
+  "started_at": "2026-05-01T12:56:14.988263",
+  "mode": "api",
+  "phases": {
+    "multiList": {
+      "REG_NO": 320595
+    },
+    "api_rank_batch": {
+      "done": 1,
+      "failed": 0,
+      "missing": 0,
+      "fails": []
+    }
+  },
+  "verdict": "PASS",
+  "candidate": {
+    "PROD_NO": "RSP3SC0665",
+    "QTY": 1500
+  },
+  "errors": [],
+  "cleanup": {
+    "rank_status": 200,
+    "reg_status": 200
+  },
+  "finished_at": "2026-05-01T12:56:40.538052"
+}

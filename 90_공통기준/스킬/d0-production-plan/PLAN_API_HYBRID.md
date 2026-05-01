@@ -376,15 +376,45 @@ python run.py --session morning --line SP3M3 --api-mode --no-mes-send
 python run.py --session morning --line SP3M3 --xlsx <1건xlsm> --api-mode --no-mes-send
 ```
 
-## P6 미진입 (운영 chain 적용)
+## P6 결과 (2026-05-01 PoC 1회 PASS) ✅
 
-선행 조건:
-1. 1주 dry-run 비교 검증 (화면 모드 vs api 모드 결과 일치)
-2. `compare_modes.py` 비교 도구 작성
-3. `run_morning.bat`에 `--api-mode` 옵션 추가
-4. 1주 chain 운영 모니터링
+산출:
+- `compare_modes.py` — 매일 1회 api 모드 1건 PoC + DELETE 정리 + verdict PASS/FAIL JSON 기록
+- `run_morning_api_compare.bat` — schtasks 등록용 wrapper (07:30 권장, morning 07:11 직후)
 
-상태: P4·P5 완성 시점. P6 진입은 사용자 결정 (1주~2주 추가 시간).
+PoC 1회 검증 (2026-05-01 12:56):
+- candidate: RSP3SC0665 1500
+- REG_NO=320595 발급
+- api_rank_batch result: done=1 failed=0 missing=0
+- mesMsg 빈 문자열 (sendMesFlag='N' 효과)
+- DELETE rank=200 + reg=200
+- verdict: **PASS**
+- 산출 JSON: `state/compare_20260501_125614.json`
+
+### 1주 누적 PASS 기준
+- 7회 연속 verdict=PASS
+- 1회라도 FAIL 시 알림 + chain 적용 보류
+
+### chain 적용 (1주 PASS 후 사용자 결정)
+- `run_morning.bat`에 `--api-mode` 추가 (1줄 변경)
+- 1주 chain 운영 모니터링
+- 회귀 발생 시 즉시 화면 모드 fallback (`--api-mode` 1줄 제거)
+
+## 옵션 A 하이브리드 종합 결산 (2026-05-01)
+
+| Phase | 상태 | 근거 |
+|-------|------|------|
+| P1 cookie/XSRF 추출 | ✅ | auth_extract.py |
+| P2 selectList + multiList write PoC | ✅ | RSP3SC0665 1건 + DELETE |
+| P3 rank + MES 전송 | ✅ (단 MES 잔존 사고) | RSP3SC0665 320590 / "그대로 두기" |
+| P4 단계 1 페이로드 캡처 | ✅ | api_p4_capture.py |
+| P4 단계 2 requests replay | ✅ | api_p4_replay.py / Content-Type=application/json 발견 |
+| P4 단계 3 api_rank_batch 본체 | ✅ | run.py 함수 + 1 item smoke |
+| P5 --api-mode dual-mode | ✅ | argparse + 분기 + 화면 모드 회귀 0 |
+| **P6 PoC 1회** | ✅ (2026-05-01) | compare_modes.py |
+| P6 1주 누적 + chain 적용 | 🟡 진행 중 | 사용자 결정 후 schtasks 등록 |
+
+**현 상태**: 코드 + 검증 완성. 운영 chain 적용은 1주 누적 PASS 후 사용자 결정. 미진입 시 화면 모드(현재 운영) 그대로 안전.
 
 ## Context
 SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.
