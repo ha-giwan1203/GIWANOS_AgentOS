@@ -1,0 +1,30 @@
+{
+  "ts": "20260501_130637",
+  "started_at": "2026-05-01T13:06:37.191317",
+  "mode": "api",
+  "phases": {
+    "multiList": {
+      "REG_NO": 320596
+    },
+    "api_rank_batch": {
+      "done": 1,
+      "failed": 0,
+      "missing": 0,
+      "fails": []
+    }
+  },
+  "verdict": "PASS",
+  "candidate": {
+    "PROD_NO": "RSP3SC0665",
+    "QTY": 1500
+  },
+  "errors": [],
+  "cleanup": {
+    "rank_status": 200,
+    "rank_body": "{\"statusTxt\":\"정상 완료되었습니다.\",\"statusCode\":\"200\"}",
+    "reg_status": 200,
+    "reg_body": "{\"statusTxt\":\"정상 완료되었습니다.\",\"statusCode\":\"200\"}",
+    "post_check_grid_rows": []
+  },
+  "finished_at": "2026-05-01T13:07:08.743584"
+}

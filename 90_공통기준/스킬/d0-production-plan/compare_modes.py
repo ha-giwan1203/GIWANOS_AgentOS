@@ -121,7 +121,7 @@ def main():
         page.evaluate("() => { try { totGridList.searchListData(); } catch(e){} }")
         time.sleep(3)
 
-        # 후보 식별
+        # 후보 식별 + 잔존 가드 (사용자 명시 — 처음 시작 시 등록 확인)
         try:
             plan_file = find_plan_file(today_dt)
             wb = openpyxl.load_workbook(plan_file, data_only=True, keep_vba=True)
@@ -130,12 +130,43 @@ def main():
                 const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
                 return d.filter(r => r.REG_DT === t).map(r => r.PROD_NO);
             }""", today_str)
-            candidates = [it for it in day_items if it["PROD_NO"] not in set(registered)]
+            registered_set = set(registered)
+            candidates = [it for it in day_items if it["PROD_NO"] not in registered_set]
+
+            # 잔존 가드: PoC 후보 RSP3SC0665가 이미 ERP 그리드에 있으면 PoC skip
+            # (P6 PoC가 매일 RSP3SC0665 1건 등록 + DELETE 정리 패턴인데, DELETE 응답 200이 실제 정리 보장 안 함을 발견 — 누적 잔존 방지)
+            poc_default = "RSP3SC0665"
             if not candidates:
-                candidates = [{"PROD_NO": "RSP3SC0665", "QTY": 1500}]
+                if poc_default in registered_set:
+                    log["verdict"] = "SKIPPED"
+                    log["skip_reason"] = f"미등록 후보 0건 + PoC default {poc_default}가 이미 등록됨 (잔존 가드). 사용자 화면 직접 정리 필요."
+                    print(f"[compare] SKIPPED — {log['skip_reason']}")
+                    log["finished_at"] = datetime.now().isoformat()
+                    state_path.write_text(json.dumps(log, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+                    write_log()
+                    sys.exit(2)
+                candidates = [{"PROD_NO": poc_default, "QTY": 1500}]
             cand = candidates[0]
+
+            # 잔존 가드 추가 — 우측 grid (sGridList) 또는 그리드 전체에서 같은 PROD_NO+today 행 잔존 확인
+            sg_match = page.evaluate("""(args) => {
+                try {
+                    const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
+                    const today_rows = d.filter(r => r.REG_DT === args.t && r.PROD_NO === args.p);
+                    return today_rows.map(r => ({REG_NO: r.REG_NO, PROD_NO: r.PROD_NO, QTY: r.PRDT_QTY||r.ADD_PRDT_QTY}));
+                } catch(e) { return [{err: String(e)}]; }
+            }""", {"t": today_str, "p": cand["PROD_NO"]})
+            if sg_match and len(sg_match) > 0 and not sg_match[0].get("err"):
+                log["verdict"] = "SKIPPED"
+                log["skip_reason"] = f"후보 {cand['PROD_NO']}가 이미 ERP 그리드에 {len(sg_match)}건 잔존: {sg_match}. PoC skip — 사용자 화면 정리 필요."
+                print(f"[compare] SKIPPED — {log['skip_reason']}")
+                log["finished_at"] = datetime.now().isoformat()
+                state_path.write_text(json.dumps(log, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+                write_log()
+                sys.exit(2)
+
             log["candidate"] = cand
-            print(f"[compare] candidate: {cand}")
+            print(f"[compare] candidate: {cand} (잔존 0)")
         except Exception as e:
             log["error"] = f"candidate: {e}"; write_log()
             print(f"[FAIL] {e}", file=sys.stderr); sys.exit(3)
@@ -201,8 +232,31 @@ def main():
                         headers={"Content-Type": "application/json"},
                         timeout=TIMEOUT,
                     )
-                    log["cleanup"] = {"rank_status": r1.status_code, "reg_status": r2.status_code}
-                    print(f"[cleanup] rank={r1.status_code} reg={r2.status_code}")
+                    log["cleanup"] = {
+                        "rank_status": r1.status_code, "rank_body": r1.text[:600],
+                        "reg_status": r2.status_code, "reg_body": r2.text[:600],
+                    }
+                    print(f"[cleanup] rank={r1.status_code} body={r1.text[:200]}")
+                    print(f"[cleanup] reg={r2.status_code} body={r2.text[:200]}")
+
+                    # 정리 실효성 검증 — 그리드 새로고침 후 후보 PROD_NO 잔존 여부
+                    time.sleep(2)
+                    page.evaluate("() => { try { totGridList.searchListData(); } catch(e){} }")
+                    time.sleep(2)
+                    post_check = page.evaluate("""(args) => {
+                        const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
+                        return d.filter(r => r.REG_DT === args.t && r.PROD_NO === args.p)
+                                .map(r => ({REG_NO: r.REG_NO, QTY: r.PRDT_QTY||r.ADD_PRDT_QTY}));
+                    }""", {"t": today_str, "p": cand["PROD_NO"]})
+                    log["cleanup"]["post_check_grid_rows"] = post_check
+                    if post_check:
+                        log["verdict"] = "FAIL"
+                        if "errors" not in log: log["errors"] = []
+                        log["errors"].append(f"DELETE 응답 200이지만 그리드 잔존 {len(post_check)}건: {post_check}")
+                        print(f"[verify] ⚠ DELETE 후 그리드 잔존 {len(post_check)}건: {post_check}")
+                    else:
+                        print(f"[verify] DELETE 후 그리드 잔존 0건 — 정리 PASS")
+
                     if r1.status_code != 200 or r2.status_code != 200:
                         log["verdict"] = "FAIL"
                         if "errors" not in log: log["errors"] = []
