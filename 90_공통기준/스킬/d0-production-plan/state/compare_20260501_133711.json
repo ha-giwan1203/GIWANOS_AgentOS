@@ -1,0 +1,10 @@
+{
+  "ts": "20260501_133711",
+  "started_at": "2026-05-01T13:37:11.746162",
+  "mode": "api",
+  "phases": {},
+  "verdict": "SKIPPED",
+  "day_items_count": 20,
+  "skip_reason": "등록 가능 후보 0건 (좌측 grid_body + 우측 s_grid_body 모두 dedupe 후). 오늘 morning이 모든 주간 등록 마침. PoC 불필요.",
+  "finished_at": "2026-05-01T13:37:25.885159"
+}

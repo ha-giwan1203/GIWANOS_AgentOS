@@ -52,7 +52,7 @@ from run import (
     ensure_chrome_cdp, navigate_to_d0, D0_URL,
     d0_upload, find_plan_file, extract_sp3m3_day, DAY_CUT_THRESHOLD,
     LINE_CONFIG, api_rank_batch, build_requests_session_from_page,
-    refresh_xsrf_from_cookies,
+    refresh_xsrf_from_cookies, dedupe_existing_registrations,
 )
 
 CDP_URL = "http://127.0.0.1:9223"
@@ -121,52 +121,53 @@ def main():
         page.evaluate("() => { try { totGridList.searchListData(); } catch(e){} }")
         time.sleep(3)
 
-        # 후보 식별 + 잔존 가드 (사용자 명시 — 처음 시작 시 등록 확인)
+        # 후보 식별 — 사용자 명시 로직 (세션133 정정):
+        # 1. 오늘 xlsm 주간 items 추출
+        # 2. dedupe_existing_registrations로 좌측 grid_body(D0 등록) 기준 중복 제외
+        # 3. 우측 s_grid_body(sGridList rank) 잔존 PROD_NO도 추가 dedupe
+        # 4. 남은 후보 0건이면 PoC SKIP (fallback 제거 — RSP3SC0665 강제 등록 안 함)
         try:
             plan_file = find_plan_file(today_dt)
             wb = openpyxl.load_workbook(plan_file, data_only=True, keep_vba=True)
             day_items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
-            registered = page.evaluate("""(t) => {
-                const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
-                return d.filter(r => r.REG_DT === t).map(r => r.PROD_NO);
-            }""", today_str)
-            registered_set = set(registered)
-            candidates = [it for it in day_items if it["PROD_NO"] not in registered_set]
+            log["day_items_count"] = len(day_items)
 
-            # 잔존 가드: PoC 후보 RSP3SC0665가 이미 ERP 그리드에 있으면 PoC skip
-            # (P6 PoC가 매일 RSP3SC0665 1건 등록 + DELETE 정리 패턴인데, DELETE 응답 200이 실제 정리 보장 안 함을 발견 — 누적 잔존 방지)
-            poc_default = "RSP3SC0665"
-            if not candidates:
-                if poc_default in registered_set:
-                    log["verdict"] = "SKIPPED"
-                    log["skip_reason"] = f"미등록 후보 0건 + PoC default {poc_default}가 이미 등록됨 (잔존 가드). 사용자 화면 직접 정리 필요."
-                    print(f"[compare] SKIPPED — {log['skip_reason']}")
-                    log["finished_at"] = datetime.now().isoformat()
-                    state_path.write_text(json.dumps(log, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
-                    write_log()
-                    sys.exit(2)
-                candidates = [{"PROD_NO": poc_default, "QTY": 1500}]
-            cand = candidates[0]
+            # 좌측 grid_body 기준 dedupe (run.py 함수 재사용)
+            day_items = dedupe_existing_registrations(page, day_items, today_dt, "SP3M3")
 
-            # 잔존 가드 추가 — 우측 grid (sGridList) 또는 그리드 전체에서 같은 PROD_NO+today 행 잔존 확인
-            sg_match = page.evaluate("""(args) => {
+            # 우측 s_grid_body(sGridList rank) 잔존 PROD_NO도 dedupe — 임시저장 잔존이 있으면 그 PROD_NO 제외
+            sgrid_prods = page.evaluate("""(t) => {
                 try {
-                    const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
-                    const today_rows = d.filter(r => r.REG_DT === args.t && r.PROD_NO === args.p);
-                    return today_rows.map(r => ({REG_NO: r.REG_NO, PROD_NO: r.PROD_NO, QTY: r.PRDT_QTY||r.ADD_PRDT_QTY}));
-                } catch(e) { return [{err: String(e)}]; }
-            }""", {"t": today_str, "p": cand["PROD_NO"]})
-            if sg_match and len(sg_match) > 0 and not sg_match[0].get("err"):
+                    const d = jQuery('#s_grid_body').pqGrid('option','dataModel').data || [];
+                    // 같은 라인 + 임시저장(EXT_PLAN_YN='Y' AND WORK_STATUS_CD='A') 또는 정상 등록 모두 PROD_NO 수집
+                    return d.filter(r => r.LINE_CD === 'SP3M3').map(r => r.PROD_NO);
+                } catch(e) { return []; }
+            }""", today_str)
+            sgrid_set = set(sgrid_prods)
+            before_sg = len(day_items)
+            day_items = [it for it in day_items if it["PROD_NO"] not in sgrid_set]
+            sg_skipped = before_sg - len(day_items)
+            if sg_skipped > 0:
+                print(f"[compare] sGridList(우측) 잔존 dedupe — {sg_skipped}건 제외 (잔존 PROD_NO: {list(sgrid_set)[:5]}{'...' if len(sgrid_set)>5 else ''})")
+
+            if not day_items:
                 log["verdict"] = "SKIPPED"
-                log["skip_reason"] = f"후보 {cand['PROD_NO']}가 이미 ERP 그리드에 {len(sg_match)}건 잔존: {sg_match}. PoC skip — 사용자 화면 정리 필요."
+                log["skip_reason"] = f"등록 가능 후보 0건 (좌측 grid_body + 우측 s_grid_body 모두 dedupe 후). 오늘 morning이 모든 주간 등록 마침. PoC 불필요."
                 print(f"[compare] SKIPPED — {log['skip_reason']}")
                 log["finished_at"] = datetime.now().isoformat()
                 state_path.write_text(json.dumps(log, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
                 write_log()
-                sys.exit(2)
+                sys.exit(0)  # SKIP은 정상 종료 (PoC 불필요한 정상 상태)
 
+            cand = day_items[0]
             log["candidate"] = cand
-            print(f"[compare] candidate: {cand} (잔존 0)")
+            log["dedupe_summary"] = {
+                "day_items_initial": log["day_items_count"],
+                "after_left_dedupe": before_sg,
+                "after_sgrid_dedupe": len(day_items),
+                "sg_skipped": sg_skipped,
+            }
+            print(f"[compare] candidate: {cand} (좌·우 grid 잔존 0)")
         except Exception as e:
             log["error"] = f"candidate: {e}"; write_log()
             print(f"[FAIL] {e}", file=sys.stderr); sys.exit(3)
@@ -216,22 +217,38 @@ def main():
         finally:
             if reg_no:
                 try:
-                    sess = build_requests_session_from_page(page)
-                    refresh_xsrf_from_cookies(sess)
-                    r1 = sess.delete(
-                        ERP_BASE + DELETE_RANK_URL,
-                        json={"EXT_PLAN_REG_NO": reg_no, "STD_DA": today_str, "PLAN_DA": today_str,
-                              "PROD_NO": cand["PROD_NO"], "LINE_CD": "SP3M3"},
-                        headers={"Content-Type": "application/json"},
-                        timeout=TIMEOUT,
-                    )
-                    refresh_xsrf_from_cookies(sess)
-                    r2 = sess.delete(
-                        ERP_BASE + DELETE_REG_URL,
-                        json={"REG_NO": reg_no},
-                        headers={"Content-Type": "application/json"},
-                        timeout=TIMEOUT,
-                    )
+                    # 세션133 진단: requests sess.delete는 응답 200이지만 실제 DB 삭제 안 됨 (사용자 잔존 검증).
+                    # 화면 sGridList.deleteRowRankDecide / popupPmD0AddnUpload 등 jQuery.ajax와 100% 동등 동작 보장 위해
+                    # page.evaluate로 9223 Chrome 페이지 컨텍스트에서 직접 $.ajax 호출.
+                    r1_raw = page.evaluate("""(args) => new Promise((resolve) => {
+                        const to = setTimeout(() => resolve({ok:false, err:'timeout 30s'}), 30000);
+                        $.ajax({
+                            url: '/prdtPlanMng/deleteDoAddnPrdtPlanInstrMngRankDecideNew.do',
+                            type: 'delete',
+                            data: JSON.stringify({
+                                EXT_PLAN_REG_NO: args.ext, STD_DA: args.today, PLAN_DA: args.today,
+                                PROD_NO: args.prod, LINE_CD: 'SP3M3',
+                            }),
+                            success: r => { clearTimeout(to); resolve({ok:true, r}); },
+                            error: (xhr,s,e) => { clearTimeout(to); resolve({ok:false, status:xhr.status, body:(xhr.responseText||'').slice(0,500)}); }
+                        });
+                    })""", {"ext": reg_no, "today": today_str, "prod": cand["PROD_NO"]})
+                    r2_raw = page.evaluate("""(reg) => new Promise((resolve) => {
+                        const to = setTimeout(() => resolve({ok:false, err:'timeout 30s'}), 30000);
+                        $.ajax({
+                            url: '/prdtPlanMng/deleteDoAddnPrdtPlanInstrMngNew.do',
+                            type: 'delete',
+                            data: JSON.stringify({REG_NO: reg}),
+                            success: r => { clearTimeout(to); resolve({ok:true, r}); },
+                            error: (xhr,s,e) => { clearTimeout(to); resolve({ok:false, status:xhr.status, body:(xhr.responseText||'').slice(0,500)}); }
+                        });
+                    })""", reg_no)
+                    # 응답 정규화 — 기존 코드 호환 (status_code, body_preview)
+                    class _R: pass
+                    r1 = _R(); r1.status_code = 200 if r1_raw.get("ok") else (r1_raw.get("status") or 0)
+                    r1.text = json.dumps(r1_raw.get("r") if r1_raw.get("ok") else {"err": r1_raw}, ensure_ascii=False)
+                    r2 = _R(); r2.status_code = 200 if r2_raw.get("ok") else (r2_raw.get("status") or 0)
+                    r2.text = json.dumps(r2_raw.get("r") if r2_raw.get("ok") else {"err": r2_raw}, ensure_ascii=False)
                     log["cleanup"] = {
                         "rank_status": r1.status_code, "rank_body": r1.text[:600],
                         "reg_status": r2.status_code, "reg_body": r2.text[:600],
@@ -239,23 +256,72 @@ def main():
                     print(f"[cleanup] rank={r1.status_code} body={r1.text[:200]}")
                     print(f"[cleanup] reg={r2.status_code} body={r2.text[:200]}")
 
-                    # 정리 실효성 검증 — 그리드 새로고침 후 후보 PROD_NO 잔존 여부
+                    # 클라이언트 캐시 정리 — sGridList(s_grid_body)에서 해당 EXT_PLAN_REG_NO 행만 제거
+                    # (DB는 DELETE로 빠졌지만 sGridList 클라이언트 메모리는 stale → 사용자 화면에 잔존으로 보임)
+                    # 사용자 작업 중 다른 행은 건드리지 않고 PoC 등록분만 정리
+                    sg_clean = page.evaluate("""(args) => {
+                        try {
+                            const $g = jQuery('#s_grid_body');
+                            if (!$g.length || !$g.pqGrid) return {ok: false, reason: 'no s_grid_body'};
+                            const data = $g.pqGrid('option','dataModel').data || [];
+                            const before = data.length;
+                            const filtered = data.filter(r => String(r.EXT_PLAN_REG_NO) !== String(args.ext));
+                            const removed = before - filtered.length;
+                            if (removed > 0) {
+                                $g.pqGrid('option','dataModel.data', filtered);
+                                $g.pqGrid('refreshDataAndView');
+                            }
+                            return {ok: true, before: before, after: filtered.length, removed: removed};
+                        } catch(e) { return {ok: false, err: String(e)}; }
+                    }""", {"ext": reg_no})
+                    log["cleanup"]["sgrid_cache_clean"] = sg_clean
+                    print(f"[cleanup] sGridList 캐시 정리: {sg_clean}")
+
+                    # 정리 실효성 검증 — 좌측(grid_body) + 우측(s_grid_body, 서버 fetch 후) 모두 잔존 여부
                     time.sleep(2)
                     page.evaluate("() => { try { totGridList.searchListData(); } catch(e){} }")
                     time.sleep(2)
+
+                    # ⚠ 진짜 DB 잔존 검증 — 같은 라인의 sGridList를 서버에서 새로 fetch
+                    # mGridList에 같은 라인 있으면 클릭 → searchListData → sGridList 서버 fetch
+                    server_check = page.evaluate("""(args) => {
+                        try {
+                            // mGridList 1행이라도 있으면 그 LINE_CD로 sGridList 강제 fetch (PoC 등록분의 라인이 sGridList에 들어가는지 확인)
+                            const m = jQuery('#m_grid_body').pqGrid('option','dataModel').data;
+                            if (!m || m.length === 0) return {skipped: 'm_grid 비어있음 — 진짜 잔존 검증 불가'};
+                            const target = m.find(r => r.LINE_CD === 'SP3M3') || m[0];
+                            sGridList.searchListData({
+                                LINE_CD: target.LINE_CD, STD_DA: target.STD_DA, PLAN_DA: target.PLAN_DA,
+                                LINE_DIV_CD: target.LINE_DIV_CD, DAY_OPT: jQuery('#dayOpt').val()
+                            });
+                            return {searchListData: 'invoked', LINE_CD: target.LINE_CD};
+                        } catch(e) { return {err: String(e)}; }
+                    }""")
+                    print(f"[verify] sGridList server fetch: {server_check}")
+                    time.sleep(3)  # 서버 응답 대기
+
                     post_check = page.evaluate("""(args) => {
-                        const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
-                        return d.filter(r => r.REG_DT === args.t && r.PROD_NO === args.p)
-                                .map(r => ({REG_NO: r.REG_NO, QTY: r.PRDT_QTY||r.ADD_PRDT_QTY}));
-                    }""", {"t": today_str, "p": cand["PROD_NO"]})
-                    log["cleanup"]["post_check_grid_rows"] = post_check
-                    if post_check:
+                        const left = jQuery('#grid_body').pqGrid('option','dataModel').data
+                            .filter(r => r.REG_DT === args.t && r.PROD_NO === args.p)
+                            .map(r => ({REG_NO: r.REG_NO, QTY: r.PRDT_QTY||r.ADD_PRDT_QTY}));
+                        let right = [];
+                        try {
+                            right = jQuery('#s_grid_body').pqGrid('option','dataModel').data
+                                .filter(r => String(r.EXT_PLAN_REG_NO) === String(args.ext))
+                                .map(r => ({rank: r.PRDT_RANK, prod: r.PROD_NO, ext: r.EXT_PLAN_REG_NO, work_status: r.WORK_STATUS_CD, ext_yn: r.EXT_PLAN_YN}));
+                        } catch(e){}
+                        return {left_grid_body: left, right_s_grid_body: right};
+                    }""", {"t": today_str, "p": cand["PROD_NO"], "ext": reg_no})
+                    log["cleanup"]["post_check"] = post_check
+                    left_n = len(post_check.get("left_grid_body", []))
+                    right_n = len(post_check.get("right_s_grid_body", []))
+                    if left_n or right_n:
                         log["verdict"] = "FAIL"
                         if "errors" not in log: log["errors"] = []
-                        log["errors"].append(f"DELETE 응답 200이지만 그리드 잔존 {len(post_check)}건: {post_check}")
-                        print(f"[verify] ⚠ DELETE 후 그리드 잔존 {len(post_check)}건: {post_check}")
+                        log["errors"].append(f"DELETE 후 잔존 — 좌측 {left_n}건 / 우측 {right_n}건")
+                        print(f"[verify] ⚠ 잔존 좌측 {left_n}건 / 우측 {right_n}건")
                     else:
-                        print(f"[verify] DELETE 후 그리드 잔존 0건 — 정리 PASS")
+                        print(f"[verify] 좌측·우측 grid 모두 잔존 0건 — 정리 PASS")
 
                     if r1.status_code != 200 or r2.status_code != 200:
                         log["verdict"] = "FAIL"

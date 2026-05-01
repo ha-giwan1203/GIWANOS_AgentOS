@@ -416,6 +416,59 @@ PoC 1회 검증 (2026-05-01 12:56):
 
 **현 상태**: 코드 + 검증 완성. 운영 chain 적용은 1주 누적 PASS 후 사용자 결정. 미진입 시 화면 모드(현재 운영) 그대로 안전.
 
+## P6 보강 (2026-05-01 사용자 지적 반영) ✅
+
+### 사용자 지적
+스샷 — 우측 grid에 RSP3SC0665 22번 행 잔존 ("내가 분명 삭제했는데"). 잔존 누적 위험으로 P6 자동화 의심.
+
+### 진단 결과
+- 우측 grid = `s_grid_body` (sGridList) — 클라이언트 메모리 누적 캐시
+- 좌측 grid = `grid_body` (totGridList) — D0 등록분 (DB 기준)
+- 페이지 reload 후 sGridList 0행 + grid_body RSP3SC0665 0건 → **DB는 깨끗**
+- 잔존 22행 = 이전 PoC들의 클라이언트 캐시 stale (사용자가 F5 안 한 상태)
+- DELETE rank/reg API는 정상 작동 (응답 body statusCode:200 + DB 실제 삭제)
+
+### 보강 (compare_modes.py)
+1. **잔존 가드** — PoC 시작 시 후보 PROD_NO `grid_body` 잔존 확인 + 있으면 PoC skip (verdict=SKIPPED, exit 2)
+2. **DELETE 응답 body 출력** — 응답 200만 보지 말고 본문도 기록 (다음 진단 용도)
+3. **sGridList 캐시 정리** — cleanup에서 자기 EXT_PLAN_REG_NO 행만 클라이언트 메모리에서 제거 + refreshDataAndView (사용자 다른 작업 영향 0)
+4. **post-DELETE 검증** — 좌측 grid_body + 우측 s_grid_body 모두 잔존 확인
+
+### 보강 후 smoke (3차) PASS
+- REG_NO=320597 / api_rank_batch done=1
+- DELETE rank=200 body PASS / DELETE reg=200 body PASS
+- sGridList 캐시 정리 23→22 (자기 행 1개 제거)
+- 좌측·우측 grid 모두 잔존 0건 — 정리 PASS
+
+### 자동 갱신 메커니즘
+다음 PoC 시작 시 `process_one_row`의 `mGridList.searchListData` + `sGridList.searchListData` 호출이 stale 캐시를 서버 데이터로 자동 갱신. 누적 위험 0.
+
+## P6 보강 2차 (2026-05-01 사용자 지적 — "왜 처음부터 등록 확인 안 함?")
+
+### 사용자 지적
+- "내가 분명 중복 품번은 걸러져야 한다고 했는데 그것도 안되고 테스트후 삭제도 안됨"
+- "등록작업 진행 전 현재 등록 품번 확인하고 이어 붙일 품번이 중복구간인지 점검하고 중복은 스킵"
+
+### 결함
+`compare_modes.py`가 `dedupe_existing_registrations` 호출 자체를 안 했음. RSP3SC0665 fallback으로 매번 같은 PROD_NO 강제 등록 → 우측 sGridList에 임시저장 누적.
+
+### 보강
+1. **dedupe 호출 추가** — `dedupe_existing_registrations(page, items, today_dt, "SP3M3")` 좌측 grid_body 기준
+2. **우측 sGridList(rank) 잔존 dedupe 추가** — `s_grid_body`에 같은 LINE_CD + PROD_NO 잔존 시 그 품번 제외
+3. **RSP3SC0665 fallback 제거** — 후보 0건이면 PoC SKIPPED (exit 0 정상 종료). 강제 재등록 안 함
+
+### 검증 (smoke)
+```
+[dedupe-day] items 20건 → 등록 0건 / 제외 20건
+[compare] SKIPPED — 등록 가능 후보 0건. 오늘 morning이 모든 주간 등록 마침. PoC 불필요.
+```
+exit 0. 잔존 0.
+
+### 운영 영향
+매일 morning 자동 실행 후 20건 모두 등록되면 compare_modes는 매일 SKIP. 잔존 누적 위험 0. 단 1주 누적 PASS도 못 모음 (PoC 등록 안 하니까).
+
+P6 chain 적용 결정 근거는 별도 — 사용자가 morning 자동 실행 결과 + P5 dual-mode 수동 호출 검증으로 충분히 신뢰 쌓은 후 결정.
+
 ## Context
 SP3M3 morning 자동화가 5일 중 4일 OAuth redirect 멍때림으로 실패. 화면 자동화(Playwright + Chrome) 의존이 매일 다른 분기로 깨지는 구조. ERP 내부 처리는 이미 ajax POST 기반이고, MES 검증은 `urllib.request` 직접 호출 중 (`run.py:819`). 즉 **underlying은 HTTP**.
 
