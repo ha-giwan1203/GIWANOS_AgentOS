@@ -125,6 +125,9 @@ def check_log_success(log_path):
         return True, "phase6_marker"
     if "exit code = 0" in tail and ("statusCode=200" in tail or "statusCode 200" in tail):
         return True, "exit0_status200"
+    # 사용자 명시 (세션133): 해당일 파일 없으면 morning skip — 알림 0 정상 종료
+    if "skip (no plan file)" in tail or "[skip] 해당일 파일 없음" in tail:
+        return True, "skip_no_file"
     return False, "no_success_marker"
 
 

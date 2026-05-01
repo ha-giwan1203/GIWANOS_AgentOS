@@ -1210,7 +1210,14 @@ def main():
             return
 
         # Phase 1: 파일
-        plan_path = find_plan_file(target_file_date)
+        # 사용자 명시 (세션133): morning/evening 자동 실행 시 해당일 파일 없으면 작업 패스 (알림 0, exit 0)
+        # — 토요일/공휴일 등 파일 미생성 케이스 자동 skip
+        try:
+            plan_path = find_plan_file(target_file_date)
+        except FileNotFoundError as e:
+            print(f"[skip] 해당일 파일 없음 — 작업 패스: {e}")
+            print(f"=== /d0-plan {session} skip (no plan file) ===")
+            return  # exit 0 정상 종료. recover/verify_run에서 알림 안 띄움
         wb = openpyxl.load_workbook(plan_path, data_only=True, keep_vba=True)
 
         if session == "evening":
