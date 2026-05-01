@@ -1,0 +1,213 @@
+{
+  "ts_start": "2026-05-02T07:06:28.566668",
+  "mode": "list-only",
+  "qry": {
+    "prdtDa": "20260502",
+    "lineCd": "SP3M3",
+    "pno": "RSP3SC0646",
+    "pnoRev": "A",
+    "prdtRank": 1,
+    "regNo": 0,
+    "revNo": "0",
+    "procNo": ""
+  },
+  "items": [
+    {
+      "procNo": "210",
+      "mngAriclCd": "000073",
+      "mngAriclNm": "보더링 후 높이",
+      "stdDivCd": "03",
+      "spec": "10.5 +0.1mm, -0.3mm",
+      "kind": "A",
+      "params": [
+        [
+          10.2,
+          10.6,
+          1
+        ]
+      ]
+    },
+    {
+      "procNo": "220",
+      "mngAriclCd": "000074",
+      "mngAriclNm": "MGG 스퀴브 GAP NG 마스터",
+      "stdDivCd": "03",
+      "spec": "불량 제품 GAP NG 확인",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "120",
+      "mngAriclCd": "000087",
+      "mngAriclNm": "락킹 ASS'Y 스플 압입 후 높이 \"0\"점 MASTER GAGE",
+      "stdDivCd": "02",
+      "spec": "0 ± 0.05",
+      "kind": "A",
+      "params": [
+        [
+          -0.05,
+          0.05,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "180",
+      "mngAriclCd": "000102",
+      "mngAriclNm": "스크류 체결 후 높이 \n\"0\"점 MASTER GAGE",
+      "stdDivCd": "02",
+      "spec": "0 ± 0.05",
+      "kind": "A",
+      "params": [
+        [
+          -0.05,
+          0.05,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "360",
+      "mngAriclCd": "000140",
+      "mngAriclNm": "센서 볼 마스터",
+      "stdDivCd": "03",
+      "spec": "불량/양품 확인 될 것 (OK/NG 마스터)",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "390",
+      "mngAriclCd": "000149",
+      "mngAriclNm": "스크류 체결 후 높이 \n\"0\"점 MASTER GAGE",
+      "stdDivCd": "03",
+      "spec": "스크류 C : 0 +0.45, -1.0mm 스크류 D : 0 +0.3, -2.0mm",
+      "kind": "A",
+      "params": [
+        [
+          -1.0,
+          0.3,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "200",
+      "mngAriclCd": "000160",
+      "mngAriclNm": "보더링 TOOL 청결 상태",
+      "stdDivCd": "03",
+      "spec": "이물 없을 것",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "200",
+      "mngAriclCd": "000175",
+      "mngAriclNm": "GG 조립 상태",
+      "stdDivCd": "03",
+      "spec": "스퀴브 GAP 측정(3개소 통과 시 문제 없을 것)",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "410",
+      "mngAriclCd": "000180",
+      "mngAriclNm": "MGG 오조립 비젼 마스터",
+      "stdDivCd": "03",
+      "spec": "불량/양품 확인 될 것 (OK/NG 마스터)",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "60",
+      "mngAriclCd": "000663",
+      "mngAriclNm": "케이스기어 & 볼 가이드 핀\n마스터",
+      "stdDivCd": "03",
+      "spec": "불량/양품 확인될것 (OK/NG)",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "91",
+      "mngAriclCd": "000679",
+      "mngAriclNm": "토션 & 베이스락 ASS'Y 압입 후 높이 \"0\"점 MASTER GAGE",
+      "stdDivCd": "02",
+      "spec": "0 ± 0.05",
+      "kind": "A",
+      "params": [
+        [
+          -0.05,
+          0.05,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "91",
+      "mngAriclCd": "000680",
+      "mngAriclNm": "베이스락 ASS'Y 압입 후 높이 \"0\" 점 MASTER GAGE",
+      "stdDivCd": "02",
+      "spec": "0 ± 0.05",
+      "kind": "A",
+      "params": [
+        [
+          -0.05,
+          0.05,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "40",
+      "mngAriclCd": "000707",
+      "mngAriclNm": "스플 베어링 부시 \"0\"점 MASTER GAGE",
+      "stdDivCd": "02",
+      "spec": "0 ± 0.05",
+      "kind": "A",
+      "params": [
+        [
+          -0.05,
+          0.05,
+          2
+        ]
+      ]
+    },
+    {
+      "procNo": "210",
+      "mngAriclCd": "000719",
+      "mngAriclNm": "보더링 상태",
+      "stdDivCd": "02",
+      "spec": "GO 10.6 + 0.02mm, NO 10.2 -0.02mm",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "200",
+      "mngAriclCd": "002436",
+      "mngAriclNm": "보더링 툴 교체 주기",
+      "stdDivCd": "03",
+      "spec": "교체 1회/2주일",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "200",
+      "mngAriclCd": "002437",
+      "mngAriclNm": "보더링 상태 확인",
+      "stdDivCd": "03",
+      "spec": "툴 내 이물질 없을 것",
+      "kind": "B",
+      "params": null
+    },
+    {
+      "procNo": "200",
+      "mngAriclCd": "002476",
+      "mngAriclNm": "MGG 코킹 상태",
+      "stdDivCd": "03",
+      "spec": "보더링 높이 측정(2개소)_10.2~10.6 만족할 것",
+      "kind": "B",
+      "params": null
+    }
+  ],
+  "save_count": 0,
+  "fail_count": 0
+}

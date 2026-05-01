@@ -4,19 +4,21 @@ description: >
   SmartMES `[J] 잡셋업` 첫 서열 품번 자동 입력 스킬.
   사용자가 "잡셋업 자동", "잡셋업 자동화", "잡셋업 입력 자동", "첫 서열 잡셋업"
   등을 언급하거나 `/d0-plan` SP3M3 morning 세션 종료 후 hand-off로 호출됨.
-  SmartMES `[J] 잡셋업` 화면에서 제품 1번(첫 서열) → 모든 공정 순회 →
-  각 공정의 모든 검사항목에 X1/X2/X3 측정값을 스펙 허용오차 내 정규분포 난수(`random.gauss`, σ=오차/3)로 입력 +
-  이상유무(OK) 자동 체크 + 저장.
-  자동화 경로: SmartMES 클라이언트(.NET ClickOnce, mesclient.exe) UI 조작.
-  v2.0 (2026-05-01~): pywinauto UIA backend (auto_id 기반, 좌표·해상도·numpad 의존성 0%).
-  v1.0 (legacy): 좌표·numpad 시퀀스 (`run_jobsetup_legacy.py` 보존, fallback).
-  ❌ ERP/MES API 직호출 아님 (잡셋업 API 미공개 — `PLAN_API_FEASIBILITY.md` 시나리오 3 확정).
-  ❌ 무인 자동 실행 금지 — 사용자가 화면에서 진행 시각 확인 가능할 때만 실행.
-  기본값 probe (식별만, 클릭 0건). 4모드: probe / select-only / enter-only / commit.
+  첫 서열 품번 모든 공정·모든 검사항목 데이터를 SmartMES MES API로 한 번에 등록.
+  ☑ 첫 서열만 등록하면 다른 서열은 SmartMES가 자동 계승 (사용자 정책 확인).
+  자동화 경로: SmartMES MES REST API 직호출 (POST /v2/checksheet/check-result/jobsetup/{list,save}.api).
+  v3.0 (2026-05-02~): REST API + JSON payload (UI 자동화 완전 폐지). 17건/30초.
+  v2.0/v2.1 (legacy): pywinauto UIA backend (`run_jobsetup_v20.py`/`run_jobsetup_v21.py` 보존).
+  v1.0 (legacy): 좌표·numpad 시퀀스 (`run_jobsetup_legacy.py` 보존).
+  spec 분류: A1 `0±0.05` / A2 `10.5 +0.1mm,-0.3mm` / A3 복합비대칭(교집합 정책) / B형 `OK/NG·이물·교체주기 등`.
+  A형: 정규분포 난수(σ=반폭/3) × 3 + OK 체크. B형: 빈 입력 + OK 체크.
+  ❌ NG 자동 체크 금지 (사람 판정만).
+  ❌ 무인 자동 실행은 사용자 입회 시에만.
+  기본값 list-only (저장 0). 4모드: list-only / dry-run / commit-one / commit-all.
 grade: B
-last_updated: 2026-05-01
-status: v2.0 (pywinauto UIA 마이그레이션 완료) — Phase 1 검증 4/4 PASS (probe/select/enter/commit 모두 `[OK] 점검결과 저장 성공`). 다중 검사항목/OCR 동적 처리는 v2.1
-hybrid_eval: 2026-05-01 평가 완료 — API 하이브리드 시나리오 3 확정 (`PLAN_API_FEASIBILITY.md`). pywinauto UIA 마이그레이션 본체 승격 (`PLAN_PYWINAUTO_MIGRATION.md`)
+last_updated: 2026-05-02
+status: v3.0 (REST API 직호출) — 2026-05-02 PoC 완료, 17/17 검사항목 등록 PASS (`/v2/checksheet/check-result/jobsetup/save.api`, dnSpy 디컴파일 spec 검증). 좌표·해상도·numpad·UI 의존성 모두 0
+hybrid_eval: 2026-05-01 평가 (시나리오 3 추정) → 2026-05-02 정정 — MESClient.exe.config + dnSpy 디컴파일로 endpoint 확인 → 시나리오 1(완전 하이브리드 가능) 확정. `PLAN_REST_API.md` 참조
 ---
 
 # SmartMES 잡셋업 자동 입력 스킬
