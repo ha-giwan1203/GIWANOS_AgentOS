@@ -827,6 +827,156 @@ def dedupe_existing_registrations(page, items, prod_date, line_cd):
     return kept
 
 
+def build_requests_session_from_page(page):
+    """Playwright page의 cookie + XSRF로 requests Session 구성.
+
+    P2/P3/P4 검증된 헤더 레시피:
+      - ajax: true (jQuery prefilter 자동 헤더 — 누락 시 multiList 500 / 8ms 즉시 거부)
+      - X-XSRF-TOKEN (매 write 호출 직전 cookie에서 다시 읽어 갱신 필수 — Spring Security 회전)
+      - Content-Type: application/json; charset=UTF-8 (P4 단계 2 발견 — form-urlencoded는 % 파싱 에러)
+    """
+    import requests as _req
+    cookies = page.context.cookies()
+    sess = _req.Session()
+    xsrf = None
+    for c in cookies:
+        sess.cookies.set(c["name"], c["value"], domain=c["domain"].lstrip("."), path=c.get("path", "/"))
+        if c["name"].upper() in ("XSRF-TOKEN", "X-XSRF-TOKEN"):
+            xsrf = c["value"]
+    sess.headers.update({
+        "ajax": "true",
+        "X-Requested-With": "XMLHttpRequest",
+        "Referer": D0_URL,
+        "Origin": "http://erp-dev.samsong.com:19100",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+        "Accept-Language": "ko-KR,ko;q=0.9",
+    })
+    if xsrf:
+        sess.headers["X-XSRF-TOKEN"] = xsrf
+    return sess
+
+
+def refresh_xsrf_from_cookies(sess):
+    """매 write 호출 직전 cookie에서 X-XSRF-TOKEN 갱신 (Spring Security 회전 대응)."""
+    for c in sess.cookies:
+        if c.name.upper() in ("XSRF-TOKEN", "X-XSRF-TOKEN"):
+            sess.headers["X-XSRF-TOKEN"] = c.value
+            return c.value
+    return None
+
+
+def api_rank_batch(page, items, target_line, save_url, sess=None):
+    """rank_batch의 옵션 A 하이브리드 변형 — jQuery.ajax POST를 requests 직접 호출로 전환.
+
+    화면 인터랙션(process_one_row dry_run으로 addRow + sGridList 채우기)은 유지,
+    multiListMainSubPrdtPlanRankDecideMng.do POST만 requests로.
+
+    sendMesFlag='N' 강제 — final_save(sendMesFlag='Y')는 별도 함수. P3 사고 재발 방지.
+
+    P4 단계 2 검증된 헤더/페이로드 레시피 적용:
+      - Content-Type: application/json; charset=UTF-8
+      - data = JSON.stringify({dataList, PARENT_PROD_ID, sendMesFlag:'N'}).encode('utf-8')
+      - X-XSRF-TOKEN 매 호출 직전 갱신
+    """
+    import requests as _req
+    if sess is None:
+        sess = build_requests_session_from_page(page)
+    base_url = "http://erp-dev.samsong.com:19100"
+
+    # 상단 grid REG_NO 최대 매핑 (rank_batch와 동일)
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    idx_map = page.evaluate("""(today) => {
+        const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
+        const map = {};
+        d.forEach(r => {
+            if (r.REG_DT === today) {
+                const key = r.PROD_NO;
+                const reg = parseInt(r.REG_NO);
+                if (!map[key] || map[key] < reg) map[key] = reg;
+            }
+        });
+        return map;
+    }""", today_str)
+
+    done, failed, missing, fails = 0, 0, 0, []
+    for it in items:
+        pno = it["PROD_NO"]
+        ext = idx_map.get(pno)
+        if not ext:
+            print(f"[api_phase4] {pno} 상단 grid 매칭 실패 (REG_NO 없음)")
+            missing += 1
+            continue
+
+        # 1. process_one_row(dry_run=True) — addRow만, jQuery.ajax POST 안 함
+        p = process_one_row(page, pno, ext, target_line, save_url, dry_run=True)
+        if not p.get("ok") or not p.get("dryRun"):
+            print(f"[api_phase4] {pno} process_one_row dry-run 실패: {p}")
+            failed += 1
+            fails.append({"prod": pno, "stage": "addRow", "reason": p.get("reason") or p.get("err")})
+            continue
+        time.sleep(0.5)
+
+        # 2. dataList + PARENT_PROD_ID 추출
+        dataList = page.evaluate("() => sGridList.$local_grid.getData()")
+        parent_prod_id = page.evaluate("() => totSelectRowData ? totSelectRowData.PROD_ID : null")
+        if not dataList or not parent_prod_id:
+            print(f"[api_phase4] {pno} dataList/PARENT_PROD_ID 추출 실패")
+            failed += 1
+            fails.append({"prod": pno, "stage": "extract", "reason": "dataList or parent missing"})
+            continue
+
+        # 3. requests POST (sendMesFlag='N' 강제)
+        refresh_xsrf_from_cookies(sess)
+        param = {"dataList": dataList, "PARENT_PROD_ID": parent_prod_id, "sendMesFlag": "N"}
+        body = json.dumps(param, ensure_ascii=False).encode("utf-8")
+        try:
+            resp = sess.post(
+                base_url + save_url,
+                data=body,
+                headers={"Content-Type": "application/json; charset=UTF-8"},
+                timeout=30,
+            )
+        except Exception as e:
+            print(f"[api_phase4] {pno} requests POST 예외: {e}")
+            failed += 1
+            fails.append({"prod": pno, "stage": "post", "reason": str(e)})
+            continue
+
+        if resp.status_code != 200:
+            print(f"[api_phase4] {pno} POST status={resp.status_code} body={resp.text[:200]}")
+            failed += 1
+            fails.append({"prod": pno, "stage": "post", "reason": f"http {resp.status_code}"})
+            continue
+
+        try:
+            r_json = resp.json()
+        except Exception:
+            print(f"[api_phase4] {pno} JSON parse 실패: {resp.text[:200]}")
+            failed += 1
+            fails.append({"prod": pno, "stage": "parse", "reason": "json parse"})
+            continue
+
+        if str(r_json.get("statusCode")) != "200":
+            print(f"[api_phase4] {pno} statusCode={r_json.get('statusCode')} txt={r_json.get('statusTxt')}")
+            failed += 1
+            fails.append({"prod": pno, "stage": "server", "reason": r_json.get("statusTxt")})
+            continue
+
+        # MES 전송 미발생 검증 (sendMesFlag='N' 효과)
+        mesMsg = r_json.get("mesMsg", "")
+        if mesMsg:
+            print(f"[api_phase4] ⚠ {pno} sendMesFlag=N인데 mesMsg 비어있지 않음: {mesMsg[:200]} — 즉시 중단")
+            failed += 1
+            fails.append({"prod": pno, "stage": "mes_unexpected", "reason": "mesMsg present with sendMesFlag=N"})
+            break
+
+        print(f"[api_phase4] {pno} ext={ext} -> OK (api)")
+        done += 1
+
+    return {"done": done, "failed": failed, "missing": missing, "fails": fails}
+
+
 def rank_batch(page, items, target_line, save_url, dry_run=False):
     """엑셀 순서대로 상단 idx 매핑 → process_one_row 반복."""
     # 상단 grid REG_NO 최대 매핑
@@ -925,7 +1075,7 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
 # ============================================================
 # 세션 실행
 # ============================================================
-def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None, parse_only=False):
+def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None, parse_only=False, no_mes_send=False, api_mode=False):
     if not items:
         print(f"[{line}] 추출 0건 — 스킵")
         return
@@ -944,10 +1094,22 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
 
     d0_upload(page, xlsx)
     target_line = "SP3M3" if line == "SP3M3" else "SD9A01"
-    batch = rank_batch(page, items, target_line, cfg["save_url"], dry_run=False)
-    print(f"[{line}] rank_batch: {batch}")
+    if api_mode:
+        # 옵션 A 하이브리드 — rank 호출만 requests 직접 POST (sendMesFlag='N' 강제)
+        batch = api_rank_batch(page, items, target_line, cfg["save_url"])
+        print(f"[{line}] api_rank_batch (Phase 4 hybrid): {batch}")
+    else:
+        batch = rank_batch(page, items, target_line, cfg["save_url"], dry_run=False)
+        print(f"[{line}] rank_batch: {batch}")
     if batch["failed"] > 0:
         print(f"[{line}] 실패 존재 — 최종 저장 보류")
+        return
+    if no_mes_send:
+        # P3 사고 재발 방지 (세션133 추가) — final_save sendMesFlag='Y' 차단
+        # rank 임시저장(sendMesFlag='N')까지만 발생. MES 전송 미발생.
+        # 단 ERP DB에는 등록분 + rank 행 잔존 — 사용자 정리 결정 필요
+        print(f"[{line}] --no-mes-send: final_save 차단 (sendMesFlag='Y' MES 전송 미실행)")
+        print(f"[{line}]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
         return
     final_save(page, cfg["save_url"])
     verify_smartmes(target_line, verify_prod_date or prod_date, items)
@@ -974,6 +1136,8 @@ def main():
     ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
     ap.add_argument("--parse-only", action="store_true", help="검증 모드: 엑셀 업로드창 첨부 + 서버 파싱(selectList)까지만. multiList(DB 저장)/Phase 4-5 모두 스킵")
+    ap.add_argument("--no-mes-send", action="store_true", help="Phase 5 final_save(sendMesFlag='Y') 차단 — MES 전송 미발생. P3 PoC/검증용. rank 임시저장(sendMesFlag='N')까지는 발생 — ERP DB 등록분 정리 필요할 수 있음")
+    ap.add_argument("--api-mode", action="store_true", help="옵션 A 하이브리드: rank 호출(Phase 4)을 jQuery.ajax 대신 requests 직접 POST로 처리. final_save(Phase 5)는 화면 모드 유지. P4 단계 3 검증된 흐름. 회귀 안전 — 화면 모드와 dual.")
     args = ap.parse_args()
 
     session = determine_session(args.session)
@@ -1027,10 +1191,19 @@ def main():
                 else:
                     d0_upload(page, xlsx_path)
             cfg = LINE_CONFIG[line_override]
-            batch = rank_batch(page, items, line_override, cfg["save_url"], dry_run=False)
-            print(f"[direct] rank_batch: {batch}")
+            if args.api_mode:
+                batch = api_rank_batch(page, items, line_override, cfg["save_url"])
+                print(f"[direct] api_rank_batch (Phase 4 hybrid): {batch}")
+            else:
+                batch = rank_batch(page, items, line_override, cfg["save_url"], dry_run=False)
+                print(f"[direct] rank_batch: {batch}")
             if batch["failed"] > 0:
                 print("[direct] 실패 존재 — 최종 저장 보류"); return
+            if args.no_mes_send:
+                print("[direct] --no-mes-send: final_save 차단 (sendMesFlag='Y' MES 전송 미실행)")
+                print("[direct]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
+                print("=== /d0-plan --xlsx --no-mes-send 완료 ===")
+                return
             final_save(page, cfg["save_url"])
             verify_smartmes(line_override, prod_date, items)
             print("=== /d0-plan --xlsx 완료 ===")
@@ -1048,11 +1221,11 @@ def main():
                 # Phase 1.5: 야간 1~5행 dedupe (주간 등록분과 PROD_NO+수량 일치 시 제외)
                 items = dedupe_night_first_5(page, items)
                 prod_date = target_file_date - timedelta(days=1)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
             if args.line in ("SD9A01","ALL"):
                 items = extract_outer_d1(wb, "SD9M01")
                 prod_date = target_file_date
-                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
+                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
             prod_date = target_file_date
@@ -1063,7 +1236,7 @@ def main():
                 if not items:
                     print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
                 else:
-                    run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
+                    run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
