@@ -66,6 +66,12 @@ COORDS = {
 # ---- 해상도 가드 ----
 EXPECTED_W, EXPECTED_H = 1920, 1080
 
+# ---- SmartMES ClickOnce launcher 경로 (자동 기동용) ----
+# ClickOnce 본체 경로는 인스턴스 hash가 매번 바뀌므로 .appref-ms 고정 launcher 사용
+SMARTMES_LAUNCHER = Path(r"C:\Users\User\Desktop\SmartMES.appref-ms")
+SMARTMES_BOOT_TIMEOUT_SEC = 60   # 부팅 + 자동 로그인 + 메인 화면 노출 대기 한계
+SMARTMES_BOOT_POLL_SEC = 2
+
 STATE_DIR = Path(__file__).parent / "state"
 STATE_DIR.mkdir(exist_ok=True)
 
@@ -93,16 +99,71 @@ def check_resolution():
         )
 
 
-def check_smartmes_running():
-    """MESClient.exe 프로세스 실행 여부 확인 (대소문자 무관)."""
+def _is_mesclient_running():
     try:
         out = subprocess.check_output(
             ["tasklist"], text=True, encoding="cp949", errors="replace",
         )
-        if "mesclient.exe" not in out.lower():
-            fail("SmartMES (MESClient.exe) 미실행")
-    except subprocess.CalledProcessError as e:
-        fail(f"tasklist 실패: {e}")
+        return "mesclient.exe" in out.lower()
+    except subprocess.CalledProcessError:
+        return False
+
+
+def _ensure_mesclient_window_ready():
+    """MESClient.exe 메인 창이 정상 노출됐는지 확인.
+
+    부팅 직후엔 launcher 다이얼로그/스플래시가 잠깐 떠있고 메인 창 핸들이 0인 시점이
+    존재한다. MainWindowTitle이 비어있지 않을 때까지 폴링.
+    """
+    ps = (
+        "Get-Process -Name MESClient -ErrorAction SilentlyContinue "
+        "| Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle -ne '' } "
+        "| Select-Object -First 1 -ExpandProperty MainWindowTitle"
+    )
+    try:
+        out = subprocess.check_output(
+            ["powershell", "-NoProfile", "-Command", ps],
+            text=True, encoding="utf-8", errors="replace", timeout=10,
+        )
+        return out.strip() != ""
+    except Exception:
+        return False
+
+
+def check_smartmes_running():
+    """SmartMES 자동 기동 + 부팅 대기. 미실행 시 launcher 호출 → 메인 창 노출까지 폴링.
+
+    - 이미 실행 중이고 메인 창이 보이면 즉시 통과
+    - 프로세스만 있고 창 미노출이면 대기 (자동 로그인 / 부팅 잔여)
+    - 둘 다 없으면 launcher(SMARTMES_LAUNCHER) 실행 후 부팅 대기
+    """
+    deadline = time.time() + SMARTMES_BOOT_TIMEOUT_SEC
+
+    if not _is_mesclient_running():
+        if not SMARTMES_LAUNCHER.exists():
+            fail(
+                f"SmartMES launcher 미발견: {SMARTMES_LAUNCHER}",
+                detail={"hint": "바탕화면 SmartMES.appref-ms 위치 확인"},
+            )
+        try:
+            subprocess.Popen(
+                ["cmd", "/c", "start", "", str(SMARTMES_LAUNCHER)],
+                shell=False,
+            )
+        except Exception as e:
+            fail(f"SmartMES launcher 실행 실패: {e}")
+        sys.stderr.write(f"[boot] SmartMES launcher 호출: {SMARTMES_LAUNCHER}\n")
+
+    while time.time() < deadline:
+        if _is_mesclient_running() and _ensure_mesclient_window_ready():
+            sys.stderr.write("[boot] SmartMES 메인 창 준비 완료\n")
+            return
+        time.sleep(SMARTMES_BOOT_POLL_SEC)
+
+    fail(
+        f"SmartMES 부팅 대기 한계 초과 ({SMARTMES_BOOT_TIMEOUT_SEC}s) — 메인 창 미노출",
+        detail={"running": _is_mesclient_running()},
+    )
 
 
 def click(coord, sleep=0.15):
@@ -217,8 +278,37 @@ def main():
     })
 
     if args.commit:
-        click(COORDS["save_button"], sleep=2)
+        # 저장 직전 스크린샷 (입력값 시각 보존)
+        pre_path = STATE_DIR / f"shot_{started:%Y%m%d_%H%M%S}_pre_save.png"
+        try:
+            pyautogui.screenshot(str(pre_path))
+            log["screenshot_pre"] = pre_path.name
+        except Exception as e:
+            log["screenshot_pre_err"] = str(e)
+
+        click(COORDS["save_button"], sleep=2.5)
         log["save_clicked"] = True
+
+        # 저장 후 스크린샷 + 픽셀 시그니처 검증
+        post_path = STATE_DIR / f"shot_{started:%Y%m%d_%H%M%S}_post_save.png"
+        try:
+            pyautogui.screenshot(str(post_path))
+            log["screenshot_post"] = post_path.name
+        except Exception as e:
+            log["screenshot_post_err"] = str(e)
+
+        # 검증: 저장 후 X1/X2/X3 입력칸이 비워졌는지(다음 검사항목 진입) 또는
+        # result_box에 OK 표시가 떴는지 확인. 저장 실패 시 에러 다이얼로그가 화면 중앙에 뜨므로 픽셀 변화로 감지.
+        try:
+            x1_pixel = pyautogui.pixel(*COORDS["x1_input"])
+            result_pixel = pyautogui.pixel(*COORDS["result_box"])
+            log["verify"] = {
+                "x1_pixel": list(x1_pixel),
+                "result_pixel": list(result_pixel),
+                "note": "픽셀 RGB 기록 — 저장 실패 시 에러 다이얼로그/색상 변화로 추적 가능. OCR 검증은 v1.x.",
+            }
+        except Exception as e:
+            log["verify_err"] = str(e)
     else:
         log["save_clicked"] = False
         log["note"] = "dry-run — 저장 미클릭. SmartMES 메모리에는 입력값 잔존 (재진입 시 사라짐)."

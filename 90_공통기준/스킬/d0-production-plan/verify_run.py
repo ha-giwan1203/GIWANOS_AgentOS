@@ -53,13 +53,16 @@ PHASE_BLOCK_KILL = {"Phase 3", "Phase 4", "Phase 5", "Phase 6"}
 
 RETRY_OK_PATTERNS = [
     (r"timeout|TimeoutError|asyncio\.TimeoutError|TimeoutException", "timeout"),
-    (r"5\d{2}\b|HTTP 5\d{2}|InternalServerError", "5xx"),
+    # 5xx HTTP 응답만 매칭 (timestamp 오매칭 방지). 단순 r"5\d{2}\b"는 [HHMMSS] 패턴에 오매칭됨
+    (r"HTTP[/ ]?5\d{2}|status[Cc]ode[: =]+5\d{2}|InternalServerError|\b5\d{2}\s+(?:Internal|Server|Bad|Service)", "5xx"),
     (r"ConnectionError|ConnectionResetError|NetworkError|ECONN", "network"),
     (r"CDP.*not running|9222.*refused|chrome.*not.*launched", "cdp_down"),
     (r"auth-dev.*login\?error|OAuth.*timeout|클라이언트.*선택.*화면", "oauth_stuck"),
 ]
 RETRY_NO_PATTERNS = [
     (r"FileNotFoundError.*\.xlsm|xlsx.*not.*exist|생산지시서.*없음", "xlsx_missing"),
+    # 폴더 없음 / 파일 없음 (run.py find_plan_file fallback 실패 시) — 즉시 알림
+    (r"FileNotFoundError.*폴더 없음|FileNotFoundError.*파일 없음", "plan_path_missing"),
     (r"PermissionError|Access.*denied|권한.*없음", "permission"),
     (r"마스터.*정보.*불일치|품번.*매칭.*실패|MasterMismatch", "master_mismatch"),
 ]

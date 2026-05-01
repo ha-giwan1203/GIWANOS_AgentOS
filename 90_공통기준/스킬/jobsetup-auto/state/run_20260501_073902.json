@@ -1,0 +1,20 @@
+{
+  "ts_start": "2026-05-01T07:39:02.647614",
+  "mode": "commit",
+  "max_items": 1,
+  "items_processed": [
+    {
+      "process": "[40] 베어링 부시 조립",
+      "item": "스플 베어링 부시 \"0\"점 MASTER GAGE",
+      "spec": "0 ± 0.05",
+      "values": [
+        0.02,
+        -0.01,
+        -0.03
+      ]
+    }
+  ],
+  "save_clicked": true,
+  "ts_end": "2026-05-01T07:39:14.002210",
+  "ok": true
+}

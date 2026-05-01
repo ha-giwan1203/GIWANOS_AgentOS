@@ -241,18 +241,59 @@ def _safe_goto(page, url, max_retries=3):
 # Phase 1: 파일 해석
 # ============================================================
 def find_plan_file(target_date: datetime) -> Path:
-    folder = Path(PLAN_ROOT) / f"{target_date.year}년 생산지시" / f"{target_date.month:02d}월"
-    if not folder.exists():
-        raise FileNotFoundError(f"폴더 없음: {folder}")
+    """target_date에 해당하는 SP3M3 생산지시서 xlsm 탐색.
+
+    월 boundary 케이스(예: 5/1 파일이 4월 폴더에 저장됨) 대응:
+    target 폴더 → 이전월 폴더 → 다음월 폴더 순으로 같은 date_tag 검색.
+    target 폴더가 없으면 자동 생성(빈 폴더로 두지 않고, fallback에서 발견 시 복사).
+    """
     date_tag = f"{target_date.year%100:02d}.{target_date.month:02d}.{target_date.day:02d}"
-    candidates = list(folder.glob(f"SP3M3_생산지시서_({date_tag})*.xlsm"))
-    if not candidates:
-        raise FileNotFoundError(f"파일 없음: {folder}/SP3M3_생산지시서_({date_tag})*.xlsm")
-    # 수정본 우선 (mtime 최신)
-    candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-    chosen = candidates[0]
-    print(f"[phase1] 파일 선택: {chosen.name}")
-    return chosen
+    pattern = f"SP3M3_생산지시서_({date_tag})*.xlsm"
+    year_root = Path(PLAN_ROOT) / f"{target_date.year}년 생산지시"
+    target_folder = year_root / f"{target_date.month:02d}월"
+
+    # 1순위: target 폴더
+    if target_folder.exists():
+        candidates = list(target_folder.glob(pattern))
+        if candidates:
+            candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            chosen = candidates[0]
+            print(f"[phase1] 파일 선택: {chosen.name}")
+            return chosen
+
+    # 2순위: 인접 월 fallback (이전월 → 다음월)
+    fallback_months = []
+    if target_date.month > 1:
+        fallback_months.append(target_date.month - 1)
+    else:
+        fallback_months.append(12)  # 1월이면 전년 12월은 별도 처리 필요 — 일단 같은 year_root 한정
+    if target_date.month < 12:
+        fallback_months.append(target_date.month + 1)
+
+    for m in fallback_months:
+        fb_folder = year_root / f"{m:02d}월"
+        if not fb_folder.exists():
+            continue
+        candidates = list(fb_folder.glob(pattern))
+        if candidates:
+            candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            src = candidates[0]
+            # target 폴더 자동 생성 + 파일 복사 (원본 보존)
+            target_folder.mkdir(parents=True, exist_ok=True)
+            dst = target_folder / src.name
+            if not dst.exists():
+                import shutil
+                shutil.copy2(src, dst)
+                print(f"[phase1] fallback: {fb_folder.name}에서 {src.name} 발견 → {target_folder.name}/ 복사")
+            else:
+                print(f"[phase1] fallback: {fb_folder.name}에서 {src.name} 발견 (target에 이미 존재)")
+            print(f"[phase1] 파일 선택: {dst.name}")
+            return dst
+
+    # 3순위: 모두 실패
+    if not target_folder.exists():
+        raise FileNotFoundError(f"폴더 없음: {target_folder} (인접 월 폴더에도 {pattern} 미발견)")
+    raise FileNotFoundError(f"파일 없음: {target_folder}/{pattern}")
 
 
 def _find_section_end(ws, start_row, next_header_keyword=None):
