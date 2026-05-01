@@ -24,6 +24,7 @@
 - **P6 보강 1차 (잔존 가드 + DELETE body)** — compare_modes 시작 시 후보 PROD_NO 잔존 확인 + cleanup DELETE 응답 body 출력 + post-DELETE 검증
 - **P6 보강 2차 (사용자 재지적 — "처음부터 등록 확인 왜 안 함")** — compare_modes에 `dedupe_existing_registrations` 호출 누락이 진짜 결함. ① dedupe 호출 추가 (좌측 grid_body 기준) ② 우측 sGridList rank 잔존 PROD_NO 추가 dedupe ③ RSP3SC0665 fallback 제거 (후보 0건이면 SKIPPED 정상 종료). smoke PASS — 오늘 morning 20건 등록 마쳤으니 후보 0건 SKIP, 잔존 0. schtasks 등록은 사용자 명시 후
 - **morning/evening 해당일 파일 없으면 작업 패스** (사용자 명시) — `run.py main()`에 `FileNotFoundError` catch 추가 → "[skip] 해당일 파일 없음 — 작업 패스" 출력 후 exit 0 정상 종료. `verify_run.py check_log_success`에 `skip_no_file` 마커 추가 → recover가 알림 안 띄우고 PASS 인식. 토요일/공휴일 등 자동 skip
+- **P6 chain 활성 (사용자 명시 "y")** — `run_morning.bat`에 `--api-mode` 추가. 매일 morning 자동 실행이 옵션 A 하이브리드 진입 (rank 호출은 requests 직접 POST, final_save는 화면 모드). OAuth redirect 멍때림 위험 본질 해소. 회귀 시 1줄 제거로 즉시 화면 모드 fallback. 1주 모니터링 후 정착 결정
 
 
 
