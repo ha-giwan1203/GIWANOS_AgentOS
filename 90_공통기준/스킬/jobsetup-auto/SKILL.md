@@ -7,13 +7,16 @@ description: >
   SmartMES `[J] 잡셋업` 화면에서 제품 1번(첫 서열) → 모든 공정 순회 →
   각 공정의 모든 검사항목에 X1/X2/X3 측정값을 스펙 허용오차 내 정규분포 난수(`random.gauss`, σ=오차/3)로 입력 +
   이상유무(OK) 자동 체크 + 저장.
-  자동화 경로: SmartMES 클라이언트(.NET ClickOnce, mesclient.exe) UI computer-use 조작.
-  ❌ ERP/MES API 직호출 아님 (잡셋업 API 미공개).
+  자동화 경로: SmartMES 클라이언트(.NET ClickOnce, mesclient.exe) UI 조작.
+  v2.0 (2026-05-01~): pywinauto UIA backend (auto_id 기반, 좌표·해상도·numpad 의존성 0%).
+  v1.0 (legacy): 좌표·numpad 시퀀스 (`run_jobsetup_legacy.py` 보존, fallback).
+  ❌ ERP/MES API 직호출 아님 (잡셋업 API 미공개 — `PLAN_API_FEASIBILITY.md` 시나리오 3 확정).
   ❌ 무인 자동 실행 금지 — 사용자가 화면에서 진행 시각 확인 가능할 때만 실행.
-  기본값 dry-run (저장 버튼 미클릭).
+  기본값 probe (식별만, 클릭 0건). 4모드: probe / select-only / enter-only / commit.
 grade: B
-last_updated: 2026-04-30
-status: v1.0 baseline (단일 케이스 [40] 1건 dry-run만) — 실측 검증 완료. 다중 검사항목/OCR 동적 처리는 v1.x
+last_updated: 2026-05-01
+status: v2.0 (pywinauto UIA 마이그레이션 완료) — Phase 1 검증 4/4 PASS (probe/select/enter/commit 모두 `[OK] 점검결과 저장 성공`). 다중 검사항목/OCR 동적 처리는 v2.1
+hybrid_eval: 2026-05-01 평가 완료 — API 하이브리드 시나리오 3 확정 (`PLAN_API_FEASIBILITY.md`). pywinauto UIA 마이그레이션 본체 승격 (`PLAN_PYWINAUTO_MIGRATION.md`)
 ---
 
 # SmartMES 잡셋업 자동 입력 스킬

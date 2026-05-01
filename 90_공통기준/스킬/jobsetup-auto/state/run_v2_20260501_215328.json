@@ -1,0 +1,48 @@
+{
+  "ts": "2026-05-01T21:53:28.085048",
+  "ok": false,
+  "msg": "컨트롤 식별 실패 1/12: ['cb_product']",
+  "detail": {
+    "missing": [
+      "cb_product"
+    ],
+    "hint": "잡셋업 화면 진입 후 재시도. SmartMES 좌측 메뉴 [J] 잡셋업 클릭."
+  },
+  "log": {
+    "ts_start": "2026-05-01T21:53:09.179554",
+    "mode": "probe",
+    "controls": {
+      "menu_jobsetup": {
+        "auto_id": "btnMenuJobSetup",
+        "type": "Button",
+        "rect": [
+          1912,
+          352,
+          2112,
+          394
+        ],
+        "ok": true
+      },
+      "menu_exit": {
+        "auto_id": "btnExit",
+        "type": "Button",
+        "rect": [
+          1912,
+          970,
+          2112,
+          1040
+        ],
+        "ok": true
+      },
+      "cb_product": {
+        "auto_id": "cbSchedule",
+        "type": "ComboBox",
+        "ok": false,
+        "err": "timed out"
+      }
+    },
+    "actions": [],
+    "mesclient_pid": 2800,
+    "window_title": "삼송 SMART MES"
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "ts_start": "2026-05-01T21:54:15.084567",
+  "mode": "select-only",
+  "controls": {
+    "menu_jobsetup": {
+      "auto_id": "btnMenuJobSetup",
+      "type": "Button",
+      "rect": [
+        1912,
+        352,
+        2112,
+        394
+      ],
+      "ok": true
+    },
+    "menu_exit": {
+      "auto_id": "btnExit",
+      "type": "Button",
+      "rect": [
+        1912,
+        970,
+        2112,
+        1040
+      ],
+      "ok": true
+    },
+    "cb_product": {
+      "auto_id": "cbSchedule",
+      "type": "ComboBox",
+      "rect": [
+        2238,
+        186,
+        2652,
+        236
+      ],
+      "ok": true
+    },
+    "cb_process": {
+      "auto_id": "cbProcess",
+      "type": "ComboBox",
+      "rect": [
+        2238,
+        256,
+        3430,
+        301
+      ],
+      "ok": true
+    },
+    "cb_item": {
+      "auto_id": "cbJobSetup",
+      "type": "ComboBox",
+      "rect": [
+        2238,
+        316,
+        3496,
+        361
+      ],
+      "ok": true
+    },
+    "txt_x1": {
+      "auto_id": "txtX1",
+      "type": "Edit",
+      "rect": [
+        3561,
+        376,
+        3674,
+        419
+      ],
+      "ok": true
+    },
+    "txt_x2": {
+      "auto_id": "txtX2",
+      "type": "Edit",
+      "rect": [
+        3561,
+        426,
+        3674,
+        469
+      ],
+      "ok": true
+    },
+    "txt_x3": {
+      "auto_id": "txtX3",
+      "type": "Edit",
+      "rect": [
+        3561,
+        476,
+        3674,
+        519
+      ],
+      "ok": true
+    },
+    "chk_ok_x1": {
+      "auto_id": "chkOkX1",
+      "type": "CheckBox",
+      "rect": [
+        3680,
+        376,
+        3754,
+        420
+      ],
+      "ok": true
+    },
+    "chk_ok_x2": {
+      "auto_id": "chkOkX2",
+      "type": "CheckBox",
+      "rect": [
+        3680,
+        426,
+        3754,
+        470
+      ],
+      "ok": true
+    },
+    "chk_ok_x3": {
+      "auto_id": "chkOkX3",
+      "type": "CheckBox",
+      "rect": [
+        3680,
+        476,
+        3754,
+        520
+      ],
+      "ok": true
+    },
+    "btn_save": {
+      "auto_id": "btnSave",
+      "type": "Button",
+      "rect": [
+        3674,
+        316,
+        3834,
+        364
+      ],
+      "ok": true
+    }
+  },
+  "actions": [
+    {
+      "action": "click_menu_jobsetup_pre",
+      "ok": true
+    },
+    {
+      "action": "select_first",
+      "target": "cb_product (1번 첫 서열)",
+      "selected_text": "1.RSP3SC0646_A",
+      "ok": true
+    },
+    {
+      "action": "select_first",
+      "target": "cb_process (첫 공정)",
+      "selected_text": "[40] 베어링 부시 조립",
+      "ok": true
+    },
+    {
+      "action": "select_first",
+      "target": "cb_item (첫 검사항목)",
+      "selected_text": "스플 베어링 부시 \"0\"점 MASTER GAGE",
+      "ok": true
+    }
+  ],
+  "mesclient_pid": 2800,
+  "window_title": "삼송 SMART MES",
+  "ok": true,
+  "ts_end": "2026-05-01T21:56:57.180076"
+}

@@ -1,0 +1,8 @@
+﻿=== mesclient.exe network probe (20260501_173051) ===
+
+[FAIL] mesclient.exe not running. Open jobsetup screen, then re-run.
+
+Candidate SmartMES-related processes (for reference):
+  (none found)
+
+Result saved: C:\Users\User\Desktop\업무리스트\90_공통기준\스킬\jobsetup-auto\scripts\..\state\probe_20260501_173051.txt

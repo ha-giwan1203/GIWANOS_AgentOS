@@ -10,9 +10,43 @@
 > 실제 업무 일정, 남은 과제, 반복 업무, 마감일의 기준 원본은 `90_공통기준/업무관리/업무_마스터리스트.xlsx`이다.
 > 이 파일은 그중 AI가 수행해야 하는 자동화·문서화·구조 개편·검토·인수인계 작업만 관리한다.
 
-최종 업데이트: 2026-05-01 KST — 세션134 [C] /self-audit 기준 보강 (settings.local 1순위 표현 폐기 → list_active_hooks.sh SSoT 정렬, 세션93 합의 적용) — `.claude/commands/self-audit.md` + `.claude/agents/self-audit-agent.md` 2개 파일만 보강. C 모드 전환 조건 7경로 명시 + Git 상태 진단 헤더 추가 + GPT 정밀평가 역할 분리 + selfcheck.sh 분리 문구. 검증 6단계 dry-run PASS (N1=N2=36, 이름 set 대칭차 빈 집합). 후속 안건 2건 (운영가이드 정합성 + hook_registry.sh 헤더 주석) / 세션133 [A+C] SP3M3 5/1 morning D0 등록(20건/3705EA) + 잡셋업 commit + 8개 이슈 근본 수정 (스케줄러 시간 변경 morning 07:11/recover 07:20, run.py 인접월 fallback, verify_run.py RETRY_NO plan_path_missing + 5xx timestamp 오매칭 차단, jobsetup SmartMES 자동 launcher + 메인창 폴링 + 저장 전후 스크린샷·픽셀 검증) + 옵션 A 하이브리드 P3 PASS (RSP3SC0665 sendMesFlag=Y MES 전송 검증, MES 잔존은 그대로 두기) + 중복 가드 추가 (dedupe_existing_registrations) + **--no-mes-send 플래그 + P4 단계 1·2·3 PASS + P5 --api-mode dual-mode + P6 PoC 1회 PASS** (compare_modes.py + run_morning_api_compare.bat / 1주 누적 7회 PASS 후 chain 적용 결정) / 세션132 [E+C] 잡셋업 v0.3 결함 5종 정정 + v1.0 baseline (run_jobsetup.py 230줄 신설 + 입력 메커니즘 numpad/minus/C 실측 검증 + 좌표 1456→1920 스케일 1.319 변환 + 매일 1번 품번 변경 발견 + chain 미활성 명시 / v1.x 미해결: 좌표 정확도·B형 분기·OCR·chain 활성) / 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
+최종 업데이트: 2026-05-01 KST — 세션134 [A+C] 잡셋업 v2.0 pywinauto UIA 마이그레이션 완료 (mesclient.exe 트래픽 실측 → 시나리오 3 확정 → pywinauto PoC 12/12 PASS → run_jobsetup.py v2 promote, run_jobsetup_legacy.py 보존, 4모드 probe/select-only/enter-only/commit, fast_fail probe + auto menu entry, ComboBox HOME+ENTER + LegacyIAccessible Value read-back, 실측 SmartMES `[OK] 점검결과 저장 성공` lblMsg 회수) / 세션134 [C] /self-audit 기준 보강 (settings.local 1순위 표현 폐기 → list_active_hooks.sh SSoT 정렬, 세션93 합의 적용) — `.claude/commands/self-audit.md` + `.claude/agents/self-audit-agent.md` 2개 파일만 보강. C 모드 전환 조건 7경로 명시 + Git 상태 진단 헤더 추가 + GPT 정밀평가 역할 분리 + selfcheck.sh 분리 문구. 검증 6단계 dry-run PASS (N1=N2=36, 이름 set 대칭차 빈 집합). 후속 안건 2건 (운영가이드 정합성 + hook_registry.sh 헤더 주석) / 세션133 [A+C] SP3M3 5/1 morning D0 등록(20건/3705EA) + 잡셋업 commit + 8개 이슈 근본 수정 (스케줄러 시간 변경 morning 07:11/recover 07:20, run.py 인접월 fallback, verify_run.py RETRY_NO plan_path_missing + 5xx timestamp 오매칭 차단, jobsetup SmartMES 자동 launcher + 메인창 폴링 + 저장 전후 스크린샷·픽셀 검증) + 옵션 A 하이브리드 P3 PASS (RSP3SC0665 sendMesFlag=Y MES 전송 검증, MES 잔존은 그대로 두기) + 중복 가드 추가 (dedupe_existing_registrations) + **--no-mes-send 플래그 + P4 단계 1·2·3 PASS + P5 --api-mode dual-mode + P6 PoC 1회 PASS** (compare_modes.py + run_morning_api_compare.bat / 1주 누적 7회 PASS 후 chain 적용 결정) / 세션132 [E+C] 잡셋업 v0.3 결함 5종 정정 + v1.0 baseline (run_jobsetup.py 230줄 신설 + 입력 메커니즘 numpad/minus/C 실측 검증 + 좌표 1456→1920 스케일 1.319 변환 + 매일 1번 품번 변경 발견 + chain 미활성 명시 / v1.x 미해결: 좌표 정확도·B형 분기·OCR·chain 활성) / 세션131 [B+C] 실패 대응 자동 진단 인용 개선 (3자 토론 합의 안1+안3 채택, 안2 보류) — `.claude/rules/incident_quote.md` 신설 + finish/daily/d0-plan 진입 점검 + CLAUDE.md 인덱스 1줄. 새 hook/gate 0개 / 세션131 [E] SP3M3 morning 자동화 5일 중 4일 OAuth 콜백 정체 실패 → D0_URL 능동 navigate fallback + verify_run cp949 reconfigure 패치 / 세션130 [B+C] hook 부하 진단 + settings.local 1회용 18건 정리 + README PreToolUse 표 번호 정합화 (settings.json/hook 스크립트 무수정) / 세션129 [측정] 정량 신호 3개 측정 시작 (옵션C, 세션128 토론 합의) / 세션128 [3way+A] 성능 실망 진단 토론(pass_ratio 1.0) + 옵션A 운영 위생 1회 정리 (TASKS 598→157, incident 122→0, kernel refresh) / 세션128 [E+C] ZDM DB 다운 → MES만 단독 진행 + mes_login() XSRF-TOKEN 발급 보장 / 세션126 [C] jobsetup-auto 신규 스킬 v0.3 + d0-production-plan v3.1 야간 dedupe / 세션125 [3way] 알잘딱깔센 진단 + share_after_push hook / 세션124 [3way] SP3M3 D0 OAuth 비login 정착 fallback / 세션123 [C] 폴더 화이트리스트 라우팅 gate / 세션122 [3way] Opus 체감 진단 + 빼는 안 4종
 
-## 세션134 (2026-05-01) — [C] /self-audit 기준 보강 (SSoT 정렬)
+## 세션134 (2026-05-01) — [A+C] 잡셋업 v2.0 pywinauto UIA 마이그레이션 + /self-audit 기준 보강
+
+### [완료] 잡셋업 v2.0 pywinauto UIA 마이그레이션 (모드 A 실무 + 부수 모드 C, 사용자 직접 진행 승인)
+
+배경: 동일 세션 내 d0-production-plan 하이브리드(API 직호출) 패턴 완성 후, 잡셋업도 동일 패턴 가능성 검증 요청. 사용자 의도는 "실제 mesclient.exe 띄워서 실측 검증". 첫 turn에서 plan 문서만 만들었다가 사용자 정정 받음 → 2차 turn부터 실측 진행.
+
+실측 단계:
+1. mesclient.exe TCP 연결 폴링(사용자 권한, PktMon 관리자 거부) — `210.216.217.95` 단일 사내 IP + 비표준 포트 3종(6379 Redis / 18100 메인 RPC / 19220 잡셋업 RPC) + 표준 HTTP/HTTPS 0건 → 시나리오 3 확정
+2. pywinauto UIA backend inspect — depth 12로 컨트롤 트리 dump, 모든 컨트롤 의미있는 `auto_id` 보유 (개발자 명시 작명) 확인. WinForms 앱이라 UIA 완전 호환
+3. PoC 스크립트 12/12 컨트롤 매핑 + select+enter+commit 시퀀스 검증
+4. v2 본체 작성 + Phase 1 검증 4단계 실측:
+   - probe: 12/12 식별 PASS
+   - select-only: HOME+ENTER + LegacyIAccessible Value fallback PASS
+   - enter-only: Edit set + Value read-back match=True ×3 PASS
+   - commit: SmartMES 실등록 + lblMsg `[ OK ] 점검결과 저장 성공` PASS
+5. v2 → 본체 promote, run_jobsetup_legacy.py로 v1 좌표본 보존
+6. probe 모드 fast_fail (1초 timeout + 첫 미식별 시 break) + 다른 모드 자동 메뉴 진입 가드 추가 → 잡셋업 화면 외부에서 호출돼도 안내 메시지 후 빠르게 종료 또는 자동 진입
+
+산출물:
+- `90_공통기준/스킬/jobsetup-auto/run_jobsetup.py` (v2 본체, 좌표·해상도·numpad 의존성 0%)
+- `90_공통기준/스킬/jobsetup-auto/run_jobsetup_legacy.py` (v1 좌표본, fallback)
+- `90_공통기준/스킬/jobsetup-auto/run_jobsetup_v2.py` (마이그레이션 transition 사본)
+- `90_공통기준/스킬/jobsetup-auto/PLAN_API_FEASIBILITY.md` (시나리오 3 판정 근거)
+- `90_공통기준/스킬/jobsetup-auto/PLAN_PYWINAUTO_MIGRATION.md` (Phase 1~3 plan)
+- `90_공통기준/스킬/jobsetup-auto/state/traffic_capture_20260501.md` (mesclient TCP 실측)
+- `90_공통기준/스킬/jobsetup-auto/state/inspect_uia_20260501_*.txt` (UIA tree dump)
+- `90_공통기준/스킬/jobsetup-auto/state/run_v2_*.json` (Phase 1 검증 6회 실행 로그)
+- `90_공통기준/스킬/jobsetup-auto/scripts/inspect_smartmes.py` `poc_pywinauto.py` `probe_mesclient_network.ps1`
+- `90_공통기준/스킬/jobsetup-auto/SKILL.md` status v2.0 갱신
+
+미해결 (v2.x):
+- 다중 검사항목 자동 순회 (`cbJobSetup` enum)
+- 다중 공정 순회 (`cbProcess` enum)
+- 검사항목별 스펙 OCR 또는 마스터 데이터 매핑
+- chain 활성 후 첫 morning 1회 사람 입회 모니터링
 
 ### [완료] /self-audit 커맨드·에이전트 보강 (모드 C, plan-first + R1~R5 사용자 승인 후)
 

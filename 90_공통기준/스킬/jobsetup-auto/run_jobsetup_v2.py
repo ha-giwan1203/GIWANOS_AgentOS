@@ -139,20 +139,14 @@ def find_main_window():
     return None, None
 
 
-def probe_controls(main_win, log, fast_fail=False):
-    """12/12 컨트롤 식별. 누락 1건이라도 있으면 fail (침묵 실패 방지).
-
-    fast_fail=True (probe 모드): timeout 1초 + 첫 미식별 시 즉시 break.
-                                  → 잡셋업 화면이 아닌 상태에서 호출되면 빠르게 안내.
-    fast_fail=False (select/enter/commit): menu click 후 호출 가정, timeout 3초.
-    """
+def probe_controls(main_win, log):
+    """12/12 컨트롤 식별. 누락 1건이라도 있으면 fail (침묵 실패 방지)."""
     found = {}
     missing = []
-    timeout = 1 if fast_fail else 3
     for key, (auto_id, ctrl_type) in CONTROL_MAP.items():
         try:
             ctrl = main_win.child_window(auto_id=auto_id, control_type=ctrl_type)
-            ctrl.wait("exists", timeout=timeout)
+            ctrl.wait("exists", timeout=3)
             r = ctrl.rectangle()
             found[key] = ctrl
             log["controls"][key] = {
@@ -166,13 +160,9 @@ def probe_controls(main_win, log, fast_fail=False):
                 "auto_id": auto_id, "type": ctrl_type,
                 "ok": False, "err": str(e)[:200],
             }
-            if fast_fail:
-                break
     if missing:
-        hint = ("잡셋업 화면 진입 후 재시도. SmartMES 좌측 메뉴 [J] 잡셋업 클릭."
-                if fast_fail else None)
         fail(f"컨트롤 식별 실패 {len(missing)}/{len(CONTROL_MAP)}: {missing}",
-             detail={"missing": missing, "hint": hint}, log=log)
+             detail={"missing": missing}, log=log)
     return found
 
 
@@ -331,23 +321,8 @@ def main():
     app = Application(backend="uia").connect(process=pid)
     main_win = app.window(title_re=".*SAMSONG.*|.*SMART.*")
 
-    # 3. 모드별 사전 처리
-    # probe: 잡셋업 화면 진입 가정 (fast_fail). 다른 화면이면 1초 안에 안내 메시지로 종료.
-    # select/enter/commit: 메뉴 우선 클릭으로 잡셋업 화면 진입 보장.
-    if args.mode != "probe":
-        # 메뉴 [J] 잡셋업 컨트롤만 우선 식별 + 클릭
-        try:
-            menu_btn = main_win.child_window(auto_id="btnMenuJobSetup", control_type="Button")
-            menu_btn.wait("exists", timeout=3)
-        except Exception as e:
-            fail(f"[J] 잡셋업 메뉴 미발견: {e}",
-                 detail={"hint": "SmartMES 메인 창 노출 확인"}, log=log)
-        menu_btn.click_input()
-        time.sleep(1.5)  # 잡셋업 화면 로딩 대기
-        log["actions"].append({"action": "click_menu_jobsetup_pre", "ok": True})
-
-    # 4. 컨트롤 12/12 probe (probe 모드는 fast_fail)
-    found = probe_controls(main_win, log, fast_fail=(args.mode == "probe"))
+    # 3. 컨트롤 12/12 probe
+    found = probe_controls(main_win, log)
     sys.stderr.write(f"[probe] {len(found)}/{len(CONTROL_MAP)} controls OK\n")
 
     if args.mode == "probe":
@@ -358,7 +333,11 @@ def main():
         print(f"[OK] {out.name} mode=probe controls=12/12")
         return 0
 
-    # 5. 드롭다운 3건 선택 (메뉴 진입은 step 3에서 이미 완료)
+    # 4. 메뉴 진입 + 드롭다운 3건 선택
+    found["menu_jobsetup"].click_input()
+    time.sleep(1.0)
+    log["actions"].append({"action": "click_menu_jobsetup", "ok": True})
+
     select_first_combo(found["cb_product"], "cb_product (1번 첫 서열)", log)
     time.sleep(1.0)
     select_first_combo(found["cb_process"], "cb_process (첫 공정)", log)
