@@ -39,6 +39,9 @@
   - dedupe: session_key + source_file + failure_signature SHA1 60분 윈도우. 동일 반복 시 incident_ledger 미기록, hook_log/stderr만 누적
 - 검증 10항목 전수 PASS [완료]: bash -n, final_check/completion_gate/write_marker 무수정, exit code 로직 보존, dedupe 실측 1차+1/2차+0/3차+0 + count=3, commit/push 경로 보존, README+TASKS+HANDOFF+STATUS 기록, stale 정리 코드, EXIT trap
 
+### 정정 (사용자 지시)
+- auto_commit_state.sh line 251 주석 명확화 — dedupe 판정(60분 윈도우)과 stale 정리(개수 50개 보존, 시간 무관)을 분리 표기. 코드 동작은 처음부터 의도대로 작동 중이었고 주석만 혼동 유발 → "stale 캐시 정리 — 개수 기준만(최신 50개 보존). 60분은 dedupe 판정 윈도우일 뿐, 정리 기준 아님"으로 통일
+
 ### 다음 AI 액션
 - 7일 모니터링: 목표 56건 → 30건 이하. effect 측정 후 Phase 2(final_check --json) 또는 B안 임계 강화 검토
 - D안(/finish 신설/통합)은 별건 plan 진행 여부 사용자 결정

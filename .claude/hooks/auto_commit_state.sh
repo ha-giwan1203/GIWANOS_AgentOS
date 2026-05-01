@@ -248,7 +248,7 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
             echo "1" > "$DEDUPE_CACHE.count" 2>/dev/null
         fi
 
-        # 60분 초과 stale 캐시 정리 (최신 50개만 보존)
+        # stale 캐시 정리 — 개수 기준만(최신 50개 보존). 60분은 dedupe 판정 윈도우일 뿐, 정리 기준 아님
         if [ -d "$DEDUPE_DIR" ]; then
             ls -t "$DEDUPE_DIR"/auto_commit_dedupe_*.txt 2>/dev/null | tail -n +51 | while IFS= read -r stale; do
                 [ -n "$stale" ] && rm -f "$stale" "${stale}.count" 2>/dev/null
