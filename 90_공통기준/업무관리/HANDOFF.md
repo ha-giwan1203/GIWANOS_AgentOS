@@ -26,14 +26,23 @@
 - hook_registry.sh 헤더 주석 [완료, 추가 조치 없음]: 헤더에 이미 LEGACY/DEPRECATED + 세션93 합의 사유 + 대체 경로 충실. 추가 주석 불필요
 
 ### /self-audit 진단 + P1 처리 (사용자 "진단시작" → "P1만 진행")
-- /self-audit 첫 실행 [완료]: self-audit-agent 진단 리포트. 활성 hook 36개 4자 대조 정합. P0=completion_before_state_sync 55건/7일, P1=share_after_push Failure Contract 누락, P2=2건 (gate_boundary_check 정정 후 1건만 잔존)
-- P1 [완료]: `.claude/hooks/README.md` Failure Contract 표 line 131에 `share_after_push.sh` 1줄 등재 (fail-open / advisory)
-- P0 [보류]: GPT 정밀평가 대상. 자동화 보강안 trade-off 정밀 비교 필요
-- P2 일부 정정: gate_boundary_check.sh는 smoke_fast.sh에서 호출 → 죽은 자산 판정 철회. render_hooks_readme.sh는 별건
+- /self-audit 첫 실행 [완료]: 활성 hook 36개 4자 대조 정합. P0=completion_before_state_sync 55건/7일, P1=share_after_push Failure Contract 누락, P2=2건 (gate_boundary_check 정정 후 1건만 잔존)
+- P1 [완료]: `.claude/hooks/README.md` Failure Contract 표 line 131에 `share_after_push.sh` 1줄 등재
+- P2 일부 정정: gate_boundary_check.sh는 smoke_fast.sh에서 호출 → 죽은 자산 철회. render_hooks_readme.sh는 별건
+
+### P0 정밀평가 + Phase 1 (사용자 "p0 정밀평가 진행해" + GPT 의견 + "조건부 승인")
+- research [완료]: completion_gate 0건 / auto_commit_state 56건 (100%). 자기잠금 본체는 auto_commit_state ↔ final_check 양자
+- plan v2 [완료]: A + B-lite 채택, C/D 보류. 1차 = auto_commit_state.sh 단독. R5 "중"
+- Phase 1 구현 [완료]: auto_commit_state.sh 재작성
+  - final_check --fast stdout/stderr 캡처 (mktemp + EXIT trap)
+  - 실패 원인 분류 7종+fallback → 처방형 메시지 출력
+  - dedupe: session_key + source_file + failure_signature SHA1 60분 윈도우. 동일 반복 시 incident_ledger 미기록, hook_log/stderr만 누적
+- 검증 10항목 전수 PASS [완료]: bash -n, final_check/completion_gate/write_marker 무수정, exit code 로직 보존, dedupe 실측 1차+1/2차+0/3차+0 + count=3, commit/push 경로 보존, README+TASKS+HANDOFF+STATUS 기록, stale 정리 코드, EXIT trap
 
 ### 다음 AI 액션
-- (없음) 본 세션 작업 종료. 다음 weekly-self-audit 자동 실행 시 새 기준으로 작동. 첫 실행 결과는 settings.json hooks 36개와 1회 대조 검증 권장
-- P0 별건은 사용자 결정에 따라 GPT 정밀평가 진행 후 plan-first 모드 C로 별도 진입
+- 7일 모니터링: 목표 56건 → 30건 이하. effect 측정 후 Phase 2(final_check --json) 또는 B안 임계 강화 검토
+- D안(/finish 신설/통합)은 별건 plan 진행 여부 사용자 결정
+- 다음 weekly-self-audit 자동 실행이 새 기준으로 첫 작동 → 결과 확인 1회
 
 ---
 

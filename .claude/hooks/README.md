@@ -133,7 +133,7 @@
 | `permissions_sanity.sh` | fail-open | 없음 | advisory. 1회용 패턴·완전 중복 탐지 시 stderr 경고만, 60분 캐시 |
 | `r1r5_plan_check.sh` | fail-open | 없음 | advisory. C 트리거 staged + plan 미참조 시 stderr 권장만, 차단 없음 (세션118 별건 2번) |
 | `mode_c_log.sh` | fail-open | 없음 | advisory. C 트리거 커밋 후 .claude/state/mode_c_log.jsonl 1줄 기록 + stderr 알림, 차단 없음 (세션118 별건 3번 — HANDOFF 직접 수정 회피). v2 (debate_20260428_080046_3way Round 1 PASS): commit_subject 멀티바이트 안전 cut(Python `[:120]` codepoint 슬라이스 + `.strip()`) + 256KB 임계 archive 분리(원자적 mv, oldest 50% → mode_c_log.archive.jsonl). |
-| `auto_commit_state.sh` | fail-open (advisory) | 없음 | advisory + 자동 push. AUTO 패턴(TASKS/HANDOFF/STATUS/state) 한정. final_check.sh --fast FAIL 시 incident 기록 후 자동 commit/push 차단 (세션102 [3way]) |
+| `auto_commit_state.sh` | fail-open (advisory) | 없음 | advisory + 자동 push. AUTO 패턴(TASKS/HANDOFF/STATUS/state) 한정. final_check.sh --fast FAIL 시 incident 기록 후 자동 commit/push 차단 (세션102 [3way]). **세션134 Phase 1**: final_check stdout/stderr 캡처 → 처방 분류(7종+fallback) 출력 + session_key/source_file/failure_signature 60분 dedupe (동일 signature 반복 시 incident_ledger 미기록, hook_log/stderr만 누적). final_check.sh / completion_gate.sh / write_marker.sh 무수정. |
 | `domain_status_sync.sh` | fail-open | 없음 | advisory. 전역 TASKS 날짜 vs 도메인 STATUS.md 날짜 14일+ drift 탐지 시 stderr 경고만, 세션 차단 없음 (보조 스크립트, session_start_restore에서 호출, 세션98 C2 합의) |
 | `token_threshold_check.sh` | fail-open | 없음 | advisory. 문서 비대화 임계 초과 시 stderr 경고만, exit 0 강제 (보조 스크립트, session_start_restore에서 호출) |
 | `share_gate.sh` | fail-open | 없음 | advisory. 3way 감지 조건 미충족 시 stderr 경고만, 차단 없음 (보조 스크립트, share-result 수동 실행) |
