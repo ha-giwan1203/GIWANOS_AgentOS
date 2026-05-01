@@ -782,6 +782,51 @@ def dedupe_night_first_5(page, items, check_count=5):
     return kept
 
 
+def dedupe_existing_registrations(page, items, prod_date, line_cd):
+    """같은 prod_date + line_cd ERP 기등록 PROD_NO 제외 (주간/morning 및 --xlsx direct 전용).
+
+    배경: 세션133 5/1 P3 PoC에서 RSP3SC0665 1건 추가 등록 시 이미 morning 20건 등록 상태였음에도
+    중복 가드 없이 등록 → MES 잔존 발생. 사용자 요청 "계획 반영 전 이미 등록된 품번 확인 단계 추가".
+
+    검사 기준:
+      - 그리드 REG_DT == prod_date + PROD_NO 일치 → 제외
+      - 다른 PLAN_DA(주야간 cross)는 제외 안 함 — 같은 PROD_NO 주간/야간 양쪽 등록 허용
+      - 야간 1~5행 dedupe(dedupe_night_first_5)와 별개 — 그건 evening 흐름 전용
+
+    Returns: 중복 제외된 items 리스트
+    """
+    if not items:
+        return items
+    target_date = prod_date.strftime("%Y-%m-%d")
+    # 그리드 새로고침 (page 진입 직후 자동 검색 안 된 케이스 방어)
+    try:
+        page.evaluate("() => { try { totGridList.searchListData(); } catch(e){} }")
+    except Exception:
+        pass
+    time.sleep(2)
+    grid = page.evaluate("""(args) => {
+        try {
+            const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
+            return d.filter(r => r.REG_DT === args.date)
+                    .map(r => ({PROD_NO: r.PROD_NO, REG_NO: r.REG_NO, QTY: Number(r.PRDT_QTY||r.ADD_PRDT_QTY||0)}));
+        } catch(e) { return []; }
+    }""", {"date": target_date})
+    if not grid:
+        print(f"[dedupe-day] 그리드 REG_DT={target_date} 등록분 0건 — 전량 진행 ({len(items)}건)")
+        return items
+    existing = {g["PROD_NO"]: g for g in grid}
+    skipped, kept = [], []
+    for it in items:
+        if it["PROD_NO"] in existing:
+            g = existing[it["PROD_NO"]]
+            print(f"[dedupe-day] {it['PROD_NO']} 이미 등록 (REG_NO={g['REG_NO']} qty={g['QTY']}) — 제외")
+            skipped.append(it)
+        else:
+            kept.append(it)
+    print(f"[dedupe-day] items {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건 (PROD_NO 일치 기준, prod_date={target_date})")
+    return kept
+
+
 def rank_batch(page, items, target_line, save_url, dry_run=False):
     """엑셀 순서대로 상단 idx 매핑 → process_one_row 반복."""
     # 상단 grid REG_NO 최대 매핑
@@ -956,6 +1001,12 @@ def main():
             prod_date = _extract_prod_date(items) or target_file_date
             line_override = args.line if args.line != "ALL" else "SP3M3"
             print(f"[direct] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
+            # 파일 업로드 전 중복 가드 (세션133 사용자 명시 — 같은 prod_date+PROD_NO 이미 등록된 건 제외)
+            items_before = len(items)
+            items = dedupe_existing_registrations(page, items, prod_date, line_override)
+            if items_before > 0 and len(items) == 0:
+                print(f"[direct] 모든 items가 이미 등록됨 — 업로드 스킵, 종료")
+                return
             if args.dry_run:
                 print("[direct] dry-run: 엑셀 확인까지만")
                 return
@@ -967,7 +1018,14 @@ def main():
                 print("[direct] parse-only: 엑셀 첨부 + 서버 파싱까지만. Phase 4/5 미진행")
                 return
             else:
-                d0_upload(page, xlsx_path)
+                # dedupe로 items 줄었으면 xlsx도 재생성 후 업로드 (selectList가 같은 파일 파싱하므로)
+                if len(items) < items_before:
+                    new_xlsx = UPLOAD_DIR / f"d0_{line_override}_{prod_date.strftime('%Y%m%d')}_dedup.xlsx"
+                    make_upload_xlsx(items, prod_date, new_xlsx)
+                    print(f"[direct] dedupe 후 재생성: {new_xlsx.name} ({len(items)}건)")
+                    d0_upload(page, new_xlsx)
+                else:
+                    d0_upload(page, xlsx_path)
             cfg = LINE_CONFIG[line_override]
             batch = rank_batch(page, items, line_override, cfg["save_url"], dry_run=False)
             print(f"[direct] rank_batch: {batch}")
@@ -1000,7 +1058,12 @@ def main():
             prod_date = target_file_date
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
+                # Phase 1.5: 같은 prod_date 이미 등록된 PROD_NO 제외 (세션133 사용자 명시 — 파일 업로드 전 중복 가드)
+                items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
+                if not items:
+                    print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
+                else:
+                    run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
