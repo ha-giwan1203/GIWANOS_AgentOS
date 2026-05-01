@@ -34,9 +34,9 @@
 
 plan: `C:/Users/User/.claude/plans/c-resilient-frost.md` (조건부 승인 → 최종 승인 + N1/N2 정의 명확화 + "다음 행동" 3번 보정 모두 반영)
 
-### 후속 안건 (이번 작업 범위 외, 별도 검토)
-- `90_공통기준/업무관리/_운영문서/하네스_운영가이드.md` self-audit 언급 1건 — 새 기준과의 정합성 미세 차이 발생 가능. 별도 검토 필요
-- `.claude/scripts/hook_registry.sh` LEGACY 격하 명시는 README에만 존재 — 스크립트 자체에 헤더 주석 추가 검토
+### 후속 안건 처리 결과 (사용자 "전부진행" 명시 후 즉시 처리)
+- [완료] `90_공통기준/업무관리/_운영문서/하네스_운영가이드.md` "현재 상태" 섹션 정합화 — weekly-self-audit scheduled-task 등록 가동 중 + 세션134 SSoT 정렬 보강 완료 반영. 기존 "주간 자동 진단: 미등록 → 다음 작업 대상" 문구 폐기
+- [완료, 추가 조치 없음] `.claude/scripts/hook_registry.sh` 검토 — 헤더에 이미 `[LEGACY / DEPRECATED]` + 세션93 합의 사유 + 대체 경로 명시 충실. 추가 주석 불필요
 
 ---
 

@@ -21,13 +21,12 @@
 - `.claude/agents/self-audit-agent.md` 전면 재작성: 진단 절차 10단계로 재구성 (Step 1 SSoT → Step 2 settings.json → Step 3 settings.local.json → ...), 허용/금지 Bash 명시, 3분류 anomaly 사례 추가, selfcheck.sh 분리 문구
 - 검증 6단계 PASS: N1(list_active_hooks --count)=36, N2(settings union)=36, set 대칭차 빈 집합. 의도된 두 파일 외 hook 자동 마커 파일만 변경
 
-### 미해결
-- `90_공통기준/업무관리/_운영문서/하네스_운영가이드.md` self-audit 언급 1건 — 새 기준과 정합성 미세 차이 발생 가능 (별도 검토)
-- `.claude/scripts/hook_registry.sh` LEGACY 격하 명시는 README에만 — 스크립트 자체에 헤더 주석 추가 검토
+### 후속 안건 처리 결과 (사용자 "전부진행" 명시 후 즉시 처리)
+- 운영가이드 정합화 [완료]: 하네스_운영가이드.md "현재 상태" 섹션 — weekly-self-audit 등록 가동 + 세션134 SSoT 정렬 반영. 기존 "미등록" 문구 폐기
+- hook_registry.sh 헤더 주석 [완료, 추가 조치 없음]: 헤더에 이미 LEGACY/DEPRECATED + 세션93 합의 사유 + 대체 경로 충실. 추가 주석 불필요
 
 ### 다음 AI 액션
-- (없음) 본 작업 완료. 다음 weekly-self-audit 자동 실행(다음 주) 시 새 기준으로 작동. 첫 실행 결과를 settings.json hooks 35개와 1회 대조 검증 권장
-- 후속 안건 2건은 사용자 결정에 따라 별도 plan 진행 여부 결정
+- (없음) 본 작업 + 후속 안건 2건 모두 완료. 다음 weekly-self-audit 자동 실행(다음 주) 시 새 기준으로 작동. 첫 실행 결과를 settings.json hooks 36개와 1회 대조 검증 권장
 
 ---
 
