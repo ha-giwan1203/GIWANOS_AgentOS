@@ -64,6 +64,15 @@ hybrid_eval: 2026-05-01 평가 (시나리오 3 추정) → 2026-05-02 정정 —
 
 ## 선결 조건
 
+### v3.x (REST API 직호출)
+- 사내 네트워크 연결 (LMES dev: `lmes-dev.samsong.com:19220` / prod: 사용자 제공)
+- Python 3 + `requests` 모듈
+- env 설정 (v3.2부터):
+  - **dev (default)**: 설정 0 — 내장 DEV_DEFAULT 사용 가능
+  - **prod**: 환경변수 `JOBSETUP_MES_SERVER` + `JOBSETUP_MES_TOKEN` 설정, 또는 `config.json`에 `prod` 섹션 작성 (template: `config.example.json`). 미설정 시 즉시 abort
+- prod 호출 시 commit 모드는 **사용자 입회 1줄 stderr 경고** 자동 출력
+
+### legacy (v1/v2.x UI 자동화 fallback)
 - SmartMES (mesclient.exe) 실행 중이고 로그인 끝난 상태
 - `[J] 잡셋업` 메뉴 진입 가능 (작업자 인증은 사용자 별도 처리)
 - 제품 드롭다운에 첫 서열(1번) 품번이 노출됨 (= 그날 SP3M3 D0 반영 끝나서 SmartMES 스케줄 동기화 완료)

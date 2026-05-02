@@ -67,6 +67,9 @@
 # 세션 락 파일
 .watch.lock
 
+# 잡셋업 v3.2: 환경별 MES 서버 token (실값). config.example.json은 추적
+90_공통기준/스킬/jobsetup-auto/config.json
+
 # Dedup 상태 파일
 .notion_dedup_state.json
 .slack_dedup_state.json

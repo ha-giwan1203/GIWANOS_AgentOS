@@ -28,6 +28,7 @@
 """
 import argparse
 import json
+import os
 import random
 import re
 import sys
@@ -38,22 +39,71 @@ from pathlib import Path
 import requests
 
 
-# ---- 설정 ----
-MES_SERVER = "http://lmes-dev.samsong.com:19220"
-TOKEN = "6c02224ce114410c8e53f45d1939a5b3"
+SCRIPT_DIR = Path(__file__).parent
+STATE_DIR = SCRIPT_DIR / "state"
+STATE_DIR.mkdir(exist_ok=True)
+CONFIG_PATH = SCRIPT_DIR / "config.json"
 
-COMMON_HEADERS = {
-    "Content-Type": "application/json; charset=UTF-8",
-    "chnl": "lmes",
-    "from": "lmes",
-    "to": "LMES",
-    "lang": "ko",
-    "usrid": "LMES",
-    "token": TOKEN,
+# dev default (v3.0 호환). prod 전환 시 환경변수 또는 config.json에서 회수
+DEV_DEFAULT = {
+    "mes_server": "http://lmes-dev.samsong.com:19220",
+    "mes_token": "6c02224ce114410c8e53f45d1939a5b3",
 }
 
-STATE_DIR = Path(__file__).parent / "state"
-STATE_DIR.mkdir(exist_ok=True)
+
+def load_env_config(env: str):
+    """환경변수 → config.json → dev default 순으로 (server, token) 회수.
+
+    env='dev' : 환경변수 → config.json[dev] → DEV_DEFAULT
+    env='prod': 환경변수 → config.json[prod] → 없으면 abort
+    """
+    # 1순위: 환경변수 (모든 env 공통)
+    server = os.environ.get("JOBSETUP_MES_SERVER")
+    token = os.environ.get("JOBSETUP_MES_TOKEN")
+    if server and token:
+        return server, token, "env"
+
+    # 2순위: config.json
+    cfg = {}
+    if CONFIG_PATH.exists():
+        try:
+            cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[WARN] config.json 파싱 실패: {e}", file=sys.stderr)
+    sect = cfg.get(env, {})
+    server = sect.get("mes_server")
+    token = sect.get("mes_token")
+    if server and token:
+        return server, token, f"config.json[{env}]"
+
+    # 3순위: dev default (env=dev만)
+    if env == "dev":
+        return DEV_DEFAULT["mes_server"], DEV_DEFAULT["mes_token"], "dev_default"
+
+    # prod 인데 회수 실패 → abort
+    raise SystemExit(
+        f"[ABORT] env={env} 설정 미발견.\n"
+        f"  환경변수 JOBSETUP_MES_SERVER + JOBSETUP_MES_TOKEN 설정\n"
+        f"  또는 {CONFIG_PATH} 에 {{\"prod\": {{\"mes_server\": \"...\", \"mes_token\": \"...\"}}}} 추가\n"
+        f"  config.example.json 참조"
+    )
+
+
+def build_common_headers(token: str):
+    return {
+        "Content-Type": "application/json; charset=UTF-8",
+        "chnl": "lmes",
+        "from": "lmes",
+        "to": "LMES",
+        "lang": "ko",
+        "usrid": "LMES",
+        "token": token,
+    }
+
+
+# 모듈 레벨 변수 (build_headers 등 기존 호출부 호환). main에서 setup_runtime로 채움
+MES_SERVER = None
+COMMON_HEADERS = None
 
 
 # ---- spec 분류 (screen_analysis_20260429.md) ----
@@ -107,6 +157,15 @@ def gen_normal_in_range(lo, hi, decimals):
 
 
 # ---- API ----
+
+def setup_runtime(env: str):
+    """env에 따라 MES_SERVER/COMMON_HEADERS 모듈 변수 설정. main에서 호출."""
+    global MES_SERVER, COMMON_HEADERS
+    server, token, src = load_env_config(env)
+    MES_SERVER = server
+    COMMON_HEADERS = build_common_headers(token)
+    return src
+
 
 def build_headers():
     h = dict(COMMON_HEADERS)
@@ -177,6 +236,8 @@ def main():
     p.add_argument("--pno-rev", default="A")
     p.add_argument("--prdt-rank", type=int, default=1)
     p.add_argument("--seed", type=int, default=None)
+    p.add_argument("--env", choices=["dev", "prod"], default="dev",
+                   help="MES 환경 (default=dev). prod 사용 시 환경변수 JOBSETUP_MES_SERVER/TOKEN 또는 config.json 필수")
     args = p.parse_args()
 
     if args.seed is not None:
@@ -186,6 +247,10 @@ def main():
 
     if args.prdt_da is None:
         args.prdt_da = datetime.now().strftime("%Y%m%d")
+
+    cfg_src = setup_runtime(args.env)
+    if args.env == "prod" and args.mode in ("commit-one", "commit-all"):
+        print(f"[!] env=prod commit 모드 — server={MES_SERVER} (cfg={cfg_src}). 사용자 입회 확인 필요", file=sys.stderr)
 
     qry = {
         "prdtDa": args.prdt_da,

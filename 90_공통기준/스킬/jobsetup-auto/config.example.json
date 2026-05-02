@@ -1,0 +1,12 @@
+{
+  "_comment": "잡셋업 v3.x 환경별 MES 서버 설정. 실제 사용 시 이 파일을 복사해서 config.json으로 저장하고 token 채워넣을 것. config.json은 gitignored.",
+  "_priority": "1) 환경변수 JOBSETUP_MES_SERVER + JOBSETUP_MES_TOKEN > 2) config.json[<env>] > 3) dev default",
+  "dev": {
+    "mes_server": "http://lmes-dev.samsong.com:19220",
+    "mes_token": "<32-char hex from MESClient.exe.config (dev)>"
+  },
+  "prod": {
+    "mes_server": "http://lmes.samsong.com:<port>",
+    "mes_token": "<32-char hex from MESClient.exe.config (prod)>"
+  }
+}
