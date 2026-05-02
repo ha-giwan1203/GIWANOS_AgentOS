@@ -27,6 +27,9 @@
 - v3.3: 첫 서열 품번 자동 회수 (GetProductionSchedule API — ServiceAgent 함수 시그니처 이미 확인됨)
 - B형 fallback 운영 정책 검증 (자동 OK 허용 범위 — 사용자 결정 필요)
 
+**GPT 판정 (2026-05-02 share-result)**: 부분PASS — item 1/2/3 PASS, item 4(B형 fallback)·item 5(chain 활성) 부분PASS.
+**B 분류 미결 의제**: GPT 추가 제안 "dev endpoint·token 의존 분리 후 prod 전환 기준 필요" — 사용자 명시 `/debate-mode` 호출 시에만 3자 토론 진입. 단독 반영 금지.
+
 **참조 문서**:
 - 본체: `90_공통기준/스킬/jobsetup-auto/run_jobsetup.py` v3.0
 - plan: `PLAN_REST_API.md` (시나리오 3 → 1 정정 + 검증 결과)
