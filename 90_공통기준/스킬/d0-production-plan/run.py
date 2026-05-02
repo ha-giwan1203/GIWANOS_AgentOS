@@ -1217,6 +1217,9 @@ def main():
                 return
             final_save(page, cfg["save_url"])
             verify_smartmes(line_override, prod_date, items)
+            # 세션135: --xlsx 분기에도 chain 호출 (line_override=SP3M3 한정)
+            if line_override == "SP3M3" and not args.parse_only and not args.no_jobsetup:
+                _run_jobsetup_chain(args.jobsetup_mode, prod_date)
             print("=== /d0-plan --xlsx 완료 ===")
             return
 
