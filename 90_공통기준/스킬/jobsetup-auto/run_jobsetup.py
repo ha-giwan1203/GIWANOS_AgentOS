@@ -195,6 +195,37 @@ def call_save(item):
     return r.status_code, j, r.text[:300]
 
 
+def call_schedule(prdt_da: str, line_cd: str):
+    """v3.3: GetProductionSchedule API. POST /v2/prdt/schdl/list.api.
+
+    근거: ServiceAgent.GetProductionSchedule (dnSpy 디컴파일):
+        request body = {prdtDa, lineCd}, 응답 = ScheduleDTO.rslt.items[]
+        ScheduleItem property: pno, pnoRev, prdtRank, lineCd, prdtDa, regNo, revNo 등
+
+    Returns: prdtRank 오름차순 정렬된 items 리스트.
+    """
+    url = f"{MES_SERVER}/v2/prdt/schdl/list.api"
+    body = {"prdtDa": prdt_da, "lineCd": line_cd}
+    r = requests.post(url, json=body, headers=build_headers(), timeout=15)
+    r.raise_for_status()
+    j = r.json()
+    sc = str(j.get("statusCode", ""))
+    if sc != "200":
+        raise RuntimeError(f"schdl/list.api statusCode={sc} msg={j.get('statusMsg')}")
+    items = j.get("rslt", {}).get("items", []) or []
+    items.sort(key=lambda it: (it.get("prdtRank") or 99))
+    return items
+
+
+def resolve_first_sequence(prdt_da: str, line_cd: str):
+    """schedule API로 prdtRank=1 항목 회수. 없으면 None."""
+    items = call_schedule(prdt_da, line_cd)
+    for it in items:
+        if (it.get("prdtRank") or 0) == 1:
+            return it
+    return None
+
+
 def build_save_item(master_item, qry, kind, params):
     """list.api 응답 1건(master) + qry 컨텍스트 + A/B 분기 → save.api payload."""
     out = dict(master_item)  # 마스터 11개 그대로 + 추가 컨텍스트
@@ -232,12 +263,14 @@ def main():
                    default="list-only")
     p.add_argument("--prdt-da", default=None, help="YYYYMMDD (default=오늘)")
     p.add_argument("--line-cd", default="SP3M3")
-    p.add_argument("--pno", default="RSP3SC0646", help="첫 서열 품번 (default 5/2 SP3M3 첫 서열)")
-    p.add_argument("--pno-rev", default="A")
+    p.add_argument("--pno", default=None, help="첫 서열 품번. 미지정 + --auto-resolve-pno 사용 시 schedule API로 회수")
+    p.add_argument("--pno-rev", default=None)
     p.add_argument("--prdt-rank", type=int, default=1)
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--env", choices=["dev", "prod"], default="dev",
                    help="MES 환경 (default=dev). prod 사용 시 환경변수 JOBSETUP_MES_SERVER/TOKEN 또는 config.json 필수")
+    p.add_argument("--auto-resolve-pno", action="store_true",
+                   help="v3.3: schedule API로 prdtRank=1 품번 자동 회수. --pno 동시 지정 + 불일치 시 abort")
     args = p.parse_args()
 
     if args.seed is not None:
@@ -251,6 +284,26 @@ def main():
     cfg_src = setup_runtime(args.env)
     if args.env == "prod" and args.mode in ("commit-one", "commit-all"):
         print(f"[!] env=prod commit 모드 — server={MES_SERVER} (cfg={cfg_src}). 사용자 입회 확인 필요", file=sys.stderr)
+
+    # v3.3: --auto-resolve-pno 처리. 사용자 인자와 충돌 시 abort.
+    if args.auto_resolve_pno:
+        sched = resolve_first_sequence(args.prdt_da, args.line_cd)
+        if sched is None:
+            raise SystemExit(f"[ABORT] schedule API에 prdtDa={args.prdt_da} lineCd={args.line_cd} prdtRank=1 항목 없음 (휴일·미반영 가능)")
+        api_pno, api_rev = sched.get("pno"), sched.get("pnoRev")
+        print(f"[schedule] auto-resolve → pno={api_pno} pnoRev={api_rev} (cfg={cfg_src})")
+        if args.pno and args.pno != api_pno:
+            raise SystemExit(f"[ABORT] --pno '{args.pno}' vs schedule API '{api_pno}' 불일치")
+        if args.pno_rev and args.pno_rev != api_rev:
+            raise SystemExit(f"[ABORT] --pno-rev '{args.pno_rev}' vs schedule API '{api_rev}' 불일치")
+        args.pno = api_pno
+        args.pno_rev = api_rev
+
+    # default fallback (auto-resolve 미사용 + --pno 미지정 시 v3.0 호환 default)
+    if args.pno is None:
+        args.pno = "RSP3SC0646"
+    if args.pno_rev is None:
+        args.pno_rev = "A"
 
     qry = {
         "prdtDa": args.prdt_da,
