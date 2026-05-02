@@ -1141,6 +1141,9 @@ def main():
     # --legacy-mode 명시 시만 화면 모드(jQuery.ajax) 진입. fallback 보존.
     ap.add_argument("--api-mode", action="store_true", default=True, help="옵션 A 하이브리드 (기본값 활성): rank 호출(Phase 4)을 requests 직접 POST. final_save(Phase 5)는 화면 모드 유지. 세션133 사용자 명시 — 매일 morning 자동 실행이 자연 검증")
     ap.add_argument("--legacy-mode", action="store_true", help="화면 모드 강제 (회귀 fallback). --api-mode를 끄고 jQuery.ajax 흐름 사용. 운영 chain 회귀 시만 사용")
+    ap.add_argument("--no-jobsetup", action="store_true", help="morning SP3M3 종료 후 잡셋업 자동 호출 차단 (chain 비활성)")
+    ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
+                    help="chain에서 호출할 잡셋업 모드 (default=commit-all). 입회 monitoring 시 list-only 권장")
     args = ap.parse_args()
 
     # --legacy-mode 명시 시 api_mode를 False로 강제 (화면 모드 fallback)
@@ -1244,6 +1247,7 @@ def main():
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
             prod_date = target_file_date
+            sp3m3_registered = False
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
                 # Phase 1.5: 같은 prod_date 이미 등록된 PROD_NO 제외 (세션133 사용자 명시 — 파일 업로드 전 중복 가드)
@@ -1252,10 +1256,44 @@ def main():
                     print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
                 else:
                     run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                    sp3m3_registered = True
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
+            # 세션135: morning SP3M3 등록 성공 시 잡셋업 자동 호출 (chain).
+            # 가드: 실 등록 발생 + dry-run/parse-only 아님 + --no-jobsetup 미사용.
+            # 실패는 advisory(morning 자체 종료에 영향 없음).
+            if sp3m3_registered and not args.dry_run and not args.parse_only and not args.no_jobsetup:
+                _run_jobsetup_chain(args.jobsetup_mode, prod_date)
+
         print("=== /d0-plan 완료 ===")
+
+
+def _run_jobsetup_chain(mode: str, prod_date):
+    """morning SP3M3 종료 후 잡셋업 v3.x 자동 호출 (chain). advisory — 실패해도 morning 정상 종료."""
+    import subprocess
+    from pathlib import Path as _P
+    script = _P(__file__).resolve().parent.parent / "jobsetup-auto" / "run_jobsetup.py"
+    if not script.exists():
+        print(f"[jobsetup-chain] script not found: {script} — skip", flush=True)
+        return
+    prdt_da = prod_date.strftime("%Y%m%d")
+    cmd = [sys.executable, str(script), "--mode", mode, "--auto-resolve-pno", "--prdt-da", prdt_da, "--line-cd", "SP3M3"]
+    print(f"[jobsetup-chain] {' '.join(cmd)}", flush=True)
+    try:
+        r = subprocess.run(cmd, timeout=180, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if r.stdout:
+            print(r.stdout, flush=True)
+        if r.stderr:
+            print(r.stderr, flush=True, file=sys.stderr)
+        if r.returncode == 0:
+            print(f"[jobsetup-chain] OK rc=0", flush=True)
+        else:
+            print(f"[jobsetup-chain] FAIL rc={r.returncode} (advisory — morning 종료에 영향 없음)", flush=True, file=sys.stderr)
+    except subprocess.TimeoutExpired:
+        print("[jobsetup-chain] TIMEOUT 180s (advisory — morning 종료에 영향 없음)", flush=True, file=sys.stderr)
+    except Exception as e:
+        print(f"[jobsetup-chain] ERROR {e!r} (advisory — morning 종료에 영향 없음)", flush=True, file=sys.stderr)
 
 
 if __name__ == "__main__":
