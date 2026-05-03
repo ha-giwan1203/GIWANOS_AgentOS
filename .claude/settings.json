@@ -83,12 +83,29 @@
     ]
   },
   "hooks": {
-    "PreCompact": [
+    "PreToolUse": [
       {
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/precompact_save.sh"
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/block_dangerous.sh",
+            "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/commit_gate.sh",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/protect_files.sh",
+            "timeout": 3
           }
         ]
       }
@@ -98,303 +115,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/session_start_restore.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/risk_profile_prompt.sh"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/block_dangerous.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/commit_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/skill_drift_check.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/debate_verify.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/date_scope_guard.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/evidence_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/protect_files.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/write_router_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/state_rebind_check.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome__form_input",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/mcp_send_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/harness_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/instruction_read_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/skill_instruction_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/permissions_sanity.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/r1r5_plan_check.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/debate_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome__javascript_tool",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/debate_independent_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__chrome-devtools-mcp__evaluate_script",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/debate_independent_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome__navigate",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/navigate_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__chrome-devtools-mcp__navigate_page",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/navigate_gate.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__chrome-devtools-mcp__new_page",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/navigate_gate.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/auto_compile.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/write_marker.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/handoff_archive.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Read|Grep|Glob|Bash|Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/evidence_mark_read.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome__get_page_text",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/debate_send_gate_mark.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "mcp__Claude_in_Chrome|Bash|Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/gpt_followup_post.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/post_commit_notify.sh",
-            "async": true
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/mode_c_log.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/share_after_push.sh"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/notify_slack.sh",
-            "async": true
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/session_start_restore.sh"
           }
         ]
       }
@@ -404,40 +125,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/stop_guard.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/gpt_followup_stop.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/completion_gate.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/evidence_stop_guard.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/auto_commit_state.sh"
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/completion_gate.sh"
           }
         ]
       }
