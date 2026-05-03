@@ -1,31 +1,42 @@
 {
   "terminal_state": "done",
   "committed_pushed": true,
-  "gpt_shared": false,
-  "gpt_judgment": null,
+  "gpt_shared": true,
+  "gpt_judgment": "부분PASS",
   "user_reported": true,
   "followup_checked": true,
-  "exception_reason": "GPT 공유 생략 — 모드 E 최소 패치(selectList timeout 60→120s 1줄) + 실무 산출물 등록(SP3M3 야간 D0 24건). 사용자 명시 종료 신호('수고했다 마무리')로 빠른 마무리 요청. 시스템 구조 변경/hook 신설 없음. 선례: 세션120 finish_state.",
-  "session": "session121",
+  "exception_reason": null,
+  "session": "session136",
   "commits": [
-    "6caed92f"
+    "f555530d",
+    "d2688d69",
+    "b237194f"
   ],
-  "topic": "[E] d0-plan SP3M3 야간 D0 24건 등록 + selectList timeout 60→120s 상향",
-  "completed_at": "2026-04-28T18:55:00",
+  "topic": "[C] 세션136 자동모드 layer 폐기 + 명시 발화 트리거 단순화 (3way share-result)",
+  "completed_at": "2026-05-03 KST",
   "notion_sync": "attempted (manual-sync, soft-fail OK)",
   "summary": {
-    "실무_산출물": "SP3M3 야간 24건 ERP D0 등록 (ext=319150~319173) + 서열 24/24 + MES rsltCnt=1200",
-    "E_최소_패치": "run.py selectList/multiList JS setTimeout 60000→120000 (2개소, 1줄 변경)",
-    "E_정량_충족": "≤20줄, ≤2파일, 신규 함수/hook/gate 없음 — timeout 상향 명시 허용",
-    "사후_B_권고": [
-      "Phase 6 SmartMES 잔존 건 식별 (prdtDa=20260428 SP3M3 15건)",
-      "selectList 60s timeout 빈발 패턴 원인 분석 (서버 부하/네트워크/엑셀 크기)",
-      "필요 시 .claude/tmp/erp_d0_dedupe.py --line SP3M3 --date 20260428 --execute로 잔존 정리"
+    "변경_본질": "자동화 명제 layer 폐기 + 사용자 명시 발화 = 1순위 입력 + 질문 허용 5조건 외 묻기 금지 + 판단/근거/실행/검증 자체 판단 형식 강제",
+    "변경_파일": [
+      "CLAUDE.md",
+      ".claude/rules/work_mode_protocol.md",
+      "90_공통기준/업무관리/TASKS.md",
+      "90_공통기준/업무관리/HANDOFF.md",
+      "memory/feedback_authority_ladder.md (신규)",
+      "memory/feedback_post_push_share.md (deprecated 이동)",
+      "memory/feedback_no_push_decision_prompt.md (deprecated 이동)"
     ],
-    "지침_위반_자가점검": [
-      "E 최소 패치 범위(timeout)를 모드 C로 잘못 분류",
-      "같은 코드로 3회 재시도 (incident 누적)",
-      "SKILL.md 원본 미독 진행"
+    "GPT_판정": "verdict 부분PASS / 채택 4 / 보류 1 / 버림 0",
+    "Gemini_교차_검증": "GPT 판정 동의 + 신규 발견(5조건 강제 시 할루시네이션 위험 — 보류)",
+    "양_모델_합의_A": "카운터 3종 측정 (질문 건수 / 5조건 해당 여부 / 결정위임 표현)",
+    "양_모델_합의_B_미결": "work_mode_protocol.md L37 모호하면 묻는다 → 5조건 #1 하위 재정렬 + 자체 판단 근거 먼저 제시 — 사용자 명시 호출 대기",
+    "Gemini_신규_발견": "5조건 #1 안전한 정지 가이드라인 별건 plan",
+    "토론지침_위반_자기보고": "L12 미진입 / L59-62 사후보강 / L64-77 상호감시 누락 / L80-130 B 분류 미승격 — 양 모델 감점이지 무효 아님 합의",
+    "다음_세션_첫_행동": [
+      "추가제안 B 사용자 명시 호출 대기",
+      "Gemini 신규 발견 안전한 정지 가이드라인 별건 plan",
+      "카운터 3종 측정 시작",
+      "1세션 후 결정 회피 패턴 재발 여부 확인"
     ]
   }
 }
