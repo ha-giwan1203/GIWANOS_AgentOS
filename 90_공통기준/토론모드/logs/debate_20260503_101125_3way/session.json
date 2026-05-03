@@ -10,7 +10,7 @@
     "3. 헤비유저 컨센서스의 사용자 도메인(제조 ERP) 적합성",
     "4. Option 1~5 중 우선 선별 + R5 롤백 계획"
   ],
-  "round_count": 1,
+  "round_count": 2,
   "max_rounds": 3,
   "turns": [
     {
@@ -61,8 +61,29 @@
       }
     }
   ],
+  "round2_summary": {
+    "claude_independent": "round2_claude.md",
+    "gpt_main": "round2_gpt.md (5098자, completion_gate 축소 + 4파일 GLOSSARY)",
+    "gemini_main": "round2_gemini.md (1879자, 흡수 반대 + 단일 플랫 + 출력의 건조함)",
+    "cross_verify": {
+      "gemini_verifies_gpt": {"verdict": "동의", "reason": "행동 교정형 명제 incident_quote.md 등을 폐기하고 결정론적 GLOSSARY 구조와 코드 검증 체계로 전환하여 인지 부채를 근본 제거"},
+      "gpt_verifies_gemini": {"verdict": "동의", "reason": "Gemini의 가이드성 자연어 출력 소거 원칙이 더 일관되므로 incident_quote.md는 흡수 없이 폐기하고 GLOSSARY는 단일 플랫 JSON 시작이 메타 0·슬림화 목표에 더 맞음"}
+    },
+    "claude_synthesis": "round2_claude_synthesis.md (Gemini 강화 입장 채택: 흡수 반대 + 단일 플랫 + 출력의 건조함)",
+    "claude_synthesis_verify": {
+      "gpt_verifies_claude": {"verdict": "동의", "reason": "Gemini 강화안까지 반영해 행동 교정 자연어를 완전히 제거하고 GLOSSARY 단일 파일·RAG 보류·Phase별 축소 절차가 명확해졌으므로 Round 2 종합안으로 적정"},
+      "gemini_verifies_claude": {"verdict": "동의", "reason": "incident_quote.md를 다른 훅에 흡수하지 않고 완전히 소거하여 도구 출력을 건조한 결정론적 데이터로 한정한 점이 인지 부채를 근본 제거하려는 리모델링의 본질적 의도와 정확히 일치하며 단일 플랫 GLOSSARY가 초기 관리 효율성을 극대화", "next_action": "합의된 8단계 Phase에 따라 Phase 1(단일 PR 및 골격 구축) 작업을 즉시 개시"}
+    },
+    "pass_ratio": 1.0,
+    "pass_ratio_basis": "4/4 동의 (R2 cross verify 2건 + R2 종합 양측 검증 2건)",
+    "issue_class": "B",
+    "skip_65": false,
+    "claude_delta": "partial",
+    "consensus_file": "round2_consensus.md"
+  },
+  "total_pass_ratio": "8/8 = 1.0 (R1 4건 + R2 4건 모두 동의)",
   "result": {
-    "status": "Round 1 종결 + GitHub 반영 + 양측 최종 통과",
+    "status": "Round 1+2 종결 + GitHub 반영 + 양측 최종 통과",
     "consensus_file": "consensus.md",
     "pass_ratio": 1.0,
     "github_commit": "08afa889",
