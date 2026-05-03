@@ -589,10 +589,11 @@ cleanup_stale_active_skills() {
   now_epoch=$(date +%s 2>/dev/null || echo 0)
   local stale_dir="$dir/_stale/$(date +%Y%m%d 2>/dev/null || echo unknown)"
   local count=0
+  local task_ids=""
   shopt -s nullglob 2>/dev/null
   for f in "$dir"/*.json; do
     [ ! -f "$f" ] && continue
-    local started age fmt_epoch
+    local started age fmt_epoch tid
     started=$(safe_json_get "started_at" < "$f" 2>/dev/null)
     if [ -n "$started" ]; then
       fmt_epoch=$(iso_to_epoch "$started")
@@ -601,22 +602,25 @@ cleanup_stale_active_skills() {
     fi
     age=$((now_epoch - fmt_epoch))
     if [ "$age" -gt 86400 ] 2>/dev/null; then
+      tid=$(safe_json_get "task_id" < "$f" 2>/dev/null)
+      [ -z "$tid" ] && tid="$(basename "$f" .json)"
       mkdir -p "$stale_dir" 2>/dev/null
       if mv "$f" "$stale_dir/" 2>/dev/null; then
         count=$((count + 1))
+        task_ids="${task_ids}${task_ids:+,}${tid}"
       fi
     fi
   done
   shopt -u nullglob 2>/dev/null
   if [ "$count" -gt 0 ] 2>/dev/null; then
-    hook_log "active_skill_cleanup" "moved=$count to=$stale_dir"
-    # STATUS.md 운영 요약 1줄 기록 (Gemini v3 A제안 채택)
+    hook_log "active_skill_cleanup" "moved=$count tasks=$task_ids to=$stale_dir"
+    # STATUS.md 운영 요약 1줄 기록 + task_id 목록 (Gemini v3+v4 A제안 채택)
     local status_md="$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md"
     if [ -f "$status_md" ]; then
       local today
       today=$(date '+%Y-%m-%d' 2>/dev/null || echo unknown)
-      printf '\n[%s] active_skill_cleanup: %d건 _stale/%s/로 이동\n' \
-        "$today" "$count" "$(basename "$stale_dir")" >> "$status_md" 2>/dev/null || true
+      printf '\n[%s] active_skill_cleanup: %d건 _stale/%s/로 이동 — tasks=[%s]\n' \
+        "$today" "$count" "$(basename "$stale_dir")" "$task_ids" >> "$status_md" 2>/dev/null || true
     fi
   fi
   return 0
