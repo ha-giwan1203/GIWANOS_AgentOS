@@ -1,21 +1,18 @@
 # 업무리스트 프로젝트
 
-@.claude/rules/data-and-files.md
+@.claude/rules/essentials.md
 
 자동차 부품 제조업(삼송 G-ERP) 업무 자동화 저장소.
 
-## 인덱스 (debate_20260428_201108_3way 빼는 안 1 적용 — 세션122)
+## 인덱스 (Phase 2 통폐합 — 세션137)
 
-상시 로딩량 감축: 핵심 원칙만 루트에 남기고, 세부 절차는 하위 문서로 분리. 항상 읽는 문서는 짧게, 필요할 때만 깊게.
+상시 로딩 1개 파일로 압축. 5개 → 1개 (data-and-files / external_models / hook_permissions / incident_quote / work_mode_protocol → essentials).
+incident_quote.md는 폐기 (Round 2 합의: 흡수 없이 archive). 폐기본은 `98_아카이브/_deprecated_v1/rules/`에 보존.
 
 | 주제 | 문서 |
 |------|------|
-| 작업 모드 5종 + 우선순위 + R1~R5 + E 정량 | [.claude/rules/work_mode_protocol.md](.claude/rules/work_mode_protocol.md) |
-| hook vs permissions 경계 + 훅 등급 | [.claude/rules/hook_permissions.md](.claude/rules/hook_permissions.md) |
-| 외부 모델 호출 + 공동작업 원칙 + /rewind 한계 + 문서 조회 + 운영 안정성 | [.claude/rules/external_models.md](.claude/rules/external_models.md) |
+| 작업 모드 5종 + R1~R5 + E + hook/permissions + 외부 모델 + 데이터·파일 + 운영 | [.claude/rules/essentials.md](.claude/rules/essentials.md) |
 | 토론모드 코어 | `90_공통기준/토론모드/CLAUDE.md` |
-| 데이터 처리·파일 정리 | `.claude/rules/data-and-files.md` |
-| 미해결 incident 자동 인용 규칙 | [.claude/rules/incident_quote.md](.claude/rules/incident_quote.md) |
 
 ## 핵심 원칙 (요약)
 
