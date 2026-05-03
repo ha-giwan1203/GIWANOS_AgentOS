@@ -1,14 +1,33 @@
 {
   "terminal_state": "done",
-  "session": 139,
+  "session": 140,
   "committed_pushed": true,
-  "last_sha": "0dcbf35a",
+  "last_sha": "517a57b8",
   "gpt_shared": true,
   "gpt_judgment": "PASS",
   "gemini_judgment": "PASS",
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
+  "session140_summary": {
+    "topic": "verify_receipt_gate_phase0",
+    "shares": 3,
+    "verdicts": [
+      "GPT PASS / Gemini 부분PASS (1차 8cf15a03)",
+      "GPT PASS / Gemini PASS (2차 b721cb78 plan v3)",
+      "GPT PASS / Gemini PASS (3차 327d0a68 Phase 0 코드)"
+    ],
+    "harness": "채택 6 / 보류 0 / 버림 0 (3차 기준)",
+    "code_changed_files": 6,
+    "phase0_no_op": true,
+    "phase0_observation_start_kst": "2026-05-03 KST",
+    "phase0_observation_end_kst": "2026-05-10 KST",
+    "phase1_entry_conditions": [
+      "7일 4지표 통과",
+      "사용자 명시 승인",
+      "d0 verify_run.py receipt stub 추가"
+    ]
+  },
   "phase7_complete": true,
   "phase7_residual_handled": true,
   "phase8_start_sha": "0dcbf35a",
