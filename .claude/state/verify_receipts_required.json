@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "default": "permissive",
+  "_comment": "Phase 0 = no-op. 모든 SKILL required:false. Phase 1부터 d0-production-plan부터 true 승격.",
+  "skills": {
+    "d0-production-plan":       { "required": false, "min_evidence": ["external_system"] },
+    "jobsetup-auto":            { "required": false, "min_evidence": ["external_system"] },
+    "production-result-upload": { "required": false, "min_evidence": ["external_system"] },
+    "line-batch-management":    { "required": false, "min_evidence": ["external_system"] },
+    "assembly-cost-settlement": { "required": false, "min_evidence": ["external_system"] }
+  }
+}

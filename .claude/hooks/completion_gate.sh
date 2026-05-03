@@ -89,6 +89,66 @@ if [ -n "$MISSING" ]; then
   exit 0
 fi
 
+# ============================================================================
+# verify_receipt gate (Phase 0 — 2026-05-03 세션140)
+# 짝 문서: 90_공통기준/업무관리/verify_receipt_gate_plan_20260503.md (v3)
+# 3way 합의: GPT PASS / Gemini PASS (SHA b721cb78)
+# Phase 0 = no-op: verify_receipts_required.json 모든 SKILL required:false →
+#                  skill_required_pattern 빈값 반환 → receipt 검사 건너뜀
+# Phase 1+에서 d0-production-plan부터 required:true 승격하면 활성화됨
+# ============================================================================
+ACTIVE_DIR="$PROJECT_ROOT/.claude/state/active_skills"
+REQUIRED_MAP="$PROJECT_ROOT/.claude/state/verify_receipts_required.json"
+RECEIPT_DIR="$PROJECT_ROOT/.claude/state/verify_receipts"
+if [ -d "$ACTIVE_DIR" ] && [ -s "$REQUIRED_MAP" ]; then
+  # 디렉토리 최신 mtime 1건 (Gemini v2 권고: 단일파일 → 개별파일)
+  LATEST_ACTIVE=$(ls -t "$ACTIVE_DIR"/*.json 2>/dev/null | head -1)
+  if [ -n "$LATEST_ACTIVE" ] && [ -s "$LATEST_ACTIVE" ]; then
+    SKILL=$(safe_json_get "skill" < "$LATEST_ACTIVE" 2>/dev/null)
+    TASK_ID=$(safe_json_get "task_id" < "$LATEST_ACTIVE" 2>/dev/null)
+    STARTED_AT=$(safe_json_get "started_at" < "$LATEST_ACTIVE" 2>/dev/null)
+    EXPECTED=$(safe_json_get "expected_receipt" < "$LATEST_ACTIVE" 2>/dev/null)
+    REQ=$(skill_required_pattern "$SKILL" "$REQUIRED_MAP" 2>/dev/null)
+    # stale marker (24h 초과) → 검사 건너뛰고 hook_log 기록
+    NOW_EPOCH=$(date +%s 2>/dev/null || echo 0)
+    STARTED_EPOCH=$(iso_to_epoch "$STARTED_AT" 2>/dev/null)
+    AGE_SEC=$((NOW_EPOCH - STARTED_EPOCH))
+    if [ "$AGE_SEC" -gt 86400 ] 2>/dev/null; then
+      hook_log "active_skill_stale" "skill=$SKILL task=$TASK_ID age=${AGE_SEC}s" 2>/dev/null
+      REQ=""
+    fi
+    if [ -n "$REQ" ]; then
+      RECEIPT_FAIL=""
+      if [ ! -s "$PROJECT_ROOT/$EXPECTED" ]; then
+        OVR=$(find_override_receipt "$RECEIPT_DIR/_override" "$SKILL" "$TASK_ID" 2>/dev/null)
+        if [ -z "$OVR" ] || ! validate_override "$OVR" 2>/dev/null; then
+          RECEIPT_FAIL="missing_receipt_and_no_valid_override"
+        else
+          hook_log "override_used" "skill=$SKILL task=$TASK_ID file=$OVR" 2>/dev/null
+        fi
+      else
+        R_TASK=$(safe_json_get "task_id" < "$PROJECT_ROOT/$EXPECTED" 2>/dev/null)
+        R_RES=$(safe_json_get "result" < "$PROJECT_ROOT/$EXPECTED" 2>/dev/null)
+        R_TS=$(safe_json_get "checked_at" < "$PROJECT_ROOT/$EXPECTED" 2>/dev/null)
+        R_EPOCH=$(iso_to_epoch "$R_TS" 2>/dev/null)
+        [ "$R_TASK" != "$TASK_ID" ] && RECEIPT_FAIL="task_id_mismatch"
+        [ "$R_RES" != "PASS" ] && RECEIPT_FAIL="${RECEIPT_FAIL}|result_not_pass"
+        [ "$R_EPOCH" -lt "$STARTED_EPOCH" ] 2>/dev/null && RECEIPT_FAIL="${RECEIPT_FAIL}|stale"
+      fi
+      if [ -n "$RECEIPT_FAIL" ]; then
+        # Gemini v2 B 추가제안 채택: error_message에 receipt 규격 + override 사용법 명시
+        REASON_TEXT="[COMPLETION GATE] verify_receipt skill=$SKILL task=$TASK_ID fail=$RECEIPT_FAIL\\nrequired: $EXPECTED\\nschema: {task_id=$TASK_ID, skill=$SKILL, result=PASS, checked_at>=$STARTED_AT, external_system|target_files 중 하나 필수}\\noverride: .claude/state/verify_receipts/_override/${SKILL}_*_${TASK_ID}.json (approver+reason>=10자+evidence+expires_at<=24h)"
+        printf '{"ts":"%s","result":"block","reason":"verify_receipt_missing","skill":"%s","task":"%s","fail":"%s","source":"gate"}\n' \
+          "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)" "$SKILL" "$TASK_ID" "$RECEIPT_FAIL" \
+          >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
+        echo "{\"decision\":\"block\",\"reason\":\"${REASON_TEXT}\"}"
+        hook_timing_end "completion_gate" "$_CMG_START" "block_receipt"
+        exit 0
+      fi
+    fi
+  fi
+fi
+
 # 정상 통과 경로 기록
 _CC_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
 printf '{"ts":"%s","result":"pass","reason":"state_sync_ok","source":"gate"}\n' "$_CC_TS" \

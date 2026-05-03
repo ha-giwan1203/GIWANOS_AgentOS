@@ -478,3 +478,146 @@ hook_measure() {
   hook_timing_end "$hook_name" "$start" "measure_rc_$rc"
   return 0
 }
+
+# ============================================================================
+# verify_receipt gate helpers (Phase 0 — 2026-05-03 세션140)
+# 짝 문서: 90_공통기준/업무관리/verify_receipt_gate_plan_20260503.md
+# 3way 합의: GPT PASS / Gemini PASS (SHA b721cb78)
+# Phase 0 = no-op: verify_receipts_required.json 모든 SKILL required:false
+# ============================================================================
+
+# ISO8601 (UTC, Z 종료) → epoch seconds. 실패 시 0
+iso_to_epoch() {
+  local iso="$1"
+  if [ -z "$iso" ]; then echo 0; return 0; fi
+  "$PY_CMD" - "$iso" <<'PYEOF' 2>/dev/null || echo 0
+import sys
+from datetime import datetime, timezone
+s = sys.argv[1].strip()
+fmts = ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S','%Y-%m-%d %H:%M:%S')
+for f in fmts:
+    try:
+        dt = datetime.strptime(s, f)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        print(int(dt.timestamp()))
+        sys.exit(0)
+    except Exception:
+        continue
+print(0)
+PYEOF
+}
+
+# verify_receipts_required.json 에서 skill의 required 여부 출력
+# required:true → "required" 출력. 그 외(false/누락) → 빈 문자열
+skill_required_pattern() {
+  local skill="$1"
+  local map_path="$2"
+  [ -z "$skill" ] && return 0
+  [ ! -s "$map_path" ] && return 0
+  "$PY_CMD" - "$skill" "$map_path" <<'PYEOF' 2>/dev/null
+import json, sys
+skill, path = sys.argv[1], sys.argv[2]
+try:
+    d = json.load(open(path, encoding='utf-8'))
+except Exception:
+    sys.exit(0)
+sk = d.get('skills', {}).get(skill)
+if sk and sk.get('required') is True:
+    print('required')
+PYEOF
+}
+
+# _override 디렉토리에서 (skill, task_id) 매칭 receipt 경로 출력. 없으면 빈값
+find_override_receipt() {
+  local override_dir="$1"
+  local skill="$2"
+  local task_id="$3"
+  [ ! -d "$override_dir" ] && return 0
+  "$PY_CMD" - "$override_dir" "$skill" "$task_id" <<'PYEOF' 2>/dev/null
+import json, os, sys, glob
+ovr_dir, skill, task_id = sys.argv[1], sys.argv[2], sys.argv[3]
+for fp in sorted(glob.glob(os.path.join(ovr_dir, '*.json'))):
+    try:
+        d = json.load(open(fp, encoding='utf-8'))
+    except Exception:
+        continue
+    if d.get('skill') == skill and d.get('task_id') == task_id:
+        print(fp); sys.exit(0)
+PYEOF
+}
+
+# override receipt 유효성 검증
+# approver(비빈) + reason(>=10자) + evidence(evidence 또는 evidence_screenshot 둘 중 하나 비빈)
+# + expires_at 미래(현재 epoch 기준)
+# 통과 시 exit 0, 실패 시 exit 1
+validate_override() {
+  local fpath="$1"
+  [ ! -s "$fpath" ] && return 1
+  "$PY_CMD" - "$fpath" <<'PYEOF' 2>/dev/null
+import json, sys
+from datetime import datetime, timezone
+try:
+    d = json.load(open(sys.argv[1], encoding='utf-8'))
+except Exception:
+    sys.exit(1)
+if not d.get('approver'): sys.exit(1)
+if len(str(d.get('reason') or '')) < 10: sys.exit(1)
+if not (d.get('evidence') or d.get('evidence_screenshot')): sys.exit(1)
+exp = d.get('expires_at')
+if not exp: sys.exit(1)
+try:
+    dt = datetime.strptime(exp, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+except Exception:
+    try:
+        dt = datetime.strptime(exp, '%Y-%m-%dT%H:%M:%S').replace(tzinfo=timezone.utc)
+    except Exception:
+        sys.exit(1)
+if dt.timestamp() < datetime.now(timezone.utc).timestamp(): sys.exit(1)
+sys.exit(0)
+PYEOF
+  return $?
+}
+
+# 24h 초과 active_skills marker를 _stale/{YYYYMMDD}/로 이동 (삭제 X)
+# session_start_restore.sh에서 호출. STATUS.md 운영 요약에도 1줄 기록.
+# 호출 비용 작음 (디렉토리 스캔 1회 + 파일별 mtime/started_at 비교)
+cleanup_stale_active_skills() {
+  local dir="$PROJECT_ROOT/.claude/state/active_skills"
+  [ ! -d "$dir" ] && return 0
+  local now_epoch
+  now_epoch=$(date +%s 2>/dev/null || echo 0)
+  local stale_dir="$dir/_stale/$(date +%Y%m%d 2>/dev/null || echo unknown)"
+  local count=0
+  shopt -s nullglob 2>/dev/null
+  for f in "$dir"/*.json; do
+    [ ! -f "$f" ] && continue
+    local started age fmt_epoch
+    started=$(safe_json_get "started_at" < "$f" 2>/dev/null)
+    if [ -n "$started" ]; then
+      fmt_epoch=$(iso_to_epoch "$started")
+    else
+      fmt_epoch=$(file_mtime "$f")
+    fi
+    age=$((now_epoch - fmt_epoch))
+    if [ "$age" -gt 86400 ] 2>/dev/null; then
+      mkdir -p "$stale_dir" 2>/dev/null
+      if mv "$f" "$stale_dir/" 2>/dev/null; then
+        count=$((count + 1))
+      fi
+    fi
+  done
+  shopt -u nullglob 2>/dev/null
+  if [ "$count" -gt 0 ] 2>/dev/null; then
+    hook_log "active_skill_cleanup" "moved=$count to=$stale_dir"
+    # STATUS.md 운영 요약 1줄 기록 (Gemini v3 A제안 채택)
+    local status_md="$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md"
+    if [ -f "$status_md" ]; then
+      local today
+      today=$(date '+%Y-%m-%d' 2>/dev/null || echo unknown)
+      printf '\n[%s] active_skill_cleanup: %d건 _stale/%s/로 이동\n' \
+        "$today" "$count" "$(basename "$stale_dir")" >> "$status_md" 2>/dev/null || true
+    fi
+  fi
+  return 0
+}

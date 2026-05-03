@@ -33,6 +33,10 @@ STATE_DIR="$PROJECT_ROOT/.claude/state"
 rm -f "$STATE_DIR/gpt_skill_entry.ok" "$STATE_DIR/gemini_skill_entry.ok" 2>/dev/null
 hook_log "session_start_restore" "skill_entry markers cleared"
 
+# verify_receipt gate Phase 0 (2026-05-03 세션140): active_skills 24h 초과 marker 정리
+# 비정상 종료 후 다음 세션 Locked 방지. STATUS.md에 1줄 기록.
+cleanup_stale_active_skills 2>/dev/null || true
+
 # Self-X Layer 1 health_summary_first marker 제거됨 (Plan stage1-I5 2026-04-22).
 # health_summary_gate 폐기에 따라 해당 marker 의존 로직도 삭제.
 
