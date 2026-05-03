@@ -1,0 +1,254 @@
+{
+  "_comment": "도메인 용어 사전. SKILL.md 압축(305→평균 49줄) 동반 신설. 단일 플랫 파일 (Round 2 합의 R2-3, Gemini 강화안).",
+  "_consensus_ref": "90_공통기준/토론모드/logs/debate_20260503_101125_3way/round2_consensus.md",
+  "_split_trigger": "500줄 초과 OR grep 누락 빈번 시 4파일 분리 (LINE_CODES/PROCESS_CODES/PARTNO_RULES) 별건 plan",
+  "_rules": {
+    "include": [
+      "제조 용어",
+      "라인 약어",
+      "공정명",
+      "ERP·MES 필드명",
+      "품번 suffix 규칙",
+      "SUB·OUTER·ASSY 관계",
+      "자주 헷갈리는 한국어·영문 표현"
+    ],
+    "exclude": [
+      "업무 절차 (각 SKILL.md/MANUAL.md 참조)",
+      "Claude 행동 규칙 (.claude/rules/essentials.md 참조)",
+      "토론모드 규칙 (90_공통기준/토론모드/CLAUDE.md 참조)",
+      "완료 판정 원칙 (CLAUDE.md 참조)",
+      "세션 이력 (TASKS.md / HANDOFF.md 참조)"
+    ]
+  },
+  "terms": {
+    "_template": {
+      "ko": "한국어",
+      "en": "영문",
+      "domain": "line / process / partno / erp_field / smartmes / mes / settlement / chomul",
+      "definition": "1줄 정의",
+      "examples": ["예시1", "예시2"]
+    },
+
+    "D0": {
+      "ko": "D0 추가생산지시",
+      "en": "D0 (Day 0) Additional Production Instruction",
+      "domain": "process",
+      "definition": "당일 morning에 ERP에 등록하는 추가 생산지시",
+      "examples": ["SP3M3 morning D0 20건 등록", "/d0-plan --session morning"]
+    },
+    "잡셋업": {
+      "ko": "잡셋업",
+      "en": "Job Setup / 점검결과 저장",
+      "domain": "smartmes",
+      "definition": "SmartMES 점검결과 저장. 첫 서열 품번 17 검사항목 일괄 등록 (REST API v3.x: POST /v2/checksheet/check-result/jobsetup/save.api)",
+      "examples": ["RSP3SC0646_A 17/17 검사항목 commit-all", "/jobsetup-auto --commit"]
+    },
+
+    "SP3M3": {
+      "ko": "SP3M3",
+      "en": "SP3 Main Line M3",
+      "domain": "line",
+      "definition": "SP3 시리즈 메인 라인 (LINE_DIV_CD=02). 일상점검 19개 점검표 / 75 항목/일",
+      "examples": ["SP3M3 야간 D0 등록", "SP3M3-200-1 점검표"]
+    },
+    "SP3S03": {
+      "ko": "SP3S03",
+      "en": "SP3 Sub Line S03",
+      "domain": "line",
+      "definition": "SP3 운영 채팅방 (Flow.team roomSrno 2938379). 초물표 라인코드 변경 대상 (SP3S03 → SP3M3)",
+      "examples": ["SP3S03 운영 채팅방 분석"]
+    },
+    "SD9A01": {
+      "ko": "SD9A01",
+      "en": "SD9 OUTER Line A01",
+      "domain": "line",
+      "definition": "OUTER 라인 (LINE_DIV_CD=01). row0 = SD9A01 고정",
+      "examples": ["SD9A01 OUTER D+1 등록"]
+    },
+    "SD9M01": {
+      "ko": "SD9M01",
+      "en": "SD9 MAIN Block M01",
+      "domain": "line",
+      "definition": "OUTER 시트 7개 라인 중 D+1 블록 식별자 (B열 == 'SD9M01' 정확 매칭)",
+      "examples": ["OUTER 시트 SD9M01 D+1 블록"]
+    },
+    "WAMAS01": { "ko": "WAMAS01", "domain": "line", "definition": "WEBBING ASSY 라인" },
+    "WABAS01": { "ko": "WABAS01", "domain": "line", "definition": "WEBBING CUTTING 라인 (WEBBING ASSY보다 먼저 체크)" },
+    "ANAAS04": { "ko": "ANAAS04", "domain": "line", "definition": "ANCHOR ASSY / SNAP-ON 라인" },
+    "DRAAS11": { "ko": "DRAAS11", "domain": "line", "definition": "D-RING 라인 (모든 D-RING 패턴)" },
+    "LTAAS01": { "ko": "LTAAS01", "domain": "line", "definition": "LASER MARKING 라인" },
+    "HCAMS02": { "ko": "HCAMS02", "domain": "line", "definition": "HOLDER,CLR ASSY 라인 (LINE_RULES 최우선)" },
+    "HASMS02": { "ko": "HASMS02", "domain": "line", "definition": "HOLDER ALR SENSOR ASSY 라인" },
+    "ISAMS03": { "ko": "ISAMS03", "domain": "line", "definition": "조립비 정산 10개 라인 중 하나" },
+    "SWAMS04": { "ko": "SWAMS04", "domain": "line", "definition": "PART_TYPE_NM 공정품_SUB → 메인서브 라인" },
+    "SWAMSMA": { "ko": "SWAMSMA", "domain": "line", "definition": "PART_TYPE_NM 공정품_SUB → MAIN 라인" },
+
+    "OUTER": {
+      "ko": "OUTER",
+      "en": "Outer",
+      "domain": "process",
+      "definition": "외부 공정. ERP D0의 OUTER_LINE_CD. row0에 고정 입력",
+      "examples": ["OUTER_LINE_CD 입력", "OUTER 시트"]
+    },
+    "MAIN": {
+      "ko": "MAIN",
+      "en": "Main",
+      "domain": "process",
+      "definition": "메인 공정. LINE_DIV_NM1='MAIN' 행만 처리 (line-batch-outer-main)",
+      "examples": ["MAIN_RULES (PART_TYPE_NM 기준)"]
+    },
+    "SUB": {
+      "ko": "SUB",
+      "en": "Sub Assembly",
+      "domain": "process",
+      "definition": "서브 조립. PART_TYPE_NM='SUB' → SUB LINE 無",
+      "examples": ["SUB ASSY 그리드", "SUB 라인 야간 없음 (조립비 정산)"]
+    },
+    "ASSY": { "ko": "ASSY", "en": "Assembly", "domain": "process", "definition": "조립 (Assembly). 품명 키워드" },
+    "야간": { "ko": "야간", "en": "Night Shift", "domain": "process", "definition": "shiftsCd=02. SP3M3 행 3~100 (3,900EA 한도)" },
+    "주간": { "ko": "주간", "en": "Day Shift", "domain": "process", "definition": "shiftsCd=01. SP3M3 행 104~203 (3600 누적 컷)" },
+
+    "RSP": {
+      "ko": "RSP",
+      "en": "RSP (Module Part No.)",
+      "domain": "partno",
+      "definition": "모듈품번 prefix. 초물표 AB13:AJ14 영역에 입력",
+      "examples": ["RSP3SC0383_A", "RSP3SC0584", "RSP3PC0129_A"]
+    },
+    "MO": {
+      "ko": "MO",
+      "en": "MO (Module-only)",
+      "domain": "partno",
+      "definition": "구ERP 미존재 모듈품번 prefix. SUB 전용 (사용자 메모 project_mo_part_rules.md)",
+      "examples": ["MO89870R6000", "MO89880R6000"]
+    },
+    "_A_suffix": {
+      "ko": "_A 접미사",
+      "en": "_A suffix",
+      "domain": "partno",
+      "definition": "잡셋업 첫 서열 품번 suffix. 매일 변동 (어제 RSP3SC0383_A → 오늘 RSP3PC0129_A)",
+      "examples": ["1.RSP3SC0383_A", "1.RSP3PC0129_A"]
+    },
+    "컬러코드": {
+      "ko": "컬러코드",
+      "en": "Color Code",
+      "domain": "partno",
+      "definition": "품번 뒤 2~3자리. 자동차 부품 [모품번]+[컬러코드] 구조. 사용자 확인 없이 분리 금지",
+      "examples": ["89870AT000 → 모품번 89870AT + 컬러 000"]
+    },
+    "접두어": {
+      "ko": "접두어",
+      "en": "Prefix",
+      "domain": "partno",
+      "definition": "품번의 일부. 임의로 제거 금지 (line-mapping-validator 원칙)",
+      "examples": ["SP3M3- (점검표 prefix)"]
+    },
+
+    "REG_NO": {
+      "ko": "REG_NO",
+      "en": "Registration No.",
+      "domain": "erp_field",
+      "definition": "ERP D0 등록 번호. SmartMES sewmacLabelScanQty와 매핑 (필드명 misleading)",
+      "examples": ["REG_NO=320623", "DELETE deleteDoAddnPrdtPlanInstrMngNew.do {REG_NO}"]
+    },
+    "EXT_PLAN_REG_NO": {
+      "ko": "EXT_PLAN_REG_NO",
+      "domain": "erp_field",
+      "definition": "ERP D0 야간 A 행 식별자. 동일 품번 여러 건 시 최대값 매핑"
+    },
+    "PROD_NO": { "ko": "PROD_NO", "domain": "erp_field", "definition": "제품 번호. dedupe 매칭 키 (PROD_NO만, 수량 무관)" },
+    "REG_DT": { "ko": "REG_DT", "domain": "erp_field", "definition": "등록 일자. 야간 1~5행 dedupe 매칭 기준 (REG_DT=오늘)" },
+    "ASSY_LINE_NM": { "ko": "ASSY_LINE_NM", "domain": "erp_field", "definition": "라인배치 SUB 그리드 컬럼명. setLineCell 대상" },
+    "MBOM_PART_NM": { "ko": "MBOM_PART_NM", "domain": "erp_field", "definition": "M-BOM 품명. LINE_RULES 키워드 매칭 대상" },
+    "PART_TYPE_NM": { "ko": "PART_TYPE_NM", "domain": "erp_field", "definition": "부품 타입명. 공정품_SUB / SUB. MAIN_RULES 우선 매칭" },
+    "LINE_DIV_CD": { "ko": "LINE_DIV_CD", "domain": "erp_field", "definition": "라인 구분 코드. 01=OUTER, 02=MAIN" },
+    "LINE_DIV_NM1": { "ko": "LINE_DIV_NM1", "domain": "erp_field", "definition": "라인 구분명. MAIN_RULES는 'MAIN' 값만 처리" },
+    "OUTER_LINE_CD": { "ko": "OUTER_LINE_CD", "domain": "erp_field", "definition": "라인배치 row0 입력값. 공란 시 최빈값 fallback" },
+    "ADDN_PRDT_REASON_CD": { "ko": "ADDN_PRDT_REASON_CD", "domain": "erp_field", "definition": "추가 생산 사유 코드. D0는 002 고정" },
+    "ERROR_FLAG": { "ko": "ERROR_FLAG", "domain": "erp_field", "definition": "엑셀 업로드 오류 행 식별 (Y=오류). openpyxl 생성 시 'Y' 다수 → Excel COM 필수" },
+
+    "sendMesFlag": {
+      "ko": "sendMesFlag",
+      "domain": "erp_field",
+      "definition": "MES 전송 플래그. Y=전송, N=차단. Phase 4 임시저장은 N, Phase 5 최종은 Y",
+      "examples": ["하이브리드 모드: sendMesFlag='N' 강제", "Phase 5 final_save: sendMesFlag='Y'"]
+    },
+
+    "lineCd": { "ko": "lineCd", "domain": "smartmes", "definition": "SmartMES API body 라인 코드 ('SP3M3', 'SD9A01')" },
+    "prdtDa": { "ko": "prdtDa", "domain": "smartmes", "definition": "SmartMES API body 생산일자 (YYYYMMDD)" },
+    "shiftsCd": { "ko": "shiftsCd", "domain": "smartmes", "definition": "교대 코드. 01=주간, 02=야간 (selectPrdtRsltLine.do)" },
+    "prdtQty": { "ko": "prdtQty", "domain": "smartmes", "definition": "MES 생산 수량 (스캔 실적)" },
+    "rsltCnt": { "ko": "rsltCnt", "domain": "smartmes", "definition": "MES 응답 결과 건수. > 0 검증 통과" },
+    "sewmacLabelScanQty": {
+      "ko": "sewmacLabelScanQty",
+      "domain": "smartmes",
+      "definition": "SmartMES 필드. 실제로는 ERP REG_NO 값 매핑 (필드명 misleading. 세션110 실증)"
+    },
+
+    "ZDM": {
+      "ko": "ZDM",
+      "en": "ZDM (Zero Defect Management)",
+      "domain": "mes",
+      "definition": "일상점검 시스템 (ax.samsong.com:34010). SP3M3 19개 점검표 75 항목/일. 일요일 차단 필수",
+      "examples": ["ZDM 일상점검", "/api/daily-inspection/{masterId}/record"]
+    },
+    "MES": {
+      "ko": "MES",
+      "en": "Manufacturing Execution System",
+      "domain": "mes",
+      "definition": "생산실적 시스템 (mes-dev.samsong.com:19200). SaveExcelData.do UPSERT — 분할 전송 시 덮어씀",
+      "examples": ["MES 실적 업로드"]
+    },
+    "SmartMES": {
+      "ko": "SmartMES",
+      "en": "SmartMES",
+      "domain": "smartmes",
+      "definition": "잡셋업·점검결과 저장 시스템 (lmes-dev.samsong.com:19220). 클라이언트 = mesclient.exe",
+      "examples": ["SmartMES [J] 잡셋업"]
+    },
+    "G-ERP": {
+      "ko": "G-ERP",
+      "en": "G-ERP (삼송 신ERP)",
+      "domain": "mes",
+      "definition": "삼송 신 ERP 시스템 (erp-dev.samsong.com:19100). 정산 GERP 실적 마스터",
+      "examples": ["G-ERP 라인배치 관리", "G-ERP 3월실적.xlsx"]
+    },
+    "구ERP": { "ko": "구ERP", "domain": "mes", "definition": "삼송 구ERP. 정산 시 야간 계산 방식 통일 (SD9A01: 야간량×단가×1.3)" },
+    "OAuth": { "ko": "OAuth", "domain": "mes", "definition": "auth-dev.samsong.com:18100. SSO 로그인 → XSRF-TOKEN 헤더" },
+    "BI": { "ko": "BI", "domain": "mes", "definition": "비즈니스 인텔리전스. 라인별 생산실적 마스터 엑셀 (Z드라이브)" },
+
+    "0109": { "ko": "0109", "domain": "settlement", "definition": "대원테크 업체 코드. 정산 대상" },
+    "야간단가": { "ko": "야간단가", "domain": "settlement", "definition": "구ERP 통일 방식. SD9A01=주간단가×1.3, SP3M3=170원 고정, SUB=야간 없음" },
+    "지원분": { "ko": "지원분", "domain": "settlement", "definition": "구ERP 피벗 시 SD9A01 전체업체 피벗에 포함" },
+    "기준정보": { "ko": "기준정보", "domain": "settlement", "definition": "01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx. 단가 매칭 마스터" },
+
+    "초물표": { "ko": "초물표", "en": "Chomul Sheet (First Article Sheet)", "domain": "chomul", "definition": "신제품 첫 생산 검사 시트 (xls). AB5:AJ14 박스에 RSP 모듈품번 반영" },
+    "H12": { "ko": "H12", "domain": "chomul", "definition": "초물표 완성품 품번 셀. RSP 매칭 키 (정규화 = 대문자+공백제거+하이픈제거)" },
+    "AB5_박스": {
+      "ko": "AB5:AJ14 박스",
+      "domain": "chomul",
+      "definition": "초물표 공용품번 박스. 3분할 재병합: AB5:AJ9=SP3M3 / AB10:AJ12=공용품번(LH빨강·RH파랑) / AB13:AJ14=RSP"
+    },
+    "LH": { "ko": "LH", "en": "Left-Hand", "domain": "chomul", "definition": "왼쪽 부품. 빨강 색상 (AB10:AJ12)" },
+    "RH": { "ko": "RH", "en": "Right-Hand", "domain": "chomul", "definition": "오른쪽 부품. 진청 색상 (AB10:AJ12)" },
+
+    "Z드라이브": {
+      "ko": "Z드라이브",
+      "domain": "process",
+      "definition": "사내 공유 드라이브 마운트 (\\\\210.216.217.180\\zz-group). BI 원본 + 생산지시서 xlsm 보관",
+      "examples": ["Z:\\★ 라인별 생산실적\\대원테크_라인별 생산실적_BI.xlsx", "Z:\\15. SP3 메인 CAPA점검\\SP3M3\\생산지시서\\..."]
+    },
+    "수정본": { "ko": "수정본", "domain": "process", "definition": "생산지시서 xlsm 파일명 접미사. 우선순위 mtime 최신" },
+    "야간_1_5행_dedupe": {
+      "ko": "야간 1~5행 dedupe",
+      "domain": "process",
+      "definition": "SP3M3 야간 첫 5행 중 같은 REG_DT(=오늘) 주간 등록분과 PROD_NO 일치 시 제외 (수량 무관, v3.2)",
+      "examples": ["dedupe_night_first_5()"]
+    },
+
+    "스펙_A1": { "ko": "스펙 A1", "domain": "smartmes", "definition": "잡셋업 측정값형. <중심>±<오차>. 예: 0±0.05" },
+    "스펙_A2": { "ko": "스펙 A2", "domain": "smartmes", "definition": "잡셋업 측정값형 비대칭+단위. 예: 10.5+0.1mm,-0.3mm" },
+    "스펙_A3": { "ko": "스펙 A3", "domain": "smartmes", "definition": "잡셋업 측정값형 복합 비대칭. A2 패턴 2회+ → 두 패턴 교집합" },
+    "스펙_B1_B4": { "ko": "스펙 B1~B4", "domain": "smartmes", "definition": "잡셋업 OK/NG 체크형. X1/X2/X3 비우고 OK만 체크 (NG 자동 체크 금지)" }
+  }
+}
