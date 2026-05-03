@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-03 KST — 세션140 [3way 3차 종결] **Phase 0 양측 PASS 합의 + A제안 2건 즉시 흡수** (SHA 327d0a68). GPT PASS / Gemini PASS, 채택 6 / 보류 0 / 버림 0. (a) Gemini A 흡수: cleanup_stale_active_skills가 STATUS.md에 task_id 목록 포함 (`tasks=[id1,id2,...]`) (b) GPT A 흡수: Phase 0 관측 4지표 집계 명령 명시 (아래). **Phase 0 관측 4지표 집계 명령** (다음 세션~7일 후 실행):
+최종 업데이트: 2026-05-04 KST — 세션141 [E+A 복구] **5/4 SP3M3 morning 수동 복구 PASS**. 자동 실행(07:11) OAuth cookie 만료로 stuck → 좀비 chrome 13개 kill + 9223 foreground 강제 + 사용자 manual 로그인 → 수동 재실행 → D0 16건(REG_NO 320626~320641) + MES rsltCnt=800 + jobsetup 17/17 검사항목 OK (RSP3SC0584). **다음 세션 첫 행동**: 5/5 morning 자동 실행 모니터링. Cookie 만료 재발 시 verify_run.py 알림 보강(별건). 세션140 [3way 3차 종결] **Phase 0 양측 PASS 합의 + A제안 2건 즉시 흡수** (SHA 327d0a68). GPT PASS / Gemini PASS, 채택 6 / 보류 0 / 버림 0. (a) Gemini A 흡수: cleanup_stale_active_skills가 STATUS.md에 task_id 목록 포함 (`tasks=[id1,id2,...]`) (b) GPT A 흡수: Phase 0 관측 4지표 집계 명령 명시 (아래). **Phase 0 관측 4지표 집계 명령** (다음 세션~7일 후 실행):
 - (1) cleanup 이벤트: `grep '"event":"active_skill_cleanup"' .claude/hooks/hook_log.jsonl | wc -l`
 - (2) stale 잔류 0: `find .claude/state/active_skills -maxdepth 1 -name '*.json' -mmin +1440 | wc -l` (0이어야 PASS)
 - (3) timing 평균 변동 ≤10%: `grep '"hook":"completion_gate"' .claude/hooks/hook_timing.jsonl | jq -r '.duration_ms' | awk '{s+=$1;c++} END{print s/c}'` (도입 전 평균 대비 ≤10%)
