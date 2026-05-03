@@ -1,0 +1,137 @@
+{
+  "_comment": "Phase 4 도메인 키워드 → SKILL.md 자동 매칭 인덱스 (참조용 데이터, hook 추가 없음).",
+  "_consensus_ref": "90_공통기준/토론모드/logs/debate_20260503_101125_3way/round2_consensus.md",
+  "_session": 137,
+  "_strategy": "사용자 발화에서 키워드 감지 시 Claude가 자발적으로 90_공통기준/스킬/{name}/SKILL.md 진입. 명제형 hook 추가 없음 (출력의 건조함 원칙).",
+  "active_slash_commands": [
+    "finish",
+    "debate-mode",
+    "share-result",
+    "gpt-send",
+    "gpt-read",
+    "gemini-send",
+    "gemini-read"
+  ],
+  "domain_keyword_to_skill": {
+    "d0-production-plan": {
+      "keywords": ["D0", "morning", "추가생산지시", "SP3M3 morning", "D0 등록", "야간 생산"],
+      "skill_path": "90_공통기준/스킬/d0-production-plan/SKILL.md",
+      "domain": "생산 자동화"
+    },
+    "jobsetup-auto": {
+      "keywords": ["잡셋업", "SmartMES", "검사항목", "save.api", "점검결과 저장", "v3.x"],
+      "skill_path": "90_공통기준/스킬/jobsetup-auto/SKILL.md",
+      "domain": "MES 자동화"
+    },
+    "assembly-cost-settlement": {
+      "keywords": ["정산", "조립비", "월말 정산", "settlement"],
+      "skill_path": "90_공통기준/스킬/assembly-cost-settlement/SKILL.md",
+      "domain": "정산"
+    },
+    "line-batch-management": {
+      "keywords": ["라인배치", "라인 배정", "ERP 라인", "line batch"],
+      "skill_path": "90_공통기준/스킬/line-batch-management/SKILL.md",
+      "domain": "라인배치"
+    },
+    "line-batch-outer-main": {
+      "keywords": ["OUTER", "MAIN", "OUTER 배치", "MAIN 배치"],
+      "skill_path": "90_공통기준/스킬/line-batch-outer-main/SKILL.md",
+      "domain": "라인배치"
+    },
+    "line-batch-mainsub": {
+      "keywords": ["메인서브", "메인서브 배치", "SP3 품번 배치", "SUB ASSY 그리드"],
+      "skill_path": "90_공통기준/스킬/line-batch-mainsub/SKILL.md",
+      "domain": "라인배치"
+    },
+    "daily-routine": {
+      "keywords": ["daily", "매일 반복", "일상 루틴"],
+      "skill_path": "90_공통기준/스킬/daily-routine/SKILL.md",
+      "domain": "운영"
+    },
+    "night-scan-compare": {
+      "keywords": ["야간 스캔", "night scan", "스캔실적 비교"],
+      "skill_path": "90_공통기준/스킬/night-scan-compare/SKILL.md",
+      "domain": "생산실적"
+    },
+    "chomul-module-partno": {
+      "keywords": ["초물 모듈", "초물 품번", "chomul"],
+      "skill_path": "90_공통기준/스킬/chomul-module-partno/SKILL.md",
+      "domain": "품번관리"
+    },
+    "pptx-generator": {
+      "keywords": ["PPT", "pptx", "프레젠테이션", "슬라이드"],
+      "skill_path": "90_공통기준/스킬/pptx-generator/SKILL.md",
+      "domain": "보고서"
+    },
+    "flow-chat-analysis": {
+      "keywords": ["Flow 채팅", "flow 분석", "설비 이슈"],
+      "skill_path": "90_공통기준/스킬/flow-chat-analysis/SKILL.md",
+      "domain": "이슈관리"
+    },
+    "production-report": {
+      "keywords": ["생산실적", "생산 집계", "production report"],
+      "skill_path": "90_공통기준/스킬/production-report/SKILL.md",
+      "domain": "생산실적"
+    },
+    "sp3-production-plan": {
+      "keywords": ["SP3 생산계획", "SP3 plan"],
+      "skill_path": "90_공통기준/스킬/sp3-production-plan/SKILL.md",
+      "domain": "생산계획"
+    },
+    "video-frame-subtitle": {
+      "keywords": ["YouTube", "영상 프레임", "자막 분석"],
+      "skill_path": "90_공통기준/스킬/video-frame-subtitle/SKILL.md",
+      "domain": "참조"
+    },
+    "auto-fix": {
+      "keywords": ["auto-fix", "자동 수리", "incident 자동 분석"],
+      "skill_path": "90_공통기준/스킬/auto-fix/SKILL.md",
+      "domain": "운영"
+    },
+    "task-status-sync": {
+      "keywords": ["task status sync", "TASKS 동기화"],
+      "skill_path": "90_공통기준/스킬/task-status-sync/SKILL.md",
+      "domain": "운영"
+    },
+    "review-claude-md": {
+      "keywords": ["CLAUDE.md 검토", "review claude md"],
+      "skill_path": "90_공통기준/스킬/review-claude-md/SKILL.md",
+      "domain": "메타"
+    },
+    "doc-check": {
+      "keywords": ["doc check", "문서 검토"],
+      "skill_path": "90_공통기준/스킬/doc-check/SKILL.md",
+      "domain": "메타"
+    },
+    "memory-audit": {
+      "keywords": ["MEMORY 검토", "memory audit", "메모리 감사"],
+      "skill_path": "90_공통기준/스킬/memory-audit/SKILL.md",
+      "domain": "메타"
+    },
+    "map-scope": {
+      "keywords": ["map-scope", "사고 품질 선언", "고위험 수정 전"],
+      "skill_path": "90_공통기준/스킬/map-scope/SKILL.md",
+      "domain": "메타"
+    },
+    "skill-creator": {
+      "keywords": ["skill 만들어", "스킬 제작", "skill creator"],
+      "skill_path": "90_공통기준/스킬/skill-creator/SKILL.md",
+      "domain": "메타"
+    },
+    "self-audit": {
+      "keywords": ["자기진단", "self audit", "시스템 자기진단"],
+      "skill_path": "90_공통기준/스킬/self-audit/SKILL.md",
+      "domain": "메타"
+    },
+    "notebooklm": {
+      "keywords": ["NotebookLM", "노트북", "노트북lm"],
+      "skill_path": "90_공통기준/스킬/notebooklm/SKILL.md",
+      "domain": "참조"
+    },
+    "supanova-deploy": {
+      "keywords": ["수파노바", "supanova", "랜딩 배포"],
+      "skill_path": "90_공통기준/스킬/supanova-deploy/SKILL.md",
+      "domain": "외부"
+    }
+  }
+}
