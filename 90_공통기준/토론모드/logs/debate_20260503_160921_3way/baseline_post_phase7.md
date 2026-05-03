@@ -92,11 +92,23 @@ strange-meninsky, ...
 **Phase 8 7일 카운트 시작**: 2026-05-03 16:30 KST
 **Phase 8 7일 카운트 종료 예정**: 2026-05-10 16:30 KST
 
-### 측정 시작 시 잔존 (GPT 조건부 통과 권고 형식)
-- `.git/worktrees/` 메타 디렉터리 16개: Windows file lock으로 prune 지연 — 다음 세션 첫 행동에서 Claude/터미널 재시작 후 `git worktree prune` 재실행 권장
-- worktree 없는 `claude/*` 브랜치 24개: 별건 정리 예정 — Phase 8 측정 중 A/B 분류로 처리. 절차: (1) `git branch --list 'claude/*' --merged main` (2) merged만 삭제 후보 (3) 미병합은 `log -1 + diff main...branch` 확인 (4) `branch_inventory.md` 기록 (5) 삭제
+### 측정 시작 시 잔존 (GPT 조건부 통과 권고 형식) — **즉시 처리 완료 (사용자 명시 지시 "잔존처리. 진행")**
 
-이 잔존 2건은 Phase 8 측정값 흔들림 시 원인 추적용으로 명시.
+**별건 1**: `.git/worktrees/` 메타 디렉터리 16개 → ✅ **삭제 완료** (강제 rm 성공, lock 해제됨)
+**별건 2**: worktree 없는 `claude/*` 브랜치 24개 → ✅ **삭제 완료** (merged 9개 `branch -d` + unmerged 12개 `branch -D`, GPT 권고 절차 따름)
+
+처리 절차 실행 결과:
+1. `branch_inventory_20260503.md` 기록 (98_아카이브/_deprecated_v1/worktrees/, 로컬)
+2. merged 9개 안전 삭제: agitated-mendel / competent-jones / elegant-kilby / friendly-kirch / hopeful-feistel / kind-chatelet / sharp-lalande / sharp-mclaren / strange-meninsky
+3. unmerged 12개 강제 삭제 (모두 4/10~4/12 시점 PR 워크플로우 폐기 직전 잔존물, 내용은 모두 docs/wrap-up/HANDOFF 류, 실질 가치는 main에 흡수): amazing-feynman / busy-johnson / dazzling-nash / dreamy-beaver / elastic-fermi / funny-solomon / goofy-hermann / great-curie / happy-margulis / hardcore-raman / quirky-dewdney / relaxed-engelbart
+
+**최종 환경 상태**:
+- `git worktree list`: 4개 (main + active 3) ✅
+- `.git/worktrees/`: 3개 (active 3 메타만 잔존)
+- `.claude/worktrees/`: 3개 (active 3 본체만 잔존)
+- `claude/*` 브랜치: 3개 (active 3만 잔존)
+
+**Phase 8 측정 시작 시 잔존**: **0건** (목표 환경 완전 달성).
 
 Phase 8 측정 항목: 신규 incident 발생률 / Slash 사용 패턴 / Subagent 호출 빈도 / Skill 호출 빈도 / always-loaded 토큰 안정성.
 
