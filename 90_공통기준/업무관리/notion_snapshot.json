@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-03 09:35 KST",
-  "last_updated": "세션136 갱신 2026-05-03",
-  "github_sha": "b237194f268cc2a16e84db178c2e14df8548ab09",
-  "github_sha_short": "b237194f",
-  "hooks_raw": 51,
-  "hooks_active": 36,
-  "commands": 33,
+  "generated_at": "2026-05-03 12:58 KST",
+  "last_updated": "세션137 갱신 2026-05-03",
+  "github_sha": "701da9c00787ffb0a1f46079e1418d1b39f05375",
+  "github_sha_short": "701da9c0",
+  "hooks_raw": 20,
+  "hooks_active": 5,
+  "commands": 7,
   "smoke": "unknown",
   "recent_sessions": [
     "세션134 (2026-05-01) — [A+C] 잡셋업 v2.0 pywinauto UIA 마이그레이션 + /self-audit 기준 보강",
