@@ -1,0 +1,68 @@
+# Claude Code 환경 (v2 초안 / Phase 1 골격)
+
+> **`.draft` 확장자 = 활성 진입점 아님.** 활성 진입점은 루트 `CLAUDE.md`. 본 파일은 Phase 2 진입 시 활성화 후보.
+> 목표 100줄 이내 (citypaul v3 209줄 모델 + Boris 100줄 룰 절충).
+> 합의 원본: `90_공통기준/토론모드/logs/debate_20260503_101125_3way/`
+
+자동차 부품 제조업(삼송 G-ERP) 업무 자동화 저장소.
+
+## 핵심 원칙
+
+- **사용자 명시 발화 = 1순위**. 발화 부재 시 SKILL.md / memory / git history grep으로 도출.
+- **출력의 건조함**: 도구는 상태와 데이터만 말함. 자연어 가이드 금지.
+- **결정론적 도구·코드 치환**: 행동 교정 명제 → Permission / Hook / Python verify.
+- **Git이 기준 원본**. 미푸시 상태를 완료로 간주 금지.
+- **Push 발화 즉시 허용**: 사용자가 "푸시해라"·"push해라"·"머지하고 푸시" 발화 시 `git push origin main` 즉시 (durable authorization).
+
+## 도메인 진입
+
+| 키워드 | 도메인 |
+|--------|------|
+| 정산 / 조립비 | `05_생산실적/조립비정산/` |
+| 라인배치 / OUTER / 메인서브 | `10_라인배치/` |
+| D0 / SP3M3 morning | `90_공통기준/스킬/d0-production-plan/` |
+| 잡셋업 / SmartMES | `90_공통기준/스킬/jobsetup-auto/` |
+| 일상점검 / ZDM | `90_공통기준/스킬/zdm-daily-inspection/` |
+| 토론 / 3자 토론 | `90_공통기준/토론모드/` |
+| 한국어 제조 용어 | `90_공통기준/glossary/GLOSSARY.json` |
+
+도메인 키워드 감지 시 해당 폴더의 MANUAL.md 또는 SKILL.md 우선 로드.
+
+## 상태 원본
+
+- TASKS: `90_공통기준/업무관리/TASKS.md` (AI 작업 상태 유일 원본)
+- HANDOFF: `90_공통기준/업무관리/HANDOFF.md` (세션 인수인계)
+- STATUS: `90_공통기준/업무관리/STATUS.md` (운영 요약)
+- 우선순위: TASKS > STATUS > HANDOFF > Notion
+
+## ERP/MES 비가역 반영 5단계
+
+1. dry-run / list-only — 등록 전 대상·일자·라인·건수 확인
+2. commit — 실제 등록
+3. verify — list API 또는 SmartMES 검증
+4. dedupe — 중복 등록 방지
+5. rollback script — 실패 시 잔존 데이터 정리
+
+판단 근거 = `verify.py` 리턴값. Claude는 판단자 아닌 **실행 대행자**.
+
+## 응답 형식 (자체 판단)
+
+질문 허용 5조건 외 모든 결정 = **판단 → 근거 → 실행 → 검증** 형식.
+- "어떻게 할까요" / "진행할까요" / "A/B 중 선택" / "원하시면" / "사용자 결정 대기" 표현 금지.
+
+## 질문 허용 5조건 (그 외 묻기 금지)
+
+1. 필수 입력값 부재
+2. 기준 문서·실물 데이터 충돌
+3. ERP/MES 비가역 반영 직전 (대상/일자/라인/건수 확인)
+4. hook/settings/SKILL Step/CLAUDE.md 수정 (= 시스템 수정)
+5. 사용자가 명시적으로 선택 요구
+
+## 금지
+
+- 원본 xlsx/docx/pdf 직접 수정
+- 승인 없는 파일명/시트명/컬럼명 변경
+- 검증 없이 값 덮어쓰기
+- Git 미확인 추측 답변
+- 미푸시 상태를 완료로 간주
+- **자연어 행동 교정 메시지 출력** (출력의 건조함)

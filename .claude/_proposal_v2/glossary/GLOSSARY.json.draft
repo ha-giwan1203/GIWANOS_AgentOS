@@ -1,0 +1,46 @@
+{
+  "_comment": "Phase 5에서 Skill 평균 305→80줄 압축 시 채워짐. 단일 플랫 파일로 시작 (Gemini 강화 입장 채택).",
+  "_consensus_ref": "round2_consensus.md R2-3",
+  "_split_trigger": "GLOSSARY.json 500줄 초과 OR grep 누락 빈번 시 4파일 분리 (LINE_CODES/PROCESS_CODES/PARTNO_RULES) 별건 plan",
+  "_rules": {
+    "include": [
+      "제조 용어",
+      "라인 약어",
+      "공정명",
+      "ERP·MES 필드명",
+      "품번 suffix 규칙",
+      "SUB·OUTER·ASSY 관계",
+      "자주 헷갈리는 한국어·영문 표현"
+    ],
+    "exclude": [
+      "업무 절차",
+      "Claude 행동 규칙",
+      "토론모드 규칙",
+      "완료 판정 원칙",
+      "세션 이력"
+    ]
+  },
+  "terms": {
+    "_template": {
+      "ko": "한국어 표기",
+      "en": "영문 표기",
+      "domain": "도메인 분류 (line / process / partno / erp_field / smartmes)",
+      "definition": "1줄 정의",
+      "examples": ["예시1", "예시2"]
+    },
+    "D0": {
+      "ko": "D0 추가생산지시",
+      "en": "D0 (Day 0)",
+      "domain": "process",
+      "definition": "당일 morning에 ERP에 등록하는 추가 생산지시",
+      "examples": ["SP3M3 morning D0 20건"]
+    },
+    "잡셋업": {
+      "ko": "잡셋업",
+      "en": "Job Setup / 점검결과 저장",
+      "domain": "smartmes",
+      "definition": "SmartMES 점검결과 저장 (REST API v3.x: POST /v2/checksheet/check-result/jobsetup/save.api)",
+      "examples": ["RSP3SC0646_A 17/17 검사항목 commit-all"]
+    }
+  }
+}

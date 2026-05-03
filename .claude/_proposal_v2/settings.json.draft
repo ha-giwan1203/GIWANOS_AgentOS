@@ -1,0 +1,95 @@
+{
+  "_comment": "v2 초안. .draft 확장자로 비활성. Phase 6에서 활성 settings.json으로 promote 대상.",
+  "_consensus_ref": "round2_consensus.md (Round 2 종결)",
+  "model": "opus",
+  "alwaysThinkingEnabled": true,
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(npm:*)",
+      "Bash(uv:*)",
+      "Bash(pip:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(touch:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Read",
+      "Write",
+      "Edit",
+      "Grep",
+      "Glob"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/block_dangerous.sh",
+            "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/commit_gate.sh",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/protect_files.sh",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/session_start_restore.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/completion_gate.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "_lifecycle_count": 4,
+  "_hook_total_count": 5,
+  "_permissions_count": 19,
+  "_diff_from_baseline": {
+    "lifecycle": "7 → 4 (-3)",
+    "hooks": "36 → 5 (-31)",
+    "permissions": "130 → 19 (-111)"
+  },
+  "_constraints_for_5_hooks": {
+    "block_dangerous": "위험 명령 차단 (rm -rf, sudo, chmod 777). deterministic 차단만.",
+    "protect_files": "보호 파일(원본 xlsx, 기준 문서) 수정 차단. deterministic.",
+    "commit_gate": "final_check --fast 통과 후만 commit/push 허용. 자연어 가이드 금지.",
+    "session_start_restore": "git status / 최근 commit 5건 / TASKS·HANDOFF 상단 / incident N건 데이터만 출력. 자연어 조언 금지.",
+    "completion_gate": "통과/실패 + 누락 staged file만 보고. '반성하라'·'다음엔 이렇게 하라' 메시지 금지."
+  }
+}

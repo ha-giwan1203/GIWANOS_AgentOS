@@ -1,0 +1,89 @@
+{
+  "_comment": "Phase 2~8 삭제 목표 수치. PR 첫 커밋에 박음. 이후 추가 시 PR 거부 (안티패턴 차단).",
+  "_baseline_ref": "baseline.json",
+  "_consensus_ref": "90_공통기준/토론모드/logs/debate_20260503_101125_3way/round2_consensus.md",
+  "_locked_at": "2026-05-03T12:30:00+09:00",
+  "_locked_by_session": 137,
+  "phase_2_rules_md": {
+    "current_count": 5,
+    "current_lines": 300,
+    "target_count": 1,
+    "target_lines": 100,
+    "delta_count": -4,
+    "delta_lines": -200
+  },
+  "phase_3_hooks": {
+    "current_count_settings_registered": 36,
+    "current_count_total_files": 55,
+    "target_count": 5,
+    "delta": -31,
+    "category_d_immediate_archive": [
+      "instruction_read_gate.sh",
+      "skill_instruction_gate.sh",
+      "r1r5_plan_check.sh",
+      "risk_profile_prompt.sh",
+      "permissions_sanity.sh",
+      "skill_drift_check.sh"
+    ],
+    "preserved_5": [
+      "block_dangerous.sh",
+      "protect_files.sh",
+      "commit_gate.sh",
+      "session_start_restore.sh",
+      "completion_gate.sh"
+    ],
+    "preserved_constraints": [
+      "session_start_restore: deterministic 데이터·상태만 출력. 자연어 조언 금지.",
+      "completion_gate: 통과/실패 + 누락 실물(staged file)만 보고. 행동 교정 메시지 금지."
+    ]
+  },
+  "phase_4_slash_commands": {
+    "current_count": 33,
+    "target_count": 5,
+    "delta": -28,
+    "replacement": "skill-rules.json 자동 매칭 엔진 도입 (ChrisWiles 패턴 + 한국어 도메인 키워드 trigger)"
+  },
+  "phase_5_skills": {
+    "current_count": 21,
+    "current_avg_lines": 305,
+    "current_total_lines": 6414,
+    "target_count": 21,
+    "target_avg_lines": 80,
+    "target_total_lines": 1680,
+    "delta_lines": -4734,
+    "decomposition": [
+      "용어 → GLOSSARY.json 분리",
+      "절차 상세 → MANUAL.md 분리",
+      "검증 명령 → Python verify 치환"
+    ]
+  },
+  "phase_6_subagents_permissions": {
+    "subagent_current": 9,
+    "subagent_target": 5,
+    "permissions_current": 130,
+    "permissions_target": 15,
+    "permissions_pattern": "포괄 패턴 (Bash(cmd:*)) 중심"
+  },
+  "phase_7_worktree": {
+    "current_count": 20,
+    "target_active_count": 3,
+    "delta": -17,
+    "procedure": ["baseline 기록", "archive/backup", "prune", "verify"],
+    "user_decision_required": "active worktree 3개 선정 (사용자 결정)"
+  },
+  "phase_8_measurement": {
+    "duration_days": 7,
+    "metrics": [
+      "always_loaded_tokens (현재 9394 → 목표 < 1000)",
+      "사용자 판단 생략 횟수",
+      "지침 문서 삭제량",
+      "분노 사이클 (같은 지적 반복 빈도)",
+      "incident 누적 증가율"
+    ],
+    "rollback_trigger": "30일 후 4지표 50% 이상 개선 없으면 stable-before-reset 복원"
+  },
+  "_anti_pattern_guard": {
+    "rule": "본 파일에 박힌 수치는 변경 금지. 추가 항목 발생 시 PR 거부.",
+    "rationale": "합의안 v2 Round 2 — 점진 적용의 안티패턴(과거 편의성으로 지침 다시 복붙) 차단"
+  }
+}
