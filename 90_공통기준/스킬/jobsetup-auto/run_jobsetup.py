@@ -153,7 +153,10 @@ def gen_normal_in_range(lo, hi, decimals):
     while True:
         v = random.gauss(center, sigma)
         if lo <= v <= hi:
-            return round(v, decimals)
+            r = round(v, decimals)
+            if r == 0:
+                r = 0.0
+            return r
 
 
 # ---- API ----
