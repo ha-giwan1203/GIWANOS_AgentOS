@@ -85,10 +85,26 @@ strange-meninsky, ...
 | active worktree 3개 확정 | ✅ |
 | prune 후 git worktree list 재검증 | ✅ (4개 정합) |
 | baseline_post_phase7.md 작성 | ✅ (이 파일) |
-| TASKS/HANDOFF에 Phase 8 시작 선언 | (pending — commit 단계) |
-| commit + push | (pending) |
+| TASKS/HANDOFF에 Phase 8 시작 선언 | ✅ (commit 40282591) |
+| commit + push | ✅ (40282591) |
 
-**Phase 8 7일 카운트 예정 시작**: 2026-05-03 (커밋 시점부터)
-**Phase 8 7일 카운트 종료 예정**: 2026-05-10
+**Phase 8 공식 시작 SHA**: 40282591
+**Phase 8 7일 카운트 시작**: 2026-05-03 16:30 KST
+**Phase 8 7일 카운트 종료 예정**: 2026-05-10 16:30 KST
+
+### 측정 시작 시 잔존 (GPT 조건부 통과 권고 형식)
+- `.git/worktrees/` 메타 디렉터리 16개: Windows file lock으로 prune 지연 — 다음 세션 첫 행동에서 Claude/터미널 재시작 후 `git worktree prune` 재실행 권장
+- worktree 없는 `claude/*` 브랜치 24개: 별건 정리 예정 — Phase 8 측정 중 A/B 분류로 처리. 절차: (1) `git branch --list 'claude/*' --merged main` (2) merged만 삭제 후보 (3) 미병합은 `log -1 + diff main...branch` 확인 (4) `branch_inventory.md` 기록 (5) 삭제
+
+이 잔존 2건은 Phase 8 측정값 흔들림 시 원인 추적용으로 명시.
 
 Phase 8 측정 항목: 신규 incident 발생률 / Slash 사용 패턴 / Subagent 호출 빈도 / Skill 호출 빈도 / always-loaded 토큰 안정성.
+
+---
+
+## 양측 최종 검증 판정 (2026-05-03 16:30 KST)
+
+- **GPT**: 조건부 통과 — Phase 7 본체 성공, 잔존 2건 baseline 명시 보강 후 Phase 8 즉시 시작 가능
+- **Gemini**: 통과 — Round 1 합의 정합, 데이터 유실 없는 슬림화, Phase 8 즉시 개시 권고
+
+**보강 반영**: 본 baseline 파일에 "측정 시작 시 잔존" 섹션 추가 (위) → GPT 조건 충족.
