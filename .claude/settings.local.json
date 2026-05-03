@@ -1,39 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(start *:*)",
-      "Bash(powershell -Command Get-Date:*)",
-      "Bash(tasklist:*)",
-      "Bash(schtasks:*)",
-      "Bash(gemini:*)",
-      "Bash(echo \"*\" | gemini *:*)",
-      "Bash(wmic process *)",
-      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/스킬/daily-routine/run.py)",
-      "Bash(touch .claude/state/*.ok)",
-      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/bridge/*:*)",
-      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/openai/*:*)",
-      "Bash(PYTHONIOENCODING=utf-8 python3 90_공통기준/토론모드/gemini/*:*)",
-      "PowerShell([Console]::OutputEncoding = [System.Text.Encoding]::UTF8; python 90_공통기준\\업무관리\\notion_sync.py --manual-sync; Write-Output \"ExitCode=$LASTEXITCODE\")",
-      "Bash(python3 -c ' *)",
-      "Bash(python3 .claude/hooks/incident_repair.py:*)",
-      "Bash(python3 -)",
-      "Bash(python -c ' *)",
-      "Bash(python 90_공통기준/업무관리/notion_sync.py --manual-sync)",
-      "mcp__304e7d67-aa0d-47cd-b5c2-f6bcb62cc5d8__notion-fetch",
-      "Bash(python3 90_공통기준/스킬/daily-routine/run.py)",
-      "mcp__Claude_in_Chrome__read_page",
-      "mcp__Claude_in_Chrome__find",
-      "Read(//c/Users/User/.claude/scheduled-tasks/**)"
+      "PowerShell(*)",
+      "Bash(cmd*:*)",
+      "Bash(taskkill:*)",
+      "Bash(schtasks:*)"
     ],
-    "ask": [
-      "Bash(python*:*)",
-      "Bash(pip *:*)",
-      "Bash(cp:*)",
-      "Bash(mv:*)",
-      "Bash(chmod:*)",
-      "Bash(cmd /c:*)",
-      "Bash(powershell:*)",
-      "Bash(taskkill:*)"
-    ]
+    "ask": []
   }
 }
