@@ -1255,7 +1255,9 @@ def main():
                 run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
-            prod_date = target_file_date
+            prod_date = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else target_file_date
+            if args.prod_date:
+                print(f"[morning] --prod-date 오버라이드: prod_date = {prod_date.strftime('%Y-%m-%d')} (file={target_file_date.strftime('%Y-%m-%d')})")
             sp3m3_registered = False
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
