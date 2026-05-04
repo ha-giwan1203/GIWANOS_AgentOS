@@ -33,15 +33,19 @@ LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 # ============================================================================
 DG_DELEGATION_RE='(진행할까요|박을까요|진입할까요|선택해[[:space:]]*주세요|어떻게[[:space:]]*할까요|원하시면|확인[[:space:]]*부탁|결정해[[:space:]]*주세요|어디에[[:space:]]*박을까)'
 DG_WHITELIST_RE='(error|not[[:space:]]+found|conflict|입력값[[:space:]]*부재|기준[[:space:]]*충돌|ERP[[:space:]]*비가역|hook[[:space:]]*수정|SKILL[[:space:]]*Step|명시[[:space:]]*선택|5조건|Y/N)'
-if [ -n "$LAST_TEXT" ] && ! echo "$LAST_TEXT" | grep -qiE "$DG_WHITELIST_RE"; then
-  if echo "$LAST_TEXT" | grep -qiE "$DG_DELEGATION_RE"; then
-    DG_MATCHED=$(echo "$LAST_TEXT" | grep -oiE "$DG_DELEGATION_RE" | head -1)
-    DG_MATCHED_ESC=$(json_escape "$DG_MATCHED")
-    DG_LOGDIR="$PROJECT_ROOT/.claude/logs"
-    [ -d "$DG_LOGDIR" ] || mkdir -p "$DG_LOGDIR" 2>/dev/null
-    printf '{"ts":"%s","type":"delegation_phrase","matched":"%s","mode":"measure_phase0","ref":"debate_20260504_102742_3way"}\n' \
-      "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)" "$DG_MATCHED_ESC" \
-      >> "$DG_LOGDIR/delegation_guard.jsonl" 2>/dev/null
+# GPT 추가제안 A 흡수 (세션142 종결): raw 감지는 항상 기록 + whitelisted 필드 분리.
+# 분석 시 `whitelisted:false` = 진짜 위임, `whitelisted:true` = false positive 후보 (튜닝용).
+if [ -n "$LAST_TEXT" ] && echo "$LAST_TEXT" | grep -qiE "$DG_DELEGATION_RE"; then
+  DG_MATCHED=$(echo "$LAST_TEXT" | grep -oiE "$DG_DELEGATION_RE" | head -1)
+  DG_WL="false"
+  if echo "$LAST_TEXT" | grep -qiE "$DG_WHITELIST_RE"; then DG_WL="true"; fi
+  DG_MATCHED_ESC=$(json_escape "$DG_MATCHED")
+  DG_LOGDIR="$PROJECT_ROOT/.claude/logs"
+  [ -d "$DG_LOGDIR" ] || mkdir -p "$DG_LOGDIR" 2>/dev/null
+  printf '{"ts":"%s","type":"delegation_phrase","matched":"%s","whitelisted":%s,"mode":"measure_phase0","ref":"debate_20260504_102742_3way"}\n' \
+    "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)" "$DG_MATCHED_ESC" "$DG_WL" \
+    >> "$DG_LOGDIR/delegation_guard.jsonl" 2>/dev/null
+  if [ "$DG_WL" = "false" ]; then
     hook_log "Stop" "delegation_guard Phase 0 measured: $DG_MATCHED" 2>/dev/null
   fi
 fi
