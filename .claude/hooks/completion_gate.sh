@@ -23,6 +23,30 @@ STATUS="$PATH_STATUS"
 
 # 마지막 assistant 메시지가 "강한 완료 주장"일 때만 gate 적용
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
+
+# ============================================================================
+# delegation guard Phase 0 (measurement only — 2026-05-04 세션142)
+# 토론 합의: 90_공통기준/토론모드/logs/debate_20260504_102742_3way/ (4-key pass_ratio=1.0)
+# 목적: Claude가 모호한 작업에서 결정을 사용자에게 떠넘기는 패턴 측정
+# 차단 없음(measurement only). Phase 1 block 전환은 7일 측정 후 사용자 명시 승인.
+# 화이트리스트(정당한 5조건·error/conflict 등) 매칭 시 측정 제외(false positive 방지).
+# ============================================================================
+DG_DELEGATION_RE='(진행할까요|박을까요|진입할까요|선택해[[:space:]]*주세요|어떻게[[:space:]]*할까요|원하시면|확인[[:space:]]*부탁|결정해[[:space:]]*주세요|어디에[[:space:]]*박을까)'
+DG_WHITELIST_RE='(error|not[[:space:]]+found|conflict|입력값[[:space:]]*부재|기준[[:space:]]*충돌|ERP[[:space:]]*비가역|hook[[:space:]]*수정|SKILL[[:space:]]*Step|명시[[:space:]]*선택|5조건|Y/N)'
+if [ -n "$LAST_TEXT" ] && ! echo "$LAST_TEXT" | grep -qiE "$DG_WHITELIST_RE"; then
+  if echo "$LAST_TEXT" | grep -qiE "$DG_DELEGATION_RE"; then
+    DG_MATCHED=$(echo "$LAST_TEXT" | grep -oiE "$DG_DELEGATION_RE" | head -1)
+    DG_MATCHED_ESC=$(json_escape "$DG_MATCHED")
+    DG_LOGDIR="$PROJECT_ROOT/.claude/logs"
+    [ -d "$DG_LOGDIR" ] || mkdir -p "$DG_LOGDIR" 2>/dev/null
+    printf '{"ts":"%s","type":"delegation_phrase","matched":"%s","mode":"measure_phase0","ref":"debate_20260504_102742_3way"}\n' \
+      "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)" "$DG_MATCHED_ESC" \
+      >> "$DG_LOGDIR/delegation_guard.jsonl" 2>/dev/null
+    hook_log "Stop" "delegation_guard Phase 0 measured: $DG_MATCHED" 2>/dev/null
+  fi
+fi
+# === end delegation guard Phase 0 ===
+
 if ! is_completion_claim "$LAST_TEXT"; then
   # 약한 패턴(잔여이슈없음/ALL CLEAR/GPT PASS)만 매칭 시 로그만 남기고 통과
   WEAK_MATCH=$(echo "$LAST_TEXT" | grep -oiE "$_COMPLETION_WEAK_PATTERN" | head -1)
