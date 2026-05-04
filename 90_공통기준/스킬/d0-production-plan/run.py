@@ -1133,6 +1133,7 @@ def main():
     ap.add_argument("--line", choices=["SP3M3","SD9A01","ALL"], default="ALL")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--target-date", help="YYYY-MM-DD 파일명 날짜 (기본 자동)")
+    ap.add_argument("--prod-date", help="YYYY-MM-DD ERP 등록 생산일자 명시 오버라이드 (공휴일 매핑 등 — evening: target-1 자동 무시 / morning: target 자동 무시)")
     ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
     ap.add_argument("--parse-only", action="store_true", help="검증 모드: 엑셀 업로드창 첨부 + 서버 파싱(selectList)까지만. multiList(DB 저장)/Phase 4-5 모두 스킵")
@@ -1237,15 +1238,20 @@ def main():
         if session == "evening":
             # SP3M3 야간: ERP 생산일 = 파일명 날짜 - 1 (야간 시작일 = 오늘)
             # SD9A01 OUTER: ERP 생산일 = 파일명 날짜 (내일)
+            prod_date_override = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else None
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_night(wb)
                 # Phase 1.5: 야간 1~5행 dedupe (주간 등록분과 PROD_NO+수량 일치 시 제외)
                 items = dedupe_night_first_5(page, items)
-                prod_date = target_file_date - timedelta(days=1)
+                prod_date = prod_date_override if prod_date_override else target_file_date - timedelta(days=1)
+                if prod_date_override:
+                    print(f"[evening] --prod-date 오버라이드: SP3M3 prod_date = {prod_date.strftime('%Y-%m-%d')} (file={target_file_date.strftime('%Y-%m-%d')})")
                 run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
             if args.line in ("SD9A01","ALL"):
                 items = extract_outer_d1(wb, "SD9M01")
-                prod_date = target_file_date
+                prod_date = prod_date_override if prod_date_override else target_file_date
+                if prod_date_override:
+                    print(f"[evening] --prod-date 오버라이드: SD9A01 prod_date = {prod_date.strftime('%Y-%m-%d')}")
                 run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
