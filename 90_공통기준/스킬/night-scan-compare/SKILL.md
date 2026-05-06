@@ -1,7 +1,8 @@
 ---
 name: night-scan-compare
 description: MES 야간스캔실적 조회 → BI 대비 비교 엑셀 자동 생성 (4시트 데이터+수식+양식)
-version: v1.1
+version: v1.2
+note: "세션143 — run.py 정식 등록. d0-production-plan의 9223 기동 + OAuth 자동 로그인 재사용. MES API GET 검증. 수식 보존 강제 (값 박기 금지). --target 인수로 Z드라이브 직접 출력 지원. 호출: python run.py --line SP3M3 --month 4 [--year 2026] [--target <UNC경로>]"
 trigger: "야간스캔", "스캔실적", "야간실적 비교", "night-scan"
 grade: B
 ---
