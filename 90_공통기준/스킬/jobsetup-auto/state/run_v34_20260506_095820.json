@@ -1,0 +1,156 @@
+{
+  "ts_start": "2026-05-06T09:58:20.973189",
+  "mode": "dry-run",
+  "qry": {
+    "prdtDa": "20260506",
+    "lineCd": "SP3M3",
+    "pno": "RSP3SC0642",
+    "pnoRev": "A",
+    "prdtRank": 1,
+    "regNo": 1,
+    "revNo": "0",
+    "procNo": ""
+  },
+  "items": [],
+  "save_count": 0,
+  "fail_count": 0,
+  "auth": {
+    "assign_count": 6,
+    "auth_plans": [
+      {
+        "procNo": "10",
+        "wrkNm": "최인선",
+        "wrkId": "A20241203006",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000124",
+          "procNo": "10",
+          "wrkId": "A20241203006",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "11",
+        "wrkNm": "이민주",
+        "wrkId": "A20230515001",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000125",
+          "procNo": "11",
+          "wrkId": "A20230515001",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "91",
+        "wrkNm": "박지영",
+        "wrkId": "A20230401001",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000102",
+          "procNo": "91",
+          "wrkId": "A20230401001",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "140",
+        "wrkNm": "김경순",
+        "wrkId": "A20230401005",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000026",
+          "procNo": "140",
+          "wrkId": "A20230401005",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "340",
+        "wrkNm": "정미량",
+        "wrkId": "A20230401004",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000095",
+          "procNo": "340",
+          "wrkId": "A20230401004",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "430",
+        "wrkNm": "김아름",
+        "wrkId": "A20230401003",
+        "wrkCertiYn_before": "Y",
+        "already_y": true,
+        "payload": {
+          "prdtDa": "20260506",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3SC0642",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000073",
+          "procNo": "430",
+          "wrkId": "A20230401003",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      }
+    ],
+    "auth_save_count": 0,
+    "auth_fail_count": 0
+  }
+}
