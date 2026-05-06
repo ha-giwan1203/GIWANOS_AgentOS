@@ -1289,7 +1289,8 @@ def _run_jobsetup_chain(mode: str, prod_date):
         print(f"[jobsetup-chain] script not found: {script} — skip", flush=True)
         return
     prdt_da = prod_date.strftime("%Y%m%d")
-    cmd = [sys.executable, str(script), "--mode", mode, "--auto-resolve-pno", "--prdt-da", prdt_da, "--line-cd", "SP3M3"]
+    cmd = [sys.executable, str(script), "--mode", mode, "--auto-resolve-pno", "--prdt-da", prdt_da, "--line-cd", "SP3M3",
+           "--with-assign", "--with-auth", "--shift", "D"]
     print(f"[jobsetup-chain] {' '.join(cmd)}", flush=True)
     try:
         r = subprocess.run(cmd, timeout=180, capture_output=True, text=True, encoding="utf-8", errors="replace")
