@@ -6,6 +6,13 @@ from collections import defaultdict
 import os
 import sys
 
+# Windows cp949 콘솔에서 utf-8 print 가능하게 (em-dash, 한국어 등)
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _pipeline_config import BASE_DIR, GERP_FILE, OLDERP_FILE, OLDERP_SHEET, MONTH, LINE_INFO, SP3M3_MODULE_FILE
 
@@ -33,12 +40,102 @@ num_fmt = '#,##0;-#,##0;"-"'
 print("1. 기준정보 로딩...")
 # 기준정보 path는 _pipeline_config.MASTER_FILE 단일 권위 사용 (V1/V2 drift 방지)
 from _pipeline_config import MASTER_FILE
-ref_wb = openpyxl.load_workbook(MASTER_FILE, data_only=True)
 print(f"   기준정보: {os.path.basename(MASTER_FILE)}")
 
 print(f"2. GERP 실적 로딩... ({os.path.basename(GERP_FILE)})")
 gerp_wb = openpyxl.load_workbook(GERP_FILE, data_only=True)
 gerp_ws = gerp_wb[gerp_wb.sheetnames[0]]
+
+# ===== 마스터 V2 자동 갱신 (사용자 룰 2026-05-07): 기준정보 누락 + Usage 차이 GERP 기준 등록 =====
+print("1-1. 마스터 V2 자동 갱신 (기준정보 누락 + Usage 차이 GERP 기준 등록)...")
+LINE_ORDER_MASTER = ['SD9A01', 'ANAAS04', 'DRAAS11', 'SP3M3', 'HASMS02', 'HCAMS02',
+                     'WAMAS01', 'WABAS01', 'WASAS01', 'ISAMS03']
+import shutil, datetime as _dt
+_master_backup = MASTER_FILE.replace('.xlsx', f'_pre_autosync_{_dt.datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx')
+shutil.copy2(MASTER_FILE, _master_backup)
+print(f"   마스터 백업: {os.path.basename(_master_backup)}")
+
+# 마스터 V2 (라인, 품번, 단가) → 행 위치 + Usage
+master_wb_w = openpyxl.load_workbook(MASTER_FILE)
+master_idx = {}  # (라인, 품번, 단가) → (sheet, row, current_usage)
+master_pn_lines = defaultdict(set)  # 품번 → 등록된 라인 set
+for sn in master_wb_w.sheetnames:
+    if sn not in LINE_ORDER_MASTER: continue
+    ws_m = master_wb_w[sn]
+    for r in range(4, ws_m.max_row + 1):
+        pn = ws_m.cell(r, 1).value
+        if not pn: continue
+        ln = ws_m.cell(r, 3).value or sn
+        u = ws_m.cell(r, 5).value
+        p = ws_m.cell(r, 7).value
+        try: p_key = round(float(p), 4) if p is not None else None
+        except: p_key = None
+        master_idx[(str(ln), str(pn).strip(), p_key)] = (sn, r, u)
+        master_pn_lines[str(pn).strip()].add(str(ln))
+
+# GERP raw 0109 + 정산 대상 (SVM/OVK/88820X skip)에서 (라인, 품번, 단가) 수집
+gerp_keys = {}  # (라인, 품번, 단가) → (Usage, 조립품번, 단가구분, 차종)
+for r in range(3, gerp_ws.max_row + 1):
+    co = gerp_ws.cell(r, 21).value
+    if str(co).strip() != '0109': continue
+    line = gerp_ws.cell(r, 3).value
+    pn = gerp_ws.cell(r, 7).value
+    cha = gerp_ws.cell(r, 6).value
+    if not line or not pn: continue
+    line = str(line).strip(); pn = str(pn).strip()
+    # SVM/OVK/88820X skip 정합
+    if line in SVM_EXCLUDE_LINES and str(cha) == 'SVM': continue
+    if line in OVK_EXCLUDE_LINES and str(cha) == 'OVK' and not pn.startswith('89880X'): continue
+    if pn.startswith('88820X'): continue
+    # RSP/MO 매핑 미적용 (사용자 룰: GERP 그대로) — RSP/MO 자체로 마스터 등록
+    if line not in LINE_ORDER_MASTER: continue
+    usage = gerp_ws.cell(r, 11).value
+    assy = gerp_ws.cell(r, 12).value
+    price = gerp_ws.cell(r, 16).value
+    nyu = gerp_ws.cell(r, 14).value
+    if nyu == '추가': continue  # 추가행은 마스터 등록 X (가산만)
+    try: p_key = round(float(price), 4) if price is not None else None
+    except: p_key = None
+    gerp_keys[(line, pn, p_key)] = (usage, assy, '정단가', cha)
+
+# 갱신 적용
+new_added = 0; usage_updated = 0
+for k, v in gerp_keys.items():
+    line, pn, p_key = k
+    usage, assy, dgu, cha = v
+    if k not in master_idx:
+        # 신규 등록 — 라인 시트 마지막 행에 추가
+        ws_m = master_wb_w[line]
+        new_r = ws_m.max_row + 1
+        ws_m.cell(new_r, 1, pn)
+        ws_m.cell(new_r, 2, '0109')
+        ws_m.cell(new_r, 3, line)
+        ws_m.cell(new_r, 4, assy or pn)
+        ws_m.cell(new_r, 5, usage if usage is not None else 1)
+        ws_m.cell(new_r, 6, dgu)
+        ws_m.cell(new_r, 7, p_key)
+        ws_m.cell(new_r, 8, cha)
+        new_added += 1
+    else:
+        # Usage 차이 — GERP Usage로 갱신
+        sn, r, cur_u = master_idx[k]
+        try:
+            cur_uf = float(cur_u) if cur_u is not None else None
+            gerp_uf = float(usage) if usage is not None else None
+            if cur_uf is not None and gerp_uf is not None and abs(cur_uf - gerp_uf) > 0.001:
+                master_wb_w[sn].cell(r, 5).value = int(gerp_uf) if gerp_uf == int(gerp_uf) else gerp_uf
+                usage_updated += 1
+        except: pass
+
+if new_added or usage_updated:
+    master_wb_w.save(MASTER_FILE)
+    print(f"   마스터 V2 자동 갱신: 신규 등록 {new_added}건 + Usage 갱신 {usage_updated}건")
+else:
+    print(f"   마스터 V2 자동 갱신: 변경 없음")
+master_wb_w.close()
+
+# 갱신된 마스터 V2 다시 로드
+ref_wb = openpyxl.load_workbook(MASTER_FILE, data_only=True)
 
 # === RSP/MO 모듈품번 → 13자리 기준품번 매핑 (SP3M3 야간) ===
 # === 차종별 이관 처리 ===
@@ -357,6 +454,7 @@ for line in LINES:
         (13, 14, '구ERP 실적', olderp_fill),
         (15, 16, '구ERP 금액', olderp_fill),
         (17, 18, '차이', summary_fill),
+        (19, 19, '오류분류', summary_fill),
     ]
     for start, end, title, fill in sections:
         cell = ws.cell(1, start, title)
@@ -374,7 +472,7 @@ for line in LINES:
                    '단가구분', '단가', '차종',
                    '주간', '야간', '주간', '야간',
                    '주간', '야간', '주간', '야간',
-                   '금액차이', '수량차이']
+                   '금액차이', '수량차이', '카테고리']
     for c, h in enumerate(col_headers, 1):
         cell = ws.cell(2, c, h)
         cell.font = header_font
@@ -479,10 +577,9 @@ for line in LINES:
         # SD9A01/SP3M3: has_night=True / SUB 라인: has_night=False (LOT B 무시 총수량)
         line_has_night = LINE_INFO[line]['has_night'] if line in LINE_INFO else False
         if line == 'SP3M3':
-            # 사용자 룰 2026-05-07: 구ERP D열(전체수량) 그대로 사용
-            # CLAUDE.md L31: 총 정산금액 = 전체수량×단가 + 야간×단가×0.3
-            # 빌더 GERP K = 정상×단가 (전체) / 야간 P=L (가산만, 사용자 룰)
-            # → 구ERP 주간 amt O = G*M = 전체×단가 = GERP K와 정합
+            # 사용자 지시 정합 2026-05-07: 야간 처리는 P=L (구ERP 야간 amt = GERP 야간 amt) 끝
+            # 빌더 내부 -야간 차감 같은 도메인 룰은 사용자 지시 아님 → 폐기
+            # M = 구ERP D열 (입고 전체수량) 그대로
             base_m = (f'IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
         elif line_has_night:
             base_m = (f'IFERROR(SUMIFS(구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)')
@@ -535,6 +632,23 @@ for line in LINES:
         ws.cell(out_r, 18).value = f'=(I{out_r}+J{out_r})-(M{out_r}+N{out_r})'
         ws.cell(out_r, 18).number_format = num_fmt
         ws.cell(out_r, 18).border = thin_border
+
+        # S: 카테고리 (오류 분류 — 사용자 ERP 정정용, 빌더 자동 재확인 룰 적용)
+        # 빌더 자동 재확인 (사용자 룰 2026-05-07):
+        # - GERP만 (구ERP 누락) → 같은 품번 여러 행 있으면 "다중단가분배" (정상, 다른 단가 행에서 구ERP 잡힘)
+        # - 수량차이 → 같은 품번 여러 행 있으면 "수량차이(다중단가합산검증)" (사용자 ERP에서 다중단가 정합 확인)
+        # 우선순위: 정상 → 다중단가분배 → GERP만 → 구ERP만 → 단가누락 → 수량차이 → 단가차이/기타
+        ws.cell(out_r, 19).value = (
+            f'=IF(ROUND(Q{out_r},0)=0,"정상",'
+            f'IF(AND(I{out_r}+J{out_r}>0,M{out_r}+N{out_r}=0,COUNTIF(A:A,A{out_r})>1),"다중단가분배(정상)",'
+            f'IF(AND(I{out_r}+J{out_r}>0,M{out_r}+N{out_r}=0),"GERP만(구ERP등록필요)",'
+            f'IF(AND(I{out_r}+J{out_r}=0,M{out_r}+N{out_r}>0),"구ERP만(GERP등록필요)",'
+            f'IF(OR(G{out_r}=0,G{out_r}=""),"기준단가누락",'
+            f'IF(AND(R{out_r}<>0,COUNTIF(A:A,A{out_r})>1),"수량차이(다중단가합산검증)",'
+            f'IF(R{out_r}<>0,"수량차이(중복확인필요)",'
+            f'"단가차이/기타")))))))'
+        )
+        ws.cell(out_r, 19).border = thin_border
 
     # ===== 기준 미등록 GERP 품번 영역 =====
     # 기준정보에 없는 GERP 품번을 자동으로 추가 (GERP 원본금액 기준)
@@ -610,8 +724,7 @@ for line in LINES:
                 # M, N: 구ERP 수량 — 첫 단가 행에만 (다중단가 패턴과 동일)
                 if is_first:
                     if line == 'SP3M3':
-                        # 사용자 룰 2026-05-07: 구ERP 입고 D열(전체) 그대로
-                        # CLAUDE.md L31: 총 = 전체×단가 + 야간×단가×0.3
+                        # 사용자 지시 정합: 야간 P=L 끝. M = 구ERP D열 그대로 (-야간 차감 폐기)
                         ws.cell(out_r, 13).value = (
                             f'=IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
                         ws.cell(out_r, 14).value = f'=J{out_r}'
@@ -650,6 +763,19 @@ for line in LINES:
                 ws.cell(out_r, 17).value = f'=(K{out_r}+L{out_r})-(O{out_r}+P{out_r})'
                 ws.cell(out_r, 18).value = f'=(I{out_r}+J{out_r})-(M{out_r}+N{out_r})'
 
+                # S: 카테고리 (미등록 영역 — GERP raw에 있지만 마스터 미등록)
+                # 미등록 영역도 다중단가 자동 재확인 적용
+                ws.cell(out_r, 19).value = (
+                    f'=IF(ROUND(Q{out_r},0)=0,"정상",'
+                    f'IF(AND(I{out_r}+J{out_r}>0,M{out_r}+N{out_r}=0,COUNTIF(A:A,A{out_r})>1),"다중단가분배(정상)",'
+                    f'IF(AND(I{out_r}+J{out_r}>0,M{out_r}+N{out_r}=0),"GERP만(마스터+구ERP등록필요)",'
+                    f'IF(AND(I{out_r}+J{out_r}=0,M{out_r}+N{out_r}>0),"구ERP만(GERP등록필요)",'
+                    f'IF(AND(R{out_r}<>0,COUNTIF(A:A,A{out_r})>1),"수량차이(다중단가합산검증)",'
+                    f'IF(R{out_r}<>0,"수량차이(중복확인필요)",'
+                    f'"단가차이/기타"))))))'
+                )
+                ws.cell(out_r, 19).border = thin_border
+
                 for c in range(9, 19):
                     ws.cell(out_r, c).number_format = num_fmt
                     ws.cell(out_r, c).border = thin_border
@@ -662,6 +788,7 @@ for line in LINES:
     ws.cell(sum_r, 1, '합계').font = Font(bold=True)
     ws.cell(sum_r, 1).fill = summary_fill
     ws.cell(sum_r, 1).border = thin_border
+    # col 9~18: SUM, col 19: 카테고리 빈값
     for c in range(9, 19):
         cl = get_column_letter(c)
         ws.cell(sum_r, c).value = f'=SUM({cl}3:{cl}{last_r})'
@@ -669,6 +796,8 @@ for line in LINES:
         ws.cell(sum_r, c).font = Font(bold=True)
         ws.cell(sum_r, c).fill = summary_fill
         ws.cell(sum_r, c).border = thin_border
+    ws.cell(sum_r, 19).fill = summary_fill
+    ws.cell(sum_r, 19).border = thin_border
 
     line_summaries[line] = sum_r
     # ※ SP3M3 야간 RSP 모듈품번은 미등록 영역에서 자동 잡힘 (별도 처리 불필요)
@@ -678,6 +807,7 @@ for line in LINES:
     ws.column_dimensions['D'].width = 16
     for c in range(9, 19):
         ws.column_dimensions[get_column_letter(c)].width = 14
+    ws.column_dimensions['S'].width = 18  # 카테고리 컬럼
 
     print(f"   {line}: data rows={last_r - 2}, sum_row={sum_r}")
 
@@ -752,6 +882,57 @@ ws_sum.column_dimensions['A'].width = 12
 ws_sum.column_dimensions['B'].width = 10
 for c in range(3, 14):
     ws_sum.column_dimensions[get_column_letter(c)].width = 16
+
+# ===== 오류리스트 sheet (사용자 ERP 정정용 카테고리 집계) =====
+print("8. 오류리스트 시트 생성 (카테고리별 차이 행 집계)...")
+ws_err = wb.create_sheet('오류리스트')
+err_headers = ['라인', '품번', '조립품번', '단가',
+               'GERP주간수량', 'GERP야간수량', '구ERP주간수량', '구ERP야간수량',
+               'GERP금액', '구ERP금액', '금액차이', '카테고리']
+for c, h in enumerate(err_headers, 1):
+    cell = ws_err.cell(1, c, h)
+    cell.font = header_font
+    cell.fill = summary_fill
+    cell.border = thin_border
+
+err_r = 1
+for line in LINES:
+    sr = line_summaries[line]
+    ws_line = wb[line]
+    # 데이터 행 + 미등록 영역 행 모두 검사 (R3 ~ sum_r-1)
+    for r in range(3, sr):
+        pno = ws_line.cell(r, 1).value
+        if not pno: continue
+        # 합계 행 또는 구분 헤더 행 skip
+        if str(pno).startswith('※') or str(pno) == '합계': continue
+        # 카테고리가 "정상"이 아닌 행만 수집 — 수식이라 calc 후 채워짐
+        # 빌더 단계에선 모든 (라인,품번) 행을 오류리스트에 cross-link
+        err_r += 1
+        ws_err.cell(err_r, 1, line).border = thin_border
+        ws_err.cell(err_r, 2).value = f"='{line}'!A{r}"
+        ws_err.cell(err_r, 3).value = f"='{line}'!D{r}"
+        ws_err.cell(err_r, 4).value = f"='{line}'!G{r}"
+        ws_err.cell(err_r, 5).value = f"='{line}'!I{r}"
+        ws_err.cell(err_r, 6).value = f"='{line}'!J{r}"
+        ws_err.cell(err_r, 7).value = f"='{line}'!M{r}"
+        ws_err.cell(err_r, 8).value = f"='{line}'!N{r}"
+        ws_err.cell(err_r, 9).value = f"='{line}'!K{r}+'{line}'!L{r}"
+        ws_err.cell(err_r, 10).value = f"='{line}'!O{r}+'{line}'!P{r}"
+        ws_err.cell(err_r, 11).value = f"='{line}'!Q{r}"
+        ws_err.cell(err_r, 12).value = f"='{line}'!S{r}"
+        for c in range(4, 12):
+            ws_err.cell(err_r, c).number_format = num_fmt
+        for c in range(1, 13):
+            ws_err.cell(err_r, c).border = thin_border
+
+ws_err.column_dimensions['A'].width = 10
+ws_err.column_dimensions['B'].width = 16
+ws_err.column_dimensions['C'].width = 16
+for c in range(4, 13):
+    ws_err.column_dimensions[get_column_letter(c)].width = 14
+ws_err.freeze_panes = 'A2'  # 헤더 고정
+
+print(f"   오류리스트 시트: {err_r-1}행 (전체 라인 cross-link, 사용자가 카테고리 컬럼 필터로 분류 확인)")
 
 # Save
 output = os.path.join(BASE, FOLDER_NAME, f'정산_수식버전_{MONTH}월.xlsx')
