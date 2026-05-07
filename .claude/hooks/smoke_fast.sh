@@ -38,8 +38,8 @@ fi
 $PY_CMD -c "import json,sys; json.load(open(sys.argv[1], encoding='utf-8'))" "$SETTINGS_LOCAL" 2>/dev/null
 check $? "settings.local.json 유효 JSON"
 
-# 3. 핵심 게이트 훅 존재 + 실행 가능
-for hook in commit_gate.sh mcp_send_gate.sh completion_gate.sh evidence_gate.sh; do
+# 3. 핵심 게이트 훅 존재 + 실행 가능 (세션137 hook 5개 운영: mcp_send_gate/evidence_gate 폐기)
+for hook in commit_gate.sh completion_gate.sh; do
   test -x "$HOOKS_DIR/$hook"
   check $? "$hook 존재+실행가능"
 done

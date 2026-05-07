@@ -53,7 +53,10 @@ check_gate "commit_gate.sh" 'TASKS\.md|HANDOFF\.md|STATUS\.md' "TASKS/HANDOFF/ST
 check_gate "evidence_gate.sh" 'git diff|--cached|staged' "Git diff/staged"
 
 # completion_gate.sh: evidence/근거 수집 언급 금지 (근거 수집은 evidence_gate 담당)
-check_gate "completion_gate.sh" '\.req|근거 수집|fresh_req|fresh_ok' "evidence/근거 수집"
+# ※ 패턴 [.]req\.[a-z]+  = .req.json/.req.yaml 등 literal .req 파일만 매칭
+#   (세션145 정정: 기존 \.req 패턴이 awk ERE에서 dot이 any-char로 해석되어
+#    _required.json·verify_receipt 같은 변수명에 false positive)
+check_gate "completion_gate.sh" '[.]req[.][a-z]+|근거 수집|fresh_req|fresh_ok' "evidence/근거 수집"
 
 printf "%b" "$REPORT"
 if [ "$FAIL" -gt 0 ]; then
