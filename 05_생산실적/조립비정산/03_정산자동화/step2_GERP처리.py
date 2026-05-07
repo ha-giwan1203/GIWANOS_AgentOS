@@ -67,10 +67,13 @@ ovk_mask = (
     & (gerp_dw['vtype'] == 'OVK')
     & ~gerp_dw['product_no'].str.startswith('89880X')
 )
+# 88820X 시작 품번은 차종 무관 정산 제외 (사용자 룰 2026-05-07 — 구ERP 미등록 시리즈)
+x88820_mask = gerp_dw['product_no'].str.startswith('88820X')
 svm_n = svm_mask.sum(); svm_amt = gerp_dw.loc[svm_mask, 'amount'].sum()
 ovk_n = ovk_mask.sum(); ovk_amt = gerp_dw.loc[ovk_mask, 'amount'].sum()
-gerp_dw = gerp_dw[~(svm_mask | ovk_mask)].copy()
-print(f"  이관 제외: SVM {svm_n}행({svm_amt:,.0f}원) + OVK {ovk_n}행({ovk_amt:,.0f}원) = {before_n - len(gerp_dw)}행 / {svm_amt + ovk_amt:,.0f}원 (정산대상 {len(gerp_dw):,}행)")
+x88820_n = x88820_mask.sum(); x88820_amt = gerp_dw.loc[x88820_mask, 'amount'].sum()
+gerp_dw = gerp_dw[~(svm_mask | ovk_mask | x88820_mask)].copy()
+print(f"  이관 제외: SVM {svm_n}행({svm_amt:,.0f}원) + OVK {ovk_n}행({ovk_amt:,.0f}원) + 88820X {x88820_n}행({x88820_amt:,.0f}원) = {before_n - len(gerp_dw)}행 / {svm_amt + ovk_amt + x88820_amt:,.0f}원 (정산대상 {len(gerp_dw):,}행)")
 
 # 라인별 요약 출력
 for lc in LINE_ORDER:

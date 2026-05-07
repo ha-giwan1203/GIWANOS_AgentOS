@@ -142,7 +142,9 @@ ws_gerp = wb.create_sheet('GERP_입력')
 
 gerp_row_count = 0
 rsp_count = 0; mo_count = 0; svm_skipped = 0; ovk_skipped = 0
+x88820_skipped = 0; dedup_skipped = 0
 out_r = 0  # GERP_입력 시트 출력 행 (skip 시 원본과 다를 수 있음)
+seen_keys = set()  # GERP raw 완전 중복 행 dedupe (사용자 룰 2026-05-07)
 for r in range(1, gerp_ws.max_row + 1):
     line_v = gerp_ws.cell(r, 3).value if r > 1 else None
     pn_v = gerp_ws.cell(r, 7).value if r > 1 else None
@@ -160,17 +162,34 @@ for r in range(1, gerp_ws.max_row + 1):
             ovk_skipped += 1
             continue
 
+    # 88820X 시작 품번 정산 제외 (사용자 룰 2026-05-07 — 차종 무관, 구ERP 미등록 시리즈)
+    if r > 1 and pn_v and str(pn_v).startswith('88820X'):
+        x88820_skipped += 1
+        continue
+
+    # GERP raw 완전 중복 dedupe (라인+품번+주야+단가+생산량+조립금액+Usage)
+    # ※ 조립품번(col12)은 동일 amt에 다른 형식이 박힐 수 있어 키에서 제외 (사용자 룰 2026-05-07)
+    if r > 1:
+        shift_v = gerp_ws.cell(r, 14).value
+        price_v = gerp_ws.cell(r, 16).value
+        qty_v = gerp_ws.cell(r, 9).value
+        amt_v = gerp_ws.cell(r, 17).value
+        usage_v = gerp_ws.cell(r, 11).value
+        dedup_key = (str(line_v), str(pn_v), str(shift_v), price_v, qty_v, amt_v, usage_v)
+        if dedup_key in seen_keys:
+            dedup_skipped += 1
+            continue
+        seen_keys.add(dedup_key)
+
     pn_replace = None
     if r > 1 and line_v and pn_v and line_v in LINE_INFO:
         ps = str(pn_v).strip()
         ln = str(line_v).strip()
-        # 1) SP3M3 RSP 매핑 (RSP는 마스터에 직접 등록 안 됨, 13자리 변환 필요)
-        if ps in RSP_DIRECT:
-            pn_replace = RSP_DIRECT[ps]
-            rsp_count += 1
-        # 2) MO 변환 제거 (2026-05-07 사용자 룰)
-        # MO 품번은 마스터(기준정보)에 라인별 자체 등록되어 있으므로 변환 X
-        # SUMIFS는 라인 시트 A열의 MO를 그대로 매칭
+        # RSP 변환 폐기 (사용자 룰 2026-05-07): GERP 모듈품번 야간 amt = 구ERP 야간 amt 동일 반영
+        # RSP를 일반 품번(13자리)로 변환하면 야간이 일반 품번 행에 합쳐져 SP3M3 구ERP 주간 -야간 차감 룰이 잘못 작동
+        # RSP 그대로 두고 빌더 라인 시트 미등록 영역에서 별개 행으로 처리 (gp=None+SP3M3 분기 P=L 적용)
+        # RSP_DIRECT는 모듈품번_매핑 시트 정보용으로만 사용
+        # MO 변환 제거 (2026-05-07 사용자 룰): MO 품번은 마스터에 라인별 자체 등록되어 SUMIFS 직접 매칭
 
     out_r += 1
     for c in range(1, gerp_ws.max_column + 1):
@@ -186,7 +205,7 @@ for r in range(1, gerp_ws.max_row + 1):
             cell.number_format = num_fmt
     if r > 1:
         gerp_row_count += 1
-print(f"   GERP_입력 시트: SVM skip {svm_skipped}건 / OVK skip {ovk_skipped}건 / RSP→13자리 {rsp_count}건 / MO→13자리 {mo_count}건")
+print(f"   GERP_입력 시트: SVM skip {svm_skipped}건 / OVK skip {ovk_skipped}건 / 88820X skip {x88820_skipped}건 / dedupe skip {dedup_skipped}건 / RSP→13자리 {rsp_count}건 / MO→13자리 {mo_count}건")
 
 print(f"   GERP 데이터: {gerp_row_count}행")
 
@@ -229,7 +248,10 @@ for r in range(2, gerp_ws.max_row + 1):
     elif ln_v in OVK_EXCLUDE_LINES and cha_v == 'OVK' and not pn_str.startswith('89880X'):
         # 89880X 시작은 OVK여도 이관 아님 (사용자 룰)
         TRANSFER_PN_EXCLUDE.add(pn_str)
-print(f"   이관 품번 (SVM+OVK): {len(TRANSFER_PN_EXCLUDE)}종")
+    elif pn_str.startswith('88820X'):
+        # 88820X 시작 품번은 차종 무관 정산 제외 (사용자 룰 2026-05-07)
+        TRANSFER_PN_EXCLUDE.add(pn_str)
+print(f"   이관 품번 (SVM+OVK+88820X): {len(TRANSFER_PN_EXCLUDE)}종")
 
 olderp_raw_count = 0; olderp_transfer_skipped = 0
 for r in range(3, olderp_ws.max_row + 1):
@@ -457,8 +479,11 @@ for line in LINES:
         # SD9A01/SP3M3: has_night=True / SUB 라인: has_night=False (LOT B 무시 총수량)
         line_has_night = LINE_INFO[line]['has_night'] if line in LINE_INFO else False
         if line == 'SP3M3':
-            # MAX(0, ...) 가드: 구ERP 미등장 + GERP 야간만 있는 케이스 음수 방지
-            base_m = (f'MAX(0,IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)-J{out_r})')
+            # 사용자 룰 2026-05-07: 구ERP D열(전체수량) 그대로 사용
+            # CLAUDE.md L31: 총 정산금액 = 전체수량×단가 + 야간×단가×0.3
+            # 빌더 GERP K = 정상×단가 (전체) / 야간 P=L (가산만, 사용자 룰)
+            # → 구ERP 주간 amt O = G*M = 전체×단가 = GERP K와 정합
+            base_m = (f'IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
         elif line_has_night:
             base_m = (f'IFERROR(SUMIFS(구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)')
         else:
@@ -480,15 +505,21 @@ for line in LINES:
         ws.cell(out_r, 14).border = thin_border
 
         # O: 구ERP 주간금액 = 기준단가 × 주간수량
+        # ※ 다중단가 O=K 시도 폐기 (2026-05-07) — SD9A01 등 다른 라인에 부수효과 +13M
         ws.cell(out_r, 15).value = f'=G{out_r}*M{out_r}'
         ws.cell(out_r, 15).number_format = num_fmt
         ws.cell(out_r, 15).border = thin_border
 
         # P: 구ERP 야간금액
         # SD9A01: 야간 130% 가산 (기존 운영 룰 — ERP 실측 검증 전까지 유지)
-        # SP3M3: 기준단가 × 야간수량 (단순) / SUB 라인: 0
+        # SP3M3: GERP 야간금액 그대로 (사용자 룰 2026-05-07 — GERP=구ERP 동일 셋팅)
+        # SUB 라인: G × N (단순)
         if line == 'SD9A01':
-            ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}*1.3'
+            # 사용자 룰 2026-05-07: 단가 ≤500 품번만 야간 가산 (×1.3), >500은 G*N (가산 X)
+            # GERP raw 야간 추가행은 단가 ≤500 품번만 별도 등록 (단가×0.3 amt). 단가>500은 야간행 자체 없음.
+            ws.cell(out_r, 16).value = f'=IF(G{out_r}<=500,G{out_r}*N{out_r}*1.3,G{out_r}*N{out_r})'
+        elif line == 'SP3M3':
+            ws.cell(out_r, 16).value = f'=L{out_r}'
         else:
             ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}'
         ws.cell(out_r, 16).number_format = num_fmt
@@ -535,6 +566,11 @@ for line in LINES:
                 out_r += 1
                 is_first = (idx == 0)
                 ws.cell(out_r, 1, pn).border = thin_border
+                # SD9A01 미등록 영역: Usage 1 고정 (사용자 룰 2026-05-07)
+                if line == 'SD9A01':
+                    cell_u = ws.cell(out_r, 5, 1)
+                    cell_u.number_format = num_fmt
+                    cell_u.border = thin_border
                 if gp is not None:
                     ws.cell(out_r, 7, gp).number_format = num_fmt  # G: GERP 단가
                     ws.cell(out_r, 7).border = thin_border
@@ -573,9 +609,10 @@ for line in LINES:
                 # M, N: 구ERP 수량 — 첫 단가 행에만 (다중단가 패턴과 동일)
                 if is_first:
                     if line == 'SP3M3':
-                        # MAX(0, ...) 가드 — 음수 방지
+                        # 사용자 룰 2026-05-07: 구ERP 입고 D열(전체) 그대로
+                        # CLAUDE.md L31: 총 = 전체×단가 + 야간×단가×0.3
                         ws.cell(out_r, 13).value = (
-                            f'=MAX(0,IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)-J{out_r})')
+                            f'=IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
                         ws.cell(out_r, 14).value = f'=J{out_r}'
                     elif line_has_night:
                         ws.cell(out_r, 13).value = (
@@ -591,11 +628,13 @@ for line in LINES:
                     ws.cell(out_r, 14).value = 0
 
                 # O, P: 구ERP 금액 — G × 수량 (첫 단가 행에만, SD9 야간 1.3배)
-                # SP3M3 RSP(gp=None) 행: 구ERP 야간 = GERP 야간 동일 (CLAUDE.md L41)
+                # SP3M3: 구ERP 야간 = GERP 야간 동일 (사용자 룰 2026-05-07, RSP/일반 모두)
                 if is_first and gp is not None:
                     ws.cell(out_r, 15).value = f'=G{out_r}*M{out_r}'
                     if line == 'SD9A01':
                         ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}*1.3'
+                    elif line == 'SP3M3':
+                        ws.cell(out_r, 16).value = f'=L{out_r}'
                     else:
                         ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}'
                 elif is_first and gp is None and line == 'SP3M3':
