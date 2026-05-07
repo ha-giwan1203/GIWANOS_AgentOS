@@ -32,6 +32,7 @@ import os
 import random
 import re
 import sys
+import time
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -335,19 +336,21 @@ def build_auth_payload(assign_item):
     """assign/list 응답 1건 → auth/cnfm/save.api payload (WorkerQRY).
 
     WorkerQRY 13 property 중 인증에 필요한 핵심 필드만 채움.
+    가드: 서버 응답에 키 부재(eventual consistency)인 경우 KeyError 회피 → 빈값.
+    호출측에서 wrkId 빈값을 SKIP 분기로 처리한다.
     """
     return {
-        "prdtDa": assign_item["prdtDa"],
-        "lineCd": assign_item["lineCd"],
+        "prdtDa": assign_item.get("prdtDa", ""),
+        "lineCd": assign_item.get("lineCd", ""),
         "revNo": str(assign_item.get("revNo", "0")),
-        "regNo": assign_item["regNo"],
-        "prdtRank": assign_item["prdtRank"],
-        "pno": assign_item["pno"],
-        "pnoRev": assign_item["pnoRev"],
+        "regNo": assign_item.get("regNo", 0),
+        "prdtRank": assign_item.get("prdtRank", 1),
+        "pno": assign_item.get("pno", ""),
+        "pnoRev": assign_item.get("pnoRev", ""),
         "shiftsCd": assign_item.get("shiftsCd", "01"),
-        "procCd": assign_item["procCd"],
-        "procNo": assign_item["procNo"],
-        "wrkId": assign_item["wrkId"],
+        "procCd": assign_item.get("procCd", ""),
+        "procNo": assign_item.get("procNo", ""),
+        "wrkId": assign_item.get("wrkId", ""),
         "mainProcYn": "Y",
         "existWrk": "Y",
     }
@@ -536,6 +539,18 @@ def main():
                 assign_log["assigned"] = ok
                 if ok:
                     print(f"  [OK] assign/save | {msg[:60]}")
+                    # eventual consistency: save 직후 list 재조회에서 wrkId 미반영 케이스
+                    # 발견(20260508). 2초 대기 후 1회 재조회하여 다음 단계로 인계.
+                    time.sleep(2)
+                    try:
+                        recheck = call_assign_list(qry)
+                        rechk_full = is_assignment_complete(recheck)
+                        assign_log["recheck_count"] = len(recheck)
+                        assign_log["recheck_complete"] = rechk_full
+                        print(f"[assign recheck] +2s → {len(recheck)}공정, 완전 배치={rechk_full}")
+                    except Exception as e:
+                        assign_log["recheck_error"] = str(e)[:120]
+                        print(f"[assign recheck] FAIL: {e}")
                 else:
                     print(f"  [FAIL] sc={sc} msg='{msg[:80]}' body={body[:200]}")
                     log["assign"] = assign_log
@@ -549,7 +564,8 @@ def main():
     log["assign"] = assign_log
 
     # v3.4: 작업자 인증 단계 (--with-auth)
-    auth_log = {"assign_count": 0, "auth_plans": [], "auth_save_count": 0, "auth_fail_count": 0}
+    auth_log = {"assign_count": 0, "auth_plans": [], "auth_save_count": 0, "auth_fail_count": 0,
+                "wrkid_missing": 0, "error_kind": None}
     if args.with_auth:
         print(f"=== auth step ===")
         try:
@@ -561,6 +577,7 @@ def main():
         print(f"[assign] {len(assigns)}공정 회수")
         for a in assigns:
             already_y = (a.get("wrkCertiYn") or "").upper() == "Y"
+            wrkid = (a.get("wrkId") or "").strip()
             print(f"  proc={a.get('procNo'):4s} {a.get('wrkNm','-'):8s} wrkId={a.get('wrkId','-')} certi={a.get('wrkCertiYn','-')} regNo={a.get('regNo')} shiftsCd={a.get('shiftsCd')}")
             payload = build_auth_payload(a)
             auth_log["auth_plans"].append({
@@ -569,12 +586,29 @@ def main():
                 "wrkId": a.get("wrkId"),
                 "wrkCertiYn_before": a.get("wrkCertiYn"),
                 "already_y": already_y,
+                "wrkid_missing": not wrkid,
                 "payload": payload,
             })
+            if not wrkid:
+                auth_log["wrkid_missing"] += 1
 
         if not assigns:
             print("[FAIL] 작업자 배치 없음 - assign/save 선행 필요")
+            auth_log["error_kind"] = "no_assigns"
+            log["auth"] = auth_log
+            out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
+            out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
             return 4
+
+        # 가드: 모든 wrkId 빈값 → 인증 불가. 잡셋업 진입 차단(wrkCertiYn=N 저장 위험).
+        if auth_log["wrkid_missing"] >= len(assigns):
+            print(f"[ABORT] wrkId 전 공정 미반영 ({len(assigns)}건) - assign/save 직후 list 응답 누락 추정")
+            print("        다음 morning 재시도 또는 SmartMES UI 수동 인증 필요")
+            auth_log["error_kind"] = "wrkid_missing_after_save"
+            log["auth"] = auth_log
+            out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
+            out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
+            return 5
 
         # auth commit
         if args.mode in ("commit-one", "commit-all"):
@@ -583,6 +617,11 @@ def main():
             for ap in targets:
                 if ap["already_y"]:
                     print(f"  [SKIP] proc={ap['procNo']} {ap['wrkNm']} 이미 Y (멱등 회피)")
+                    continue
+                if ap.get("wrkid_missing"):
+                    auth_log["auth_fail_count"] += 1
+                    auth_log["error_kind"] = auth_log["error_kind"] or "wrkid_missing_partial"
+                    print(f"  [SKIP] proc={ap['procNo']} wrkId 미반영 - 인증 불가")
                     continue
                 sc, j, body = call_auth_cnfm(ap["payload"])
                 msg = (j or {}).get("statusMsg", "") if j else ""
