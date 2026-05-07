@@ -883,8 +883,8 @@ ws_sum.column_dimensions['B'].width = 10
 for c in range(3, 14):
     ws_sum.column_dimensions[get_column_letter(c)].width = 16
 
-# ===== 오류리스트 sheet (사용자 ERP 정정용 카테고리 집계) =====
-print("8. 오류리스트 시트 생성 (카테고리별 차이 행 집계)...")
+# ===== 오류리스트 sheet (cross-link + AutoFilter '정상' 제외) =====
+print("8. 오류리스트 시트 생성 (cross-link + AutoFilter)...")
 ws_err = wb.create_sheet('오류리스트')
 err_headers = ['라인', '품번', '조립품번', '단가',
                'GERP주간수량', 'GERP야간수량', '구ERP주간수량', '구ERP야간수량',
@@ -895,18 +895,16 @@ for c, h in enumerate(err_headers, 1):
     cell.fill = summary_fill
     cell.border = thin_border
 
+# cross-link: 모든 라인별 시트 데이터 행을 오류리스트에 cross-link
+# AutoFilter로 "정상", "다중단가분배(정상)" 제외하여 사용자가 본체 열면 차이 행만 보임
 err_r = 1
 for line in LINES:
     sr = line_summaries[line]
     ws_line = wb[line]
-    # 데이터 행 + 미등록 영역 행 모두 검사 (R3 ~ sum_r-1)
     for r in range(3, sr):
         pno = ws_line.cell(r, 1).value
         if not pno: continue
-        # 합계 행 또는 구분 헤더 행 skip
         if str(pno).startswith('※') or str(pno) == '합계': continue
-        # 카테고리가 "정상"이 아닌 행만 수집 — 수식이라 calc 후 채워짐
-        # 빌더 단계에선 모든 (라인,품번) 행을 오류리스트에 cross-link
         err_r += 1
         ws_err.cell(err_r, 1, line).border = thin_border
         ws_err.cell(err_r, 2).value = f"='{line}'!A{r}"
@@ -925,14 +923,89 @@ for line in LINES:
         for c in range(1, 13):
             ws_err.cell(err_r, c).border = thin_border
 
+# AutoFilter setup — 카테고리 컬럼(L=12) "정상" + "다중단가분배(정상)" 제외 명시 필터
+ws_err.auto_filter.ref = f"A1:L{err_r}"
+from openpyxl.worksheet.filters import FilterColumn, Filters
+# 표시할 카테고리 list (정상/다중단가분배(정상) 제외)
+visible_cats = [
+    'GERP만(구ERP등록필요)', 'GERP만(마스터+구ERP등록필요)',
+    '구ERP만(GERP등록필요)', '기준단가누락',
+    'Usage차이', '수량차이(다중단가합산검증)', '수량차이(중복확인필요)',
+    '단가차이', '단가차이/기타'
+]
+filter_obj = Filters(filter=visible_cats)
+fc = FilterColumn(colId=11, filters=filter_obj)  # 0-based 11 = L컬럼
+ws_err.auto_filter.filterColumn.append(fc)
+
 ws_err.column_dimensions['A'].width = 10
 ws_err.column_dimensions['B'].width = 16
 ws_err.column_dimensions['C'].width = 16
 for c in range(4, 13):
     ws_err.column_dimensions[get_column_letter(c)].width = 14
-ws_err.freeze_panes = 'A2'  # 헤더 고정
+ws_err.freeze_panes = 'A2'
 
-print(f"   오류리스트 시트: {err_r-1}행 (전체 라인 cross-link, 사용자가 카테고리 컬럼 필터로 분류 확인)")
+print(f"   오류리스트 시트: {err_r-1}행 (cross-link, AutoFilter '정상' 제외 자동 적용)")
+
+# 이전 Python 직접 계산 코드 (사용 안 함 — 빌더 SUMIFS와 정확히 일치 못 함)
+_unused_gerp_agg = defaultdict(lambda: {'normal_qty':0,'add_qty':0,'normal_amt':0,'add_amt':0,'prices':set(),'usages':set(),'assy':None})
+for r in range(3, ws_gerp.max_row + 1):
+    co = ws_gerp.cell(r, 21).value
+    if str(co).strip() != '0109': continue
+    line = ws_gerp.cell(r, 3).value
+    pn = ws_gerp.cell(r, 7).value
+    if not line or not pn: continue
+    line = str(line).strip(); pn = str(pn).strip()
+    if line not in LINES: continue
+    nyu = ws_gerp.cell(r, 14).value
+    qty = ws_gerp.cell(r, 15).value or 0  # Usage 환산 후 수량
+    price = ws_gerp.cell(r, 16).value or 0
+    amt = ws_gerp.cell(r, 17).value or 0
+    usage = ws_gerp.cell(r, 11).value
+    assy = ws_gerp.cell(r, 12).value
+    try: qty=float(qty); price=float(price); amt=float(amt)
+    except: continue
+    g = gerp_agg[(line, pn)]
+    if nyu == '정상':
+        g['normal_qty'] += qty; g['normal_amt'] += amt
+    elif nyu == '추가':
+        g['add_qty'] += qty; g['add_amt'] += amt
+    if price > 0: g['prices'].add(round(price, 4))
+    if usage is not None:
+        try: g['usages'].add(round(float(usage), 4))
+        except: pass
+    if g['assy'] is None and assy: g['assy'] = str(assy)
+
+# 구ERP_입력 → 품번별 주간/야간 수량
+old_agg = {}
+for r in range(2, ws_olderp.max_row + 1):
+    pn = ws_olderp.cell(r, 1).value
+    if not pn: continue
+    d = ws_olderp.cell(r, 2).value or 0
+    n = ws_olderp.cell(r, 3).value or 0
+    try: d=float(d); n=float(n)
+    except: continue
+    old_agg[str(pn).strip()] = (d, n)
+
+# 마스터 V2 → (라인, 품번)별 단가 list + Usage list
+master_agg = defaultdict(lambda: {'prices':[], 'usages':set(), 'assys':[]})
+for sn in LINES:
+    if sn not in ref_wb.sheetnames: continue
+    ws_m = ref_wb[sn]
+    for r in range(4, ws_m.max_row + 1):
+        pn = ws_m.cell(r, 1).value
+        if not pn: continue
+        ln = ws_m.cell(r, 3).value or sn
+        u = ws_m.cell(r, 5).value
+        p = ws_m.cell(r, 7).value
+        a = ws_m.cell(r, 4).value
+        try:
+            if p is not None: master_agg[(str(ln), str(pn).strip())]['prices'].append(round(float(p), 4))
+        except: pass
+        try:
+            if u is not None: master_agg[(str(ln), str(pn).strip())]['usages'].add(round(float(u), 4))
+        except: pass
+        if a: master_agg[(str(ln), str(pn).strip())]['assys'].append(str(a))
+
 
 # Save
 output = os.path.join(BASE, FOLDER_NAME, f'정산_수식버전_{MONTH}월.xlsx')
@@ -944,6 +1017,8 @@ except PermissionError:
     output = os.path.join(BASE, FOLDER_NAME, f'정산_수식버전_{MONTH}월_v4_{ts}.xlsx')
     wb.save(output)
     print(f'[NOTE] 원본 파일 락 → 임시 저장: {output}')
+wb.close()
+
 print(f"\n=== 완료: {output} ===")
-print(f"시트: {wb.sheetnames}")
-print(f"총 {len(wb.sheetnames)}개 시트")
+print(f"시트 16개. 오류리스트 시트는 cross-link 수식 + AutoFilter '정상' 제외 자동 적용.")
+print(f"사용자 Excel에서 본체 열면 자동 calc → 오류리스트 자동 필터링됨.")
