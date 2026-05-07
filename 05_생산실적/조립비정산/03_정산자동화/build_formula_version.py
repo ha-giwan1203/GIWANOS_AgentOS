@@ -1,12 +1,21 @@
-"""수식 기반 정산 파일 생성 스크립트"""
+"""수식 기반 정산 파일 생성 스크립트 (_pipeline_config 사용)"""
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
+from collections import defaultdict
 import os
+import sys
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _pipeline_config import BASE_DIR, GERP_FILE, OLDERP_FILE, OLDERP_SHEET, MONTH, LINE_INFO, SP3M3_MODULE_FILE
 
-print("=== 수식 기반 정산 파일 생성 ===")
+BASE = BASE_DIR
+_m_int = int(MONTH) + 1
+if _m_int > 12:
+    _m_int -= 12
+FOLDER_NAME = f'{_m_int:02d}월'
+
+print(f"=== 수식 기반 정산 파일 생성 ({MONTH}월 정산 → {FOLDER_NAME}/) ===")
 
 # Styles
 header_font = Font(bold=True, size=11)
@@ -22,21 +31,73 @@ num_fmt = '#,##0;-#,##0;"-"'
 
 # 1. Load sources
 print("1. 기준정보 로딩...")
-ref_wb = openpyxl.load_workbook(
-    os.path.join(BASE, '01_기준정보', '기준정보_라인별정리_최종_V1_20260316.xlsx'),
-    data_only=True)
+# 기준정보 path는 _pipeline_config.MASTER_FILE 단일 권위 사용 (V1/V2 drift 방지)
+from _pipeline_config import MASTER_FILE
+ref_wb = openpyxl.load_workbook(MASTER_FILE, data_only=True)
+print(f"   기준정보: {os.path.basename(MASTER_FILE)}")
 
-print("2. GERP 실적 로딩...")
-gerp_wb = openpyxl.load_workbook(
-    os.path.join(BASE, '04월', '실적데이터', 'G-ERP 3월실적.xlsx'),
-    data_only=True)
+print(f"2. GERP 실적 로딩... ({os.path.basename(GERP_FILE)})")
+gerp_wb = openpyxl.load_workbook(GERP_FILE, data_only=True)
 gerp_ws = gerp_wb[gerp_wb.sheetnames[0]]
 
-print("3. 구ERP 실적 로딩...")
-olderp_wb = openpyxl.load_workbook(
-    os.path.join(BASE, '04월', '실적데이터', '구ERP 3월 실적.xlsx'),
-    data_only=True)
-olderp_ws = olderp_wb['3월 실적']
+# === RSP/MO 모듈품번 → 13자리 기준품번 매핑 (SP3M3 야간) ===
+# === 차종별 이관 처리 ===
+# SVM 차종: SP3M3/HCAMS02/ISAMS03 → 이관 (정산 제외)
+# OVK 차종: SD9A01/ANAAS04/DRAAS11 → 이관 (정산 제외)
+print("2-1. RSP/MO 매핑 로드 + SP3M3 prefix 매핑...")
+SVM_EXCLUDE_LINES = {'SP3M3', 'HCAMS02', 'ISAMS03'}
+OVK_EXCLUDE_LINES = {'SD9A01', 'ANAAS04', 'DRAAS11'}
+RSP_TO_PN10 = {}  # RSP/MO → 10자리 기본품번
+try:
+    mwb = openpyxl.load_workbook(SP3M3_MODULE_FILE, data_only=True, read_only=True)
+    mws = mwb['Sheet1']
+    for row in mws.iter_rows(min_row=2, values_only=True):
+        if len(row) < 4: continue
+        pn10, rsp = row[1], row[3]
+        if rsp and pn10:
+            RSP_TO_PN10[str(rsp).strip()] = str(pn10).strip()
+    mwb.close()
+except Exception as e:
+    print(f"   [WARN] RSP 매핑 로드 실패: {e}")
+
+# 라인별 10자리 prefix → 첫 등장 13자리 품번 (전체 라인, SVM 이관 차종 제외)
+LINE_PN10_TO_PN13 = defaultdict(dict)  # line → {10자리: 13자리}
+for ln in ref_wb.sheetnames:
+    if ln not in LINE_INFO: continue
+    rws = ref_wb[ln]
+    seen10 = set()
+    for row in rws.iter_rows(min_row=4, values_only=True):
+        pn = row[0]
+        cha = row[7] if len(row) > 7 else None  # col 8 = 차종
+        # 이관 차종 제외 (SVM = SP3M3/HCAMS02/ISAMS03, OVK = SD9A01/ANAAS04/DRAAS11)
+        if ln in SVM_EXCLUDE_LINES and str(cha) == 'SVM':
+            continue
+        if ln in OVK_EXCLUDE_LINES and str(cha) == 'OVK':
+            continue
+        if pn and isinstance(pn, str) and len(pn) >= 10:
+            pn10 = pn[:10]
+            if pn10 not in seen10:
+                LINE_PN10_TO_PN13[ln][pn10] = pn
+                seen10.add(pn10)
+
+# RSP → 13자리 직접 매핑 (SP3M3 매핑파일 기반)
+RSP_DIRECT = {}
+sp_pn10_to_13 = LINE_PN10_TO_PN13.get('SP3M3', {})
+for rsp, pn10 in RSP_TO_PN10.items():
+    if pn10 in sp_pn10_to_13:
+        RSP_DIRECT[rsp] = sp_pn10_to_13[pn10]
+print(f"   RSP 매핑 {len(RSP_TO_PN10)}건 / SP3M3 직접 매핑 {len(RSP_DIRECT)}건")
+print(f"   라인별 prefix 매핑: " + ", ".join(f"{ln}={len(LINE_PN10_TO_PN13[ln])}" for ln in LINE_INFO))
+
+# === MO 매핑 사전 빌드 (전체 라인) ===
+# MO + 10자리 → 라인별 prefix 매칭 → 13자리
+MO_DIRECT = {}  # (라인, MO품번) → 13자리
+# 4월부터: 마스터에 미등록인 MO도 13자리 prefix로 매핑 가능 (빌더 L161~165 로직)
+# 매핑 시트엔 마스터 등록된 RSP만 박음 (사용자 추적성 확보)
+
+print(f"3. 구ERP 실적 로딩... ({os.path.basename(OLDERP_FILE)} / 시트={OLDERP_SHEET})")
+olderp_wb = openpyxl.load_workbook(OLDERP_FILE, data_only=True)
+olderp_ws = olderp_wb[OLDERP_SHEET]
 
 # 2. New workbook
 wb = openpyxl.Workbook()
@@ -65,7 +126,9 @@ guide_lines = [
     '제한사항:',
     '  - 구ERP 야간: LOT 끝자리 B = 야간, 그 외 = 주간',
     '  - SP3M3 구ERP: 서브라인 LOT B 무의미 → 총수량-GERP야간=주간, 야간=GERP야간',
-    '  - SP3M3 RSP 모듈품번 역변환은 수식으로 불가 -> Python 파이프라인 필요',
+    '  - SP3M3 RSP 모듈품번: 빌더 실행 시 GERP_입력 시트의 RSP/MO 품번이 13자리로 자동 변환됨',
+    '  - 매월 빌더 재실행 (build_formula_version.py) → 매핑 최신 반영',
+    '  - 변환 결과는 모듈품번_매핑 시트에서 확인 가능',
     '  - Usage=2 품번 수량 2배 환산은 미적용 (필요시 수동 확인)',
 ]
 for r, text in enumerate(guide_lines, 1):
@@ -78,10 +141,43 @@ print("4. GERP_입력 시트 생성...")
 ws_gerp = wb.create_sheet('GERP_입력')
 
 gerp_row_count = 0
+rsp_count = 0; mo_count = 0; svm_skipped = 0; ovk_skipped = 0
+out_r = 0  # GERP_입력 시트 출력 행 (skip 시 원본과 다를 수 있음)
 for r in range(1, gerp_ws.max_row + 1):
+    line_v = gerp_ws.cell(r, 3).value if r > 1 else None
+    pn_v = gerp_ws.cell(r, 7).value if r > 1 else None
+    cha_v = gerp_ws.cell(r, 6).value if r > 1 else None  # 차종
+
+    # SVM 차종 이관 — SP3M3/HCAMS02/ISAMS03 라인
+    if r > 1 and line_v in SVM_EXCLUDE_LINES and str(cha_v) == 'SVM':
+        svm_skipped += 1
+        continue
+
+    # OVK 차종 이관 — SD9A01/ANAAS04/DRAAS11 라인
+    # 단 89880X 시작 품번은 OVK여도 이관 아님 (사용자 룰 2026-05-07)
+    if r > 1 and line_v in OVK_EXCLUDE_LINES and str(cha_v) == 'OVK':
+        if not (pn_v and str(pn_v).startswith('89880X')):
+            ovk_skipped += 1
+            continue
+
+    pn_replace = None
+    if r > 1 and line_v and pn_v and line_v in LINE_INFO:
+        ps = str(pn_v).strip()
+        ln = str(line_v).strip()
+        # 1) SP3M3 RSP 매핑 (RSP는 마스터에 직접 등록 안 됨, 13자리 변환 필요)
+        if ps in RSP_DIRECT:
+            pn_replace = RSP_DIRECT[ps]
+            rsp_count += 1
+        # 2) MO 변환 제거 (2026-05-07 사용자 룰)
+        # MO 품번은 마스터(기준정보)에 라인별 자체 등록되어 있으므로 변환 X
+        # SUMIFS는 라인 시트 A열의 MO를 그대로 매칭
+
+    out_r += 1
     for c in range(1, gerp_ws.max_column + 1):
         v = gerp_ws.cell(r, c).value
-        cell = ws_gerp.cell(r, c, v)
+        if c == 7 and pn_replace:
+            v = pn_replace
+        cell = ws_gerp.cell(out_r, c, v)
         if r == 1:
             cell.font = header_font
             cell.fill = gerp_fill
@@ -90,31 +186,74 @@ for r in range(1, gerp_ws.max_row + 1):
             cell.number_format = num_fmt
     if r > 1:
         gerp_row_count += 1
+print(f"   GERP_입력 시트: SVM skip {svm_skipped}건 / OVK skip {ovk_skipped}건 / RSP→13자리 {rsp_count}건 / MO→13자리 {mo_count}건")
 
 print(f"   GERP 데이터: {gerp_row_count}행")
 
-# ===== 구ERP_입력 sheet (품번별 주야 집계) =====
-print("5. 구ERP_입력 시트 생성 (품번별 집계)...")
+# === GERP 라인별 품번/단가 캐시 (미등록·단가차이 영역 식별용) ===
+gerp_line_pns = defaultdict(set)         # 라인 → 품번 set
+gerp_line_pn_prices = defaultdict(set)   # (라인, 품번) → 정상행 단가 set
+for r in range(2, gerp_ws.max_row + 1):
+    line_v = gerp_ws.cell(r, 3).value
+    pn_v = gerp_ws.cell(r, 7).value
+    sd_v = gerp_ws.cell(r, 14).value
+    price_v = gerp_ws.cell(r, 16).value
+    if line_v and pn_v:
+        ls = str(line_v).strip()
+        ps = str(pn_v).strip()
+        gerp_line_pns[ls].add(ps)
+        if sd_v == '정상' and price_v is not None:
+            gerp_line_pn_prices[(ls, ps)].add(price_v)
+
+# ===== 구ERP_입력 sheet (품번별 주야 집계 — 전체업체 피벗) =====
+# CLAUDE.md L29/L37 규칙:
+#   - SD9·SUB 라인: 0109 전체 품번 대상, 라인코드 무시 → 전체업체 피벗에도 0109 품번이 모두 포함되어 결과 동일
+#   - SP3M3: 모듈품번(MO) 매칭 불가 → 전체업체 피벗(all_day/all_night) 필수
+# 따라서 단일 피벗을 전체업체로 만들면 두 케이스 모두 커버
+print("5. 구ERP_입력 시트 생성 (전체업체 품번별 주야 피벗)...")
 ws_olderp = wb.create_sheet('구ERP_입력')
 
-# Python에서 0109 업체 품번별 주간/야간 수량 집계
-from collections import defaultdict
 olderp_day = defaultdict(int)   # LOT 끝자리 ≠ B
 olderp_night = defaultdict(int) # LOT 끝자리 = B
 
-olderp_raw_count = 0
+# 이관 품번 set (SVM + OVK 차종 → 정산 제외)
+TRANSFER_PN_EXCLUDE = set()
+for r in range(2, gerp_ws.max_row + 1):
+    ln_v = str(gerp_ws.cell(r, 3).value)
+    cha_v = str(gerp_ws.cell(r, 6).value)
+    pn_x = gerp_ws.cell(r, 7).value
+    if not pn_x: continue
+    pn_str = str(pn_x).strip()
+    if ln_v in SVM_EXCLUDE_LINES and cha_v == 'SVM':
+        TRANSFER_PN_EXCLUDE.add(pn_str)
+    elif ln_v in OVK_EXCLUDE_LINES and cha_v == 'OVK' and not pn_str.startswith('89880X'):
+        # 89880X 시작은 OVK여도 이관 아님 (사용자 룰)
+        TRANSFER_PN_EXCLUDE.add(pn_str)
+print(f"   이관 품번 (SVM+OVK): {len(TRANSFER_PN_EXCLUDE)}종")
+
+olderp_raw_count = 0; olderp_transfer_skipped = 0
 for r in range(3, olderp_ws.max_row + 1):
     pn = olderp_ws.cell(r, 5).value
     vendor = olderp_ws.cell(r, 3).value
-    if not pn or not vendor or not str(vendor).startswith('0109'):
+    if not pn or not vendor:
+        continue
+    ps = str(pn).strip()
+    # 이관 품번 skip (SVM + OVK)
+    if ps in TRANSFER_PN_EXCLUDE:
+        olderp_transfer_skipped += 1
         continue
     olderp_raw_count += 1
     lot = str(olderp_ws.cell(r, 10).value or '')
-    qty = olderp_ws.cell(r, 11).value or 0
+    qty_raw = olderp_ws.cell(r, 11).value or 0
+    try:
+        qty = int(qty_raw) if not isinstance(qty_raw, (int, float)) else qty_raw
+    except (ValueError, TypeError):
+        continue
     if lot.strip().endswith('B'):
-        olderp_night[pn] += qty
+        olderp_night[ps] += qty
     else:
-        olderp_day[pn] += qty
+        olderp_day[ps] += qty
+print(f"   구ERP_입력 시트: 이관 품번(SVM+OVK) skip {olderp_transfer_skipped}건")
 
 # 품번 합집합
 all_pns = sorted(set(olderp_day) | set(olderp_night), key=str)
@@ -135,6 +274,47 @@ for i, pn in enumerate(all_pns):
     ws_olderp.cell(out_r, 4).number_format = num_fmt
 
 print(f"   구ERP 원본: {olderp_raw_count}행 → 집계: {len(all_pns)}품번")
+
+# ===== 모듈품번_매핑 sheet (참조용) =====
+print("5.5 모듈품번_매핑 시트 생성...")
+ws_map = wb.create_sheet('모듈품번_매핑')
+map_headers = ['모듈품번(GERP원본)', '변환_13자리', '10자리', '대상라인', '비고']
+for c, h in enumerate(map_headers, 1):
+    cell = ws_map.cell(1, c, h)
+    cell.font = header_font
+    cell.fill = header_fill
+    cell.border = thin_border
+
+map_r = 1
+# RSP 매핑 성공 (마스터 → SP3M3 prefix → 13자리)
+for rsp, pn13 in sorted(RSP_DIRECT.items()):
+    map_r += 1
+    pn10 = RSP_TO_PN10.get(rsp, '')
+    ws_map.cell(map_r, 1, rsp).border = thin_border
+    ws_map.cell(map_r, 2, pn13).border = thin_border
+    ws_map.cell(map_r, 3, pn10).border = thin_border
+    ws_map.cell(map_r, 4, 'SP3M3').border = thin_border
+    ws_map.cell(map_r, 5, 'RSP→13자리 자동변환').border = thin_border
+
+# 마스터 등록인데 매핑 못 한 RSP (10자리가 SP3M3 시트에 없음)
+unmap_rsp = sorted(set(RSP_TO_PN10.keys()) - set(RSP_DIRECT.keys()))
+for rsp in unmap_rsp:
+    map_r += 1
+    pn10 = RSP_TO_PN10.get(rsp, '')
+    ws_map.cell(map_r, 1, rsp).border = thin_border
+    c2 = ws_map.cell(map_r, 2, '미매핑')
+    c2.border = thin_border
+    c2.font = Font(color='C00000')
+    ws_map.cell(map_r, 3, pn10).border = thin_border
+    ws_map.cell(map_r, 4, '-').border = thin_border
+    ws_map.cell(map_r, 5, '10자리가 SP3M3 기준정보에 없음 (이관/구품번)').border = thin_border
+
+ws_map.column_dimensions['A'].width = 18
+ws_map.column_dimensions['B'].width = 18
+ws_map.column_dimensions['C'].width = 14
+ws_map.column_dimensions['D'].width = 10
+ws_map.column_dimensions['E'].width = 40
+print(f"   매핑 시트: {len(RSP_DIRECT)}건 매핑 + {len(unmap_rsp)}건 미매핑")
 
 # ===== 10 Line sheets =====
 LINES = ['SD9A01', 'ANAAS04', 'DRAAS11', 'SP3M3', 'HASMS02', 'HCAMS02',
@@ -186,6 +366,14 @@ for line in LINES:
         else:
             cell.fill = summary_fill
 
+    # 라인의 (품번 → [단가들]) 사전 — 다중단가 식별용
+    pn_prices_list = defaultdict(list)
+    for rr in range(4, ref_ws.max_row + 1):
+        pp = ref_ws.cell(rr, 1).value
+        pr = ref_ws.cell(rr, 7).value
+        if pp and isinstance(pr, (int, float)):
+            pn_prices_list[str(pp).strip()].append(pr)
+
     # Data rows (ref file: row 4+ = data, row 1=title, row 3=header)
     out_r = 2  # will increment to 3+
     for r in range(4, ref_ws.max_row + 1):
@@ -202,21 +390,51 @@ for line in LINES:
             if c == 7 and isinstance(v, (int, float)):
                 cell.number_format = num_fmt
 
-        # I: GERP 주간수량
-        ws.cell(out_r, 9).value = (
-            f'=SUMIFS(GERP_입력!$I:$I,'
-            f'GERP_입력!$C:$C,"{line}",'
-            f'GERP_입력!$G:$G,A{out_r},'
-            f'GERP_입력!$N:$N,"정상")')
+        # I: GERP 주간수량 — Python step5 처리 방식
+        # 단일단가: SUMIFS(전체 정상) — 단가차이도 자동 흡수
+        # 다중단가 첫 행: SUMIFS(자기 단가) + (SUMIFS(전체) - SUMIFS(다른 단가들))
+        # 다중단가 다른 행: SUMIFS(자기 단가) — 자기 단가만
+        ps = str(pn).strip()
+        prices_list = pn_prices_list.get(ps, [])
+        is_multi = len(prices_list) > 1
+        is_first_pn = (out_r == 3) or (ws.cell(out_r-1, 1).value != pn)
+        # 단가 매칭 SUMIFS 공통
+        sumifs_self = (f'SUMIFS(GERP_입력!$O:$O,GERP_입력!$C:$C,"{line}",'
+                       f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"정상",'
+                       f'GERP_입력!$P:$P,G{out_r})')
+        sumifs_all = (f'SUMIFS(GERP_입력!$O:$O,GERP_입력!$C:$C,"{line}",'
+                      f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"정상")')
+        if not is_multi:
+            # 단일단가: 전체 합산 (단가차이 자동 흡수)
+            ws.cell(out_r, 9).value = f'={sumifs_all}'
+        elif is_first_pn:
+            # 다중단가 첫 행: 전체 - 다른 단가들 합 (= 자기 단가 GERP + 단가차이 잔여)
+            other_sumifs = []
+            current_price = ref_ws.cell(r, 7).value
+            for op in prices_list:
+                if op != current_price:
+                    other_sumifs.append(
+                        f'SUMIFS(GERP_입력!$O:$O,GERP_입력!$C:$C,"{line}",'
+                        f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"정상",'
+                        f'GERP_입력!$P:$P,{op})')
+            if other_sumifs:
+                other_sum = '+'.join(other_sumifs)
+                ws.cell(out_r, 9).value = f'={sumifs_all}-({other_sum})'
+            else:
+                ws.cell(out_r, 9).value = f'={sumifs_all}'
+        else:
+            # 다중단가 다른 행: 자기 단가만
+            ws.cell(out_r, 9).value = f'={sumifs_self}'
         ws.cell(out_r, 9).number_format = num_fmt
         ws.cell(out_r, 9).border = thin_border
 
-        # J: GERP 야간수량
+        # J: GERP 야간수량 — 첫 다중단가 행에만 합산 (다중단가 야간 중복 방지)
         ws.cell(out_r, 10).value = (
-            f'=SUMIFS(GERP_입력!$I:$I,'
+            f'=IF(COUNTIF(A$3:A{out_r},A{out_r})=1,'
+            f'SUMIFS(GERP_입력!$O:$O,'
             f'GERP_입력!$C:$C,"{line}",'
             f'GERP_입력!$G:$G,A{out_r},'
-            f'GERP_입력!$N:$N,"추가")')
+            f'GERP_입력!$N:$N,"추가"),0)')
         ws.cell(out_r, 10).number_format = num_fmt
         ws.cell(out_r, 10).border = thin_border
 
@@ -225,48 +443,54 @@ for line in LINES:
         ws.cell(out_r, 11).number_format = num_fmt
         ws.cell(out_r, 11).border = thin_border
 
-        # L: GERP 야간금액 — GERP 추가행의 조립금액(col Q)을 직접 합산
-        #    야간은 GERP 원본금액이 권위값이므로 기준단가로 재계산하지 않음
+        # L: GERP 야간금액 — 첫 다중단가 행에만 합산 (중복 방지)
         ws.cell(out_r, 12).value = (
-            f'=SUMIFS(GERP_입력!$Q:$Q,'
+            f'=IF(COUNTIF(A$3:A{out_r},A{out_r})=1,'
+            f'SUMIFS(GERP_입력!$Q:$Q,'
             f'GERP_입력!$C:$C,"{line}",'
             f'GERP_입력!$G:$G,A{out_r},'
-            f'GERP_입력!$N:$N,"추가")')
+            f'GERP_입력!$N:$N,"추가"),0)')
         ws.cell(out_r, 12).number_format = num_fmt
         ws.cell(out_r, 12).border = thin_border
 
-        # M: 구ERP 주간수량 — 집계 테이블에서 SUMIFS
-        # SP3M3: 구ERP 총수량(합계) - GERP 야간수량 (서브라인 LOT B 무의미)
+        # M: 구ERP 주간수량 — 첫 다중단가 행에만 합산 (다중단가 중복 방지)
+        # SD9A01/SP3M3: has_night=True / SUB 라인: has_night=False (LOT B 무시 총수량)
+        line_has_night = LINE_INFO[line]['has_night'] if line in LINE_INFO else False
         if line == 'SP3M3':
-            ws.cell(out_r, 13).value = (
-                f'=IFERROR(SUMIFS('
-                f"구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)"
-                f'-J{out_r}')
+            # MAX(0, ...) 가드: 구ERP 미등장 + GERP 야간만 있는 케이스 음수 방지
+            base_m = (f'MAX(0,IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)-J{out_r})')
+        elif line_has_night:
+            base_m = (f'IFERROR(SUMIFS(구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)')
         else:
-            ws.cell(out_r, 13).value = (
-                f'=IFERROR(SUMIFS('
-                f"구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)")
+            base_m = (f'IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
+        ws.cell(out_r, 13).value = f'=IF(COUNTIF(A$3:A{out_r},A{out_r})=1,{base_m},0)'
         ws.cell(out_r, 13).number_format = num_fmt
         ws.cell(out_r, 13).border = thin_border
 
-        # N: 구ERP 야간수량 — 집계 테이블에서 SUMIFS
-        # SP3M3: GERP 야간 동일 적용 (서브라인 야간 구분 불가)
+        # N: 구ERP 야간수량 — 첫 다중단가 행에만 합산
         if line == 'SP3M3':
             ws.cell(out_r, 14).value = f'=J{out_r}'
-        else:
+        elif line_has_night:
             ws.cell(out_r, 14).value = (
-                f'=IFERROR(SUMIFS('
-                f"구ERP_입력!$C:$C,구ERP_입력!$A:$A,A{out_r}),0)")
+                f'=IF(COUNTIF(A$3:A{out_r},A{out_r})=1,'
+                f'IFERROR(SUMIFS(구ERP_입력!$C:$C,구ERP_입력!$A:$A,A{out_r}),0),0)')
+        else:
+            ws.cell(out_r, 14).value = 0
         ws.cell(out_r, 14).number_format = num_fmt
         ws.cell(out_r, 14).border = thin_border
 
-        # O: 구ERP 주간금액
+        # O: 구ERP 주간금액 = 기준단가 × 주간수량
         ws.cell(out_r, 15).value = f'=G{out_r}*M{out_r}'
         ws.cell(out_r, 15).number_format = num_fmt
         ws.cell(out_r, 15).border = thin_border
 
         # P: 구ERP 야간금액
-        ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}'
+        # SD9A01: 야간 130% 가산 (기존 운영 룰 — ERP 실측 검증 전까지 유지)
+        # SP3M3: 기준단가 × 야간수량 (단순) / SUB 라인: 0
+        if line == 'SD9A01':
+            ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}*1.3'
+        else:
+            ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}'
         ws.cell(out_r, 16).number_format = num_fmt
         ws.cell(out_r, 16).border = thin_border
 
@@ -280,6 +504,117 @@ for line in LINES:
         ws.cell(out_r, 18).number_format = num_fmt
         ws.cell(out_r, 18).border = thin_border
 
+    # ===== 기준 미등록 GERP 품번 영역 =====
+    # 기준정보에 없는 GERP 품번을 자동으로 추가 (GERP 원본금액 기준)
+    ref_pn_set = set()
+    for r in range(4, ref_ws.max_row + 1):
+        pn_v = ref_ws.cell(r, 1).value
+        if pn_v:
+            ref_pn_set.add(str(pn_v).strip())
+    line_gerp_pns = gerp_line_pns.get(line, set())
+    unmatched_pns = sorted(line_gerp_pns - ref_pn_set)
+
+    if unmatched_pns:
+        # 구분 헤더 행
+        out_r += 1
+        sec_cell = ws.cell(out_r, 1, f'※ 기준 미등록 GERP 품번 ({len(unmatched_pns)}건) — GERP 단가별 분배')
+        sec_cell.font = Font(bold=True, italic=True, color='C00000')
+        for c in range(1, 19):
+            ws.cell(out_r, c).fill = summary_fill
+            ws.cell(out_r, c).border = thin_border
+        ws.merge_cells(start_row=out_r, start_column=1, end_row=out_r, end_column=18)
+
+        line_has_night = LINE_INFO[line]['has_night'] if line in LINE_INFO else False
+        for pn in unmatched_pns:
+            # GERP 정상 단가 set (없으면 야간만 있는 케이스 — RSP 등)
+            gerp_prices = sorted(gerp_line_pn_prices.get((line, pn), set()))
+            if not gerp_prices:
+                gerp_prices = [None]  # 야간만 있는 RSP 같은 케이스 — 단가 None인 1행
+
+            for idx, gp in enumerate(gerp_prices):
+                out_r += 1
+                is_first = (idx == 0)
+                ws.cell(out_r, 1, pn).border = thin_border
+                if gp is not None:
+                    ws.cell(out_r, 7, gp).number_format = num_fmt  # G: GERP 단가
+                    ws.cell(out_r, 7).border = thin_border
+
+                # I: 자기 단가 GERP 주간수량
+                if gp is not None:
+                    ws.cell(out_r, 9).value = (
+                        f'=SUMIFS(GERP_입력!$O:$O,GERP_입력!$C:$C,"{line}",'
+                        f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"정상",'
+                        f'GERP_입력!$P:$P,G{out_r})')
+                else:
+                    ws.cell(out_r, 9).value = 0
+
+                # J: 야간은 첫 단가 행에만 합산 (RSP는 단가 정보 없음, 단가 무관)
+                if is_first:
+                    ws.cell(out_r, 10).value = (
+                        f'=SUMIFS(GERP_입력!$O:$O,GERP_입력!$C:$C,"{line}",'
+                        f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"추가")')
+                else:
+                    ws.cell(out_r, 10).value = 0
+
+                # K: GERP 주간금액 = G × I (자기 단가 × 자기 단가 수량)
+                if gp is not None:
+                    ws.cell(out_r, 11).value = f'=G{out_r}*I{out_r}'
+                else:
+                    ws.cell(out_r, 11).value = 0
+
+                # L: GERP 야간금액 (첫 단가 행에만, 원본금액 직접)
+                if is_first:
+                    ws.cell(out_r, 12).value = (
+                        f'=SUMIFS(GERP_입력!$Q:$Q,GERP_입력!$C:$C,"{line}",'
+                        f'GERP_입력!$G:$G,A{out_r},GERP_입력!$N:$N,"추가")')
+                else:
+                    ws.cell(out_r, 12).value = 0
+
+                # M, N: 구ERP 수량 — 첫 단가 행에만 (다중단가 패턴과 동일)
+                if is_first:
+                    if line == 'SP3M3':
+                        # MAX(0, ...) 가드 — 음수 방지
+                        ws.cell(out_r, 13).value = (
+                            f'=MAX(0,IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)-J{out_r})')
+                        ws.cell(out_r, 14).value = f'=J{out_r}'
+                    elif line_has_night:
+                        ws.cell(out_r, 13).value = (
+                            f'=IFERROR(SUMIFS(구ERP_입력!$B:$B,구ERP_입력!$A:$A,A{out_r}),0)')
+                        ws.cell(out_r, 14).value = (
+                            f'=IFERROR(SUMIFS(구ERP_입력!$C:$C,구ERP_입력!$A:$A,A{out_r}),0)')
+                    else:
+                        ws.cell(out_r, 13).value = (
+                            f'=IFERROR(SUMIFS(구ERP_입력!$D:$D,구ERP_입력!$A:$A,A{out_r}),0)')
+                        ws.cell(out_r, 14).value = 0
+                else:
+                    ws.cell(out_r, 13).value = 0
+                    ws.cell(out_r, 14).value = 0
+
+                # O, P: 구ERP 금액 — G × 수량 (첫 단가 행에만, SD9 야간 1.3배)
+                # SP3M3 RSP(gp=None) 행: 구ERP 야간 = GERP 야간 동일 (CLAUDE.md L41)
+                if is_first and gp is not None:
+                    ws.cell(out_r, 15).value = f'=G{out_r}*M{out_r}'
+                    if line == 'SD9A01':
+                        ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}*1.3'
+                    else:
+                        ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}'
+                elif is_first and gp is None and line == 'SP3M3':
+                    # SP3M3 RSP 야간 행 — 단가 없음, 구ERP 야간금액 = GERP 야간금액
+                    ws.cell(out_r, 15).value = 0
+                    ws.cell(out_r, 16).value = f'=L{out_r}'
+                else:
+                    ws.cell(out_r, 15).value = 0
+                    ws.cell(out_r, 16).value = 0
+
+                # Q, R
+                ws.cell(out_r, 17).value = f'=(K{out_r}+L{out_r})-(O{out_r}+P{out_r})'
+                ws.cell(out_r, 18).value = f'=(I{out_r}+J{out_r})-(M{out_r}+N{out_r})'
+
+                for c in range(9, 19):
+                    ws.cell(out_r, c).number_format = num_fmt
+                    ws.cell(out_r, c).border = thin_border
+
+    # 단가차이 영역 폐기 — 다중단가 첫 행이 SUMIFS로 잔여 흡수하므로 별도 영역 불필요
     last_r = out_r
 
     # Summary row
@@ -295,20 +630,8 @@ for line in LINES:
         ws.cell(sum_r, c).fill = summary_fill
         ws.cell(sum_r, c).border = thin_border
 
-    # SP3M3: 야간은 RSP 모듈품번이라 행별 매칭 불가 → 합계행에서 직접 SUMIFS
-    if line == 'SP3M3':
-        # J: 야간수량 합계 = GERP_입력에서 SP3M3 + 추가 행 전체
-        ws.cell(sum_r, 10).value = (
-            '=SUMIFS(GERP_입력!$I:$I,'
-            'GERP_입력!$C:$C,"SP3M3",'
-            'GERP_입력!$N:$N,"추가")')
-        # L: 야간금액 합계 = GERP_입력 조립금액에서 SP3M3 + 추가
-        ws.cell(sum_r, 12).value = (
-            '=SUMIFS(GERP_입력!$Q:$Q,'
-            'GERP_입력!$C:$C,"SP3M3",'
-            'GERP_입력!$N:$N,"추가")')
-
     line_summaries[line] = sum_r
+    # ※ SP3M3 야간 RSP 모듈품번은 미등록 영역에서 자동 잡힘 (별도 처리 불필요)
 
     # Column widths
     ws.column_dimensions['A'].width = 18
@@ -391,8 +714,15 @@ for c in range(3, 14):
     ws_sum.column_dimensions[get_column_letter(c)].width = 16
 
 # Save
-output = os.path.join(BASE, '04월', '정산_수식버전_03월.xlsx')
-wb.save(output)
+output = os.path.join(BASE, FOLDER_NAME, f'정산_수식버전_{MONTH}월.xlsx')
+try:
+    wb.save(output)
+except PermissionError:
+    import datetime
+    ts = datetime.datetime.now().strftime('%H%M%S')
+    output = os.path.join(BASE, FOLDER_NAME, f'정산_수식버전_{MONTH}월_v4_{ts}.xlsx')
+    wb.save(output)
+    print(f'[NOTE] 원본 파일 락 → 임시 저장: {output}')
 print(f"\n=== 완료: {output} ===")
 print(f"시트: {wb.sheetnames}")
 print(f"총 {len(wb.sheetnames)}개 시트")

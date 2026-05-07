@@ -42,6 +42,8 @@ all_gerp = pd.DataFrame({
     'unit_price': pd.to_numeric(data.iloc[:, c['unit_price']], errors='coerce').fillna(0),
     'amount':     pd.to_numeric(data.iloc[:, c['amount']], errors='coerce').fillna(0),
     'vendor_cd':  data.iloc[:, c['vendor_cd']].astype(str).str.strip(),
+    # 차종 컬럼 (col 5, 0-based) — SVM/OVK 이관품번 제외 분기용 (빌더와 정합)
+    'vtype':      data.iloc[:, 5].astype(str).str.strip(),
 })
 
 print(f"  GERP 전체: {len(all_gerp):,}행")
@@ -51,6 +53,24 @@ print(f"\n[2/3] 대원테크({VENDOR_CODE}) 필터링 및 주야 분리...")
 gerp_dw = all_gerp[all_gerp['vendor_cd'] == VENDOR_CODE].copy()
 gerp_dw['shift_type'] = gerp_dw['shift'].map({'정상': '주간', '추가': '야간'}).fillna('주간')
 print(f"  대원테크: {len(gerp_dw):,}행")
+
+# ── 이관품번(SVM/OVK) 제외 — 빌더와 동일 로직 ─────────────────
+# SVM 차종: SP3M3/HCAMS02/ISAMS03 → 이관 (정산 제외)
+# OVK 차종: SD9A01/ANAAS04/DRAAS11 → 이관 (정산 제외)
+SVM_TRANSFER_LINES = {'SP3M3', 'HCAMS02', 'ISAMS03'}
+OVK_TRANSFER_LINES = {'SD9A01', 'ANAAS04', 'DRAAS11'}
+before_n = len(gerp_dw)
+svm_mask = gerp_dw['line'].isin(SVM_TRANSFER_LINES) & (gerp_dw['vtype'] == 'SVM')
+# OVK: 단 89880X 시작 품번은 OVK여도 이관 아님 (사용자 룰 2026-05-07)
+ovk_mask = (
+    gerp_dw['line'].isin(OVK_TRANSFER_LINES)
+    & (gerp_dw['vtype'] == 'OVK')
+    & ~gerp_dw['product_no'].str.startswith('89880X')
+)
+svm_n = svm_mask.sum(); svm_amt = gerp_dw.loc[svm_mask, 'amount'].sum()
+ovk_n = ovk_mask.sum(); ovk_amt = gerp_dw.loc[ovk_mask, 'amount'].sum()
+gerp_dw = gerp_dw[~(svm_mask | ovk_mask)].copy()
+print(f"  이관 제외: SVM {svm_n}행({svm_amt:,.0f}원) + OVK {ovk_n}행({ovk_amt:,.0f}원) = {before_n - len(gerp_dw)}행 / {svm_amt + ovk_amt:,.0f}원 (정산대상 {len(gerp_dw):,}행)")
 
 # 라인별 요약 출력
 for lc in LINE_ORDER:
