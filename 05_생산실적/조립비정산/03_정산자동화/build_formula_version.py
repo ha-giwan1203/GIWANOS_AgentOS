@@ -515,9 +515,10 @@ for line in LINES:
         # SP3M3: GERP 야간금액 그대로 (사용자 룰 2026-05-07 — GERP=구ERP 동일 셋팅)
         # SUB 라인: G × N (단순)
         if line == 'SD9A01':
-            # 사용자 룰 2026-05-07: 단가 ≤500 품번만 야간 가산 (×1.3), >500은 G*N (가산 X)
-            # GERP raw 야간 추가행은 단가 ≤500 품번만 별도 등록 (단가×0.3 amt). 단가>500은 야간행 자체 없음.
-            ws.cell(out_r, 16).value = f'=IF(G{out_r}<=500,G{out_r}*N{out_r}*1.3,G{out_r}*N{out_r})'
+            # 사용자 룰 정정 2026-05-07: ERP raw 실측 결과 모든 SD9A01 품번 야간 가산 30% 적용
+            # GERP raw 추가행 단가 = 정상 단가 × 0.3 (예: 정상 763 → 추가 228.9). 추가행은 가산만 별도.
+            # 빌더 P = G*N*1.3 (전체 100% + 가산 30%) — 마스터 단가 무관 모든 품번
+            ws.cell(out_r, 16).value = f'=G{out_r}*N{out_r}*1.3'
         elif line == 'SP3M3':
             ws.cell(out_r, 16).value = f'=L{out_r}'
         else:
