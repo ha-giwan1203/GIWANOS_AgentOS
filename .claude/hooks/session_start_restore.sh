@@ -181,7 +181,8 @@ if [ -x "$DOMAIN_SYNC" ]; then
   [ -n "$DOMAIN_RESULT" ] && echo "$DOMAIN_RESULT"
 fi
 
-# 드리프트 경고: TASKS/HANDOFF/STATUS 상단 날짜 비교 (hook_config.json drift_check 연동)
+# 드리프트 검사: TASKS/HANDOFF/STATUS 상단 날짜 (출력 축약 — 2026-05-08 세션148 근본 해결)
+# 출력 안 하고 hook_log만 기록. on-demand는 /현재상태 슬래시 명령어로.
 DRIFT_PATTERN="최종 업데이트"
 if [ -f "$CONFIG_FILE" ]; then
   _dp=$(grep '"date_pattern"' "$CONFIG_FILE" 2>/dev/null | sed 's/.*: *"\(.*\)".*/\1/' | head -1)
@@ -195,7 +196,6 @@ _HANDOFF_DATE=$(_extract_date "$PATH_HANDOFF")
 _STATUS_DATE=$(_extract_date "$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md")
 if [ -n "$_TASKS_DATE" ] && [ -n "$_HANDOFF_DATE" ] && [ -n "$_STATUS_DATE" ]; then
   if [ "$_TASKS_DATE" != "$_HANDOFF_DATE" ] || [ "$_TASKS_DATE" != "$_STATUS_DATE" ]; then
-    echo "[DRIFT] 상태 문서 날짜 불일치: TASKS=$_TASKS_DATE / HANDOFF=$_HANDOFF_DATE / STATUS=$_STATUS_DATE"
     hook_log "session_start_restore" "DRIFT detected: T=$_TASKS_DATE H=$_HANDOFF_DATE S=$_STATUS_DATE"
   fi
 fi
@@ -217,24 +217,9 @@ else
   echo "--- selfcheck 미실행 (bash .claude/self/selfcheck.sh 권장) ---"
 fi
 
-# Phase 3-1: 미해결 incident 요약 + 24h 신규 건수
-INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
-if [ -f "$INCIDENT_LEDGER" ]; then
-  TOTAL_COUNT=$(wc -l < "$INCIDENT_LEDGER" 2>/dev/null | tr -d ' ')
-  RESOLVED_COUNT=$(grep -c '"resolved":true\|"resolved": true' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
-  OPEN_COUNT=$(( TOTAL_COUNT - RESOLVED_COUNT ))
-  # 24시간 이내 신규 건수 (incident 필드명: "ts")
-  # 세션86: ledger ts는 UTC(Z 접미사) → cutoff도 UTC로 생성 (-u). KST 로컬 시간으로 비교 시 9시간 오프셋 발생
-  CUTOFF_24H=$(date -u -d "-24 hours" "+%Y-%m-%dT%H:%M" 2>/dev/null || date -u -v-24H "+%Y-%m-%dT%H:%M" 2>/dev/null || echo "")
-  RECENT_COUNT=0
-  if [ -n "$CUTOFF_24H" ]; then
-    RECENT_COUNT=$(awk -v cutoff="$CUTOFF_24H" '/"ts"/ { match($0, /"ts":"([^"]+)"/, a); if(a[1] >= cutoff) c++ } END { print c+0 }' "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
-  fi
-  if [ "$OPEN_COUNT" -gt 0 ] || [ "$RECENT_COUNT" -gt 0 ]; then
-    echo "--- 미해결 incident: ${OPEN_COUNT}건 (총 ${TOTAL_COUNT}건, 최근24h 신규 ${RECENT_COUNT}건) ---"
-    echo "    /auto-fix 로 분석 가능"
-  fi
-fi
+# incident 요약 출력 제거 (2026-05-08 세션148 근본 해결 — 압박 알람 on-demand 이동)
+# 사유: 매 세션 시작 시 "미해결 N건" 알람이 사고 출발선 압박 → 떠넘기기 유발
+# on-demand 확인은 /auto-fix 또는 /현재상태 슬래시 명령어. 검사 로직은 다른 hook이 별도 보유.
 
 hook_timing_end "session_start_restore" "$_SSR_START" "$KERNEL_STATE"
 exit 0
