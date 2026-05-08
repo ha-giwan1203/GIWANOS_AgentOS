@@ -1,0 +1,33 @@
+{
+  "_purpose": "마스터 V2 자동갱신 시 skip 대상 (라인, 품번, 단가) — 사용자 명시 삭제 / GERP 중복 입력 등",
+  "_format": "[line, part_no, price]",
+  "entries": [
+    [
+      "WAMAS01",
+      "89860X9000CTS",
+      16
+    ],
+    [
+      "WAMAS01",
+      "AD62203429WDN",
+      16
+    ],
+    [
+      "WAMAS01",
+      "89860SWIA0DDV",
+      16
+    ]
+  ],
+  "history": [
+    {
+      "date": "2026-05-08",
+      "session": "149",
+      "reason": "GERP raw에 같은 품번이 단가37 + 단가16 두 행으로 중복 입력 → 단가16이 잘못 입력. 구ERP는 1번만 잡힘. 마스터 V2 단가16 행 삭제하면 빌더 자동갱신이 부활시키므로 denylist 기록.",
+      "added": [
+        "WAMAS01|89860X9000CTS|16",
+        "WAMAS01|AD62203429WDN|16",
+        "WAMAS01|89860SWIA0DDV|16"
+      ]
+    }
+  ]
+}

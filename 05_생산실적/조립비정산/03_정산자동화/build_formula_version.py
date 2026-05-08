@@ -55,10 +55,27 @@ gerp_ws = gerp_wb[gerp_wb.sheetnames[0]]
 print("1-1. 마스터 V2 자동 갱신 (기준정보 누락 + Usage 차이 GERP 기준 등록)...")
 LINE_ORDER_MASTER = ['SD9A01', 'ANAAS04', 'DRAAS11', 'SP3M3', 'HASMS02', 'HCAMS02',
                      'WAMAS01', 'WABAS01', 'WASAS01', 'ISAMS03']
-import shutil, datetime as _dt
+import shutil, datetime as _dt, json as _json
 _master_backup = MASTER_FILE.replace('.xlsx', f'_pre_autosync_{_dt.datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx')
 shutil.copy2(MASTER_FILE, _master_backup)
 print(f"   마스터 백업: {os.path.basename(_master_backup)}")
+
+# denylist 로드 (사용자 명시 삭제 / GERP 중복 입력 skip — 세션149, 2026-05-08)
+_denylist_path = os.path.join(os.path.dirname(MASTER_FILE), '_master_denylist.json')
+DENYLIST = set()
+if os.path.exists(_denylist_path):
+    try:
+        with open(_denylist_path, 'r', encoding='utf-8') as _f:
+            _dl = _json.load(_f)
+        for _e in _dl.get('entries', []):
+            if len(_e) >= 3:
+                _ln, _pn, _pr = _e[0], _e[1], _e[2]
+                try: _pr_key = round(float(_pr), 4) if _pr is not None else None
+                except: _pr_key = None
+                DENYLIST.add((str(_ln).strip(), str(_pn).strip(), _pr_key))
+        print(f"   denylist 로드: {len(DENYLIST)}건 (자동갱신 skip)")
+    except Exception as _ex:
+        print(f"   [WARN] denylist 로드 실패: {_ex}")
 
 # 마스터 V2 (라인, 품번, 단가) → 행 위치 + Usage
 master_wb_w = openpyxl.load_workbook(MASTER_FILE)
@@ -99,6 +116,8 @@ for r in range(2, gerp_ws.max_row + 1):
     if nyu == '추가': continue  # 추가행은 마스터 등록 X (가산만)
     try: p_key = round(float(price), 4) if price is not None else None
     except: p_key = None
+    # denylist skip — 사용자 명시 삭제 / GERP 중복 입력 부활 차단 (세션149)
+    if (line, pn, p_key) in DENYLIST: continue
     gerp_keys[(line, pn, p_key)] = (usage, assy, '정단가', cha)
 
 # 갱신 적용
