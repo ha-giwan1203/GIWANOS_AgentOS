@@ -25,31 +25,12 @@ STATUS="$PATH_STATUS"
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 
 # ============================================================================
-# delegation guard Phase 0 (measurement only — 2026-05-04 세션142)
-# 토론 합의: 90_공통기준/토론모드/logs/debate_20260504_102742_3way/ (4-key pass_ratio=1.0)
-# 목적: Claude가 모호한 작업에서 결정을 사용자에게 떠넘기는 패턴 측정
-# 차단 없음(measurement only). Phase 1 block 전환은 7일 측정 후 사용자 명시 승인.
-# 화이트리스트(정당한 5조건·error/conflict 등) 매칭 시 측정 제외(false positive 방지).
+# delegation guard Phase 0 — 제거 (2026-05-08 세션148 토론 합의 3/3)
+# 합의 매트릭스: GPT 권고 + Gemini 동의 + Claude 채택. SHA f4eeee11 후속.
+# 사유: measurement만으로도 자기검열 유발. 위임 떠넘기기 방지는
+#   (1) CLAUDE.md:70 "위임 떠넘기기 금지" 명시 + (2) 메모리 feedback_authority_ladder.md 5조건으로 충분.
+# 기존 .claude/logs/delegation_guard.jsonl 로그는 보존(세션142 측정 데이터). 신규 측정 중단.
 # ============================================================================
-DG_DELEGATION_RE='(진행할까요|박을까요|진입할까요|선택해[[:space:]]*주세요|어떻게[[:space:]]*할까요|원하시면|확인[[:space:]]*부탁|결정해[[:space:]]*주세요|어디에[[:space:]]*박을까)'
-DG_WHITELIST_RE='(error|not[[:space:]]+found|conflict|입력값[[:space:]]*부재|기준[[:space:]]*충돌|ERP[[:space:]]*비가역|hook[[:space:]]*수정|SKILL[[:space:]]*Step|명시[[:space:]]*선택|5조건|Y/N)'
-# GPT 추가제안 A 흡수 (세션142 종결): raw 감지는 항상 기록 + whitelisted 필드 분리.
-# 분석 시 `whitelisted:false` = 진짜 위임, `whitelisted:true` = false positive 후보 (튜닝용).
-if [ -n "$LAST_TEXT" ] && echo "$LAST_TEXT" | grep -qiE "$DG_DELEGATION_RE"; then
-  DG_MATCHED=$(echo "$LAST_TEXT" | grep -oiE "$DG_DELEGATION_RE" | head -1)
-  DG_WL="false"
-  if echo "$LAST_TEXT" | grep -qiE "$DG_WHITELIST_RE"; then DG_WL="true"; fi
-  DG_MATCHED_ESC=$(json_escape "$DG_MATCHED")
-  DG_LOGDIR="$PROJECT_ROOT/.claude/logs"
-  [ -d "$DG_LOGDIR" ] || mkdir -p "$DG_LOGDIR" 2>/dev/null
-  printf '{"ts":"%s","type":"delegation_phrase","matched":"%s","whitelisted":%s,"mode":"measure_phase0","ref":"debate_20260504_102742_3way"}\n' \
-    "$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)" "$DG_MATCHED_ESC" "$DG_WL" \
-    >> "$DG_LOGDIR/delegation_guard.jsonl" 2>/dev/null
-  if [ "$DG_WL" = "false" ]; then
-    hook_log "Stop" "delegation_guard Phase 0 measured: $DG_MATCHED" 2>/dev/null
-  fi
-fi
-# === end delegation guard Phase 0 ===
 
 if ! is_completion_claim "$LAST_TEXT"; then
   # 약한 패턴(잔여이슈없음/ALL CLEAR/GPT PASS)만 매칭 시 로그만 남기고 통과
@@ -184,75 +165,13 @@ printf '{"ts":"%s","result":"pass","reason":"state_sync_ok","source":"gate"}\n' 
 rm -f "$MARKER" 2>/dev/null
 
 # ============================================================================
-# Phase 2-B 소프트 블록 (의제5 3자 토론 합의, 2026-04-19)
-# 최근 7일간 permissions_sanity '1회용 패턴' 경고가 동일 라벨 3회 이상 누적된 경우
-# 완료 보고 직전에 한 번 차단. 하드페일 없음 — 사용자가 의식적으로 재시도하면 통과.
+# Phase 2-B permissions_sanity 7일 누적 소프트블록 — 제거 (2026-05-08 세션148 토론 합의 3/3)
+# 합의 매트릭스: GPT 권고 + Gemini 동의(폐기 기능 잔재) + Claude 채택.
+# 사유: permissions_sanity hook 자체는 비활성(98_아카이브/_deprecated_v1/hooks/).
+#   completion_gate가 산출물 로그(hook_log.jsonl의 "permissions_sanity ... 경고")만
+#   7일 누적 검사하던 잔존 의존. 죽은 hook의 그림자.
+# 기존 .claude/state/completion_gate_phase2b_last.txt cache는 그대로 둠 (참조 안 함).
 # ============================================================================
-PSCOUNT_CACHE="$PROJECT_ROOT/.claude/state/completion_gate_phase2b_last.txt"
-_P2B_NOW=$(date +%s 2>/dev/null || echo 0)
-_P2B_LAST=0
-if [ -f "$PSCOUNT_CACHE" ]; then
-  _P2B_LAST=$(cat "$PSCOUNT_CACHE" 2>/dev/null || echo 0)
-fi
-# 동일 세션에서 이미 경고 후 재시도한 경우는 통과 (60초 이내 재호출 = 사용자 의도적 재시도)
-if [ $((_P2B_NOW - _P2B_LAST)) -lt 60 ] 2>/dev/null; then
-  hook_timing_end "completion_gate" "$_CMG_START" "pass_cooldown"
-  exit 0
-fi
-
-if [ -f "$PROJECT_ROOT/.claude/hooks/hook_log.jsonl" ]; then
-  REPEATED=$(PYTHONUTF8=1 "$PY_CMD" - "$PROJECT_ROOT/.claude/hooks/hook_log.jsonl" <<'PYEOF' 2>/dev/null
-import json, re, sys
-from collections import Counter
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-
-log_path = Path(sys.argv[1])
-if not log_path.exists():
-    sys.exit(0)
-
-cutoff = datetime.now(timezone.utc) - timedelta(days=7)
-label_re = re.compile(r'\[([^\]]+)\]')
-counter = Counter()
-
-try:
-    for line in log_path.read_text(encoding='utf-8', errors='ignore').splitlines():
-        try:
-            d = json.loads(line)
-        except Exception:
-            continue
-        msg = d.get('msg', '')
-        if 'permissions_sanity' not in msg or '경고' not in msg:
-            continue
-        ts = d.get('ts', '')
-        try:
-            dt = datetime.strptime(ts, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
-        except Exception:
-            continue
-        if dt < cutoff:
-            continue
-        m = label_re.search(msg)
-        if m:
-            counter[m.group(1)] += 1
-except Exception:
-    sys.exit(0)
-
-repeated = sorted([(k, v) for k, v in counter.items() if v >= 3], key=lambda x: -x[1])
-if repeated:
-    parts = [f"{k}({v}회)" for k, v in repeated[:3]]
-    print("|".join(parts))
-PYEOF
-)
-  if [ -n "$REPEATED" ]; then
-    hook_incident "soft_block" "completion_gate" "$REPEATED" "1회용 패턴 ${REPEATED} 7일 내 3회 이상 누적" '"classification_reason":"oneoff_pattern_repeat","phase":"2B","next_action":"CLAUDE.md 5단계 의사결정 트리 참조. 포괄 Bash(echo:*) 등 사용 또는 settings 정리 후 재보고"' 2>/dev/null || true
-    printf '{"ts":"%s","result":"soft_block","reason":"phase2b_oneoff_repeat","repeated":"%s","source":"gate"}\n' "$_CC_TS" "$REPEATED" \
-      >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
-    echo "$_P2B_NOW" > "$PSCOUNT_CACHE" 2>/dev/null || true
-    echo "{\"decision\":\"deny\",\"reason\":\"[COMPLETION GATE · Phase 2-B 소프트 블록] 최근 7일간 permissions 1회용 패턴이 반복 등록되고 있습니다: ${REPEATED}. CLAUDE.md 5단계 의사결정 트리를 재검토하거나 포괄 Bash(echo:*) 패턴을 활용하세요. 의도적인 진행이라면 재보고 시 통과됩니다(60초 쿨다운).\"}"
-    hook_timing_end "completion_gate" "$_CMG_START" "soft_block"
-    exit 0
-  fi
-fi
 
 hook_timing_end "completion_gate" "$_CMG_START" "pass"
 exit 0
