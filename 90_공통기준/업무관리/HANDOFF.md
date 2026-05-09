@@ -4,7 +4,35 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-08 KST — **세션150** [A] 4월 이관품번 라인별 정리 시트 추가 완료 / 세션149 [A] 4월 화인텍 이관품번 지원비용 파일 양식 작성 (정리 대기) + [A+C] 4월 정산 마스터 V2 정리 완료.
+최종 업데이트: 2026-05-09 KST — **세션151** [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료 / 세션149 [A] 4월 화인텍 이관품번 지원비용 파일 양식 작성 (정리 대기) + [A+C] 4월 정산 마스터 V2 정리 완료.
+
+## 세션151 D0 자동화 패치 (2026-05-09)
+
+**배경**: 사용자 보고 — 5/9(토) morning 자동 실행 실패 + 야간 evening 반영 시 가끔 품번 누락. 분석 후 3종 패치 적용·push.
+
+**원인 진단 (B 모드)**:
+1. **morning 실패** = 5/8 작업 후 안 닫힌 자동화용 Chrome이 절전 사이 9223 listen 사망 → 5/9 새 Chrome launch가 single-instance 규칙으로 좀비에 URL만 위임 → 화면엔 ERP 로그인 페이지(사용자 직접 관찰) 떴지만 9223 listen 부활 안 함 → Python timeout. 자동복구도 `verify_run.py` 분류 패턴이 `9222`로 굳어 있어 UNKNOWN 처리.
+2. **evening 누락** = `rank_batch`/`api_rank_batch`의 `idx_map`이 PROD_NO 단일 키 + REG_NO max만 보관 → 같은 품번 N행 등록 시 1건만 라인 배치되고 나머지 누락. 4/30 manual_evening 로그 ext=320225/320227 두 번 OK + 320224/320226 빈 슬롯이 직접 증거.
+3. **검증 부재** = `verify_smartmes`가 set 비교라 중복 품번 1건 누락 검출 불가. 불일치 떠도 exit 0.
+
+**적용 패치 (commit 59273df9)**:
+- `run.py` `_kill_zombie_chrome()` 신설 — CHROME_PROFILE 매칭 chrome.exe만 선별 종료 + SingletonLock/Cookie/Socket 정리 후 fresh launch. `ensure_chrome_cdp()` CDP dead 분기에서 호출.
+- `run.py` `rank_batch`/`api_rank_batch` idx_map → PROD_NO -> [REG_NO 오름차순 배열], items 등장 순서대로 N번째 REG_NO 매핑.
+- `run.py` `verify_smartmes` Counter 기반 카운트·중복·순서 3중 검증, 실패 시 False 반환 + 호출처에서 `PHASE6_FAILED` 누적, `main` 종료부에 `sys.exit(2)`.
+- `verify_run.py` `cdp_down` 패턴 보강(`922[23]` + `기동 실패` + `dead`) + RETRY_NO_PATTERNS에 `phase6_verify_failed` 신설.
+- 신설 (보존, schtasks 등록 보류): `run_evening.bat` / `run_evening_hidden.vbs` / `run_evening_recover.bat`.
+
+**schtasks evening 등록 보류**: 사용자 결정 — 야간 계획 확정 시간이 일정하지 않아 자동 시간 등록 부적합. ad-hoc 수동 실행 유지(`D0_저녁.bat` 또는 신설 `run_evening.bat`).
+
+**검증**:
+- 5/9 morning 로그 분류기 시뮬레이션: `UNKNOWN/unmatched` → `RETRY_OK/cdp_down` 으로 정상 전환 확인.
+- 4/30 evening 시뮬레이션: BEFORE `[320225, 320225, 320227, 320227]` 중복 → AFTER `[320224, 320225, 320226, 320227]` unique. 누락 재현·해결 확인.
+- `python -m py_compile run.py verify_run.py` PASS.
+
+**다음 세션 첫 행동**:
+1. 다음 morning 자동 실행(5/11 월 07:11) 결과 모니터링 — `_kill_zombie_chrome` 정상 동작 + 9223 fresh launch 확인.
+2. 야간 evening 수동 실행 시 같은 품번 N회 등장 케이스에서 누락 0 검증.
+3. phase6 검증 실패 트리거 시 verify_run 자동복구 분기 진입 동작 확인 (`recover_evening_*.log` 분류=`phase6_verify_failed`).
 
 ## 4월 이관품번 정리 (세션150)
 
