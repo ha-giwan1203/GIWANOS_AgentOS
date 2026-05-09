@@ -38,6 +38,9 @@ SMARTMES_TOKEN = "bfee3f3d-caf9-434d-abbb-2cb015ec2469"
 SMARTMES_BASE = "http://lmes-dev.samsong.com:19220"
 DAY_CUT_THRESHOLD = 3600
 
+# 세션151: phase6 SmartMES 검증 실패 누적. main 종료 시 0이 아니면 exit 코드 2 (verify_run에서 자동복구 진입).
+PHASE6_FAILED = []  # [(line_cd, prod_date_str), ...]
+
 LINE_CONFIG = {
     "SP3M3": {
         "line_div_cd": "02",
@@ -75,6 +78,50 @@ def _suppress_chrome_crash_restore(profile_dir: str):
         print(f"[phase0] Preferences 정리 실패 (무시): {e}")
 
 
+def _kill_zombie_chrome(profile_dir: str):
+    """자동화 프로필 Chrome 좀비만 선별 종료 + 잠금파일 정리.
+
+    세션151 보강: 5/9(토) morning 실패 분석 결과.
+    같은 user-data-dir로 Chrome 좀비가 살아있으면 새 launch가 single-instance 규칙으로
+    좀비에 URL만 위임 → 9223 listen은 부활 안 함 → 화면엔 ERP 로그인 페이지만 뜨고 Python timeout.
+
+    프로필 디렉토리 매칭(`--user-data-dir=...`)으로 자동화 Chrome만 식별하여
+    사용자 일상 Chrome(다른 프로필)은 건드리지 않는다.
+    """
+    try:
+        # CommandLine에 user-data-dir 매칭. profile_dir의 백슬래시는 PowerShell -like 패턴에서
+        # 그대로 사용 가능 (와일드카드 *로 둘러싸므로 escape 불필요).
+        ps_cmd = (
+            "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
+            f"Where-Object {{ $_.CommandLine -like '*--user-data-dir={profile_dir}*' }} | "
+            "Select-Object -ExpandProperty ProcessId"
+        )
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-Command", ps_cmd],
+            capture_output=True, text=True, timeout=10
+        )
+        pids = [p.strip() for p in result.stdout.splitlines() if p.strip().isdigit()]
+        if pids:
+            print(f"[phase0] zombie chrome 발견 (프로필 매칭): pids={pids} — 종료")
+            for pid in pids:
+                subprocess.run(["taskkill", "/F", "/PID", pid], capture_output=True, timeout=5)
+            time.sleep(1.5)  # 종료 안정화 + 파일 핸들 release
+        else:
+            print("[phase0] zombie chrome 없음")
+        # 잠금파일 잔재 정리 (Chrome 비정상 종료 후 SingletonLock 잔존 시 신규 인스턴스 차단됨)
+        from pathlib import Path as _Path
+        for lock_name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
+            lock_path = _Path(profile_dir) / lock_name
+            try:
+                if lock_path.exists() or lock_path.is_symlink():
+                    lock_path.unlink()
+                    print(f"[phase0] {lock_name} 정리")
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"[phase0] zombie chrome 정리 실패 (무시): {e}")
+
+
 def ensure_chrome_cdp():
     """CDP 9223 기동 확인."""
     import urllib.request
@@ -85,6 +132,8 @@ def ensure_chrome_cdp():
     except Exception:
         print("[phase0] CDP dead — launching Chrome")
 
+    # 세션151: single-instance 위임 함정 차단 — 같은 프로필 좀비 정리 후 fresh launch
+    _kill_zombie_chrome(CHROME_PROFILE)
     # Chrome 비정상 종료 잔재 정리 (세션110 — 복원 알림 차단)
     _suppress_chrome_crash_restore(CHROME_PROFILE)
 
@@ -884,7 +933,9 @@ def api_rank_batch(page, items, target_line, save_url, sess=None):
         sess = build_requests_session_from_page(page)
     base_url = "http://erp-dev.samsong.com:19100"
 
-    # 상단 grid REG_NO 최대 매핑 (rank_batch와 동일)
+    # 상단 grid REG_NO 오름차순 배열 매핑 (세션151: PROD_NO 단일 키 → 다중 등장 매핑)
+    # 같은 PROD_NO가 items에 N번 나오면 grid에도 N행 등록되는데, 기존 단일 키는 N건 모두 같은 ext로 매핑되어
+    # 1건만 처리되고 나머지(N-1)건 누락. items 등장 순서대로 N번째 REG_NO 매핑.
     today_str = datetime.now().strftime("%Y-%m-%d")
     idx_map = page.evaluate("""(today) => {
         const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
@@ -892,21 +943,27 @@ def api_rank_batch(page, items, target_line, save_url, sess=None):
         d.forEach(r => {
             if (r.REG_DT === today) {
                 const key = r.PROD_NO;
-                const reg = parseInt(r.REG_NO);
-                if (!map[key] || map[key] < reg) map[key] = reg;
+                if (!map[key]) map[key] = [];
+                map[key].push(parseInt(r.REG_NO));
             }
         });
+        for (const k in map) map[k].sort((a,b) => a - b);
         return map;
     }""", today_str)
 
     done, failed, missing, fails = 0, 0, 0, []
+    pno_seen = {}  # pno -> 이미 처리한 등장 횟수
     for it in items:
         pno = it["PROD_NO"]
-        ext = idx_map.get(pno)
-        if not ext:
-            print(f"[api_phase4] {pno} 상단 grid 매칭 실패 (REG_NO 없음)")
+        arr = idx_map.get(pno) or []
+        n = pno_seen.get(pno, 0)
+        if n >= len(arr):
+            print(f"[api_phase4] {pno} 상단 grid 매칭 실패 (등장 #{n+1}, grid에 {len(arr)}건만)")
             missing += 1
+            pno_seen[pno] = n + 1
             continue
+        ext = arr[n]
+        pno_seen[pno] = n + 1
 
         # 1. process_one_row(dry_run=True) — addRow만, jQuery.ajax POST 안 함
         p = process_one_row(page, pno, ext, target_line, save_url, dry_run=True)
@@ -978,29 +1035,42 @@ def api_rank_batch(page, items, target_line, save_url, sess=None):
 
 
 def rank_batch(page, items, target_line, save_url, dry_run=False):
-    """엑셀 순서대로 상단 idx 매핑 → process_one_row 반복."""
-    # 상단 grid REG_NO 최대 매핑
+    """엑셀 순서대로 상단 idx 매핑 → process_one_row 반복.
+
+    세션151 보강: 같은 PROD_NO가 items에 N번 나오면(야간 같은 품번 2회 등장) grid에도 N행 등록되는데,
+    기존 idx_map은 PROD_NO 단일 키 + REG_NO 최대값만 보관 → N건 모두 같은 ext에 매핑되어
+    1건만 라인 배치되고 나머지(N-1)건은 누락. 4/30 evening RSP3SC0395/0396 ext=320225/320227 중복 OK
+    + ext=320224/320226 슬롯 빈 케이스가 직접 증거.
+    → idx_map을 PROD_NO -> [REG_NO 오름차순 배열]로, items 순회 시 같은 PROD_NO N번째 등장에 N번째 REG_NO 매핑.
+    """
+    # 상단 grid REG_NO 오름차순 배열 매핑
     idx_map = page.evaluate("""(today) => {
         const d = jQuery('#grid_body').pqGrid('option','dataModel').data;
         const map = {};
         for (let i=0;i<d.length;i++) {
             if (d[i].REG_DT !== today) continue;
             const pno = d[i].PROD_NO;
-            if (!map[pno] || Number(d[i].REG_NO) > Number(map[pno].extReg)) {
-                map[pno] = {idx:i, extReg:d[i].REG_NO};
-            }
+            if (!map[pno]) map[pno] = [];
+            map[pno].push({idx:i, extReg:Number(d[i].REG_NO)});
         }
+        for (const k in map) map[k].sort((a,b) => a.extReg - b.extReg);
         return map;
     }""", datetime.today().strftime("%Y-%m-%d"))
 
     done, failed, missing = 0, 0, 0
     fails = []
+    pno_seen = {}  # pno -> 이미 처리한 등장 횟수
     for it in items:
         pno = it["PROD_NO"]
-        if pno not in idx_map:
-            print(f"[phase4] SKIP missing in grid: {pno}")
-            missing += 1; continue
-        ext = idx_map[pno]["extReg"]
+        arr = idx_map.get(pno) or []
+        n = pno_seen.get(pno, 0)
+        if n >= len(arr):
+            print(f"[phase4] SKIP missing in grid: {pno} (등장 #{n+1}, grid에 {len(arr)}건만)")
+            missing += 1
+            pno_seen[pno] = n + 1
+            continue
+        ext = arr[n]["extReg"]
+        pno_seen[pno] = n + 1
         r = process_one_row(page, pno, ext, target_line, save_url, dry_run=dry_run)
         ok = r.get("ok") and (r.get("dryRun") or (r.get("r") and str(r["r"].get("statusCode"))=="200"))
         print(f"[phase4] {pno} ext={ext} -> {'OK' if ok else 'FAIL'}")
@@ -1044,7 +1114,13 @@ def final_save(page, save_url):
 # Phase 6: SmartMES 검증
 # ============================================================
 def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
+    """SmartMES 등록 결과 검증.
+
+    세션151 보강: 기존엔 set 비교라 같은 PROD_NO 중복(엑셀 2건 / server 1건) 누락 검출 불가.
+    Counter 기반 카운트·중복 검증 + 건수 일치 검증 추가. 실패 시 False 반환 → main 종료 시 exit 비-0.
+    """
     import urllib.request
+    from collections import Counter
     headers = {
         "Authorization": f"Bearer {SMARTMES_TOKEN}",
         "tid": SMARTMES_TOKEN, "token": SMARTMES_TOKEN,
@@ -1057,19 +1133,48 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
         items = json.loads(urllib.request.urlopen(req, timeout=5).read())["rslt"]["items"]
     except Exception as e:
         print(f"[phase6] SmartMES 조회 실패: {e}")
-        return
+        return False
     r_items = sorted([x for x in items if x["workStatusCd"] == "R"], key=lambda i: i["prdtRank"])
     pnos_server = [x["pno"] for x in r_items]
     pnos_excel = [it["PROD_NO"] for it in excel_order]
-    # 엑셀 순서 기준으로 서버의 R 리스트 일치 여부
-    filtered_server = [p for p in pnos_server if p in set(pnos_excel)]
-    filtered_excel = [p for p in pnos_excel if p in set(pnos_server)]
-    if filtered_server == filtered_excel:
-        print(f"[phase6] {line_cd} 서열 순서 엑셀 일치 ✅ ({len(filtered_server)}건)")
-    else:
-        print(f"[phase6] {line_cd} 서열 불일치")
-        print(f"  server: {filtered_server[:10]}...")
-        print(f"  excel : {filtered_excel[:10]}...")
+
+    cnt_server = Counter(pnos_server)
+    cnt_excel = Counter(pnos_excel)
+    excel_set = set(pnos_excel)
+    server_set = set(pnos_server)
+
+    issues = []
+
+    # (1) 카운트별 중복 누락 검증 — set 비교 한계 보강
+    missing_pnos = []
+    for pno, n_excel in cnt_excel.items():
+        n_server = cnt_server.get(pno, 0)
+        if n_server < n_excel:
+            missing_pnos.append({"pno": pno, "excel": n_excel, "server": n_server})
+    if missing_pnos:
+        issues.append(f"품번별 누락 {len(missing_pnos)}건")
+
+    # (2) 엑셀 PROD_NO 기준 server 등록 합계 vs 엑셀 건수
+    server_in_excel_count = sum(cnt_server[p] for p in cnt_server if p in excel_set)
+    if server_in_excel_count != len(pnos_excel):
+        issues.append(f"건수 불일치 server={server_in_excel_count} excel={len(pnos_excel)}")
+
+    # (3) 순서 검증 — 엑셀에만 있는 / server에만 있는 PROD_NO 제외하고 동일 시퀀스인지
+    filtered_server = [p for p in pnos_server if p in excel_set]
+    filtered_excel = [p for p in pnos_excel if p in server_set]
+    if filtered_server != filtered_excel:
+        issues.append("순서 불일치")
+
+    if not issues:
+        print(f"[phase6] {line_cd} 서열 순서 엑셀 일치 ✅ ({len(pnos_excel)}건, 카운트·중복·순서 모두 일치)")
+        return True
+
+    print(f"[phase6] {line_cd} 검증 실패: {' / '.join(issues)}")
+    print(f"  server: {filtered_server[:10]}{'...' if len(filtered_server) > 10 else ''}")
+    print(f"  excel : {filtered_excel[:10]}{'...' if len(filtered_excel) > 10 else ''}")
+    if missing_pnos:
+        print(f"  누락 상세: {missing_pnos}")
+    return False
 
 
 # ============================================================
@@ -1112,7 +1217,9 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         print(f"[{line}]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
         return
     final_save(page, cfg["save_url"])
-    verify_smartmes(target_line, verify_prod_date or prod_date, items)
+    vp = verify_prod_date or prod_date
+    if not verify_smartmes(target_line, vp, items):
+        PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
 
 
 def determine_session(arg):
@@ -1217,7 +1324,8 @@ def main():
                 print("=== /d0-plan --xlsx --no-mes-send 완료 ===")
                 return
             final_save(page, cfg["save_url"])
-            verify_smartmes(line_override, prod_date, items)
+            if not verify_smartmes(line_override, prod_date, items):
+                PHASE6_FAILED.append((line_override, prod_date.strftime("%Y-%m-%d")))
             # 세션135: --xlsx 분기에도 chain 호출 (line_override=SP3M3 한정)
             if line_override == "SP3M3" and not args.parse_only and not args.no_jobsetup:
                 _run_jobsetup_chain(args.jobsetup_mode, prod_date)
@@ -1278,6 +1386,12 @@ def main():
                 _run_jobsetup_chain(args.jobsetup_mode, prod_date)
 
         print("=== /d0-plan 완료 ===")
+
+    # 세션151: phase6 검증 실패 누적 시 exit 2로 verify_run 자동복구 진입 신호.
+    # final_save 후 SmartMES 카운트·중복·순서 중 하나라도 어긋나면 활성. 누락 의심 시 사용자 알림.
+    if PHASE6_FAILED:
+        print(f"[phase6] 검증 실패 누적: {PHASE6_FAILED} — exit 2", file=sys.stderr)
+        sys.exit(2)
 
 
 def _run_jobsetup_chain(mode: str, prod_date):

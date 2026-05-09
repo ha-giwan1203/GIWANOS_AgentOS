@@ -56,7 +56,9 @@ RETRY_OK_PATTERNS = [
     # 5xx HTTP 응답만 매칭 (timestamp 오매칭 방지). 단순 r"5\d{2}\b"는 [HHMMSS] 패턴에 오매칭됨
     (r"HTTP[/ ]?5\d{2}|status[Cc]ode[: =]+5\d{2}|InternalServerError|\b5\d{2}\s+(?:Internal|Server|Bad|Service)", "5xx"),
     (r"ConnectionError|ConnectionResetError|NetworkError|ECONN", "network"),
-    (r"CDP.*not running|9222.*refused|chrome.*not.*launched", "cdp_down"),
+    # 세션151: 9222→9223 전환(세션107) 미동기화 + 한국어 메시지 미반영 보강.
+    # "CDP 9223 기동 실패" 메시지가 UNKNOWN으로 떨어지던 버그 수정.
+    (r"CDP.*(not running|기동 실패|dead)|922[23].*refused|chrome.*not.*launched", "cdp_down"),
     (r"auth-dev.*login\?error|OAuth.*timeout|클라이언트.*선택.*화면", "oauth_stuck"),
 ]
 RETRY_NO_PATTERNS = [
@@ -65,6 +67,9 @@ RETRY_NO_PATTERNS = [
     (r"FileNotFoundError.*폴더 없음|FileNotFoundError.*파일 없음", "plan_path_missing"),
     (r"PermissionError|Access.*denied|권한.*없음", "permission"),
     (r"마스터.*정보.*불일치|품번.*매칭.*실패|MasterMismatch", "master_mismatch"),
+    # 세션151: phase6 검증 실패는 등록 자체는 완료된 상태라 재시도해도 같은 결과 → 즉시 사용자 알림.
+    # 누락 품번은 화면에서 수동 추가하거나 dedupe 후 재반영 결정 필요.
+    (r"\[phase6\] .* 검증 실패|phase6.*검증 실패 누적", "phase6_verify_failed"),
 ]
 
 
