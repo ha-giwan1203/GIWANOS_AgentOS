@@ -34,6 +34,8 @@
 2. 야간 evening 수동 실행 시 같은 품번 N회 등장 케이스에서 누락 0 검증.
 3. phase6 검증 실패 트리거 시 verify_run 자동복구 분기 진입 동작 확인 (`recover_evening_*.log` 분류=`phase6_verify_failed`).
 
+**GPT 판정 (2026-05-09)**: PASS — 5/5 items 모두 실증됨·동의 (좀비 chrome 정리 / rank_batch N번째 매핑 / verify_smartmes Counter 3중 검증 + exit 2 / verify_run cdp_down 9223 보강 / evening schtasks 보류 결정). 추가제안 A분류 1건 — 다음 1회 morning 자동 실행 + 1회 evening 수동 실행 로그만 관찰. 코드 추가 수정 불필요. 확인 포인트: zombie chrome 발견/없음 / CDP 9223 fresh launch / evening 중복 품번 ext 연속 REG_NO 매핑 / phase6 실패 시 exit 2 실제 잡힘 여부.
+
 ## 4월 이관품번 정리 (세션150)
 
 **산출물**: `05_생산실적/조립비정산/05월/중복품번_오류리스트_04월.xlsx` (시트 1개 — `오류리스트`)

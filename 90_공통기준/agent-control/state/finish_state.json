@@ -1,31 +1,68 @@
 {
   "terminal_state": "done",
-  "session": 140,
+  "session": 151,
   "committed_pushed": true,
-  "last_sha": "517a57b8",
+  "last_sha": "00f97c5c",
   "gpt_shared": true,
   "gpt_judgment": "PASS",
-  "gemini_judgment": "PASS",
-  "user_reported": true,
+  "gemini_judgment": null,
+  "user_reported": false,
   "followup_checked": true,
   "exception_reason": null,
-  "session140_summary": {
-    "topic": "verify_receipt_gate_phase0",
-    "shares": 3,
-    "verdicts": [
-      "GPT PASS / Gemini 부분PASS (1차 8cf15a03)",
-      "GPT PASS / Gemini PASS (2차 b721cb78 plan v3)",
-      "GPT PASS / Gemini PASS (3차 327d0a68 Phase 0 코드)"
+  "session151_summary": {
+    "topic": "d0_morning_zombie_chrome_fix_evening_partno_dedup_fix",
+    "commits": ["59273df9", "00f97c5c"],
+    "patches": [
+      "_kill_zombie_chrome — CHROME_PROFILE matching chrome.exe selective kill via PowerShell Get-CimInstance + SingletonLock cleanup before fresh launch",
+      "rank_batch/api_rank_batch idx_map: PROD_NO single key -> [REG_NO ascending array], items Nth occurrence maps Nth REG_NO",
+      "verify_smartmes Counter-based 3-way verification (count/dup/order) + PHASE6_FAILED accumulation + sys.exit(2)",
+      "verify_run cdp_down pattern 922[23]/Korean reinforcement + phase6_verify_failed RETRY_NO classification"
     ],
-    "harness": "채택 6 / 보류 0 / 버림 0 (3차 기준)",
-    "code_changed_files": 6,
-    "phase0_no_op": true,
-    "phase0_observation_start_kst": "2026-05-03 KST",
-    "phase0_observation_end_kst": "2026-05-10 KST",
-    "phase1_entry_conditions": [
-      "7일 4지표 통과",
-      "사용자 명시 승인",
-      "d0 verify_run.py receipt stub 추가"
+    "evening_wrappers_added": [
+      "run_evening.bat",
+      "run_evening_hidden.vbs",
+      "run_evening_recover.bat"
+    ],
+    "schtasks_evening_registered": false,
+    "schtasks_evening_reason": "야간 계획 확정 시간 가변 — 사용자 결정으로 ad-hoc 실행 유지",
+    "validation": {
+      "morning_log_classifier": "BEFORE UNKNOWN/unmatched -> AFTER RETRY_OK/cdp_down",
+      "evening_simulation": "BEFORE ext=[320225,320225,320227,320227] -> AFTER ext=[320224,320225,320226,320227] unique",
+      "py_compile": "PASS"
+    },
+    "gpt_judgment_detail": {
+      "verdict": "PASS",
+      "items": "5/5 실증됨·동의",
+      "additional_proposal": "A분류 — 다음 1회 morning 자동 실행 + 1회 evening 수동 실행 로그 모니터링 / 코드 수정 불필요"
+    },
+    "next_session_first_actions": [
+      "다음 morning 자동 실행(5/11 월 07:11) _kill_zombie_chrome 동작 확인",
+      "evening 수동 실행 시 같은 품번 N회 등장 케이스 누락 0 검증",
+      "phase6 검증 실패 트리거 시 verify_run 자동복구 분기 진입 확인"
+    ]
+  },
+  "session143_summary": {
+    "topic": "sp3m3_night_5_4_d0_register_with_prod_date_arg",
+    "commits": ["81360bc1", "c0be1328", "4b313046"],
+    "erp_register": {
+      "line": "SP3M3",
+      "session": "evening",
+      "file_date": "2026-05-06",
+      "prod_date": "2026-05-04",
+      "extracted": 25,
+      "deduped": 1,
+      "registered": 24,
+      "reg_no_range": "321084~321107",
+      "mes_rslt_cnt": 1200,
+      "verify_smartmes": "pass"
+    },
+    "code_changes": [
+      "run.py --prod-date arg added (evening flow)",
+      "run.py --prod-date arg applied (morning flow)"
+    ],
+    "deferred_agendas": [
+      "야간 6행+ 중복 PROD_NO silent 누락 plan (plans/1-5-silly-ritchie.md)",
+      "공휴일 자동 매핑 fallback (today+1 없으면 today+2 1일 fallback)"
     ]
   },
   "phase7_complete": true,
