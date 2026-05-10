@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-09 KST — **세션151** [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료 / 세션149 [A] 4월 화인텍 이관품번 지원비용 파일 양식 작성 (정리 대기) + [A+C] 4월 정산 마스터 V2 정리 완료.
+최종 업데이트: 2026-05-11 KST — **세션151 후속** [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / **세션151** [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료 / 세션149 [A] 4월 화인텍 이관품번 지원비용 파일 양식 작성 (정리 대기) + [A+C] 4월 정산 마스터 V2 정리 완료.
 
 ## 세션151 D0 자동화 패치 (2026-05-09)
 
@@ -34,7 +34,37 @@
 2. 야간 evening 수동 실행 시 같은 품번 N회 등장 케이스에서 누락 0 검증.
 3. phase6 검증 실패 트리거 시 verify_run 자동복구 분기 진입 동작 확인 (`recover_evening_*.log` 분류=`phase6_verify_failed`).
 
-**GPT 판정 (2026-05-09)**: PASS — 5/5 items 모두 실증됨·동의 (좀비 chrome 정리 / rank_batch N번째 매핑 / verify_smartmes Counter 3중 검증 + exit 2 / verify_run cdp_down 9223 보강 / evening schtasks 보류 결정). 추가제안 A분류 1건 — 다음 1회 morning 자동 실행 + 1회 evening 수동 실행 로그만 관찰. 코드 추가 수정 불필요. 확인 포인트: zombie chrome 발견/없음 / CDP 9223 fresh launch / evening 중복 품번 ext 연속 REG_NO 매핑 / phase6 실패 시 exit 2 실제 잡힘 여부.
+**GPT 판정 (2026-05-09)**: PASS — 5/5 items 모두 실증됨·동의 (좀비 chrome 정리 / rank_batch N번째 매핑 / verify_smartmes Counter 3중 검증 + exit 2 / verify_run cdp_down 9223 보강 / evening schtasks 보류 결정). 추가제안 A분류 1건 — 다음 1회 morning 자동 실행 + 1회 evening 수동 실행 로그만 관찰.
+
+## 세션151 후속 — 5/11 morning OAuth 실패 + `_force_chrome_foreground` 신설 (2026-05-11)
+
+**증상**: 5/11(월) 07:11 morning 자동 실행 → `_kill_zombie_chrome` 좀비 2개 정상 정리 + CDP 9223 fresh launch 성공. 그러나 OAuth pyautogui 자동 로그인이 `/login?error` 받고 2회 모두 실패 → 등록 0건.
+
+**사용자 직접 관찰**: "아침에 보니까 또 브라우저 창 위에 다른 것들이 떠 있어서 로그인 못했던 거 같다."
+
+**진짜 원인 (반복 진단 실패 사실 인정)**:
+- 세션141 (5/4)에서 사용자가 이미 정확히 진단한 패턴 — Chrome window가 OS-foreground 아니면 pyautogui 클릭이 위 창에 떨어져 빈값 submit → `?error`.
+- 세션141 패치는 `run_morning_hidden.vbs` (콘솔 hidden)만 적용. **Chrome window OS-foreground 강제 코드는 미적용**. 5/5~5/8 4일 통과는 운(그 시간대 다른 창 없었음).
+- 세션151 (5/9)에서 사용자가 "로그인 단계에서 못했다" 또 짚었으나 `_kill_zombie_chrome` single-instance 위임 해석으로 본질 절반만 잡음.
+- 5/11에 동일 패턴 재발.
+
+**5/11 수동 처리**: 사용자 직접 ERP 등록(REG_NO=324492 RSP3SC0666 / 324493 RSP3SC0665). 내 manual 재실행은 `dedupe_existing_registrations` 가드로 중복 차단 정상 동작. 잡셋업 chain은 작업자 배치(6공정) commit 성공 / auth 단계 `[ABORT] wrkId 전 공정 미반영` (sleep +2s 후 list 응답 wrkId 누락 — eventual consistency 이슈) → 검사항목 17건 미진행. SmartMES UI 수동 처리 필요.
+
+**적용 패치 (commit 본 커밋)**:
+- `_force_chrome_foreground()` 신설 — `EnumWindows` + `GetWindowThreadProcessId`로 자동화 프로필(`--user-data-dir=CHROME_PROFILE`) chrome.exe PID 매칭 윈도우만 `ShowWindow(SW_RESTORE)` + `SetForegroundWindow`. 카카오톡/Claude 등 다른 Chromium 앱(같은 `Chrome_WidgetWin` 클래스) 오매칭 차단.
+- 매칭 우선순위: PID 매칭(정확) → URL 키워드(보조) → 둘 다 실패 시 False 반환(fallback 없음).
+- `ensure_erp_login` 진입 직후 + pyautogui 클릭 직전 2회 호출 (호출 사이 다른 창 끼어듦 차단).
+- submit 직후 `/login?error` 감지 시 즉시 경고 출력 (60초 timeout 기다리지 않음).
+
+**검증**:
+- py_compile PASS.
+- Smoke test (자동화 chrome 미가동 상태): `자동화 chrome 윈도우 미발견 — foreground 강제 안 함 (titles: ['Claude'])` → False 반환. 카톡/Claude 등 오매칭 0건 확인.
+
+**다음 morning(5/12 화) 첫 행동**:
+1. `[phase0] chrome OS-foreground (자동화 PID=...)` 로그 출력 확인.
+2. OAuth `?error` 재발 여부 — `_force_chrome_foreground` 호출 후에도 `?error` 받으면 진짜 원인이 foreground 아님(자격 캐시 손실 / password manager 타이밍 등 다른 가설로 분기).
+3. 5/11 ABORT된 잡셋업(RSP3SC0666 검사항목 17건 + auth) SmartMES UI 잔존 여부 확인 — 사용자 수동 처리 완료되었는지.
+4. recover_20260511*.log 부재 원인 점검 (D0_SP3M3_Morning_Recover schtasks 가동 여부).
 
 ## 4월 이관품번 정리 (세션150)
 

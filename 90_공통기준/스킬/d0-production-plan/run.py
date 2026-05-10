@@ -159,22 +159,118 @@ def ensure_chrome_cdp():
     raise RuntimeError("CDP 9223 기동 실패")
 
 
+def _force_chrome_foreground():
+    """Chrome window 강제 OS-foreground (pyautogui 입력 가로채기 방지).
+
+    세션151 보강 (사용자 5/11 재지적 — 세션141 본질 진단 미반영분 흡수):
+    page.bring_to_front()는 Chrome 내부 탭 활성화만, Windows OS 창 순서는 별개.
+    자동 실행 시점에 다른 앱 창이 Chrome 위에 있으면 pyautogui.click/press가
+    그 위 창에 떨어져 빈값 submit → `/login?error`.
+
+    매칭 우선순위 (좁은 매칭 우선 — 카카오톡/슬랙 등 Chromium 기반 앱 오매칭 차단):
+    1. CHROME_PROFILE(`--user-data-dir`)로 launch된 chrome.exe PID 매칭 (정확)
+    2. PID 수집 실패 시 erp-dev/auth-dev/samsong URL 키워드 매칭 (보조)
+    3. 둘 다 실패 → False (fallback 없음 — 카톡/슬랙에 끌려가지 않도록)
+
+    Windows 한정. Linux/Mac에선 ctypes.windll ImportError → 무시.
+    """
+    try:
+        import ctypes
+        from ctypes import wintypes, byref
+        user32 = ctypes.windll.user32
+
+        # 1. EnumWindows로 Chrome_WidgetWin 클래스 + window의 PID 수집
+        candidates = []  # [(hwnd, title, pid), ...]
+        def cb(hwnd, _lparam):
+            if not user32.IsWindowVisible(hwnd):
+                return True
+            cls = ctypes.create_unicode_buffer(256)
+            user32.GetClassNameW(hwnd, cls, 256)
+            if 'Chrome_WidgetWin' not in cls.value:
+                return True
+            title = ctypes.create_unicode_buffer(512)
+            user32.GetWindowTextW(hwnd, title, 512)
+            if not title.value:
+                return True
+            pid = wintypes.DWORD()
+            user32.GetWindowThreadProcessId(hwnd, byref(pid))
+            candidates.append((hwnd, title.value, pid.value))
+            return True
+        EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, wintypes.HWND, wintypes.LPARAM)
+        user32.EnumWindows(EnumWindowsProc(cb), 0)
+
+        if not candidates:
+            print("[phase0] chrome window 없음 — foreground 강제 안 함")
+            return False
+
+        # 2. 자동화 프로필 chrome.exe PID set 수집
+        automation_pids = set()
+        try:
+            ps_cmd = (
+                "Get-CimInstance Win32_Process -Filter \"Name='chrome.exe'\" | "
+                f"Where-Object {{ $_.CommandLine -like '*--user-data-dir={CHROME_PROFILE}*' }} | "
+                "Select-Object -ExpandProperty ProcessId"
+            )
+            result = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", ps_cmd],
+                capture_output=True, text=True, timeout=10
+            )
+            automation_pids = {int(p.strip()) for p in result.stdout.splitlines() if p.strip().isdigit()}
+        except Exception as e:
+            print(f"[phase0] 자동화 PID 수집 실패: {e}")
+
+        # 3. PID 매칭 우선 (정확)
+        if automation_pids:
+            for hwnd, t, pid in candidates:
+                if pid in automation_pids:
+                    user32.ShowWindow(hwnd, 9)  # SW_RESTORE
+                    user32.SetForegroundWindow(hwnd)
+                    print(f"[phase0] chrome OS-foreground (자동화 PID={pid}): {t[:60]}")
+                    return True
+            print(f"[phase0] 자동화 chrome PID 매칭 윈도우 없음 (pids={automation_pids})")
+
+        # 4. URL 키워드 매칭 (보조 — PID 수집 실패 시만)
+        for hwnd, t, _ in candidates:
+            tl = t.lower()
+            if 'erp-dev' in tl or 'auth-dev' in tl or 'samsong' in tl:
+                user32.ShowWindow(hwnd, 9)
+                user32.SetForegroundWindow(hwnd)
+                print(f"[phase0] chrome OS-foreground (URL 키워드): {t[:60]}")
+                return True
+
+        # 5. 둘 다 실패 — 카톡/슬랙 등 오매칭 차단 위해 fallback 제거
+        sample_titles = [t[:30] for _, t, _ in candidates[:3]]
+        print(f"[phase0] 자동화 chrome 윈도우 미발견 — foreground 강제 안 함 (titles: {sample_titles})")
+        return False
+    except Exception as e:
+        print(f"[phase0] foreground 강제 예외 (무시): {e}")
+        return False
+
+
 def ensure_erp_login(page):
     """auth-dev 로그인 페이지면 자동 로그인."""
     if "auth-dev.samsong.com" in page.url and "/login" in page.url:
         print("[phase0] OAuth 로그인 수행")
         page.bring_to_front()
+        # 세션151: Chrome window OS-foreground 강제 (pyautogui 입력 가로채기 방지)
+        _force_chrome_foreground()
         time.sleep(1.0)
         page.wait_for_selector('input[name="userId"]', timeout=10000)
         info = page.evaluate("() => ({screenX: window.screenX, screenY: window.screenY, chromeH: window.outerHeight - window.innerHeight})")
         box = page.locator('input[name="userId"]').bounding_box()
         sx = int(info["screenX"] + box["x"] + box["width"] / 2)
         sy = int(info["screenY"] + info["chromeH"] + box["y"] + box["height"] / 2)
+        # 클릭·키 입력 직전 1회 더 강제 (PyAutoGUI 호출 사이 다른 창이 끼어들 위험 차단)
+        _force_chrome_foreground()
         pyautogui.click(sx, sy); time.sleep(1.5)
         pyautogui.press("down"); time.sleep(0.5)
         pyautogui.press("return"); time.sleep(1.5)
         page.locator("button[type=submit]").first.click()
         time.sleep(5)
+        # 세션151: submit 직후 URL 즉시 검사 — ?error면 60초 기다리지 말고 즉시 fail 신호
+        if "/login?error" in page.url or "/login?" in page.url and "error" in page.url:
+            print(f"[phase0] ⚠ submit 직후 /login?error 감지 — pyautogui 입력 가로채기 의심. URL: {page.url}")
+            # raise 안 하고 caller(navigate_to_d0)의 재시도 분기에서 1회 재시도 흐름 유지
 
 
 def _wait_oauth_complete(page, timeout_sec: float = 60.0):
