@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-03 12:58 KST",
-  "last_updated": "세션137 갱신 2026-05-03",
-  "github_sha": "701da9c00787ffb0a1f46079e1418d1b39f05375",
-  "github_sha_short": "701da9c0",
+  "generated_at": "2026-05-09 13:07 KST",
+  "last_updated": "세션151 갱신 2026-05-09",
+  "github_sha": "00f97c5cecc222a284f9a67352ec9ecbb51661bd",
+  "github_sha_short": "00f97c5c",
   "hooks_raw": 20,
   "hooks_active": 5,
   "commands": 7,
@@ -21,12 +21,7 @@
     "세션132 (2026-04-30) — [E+C] 잡셋업 v1.0 baseline 정정",
     "세션131 (2026-04-30) — [B+C] 실패 대응 자동 진단 인용 개선",
     "세션131 (2026-04-30) — [E] SP3M3 morning 자동화 OAuth 콜백 정체 패치",
-    "세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리",
-    "세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)",
-    "세션128 (2026-04-29) — [3way+A] 성능 실망 진단 + 운영 위생 1회 정리",
-    "세션128 (2026-04-29) — [C] block_dangerous false positive + config awk 파싱 버그 패치",
-    "세션128 (2026-04-29) — [E+C] ZDM 서버 DB 다운 + MES 단독 업로드 + 1차 POST 500 패치",
-    "세션126 (2026-04-29) — [C] jobsetup-auto 신규 스킬 + d0-production-plan 야간 dedupe"
+    "세션130 (2026-04-30) — [B+C] hook 부하 진단 + 정합화 정리"
   ],
   "sessions_detail": [
     {
@@ -203,106 +198,6 @@
         "- **[1순위]** auto_commit_state.sh가 수동 commit/push 의도를 가로채 메시지를 `[auto]`로 덮은 사건 — 본 세션 d59d844b에서 실증. 7세션 측정 종료 후 옵션 B 진입 시 최우선 타겟. 측정 로그 비고에 기록됨 (`quant_signal_log.md` 세션130 행).",
         "- **[2순위]** hook_timing 1주 추가 측정 결과 기반 advisory 강등/매처 축소 후보 재논의 (debate_verify·harness_gate·Stop hook 포함).",
         "- **[3순위]** final_check WARN 1건(block_dangerous·protect_files python3 의존) + settings.local 보류 후보 3건(python -c 따옴표 차이 등) 별도 정리."
-      ]
-    },
-    {
-      "header": "세션129 (2026-04-29) — [측정] 정량 신호 3개 측정 시작 (옵션C)",
-      "body": [
-        "- 합의: 세션128 `debate_20260429_202801_3way` Round 1 pass_ratio 1.0 옵션C 채택",
-        "- 신호: S1 첫 답변 실물 지향성 ≥70% / S2 PASS 도달 ≥1 / S3 메타 커밋 0~1",
-        "- 로그: `90_공통기준/토론모드/logs/quant_signal_log.md` (append-only)",
-        "- plan: `C:/Users/User/.claude/plans/virtual-bouncing-crab.md`",
-        "- 신규 hook/skill/command 0개 (S3 위반 회피 설계)",
-        "- 본 세션129 자기 측정: S1 60% (3/5라인) / S2 PASS / S3 1건 → 부분 PASS",
-        "- GPT: PASS / item 1·2·3 모두 실증됨·동의 / 추가제안 A분류 1건",
-        "- Gemini: PASS / item 1·2·3 모두 실증됨·동의 / GPT 판정 교차검증 동의 / 추가제안 A분류 1건 (구체화)",
-        "- 라벨링 종합: 채택 3 / 보류 0 / 버림 0",
-        "- S1 측정 정량화: \"전체 N줄 중 실행 M줄\" 근거 비고 명시 의무 추가",
-        "- 본 세션129 자기 측정 1행에 정량 근거 (3/5) 추가 기록",
-        "- 변경 파일: `quant_signal_log.md` 1건만 — S3 시그널 유지",
-        "- ALL≥5/7 → 옵션B 보류 / ALL≤2/7 → 옵션B 즉시 활성",
-        "- 다음 일반 세션 종료 시 1행 추가 (S1/S2/S3 정직 기록)"
-      ]
-    },
-    {
-      "header": "세션128 (2026-04-29) — [3way+A] 성능 실망 진단 + 운영 위생 1회 정리",
-      "body": [
-        "- 의제: 이전 세션 전반적 실망의 근본 원인이 시스템 설계 문제인지 구분",
-        "- 5축 분류 합의: 시스템 설계 부하 40~45% / 메타·운영 위생 25~30% / **실물검증 루프 결함(신규) 15~20%** / 모델 한계 10~15% (시스템 흡수) / 기대치 5~10%",
-        "- 진단 키워드: **\"목표 함수 오염\"** (문제 해결 → 규칙 준수로 변질)",
-        "- 다음 행동 분기: 긴급 실무 D→A→C→B / 시스템 정비 A→D→C→B",
-        "- 정량 신호 3개: 첫 답변 실물 지향성 70%+, PASS 도달률 1+ (커밋 또는 실물 산출물), Meta-Loop 탈출 (메타 커밋 0~1)",
-        "- claude_delta major / issue_class B / 양측 통과 (GPT 정량 신호 2번 보강 권고 반영)",
-        "- 로그: `90_공통기준/토론모드/logs/debate_20260429_202801_3way/`",
-        "- plan: `C:/Users/User/.claude/plans/jiggly-cuddling-nygaard.md` (사용자 승인)",
-        "- TASKS.md 598 → 157줄 (-441줄). 세션109~121 → `98_아카이브/TASKS_archive_세션109-121_20260429.md` (gitignored, 로컬 보존)",
-        "- incident_ledger 미해결 122건 → bulk close (`resolved_by: hygiene_session128`, `resolved_note`: 정상 안전장치 발화). 백업: `incident_ledger.jsonl.bak_session128_hygiene`",
-        "- session_kernel.md refresh — 146h stale → 2026-04-29 12:15 KST 재저장 (precompact_save.sh 호출)",
-        "- 활성 hook 36개 (이벤트별 분포: PreCompact 1 / SessionStart 1 / UserPromptSubmit 1 / PreToolUse 18 / PostToolUse 9 / Notification 1 / Stop 5)",
-        "- settings.local.json 1회용 패턴 누적(echo·touch 6건) revert — 빼는 안 1+2 원칙 유지",
-        "- 첫 답변 실물 지향성 70% 이상 / PASS 도달률 1건 이상 / Meta-Loop 탈출 (메타 커밋 0~1회)",
-        "- 1주 관찰 후 옵션 B(구조 다이어트 토론) 진입 여부 판단"
-      ]
-    },
-    {
-      "header": "세션128 (2026-04-29) — [C] block_dangerous false positive + config awk 파싱 버그 패치",
-      "body": [
-        "- 1차 발견: 직전 share-result `cat > /tmp/share_msg.txt << EOF ... settings.local.json ... EOF` 차단 — 본문에 보호 파일명 인용만으로 false positive",
-        "- 토론 진입 시도(round1_claude.md 작성) → 사용자 중지 요청 → Claude 단독 패치 결정",
-        "- 2차 발견 (디버그 trace): `hook_config.json` awk 파싱이 한 줄 JSON 배열에서 `]` 인식 실패 → `PROTECTED_PATTERNS=(,)` 같은 잘못된 값으로 hardcoded fallback 무력화 (block_dangerous + protect_files 동일 버그)",
-        "- 패치 3건:",
-        "- 검증 14/14 PASS: block_dangerous 10케이스(DENY 5 + ALLOW 5) + protect_files 4케이스",
-        "- 회귀 영향 0: PreToolUse(Bash/Write) gate 단계, 외부 ERP/MES 영향 없음, 기존 차단 시나리오 모두 보존",
-        "- 부수 정리: 미완료 토론 로그 `debate_20260429_214057_3way` + 임시 메시지 `99_임시수집/debate_msg_gpt.txt` 폐기",
-        "- **양측 PASS** (commit b2f6e651 share-result 결과):",
-        "  - GPT: PASS / 3 items 모두 실증됨·동의 / 추가제안 없음",
-        "  - Gemini: PASS / 3 items 모두 실증됨·동의 / GPT 판정 교차검증 동의 / 추가제안 없음",
-        "  - 라벨링 종합: 채택 3 / 보류 0 / 버림 0"
-      ]
-    },
-    {
-      "header": "세션128 (2026-04-29) — [E+C] ZDM 서버 DB 다운 + MES 단독 업로드 + 1차 POST 500 패치",
-      "body": [
-        "- ZDM 일상점검: 차단 (서버 측 DB 다운 — `Connection terminated due to connection timeout`)",
-        "  - 진단: `/api/daily-inspection` HTTP 500 / 페이지 무한 busy / 5회 연속 일관 500 → 일시 장애 아님",
-        "  - 정보팀 호출 필요. 복구 후 daily-routine 재실행 시 누락 보정 자동 수행",
-        "- MES 생산실적 업로드: 완료 (사용자 명시 승인 후 단독 실행)",
-        "  - 누락일 2026-04-28 (1건). 1차 500 → 재로그인 후 성공: 15/15건, qty 45,381/45,381 (BI 일치)",
-        "- 원인 가설: OAuth 로그인 직후 `cookies.get(\"XSRF-TOKEN\")` 빈 값 → 첫 SaveExcelData.do POST 매번 500",
-        "- 패치: `mes_login()` return 직전 `layout.do` GET 1회 추가 → XSRF 쿠키 발급 보장",
-        "- 파일: `90_공통기준/스킬/daily-routine/run.py:188`",
-        "- 검증: 다음 daily-routine 실행 시 1차 시도 성공 여부 추적. 가설 미통과 시 `git revert` 1회 롤백",
-        "- 영향 범위: `mes_login()` 호출처 daily-routine/run.py 내부 2곳만 (외부 import 없음)"
-      ]
-    },
-    {
-      "header": "세션126 (2026-04-29) — [C] jobsetup-auto 신규 스킬 + d0-production-plan 야간 dedupe",
-      "body": [
-        "- plan: `C:\\Users\\User\\.claude\\plans\\splendid-roaming-quilt.md`",
-        "- 신규: `90_공통기준/스킬/jobsetup-auto/SKILL.md` (v0.3, 무인 자동 실행 + fail-fast 4종)",
-        "- 신규: `90_공통기준/스킬/jobsetup-auto/state/screen_analysis_20260429.md` (선행 분석 — 11공정 17검사항목 + 좌표 + 스펙 6종 패턴)",
-        "- 신규: `.claude/commands/jobsetup-auto.md` (슬래시 래퍼)",
-        "- 분포 정책: 정규분포 `random.gauss(center, σ=오차/3)`, 시드 미고정 → 매일 다른 값. 균등분포 사용 금지·시드 고정 금지 명문화",
-        "- 검사항목 분류: (A) 측정값형 A1/A2/A3 + (B) OK/NG 체크형 B1/B2/B3/B4 — 6종 정규식 박음",
-        "- R5 롤백: 재입력 + 재저장으로 정정 (별도 삭제 API 불필요, 사용자 답변 확정)",
-        "- 책임 경고: SmartMES 실측값을 난수로 대체 = 사용자 본인 책임 운영",
-        "- 수정: `.claude/commands/d0-plan.md` Step 5 — 사용자 확인 단계 제거 → 검증 PASS 직후 즉시 `/jobsetup-auto --commit` 자동 호출",
-        "- 끄기 옵션: `--no-jobsetup` / dry-run 옵션: `--jobsetup-dry-run`",
-        "- 수정: `90_공통기준/스킬/d0-production-plan/run.py` — `dedupe_night_first_5()` 함수 신설 + main() evening+SP3M3 분기에서 호출 (40줄 신규)",
-        "- 수정: `90_공통기준/스킬/d0-production-plan/SKILL.md` — Phase 4 step 16.5 + 핵심 주의사항 10 + 변경 이력 v3.1",
-        "- 매칭 기준: REG_DT=오늘 AND PROD_NO 일치 AND 수량 일치 (`PRDT_QTY \\|\\| ADD_PRDT_QTY \\|\\| PRDT_PLAN_QTY` 3 키 OR)",
-        "- AST 검증 PASS",
-        "- 2026-04-30 07:05 SP3M3 morning D0 → 자동 hand-off → `/jobsetup-auto --commit` 첫 실 가동",
-        "- 저장 단위 (검사항목/공정/일괄) 첫 실행에서 관찰 → SKILL.md Step 8 v1.0 확정",
-        "- 오늘 저녁 17~19시 evening 세션 첫 dedupe 로그 검증 (수량 키 매칭 정상 동작 확인)",
-        "- **GPT 판정**: 부분PASS (item 1·2·3 동의 / item 3 균등분포 잔재 보류 / item 4 d0-plan vs 스케줄러 분리 위험 보류 / item 5 저장 단위 잔존 보류 / item 6 main 머지 보류 반대)",
-        "- **Gemini 판정**: PASS (item 1·2·3 모두 실증됨·동의 / 추가제안 없음 / 잔존 관찰 후 해제 권장)",
-        "- **즉시 반영**: A 분류 1건 — SKILL.md description+결정표 균등분포→정규분포 정정 (commit d85f1e1d)",
-        "- **잔존 사유**: main 머지 보류·저장 단위 잔존·d0-plan 스케줄러 분리는 모두 첫 실행 검증 후 해소 가능. 운영 기준 최종 PASS는 첫 실 가동 후 재공유",
-        "- Phase 3 업로드 18건 / Phase 4 rank_batch done=18 failed=0 / Phase 5 mesMsg statusCode=200 rsltCnt=850",
-        "- 야간 등록 ext: 319742~319759 (319751, 319752 일부 중복 제외 → 17 unique)",
-        "- 1차 실행 시 사용자가 브라우저 닫아 12건만 임시저장 후 중단 → 사용자 ERP 직접 12건 삭제 → 2차 재실행 18건 정상 완료",
-        "- erp_d0_deleteA.py 9222 → 9223 포트 정정 패치 (.claude/tmp/ — 별도 commit 필요)"
       ]
     }
   ]

@@ -1,0 +1,175 @@
+{
+  "ts_start": "2026-05-12T07:13:17.896310",
+  "mode": "commit-all",
+  "qry": {
+    "prdtDa": "20260512",
+    "lineCd": "SP3M3",
+    "pno": "RSP3PC0130",
+    "pnoRev": "A",
+    "prdtRank": 1,
+    "regNo": 1,
+    "revNo": "0",
+    "procNo": ""
+  },
+  "items": [],
+  "save_count": 0,
+  "fail_count": 0,
+  "assign": {
+    "current_count": 6,
+    "complete_before": false,
+    "assigned": true,
+    "save_status": 200,
+    "save_msg": "성공하였습니다.lmes",
+    "save_ok": true,
+    "skipped": false,
+    "recheck_count": 6,
+    "recheck_complete": false
+  },
+  "auth": {
+    "assign_count": 6,
+    "auth_plans": [
+      {
+        "procNo": "10",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000124",
+          "procNo": "10",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "11",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000125",
+          "procNo": "11",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "91",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000102",
+          "procNo": "91",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "140",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000026",
+          "procNo": "140",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "340",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000095",
+          "procNo": "340",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      },
+      {
+        "procNo": "430",
+        "wrkNm": null,
+        "wrkId": null,
+        "wrkCertiYn_before": "N",
+        "already_y": false,
+        "wrkid_missing": true,
+        "payload": {
+          "prdtDa": "20260512",
+          "lineCd": "SP3M3",
+          "revNo": "0",
+          "regNo": 1,
+          "prdtRank": 1,
+          "pno": "RSP3PC0130",
+          "pnoRev": "A",
+          "shiftsCd": "01",
+          "procCd": "000073",
+          "procNo": "430",
+          "wrkId": "",
+          "mainProcYn": "Y",
+          "existWrk": "Y"
+        }
+      }
+    ],
+    "auth_save_count": 0,
+    "auth_fail_count": 0,
+    "wrkid_missing": 6,
+    "error_kind": "wrkid_missing_after_save"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "SP3M3": {
+    "primary_line_cd": "SP3M3",
+    "paired_line_cd": "HCAMS02",
+    "master_file": "\\\\210.216.217.180\\zz-group\\15. SP3 메인 CAPA점검\\SP3M3\\생산지시서\\2026년 생산지시\\{MM}월\\SP3M3_생산지시서_({YY}.{MM}.{DD}).xlsm",
+    "sheet_name": "SP3 LINE 기준 정보",
+    "header_row": 2,
+    "pn_column_header": "품번",
+    "exempt_column_header": "홀더CLR 사양",
+    "exempt_value": "ELR",
+    "exempt_skips": "paired",
+    "comment": "ELR(자동잠금장치) 행은 HCAMS02 라인 등록 면제. 도메인 룰."
+  }
+}

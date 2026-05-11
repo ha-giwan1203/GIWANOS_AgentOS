@@ -4,7 +4,93 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-11 KST — **세션151 후속** [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / **세션151** [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료 / 세션149 [A] 4월 화인텍 이관품번 지원비용 파일 양식 작성 (정리 대기) + [A+C] 4월 정산 마스터 V2 정리 완료.
+최종 업데이트: 2026-05-12 KST — **세션152** [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료.
+
+## 세션152 SP3M3 등록 누락 점검 (2026-05-11 ~ 05-12)
+
+**배경**: SP3M3 라인 기준정보(.xlsm 생산지시서) 279 모품번을 ERP 조립비 현황관리(New)와 대조해 SP3M3·HCAMS02 라인 등록 누락 발굴. ELR 면제 룰 + 컬러별 분리 + W·X·Z·G 접두사 처리 + 마스터 sync 자동화.
+
+**신규 스킬**: `90_공통기준/스킬/assy-registration-check/`
+- `SKILL.md` / `MANUAL.md` / `lines.json` (라인별 룰 config — 다른 라인 확장 가능)
+- `run_check.py` — 진입점. CLI `python run_check.py SP3M3 [--applied YYYY-MM-DD]`
+- `lookup_lines.py` — Hdr+Dtl wrapper (gerp-unregistered-check erp_lookup 재사용, cmpy_cd 빈칸 Hdr — 사용자 ERP 검색 동일)
+- `lookup_linebatch.py` — ERP 라인배치 자동조회 (line-batch-mainsub `searchProdNo`+pqGrid 패턴, main world context 선택)
+- `classify.py` — primary/paired 라인 분류 (10종 + 컬러편차)
+- `fill_error_list.py` / `report.py` — 양식·xlsx 작성
+- `register_to_master.py` — 신규 시퀀스 자동 부여 + 마스터 append (충돌 회피: 마스터 + ERP cache PART_NO set)
+- `apply_sync.py` / `sync_master.py` — ERP → 마스터 단가/PART_NO 일괄 sync
+- `cross_check_gerp.py` — GERP/구ERP 4월 raw 교차 검증
+- `recheck_err_list.py` — 양식 PROD_NO ERP 재조회로 등록 진척 확인
+- `_xlsx_style.py` — 공용 서식 helper (맑은 고딕 11pt + 가운데 + thin border + 청남색 헤더)
+- 보조: `fix_wprefix_cost0.py` / `add_ctd_sp3m3_missing.py` / `split_unreg_colors.py` / `merge_colors_v2.py` / `export_1xls_cache.py` / `add_w_prefix.py` / `add_unregistered.py` / `add_unreg_to_master.py` / `reformat_err_xlsx.py`
+
+**분류 결과 (279 모품번)**:
+- 정상(일반) 184 + 정상(면제) 50 = 234
+- 라인누락 5(양쪽 3 + paired 1 + primary면제 1) → 컬러별 13행 × 라인 = 39
+- 컬러편차 26
+- ★미등록 40 (일반 37 + 면제 3, W접두사 8 포함) — 진짜 미등록 32
+
+**도메인 룰 정착**:
+- ELR (홀더CLR 사양 I열) → HCAMS02 면제, SP3M3만 검증
+- 컬러 4자리 = 미사용 품번 (제외)
+- 같은 모품번 컬러별 단가 동일 (컬러편차 차용)
+- MO 접두사 = 반제품 수출품번 = **컬러 없음** (모품번 단위)
+- W/V/X/Z 접두사 = 마스터 표기 변형. ERP·GERP 실표기는 strip 형식 (예: W89870BS000 ↔ 89870BS000)
+- HCAMS02 단가 룰: **NLR 사양=86원 / CLR 사양=94원** (V2 마스터 단가 분포 7종 중 주력)
+
+**ERP raw 발견**:
+- 같은 컬러+라인에 PART_NO 2개 동시 등록 — 옛 SP3M3-NNNNN(cost=0 deactivate) + 새 SP3MNNN(cost>0 active)
+- cost>0 행만 선택해야 실등록값 (fix_wprefix_cost0)
+- CTD 컬러는 SP3M3 cost=0뿐인 케이스 다수 → 같은 모품번 OVS 단가 차용해 라인누락 추가 (add_ctd_sp3m3_missing)
+- ERP 신규 등록 시 PART_NO 형식 `{LINE}-{YYMMDD}_NN` (예: SP3M3-260509_01)
+
+**마스터 V2 (`01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx`) 누적 변경**:
+- SP3M3 시트 +130여 행 (라인누락 23 + apply_sync append 25 + W strip apply_sync 포함 + 미등록 컬러별 + MO 모품번 단위)
+- HCAMS02 시트 +110여 행 동일 패턴
+- ERP 권위 단가/PART_NO 일괄 update (단가차이 264 + PART_NO만 다른 608 = update 872)
+- 사양 없음 3건 (89870R6500/89880R6500/7560241020) 마스터·양식 삭제 (E-BOM 사양 없음 확인)
+- 백업 시점별 보존: `_pre_assyreg_*` / `_pre_costsync_*` / `_pre_applysync_*` / `_pre_wprefix_*` / `_pre_addunreg_*` / `_pre_unregsplit_*` / `_pre_mergecolors_*` / `_pre_partsync_*` / `_pre_delR6500_*` / `_pre_del7560_*`
+
+**오류리스트 양식 (`\\210.216.217.180\zz-group\★ 신규 시스템\1. GERP 조립비\완료\정합성 검증\★ 2026년 오류리스트\4월 오류리스트\대원테크\오류리스트_04월_추가.xlsx`) 218행**:
+- 라인누락 39 + W접두사 sync 19 (cost>0 필터 후) + CTD 누락 4 + 품번신규 153 + 기타
+- 오류유형: "라인코드 누락" / "품번 신규 등록" 2종
+- 비고: "신규등록" (일부 컬러편차 차용 표시 포함)
+- HCAMS02 단가 73행 자동 채움 (NLR=86 24행 + CLR=94 49행) — prefix strip 후 마스터 I열 사양 매칭
+- 사용자 ERP 등록 완료 4건(89870/89880AT500CCV × SP3M3+HCAMS02) PART_NO sync 후 양식에서 삭제됨
+- 양식·마스터 서식 일관 적용 (reformat_err_xlsx.py로 양식 본체 390셀 + auto 너비)
+
+**ERP 자동조회 cache** (`05월/_cache/`):
+- `erp_lookup_SP3M3_20260509.json` — 279 모품번 ERP 조립비 현황 raw (5/9 시점)
+- `erp_w_strip.json` — W strip 8 모품번 재조회
+- `erp_unreg_recheck.json` — 미등록 32 모품번 (cmpy_cd 빈칸 재조회)
+- `erp_recheck_*.json` — 양식 PROD_NO 재조회 (사용자 등록 진척 확인용)
+- `linebatch_24pns.json` — 라인배치 24 모품번 조회 (19 매칭)
+- `xls1_colors.json` — 1.XLS 7202행 생산계획 매칭 결과
+- `registered_rows.json` — 양식 43행 신규 시퀀스 결과
+
+**검증 결과 (cross_check_gerp.py)**:
+- 미등록 40건 vs GERP 4월 raw → 매칭 0건 (W strip 6건 false positive 제외 시 진짜 0)
+- 미등록 40건 vs 구ERP 4월 raw → 매칭 0건 (W strip 6건 false positive 제외)
+- **4월 정산 누락 = 0건** (정산 영향 없음 확인)
+
+**다음 세션 첫 행동** (2026-05-12 이후):
+1. 사용자 ERP 신규 등록 진척 확인 — `python recheck_err_list.py`로 양식 218행 PROD_NO 재조회
+2. ERP 등록 완료 행 PART_NO sync (양식·마스터 모두) → 양식에서 삭제
+3. SP3M3 라인 단가 빈칸 남은 행 처리 — 양식 SP3M3 빈칸 행 list-up + 사용자 단가 책정 가이드 또는 동일 모품번 다른 컬러 차용
+4. 5월 정산 시작 전 마스터 단가 빈칸 행 점검 (정산 빌더 마스터 단가 가져올 때 None 처리 분기 확인)
+5. 마스터 잔존 304건 (apply_sync 보고서 분류) — 양산 정지 archive 검토 (사용자 결정 필요)
+6. 다른 9개 라인(SD9A01/ANAAS04/DRAAS11/HASMS02/WAMAS01/WABAS01/WASAS01/ISAMS03 + HCAMS02 main) 점검 확장 — lines.json에 페어 룰 추가 후 동일 흐름
+
+**참고 — 사용자 도메인 발화 정착**:
+- "MO품번은 반제품 수출품번이기 때문에 컬러코드가 없음"
+- "ELR 사양은 HCAMS02 라인에서 제외"
+- "기존 품번 컬러에 사용되는 조립품번은 사용금지 — 새 시퀀스 자동 부여"
+- "조립비 정산에 품번 자체가 등록 누락된 경우" — ★미등록 분류 별도 처리 필요
+- "ERP 라인배치에서 품번별 확인 가능" — line-batch-mainsub 패턴 활용한 자동조회 스킬 추가
+- "전체 파일을 API로 받아서 확인" — 향후 endpoint 직접 호출 최적화 여지 (현재는 화면 검색 기반)
+- "오류리스트 NLR 86원 / CLR 94원 입력" — HCAMS02 단가 룰 정착
+
+
 
 ## 세션151 D0 자동화 패치 (2026-05-09)
 
