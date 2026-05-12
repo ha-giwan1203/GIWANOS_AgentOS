@@ -2,7 +2,7 @@
   "terminal_state": "done",
   "session": 152,
   "committed_pushed": true,
-  "last_sha": "db652cfa",
+  "last_sha": "4964c0df",
   "gpt_shared": true,
   "gpt_judgment": "정합",
   "gemini_judgment": null,
@@ -94,7 +94,7 @@
       "end_to_end": "Worktree: STATUS.md `2026-05-08 KST — 세션148` stale → final_check --fast --fix → `2026-05-12 KST — 세션152 (자동 갱신: final_check --fix)` correct replacement + STATUS session drift resolved → backup restore git diff 0",
       "main_repo_patch_applied": true
     },
-    "main_push_chain": "cd42238e → 861beaf9 → db652cfa",
+    "main_push_chain": "cd42238e → 861beaf9 → db652cfa → 91829080 → f021ff75 → f9d7b4f7 → 4964c0df",
     "phase0_incident_quote": "final_check meta_drift 4 + commit_gate pre_commit_check 1 — all targets of this fix",
     "notion_sync": "success (manual-sync)",
     "gpt_share_blocked_by": null,
@@ -113,6 +113,18 @@
         "policy_violation_self_report": "부분반영 / 추가 패치 권고 — /finish 5단계에 CDP 자동 launch 의무 명문화 필요"
       },
       "additional_proposal": "/finish 5단계 본문에 'CDP/Chrome MCP down 감지 시 사용자 질문 없이 자동 launch 1회 + 4초 후 HTTP 200 재확인 + 실패 시 exception 기록' 명시. 분류 A (별건 후속 patch)"
-    }
+    },
+    "additional_patches": [
+      {
+        "sha": "f9d7b4f7",
+        "topic": "CDP 9222 자동 launch 의무 명문화 (gpt-send 0단계 + finish 5단계)",
+        "gpt_verdict": "부분반영"
+      },
+      {
+        "sha": "4964c0df",
+        "topic": "gpt-send 잔여 '즉시 실패 보고' 2곳 → 0단계 정합 통일",
+        "gpt_verdict": "self-applied per GPT recommendation"
+      }
+    ]
   }
 }
