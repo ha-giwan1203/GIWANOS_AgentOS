@@ -1,17 +1,20 @@
 {
-  "terminal_state": "done",
-  "session": 151,
+  "terminal_state": "exception",
+  "session": 152,
   "committed_pushed": true,
-  "last_sha": "00f97c5c",
-  "gpt_shared": true,
-  "gpt_judgment": "PASS",
+  "last_sha": "db652cfa",
+  "gpt_shared": false,
+  "gpt_judgment": null,
   "gemini_judgment": null,
   "user_reported": false,
-  "followup_checked": true,
-  "exception_reason": null,
+  "followup_checked": false,
+  "exception_reason": "cdp_9222_down — Chrome DevTools 9222 미기동으로 GPT 토론방 공유 불가. 사용자 Chrome 재기동 후 다음 세션 공유 보류.",
   "session151_summary": {
     "topic": "d0_morning_zombie_chrome_fix_evening_partno_dedup_fix",
-    "commits": ["59273df9", "00f97c5c"],
+    "commits": [
+      "59273df9",
+      "00f97c5c"
+    ],
     "patches": [
       "_kill_zombie_chrome — CHROME_PROFILE matching chrome.exe selective kill via PowerShell Get-CimInstance + SingletonLock cleanup before fresh launch",
       "rank_batch/api_rank_batch idx_map: PROD_NO single key -> [REG_NO ascending array], items Nth occurrence maps Nth REG_NO",
@@ -43,7 +46,11 @@
   },
   "session143_summary": {
     "topic": "sp3m3_night_5_4_d0_register_with_prod_date_arg",
-    "commits": ["81360bc1", "c0be1328", "4b313046"],
+    "commits": [
+      "81360bc1",
+      "c0be1328",
+      "4b313046"
+    ],
     "erp_register": {
       "line": "SP3M3",
       "session": "evening",
@@ -69,5 +76,32 @@
   "phase7_residual_handled": true,
   "phase8_start_sha": "0dcbf35a",
   "phase8_start_kst": "2026-05-03 17:00 KST",
-  "phase8_end_kst": "2026-05-10 17:00 KST"
+  "phase8_end_kst": "2026-05-10 17:00 KST",
+  "session152_summary": {
+    "topic": "final_check_sed_kst_optional_token_fix",
+    "commits": [
+      "861beaf9",
+      "db652cfa"
+    ],
+    "root_cause": "sed pattern `[0-9-]*` followed by ` —` expected → actual STATUS.md format `2026-05-08 KST — 세션148` mismatch → mv overwrites identical content → [FIX] log printed but actual replacement 0",
+    "patches": [
+      "L313 sed: `[0-9-]*\\( KST\\)\\?` optional capture + new line forces ` KST` (current format consistency)",
+      "L362 sed: same optional + `\u0001\u0002` preserves KST-absent lines"
+    ],
+    "evidence": "incident_ledger.jsonl last 7 days — meta_drift 14 / session_drift 4 accumulated; cd42238e weekly self-audit --fast --fix executed → git diff 0 bytes confirmed",
+    "validation": {
+      "sed_unit": "4 cases (KST present/absent × L313/L362) all PASS",
+      "end_to_end": "Worktree: STATUS.md `2026-05-08 KST — 세션148` stale → final_check --fast --fix → `2026-05-12 KST — 세션152 (자동 갱신: final_check --fix)` correct replacement + STATUS session drift resolved → backup restore git diff 0",
+      "main_repo_patch_applied": true
+    },
+    "main_push_chain": "cd42238e → 861beaf9 → db652cfa",
+    "phase0_incident_quote": "final_check meta_drift 4 + commit_gate pre_commit_check 1 — all targets of this fix",
+    "notion_sync": "success (manual-sync)",
+    "gpt_share_blocked_by": "cdp_9222_down",
+    "next_session_first_actions": [
+      "사용자 Chrome 9222 헬스 복구 후 본 fix(commits 861beaf9 + db652cfa) GPT 공유 + 판정 확인",
+      "main 환경에서 다음 commit_gate/final_check 실행 시 meta_drift incident 누적 멈춤 확인",
+      "incident_ledger.jsonl 신규 meta_drift 0 검증 (7일 관측 윈도우)"
+    ]
+  }
 }
