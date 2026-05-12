@@ -19,7 +19,9 @@
       "Bash(python \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
       "Bash(ls C:/Users/User/.claude/scheduled-tasks/ 2>&1)",
       "Bash(find C:/Users/User/.claude -maxdepth 5 -name \"self-audit*\" 2>&1 | grep -v worktree | head -20)",
-      "mcp__8d2abc6d-9827-4a8a-91b9-99dce8a2ee5d__slack_send_message"
+      "mcp__8d2abc6d-9827-4a8a-91b9-99dce8a2ee5d__slack_send_message",
+      "Bash(awk 'NR==13 {print \"line13 chars:\", length\\($0\\)}' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")",
+      "Bash(awk 'NR==13' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")"
     ],
     "ask": [],
     "additionalDirectories": [

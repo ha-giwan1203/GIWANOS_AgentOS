@@ -4,7 +4,39 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-12 KST — **세션152** [C] **별건 fix** final_check.sh sed 패턴 ` KST` 옵셔널 누락 (L313·L362) → meta_drift 14건/session_drift 4건 누적 원인 / commit 861beaf9 main push 완료. / 세션152 [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료.
+최종 업데이트: 2026-05-12 KST — **세션152** [C] **별건 fix** final_check.sh sed 패턴 ` KST` 옵셔널 누락 (L313·L362) → meta_drift 14건/session_drift 4건 누적 원인 / commit 861beaf9 main push 완료. / 세션152 [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료. / **세션152 evening [A+C] SP3M3 야간계획 반영 사고 + run.py 4종 패치** (Phase 6 5건 누락 → idx_map 정렬 a-b→b-a 매뉴얼 4번 룰 준수 / pyautogui ID 0109 명시 typewrite / OAuth wait 60s→10s / 누락 5건 새 ext 보강 등록 + final_save 200).
+
+## 세션152 evening — SP3M3 야간계획 반영 사고 (2026-05-12 18:39~19:30)
+
+**배경**: 사용자 "SP3M3 야간계획 반영" 발화 → d0-production-plan evening 세션(--line SP3M3) 실행.
+
+**실행 결과**:
+- Phase 0~5: 정상 (24건 추출 → dedupe 1행 RSP3PC0054 제외 → 23건 ERP 업로드 + 서열 + MES 전송 statusCode 200 / mesMsg rsltCnt=900)
+- Phase 6 SmartMES 대조: FAIL 5건 누락 (RSP3PC0130/RSP3PC0129/RSP3SC0644/RSP3SC0590/RSP3SC0584 ext=325225~325230)
+
+**진단**: `_diag_dup_rows.py` 실측으로 5건 모두 ERP 그리드 2행 공존 확인 — 작은 ext(주간 기존) + 큰 ext(야간 신규 325983~325987). phase3 multiList INSERT 정상.
+
+**근본 원인**: `api_rank_batch` `run.py:1046` idx_map 정렬이 `(a,b) => a - b` 오름차순 → 매뉴얼 4번 룰 "EXT_PLAN_REG_NO 최대값 매핑" 위반. 야간 items 1건 등장 시 0번째(=가장 작은 ext=주간 기존)에 매핑 → 야간 rank가 주간 행 위에 덮어 박힘.
+
+**run.py 패치 4종 (세션152 evening)**:
+1. **L1046 idx_map sort `b-a` 내림차순** — 매뉴얼 4번 룰 준수. 야간 1건 등장 시 신규 ext에 자동 매핑.
+2. **L265~270 `ensure_erp_login`** pyautogui ID `0109` 명시 typewrite + `Ctrl+A` + `Delete` 초기화. 기존 `down`+`return` 자동완성 첫 항목 의존 폐기. 사용자 자동완성 ID 3개 저장 환경에서 매번 다른 ID 접속되던 사고 차단.
+3. **L282/322~344 `_wait_oauth_complete` timeout 60s → 10s**. 0109 명시 입력으로 OAuth 정상 통과 가정 + 정체 시 fallback 빠른 진입.
+4. `--no-dedupe` 옵션 추가했으나 사용자 정정 "1~5행 dedupe는 유지"로 즉시 원복 (net 변경 0).
+
+**누락 5건 보강 (`_fix_missing_5.py`)**:
+- 새 ext(325983~325987)에 직접 `process_one_row` 호출 → rank 39~43 박음
+- `final_save` mesMsg rsltCnt=250 / statusCode 200 / MES 전송 완료
+- 사용자 지시 "기존 잘못 박힌 5건 rank(ext=325225~325230 위 A rank) 삭제 X" — ERP 잔존 유지
+
+**다음 morning (2026-05-13 07:10) 검증 포인트**:
+- `[phase0]` 로그에서 `OAuth 완료 대기 60s 실패` 메시지 부재 확인 (10s로 단축됨)
+- ID 0109 정확 입력 검증 (잘못된 ID 접속 사고 재발 X)
+- idx_map 내림차순 자연 검증 (주간 새 등록 시 정렬 정상)
+
+**잔존 자산**:
+- `_diag_dup_rows.py` (5건 진단 스크립트, 동일 사고 재발 시 재사용)
+- `_fix_missing_5.py` (5건 누락 보강 스크립트, 동일 사고 재발 시 참고)
 
 ## 세션152 별건 — final_check sed KST 패치 (2026-05-12)
 

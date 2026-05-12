@@ -263,8 +263,14 @@ def ensure_erp_login(page):
         # 클릭·키 입력 직전 1회 더 강제 (PyAutoGUI 호출 사이 다른 창이 끼어들 위험 차단)
         _force_chrome_foreground()
         pyautogui.click(sx, sy); time.sleep(1.5)
-        pyautogui.press("down"); time.sleep(0.5)
-        pyautogui.press("return"); time.sleep(1.5)
+        # 세션152: ID "0109" 명시 typewrite (기존 down+return 자동완성 의존 폐기).
+        # 사용자 환경에 자동완성 ID 3개 저장됨 — down 1번이 첫 항목 아닌 다른 위치 선택해서 매번 다른 ID 접속되던 실측 사고 반영.
+        # 사용자 지정 ID = 0109 고정. typewrite 전 Ctrl+A + Delete로 기존 자동완성 텍스트 비움 (잔존 텍스트와 합쳐 다른 ID 되는 케이스 차단).
+        # 비밀번호는 Chrome password manager 자동완성에 의존 (코드 미박힘) — userId 입력 + tab 시 자동 채움.
+        pyautogui.hotkey('ctrl', 'a'); time.sleep(0.2)
+        pyautogui.press('delete'); time.sleep(0.3)
+        pyautogui.typewrite("0109", interval=0.05); time.sleep(0.5)
+        pyautogui.press("tab"); time.sleep(1.5)  # password 칸 이동 + Chrome 자동완성 발동 대기
         page.locator("button[type=submit]").first.click()
         time.sleep(5)
         # 세션151: submit 직후 URL 즉시 검사 — ?error면 60초 기다리지 말고 즉시 fail 신호
@@ -273,7 +279,7 @@ def ensure_erp_login(page):
             # raise 안 하고 caller(navigate_to_d0)의 재시도 분기에서 1회 재시도 흐름 유지
 
 
-def _wait_oauth_complete(page, timeout_sec: float = 60.0):
+def _wait_oauth_complete(page, timeout_sec: float = 10.0):
     """OAuth 완료 대기 — auth-dev 떠나고 erp-dev 본 페이지(oauth2/sso 콜백 제외) 도달까지.
 
     세션110 보강: 기존 `"erp-dev.samsong.com" in url` 조건은 OAuth 콜백 중간 단계
@@ -283,6 +289,9 @@ def _wait_oauth_complete(page, timeout_sec: float = 60.0):
     세션131 [E] 보강: default 30→60s. 5일 중 4일 morning 자동화 OAuth timeout 실패
     실측 (4/27 4/29 4/30). 7시 ERP 부하 + cold start fresh launch에서 OAuth 콜백 redirect
     chain이 30s를 넘어가는 케이스 흡수.
+
+    세션152: 60s → 10s. ID typewrite 명시 입력으로 자동완성 실패 케이스 차단된 후
+    OAuth 콜백 정체 시 빠른 fallback 진입 우선. 사용자 명시 변경 (체감 대기 단축).
     """
     deadline = time.time() + timeout_sec
     while time.time() < deadline:
@@ -313,20 +322,20 @@ def navigate_to_d0(browser):
     page.bring_to_front()
     ensure_erp_login(page)
 
-    # OAuth 완료 명시 대기 (세션110 보강 — oauth2/sso 콜백 부분 매칭 버그 수정 / 세션131 [E] 60s 상향)
-    if not _wait_oauth_complete(page, timeout_sec=60.0):
-        print(f"[phase0] OAuth 완료 대기 60s 실패 — 현재 URL: {page.url}")
+    # OAuth 완료 명시 대기 (세션110 보강 — oauth2/sso 콜백 부분 매칭 버그 수정 / 세션152 60s→10s)
+    if not _wait_oauth_complete(page, timeout_sec=10.0):
+        print(f"[phase0] OAuth 완료 대기 10s 실패 — 현재 URL: {page.url}")
         # login 페이지 다시 도달 시 1회 재시도
         if "auth-dev.samsong.com" in page.url and "/login" in page.url:
             print("[phase0] login 페이지 재도달 — 재로그인 1회 시도")
             ensure_erp_login(page)
-            if not _wait_oauth_complete(page, timeout_sec=60.0):
+            if not _wait_oauth_complete(page, timeout_sec=10.0):
                 raise RuntimeError(f"OAuth 완료 2회 실패: {page.url}")
         elif "auth-dev.samsong.com" in page.url:
             # 세션124 [3way] 보강: 비login auth-dev 정착(클라이언트 선택 화면 등) 시 D0_URL 직접 이동 1회 시도
             print("[phase0] auth-dev 비login 정착 — D0_URL 직접 이동 1회 시도")
             _safe_goto(page, D0_URL)
-            if not _wait_oauth_complete(page, timeout_sec=60.0):
+            if not _wait_oauth_complete(page, timeout_sec=10.0):
                 raise RuntimeError(f"OAuth 완료 실패: auth-dev 클라이언트 선택 화면에서 D0_URL 직접 이동 1회 시도 후에도 erp-dev 미도달 — 현재 URL: {page.url}")
         else:
             # 세션131 [E]: OAuth 콜백 URL(oauth2/sso 등) 정체 — D0_URL 직접 navigate fallback
@@ -335,7 +344,7 @@ def navigate_to_d0(browser):
             # 클라이언트가 능동 navigate로 우회. 4/27·4/29·4/30 3건 동일 증상 흡수.
             print(f"[phase0] OAuth 콜백 정체 ({page.url}) — D0_URL 직접 이동 1회 시도")
             _safe_goto(page, D0_URL)
-            if not _wait_oauth_complete(page, timeout_sec=60.0):
+            if not _wait_oauth_complete(page, timeout_sec=10.0):
                 raise RuntimeError(f"OAuth 완료 실패 (D0_URL 직접 이동 후에도 미완료): {page.url}")
 
     try: page.wait_for_load_state("domcontentloaded", timeout=15000)
@@ -1043,7 +1052,10 @@ def api_rank_batch(page, items, target_line, save_url, sess=None):
                 map[key].push(parseInt(r.REG_NO));
             }
         });
-        for (const k in map) map[k].sort((a,b) => a - b);
+        // 세션152: 매뉴얼 4번 룰 "EXT_PLAN_REG_NO 최대값 매핑" 준수 — 내림차순.
+        // items N번째 등장 시 N번째 큰 값(=가장 최근 phase3 신규 INSERT) 우선.
+        // 야간/주간 중복 PROD_NO 케이스: 야간 items 1건 → 최대 ext(=야간 신규) 매핑 → 주간 기존 ext에 덮어쓰기 방지.
+        for (const k in map) map[k].sort((a,b) => b - a);
         return map;
     }""", today_str)
 
