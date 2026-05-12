@@ -262,6 +262,70 @@ def _load_oauth_cred():
     return cfg["id"], cfg["pw"]
 
 
+def erp_login_via_http():
+    """ERP OAuth SSO를 requests로 직접 처리 — 브라우저·CDP·pyautogui 의존 0.
+
+    세션153 (2026-05-13) — A안 점진 전환 1단계.
+    daily-routine mes_login() 패턴의 ERP 버전. 실측 캡처 PASS:
+      r1 = GET erp-dev/oauth2/sso → ssoUrl 변수 추출
+      r2 = GET ssoUrl (auth-dev/oauth/authorize, JSESSIONID 발급)
+      r3 = POST auth-dev/login (userId/password/clientId=ERP/ssoUrl)
+           → redirect layout.do?statusCode=200+OK
+      r4 = GET erp-dev/layout/layout.do → XSRF-TOKEN 발급
+
+    반환: requests.Session (cookies + X-XSRF-TOKEN header 세팅 완료). 실패 시 None.
+    가로채기 시나리오 자체 0%. 가장 견고.
+    """
+    import requests as _req
+    user_id, password = _load_oauth_cred()
+    s = _req.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    try:
+        r1 = s.get("http://erp-dev.samsong.com:19100/oauth2/sso", timeout=10)
+        m = re.search(r"ssoUrl\s*=\s*'([^']+)'", r1.text)
+        if not m:
+            print("[phase0:http] FAIL ssoUrl 파싱 실패")
+            return None
+        sso_url = m.group(1)
+        s.get(sso_url, allow_redirects=True, timeout=10)
+        r3 = s.post("http://auth-dev.samsong.com:18100/login", data={
+            "userId": user_id, "password": password,
+            "clientId": "ERP", "ssoUrl": sso_url, "clientName": "", "lang": "ko"
+        }, allow_redirects=True, timeout=15)
+        if "layout.do" not in r3.url:
+            print(f"[phase0:http] FAIL 로그인 후 URL={r3.url}")
+            return None
+        s.get("http://erp-dev.samsong.com:19100/layout/layout.do", timeout=10)
+        s.headers["X-XSRF-TOKEN"] = s.cookies.get("XSRF-TOKEN", "")
+        print(f"[phase0:http] OAuth PASS (cookies: {list(s.cookies.keys())})")
+        return s
+    except Exception as e:
+        print(f"[phase0:http] FAIL {e}")
+        return None
+
+
+def _inject_cookies_to_playwright(context, sess):
+    """requests.Session cookie를 playwright context에 주입.
+
+    HTTP OAuth로 받은 SESSION/XSRF-TOKEN/JSESSIONID cookie를 playwright context에
+    추가해서, page.goto(D0_URL) 시 OAuth 페이지 안 거치고 즉시 통과되게 함.
+    """
+    cookies_for_pw = []
+    for c in sess.cookies:
+        domain = c.domain or "erp-dev.samsong.com"
+        if domain.startswith("."):
+            domain = domain
+        cookies_for_pw.append({
+            "name": c.name,
+            "value": c.value,
+            "domain": domain,
+            "path": c.path or "/",
+        })
+    if cookies_for_pw:
+        context.add_cookies(cookies_for_pw)
+        print(f"[phase0:http] playwright cookie 주입 {len(cookies_for_pw)}건 ({[c['name'] for c in cookies_for_pw]})")
+
+
 def ensure_erp_login(page):
     """auth-dev 로그인 페이지면 자동 로그인 — DOM 직접 입력 (page.fill).
 
@@ -312,9 +376,22 @@ def _wait_oauth_complete(page, timeout_sec: float = 10.0):
     return False
 
 
-def navigate_to_d0(browser):
-    """D0추가생산지시 화면 탭 확보."""
+def navigate_to_d0(browser, sess=None):
+    """D0추가생산지시 화면 탭 확보.
+
+    세션153: sess 인자 추가 — HTTP OAuth로 받은 requests.Session의 cookie를
+    playwright context에 주입해서 ensure_erp_login(브라우저 OAuth) 자체를 우회.
+    sess=None이거나 cookie 주입 후에도 login 페이지면 기존 page.fill fallback.
+    """
     ctx = browser.contexts[0]
+
+    # HTTP OAuth 성공 시 cookie 주입 → 브라우저 OAuth 스킵
+    if sess is not None:
+        try:
+            _inject_cookies_to_playwright(ctx, sess)
+        except Exception as e:
+            print(f"[phase0:http] cookie 주입 실패 (page.fill fallback 진입): {e}")
+
     page = None
     for pg in ctx.pages:
         if "viewListDoAddnPrdtPlanInstrMngNew" in pg.url:
@@ -1369,6 +1446,8 @@ def main():
     ap.add_argument("--api-mode", action="store_true", default=True, help="옵션 A 하이브리드 (기본값 활성): rank 호출(Phase 4)을 requests 직접 POST. final_save(Phase 5)는 화면 모드 유지. 세션133 사용자 명시 — 매일 morning 자동 실행이 자연 검증")
     ap.add_argument("--legacy-mode", action="store_true", help="화면 모드 강제 (회귀 fallback). --api-mode를 끄고 jQuery.ajax 흐름 사용. 운영 chain 회귀 시만 사용")
     ap.add_argument("--no-jobsetup", action="store_true", help="morning SP3M3 종료 후 잡셋업 자동 호출 차단 (chain 비활성)")
+    ap.add_argument("--day-cut", type=int, default=DAY_CUT_THRESHOLD, help=f"morning SP3M3 주간 누적 컷 임계 (default={DAY_CUT_THRESHOLD}). PoC/특수 케이스만 변경")
+    ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
                     help="chain에서 호출할 잡셋업 모드 (default=commit-all). 입회 monitoring 시 list-only 권장")
     args = ap.parse_args()
@@ -1388,11 +1467,14 @@ def main():
         target_file_date = today + timedelta(days=1) if session == "evening" else today
     print(f"파일명 날짜(target_file_date) = {target_file_date.strftime('%Y-%m-%d')}")
 
-    # Phase 0
+    # Phase 0 — HTTP OAuth 우선 (세션153 A안 1단계), 실패 시 브라우저 page.fill fallback
+    sess = erp_login_via_http()
+    if sess is None:
+        print("[phase0] HTTP OAuth 실패 — Chrome page.fill 경로 fallback")
     ensure_chrome_cdp()
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(CDP_URL)
-        page = navigate_to_d0(browser)
+        page = navigate_to_d0(browser, sess=sess)
 
         # --xlsx 직접 사용 모드: Phase 1 추출 건너뛰고 그대로 업로드
         if args.xlsx:
@@ -1487,9 +1569,12 @@ def main():
                 print(f"[morning] --prod-date 오버라이드: prod_date = {prod_date.strftime('%Y-%m-%d')} (file={target_file_date.strftime('%Y-%m-%d')})")
             sp3m3_registered = False
             if args.line in ("SP3M3","ALL"):
-                items = extract_sp3m3_day(wb, DAY_CUT_THRESHOLD)
+                items = extract_sp3m3_day(wb, args.day_cut)
                 # Phase 1.5: 같은 prod_date 이미 등록된 PROD_NO 제외 (세션133 사용자 명시 — 파일 업로드 전 중복 가드)
                 items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
+                if args.limit is not None and len(items) > args.limit:
+                    print(f"[morning] --limit {args.limit} 적용: {len(items)}건 → {args.limit}건 (PoC)")
+                    items = items[:args.limit]
                 if not items:
                     print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
                 else:
