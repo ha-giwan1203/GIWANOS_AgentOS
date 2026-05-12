@@ -247,35 +247,42 @@ def _force_chrome_foreground():
         return False
 
 
+def _load_oauth_cred():
+    """OAuth ID/PW 로컬 credential 파일 로드.
+
+    세션153: pyautogui typewrite + Chrome 자동완성 의존 폐기. ID/PW를 .oauth.json에
+    저장하고 page.fill()로 DOM 직접 입력 — OS focus 가로채기 위험 0%.
+    """
+    cred_path = Path(__file__).parent / ".oauth.json"
+    if not cred_path.exists():
+        raise RuntimeError(f".oauth.json 미존재: {cred_path} — ID/PW 파일 저장 후 재실행")
+    cfg = json.loads(cred_path.read_text(encoding="utf-8"))
+    if not cfg.get("id") or not cfg.get("pw"):
+        raise RuntimeError(f".oauth.json id/pw 누락: {cred_path}")
+    return cfg["id"], cfg["pw"]
+
+
 def ensure_erp_login(page):
-    """auth-dev 로그인 페이지면 자동 로그인."""
+    """auth-dev 로그인 페이지면 자동 로그인 — DOM 직접 입력 (page.fill).
+
+    세션153 (2026-05-13): pyautogui 키보드 입력 + Chrome 비번관리자 자동완성 의존 폐기.
+    실측 사고 — 다른 창이 Chrome 위에 떠 있으면 pyautogui 키가 가로채여 빈 form submit
+    → /login?error 반복 (5/13 07:11~07:42 morning 자동화 51min 한계 도달 실패).
+    page.fill()은 DOM API라 OS focus 무관 → 가로채기 불가능.
+
+    ID/PW 원본: 같은 폴더 .oauth.json (gitignore 처리).
+    """
     if "auth-dev.samsong.com" in page.url and "/login" in page.url:
-        print("[phase0] OAuth 로그인 수행")
+        print("[phase0] OAuth 로그인 수행 (DOM 직접 입력)")
+        user_id, password = _load_oauth_cred()
         page.bring_to_front()
-        # 세션151: Chrome window OS-foreground 강제 (pyautogui 입력 가로채기 방지)
-        _force_chrome_foreground()
-        time.sleep(1.0)
-        page.wait_for_selector('input[name="userId"]', timeout=10000)
-        info = page.evaluate("() => ({screenX: window.screenX, screenY: window.screenY, chromeH: window.outerHeight - window.innerHeight})")
-        box = page.locator('input[name="userId"]').bounding_box()
-        sx = int(info["screenX"] + box["x"] + box["width"] / 2)
-        sy = int(info["screenY"] + info["chromeH"] + box["y"] + box["height"] / 2)
-        # 클릭·키 입력 직전 1회 더 강제 (PyAutoGUI 호출 사이 다른 창이 끼어들 위험 차단)
-        _force_chrome_foreground()
-        pyautogui.click(sx, sy); time.sleep(1.5)
-        # 세션152: ID "0109" 명시 typewrite (기존 down+return 자동완성 의존 폐기).
-        # 사용자 환경에 자동완성 ID 3개 저장됨 — down 1번이 첫 항목 아닌 다른 위치 선택해서 매번 다른 ID 접속되던 실측 사고 반영.
-        # 사용자 지정 ID = 0109 고정. typewrite 전 Ctrl+A + Delete로 기존 자동완성 텍스트 비움 (잔존 텍스트와 합쳐 다른 ID 되는 케이스 차단).
-        # 비밀번호는 Chrome password manager 자동완성에 의존 (코드 미박힘) — userId 입력 + tab 시 자동 채움.
-        pyautogui.hotkey('ctrl', 'a'); time.sleep(0.2)
-        pyautogui.press('delete'); time.sleep(0.3)
-        pyautogui.typewrite("0109", interval=0.05); time.sleep(0.5)
-        pyautogui.press("tab"); time.sleep(1.5)  # password 칸 이동 + Chrome 자동완성 발동 대기
-        page.locator("button[type=submit]").first.click()
-        time.sleep(5)
-        # 세션151: submit 직후 URL 즉시 검사 — ?error면 60초 기다리지 말고 즉시 fail 신호
-        if "/login?error" in page.url or "/login?" in page.url and "error" in page.url:
-            print(f"[phase0] ⚠ submit 직후 /login?error 감지 — pyautogui 입력 가로채기 의심. URL: {page.url}")
+        page.wait_for_selector('#userId', timeout=10000)
+        page.fill('#userId', user_id)
+        page.fill('#password', password)
+        page.click('#loginBtn')
+        time.sleep(3)
+        if "/login?error" in page.url:
+            print(f"[phase0] ⚠ submit 직후 /login?error — .oauth.json id/pw 검증 필요. URL: {page.url}")
             # raise 안 하고 caller(navigate_to_d0)의 재시도 분기에서 1회 재시도 흐름 유지
 
 
@@ -1161,7 +1168,11 @@ def rank_batch(page, items, target_line, save_url, dry_run=False):
             if (!map[pno]) map[pno] = [];
             map[pno].push({idx:i, extReg:Number(d[i].REG_NO)});
         }
-        for (const k in map) map[k].sort((a,b) => a.extReg - b.extReg);
+        // 세션152 evening: 매뉴얼 4번 룰 "EXT_PLAN_REG_NO 최대값 매핑" 준수 — 내림차순.
+        // api_rank_batch(L1046)와 동일 정렬 방향 동기화. legacy --legacy-mode fallback 경로에서도
+        // 야간/주간 중복 PROD_NO 시 신규 ext(=최대) 우선 매핑하여 주간 기존 행 덮어쓰기 차단.
+        // GPT 판정 부분반영 후속 patch (legacy 경로 동기화 누락 지적 반영).
+        for (const k in map) map[k].sort((a,b) => b.extReg - a.extReg);
         return map;
     }""", datetime.today().strftime("%Y-%m-%d"))
 

@@ -2,6 +2,9 @@
 # 보안 민감정보 완전 차단
 # ==========================
 
+# d0-production-plan OAuth credential (세션153)
+.oauth.json
+
 # 환경 변수 / API 키 / 인증 토큰
 *.env
 *.env.*
