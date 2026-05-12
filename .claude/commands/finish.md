@@ -66,6 +66,7 @@ python .claude/hooks/incident_repair.py --json --limit 5
 - 이 단계는 `/finish` 전용 — `/share-result` 단독 호출 경로에서는 실행되지 않는다 (책임 분리)
 
 ### 5단계: GPT 공유
+- **[MUST 세션152 신설]** 진입 전 CDP 9222 헬스체크. down 감지 시 사용자 질문 없이 자동 launch 1회 + 4초 후 HTTP 200 재확인. 2회 연속 미수신 시에만 `terminal_state=exception`, `exception_reason="cdp_9222_unrecoverable"`. **[NEVER]** down 감지 즉시 exception 처리 금지 — 자동 launch 1회 우선. 자동 launch 절차는 `gpt-send.md` 0단계가 처리 (단일 SSoT). 세션152 GPT 판정 별건 권고 (분류 A) 반영.
 - Chrome MCP로 GPT 토론방에 전송 (CDP 폐기됨)
 - 입력 전 미확인 응답 점검 필수
 - SHA + 수정 내용 + 판정 요청
