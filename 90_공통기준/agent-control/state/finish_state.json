@@ -1,14 +1,14 @@
 {
-  "terminal_state": "exception",
+  "terminal_state": "done",
   "session": 152,
   "committed_pushed": true,
   "last_sha": "db652cfa",
-  "gpt_shared": false,
-  "gpt_judgment": null,
+  "gpt_shared": true,
+  "gpt_judgment": "정합",
   "gemini_judgment": null,
-  "user_reported": false,
-  "followup_checked": false,
-  "exception_reason": "cdp_9222_down — Chrome DevTools 9222 미기동으로 GPT 토론방 공유 불가. 사용자 Chrome 재기동 후 다음 세션 공유 보류.",
+  "user_reported": true,
+  "followup_checked": true,
+  "exception_reason": null,
   "session151_summary": {
     "topic": "d0_morning_zombie_chrome_fix_evening_partno_dedup_fix",
     "commits": [
@@ -97,11 +97,22 @@
     "main_push_chain": "cd42238e → 861beaf9 → db652cfa",
     "phase0_incident_quote": "final_check meta_drift 4 + commit_gate pre_commit_check 1 — all targets of this fix",
     "notion_sync": "success (manual-sync)",
-    "gpt_share_blocked_by": "cdp_9222_down",
+    "gpt_share_blocked_by": null,
     "next_session_first_actions": [
-      "사용자 Chrome 9222 헬스 복구 후 본 fix(commits 861beaf9 + db652cfa) GPT 공유 + 판정 확인",
-      "main 환경에서 다음 commit_gate/final_check 실행 시 meta_drift incident 누적 멈춤 확인",
-      "incident_ledger.jsonl 신규 meta_drift 0 검증 (7일 관측 윈도우)"
-    ]
+      "/finish 5단계 본문에 CDP 자동 launch 의무 명문화 (.claude/commands/finish.md 또는 share-result 본문)",
+      "main 환경에서 다음 commit_gate/final_check 실행 시 meta_drift incident 누적 0 검증 (7일 관측)",
+      "GPT 추가 제안 분류 A 별건 patch 진입 시점 사용자 명시 발화 대기"
+    ],
+    "gpt_share_recovered_by": "CDP 9222 자동 launch 사용자 재지적 → PowerShell Start-Process 즉시 실행 → HTTP 200 → GPT 공유 진입 → 판정 정합",
+    "gpt_judgment_detail": {
+      "verdict": "정합",
+      "items": {
+        "sed_pattern_fix": "정합 / 동의 — `[^—]*`보다 KST 명시 옵셔널이 과허용 방지",
+        "validation_sufficiency": "정합 / 동의 — 4케이스 단위 + 워크트리 end-to-end 충분",
+        "regression_risk": "낮음 / 추가 확인 불필요",
+        "policy_violation_self_report": "부분반영 / 추가 패치 권고 — /finish 5단계에 CDP 자동 launch 의무 명문화 필요"
+      },
+      "additional_proposal": "/finish 5단계 본문에 'CDP/Chrome MCP down 감지 시 사용자 질문 없이 자동 launch 1회 + 4초 후 HTTP 200 재확인 + 실패 시 exception 기록' 명시. 분류 A (별건 후속 patch)"
+    }
   }
 }
