@@ -310,7 +310,7 @@ if [ -n "$TASKS_DATE" ] && [ -n "$STATUS_DATE" ]; then
       if [ -n "$STATUS_TASKS_SESSION" ]; then
         # macOS/Linux sed 호환: 임시 파일 경유
         _tmp_status=$(mktemp)
-        sed "s/^최종 업데이트: [0-9-]* — 세션[0-9]\+.*/최종 업데이트: $TASKS_DATE — 세션$STATUS_TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
+        sed "s/^최종 업데이트: [0-9-]*\( KST\)\? — 세션[0-9]\+.*/최종 업데이트: $TASKS_DATE KST — 세션$STATUS_TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
         echo "  [FIX] STATUS.md 자동 갱신: $STATUS_DATE → $TASKS_DATE (세션$STATUS_TASKS_SESSION)"
       else
         fail "STATUS($STATUS_DATE) < TASKS($TASKS_DATE) — TASKS 세션 번호 추출 실패로 자동 갱신 불가"
@@ -359,7 +359,7 @@ if [ -n "$TASKS_SESSION" ] && [ -n "$STATUS_SESSION" ] && [ "$STATUS_DATE" = "$T
     if $FIX_MODE; then
       # 날짜는 유지하고 세션 번호만 갱신 (\1에 기존 날짜 캡처)
       _tmp_status=$(mktemp)
-      sed "s/^\(최종 업데이트: [0-9-]*\) — 세션[0-9]\+.*/\1 — 세션$TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
+      sed "s/^\(최종 업데이트: [0-9-]*\)\( KST\)\? — 세션[0-9]\+.*/\1\2 — 세션$TASKS_SESSION (자동 갱신: final_check --fix)/" "$STATUS_FILE" > "$_tmp_status" && mv "$_tmp_status" "$STATUS_FILE"
       echo "  [FIX] STATUS.md 세션 갱신: 세션$STATUS_SESSION → 세션$TASKS_SESSION"
     else
       fail "STATUS(세션$STATUS_SESSION) < TASKS(세션$TASKS_SESSION) — 세션 드리프트 (--fix로 자동 교정 가능)"
