@@ -4,7 +4,24 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-12 KST — **세션152** [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료.
+최종 업데이트: 2026-05-12 KST — **세션152** [C] **별건 fix** final_check.sh sed 패턴 ` KST` 옵셔널 누락 (L313·L362) → meta_drift 14건/session_drift 4건 누적 원인 / commit 861beaf9 main push 완료. / 세션152 [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료.
+
+## 세션152 별건 — final_check sed KST 패치 (2026-05-12)
+
+**원인**: `.claude/hooks/final_check.sh` L313/L362 sed 정규식 `[0-9-]*` 뒤에 ` —`만 기대 → 실제 STATUS.md 행 `2026-05-08 KST — 세션148`과 매칭 실패. mv는 동일 내용 덮어쓰기 → [FIX] 로그만 출력되고 실제 치환 0.
+
+**증거**: `.claude/incident_ledger.jsonl` 최근 7일 — `meta_drift` 14건 / `session_drift` 4건 누적. cd42238e 주간 self-audit `--fast --fix` 실행 후 `git diff` 0 bytes 확인으로 진단.
+
+**수정 (commit 861beaf9)**:
+- L313 sed: `[0-9-]*\( KST\)\?` 옵셔널 캡처 + 새 라인은 ` KST` 강제 포함 (현 형식 일관성)
+- L362 sed: 동일 옵셔널 + `\1\2`로 KST 부재 행도 보존
+
+**검증**:
+- sed 단위 4 케이스 (KST 유/무 × L313/L362) 전부 PASS
+- 워크트리 end-to-end: STATUS.md `2026-05-08 KST — 세션148` 인위 stale → `final_check --fast --fix` → `2026-05-12 KST — 세션152 (자동 갱신: final_check --fix)` 정상 치환 + STATUS 세션 드리프트 동시 해소 → 백업 원복 git diff 0
+- main push: cd42238e..861beaf9 main -> main
+
+**예상 효과**: 다음 commit_gate/final_check 호출부터 STATUS.md 드리프트 자동 fix 정상 작동. meta_drift / session_drift incident 누적 중단.
 
 ## 세션152 SP3M3 등록 누락 점검 (2026-05-11 ~ 05-12)
 
