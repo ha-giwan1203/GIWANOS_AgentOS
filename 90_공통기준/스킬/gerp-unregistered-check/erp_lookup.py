@@ -121,16 +121,26 @@ def _suppress_chrome_crash_restore(profile_dir: str):
 
 
 # ============================================================
-# OAuth 자동 로그인 (d0 패턴 — pyautogui OS 클릭으로 password manager dropdown 트리거)
+# OAuth 자동 로그인 (세션153 — d0 패치 동기화: page.fill DOM 직접 입력)
 # ============================================================
 def ensure_erp_login_via_playwright():
-    """playwright로 OAuth 자동 로그인 처리. d0 ensure_erp_login 직접 활용."""
+    """playwright로 OAuth 자동 로그인 처리.
+
+    세션153 (2026-05-13): pyautogui click/down/return 폐기 — OS focus 가로채기 위험 0%.
+    ID/PW는 d0-production-plan/.oauth.json에서 로드 (d0 _load_oauth_cred 재사용).
+    """
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         raise RuntimeError("playwright 미설치 — pip install playwright + playwright install chromium")
-    import pyautogui  # noqa
-    pyautogui.FAILSAFE = False
+
+    # d0의 _load_oauth_cred 재사용 (auth_extract.py와 동일 import 패턴)
+    import sys
+    from pathlib import Path
+    D0_DIR = Path(__file__).resolve().parent.parent / "d0-production-plan"
+    if str(D0_DIR) not in sys.path:
+        sys.path.insert(0, str(D0_DIR))
+    from run import _load_oauth_cred  # noqa
 
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(CDP_URL)
@@ -153,19 +163,17 @@ def ensure_erp_login_via_playwright():
         page.bring_to_front()
         time.sleep(1.0)
 
-        # 로그인 페이지면 자동 로그인
+        # 로그인 페이지면 자동 로그인 (DOM 직접 입력)
         if "auth-dev.samsong.com" in page.url and "/login" in page.url:
-            print("[phase0] OAuth 로그인 수행")
-            page.wait_for_selector('input[name="userId"]', timeout=10000)
-            info = page.evaluate("() => ({screenX: window.screenX, screenY: window.screenY, chromeH: window.outerHeight - window.innerHeight})")
-            box = page.locator('input[name="userId"]').bounding_box()
-            sx = int(info["screenX"] + box["x"] + box["width"] / 2)
-            sy = int(info["screenY"] + info["chromeH"] + box["y"] + box["height"] / 2)
-            pyautogui.click(sx, sy); time.sleep(1.5)
-            pyautogui.press("down"); time.sleep(0.5)
-            pyautogui.press("return"); time.sleep(1.5)
-            page.locator("button[type=submit]").first.click()
-            time.sleep(5)
+            print("[phase0] OAuth 로그인 수행 (DOM 직접 입력)")
+            user_id, password = _load_oauth_cred()
+            page.wait_for_selector('#userId', timeout=10000)
+            page.fill('#userId', user_id)
+            page.fill('#password', password)
+            page.click('#loginBtn')
+            time.sleep(3)
+            if "/login?error" in page.url:
+                print(f"[phase0] ⚠ submit 직후 /login?error — .oauth.json id/pw 검증 필요. URL: {page.url}")
 
         # OAuth 완료 대기
         deadline = time.time() + 60
