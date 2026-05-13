@@ -109,9 +109,36 @@ if echo "$STAGED" | grep -qE '(\.claude/hooks/|settings.*\.json)'; then
   MODE="--full"
 fi
 
+# ── 결과 캐싱 (세션154 — /finish 연속 commit 17초×N 방지) ──
+# --fast 모드 한정, 60초 윈도우 내 직전 PASS 재사용. --full 승격(hook/settings 변경)은 무조건 실행.
+# STAGED 셋이 달라도 60초 안에 직전 검사 통과했으면 동일 시스템 상태로 간주.
+# 위험: 60초 안에 외부에서 위험 파일 추가 시 검사 skip. 단, hook/settings 변경은 --full 승격으로 캐시 우회.
+CACHE_DIR="$PROJECT_DIR/.claude/state/commit_gate_cache"
+mkdir -p "$CACHE_DIR" 2>/dev/null
+CACHE_FILE="$CACHE_DIR/last_pass_fast.ts"
+CACHE_TTL=60
+
+if [ "$MODE" = "--fast" ] && [ -f "$CACHE_FILE" ]; then
+  CACHE_MTIME=$(stat -c %Y "$CACHE_FILE" 2>/dev/null || stat -f %m "$CACHE_FILE" 2>/dev/null)
+  if [ -n "$CACHE_MTIME" ]; then
+    NOW=$(date +%s)
+    CACHE_AGE=$((NOW - CACHE_MTIME))
+    if [ "$CACHE_AGE" -lt "$CACHE_TTL" ]; then
+      hook_log "PreToolUse/Bash" "commit_gate PASS: cache hit (mode=--fast age=${CACHE_AGE}s)" 2>/dev/null
+      hook_timing_end "commit_gate" "$_CG_START" "cache_hit"
+      exit 0
+    fi
+  fi
+fi
+
 # final_check 실행
 RESULT=$(bash "$HOOKS_DIR/final_check.sh" "$MODE" 2>&1)
 EXIT_CODE=$?
+
+# PASS 시 캐시 갱신 (--fast 한정, FAIL은 캐시 안 함 — 재검증 필요)
+if [ "$EXIT_CODE" -eq 0 ] && [ "$MODE" = "--fast" ]; then
+  touch "$CACHE_FILE" 2>/dev/null
+fi
 
 if [ "$EXIT_CODE" -ne 0 ]; then
   # FAIL 항목만 추출하여 간결한 메시지
