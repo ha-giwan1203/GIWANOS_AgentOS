@@ -1581,6 +1581,77 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
             "last_parent_prod_id": last_parent, "last_m_row": last_m_row}
 
 
+def _apply_set_begin_time(s_data):
+    """JS sGridList.setBeginTime() Python 재현 — 매 row에 PRDT_RANK + BEGIN_TIME + END_TIME +
+    PLAN_DA_S + PLAN_DA_E 부여. 휴식시간 8종 자동 가산.
+
+    JS 알고리즘 정밀 mirror (2026-05-13 캡처):
+      idx==0: beginTime = DAY_BEGIN_TIME[0:2]+":00" or "08:00"
+      idx>0:  beginTime = 이전 row의 endTime
+      tDate = PLAN_DA + beginTime
+      upm = UPH_QTY / 60 (분당 생산량)
+      tDate += ceil(PRDT_PLAN_QTY / upm) 분
+      휴식시간 가산 (start_date ≤ X and end_date ≥ X면 +N분):
+        9:50~10:00 +10 / 12:00~13:00 +60 / 14:50~15:00 +10 / 17:00~17:10 +10 /
+        21:00~21:10 +10 (PLAN_DA)
+        00:00~01:00 +60 / 03:00~03:10 +10 / 05:00~05:10 +10 (NEXT_PLAN_DA)
+      PLAN_DA_S/E = beginTime/endTime ≥ "08:00" ? PLAN_DA : NEXT_PLAN_DA
+      PRDT_RANK = idx + 1
+    """
+    import math
+    DFLT = "08:00"
+    end_time = None
+    for idx, obj in enumerate(s_data):
+        plan_da = obj.get("PLAN_DA")
+        next_plan_da = obj.get("NEXT_PLAN_DA") or plan_da
+
+        if idx == 0:
+            day_begin = obj.get("DAY_BEGIN_TIME")
+            begin_time = (day_begin[:2] + ":00") if day_begin else "08:00"
+        else:
+            begin_time = end_time
+
+        t_date = datetime.strptime(f"{plan_da} {begin_time}", "%Y-%m-%d %H:%M")
+        start_date = t_date
+
+        prdt_qty = int(obj.get("PRDT_PLAN_QTY") or 0)
+        try:
+            uph = float(obj.get("UPH_QTY") or 0)
+        except (ValueError, TypeError):
+            uph = 0
+        upm = uph / 60.0 if uph > 0 else 1.0
+        add_min = math.ceil(prdt_qty / upm) if upm > 0 else 0
+        t_date += timedelta(minutes=add_min)
+        end_date = t_date
+
+        breaks = [
+            (plan_da, "09:50", "10:00", 10),
+            (plan_da, "12:00", "13:00", 60),
+            (plan_da, "14:50", "15:00", 10),
+            (plan_da, "17:00", "17:10", 10),
+            (plan_da, "21:00", "21:10", 10),
+            (next_plan_da, "00:00", "01:00", 60),
+            (next_plan_da, "03:00", "03:10", 10),
+            (next_plan_da, "05:00", "05:10", 10),
+        ]
+        for d, bs, es, dm in breaks:
+            bp = datetime.strptime(f"{d} {bs}", "%Y-%m-%d %H:%M")
+            ep = datetime.strptime(f"{d} {es}", "%Y-%m-%d %H:%M")
+            if end_date >= bp and start_date <= ep:
+                t_date += timedelta(minutes=dm)
+                end_date = t_date
+
+        end_time = f"{t_date.hour:02d}:{t_date.minute:02d}"
+        plan_da_s = plan_da if begin_time >= DFLT else next_plan_da
+        plan_da_e = plan_da if end_time >= DFLT else next_plan_da
+
+        obj["BEGIN_TIME"] = begin_time
+        obj["END_TIME"] = end_time
+        obj["PRDT_RANK"] = idx + 1
+        obj["PLAN_DA_S"] = plan_da_s
+        obj["PLAN_DA_E"] = plan_da_e
+
+
 def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1'):
     """phase5 final_save — sGrid 재조회 후 sendMesFlag='Y'로 POST.
 
@@ -1601,19 +1672,12 @@ def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1')
                  params=s_params, timeout=15)
     s_data = r.json().get("data", {}).get("list", []) or []
 
-    # PRDT_RANK 자동 부여 (ERP가 sendMesFlag='N' 임시저장 시 새 row의 RANK 저장 안 함).
-    # JS의 sGridList.addRow는 grid 위에서 자동으로 다음 인덱스 RANK 부여 — Python에선 명시 처리.
-    # 2026-05-13 PoC 실측: phase5 final_save에서 "'prdtRank'은(는) 필수 입력입니다" 801 에러 → 부여 필수.
-    existing_ranks = [r.get("PRDT_RANK") for r in s_data if r.get("PRDT_RANK") is not None]
-    next_rank = max(existing_ranks) if existing_ranks else 0
-    fixed = 0
-    for row in s_data:
-        if row.get("PRDT_RANK") is None:
-            next_rank += 1
-            row["PRDT_RANK"] = next_rank
-            fixed += 1
-    if fixed:
-        print(f"[phase5:http] PRDT_RANK None {fixed}건 자동 부여 (max={next_rank})")
+    # JS sGridList.setBeginTime() 정밀 재현 — 모든 row의 PRDT_RANK + BEGIN_TIME + END_TIME +
+    # PLAN_DA_S + PLAN_DA_E 일괄 부여. 휴식시간 8종 자동 가산.
+    # 2026-05-13 PoC 실측: 단순 PRDT_RANK 부여만으로는 "Transaction rolled back" -9999 발생 →
+    # 시간 계산 비즈니스 로직 재현 필수.
+    _apply_set_begin_time(s_data)
+    print(f"[phase5:http] setBeginTime 적용 ({len(s_data)}건, ranks 1~{len(s_data)})")
 
     sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
     payload = {"dataList": s_data, "PARENT_PROD_ID": parent_prod_id, "sendMesFlag": "Y"}
