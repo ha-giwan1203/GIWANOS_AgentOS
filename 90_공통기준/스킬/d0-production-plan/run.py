@@ -41,6 +41,11 @@ DAY_CUT_THRESHOLD = 3600
 # 세션151: phase6 SmartMES 검증 실패 누적. main 종료 시 0이 아니면 exit 코드 2 (verify_run에서 자동복구 진입).
 PHASE6_FAILED = []  # [(line_cd, prod_date_str), ...]
 
+# 세션153 A안 2단계: phase3 D0 업로드를 requests로 처리할 때 사용할 session.
+# main에서 --http-upload 옵션 활성 + erp_login_via_http() 성공 시 세팅.
+# d0_upload(page, xlsx) 호출 시 이 변수 있으면 d0_upload_via_http로 분기 (호출자 시그니처 무변경).
+_HTTP_UPLOAD_SESS = None
+
 LINE_CONFIG = {
     "SP3M3": {
         "line_div_cd": "02",
@@ -744,8 +749,24 @@ def _wait_d0_popup_frame(page, timeout_sec: float = 25.0):
 def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
     """팝업 오픈 → selectList → multiList.
 
+    세션153 A안 2단계: _HTTP_UPLOAD_SESS 세팅 시 d0_upload_via_http로 분기.
+    호출자 시그니처 무변경 (page 인자 무시).
+
     parse_only=True: selectList(엑셀 첨부 + 서버 파싱 + 화면 표시)까지만 수행하고 multiList(DB 저장) 스킵.
     검증 모드 전용 (Phase 4/5 미진행)."""
+    if _HTTP_UPLOAD_SESS is not None:
+        d0_upload_via_http(_HTTP_UPLOAD_SESS, xlsx_path, parse_only=parse_only)
+        # 세션153 A안 2단계 보강: HTTP 업로드 후 브라우저 grid 갱신 (phase4가 grid 데이터 사용).
+        # 미호출 시 api_rank_batch가 신규 PROD_NO를 grid에서 못 찾아 매칭 실패.
+        if not parse_only:
+            try:
+                page.evaluate("() => { if (typeof totGridList !== 'undefined' && totGridList.searchListData) totGridList.searchListData(); }")
+                time.sleep(3)
+                print("[phase3:http] 브라우저 grid 갱신 완료")
+            except Exception as e:
+                print(f"[phase3:http] grid 갱신 경고 (무시): {e}")
+        return
+
     # 페이지 로드 확인 + 버튼 대기 (세션107 Gemini 지적: 15s → 30s, ERP 초기 로드 지연 대응)
     try:
         page.wait_for_selector("#btnExcelUpload", timeout=30000)
@@ -873,6 +894,72 @@ def d0_upload(page, xlsx_path: Path, parse_only: bool = False):
     except Exception: pass
     time.sleep(3)
     print("[phase3] D0 업로드 완료")
+
+
+def d0_upload_via_http(sess, xlsx_path: Path, parse_only: bool = False):
+    """Phase 3 D0 업로드 — requests 직접 (브라우저·iframe·jQuery 의존 0).
+
+    세션153 A안 2단계 — daily-routine HTTP POST 패턴 ERP 확장.
+    실측 캡처 PASS (2026-05-13):
+      1) GET popupPmD0AddnUpload.do?callbackFunid=totGridList — XSRF 갱신
+      2) POST selectListPmD0AddnUpload.do multipart (files + hidden 3종)
+         → {data:{list:[...]}, statusCode:200}
+      3) POST multiListPmD0AddnUpload.do JSON ({excelList, ADDN_PRDT_REASON_CD})
+         → {statusCode:200}
+
+    핵심 — X-XSRF-TOKEN 헤더는 매 POST 직전 최신 cookie['XSRF-TOKEN']로 갱신해야 함.
+    cookie 갱신 시점과 header 시점 불일치 시 ERP 500.
+
+    parse_only=True: selectList만 (multiList=DB 저장 스킵). 검증 전용.
+    """
+    import requests as _req  # noqa
+    POPUP_URL = "http://erp-dev.samsong.com:19100/prdtPlanMng/popupPmD0AddnUpload.do?callbackFunid=totGridList"
+    SELECT_URL = "http://erp-dev.samsong.com:19100/prdtPlanMng/selectListPmD0AddnUpload.do"
+    MULTI_URL = "http://erp-dev.samsong.com:19100/prdtPlanMng/multiListPmD0AddnUpload.do"
+
+    # 1) popup GET — referer/XSRF 갱신
+    sess.get(POPUP_URL, timeout=10)
+    sess.headers["Referer"] = POPUP_URL
+    sess.headers["X-Requested-With"] = "XMLHttpRequest"
+
+    with open(xlsx_path, "rb") as f:
+        file_bytes = f.read()
+
+    # 2) selectList (파일 파싱)
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    files = {"files": (xlsx_path.name, file_bytes,
+                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+    data = {"callbackFunid": "totGridList", "dataList": "", "ADDN_PRDT_REASON_CD": ""}
+    r1 = sess.post(SELECT_URL, files=files, data=data, timeout=120)
+    res1 = r1.json() if r1.headers.get("content-type","").startswith("application/json") else {}
+    print(f"[phase3:http parse] status={r1.status_code} statusCode={res1.get('statusCode')} listLen={len(res1.get('data',{}).get('list',[]) or [])}")
+    if r1.status_code != 200 or str(res1.get("statusCode")) != "200":
+        raise RuntimeError(f"selectListPmD0AddnUpload 실패: status={r1.status_code} body={r1.text[:400]}")
+    list_data = res1["data"]["list"]
+    if not list_data:
+        raise RuntimeError(f"selectList 응답 list 빈값: {r1.text[:400]}")
+    err_rows = [row for row in list_data if row.get("ERROR_FLAG")]
+    if err_rows:
+        raise RuntimeError(f"오류 행 {len(err_rows)}건 존재: {err_rows[:3]}")
+
+    if parse_only:
+        print(f"[phase3:http parse-only] selectList 완료 ({len(list_data)}건) — multiList 스킵")
+        return
+
+    # 3) multiList (DB 저장)
+    # ADDN_PRDT_REASON_CD = "002" (신규추가수량) — 2026-05-13 grid row 실측 캡처값.
+    # 빈 값으로 보내면 등록사유 칸 비어 있는 채로 ERP DB 등록됨 (사용자 실측 지적).
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    payload = {"excelList": list_data, "ADDN_PRDT_REASON_CD": "002"}
+    r2 = sess.post(MULTI_URL, data=json.dumps(payload),
+                   headers={"Content-Type": "application/json; charset=utf-8",
+                            "X-XSRF-TOKEN": sess.cookies.get("XSRF-TOKEN", "")},
+                   timeout=30)
+    res2 = r2.json() if r2.headers.get("content-type","").startswith("application/json") else {}
+    print(f"[phase3:http save] status={r2.status_code} statusCode={res2.get('statusCode')} statusTxt={res2.get('statusTxt')}")
+    if r2.status_code != 200 or str(res2.get("statusCode")) != "200":
+        raise RuntimeError(f"multiListPmD0AddnUpload 실패: status={r2.status_code} body={r2.text[:400]}")
+    print(f"[phase3:http] D0 업로드 완료 ({len(list_data)}건)")
 
 
 # ============================================================
@@ -1448,6 +1535,7 @@ def main():
     ap.add_argument("--no-jobsetup", action="store_true", help="morning SP3M3 종료 후 잡셋업 자동 호출 차단 (chain 비활성)")
     ap.add_argument("--day-cut", type=int, default=DAY_CUT_THRESHOLD, help=f"morning SP3M3 주간 누적 컷 임계 (default={DAY_CUT_THRESHOLD}). PoC/특수 케이스만 변경")
     ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
+    ap.add_argument("--http-upload", action="store_true", help="세션153 A안 2단계: phase3 D0 업로드를 requests 직접 (브라우저·iframe·jQuery 0). HTTP OAuth 성공 시만 활성")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
                     help="chain에서 호출할 잡셋업 모드 (default=commit-all). 입회 monitoring 시 list-only 권장")
     args = ap.parse_args()
@@ -1471,6 +1559,11 @@ def main():
     sess = erp_login_via_http()
     if sess is None:
         print("[phase0] HTTP OAuth 실패 — Chrome page.fill 경로 fallback")
+    # 세션153 A안 2단계: --http-upload 활성 + sess 가능 → phase3을 requests로 처리
+    if args.http_upload and sess is not None:
+        global _HTTP_UPLOAD_SESS
+        _HTTP_UPLOAD_SESS = sess
+        print("[phase3] --http-upload 활성 — d0_upload requests 경로 사용")
     ensure_chrome_cdp()
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(CDP_URL)
