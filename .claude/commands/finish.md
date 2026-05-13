@@ -2,6 +2,8 @@
 
 > **자동 트리거 키워드** (세션153 신설): 사용자가 "마무리"·"끝"·"끝내자"·"종료"·"완료"·"수고했다 마무리"·"오늘 끝" 발화 시 즉시 본 명령 자동 실행. 단순 인사 해석 금지. 단독 "수고했다"만이면 1줄 확인 허용.
 >
+> **GPT 공유 범위** (세션154 신설 — 사용자 명시 결정): 도메인 산출물 작업(A 모드 — 정산·라인배치·MES 업로드·일상점검·생산계획·보고서 등 실무 산출물 생성)은 **5~8단계 자동 생략**. 시스템 수정 작업(C 모드 — hook·settings·skill·CLAUDE.md·규칙 수정) 및 사용자가 "GPT 공유해라"·"공유해"·"GPT한테 보내라" 명시 발화 시에만 5~8단계 진행. 근거: 도메인 산출물은 사용자 본인이 직접 검증(엑셀 열어 확인)하므로 GPT 판정 가치 적음 + 외부 의존 30~60초 절감.
+>
 > `/share-result` 확장 루틴의 alias/wrapper. 단, 4.5단계(Notion 동기화)는 share-result 위임 밖 독립 실행.
 > [역사] GPT 합의 2026-04-04 — 최초 8단계 자동 루틴 강제 방안 (세션86 오후 2026-04-21 3자 토론으로 9단계 확장, 4.5 Notion 독립 신설. 이 문구는 원형 보존 목적)
 > 세션86 3자 토론(2026-04-21) 3way 만장일치: 4.5단계 Notion 동기화를 `/finish` 전용으로 분리.
@@ -68,6 +70,13 @@ python .claude/hooks/incident_repair.py --json --limit 5
 - 이 단계는 `/finish` 전용 — `/share-result` 단독 호출 경로에서는 실행되지 않는다 (책임 분리)
 
 ### 5단계: GPT 공유
+
+**[진입 조건 분기 — 세션154 신설]**
+- **C 모드 작업** (hook·settings·skill·CLAUDE.md·규칙·gate·permission 수정) → 5~8단계 진행
+- **A 모드 작업** (정산·라인배치·MES 업로드·일상점검·생산계획·보고서 등 도메인 산출물) → 5~8단계 **자동 생략**. `terminal_state=done` 즉시 기록. `gpt_shared=false` / `gpt_judgment=null` / `user_reported=true` (4단계 직후 사용자 1회 보고로 종결).
+- **사용자 명시 강제** ("GPT 공유해라"·"공유해"·"GPT한테 보내라"·"판정 받아라") → 모드 무관 5~8단계 강제 진행
+
+**진행 시 (C 모드 또는 사용자 명시):**
 - **[MUST 세션152 신설]** 진입 전 CDP 9222 헬스체크. down 감지 시 사용자 질문 없이 자동 launch 1회 + 4초 후 HTTP 200 재확인. 2회 연속 미수신 시에만 `terminal_state=exception`, `exception_reason="cdp_9222_unrecoverable"`. **[NEVER]** down 감지 즉시 exception 처리 금지 — 자동 launch 1회 우선. 자동 launch 절차는 `gpt-send.md` 0단계가 처리 (단일 SSoT). 세션152 GPT 판정 별건 권고 (분류 A) 반영.
 - Chrome MCP로 GPT 토론방에 전송 (CDP 폐기됨)
 - 입력 전 미확인 응답 점검 필수
@@ -97,9 +106,11 @@ python .claude/hooks/incident_repair.py --json --limit 5
 - timeout/로그인만료/네트워크오류 → `terminal_state: "exception"`, `exception_reason` 기록
 - 예외 시에도 사용자 보고는 수행
 
-## 공유 범위
-- **모든 커밋은 예외 없이 GPT에 공유한다** — 상태 문서 갱신(6단계) 후 추가 커밋이 발생하면 해당 커밋도 GPT에 공유한 뒤 사용자 보고한다
-- 커밋 종류(docs, fix, feat 등)에 따라 공유를 임의 생략하지 않는다
+## 공유 범위 (세션154 개정)
+- **C 모드 커밋은 GPT 공유 필수** — 시스템 수정 commit 발생 시 모두 공유. 종류(docs, fix, feat) 무관.
+- **A 모드(도메인 산출물) 커밋은 GPT 공유 생략** — 사용자 본인이 산출물 직접 검증. GPT 판정 가치 적음.
+- **혼합 commit (C + A 변경 한 commit)** → C 변경분이 있으면 GPT 공유 진행.
+- **사용자 명시 발화 시** 모드 무관 GPT 공유 강제.
 
 ## Stop guard 연동
 - completion_gate.sh가 finish_state.json의 terminal_state를 확인
