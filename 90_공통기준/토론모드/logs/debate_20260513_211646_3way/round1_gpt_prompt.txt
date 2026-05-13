@@ -1,0 +1,25 @@
+의제: Claude Code 떠넘기기 재발 — 자기검열(문서 규칙)만으로 불충분한가, hook gate 복원이 정당한가, 세션148 delegation_guard 폐기 결정을 뒤집어야 하는가. 3자 토론(Claude×GPT×Gemini) Round 1 GPT 본론 요청.
+
+배경:
+- 세션148(2026-05-08) 3way 토론에서 "CLAUDE.md 금지 문구(어떻게 할까요·진행할까요·A/B 중 선택·원하시면·사용자 결정 대기·1단어 응답 부탁 등 6개) + 메모리 feedback_authority_ladder.md 2조건(ERP/MES 비가역 직전 1줄 확인 / 사용자 명시 선택 요구)만으로 떠넘기기 차단 충분"이라 판단해 delegation_guard hook을 measurement 모드로 폐기.
+- 13일 후 세션157(2026-05-13) 사용자가 "또 떠넘기는 거 같다·스스로 사고를 포기한 느낌·지침을 안 보는 것 같다" 체감 지적.
+- 진단 결과 누적 회귀 신호: finish 자동 트리거(세션153) / commit_gate 60초 캐싱 + early-exit(세션154,156) / gpt-send 0단계 자동 기동(세션152) / session_kernel.md 253h stale로 매 세션 cold start.
+- 세션132에서도 옵션 4지선다·의도 확인 5회 발화 사례 있었음.
+
+쟁점 3개 — 각각 채택·보류·버림 판정 요청:
+
+H1. 자기검열(RLHF + CLAUDE.md 금지 문구)만으로 떠넘기기 차단 충분한가? (현재 가정)
+H2. delegation_guard hook을 advisory/measurement에서 gate(차단 exit 2)로 복원하는 것이 정당한가?
+H3. 세션148 합의를 번복해야 하는가, 아니면 다른 보강(SessionStart 모드 라벨링·CLAUDE.md "1줄 확인 허용" 1조건 압축)이 우선인가?
+
+Claude 독자 입장 (Round 0 선행 작성):
+- H1 버림 — 13일 만에 재발한 것 자체가 문서 규칙 강도 부족 증거
+- H2 채택 — 단 형태가 관건. Claude Code에 PostResponse hook 표준 없음. 대안: (1) Stop hook 텍스트 검사 (2) UserPromptSubmit hook 사전 안내 (3) completion_gate 응답 텍스트 검사 추가. 정규식 보수화·whitelist 필요(토론모드 라벨링 응답 false positive 방지).
+- H3 부분 채택 — 세션148 합의 일부만 번복. SessionStart 모드 라벨링 + 1줄 확인 압축과 패키지로.
+
+요청:
+- H1·H2·H3 각각 GPT 입장 + 근거 (채택/보류/버림 명시)
+- Claude 입장에 대한 동의·이의·반대 안
+- 특히 H2의 hook gate 구현 형태 — Claude Code의 실제 hook 종류(PreToolUse/PostToolUse/UserPromptSubmit/SessionStart/Stop)에서 어느 것이 응답 텍스트 검사에 적합한지 실증 기반 의견
+- 라벨링: 실증됨 / 일반론 / 환경미스매치 / 과잉설계 / 구현경로미정 중 1개
+- 한국어만, 문단·번호 목록형. 표 금지.

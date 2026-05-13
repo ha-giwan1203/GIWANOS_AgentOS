@@ -25,12 +25,39 @@ STATUS="$PATH_STATUS"
 LAST_TEXT=$(last_assistant_text 2>/dev/null || true)
 
 # ============================================================================
-# delegation guard Phase 0 — 제거 (2026-05-08 세션148 토론 합의 3/3)
-# 합의 매트릭스: GPT 권고 + Gemini 동의 + Claude 채택. SHA f4eeee11 후속.
-# 사유: measurement만으로도 자기검열 유발. 위임 떠넘기기 방지는
-#   (1) CLAUDE.md:70 "위임 떠넘기기 금지" 명시 + (2) 메모리 feedback_authority_ladder.md 5조건으로 충분.
-# 기존 .claude/logs/delegation_guard.jsonl 로그는 보존(세션142 측정 데이터). 신규 측정 중단.
+# delegation guard Phase 0 — 복원 (2026-05-13 세션157 3way 만장일치)
+# 합의 매트릭스: GPT 조건부 채택 + Gemini 채택 + Claude 채택 (pass_ratio=1.00)
+# 사유: 세션148 폐기 후 13일 만에 사용자 떠넘기기 재발 체감 → 문서 규칙은 필요조건이지 충분조건 아님 실증.
+# 형태: 새 hook 추가 없이 본 Stop hook 내부 최소 복원. hook 26개 과밀 회피.
+# 로그: 3way 합의 — debate_20260513_211646_3way/round1_cross_verification.md (pass_ratio=1.00)
 # ============================================================================
+
+# Stop hook stdin JSON 읽기 — stop_hook_active 검출 (무한 루프 방지)
+HOOK_INPUT=$(cat 2>/dev/null || true)
+STOP_HOOK_ACTIVE=$(echo "$HOOK_INPUT" | safe_json_get "stop_hook_active" 2>/dev/null || echo "")
+
+# 떠넘기기 패턴 (보수적 — false positive 최소화)
+_DELEGATION_PATTERN='(어떻게[[:space:]]*할까요|진행할까요|원하시면[[:space:]]*(말씀|알려|진행)|선택해[[:space:]]*주세요|A/B[[:space:]]*중[[:space:]]*선택|사용자[[:space:]]*결정[[:space:]]*대기|1단어로[[:space:]]*답|확인해주시면[[:space:]]*진행|말씀해주시면[[:space:]]*진행)'
+# whitelist — false positive 방지 (토론모드 판정 / 사용자 명시 선택 / ERP·MES 1줄 확인)
+_DELEGATION_WHITELIST='(통과[[:space:]]*/[[:space:]]*조건부|조건부[[:space:]]*통과|토론모드|debate-mode|3way|3자[[:space:]]*토론|"물어봐"|"확인해"|"비교해"|"선택지"|ERP/MES|MES[[:space:]]*업로드|MES[[:space:]]*비가역|반영[[:space:]]*대상[[:space:]]*[:：])'
+
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  # 2회차 — 무조건 통과 + incident_ledger 기록 (정규식 과민 추적, GPT 권고)
+  _DG_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  printf '{"ts":"%s","result":"second_pass","source":"delegation_guard","note":"stop_hook_active=true 2회차 통과"}\n' "$_DG_TS" \
+    >> "$PROJECT_ROOT/.claude/logs/delegation_guard.jsonl" 2>/dev/null
+  hook_log "Stop" "delegation_guard: stop_hook_active=true 2회차 통과" 2>/dev/null || true
+elif [ -n "$LAST_TEXT" ] && echo "$LAST_TEXT" | grep -qiE "$_DELEGATION_PATTERN" && ! echo "$LAST_TEXT" | grep -qiE "$_DELEGATION_WHITELIST"; then
+  _DG_MATCH=$(echo "$LAST_TEXT" | grep -oiE "$_DELEGATION_PATTERN" | head -1)
+  _DG_SAFE=$(json_escape "$_DG_MATCH" 2>/dev/null || echo "$_DG_MATCH")
+  hook_incident "gate_reject" "delegation_guard" "$_DG_MATCH" "위임 떠넘기기 발화 감지 — 패턴 '${_DG_MATCH}'" '"classification_reason":"delegation_pattern","normal_flow":false,"next_action":"판단 1줄+다음행동 1줄로 재작성"' 2>/dev/null || true
+  _DG_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  printf '{"ts":"%s","result":"block","reason":"delegation_pattern","match":"%s","source":"delegation_guard"}\n' "$_DG_TS" "$_DG_SAFE" \
+    >> "$PROJECT_ROOT/.claude/logs/delegation_guard.jsonl" 2>/dev/null
+  echo "{\"decision\":\"block\",\"reason\":\"[DELEGATION GUARD] 위임 떠넘기기 패턴 감지: '${_DG_MATCH}'. 질문으로 멈추지 말고 (1) 현재 모드 [A/B/C/D/E] 다시 출력 (2) 네 판단 1줄 (3) 다음 행동 1줄로 재작성하라.\"}"
+  hook_timing_end "completion_gate" "$_CMG_START" "block_delegation"
+  exit 0
+fi
 
 if ! is_completion_claim "$LAST_TEXT"; then
   # 약한 패턴(잔여이슈없음/ALL CLEAR/GPT PASS)만 매칭 시 로그만 남기고 통과
