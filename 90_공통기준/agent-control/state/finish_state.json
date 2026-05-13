@@ -1,9 +1,42 @@
 {
   "terminal_state": "done",
+  "session": 155,
   "committed_pushed": true,
+  "last_sha": "6a8d0933",
   "gpt_shared": false,
   "gpt_judgment": null,
   "user_reported": true,
   "followup_checked": true,
-  "exception_reason": null
+  "exception_reason": "gpt_share_skipped_user_terminated_after_incident_recovery",
+  "session155_summary": {
+    "topic": "sp3m3_5_13_evening_phase4_sort_regression_recovery_plus_helper_extraction",
+    "commits": [
+      "62ca68bd",
+      "d62649c7",
+      "6a8d0933"
+    ],
+    "incident_chain": [
+      {
+        "phase": "새 세션 라우팅",
+        "issue": "다른 세션 Claude가 SP3 메인서브 v2.xlsm(OUTER 계획) 잘못 매칭 → APPLY_TO_PLAN 매크로 실행 시도",
+        "fix": "CLAUDE.md 도메인 표에 d0-production-plan 명시 row 추가 + feedback_d0_plan_routing.md 메모리 신설"
+      },
+      {
+        "phase": "phase4 정렬 회귀",
+        "issue": "evening --http-only 5건 누락 (RSP3SC0644/0590/0584/0023/0026 야간 신규 ext에 rank 미박힘) — REG_NO ascending 정렬 버그",
+        "root_cause": "A안 3단계 신설 시 세션152 매뉴얼 4번 룰 누락 (legacy는 b-a 내림차순 OK, 새 함수 ascending)",
+        "fix": "api_rank_batch_via_http reverse=True 추가 (d62649c7) + 5건 보강 등록 (rank 42~46, MES rsltCnt=250)"
+      },
+      {
+        "phase": "회귀 차단",
+        "issue": "정렬 룰이 두 함수에 따로 박혀 새 함수 추가 시 반복 누락 (세션152·155 2회 회귀)",
+        "fix": "_sort_idx_map_desc() 헬퍼 추출 + 호출부 주석에 회귀 이력 명시 + feedback_d0_idx_map_sort_desc.md 메모리 신설 (6a8d0933)"
+      }
+    ],
+    "sgrid_final": "46건 (주간 18 + 야간 28) WORK_STATUS=R 전원 정상",
+    "next_session_first_actions": [
+      "5/14 07:11~07:20 Claude 루틴 d0-morning 첫 자동 실행 결과 확인",
+      "GPT 공유 미수행 — share-result 별건 가능"
+    ]
+  }
 }
