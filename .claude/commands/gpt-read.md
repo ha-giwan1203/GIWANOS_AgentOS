@@ -62,9 +62,11 @@ CDP Chrome(포트 9222, 프로필 `C:\temp\chrome-cdp`) 기동 필수.
 }
 ```
 
-**폴링 정책**:
-- `isExtended=false`: 3/5/8초 단계, 최대 300초 (기존 유지)
-- `isExtended=true`: 3/5/8/15초 반복, 300초 이후만 30초 단계로 전환, 최대 600초
+**폴링 정책** (세션157 3way R1 합의 1.00 — 폴링 단축):
+- `isExtended=false`: **1/2/3초 단계**, 최대 300초 (이전 3/5/8 → 라운드당 20~50초 절감)
+- `isExtended=true`: 3/5/8/15초 반복, 300초 이후만 30초 단계로 전환, 최대 600초 (thinking 모델은 long polling 필요로 기존 유지)
+- 안정성 검사(2-b 2회 연속 동일)는 **유지** — race condition 방지 필수
+- 가속 비활성 조건: `.claude/state/debate_accel_disabled` 존재 시 즉시 이전 3/5/8초로 fallback (Safe-cutoff 트리거 시)
 - **종료 판정은 stop-button 단독으로 하지 않음** (세션82 실증: thinking 중 stop-button 지속 유지되며 Claude가 오클릭)
   - 종료 조건 OR:
     1. `stopBtn=false` AND 2-b 안정성(2회 연속 동일) PASS (기존 경로)

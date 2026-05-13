@@ -28,9 +28,10 @@ CDP Chrome(포트 9222, 프로필 `C:\temp\chrome-cdp`) 기동 필수.
   return btn ? btn.getAttribute('aria-disabled') : 'not_found';
 }
 ```
-- `"true"` → 생성 중 → 적응형 polling (3/5/8초, 최대 300초)
+- `"true"` → 생성 중 → 적응형 polling **1/2/3초** (세션157 3way R1 단축, 이전 3/5/8), 최대 300초
 - `"not_found"` → DOM 재구성 중 → 2초 대기 후 재시도 (최대 5회). 5회 초과 시 `navigate_page(type="reload")`
 - `"false"` → 2-b로
+- 가속 비활성 조건: `.claude/state/debate_accel_disabled` 존재 시 이전 3/5/8초로 fallback
 
 2-b. **마지막 유효 블록 안정성 확인** (placeholder 스킵 + 2회 연속 동일 여부):
 ```javascript

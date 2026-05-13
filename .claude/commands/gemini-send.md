@@ -156,12 +156,13 @@ touch .claude/state/gemini_skill_entry.ok
 }
 ```
 
-- 적응형 polling:
-  - 0~20초: sleep 2
-  - 20~60초: sleep 3
-  - 60초~: sleep 5
+- 적응형 polling (세션157 3way R1 단축):
+  - 0~30초: **sleep 1** (이전 2초)
+  - 30~120초: **sleep 2** (이전 60~ 5초)
+  - 120초~: sleep 3
   - 최대 300초
 - `aria-disabled="false"` 반환 시 완료
+- 가속 비활성 조건: `.claude/state/debate_accel_disabled` 존재 시 이전 2/3/5초 단계로 fallback
 
 ### 5. 응답 읽기
 

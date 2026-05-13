@@ -146,10 +146,11 @@ touch .claude/state/gpt_skill_entry.ok
 - `fill` tool은 contenteditable div에서 불안정 → execCommand 우선
 
 ### 4. 응답 완료 대기
-- 적응형 polling (세션79 속도 개선 + 세션83 thinking 확장):
+- 적응형 polling (세션79 속도 개선 + 세션83 thinking 확장 + 세션157 3way R1 단축):
   - thinking·reasoning 모델 감지는 `/gpt-read` 2-a 참조 (data-message-model-slug includes 판정)
-  - 일반 모델: 2/3/5초 단계, 최대 300초
-  - 확장추론 모델(isExtended=true): 2/3/5/8초 반복, 300초 이후 15/30초 단계, 최대 600초
+  - 일반 모델: **1/2/3초 단계**, 최대 300초 (이전 2/3/5 → 라운드당 20~50초 절감)
+  - 확장추론 모델(isExtended=true): 2/3/5/8초 반복, 300초 이후 15/30초 단계, 최대 600초 (long polling 유지)
+  - 가속 비활성 조건: `.claude/state/debate_accel_disabled` 존재 시 즉시 이전 2/3/5초로 fallback
 - `evaluate_script`로 stop-button + 마지막 블록 상태 병행 확인:
 ```javascript
 () => {

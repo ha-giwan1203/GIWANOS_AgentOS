@@ -174,6 +174,36 @@ B 분류에 해당하는 구조 변경이라도, 세션 내에서 사용자가 *
 
 **관련 스킬**: `/gpt-send`, `/gpt-read`, `/gemini-send`, `/gemini-read` 모두 chrome-devtools-mcp 기반. 모든 Step 1-C에 `select_page(bringToFront=true)` 단계 명시. claude-in-chrome 계열 MCP 호출 금지.
 
+## 폴링 단축 가속 정책 (세션157 3way R1 만장일치, 2026-05-13)
+
+> 합의 원본: `logs/debate_20260513_232210_3way/` (pass_ratio=4/4=1.00)
+> 사용자 의도: 토론모드 속도 가속 + ChatGPT 프로젝트방 컨텍스트 유지
+
+**폐기 결정**: 콘솔 fetch 가속안(SPA 백엔드 직접 호출)은 ToS·계정 리스크(OpenAI/Google 약관 명시 금지)와 가속폭 한계(라운드당 20~60초)로 채택 불가. 원래 PLAN(`kind-waddling-oasis.md` 콘솔 fetch 가속안) 폐기.
+
+**채택안 (UI 자동화 가속)**:
+
+| 항목 | 변경 |
+|------|------|
+| **폴링 주기** | 일반 모델 3/5/8초 → **1/2/3초** (thinking 모델 long polling은 그대로) |
+| **본문 추출** | 생성 중 실시간 polling → **One-shot** (중지 버튼 사라진 직후 1회) |
+| **bringToFront** | 무분별 호출 → **듀얼 트리거** (전송 직후 1회 + 30초 경과 후 1회) |
+| **race condition 방지** | 2회 연속 동일 안정성 검사 **유지** |
+
+**Safe-cutoff 회귀 보험** (4종 트리거 — 1회라도 감지 시 즉시 가속 비활성):
+1. 인증 챌린지 화면 (Cloudflare/captcha/2FA)
+2. 대화 기록 미저장 신호
+3. 사용량 경고·임시 제한
+4. 보안 알림·비정상 활동 경고
+
+**hook**: `.claude/hooks/debate_safe_cutoff.sh` — stdin 텍스트 검사 → 트리거 시 `.claude/state/debate_accel_disabled` 생성.
+
+**비활성 진입 시 fallback**: 폴링 1/2/3초 → 3/5/8초로 자동 복귀. UI 자동화 전체 흐름 유지.
+
+**해제 절차**: `rm .claude/state/debate_accel_disabled` (사용자 명시 인지 강제 — 자동 해제 금지).
+
+**기대 효과**: 라운드 2~3분 → **1.5~2분** (20~50초 절감). ToS 안전 + 프로젝트방 컨텍스트 그대로.
+
 ## GPT 실물 검증 공유 (NEVER)
 구현 → `git commit` → `git push` → SHA + `git show --stat` 요약 포함 공유 (한 번에). 커밋 없이 먼저 공유 금지.
 
