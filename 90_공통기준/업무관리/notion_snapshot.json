@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-05-13 11:11 KST",
+  "generated_at": "2026-05-13 14:07 KST",
   "last_updated": "세션153 갱신 2026-05-13",
-  "github_sha": "d2059a2c3594bb5b3edb660b0650508e90dd098a",
-  "github_sha_short": "d2059a2c",
-  "hooks_raw": 20,
-  "hooks_active": 5,
+  "github_sha": "ede3587152664079643d5324eda76fdf60a763a4",
+  "github_sha_short": "ede35871",
+  "hooks_raw": 21,
+  "hooks_active": 6,
   "commands": 7,
   "smoke": "unknown",
   "recent_sessions": [
