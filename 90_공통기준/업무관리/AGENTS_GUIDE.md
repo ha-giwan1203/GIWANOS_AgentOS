@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 5개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 6개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
@@ -92,19 +92,21 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_SKILLS_START -->
 
-### Skills (90_공통기준/스킬/) — 21개 등록
+### Skills (90_공통기준/스킬/) — 23개 등록
 
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
 
 | 스킬 | Grade | 설명 |
 |------|-------|------|
 | assembly-cost-settlement | B | 월말 조립비 정산 자동화 — 대원테크(0109) 10개 라인 GERP/구ERP 합계 + 차이 유형 분류 +  |
+| assy-registration-check | B | 라인 기준정보 파일의 모품번이 ERP 조립비 현황관리(New)에 주라인+짝라인 모두 등록되어 있는지 사전 점 |
 | auto-fix | - | - |
 | chomul-module-partno | A | 초물표 모듈품번(RSP) 일괄 반영 — AB5:AJ14 박스에 RSP 입력/수정 + 라인코드 SP3S03→S |
 | d0-production-plan | B | ERP D0 추가생산지시 자동화 (SP3M3 MAIN + SD9A01 OUTER). xlsm 추출 → ERP |
 | daily-routine | A | ZDM 일상점검 + MES 생산실적 업로드 통합 자동화 (월~토 08:07 cron) |
 | flow-chat-analysis | C | Flow.team SP3S03 채팅방 원문 → 품질·설비 이슈 자동 분류 + 월별 보고서 |
-| jobsetup-auto | B | SmartMES 잡셋업 첫 서열 품번 자동 입력 (REST API v3.x). 17 검사항목/30초. 첫 서 |
+| gerp-unregistered-check | B | 매월 정산 빌더 산출물(정산_수식버전_MM월.xlsx)에서 GERP 미등록 품번 + 분류 라벨 정확성 + E |
+| jobsetup-auto | B | SmartMES 첫 서열 품번 자동 처리 (REST API v3.5). 작업자 배치 + 인증 + 잡셋업 17 |
 | line-batch-mainsub | A | ERP 메인서브 라인배치 자동화 — SP3메인서브 품번 검색 + SUB ASSY 그리드 조립라인 자동 입력  |
 | line-batch-management | A | ERP 라인배치 관리 통합 자동화 — SP3메인서브 + OUTER 라인 (검색 기반 + 리스트업 기반). 시 |
 | line-batch-outer-main | A | ERP OUTER/MAIN 라인배치 자동화 — 검색 없이 그리드 행 순서대로 리스트업 처리 |
