@@ -54,7 +54,7 @@ elif [ -n "$LAST_TEXT" ] && echo "$LAST_TEXT" | grep -qiE "$_DELEGATION_PATTERN"
   _DG_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
   printf '{"ts":"%s","result":"block","reason":"delegation_pattern","match":"%s","source":"delegation_guard"}\n' "$_DG_TS" "$_DG_SAFE" \
     >> "$PROJECT_ROOT/.claude/logs/delegation_guard.jsonl" 2>/dev/null
-  echo "{\"decision\":\"block\",\"reason\":\"[DELEGATION GUARD] 위임 떠넘기기 패턴 감지: '${_DG_MATCH}'. 질문으로 멈추지 말고 (1) 현재 모드 [A/B/C/D/E] 다시 출력 (2) 네 판단 1줄 (3) 다음 행동 1줄로 재작성하라.\"}"
+  echo "{\"decision\":\"block\",\"reason\":\"[DELEGATION GUARD] 떠넘기기 패턴 '${_DG_MATCH}' 감지. 질문 없이 네 판단으로 재작성하라.\"}"
   hook_timing_end "completion_gate" "$_CMG_START" "block_delegation"
   exit 0
 fi

@@ -84,19 +84,14 @@ if [ -n "$SETTINGS_CHANGE" ]; then
   fi
 fi
 
-# 판정
+# 판정 — 세션157 사용자 지시: 사용자 결정 유도 문구 제거. 감지 사실만 stderr 1줄 + log 기록.
 if [ ${#REASONS[@]} -gt 0 ]; then
-  echo "[share_gate] 3way 공유 필수 — 감지 사유 ${#REASONS[@]}건:" >&2
-  for r in "${REASONS[@]}"; do
-    echo "  - $r" >&2
-  done
-  echo "[share_gate] → GPT 공유 후 Gemini에도 동일 메시지 전송 필수. 2자 종결 금지." >&2
-  hook_log "share_gate" "3way required: ${REASONS[*]}"
-  hook_timing_end "share_gate" "$_SG_START" "3way_required"
+  echo "[share_gate] 3way 신호 ${#REASONS[@]}건 감지: ${REASONS[*]}" >&2
+  hook_log "share_gate" "3way signal: ${REASONS[*]}"
+  hook_timing_end "share_gate" "$_SG_START" "3way_signal"
 else
-  echo "[share_gate] 2way 허용 (3way 감지 조건 0건)" >&2
-  hook_log "share_gate" "2way ok"
-  hook_timing_end "share_gate" "$_SG_START" "2way_ok"
+  hook_log "share_gate" "no 3way signal"
+  hook_timing_end "share_gate" "$_SG_START" "no_signal"
 fi
 
 exit 0
