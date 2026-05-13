@@ -224,7 +224,7 @@ B 분기 시 (세션117 비대칭 전환):
 예외 발생 시 → `terminal_state: "exception"`, `exception_reason: "{사유}"`
 
 ## 주의사항
-- **모든 커밋은 예외 없이 GPT에 공유한다** — 상태 문서 갱신, docs 커밋 포함. 커밋 종류에 따라 공유를 임의 생략하지 않는다
+- **GPT 공유 범위 (세션156 토론 합의)** — C 모드(hook/settings/skill/commands/규칙 수정) 커밋은 GPT 공유 필수. A 모드(정산·라인배치·MES·일상점검·생산계획·보고서 등 도메인 산출물) 커밋은 사용자 명시 공유 지시 없으면 생략. 근거: 메모리 `feedback_finish_gpt_share_scope.md` + finish.md 5~8단계 자동 생략 룰과 정합
 - 커밋 없이 결과만 공유 금지 — 반드시 SHA 포함
 - 토론모드 규칙 준수 (Chrome MCP 단일 전송)
 - 입력 전 미확인 응답 점검 필수
