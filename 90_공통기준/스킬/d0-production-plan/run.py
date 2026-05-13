@@ -46,6 +46,10 @@ PHASE6_FAILED = []  # [(line_cd, prod_date_str), ...]
 # d0_upload(page, xlsx) 호출 시 이 변수 있으면 d0_upload_via_http로 분기 (호출자 시그니처 무변경).
 _HTTP_UPLOAD_SESS = None
 
+# 세션153 A안 3단계: 완전 브라우저-less. --http-only 옵션 활성 시 세팅.
+# phase0~6 전부 requests path. ensure_chrome_cdp + playwright 호출 0.
+_HTTP_ONLY_SESS = None
+
 LINE_CONFIG = {
     "SP3M3": {
         "line_div_cd": "02",
@@ -1065,8 +1069,33 @@ def process_one_row(page, prod_no, target_ext_reg, target_line, save_url, dry_ru
     return r
 
 
+def dedupe_night_first_5_via_http(sess, items, check_count=5):
+    """야간 첫 N행 dedupe — HTTP totGrid 조회로 대체."""
+    if not items:
+        return items
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    grid_all = fetch_tot_grid_via_http(sess, today_str)
+    grid = [{"PROD_NO": g["PROD_NO"], "QTY": int(g.get("PRDT_QTY") or g.get("ADD_PRDT_QTY") or 0)}
+            for g in grid_all if g.get("REG_DT") == today_str]
+    if not grid:
+        print(f"[dedupe:http] 상단 grid REG_DT={today_str} 등록분 0건 — 야간 dedupe 스킵")
+        return items
+    skipped, kept = [], []
+    for i, it in enumerate(items):
+        if i < check_count:
+            match = next((g for g in grid if g["PROD_NO"] == it["PROD_NO"]), None)
+            if match:
+                skipped.append(it)
+                print(f"[dedupe:http] 야간 {i+1}행 PROD_NO={it['PROD_NO']} 야간qty={it['QTY']} 주간qty={match['QTY']} → 제외")
+                continue
+        kept.append(it)
+    print(f"[dedupe:http] 야간 {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건")
+    return kept
+
+
 def dedupe_night_first_5(page, items, check_count=5):
-    """야간 추출 결과의 첫 N행(기본 5)을 ERP 상단 grid 기등록분과 비교해 중복 제외.
+    """세션153 A안 3단계: _HTTP_ONLY_SESS 시 http 버전 분기.
+    야간 추출 결과의 첫 N행(기본 5)을 ERP 상단 grid 기등록분과 비교해 중복 제외.
 
     매칭 기준: REG_DT=오늘 AND **PROD_NO 일치만** (수량 무관, 2026-04-29 사용자 결정 v3.2).
     매칭된 행만 items에서 제외. N+1번째 이후는 그대로.
@@ -1075,6 +1104,8 @@ def dedupe_night_first_5(page, items, check_count=5):
     초기 v3.1은 PROD_NO+수량 동시 매칭이었으나, 같은 품번이면 수량 다르더라도 작업자 입장에서
     중복 작업 위험 동일하므로 PROD_NO만으로 매칭하도록 정책 단순화.
     """
+    if _HTTP_ONLY_SESS is not None:
+        return dedupe_night_first_5_via_http(_HTTP_ONLY_SESS, items, check_count)
     if not items:
         return items
     today_str = datetime.now().strftime("%Y-%m-%d")
@@ -1107,8 +1138,57 @@ def dedupe_night_first_5(page, items, check_count=5):
     return kept
 
 
+def fetch_tot_grid_via_http(sess, target_date):
+    """totGrid 조회 — GET /prdtPlanMng/selectListDoAddnPrdtPlanInstrMngNew.do.
+
+    실측 캡처 (2026-05-13): GET method, params={searchDate, searchShipDa, searchRegUsrNm=대원테크}.
+    POST 보내면 "Request method 'POST' not supported" 거부.
+    """
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    sess.headers["X-Requested-With"] = "XMLHttpRequest"
+    sess.headers["Referer"] = "http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do"
+    sess.headers["ajax"] = "true"
+    params = {"searchDate": "", "searchShipDa": target_date, "searchRegUsrNm": "대원테크"}
+    r = sess.get("http://erp-dev.samsong.com:19100/prdtPlanMng/selectListDoAddnPrdtPlanInstrMngNew.do",
+                 params=params, timeout=15)
+    if r.status_code != 200:
+        return []
+    data = r.json()
+    return data.get("data", {}).get("list", []) or []
+
+
+def dedupe_existing_registrations_via_http(sess, items, prod_date, line_cd):
+    """phase1.5 dedupe — requests 직접 (브라우저 의존 0).
+
+    세션153 A안 3단계 — totGrid endpoint 사용.
+    """
+    if not items:
+        return items
+    target_date = prod_date.strftime("%Y-%m-%d")
+    grid_all = fetch_tot_grid_via_http(sess, target_date)
+    grid = [{"PROD_NO": g["PROD_NO"], "REG_NO": g.get("REG_NO"),
+             "QTY": int(g.get("PRDT_QTY") or g.get("ADD_PRDT_QTY") or 0),
+             "_raw": g}
+            for g in grid_all if g.get("REG_DT") == target_date]
+    if not grid:
+        print(f"[dedupe-day:http] 그리드 REG_DT={target_date} 등록분 0건 — 전량 진행 ({len(items)}건)")
+        return items
+    existing = {g["PROD_NO"]: g for g in grid}
+    skipped, kept = [], []
+    for it in items:
+        if it["PROD_NO"] in existing:
+            g = existing[it["PROD_NO"]]
+            print(f"[dedupe-day:http] {it['PROD_NO']} 이미 등록 (REG_NO={g['REG_NO']} qty={g['QTY']}) — 제외")
+            skipped.append(it)
+        else:
+            kept.append(it)
+    print(f"[dedupe-day:http] items {len(items)}건 → 등록 {len(kept)}건 / 제외 {len(skipped)}건 (PROD_NO 일치 기준, prod_date={target_date})")
+    return kept
+
+
 def dedupe_existing_registrations(page, items, prod_date, line_cd):
-    """같은 prod_date + line_cd ERP 기등록 PROD_NO 제외 (주간/morning 및 --xlsx direct 전용).
+    """세션153 A안 3단계: _HTTP_ONLY_SESS 시 http 버전으로 분기 (호출자 시그니처 무변경).
+    같은 prod_date + line_cd ERP 기등록 PROD_NO 제외 (주간/morning 및 --xlsx direct 전용).
 
     배경: 세션133 5/1 P3 PoC에서 RSP3SC0665 1건 추가 등록 시 이미 morning 20건 등록 상태였음에도
     중복 가드 없이 등록 → MES 잔존 발생. 사용자 요청 "계획 반영 전 이미 등록된 품번 확인 단계 추가".
@@ -1120,6 +1200,8 @@ def dedupe_existing_registrations(page, items, prod_date, line_cd):
 
     Returns: 중복 제외된 items 리스트
     """
+    if _HTTP_ONLY_SESS is not None:
+        return dedupe_existing_registrations_via_http(_HTTP_ONLY_SESS, items, prod_date, line_cd)
     if not items:
         return items
     target_date = prod_date.strftime("%Y-%m-%d")
@@ -1369,6 +1451,183 @@ def rank_batch(page, items, target_line, save_url, dry_run=False):
 # ============================================================
 # Phase 5: 최종 저장 (MES 전송)
 # ============================================================
+def process_one_row_via_http(sess, prod_no, target_ext_reg, target_line, save_url, prod_date, day_opt='1'):
+    """phase4 한 row 처리 — requests 직접 (브라우저 page.evaluate 0).
+
+    JS process_one_row 흐름을 그대로 mirror:
+      1) totGrid GET → PROD_NO + REG_NO 매칭 row (totSelectRowData)
+      2) mGrid GET → target_line LINE_CD 매칭 row (mSelectRowData)
+      3) sGrid GET → 현재 누적 dataList
+      4) rowData 구성 (m copy + WORK_STATUS_CD=A, EXT_PLAN_YN=Y 등)
+      5) POST save_url + {dataList + [rowData], PARENT_PROD_ID, sendMesFlag='N'}
+
+    Returns: {ok, addedRank, parent_prod_id, m_row, ...}
+    """
+    BASE = "http://erp-dev.samsong.com:19100"
+    target_date = prod_date.strftime("%Y-%m-%d")
+
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    sess.headers["X-Requested-With"] = "XMLHttpRequest"
+    sess.headers["Referer"] = BASE + "/prdtPlanMng/viewListDoAddnPrdtPlanInstrMngNew.do"
+    sess.headers["ajax"] = "true"
+
+    # 1) totGrid 조회 + 매칭
+    grid = fetch_tot_grid_via_http(sess, target_date)
+    tot = next((r for r in grid if r.get("PROD_NO") == prod_no and str(r.get("REG_NO")) == str(target_ext_reg)), None)
+    if tot is None:
+        return {"ok": False, "stage": "top_click", "err": "totGrid 매칭 실패"}
+
+    # 2) mGrid GET
+    m_params = {"PROD_ID": tot["PROD_ID"], "PLAN_DA": tot["REG_DT"], "PRDT_QTY": tot["PRDT_QTY"],
+                "SHIPTDA": tot["SHIPTDA"], "EXT_PLAN_REG_NO": tot["REG_NO"], "DAY_OPT": day_opt}
+    r = sess.get(BASE + "/prdtPlanMng/selectListDoAddnPrdtConctLineNew.do", params=m_params, timeout=15)
+    m_list = r.json().get("data", {}).get("list", []) or []
+    m = next((row for row in m_list if row.get("LINE_CD") == target_line), None)
+    if m is None:
+        return {"ok": False, "stage": "m_select", "err": f"line {target_line} 없음", "avail": [x.get("LINE_CD") for x in m_list]}
+    if not m.get("MPRDTN_DIV_CD"):
+        return {"ok": False, "stage": "m_validate", "err": "MPRDTN_DIV_CD 공란"}
+    if not m.get("PRDT_CATE_CD"):
+        return {"ok": False, "stage": "m_validate", "err": "PRDT_CATE_CD 공란"}
+
+    # 3) sGrid GET
+    s_params = {"LINE_CD": m["LINE_CD"], "STD_DA": m["STD_DA"], "PLAN_DA": m["PLAN_DA"],
+                "LINE_DIV_CD": m["LINE_DIV_CD"], "DAY_OPT": day_opt}
+    r2 = sess.get(BASE + "/prdtPlanMng/selectListDoAddnPrdtConctLineDetailNew.do", params=s_params, timeout=15)
+    s_data = r2.json().get("data", {}).get("list", []) or []
+
+    # 4) rowData = Object.assign({}, m) + 필드 덮어쓰기 (JS code mirror)
+    row_data = dict(m)
+    row_data["DAY_OPT"] = day_opt
+    row_data["WORK_STATUS_CD"] = "A"
+    row_data["WORK_STATUS_NM"] = "추가"
+    row_data["EXT_PLAN_YN"] = "Y"
+    row_data["EXT_PLAN_REG_NO"] = m["EXT_PLAN_REG_NO"]
+    row_data["LINE_NM"] = m["LINE_NM"]
+    row_data["LINE_CD"] = m["LINE_CD"]
+    row_data["PROD_NO"] = m["PROD_NO"]
+    row_data["PROD_NM"] = m["PROD_NM"]
+    row_data["PROD_REV"] = m["PROD_REV"]
+    row_data["PRDT_PLAN_QTY"] = m["ADD_PRDT_QTY"]
+    row_data["OLD_PRDT_PLAN_QTY"] = m["ADD_PRDT_QTY"]
+    row_data["NEXT_PLAN_DA"] = m["NEXT_PLAN_DA"]
+
+    # 5) dataList = s_data + [row_data] + POST save_url
+    data_list = list(s_data) + [row_data]
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    payload = {"dataList": data_list, "PARENT_PROD_ID": tot["PROD_ID"], "sendMesFlag": "N"}
+    r3 = sess.post(BASE + save_url, data=json.dumps(payload),
+                   headers={"Content-Type": "application/json; charset=utf-8",
+                            "X-XSRF-TOKEN": sess.cookies.get("XSRF-TOKEN", "")},
+                   timeout=30)
+    res = r3.json() if r3.headers.get("content-type", "").startswith("application/json") else {}
+    if r3.status_code != 200 or str(res.get("statusCode")) != "200":
+        return {"ok": False, "stage": "save", "err": f"status={r3.status_code} body={r3.text[:300]}"}
+    return {"ok": True, "addedRank": len(data_list), "parent_prod_id": tot["PROD_ID"],
+            "m_row": {k: m[k] for k in ("LINE_CD", "STD_DA", "PLAN_DA", "LINE_DIV_CD") if k in m},
+            "dataListLen": len(data_list)}
+
+
+def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_opt='1'):
+    """phase4 api_rank_batch HTTP — items 순회하며 process_one_row_via_http 호출.
+
+    같은 PROD_NO N회 등장 시 N번째 REG_NO 매칭 (api_rank_batch와 동일 정책).
+    last_m_row / last_parent_prod_id 반환 — final_save_via_http에서 사용.
+    """
+    target_date = prod_date.strftime("%Y-%m-%d")
+    grid = fetch_tot_grid_via_http(sess, target_date)
+    grid_by_pno = {}
+    for g in grid:
+        if g.get("REG_DT") != target_date:
+            continue
+        grid_by_pno.setdefault(g["PROD_NO"], []).append(g)
+    for v in grid_by_pno.values():
+        v.sort(key=lambda x: int(x.get("REG_NO", 0)))
+
+    done = failed = missing = 0
+    fails = []
+    last_parent = None
+    last_m_row = None
+    pno_idx = {}
+
+    for it in items:
+        pno = it["PROD_NO"]
+        idx = pno_idx.get(pno, 0)
+        cands = grid_by_pno.get(pno, [])
+        if idx >= len(cands):
+            print(f"[api_phase4:http] {pno} 등장 #{idx+1} grid 후보 부족 ({len(cands)}건)")
+            missing += 1
+            fails.append({"pno": pno, "stage": "match"})
+            continue
+        target_ext_reg = cands[idx]["REG_NO"]
+        pno_idx[pno] = idx + 1
+
+        result = process_one_row_via_http(sess, pno, target_ext_reg, target_line, save_url, prod_date, day_opt)
+        if result.get("ok"):
+            done += 1
+            last_parent = result.get("parent_prod_id")
+            last_m_row = result.get("m_row")
+            print(f"[api_phase4:http] {pno} ext={target_ext_reg} -> OK (rank={result.get('addedRank')})")
+        else:
+            failed += 1
+            fails.append({"pno": pno, "ext": target_ext_reg, "result": result})
+            print(f"[api_phase4:http] {pno} ext={target_ext_reg} -> FAIL: {result}")
+            if failed >= 3:
+                print("[api_phase4:http] 3회 연속 실패 — 중단")
+                break
+        time.sleep(0.5)
+
+    return {"done": done, "failed": failed, "missing": missing, "fails": fails,
+            "last_parent_prod_id": last_parent, "last_m_row": last_m_row}
+
+
+def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1'):
+    """phase5 final_save — sGrid 재조회 후 sendMesFlag='Y'로 POST.
+
+    last_m_row: api_rank_batch_via_http 결과에서 받은 마지막 처리 m row의 LINE_CD/STD_DA/PLAN_DA/LINE_DIV_CD.
+    """
+    BASE = "http://erp-dev.samsong.com:19100"
+    if last_m_row is None or parent_prod_id is None:
+        raise RuntimeError("final_save_via_http: last_m_row/parent_prod_id 누락")
+
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    sess.headers["ajax"] = "true"
+
+    # sGrid 재조회
+    s_params = {"LINE_CD": last_m_row["LINE_CD"], "STD_DA": last_m_row["STD_DA"],
+                "PLAN_DA": last_m_row["PLAN_DA"], "LINE_DIV_CD": last_m_row["LINE_DIV_CD"],
+                "DAY_OPT": day_opt}
+    r = sess.get(BASE + "/prdtPlanMng/selectListDoAddnPrdtConctLineDetailNew.do",
+                 params=s_params, timeout=15)
+    s_data = r.json().get("data", {}).get("list", []) or []
+
+    # PRDT_RANK 자동 부여 (ERP가 sendMesFlag='N' 임시저장 시 새 row의 RANK 저장 안 함).
+    # JS의 sGridList.addRow는 grid 위에서 자동으로 다음 인덱스 RANK 부여 — Python에선 명시 처리.
+    # 2026-05-13 PoC 실측: phase5 final_save에서 "'prdtRank'은(는) 필수 입력입니다" 801 에러 → 부여 필수.
+    existing_ranks = [r.get("PRDT_RANK") for r in s_data if r.get("PRDT_RANK") is not None]
+    next_rank = max(existing_ranks) if existing_ranks else 0
+    fixed = 0
+    for row in s_data:
+        if row.get("PRDT_RANK") is None:
+            next_rank += 1
+            row["PRDT_RANK"] = next_rank
+            fixed += 1
+    if fixed:
+        print(f"[phase5:http] PRDT_RANK None {fixed}건 자동 부여 (max={next_rank})")
+
+    sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
+    payload = {"dataList": s_data, "PARENT_PROD_ID": parent_prod_id, "sendMesFlag": "Y"}
+    r2 = sess.post(BASE + save_url, data=json.dumps(payload),
+                   headers={"Content-Type": "application/json; charset=utf-8",
+                            "X-XSRF-TOKEN": sess.cookies.get("XSRF-TOKEN", "")},
+                   timeout=120)
+    res = r2.json() if r2.headers.get("content-type", "").startswith("application/json") else {}
+    print(f"[phase5:http final_save] status={r2.status_code} statusCode={res.get('statusCode')} mesMsg={(res.get('mesMsg') or '')[:120]}")
+    if r2.status_code != 200 or str(res.get("statusCode")) != "200":
+        raise RuntimeError(f"final_save_via_http 실패: status={r2.status_code} body={r2.text[:300]}")
+    return res
+
+
 def final_save(page, save_url):
     js = """
     async (args) => {
@@ -1480,8 +1739,27 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         print(f"[{line}] parse-only: 업로드 창에 엑셀 첨부 + 서버 파싱까지만 (추출 {len(items)}건). Phase 4/5 미진행")
         return
 
-    d0_upload(page, xlsx)
     target_line = "SP3M3" if line == "SP3M3" else "SD9A01"
+
+    # 세션153 A안 3단계 — 완전 브라우저-less path
+    if _HTTP_ONLY_SESS is not None:
+        sess = _HTTP_ONLY_SESS
+        d0_upload_via_http(sess, xlsx, parse_only=False)
+        batch = api_rank_batch_via_http(sess, items, target_line, cfg["save_url"], prod_date, day_opt='1')
+        print(f"[{line}:http] api_rank_batch: {batch}")
+        if batch["failed"] > 0 or batch["missing"] > 0:
+            print(f"[{line}:http] 실패/누락 존재 — 최종 저장 보류")
+            return
+        if no_mes_send:
+            print(f"[{line}:http] --no-mes-send: final_save 차단")
+            return
+        final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"], day_opt='1')
+        vp = verify_prod_date or prod_date
+        if not verify_smartmes(target_line, vp, items):
+            PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
+        return
+
+    d0_upload(page, xlsx)
     if api_mode:
         # 옵션 A 하이브리드 — rank 호출만 requests 직접 POST (sendMesFlag='N' 강제)
         batch = api_rank_batch(page, items, target_line, cfg["save_url"])
@@ -1536,6 +1814,7 @@ def main():
     ap.add_argument("--day-cut", type=int, default=DAY_CUT_THRESHOLD, help=f"morning SP3M3 주간 누적 컷 임계 (default={DAY_CUT_THRESHOLD}). PoC/특수 케이스만 변경")
     ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
     ap.add_argument("--http-upload", action="store_true", help="세션153 A안 2단계: phase3 D0 업로드를 requests 직접 (브라우저·iframe·jQuery 0). HTTP OAuth 성공 시만 활성")
+    ap.add_argument("--http-only", action="store_true", help="세션153 A안 3단계: 완전 브라우저-less. phase0~6 전부 requests. ensure_chrome_cdp + playwright 0")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
                     help="chain에서 호출할 잡셋업 모드 (default=commit-all). 입회 monitoring 시 list-only 권장")
     args = ap.parse_args()
@@ -1564,6 +1843,14 @@ def main():
         global _HTTP_UPLOAD_SESS
         _HTTP_UPLOAD_SESS = sess
         print("[phase3] --http-upload 활성 — d0_upload requests 경로 사용")
+
+    # 세션153 A안 3단계: --http-only 활성 + sess 가능 → phase0~6 전부 requests
+    if args.http_only and sess is not None:
+        global _HTTP_ONLY_SESS
+        _HTTP_ONLY_SESS = sess
+        print("[phase0] --http-only 활성 — 브라우저 launch 스킵, 완전 HTTP path")
+        return _main_http_only(args, sess, session, target_file_date)
+
     ensure_chrome_cdp()
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(CDP_URL)
@@ -1686,6 +1973,73 @@ def main():
 
     # 세션151: phase6 검증 실패 누적 시 exit 2로 verify_run 자동복구 진입 신호.
     # final_save 후 SmartMES 카운트·중복·순서 중 하나라도 어긋나면 활성. 누락 의심 시 사용자 알림.
+    if PHASE6_FAILED:
+        print(f"[phase6] 검증 실패 누적: {PHASE6_FAILED} — exit 2", file=sys.stderr)
+        sys.exit(2)
+
+
+def _main_http_only(args, sess, session, target_file_date):
+    """세션153 A안 3단계 — 완전 브라우저-less main 흐름.
+
+    ensure_chrome_cdp + sync_playwright 0. dedupe/d0_upload/api_rank_batch/final_save 모두 http.
+    page=None — page 의존 함수는 _HTTP_ONLY_SESS 보고 자동 분기 (래퍼).
+    --xlsx 직접 모드는 미지원 (사용자 요청 시 추가).
+    """
+    try:
+        plan_path = find_plan_file(target_file_date)
+    except FileNotFoundError as e:
+        print(f"[skip:http] 해당일 파일 없음 — 작업 패스: {e}")
+        print(f"=== /d0-plan {session} skip (no plan file) http-only ===")
+        return
+    wb = openpyxl.load_workbook(plan_path, data_only=True, keep_vba=True)
+    page = None
+
+    if session == "evening":
+        prod_date_override = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else None
+        if args.line in ("SP3M3", "ALL"):
+            items = extract_sp3m3_night(wb)
+            items = dedupe_night_first_5(page, items)
+            prod_date = prod_date_override if prod_date_override else target_file_date - timedelta(days=1)
+            if prod_date_override:
+                print(f"[evening:http] --prod-date 오버라이드: SP3M3 prod_date = {prod_date.strftime('%Y-%m-%d')}")
+            if args.limit is not None and len(items) > args.limit:
+                print(f"[evening:http] --limit {args.limit} 적용: {len(items)}건 → {args.limit}건")
+                items = items[:args.limit]
+            run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
+                             verify_prod_date=prod_date, parse_only=args.parse_only,
+                             no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+        if args.line in ("SD9A01", "ALL"):
+            items = extract_outer_d1(wb, "SD9M01")
+            prod_date = prod_date_override if prod_date_override else target_file_date
+            if args.limit is not None and len(items) > args.limit:
+                items = items[:args.limit]
+            run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run,
+                             verify_prod_date=prod_date, parse_only=args.parse_only,
+                             no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+    else:  # morning
+        prod_date = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else target_file_date
+        sp3m3_registered = False
+        if args.line in ("SP3M3", "ALL"):
+            items = extract_sp3m3_day(wb, args.day_cut)
+            items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
+            if args.limit is not None and len(items) > args.limit:
+                print(f"[morning:http] --limit {args.limit} 적용: {len(items)}건 → {args.limit}건 (PoC)")
+                items = items[:args.limit]
+            if not items:
+                print("[morning:http] dedupe 후 등록 대상 0건 — 업로드 스킵")
+            else:
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
+                                 verify_prod_date=prod_date, parse_only=args.parse_only,
+                                 no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                sp3m3_registered = True
+        if args.line == "SD9A01":
+            print("[morning:http] SD9A01은 저녁 세션 전용 — 스킵")
+
+        if sp3m3_registered and not args.dry_run and not args.parse_only and not args.no_jobsetup:
+            _run_jobsetup_chain(args.jobsetup_mode, prod_date)
+
+    print("=== /d0-plan http-only 완료 ===")
+
     if PHASE6_FAILED:
         print(f"[phase6] 검증 실패 누적: {PHASE6_FAILED} — exit 2", file=sys.stderr)
         sys.exit(2)
