@@ -8,6 +8,13 @@
 #   - 차단 메커니즘: JSON `{"hookSpecificOutput":{"permissionDecision":"deny",...}}` (PreToolUse 최신 스펙) + exit 2 (belt-and-suspenders)
 #   - timing 계측: hook_timing_start/end 호출부 배선 완료
 
+# Fast early-exit (세션156) — git commit/push 아닐 때 hook_common.sh source 전에 즉시 종료
+# 매 Bash 호출마다 발동하던 1.8초 부하 제거. git 명령일 때만 원래 로직 진입.
+INPUT_CACHE=$(cat)
+if ! printf '%s' "$INPUT_CACHE" | grep -qE 'git (commit|push)'; then
+  exit 0
+fi
+
 source "$(dirname "$0")/hook_common.sh" 2>/dev/null || true
 
 # Phase 2-B: 전체 실행 시간 계측 (의제4 수집 데이터)
@@ -53,7 +60,7 @@ should_suppress_incident() {
   return 1  # no suppress — should record
 }
 
-INPUT=$(cat)
+INPUT="$INPUT_CACHE"
 # 안전 JSON 파서 사용 (sed 단독 파싱 취약성 대체, GPT+Claude 합의 2026-04-07)
 COMMAND=$(echo "$INPUT" | safe_json_get "command")
 
