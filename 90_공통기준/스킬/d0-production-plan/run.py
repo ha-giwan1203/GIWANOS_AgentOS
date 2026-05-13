@@ -1541,8 +1541,12 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
         if g.get("REG_DT") != target_date:
             continue
         grid_by_pno.setdefault(g["PROD_NO"], []).append(g)
+    # 세션155 버그 fix: REG_NO 내림차순 (매뉴얼 4번 룰 — 야간 신규 ext가 주간 기존 ext보다 큼).
+    # ascending 정렬 시 같은 PROD_NO에 주야 양쪽 등록 있으면 idx=0이 주간(작은 ext)을 잡아
+    # 야간 rank가 주간 row에 덮어 박힘 → SmartMES 5건 미반영 사고.
+    # 세션152 legacy rank_batch는 b-a 내림차순 이미 적용 — A안 3단계 신설 시 누락.
     for v in grid_by_pno.values():
-        v.sort(key=lambda x: int(x.get("REG_NO", 0)))
+        v.sort(key=lambda x: int(x.get("REG_NO", 0)), reverse=True)
 
     done = failed = missing = 0
     fails = []
