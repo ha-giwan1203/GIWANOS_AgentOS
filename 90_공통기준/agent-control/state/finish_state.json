@@ -2,13 +2,24 @@
   "terminal_state": "done",
   "session": 153,
   "committed_pushed": true,
-  "last_sha": "4d9291eb",
-  "gpt_shared": false,
-  "gpt_judgment": null,
+  "last_sha": "ede35871",
+  "gpt_shared": true,
+  "gpt_judgment": "정합",
   "gemini_judgment": null,
   "user_reported": true,
   "followup_checked": true,
-  "exception_reason": "gpt_share_skipped_user_terminated_session",
+  "exception_reason": null,
+  "session153_finish_chain": {
+    "topic": "session152_evening_followup_cleanup_push",
+    "commits": ["d739bf83", "ede35871"],
+    "gpt_verdict": "정합",
+    "gpt_reason": "legacy rank_batch L1421 b.extReg-a.extReg 내림차순 main 반영 확인. 코드·상태문서 기준 정합. morning 2026-05-13 07:10 운영 실측 대기.",
+    "next_morning_check": [
+      "[phase0] OAuth 완료 대기 10s 통과 확인 (60s→10s 단축)",
+      "ID 0109 정확 입력 검증",
+      "idx_map 내림차순 자연 검증 (주간 새 등록 시)"
+    ]
+  },
   "session153_summary": {
     "topic": "d0_plan_gerp_login_full_redesign_plus_claude_routine_migration",
     "commits": [
