@@ -1,14 +1,60 @@
 {
   "terminal_state": "done",
-  "session": 152,
+  "session": 153,
   "committed_pushed": true,
-  "last_sha": "4964c0df",
-  "gpt_shared": true,
-  "gpt_judgment": "정합",
+  "last_sha": "4d9291eb",
+  "gpt_shared": false,
+  "gpt_judgment": null,
   "gemini_judgment": null,
   "user_reported": true,
   "followup_checked": true,
-  "exception_reason": null,
+  "exception_reason": "gpt_share_skipped_user_terminated_session",
+  "session153_summary": {
+    "topic": "d0_plan_gerp_login_full_redesign_plus_claude_routine_migration",
+    "commits": [
+      "dcd95815",
+      "69adfbb0",
+      "db9c8bcd",
+      "14a0ca14",
+      "fafac0c9",
+      "4d9291eb"
+    ],
+    "stages": {
+      "step1_oauth_pagefill": "pyautogui typewrite → page.fill DOM 직접 입력 (#userId/#password/#loginBtn). .oauth.json local credential (gitignore). 가로채기 시나리오 영구 차단.",
+      "step2_http_oauth": "daily-routine mes_login 패턴의 ERP 확장. requests로 ssoUrl 추출 + auth-dev/login POST(clientId=ERP) + cookies(SESSION/XSRF-TOKEN/JSESSIONID) → playwright context 주입. ensure_erp_login 미진입.",
+      "step3_http_upload": "phase3 multipart + JSON multiList requests 전환. ADDN_PRDT_REASON_CD=\"002\" (신규추가수량 grid row 실측 캡처). X-XSRF-TOKEN 매 POST 직전 cookie 최신값 갱신 필수.",
+      "step4_http_only": "phase4 process_one_row_via_http + final_save_via_http + _apply_set_begin_time (JS sGridList.setBeginTime 정밀 mirror — 휴식시간 8종 9:50/12:00/14:50/17:00/21:00/24:00/3:00/5:00 자동 가산). ensure_chrome_cdp + playwright 0.",
+      "step5_routine_migration": "Claude scheduled-task `d0-morning` 등록 (월~토 07:11 KST cron `11 7 * * 1-6`). Windows schtasks D0_SP3M3_Morning + D0_SP3M3_Morning_Recover 2건 삭제. Slack 알림 테스트 PASS."
+    },
+    "poc_validation": {
+      "step3_PoC": "RSP3SC0696 326309 phase0~6 풀 흐름 PASS (브라우저 fallback 경로)",
+      "step4_PoC": "RSP3PC0144 326320 rank=19 phase0~6 풀 흐름 PASS (--http-only, 브라우저 launch 0)",
+      "set_begin_time_unit": "sGrid 18행 100% 일치 (휴식시간 4건 케이스 포함)",
+      "erp_grid_direct_dump": "REASON_CD=002 / PRDT_RANK=19 / BEGIN_TIME=19:50 / END_TIME=20:09 / WORK_STATUS_CD=R"
+    },
+    "regression_insurance": "--http-only default off. 매일 자동 실행은 기존 page.evaluate 경로 그대로. 1~2주 검증 후 default on 검토.",
+    "stranded_data_cleaned": [
+      "RSP3PC0144 326312 (사용자 화면 수동 삭제)",
+      "RSP3PC0143 326313 (사용자 화면 수동 삭제)",
+      "RSP3SC0752 빈 등록사유 row (사용자 화면 수동 삭제)"
+    ],
+    "scheduled_task_d0_morning": {
+      "taskId": "d0-morning",
+      "cron": "11 7 * * 1-6",
+      "next_run": "2026-05-14T07:19 KST (jitter 적용)",
+      "fail_alert": "Slack C096LU8PH44 + <@U096LU8KNN8> 멘션"
+    },
+    "slack_test": {
+      "channel": "C096LU8PH44",
+      "ts": "1778637849.651899",
+      "status": "PASS"
+    },
+    "next_session_first_actions": [
+      "5/14 07:11~07:20 첫 Claude 루틴 자동 실행 결과 확인 (채팅창 또는 Slack)",
+      "1~2주 안정 후 --http-only default on 전환 검토 (별건)",
+      "GPT 공유 미수행 (사용자 종료 명시 — 다음 세션에서 share-result로 보충 가능)"
+    ]
+  },
   "session151_summary": {
     "topic": "d0_morning_zombie_chrome_fix_evening_partno_dedup_fix",
     "commits": [
@@ -124,6 +170,13 @@
         "sha": "4964c0df",
         "topic": "gpt-send 잔여 '즉시 실패 보고' 2곳 → 0단계 정합 통일",
         "gpt_verdict": "self-applied per GPT recommendation"
+      },
+      {
+        "sha": "c2940c7a",
+        "topic": "evening SP3M3 야간계획 반영 사고 + run.py 4종 패치 (idx_map b-a 내림차순 / 0109 typewrite / OAuth 60s→10s / dedupe-night 정책 유지)",
+        "gpt_verdict": "부분반영",
+        "gpt_reason": "api_rank_batch는 정합. legacy rank_batch(--legacy-mode fallback 경로) idx_map sort 동기화 미확인 — 같은 사고 재발 가능",
+        "followup_uncommitted": "run.py L1164 legacy rank_batch idx_map sort a.extReg-b.extReg → b.extReg-a.extReg 내림차순 동기화 (working tree 수정 완료, push 사용자 승인 대기)"
       }
     ]
   }

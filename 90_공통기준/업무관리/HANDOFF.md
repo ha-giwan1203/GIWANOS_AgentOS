@@ -4,7 +4,41 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-12 KST — **세션152** [C] **별건 fix** final_check.sh sed 패턴 ` KST` 옵셔널 누락 (L313·L362) → meta_drift 14건/session_drift 4건 누적 원인 / commit 861beaf9 main push 완료. / 세션152 [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료. / **세션152 evening [A+C] SP3M3 야간계획 반영 사고 + run.py 4종 패치** (Phase 6 5건 누락 → idx_map 정렬 a-b→b-a 매뉴얼 4번 룰 준수 / pyautogui ID 0109 명시 typewrite / OAuth wait 60s→10s / 누락 5건 새 ext 보강 등록 + final_save 200).
+최종 업데이트: 2026-05-13 KST — **세션153** [C] **d0-plan GERP 로그인·자동화 전면 재설계 + Claude 루틴 이관** — OAuth pyautogui 가로채기 영구 차단(page.fill DOM 직접) → HTTP OAuth(daily-routine 패턴 ERP 확장) → HTTP 업로드(multipart + JSON multiList, ADDN_PRDT_REASON_CD=002) → HTTP rank/final_save + setBeginTime Python 재현(휴식시간 8종) → 완전 브라우저-less 옵션 `--http-only` PoC PASS (RSP3PC0144 326320 rank=19 풀 흐름). 6 commit (dcd95815 / 69adfbb0 / db9c8bcd / 14a0ca14 / fafac0c9 / 4d9291eb). + Claude scheduled-task `d0-morning` 등록(월~토 07:11 KST) + Windows schtasks D0_SP3M3_Morning/Recover 2건 삭제 + Slack 알림 테스트 PASS(채널 C096LU8PH44, ts=1778637849). / **세션152** [C] **별건 fix** final_check.sh sed 패턴 ` KST` 옵셔널 누락 (L313·L362) → meta_drift 14건/session_drift 4건 누적 원인 / commit 861beaf9 main push 완료. / 세션152 [A+C] SP3M3 라인 조립비 등록 누락 점검 + 신규 스킬 `assy-registration-check` 신설 + V2 마스터 일괄 sync + 4월 오류리스트_추가.xlsx 218행 작성 + HCAMS02 NLR/CLR 단가 룰 적용. / 세션151 후속 [C] 5/11 morning OAuth 실패 → `_force_chrome_foreground` 신설 / 세션151 [B+C] D0 자동화 실패 분석 + 3종 패치 commit 59273df9 / 세션150 [A] 4월 이관품번 라인별 정리 시트 추가 완료. / **세션152 evening [A+C] SP3M3 야간계획 반영 사고 + run.py 4종 패치** (Phase 6 5건 누락 → idx_map 정렬 a-b→b-a 매뉴얼 4번 룰 준수 / pyautogui ID 0109 명시 typewrite / OAuth wait 60s→10s / 누락 5건 새 ext 보강 등록 + final_save 200).
+
+## 세션153 — d0-plan GERP 로그인·자동화 전면 재설계 (2026-05-13 08:00~11:00)
+
+**배경**: 5/13 morning 자동화 OAuth 2회 연속 `/login?error` → recover 51min 한계 도달 종료. 사용자 "왜 똑같은 문제를 반복하나" 발화 → 근본 진단.
+
+**진단**: pyautogui 키보드 입력 + Chrome 비번관리자 자동완성이 OS focus 가로채기 취약. 세션141 hidden.vbs / 세션151 _kill_zombie_chrome / 세션152 OAuth 60→10s — 전부 타이밍·재시도 패치라 입력 메커니즘 자체는 그대로.
+
+**A안 1단계 (HTTP OAuth)**: requests로 OAuth SSO POST 직접. ssoUrl 추출 → /login POST(userId/password/clientId=ERP/ssoUrl) → cookies(SESSION/XSRF-TOKEN/JSESSIONID) 확보 → playwright context 주입 → D0_URL 즉시 통과. ID/PW는 .oauth.json(.gitignore). selector dump: input[name=userId/password]/#loginBtn.
+
+**A안 2단계 (HTTP 업로드)**: phase3을 requests multipart로. POPUP GET → selectListPmD0AddnUpload(files+hidden3) → multiListPmD0AddnUpload({excelList, ADDN_PRDT_REASON_CD:"002"}). 핵심 단서 — X-XSRF-TOKEN은 매 POST 직전 cookie 최신값 갱신 필수(불일치 시 500). ADDN_PRDT_REASON_CD 빈값 보내면 등록사유 빈 row 등록(사용자 화면 캡처로 발견 → "002"="신규추가수량" grid row 직접 dump).
+
+**A안 3단계 (완전 브라우저-less)**: phase4(rank) + phase5(final_save) + phase6(verify) 모두 requests로 전환. process_one_row_via_http가 totGrid GET → mGrid GET → sGrid GET → rowData 구성 → save POST. final_save는 sGrid 재조회 + `_apply_set_begin_time` 적용 후 sendMesFlag='Y' POST. setBeginTime JS 정밀 mirror — UPH 기반 분 단위 + 휴식시간 8종(9:50/12:00/14:50/17:00/21:00/24:00/3:00/5:00) 자동 가산 + PRDT_RANK = idx+1 + PLAN_DA_S/E.
+
+**단위 검증**: sGrid 18행 적용 시 ERP 기존 BEGIN/END/RANK와 100% 일치(휴식시간 4건 케이스 포함).
+
+**PoC 실 등록 검증** (RSP3PC0144 1건, 5/13, --http-only):
+- phase0 OAuth PASS, ensure_chrome_cdp 미호출 (브라우저 launch 0)
+- phase3 D0 업로드 PASS / phase4 ext=326320 rank=19 / phase5 mesMsg 성공 rsltCnt=50
+- phase6 서열 순서 엑셀 일치 ✅
+- ERP grid 직접 dump 검증: REASON_CD=002, PRDT_RANK=19, BEGIN_TIME=19:50(연속), END_TIME=20:09, WORK_STATUS_CD=R
+
+**자동화 이관**:
+- Claude scheduled-task `d0-morning` 등록 (월~토 07:11 KST cron `11 7 * * 1-6`, jitter 적용 07:19)
+- prompt: run_morning.bat 실행 + 실패 시 Slack 알림(C096LU8PH44 + <@U096LU8KNN8> 멘션)
+- Windows schtasks D0_SP3M3_Morning + D0_SP3M3_Morning_Recover **삭제**
+- Slack 알림 테스트 PASS (ts=1778637849)
+
+**회귀 보험**: `--http-only` 옵션 default off. 매일 자동 실행은 기존 page.evaluate 경로 그대로(점진 전환). 1~2주 검증 후 default on 검토.
+
+**잔여 정리**:
+- 사용자 화면 수동 삭제 — RSP3PC0144 326312 / RSP3PC0143 326313 / RSP3SC0752 빈 등록사유 row (모두 정리 완료)
+- ERP는 sGrid에 임시저장 후 sGrid 행 삭제 시 상단 grid 삭제 비활성 → D0 reload(F5) 후 활성 (실측 확인)
+
+**부가 패치**: gerp-unregistered-check/erp_lookup.py도 동일 OAuth page.fill 패턴 동기화 (69adfbb0). daily-routine/run.py는 이미 requests POST 방식 — 패치 불필요.
 
 ## 세션152 evening — SP3M3 야간계획 반영 사고 (2026-05-12 18:39~19:30)
 
