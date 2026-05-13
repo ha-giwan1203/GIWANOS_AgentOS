@@ -1273,6 +1273,21 @@ def refresh_xsrf_from_cookies(sess):
     return None
 
 
+def _sort_idx_map_desc(grid_by_pno):
+    """phase4 매뉴얼 4번 룰 — PROD_NO별 REG_NO 내림차순 정렬 (max ext = idx=0).
+
+    같은 PROD_NO가 주야 양쪽 등록된 경우 야간 신규(큰 ext)가 먼저 매핑되어야
+    rank가 야간 row에 정확히 박힘. ascending 정렬 시 주간 기존 ext에 덮어 박혀
+    SmartMES 누락 사고 발생 (세션152 / 세션155 2회 회귀).
+
+    모든 phase4 매칭 함수는 반드시 이 헬퍼 또는 동등 정렬 사용 필수.
+    legacy api_rank_batch(L1311 JS)도 동일 정책(`b-a`) 적용 중.
+    """
+    for v in grid_by_pno.values():
+        v.sort(key=lambda x: int(x.get("REG_NO", 0)), reverse=True)
+    return grid_by_pno
+
+
 def api_rank_batch(page, items, target_line, save_url, sess=None):
     """rank_batch의 옵션 A 하이브리드 변형 — jQuery.ajax POST를 requests 직접 호출로 전환.
 
@@ -1541,12 +1556,16 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
         if g.get("REG_DT") != target_date:
             continue
         grid_by_pno.setdefault(g["PROD_NO"], []).append(g)
-    # 세션155 버그 fix: REG_NO 내림차순 (매뉴얼 4번 룰 — 야간 신규 ext가 주간 기존 ext보다 큼).
-    # ascending 정렬 시 같은 PROD_NO에 주야 양쪽 등록 있으면 idx=0이 주간(작은 ext)을 잡아
-    # 야간 rank가 주간 row에 덮어 박힘 → SmartMES 5건 미반영 사고.
-    # 세션152 legacy rank_batch는 b-a 내림차순 이미 적용 — A안 3단계 신설 시 누락.
-    for v in grid_by_pno.values():
-        v.sort(key=lambda x: int(x.get("REG_NO", 0)), reverse=True)
+    # ⚠️ 매뉴얼 4번 룰 (REG_NO 내림차순 매핑) — 반드시 준수
+    # ============================================================
+    # 같은 PROD_NO가 주야 양쪽 등록된 경우 max ext(= 야간 신규)부터 매핑.
+    # ascending 정렬 시 주간 기존 ext(작은 값)가 idx=0이 되어 야간 rank가
+    # 주간 row에 덮어 박힘 → SmartMES 누락 사고.
+    # 회귀 이력 — 같은 사고 2회 발생:
+    #   세션152 evening: legacy rank_batch idx_map JS sort a-b → b-a 패치
+    #   세션155 evening: A안 3단계 신설 시 reverse=True 누락 → 5건 누락 → 보강
+    # 새 함수 추가 시 _sort_idx_map_desc(...) 헬퍼 호출 또는 reverse=True 명시 필수.
+    _sort_idx_map_desc(grid_by_pno)
 
     done = failed = missing = 0
     fails = []
