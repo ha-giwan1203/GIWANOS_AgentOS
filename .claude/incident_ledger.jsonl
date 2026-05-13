@@ -1435,3 +1435,5 @@
 {"ts":"2026-05-13T12:38:52Z","type":"gate_reject","hook":"final_check","file":"STATUS.md","detail":"session_drift: STATUS(세션155) < TASKS(세션157)","resolved":false,"classification_reason":"session_drift"}
 {"ts":"2026-05-13T13:02:45Z","type":"gate_reject","hook":"delegation_guard","file":"A/B 중 선택","detail":"위임 떠넘기기 발화 감지 — 패턴 'A/B 중 선택'","resolved":false,"classification_reason":"delegation_pattern","normal_flow":false,"next_action":"판단 1줄+다음행동 1줄로 재작성"}
 {"ts":"2026-05-13T13:11:03Z","type":"gate_reject","hook":"final_check","file":"STATUS.md","detail":"session_drift: STATUS(세션155) < TASKS(세션157)","resolved":false,"classification_reason":"session_drift"}
+{"ts":"2026-05-13T14:44:55Z","type":"gate_reject","hook":"final_check","file":"STATUS.md","detail":"session_drift: STATUS(세션155) < TASKS(세션157)","resolved":false,"classification_reason":"session_drift"}
+{"ts":"2026-05-13T21:31:13Z","type":"warn_recorded","hook":"commit_gate","file":"","detail":"문서 드리프트 감지","resolved":false,"classification_reason":"doc_drift","source":"final_check","warn_raw":"[WARN] README(5) ≠ settings(6) — 문서 드리프트;","normal_flow":true}
