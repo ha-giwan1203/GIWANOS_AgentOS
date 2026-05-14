@@ -6,6 +6,10 @@
 .oauth.json
 .oauth_*.json
 
+# line-stoppage qis_extract.py Chromium user-data-dir
+90_공통기준/스킬/line-stoppage/.qis_profile/
+**/.qis_profile/
+
 # 환경 변수 / API 키 / 인증 토큰
 *.env
 *.env.*
