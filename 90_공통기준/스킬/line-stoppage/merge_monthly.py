@@ -154,6 +154,22 @@ def merge(yyyymm: str):
         ws.cell(r, 4).font = BODY; ws.cell(r, 4).alignment = RIGHT; ws.cell(r, 4).border = BORDER; ws.cell(r, 4).number_format = FMT_INT
         ws.cell(r, 5).font = BODY; ws.cell(r, 5).alignment = LEFT; ws.cell(r, 5).border = BORDER
 
+    # 합계 행 (시스템 합계 — 청구유형 다른 점은 비고에 명시)
+    sum_cnt = sum(r[2] for r in body_rows)
+    sum_amt = sum(r[3] for r in body_rows)
+    ws.append(["합계", "", sum_cnt, sum_amt, "청구유형 다름 — 정산 시 분리"])
+    sr = ws.max_row
+    ws.row_dimensions[sr].height = 24
+    bold = Font(bold=True, size=11, name="맑은 고딕")
+    for col in (1, 2, 3, 4, 5):
+        c = ws.cell(sr, col)
+        c.font = bold; c.fill = SUB_FILL; c.border = BORDER
+    ws.cell(sr, 1).alignment = CENTER
+    ws.cell(sr, 2).alignment = CENTER
+    ws.cell(sr, 3).alignment = RIGHT; ws.cell(sr, 3).number_format = FMT_INT
+    ws.cell(sr, 4).alignment = RIGHT; ws.cell(sr, 4).number_format = FMT_INT
+    ws.cell(sr, 5).alignment = LEFT; ws.cell(sr, 5).font = Font(italic=True, size=10, color="C00000", name="맑은 고딕")
+
     # 0건 탭 메모 (작은 글씨로 한 줄)
     zero_tabs = [k for k, v in qis_summary.items() if v[0] == 0]
     if zero_tabs:
