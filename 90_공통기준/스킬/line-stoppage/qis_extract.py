@@ -93,16 +93,36 @@ def login_and_enter(ctx, user_id, pw_val):
     page = ctx.pages[0] if ctx.pages else ctx.new_page()
     page.goto(QIS_HOME, timeout=60000, wait_until="domcontentloaded")
     time.sleep(2)
-    if page.locator('input[name="userid"]').count() > 0:
+    print(f"  [debug] after goto: url={page.url} title={page.title()!r}")
+    has_login = page.locator('input[name="userid"]').count() > 0
+    print(f"  [debug] login form: {has_login}")
+    if has_login:
         page.fill('input[name="userid"]', user_id)
         page.fill('input[name="userpw"]', pw_val)
         page.evaluate("() => { const r=document.querySelector('input[name=company][value=BP]'); if(r){r.checked=true; r.click();} }")
         time.sleep(0.5)
         page.click("button.login-btn")
-        time.sleep(4)
-    # detail frame으로 비용청구작성관리 진입
-    page.evaluate(f"() => {{ if(window.frames && window.frames['detail']) window.frames['detail'].location.href='{ACCOUNT_URL}'; else location.href='{ACCOUNT_URL}'; }}")
-    time.sleep(5)
+        time.sleep(5)
+        print(f"  [debug] after login: url={page.url} title={page.title()!r}")
+        print(f"  [debug] frames: {[(f.name, f.url[:60]) for f in page.frames]}")
+    # detail frame 확보 + 비용청구작성관리 진입
+    for _ in range(20):
+        detail = next((f for f in page.frames if f.name == "detail"), None)
+        if detail is not None: break
+        time.sleep(0.5)
+    if detail is None:
+        print(f"  [debug] final frames: {[(f.name, f.url[:80]) for f in page.frames]}")
+        raise RuntimeError("detail frame 미생성 (로그인 실패 의심)")
+    detail.goto(ACCOUNT_URL, timeout=30000, wait_until="domcontentloaded")
+    # 페이지 로드 완료 — 검색일자 input 등장까지 대기
+    for _ in range(20):
+        try:
+            detail = next((f for f in page.frames if f.name == "detail"), None)
+            if detail.locator('input[id^="STD_DT_"]').count() > 0:
+                break
+        except Exception: pass
+        time.sleep(0.5)
+    time.sleep(1)
     return page
 
 
@@ -168,7 +188,7 @@ def save_outputs(results: dict, yyyymm: str):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--month", required=True, help="YYYY-MM")
-    p.add_argument("--keep-open", action="store_true")
+    p.add_argument("--headless", action="store_true", help="창 안 띄우고 백그라운드")
     args = p.parse_args()
 
     cred = json.loads(CRED_PATH.read_text(encoding="utf-8"))
@@ -176,11 +196,15 @@ def main():
     df, dt = month_range(args.month)
     print(f"[start] QIS {args.month} ({df}~{dt})")
 
-    ensure_chromium_cdp()
     results = {}
     with sync_playwright() as pw:
-        browser = pw.chromium.connect_over_cdp(f"http://127.0.0.1:{CDP_PORT}")
-        ctx = browser.contexts[0]
+        browser = pw.chromium.launch(headless=args.headless, args=[
+            "--no-first-run", "--no-default-browser-check",
+            "--unsafely-treat-insecure-origin-as-secure=http://qis.samsong.co.kr",
+            "--disable-features=HttpsUpgrades,HttpsFirstBalancedMode,HttpsFirstModeIncognito,HttpsFirstModeForTypicallySecureUsers,HttpsFirstModeForAdvancedProtectionUsers",
+            "--allow-running-insecure-content",
+        ])
+        ctx = browser.new_context()
         page = login_and_enter(ctx, user_id, pw_val)
         detail = next((f for f in page.frames if f.name == "detail"), None)
         if detail is None:
@@ -192,7 +216,7 @@ def main():
             results[label] = r
             print(f"  {label}: total={r.get('total', 0)} err={r.get('err','')}")
 
-        # browser 연결만 끊고 detach Chromium은 유지 (--keep-open 무관, 항상 유지)
+        browser.close()
 
     raw_path, md_path = save_outputs(results, args.month)
     print(f"\n[OK] {raw_path}")
