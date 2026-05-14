@@ -3,8 +3,38 @@ import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from collections import defaultdict
+from datetime import datetime
 import os
 import sys
+from pathlib import Path
+
+# === SP3M3 BI 보정 룰 (2026-05-14 채택, CLAUDE.md "SP3M3 구ERP 야간 BI 보정 룰" 참조) ===
+BI_PATH = Path(r"C:\Users\User\Desktop\업무리스트\05_생산실적\BI실적\대원테크_라인별 생산실적_BI.xlsx")
+
+
+def extract_bi_night_total(line: str, year: int, month: int) -> tuple[int, int]:
+    """BI 원본 라인×월 야간 합계 + 일수. (qty, days) 반환. 데이터 없으면 (0, 0)."""
+    if not BI_PATH.exists():
+        return 0, 0
+    wb = openpyxl.load_workbook(BI_PATH, data_only=True, read_only=True)
+    ws = wb.worksheets[0]
+    rows = list(ws.iter_rows(values_only=True))
+    wb.close()
+    night_val = next((r[5] for r in rows[1:]
+                      if r[4] == line and r[5] not in (None, "주간")), None)
+    if night_val is None:
+        return 0, 0
+    total = days = 0
+    for r in rows[1:]:
+        if r[4] != line or r[5] != night_val:
+            continue
+        d = r[7]
+        if not isinstance(d, datetime) or d.year != year or d.month != month:
+            continue
+        if r[14]:
+            total += r[14]
+            days += 1
+    return total, days
 
 # Windows cp949 콘솔에서 utf-8 print 가능하게 (em-dash, 한국어 등)
 try:
@@ -676,6 +706,57 @@ for line in LINES:
         ws.cell(sum_r, c).border = thin_border
     ws.cell(sum_r, 19).fill = summary_fill
     ws.cell(sum_r, 19).border = thin_border
+
+    # ===== SP3M3 한정 BI 보정 (2026-05-14 채택) =====
+    # 적용 조건 5개: 라인=SP3M3 / 정산월 >= 2026-04 / BI 야간수량 존재 / GERP 야간수량 > 0 / GERP 야간금액 > 0
+    # CLAUDE.md "SP3M3 구ERP 야간 BI 보정 룰" 참조
+    if line == 'SP3M3':
+        try:
+            year_int = 2026  # 정산 대상 연도 (현재 2026년 운영). 다년 운영 시 _pipeline_config에 추가
+            month_int = int(MONTH)
+            # 정산월 조건: 4월 이상
+            if month_int >= 4:
+                bi_qty, bi_days = extract_bi_night_total('SP3M3', year_int, month_int)
+                if bi_qty > 0:
+                    # GERP 야간수량(J) / GERP 야간금액(L) > 0 검증은 엑셀 수식 ROUND 단계에서 자동 처리
+                    # (J=0이면 #DIV/0 → 사용자 검토 필요로 명시)
+                    # N{sum_r} 덮어쓰기: SUM → BI 직접 값
+                    ws.cell(sum_r, 14).value = bi_qty
+                    ws.cell(sum_r, 14).number_format = num_fmt
+                    ws.cell(sum_r, 14).font = Font(bold=True)
+                    ws.cell(sum_r, 14).fill = summary_fill
+                    ws.cell(sum_r, 14).border = thin_border
+                    # P{sum_r} 덮어쓰기: SUM → ROUND(BI × 평균단가)
+                    n_col = get_column_letter(14)
+                    l_col = get_column_letter(12)
+                    j_col = get_column_letter(10)
+                    ws.cell(sum_r, 16).value = (
+                        f'=IF({j_col}{sum_r}=0,0,'
+                        f'ROUND({n_col}{sum_r}*({l_col}{sum_r}/{j_col}{sum_r}),0))'
+                    )
+                    ws.cell(sum_r, 16).number_format = num_fmt
+                    ws.cell(sum_r, 16).font = Font(bold=True)
+                    ws.cell(sum_r, 16).fill = summary_fill
+                    ws.cell(sum_r, 16).border = thin_border
+                    # 비고 행 추가 (sum_r + 2)
+                    note_r = sum_r + 2
+                    ws.cell(note_r, 1).value = (
+                        f"※ SP3M3 구ERP 야간 BI 보정 ({year_int}-{month_int:02d}): "
+                        f"BI 야간수량 {bi_qty:,} EA × GERP 야간 평균단가(L/J) 기준. "
+                        f"행별 RSP 야간 데이터는 원본 유지, 합계행만 비교용 보정. "
+                        f"이 값은 '구ERP 원본 야간금액'이 아니라 'BI 보정 비교용 금액'."
+                    )
+                    ws.cell(note_r, 1).font = Font(italic=True, color='808080', size=9)
+                    ws.merge_cells(start_row=note_r, start_column=1, end_row=note_r, end_column=16)
+                    print(f"   SP3M3 BI 보정 적용: 야간수량 {bi_qty:,} EA ({bi_days}일)")
+                else:
+                    # 예외: BI 야간수량 없음 → 보정 금지 + 경고
+                    print(f"   [WARN] SP3M3 BI 보정 불가 — BI 야간수량 0 또는 BI 파일 미존재. 기존 SUM 룰 유지.")
+            else:
+                # 정산월 < 4월: 옛 룰 (P=L 등) 유지 — SP3M3 BI 보정 미적용
+                print(f"   SP3M3: 정산월 {month_int}월 < 4월 → BI 보정 미적용 (옛 룰 유지)")
+        except Exception as e:
+            print(f"   [ERROR] SP3M3 BI 보정 실패: {e}. 기존 SUM 룰 유지.")
 
     line_summaries[line] = sum_r
     # ※ SP3M3 야간 RSP 모듈품번은 미등록 영역에서 자동 잡힘 (별도 처리 불필요)
