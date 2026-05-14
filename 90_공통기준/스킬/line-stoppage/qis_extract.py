@@ -30,7 +30,8 @@ CRED_PATH = SKILL_DIR / ".oauth_qis.json"
 QIS_HOME = "http://qis.samsong.co.kr/"
 ACCOUNT_URL = "http://qis.samsong.co.kr/qis/claim/account/accountView.jsp?system_nm=QIS&menu_id=60012"
 CDP_PORT = 9224
-PROFILE = str(SKILL_DIR / ".qis_profile")
+# Chromium user-data-dir — 홈 디렉토리에 (d0의 .flow-chrome-debug와 동일 패턴)
+PROFILE = str(Path.home() / ".qis-chromium-profile")
 
 TABS = [
     ("라인정지", "ui-id-1", "ui-id-2"),
