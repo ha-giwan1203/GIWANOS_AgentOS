@@ -21,14 +21,24 @@ grade: B
 
 ## 사용
 ```bash
-python run.py --session morning              # 아침 (하이브리드, default)
-python run.py --session evening              # 저녁
-python run.py --session auto                 # 시간대 자동
-python run.py --session morning --legacy-mode    # 회귀 fallback
-python run.py --session evening --dry-run        # 추출 검증
+# ⚠ 사용자 발화에 라인 명시("SP3M3 야간"·"SD9A01" 등) → --line 의무
+# ⚠ 브라우저-less 운영 default → --http-only 권장 (CDP/Playwright 부재 시 필수)
+python run.py --session morning --line SP3M3 --http-only    # 주간 (default 권장)
+python run.py --session evening --line SP3M3 --http-only    # 야간 SP3M3만
+python run.py --session evening --line SD9A01 --http-only   # 야간 SD9A01만
+python run.py --session evening --line ALL --http-only      # 묶음 (cron/스케줄러 전용)
+
+# 옵션 (조합)
+python run.py --session auto                                  # 시간대 자동
+python run.py --session evening --line SP3M3 --dry-run        # 추출 검증
+python run.py --session morning --legacy-mode                 # 회귀 fallback (화면 모드)
 python run.py --session morning --xlsx <1건xlsx> --target-date YYYY-MM-DD   # 1건 PoC
-python run.py --session morning --no-mes-send    # Phase 5 차단
+python run.py --session morning --line SP3M3 --no-mes-send    # Phase 5 차단
 ```
+
+**필수 옵션 (사용자 호출 시)**:
+- `--line {SP3M3|SD9A01|ALL}` — default=ALL은 cron 전용. 사람 호출 시 반드시 라인 명시.
+- `--http-only` — 세션153 A안 3단계 완전 브라우저-less. CDP/Playwright 0. 미명시 시 브라우저 모드로 떨어짐.
 
 ## 절차 (요약)
 1. Phase 0: CDP 9223 + ERP OAuth + D0 화면 진입
