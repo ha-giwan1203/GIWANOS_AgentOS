@@ -19,7 +19,7 @@ try: sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception: pass
 
 import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -57,11 +57,20 @@ def parse_gerp_summary(xlsx_path: Path):
     return 0, 0
 
 
-HF = Font(bold=True, color="FFFFFF")
+HF = Font(bold=True, color="FFFFFF", size=11, name="맑은 고딕")
 HB = PatternFill("solid", fgColor="305496")
-HEAD = Alignment(horizontal="center", vertical="center")
-TITLE = Font(bold=True, size=14, color="305496")
-NOTE = Font(italic=True, color="C00000")
+HEAD = Alignment(horizontal="center", vertical="center", wrap_text=True)
+TITLE = Font(bold=True, size=16, color="305496", name="맑은 고딕")
+NOTE = Font(italic=True, color="C00000", size=10, name="맑은 고딕")
+BODY = Font(size=11, name="맑은 고딕")
+THIN = Side(style="thin", color="9E9E9E")
+BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
+CENTER = Alignment(horizontal="center", vertical="center")
+RIGHT = Alignment(horizontal="right", vertical="center")
+LEFT = Alignment(horizontal="left", vertical="center", indent=1)
+FMT_INT = "#,##0"
+SUBTITLE = Font(bold=True, size=12, color="305496", name="맑은 고딕")
+SUB_FILL = PatternFill("solid", fgColor="D9E1F2")
 
 
 def merge(yyyymm: str):
@@ -105,47 +114,100 @@ def merge(yyyymm: str):
         for i in range(1, len(headers) + 1):
             ws.column_dimensions[openpyxl.utils.get_column_letter(i)].width = 18
 
-    # 통합집계
+    # 통합집계 시트 — 0건 제외, 디자인 보강
     ws = wb.create_sheet("통합집계", 0)
-    ws.append([f"■ {yyyymm} 라인정지·라인교체 통합 — 대원테크(0109)"])
+    ws.row_dimensions[1].height = 28
+    ws["A1"] = f"{yyyymm}  라인정지·라인교체 통합  —  대원테크(0109)"
     ws["A1"].font = TITLE
+    ws["A1"].alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws.merge_cells("A1:E1")
     ws.append([])
+
+    # 표 1: 시스템별 청구 (0건 제외)
     ws.append(["시스템", "청구유형", "건수", "금액(원)", "비고"])
     for c in ws[3]:
-        c.font = HF; c.fill = HB; c.alignment = HEAD
+        c.font = HF; c.fill = HB; c.alignment = HEAD; c.border = BORDER
+    ws.row_dimensions[3].height = 24
 
     gerp_cnt, gerp_amt = parse_gerp_summary(xlsx)
-    ws.append(["G-ERP 라인보상상세현황", "라인정지", gerp_cnt, gerp_amt, "본사 등록"])
-
+    body_rows = []
+    if gerp_cnt > 0:
+        body_rows.append(["G-ERP 라인보상상세현황", "라인정지", gerp_cnt, gerp_amt, "본사 직등록"])
+    qis_summary = {}
     for label in ("라인정지", "재작업", "선별작업", "기타생산비용"):
         rs = qis.get(label, {}).get("rows", [])
         cnt = len(rs)
         amt = sum(to_int(r.get("TOTAL_REQUIRE") or r.get("REWARD_LINE") or 0) for r in rs)
+        qis_summary[label] = (cnt, amt)
+        if cnt == 0:
+            continue  # 0건 제외
         type_name = "라인교체" if label == "기타생산비용" else label
-        note = "협력사 작성" if cnt > 0 else "협력사 작성 0"
-        ws.append([f"QIS Claim ({label} 탭)", type_name, cnt, amt, note])
+        body_rows.append([f"QIS Claim · {label}", type_name, cnt, amt, "협력사 작성"])
+
+    for row in body_rows:
+        ws.append(row)
+        r = ws.max_row
+        ws.row_dimensions[r].height = 22
+        ws.cell(r, 1).font = BODY; ws.cell(r, 1).alignment = LEFT; ws.cell(r, 1).border = BORDER
+        ws.cell(r, 2).font = BODY; ws.cell(r, 2).alignment = CENTER; ws.cell(r, 2).border = BORDER
+        ws.cell(r, 3).font = BODY; ws.cell(r, 3).alignment = RIGHT; ws.cell(r, 3).border = BORDER; ws.cell(r, 3).number_format = FMT_INT
+        ws.cell(r, 4).font = BODY; ws.cell(r, 4).alignment = RIGHT; ws.cell(r, 4).border = BORDER; ws.cell(r, 4).number_format = FMT_INT
+        ws.cell(r, 5).font = BODY; ws.cell(r, 5).alignment = LEFT; ws.cell(r, 5).border = BORDER
+
+    # 0건 탭 메모 (작은 글씨로 한 줄)
+    zero_tabs = [k for k, v in qis_summary.items() if v[0] == 0]
+    if zero_tabs:
+        ws.append([])
+        ws.append([f"※ QIS 협력사 0건 탭(이번 달 작성 없음): {' / '.join(zero_tabs)}"])
+        ws.cell(ws.max_row, 1).font = NOTE
+        ws.merge_cells(start_row=ws.max_row, start_column=1, end_row=ws.max_row, end_column=5)
 
     ws.append([])
     ws.append(["※ 청구유형이 다르므로 단순 합산 금지. 정산 본체에 별도 라인으로 들어감."])
     ws.cell(ws.max_row, 1).font = NOTE
+    ws.merge_cells(start_row=ws.max_row, start_column=1, end_row=ws.max_row, end_column=5)
 
-    # QIS 라인교체 귀책 세분
+    # 표 2: QIS 라인교체 귀책 세분 (0건 아닐 때만)
     if rows:
         ws.append([])
-        ws.append(["■ QIS 라인교체 귀책 세분"])
-        ws.cell(ws.max_row, 1).font = Font(bold=True, size=12, color="305496")
-        ws.append(["귀책 부서", "건수", "금액(원)"])
-        for c in ws[ws.max_row]:
-            c.font = HF; c.fill = HB; c.alignment = HEAD
+        ws.append([f"QIS 라인교체 {len(rows)}건 — 귀책 부서별"])
+        ws.cell(ws.max_row, 1).font = SUBTITLE; ws.cell(ws.max_row, 1).fill = SUB_FILL
+        ws.merge_cells(start_row=ws.max_row, start_column=1, end_row=ws.max_row, end_column=5)
+        ws.row_dimensions[ws.max_row].height = 22
+
+        ws.append(["귀책 부서", "건수", "금액(원)", "", ""])
+        hr = ws.max_row
+        ws.row_dimensions[hr].height = 22
+        for col in (1, 2, 3):
+            c = ws.cell(hr, col)
+            c.font = HF; c.fill = HB; c.alignment = HEAD; c.border = BORDER
+
         by_dept = defaultdict(lambda: {"cnt": 0, "amt": 0})
         for r in rows:
             d = r.get("NAME_CHARGE") or r.get("DEPT_ING") or "?"
             by_dept[d]["cnt"] += 1
             by_dept[d]["amt"] += to_int(r.get("TOTAL_REQUIRE") or 0)
         for d, v in sorted(by_dept.items(), key=lambda x: -x[1]["amt"]):
-            ws.append([d, v["cnt"], v["amt"]])
+            ws.append([d, v["cnt"], v["amt"], "", ""])
+            r0 = ws.max_row
+            ws.row_dimensions[r0].height = 22
+            ws.cell(r0, 1).font = BODY; ws.cell(r0, 1).alignment = LEFT; ws.cell(r0, 1).border = BORDER
+            ws.cell(r0, 2).font = BODY; ws.cell(r0, 2).alignment = RIGHT; ws.cell(r0, 2).border = BORDER; ws.cell(r0, 2).number_format = FMT_INT
+            ws.cell(r0, 3).font = BODY; ws.cell(r0, 3).alignment = RIGHT; ws.cell(r0, 3).border = BORDER; ws.cell(r0, 3).number_format = FMT_INT
+        # 합계 행
+        ws.append(["합계", sum(v["cnt"] for v in by_dept.values()), sum(v["amt"] for v in by_dept.values()), "", ""])
+        sr = ws.max_row
+        ws.row_dimensions[sr].height = 24
+        for col in (1, 2, 3):
+            c = ws.cell(sr, col)
+            c.font = Font(bold=True, size=11, name="맑은 고딕")
+            c.fill = SUB_FILL
+            c.border = BORDER
+            c.alignment = RIGHT if col > 1 else CENTER
+            if col > 1: c.number_format = FMT_INT
 
-    for col, w in zip("ABCDE", (25, 18, 8, 14, 18)):
+    # 컬럼 너비
+    for col, w in zip("ABCDE", (30, 14, 10, 16, 22)):
         ws.column_dimensions[col].width = w
 
     wb.save(xlsx)
