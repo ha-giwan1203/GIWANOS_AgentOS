@@ -31,16 +31,63 @@
 라인정지비 = (주간 분당정지비 × 주간 정지시간) + (야간 분당정지비 × 야간 정지시간)
 ```
 
-## 월별 작업 절차
+## 월별 작업 절차 (자동화 우선 / 수동은 최후)
 
+### Step 1 — 기존 raw 파일 확인 (있으면 그대로 사용)
+```bash
+ls 05_생산실적/조립비정산/{MM+1}월/라인정지_{MM}월_raw.xlsx
+```
+존재하면 그 파일 그대로 사용. 재조회 불필요.
+
+### Step 2 — line-stoppage 스킬 자동 조회 (G-ERP)
+```bash
+python 90_공통기준/스킬/line-stoppage/run.py --month 2026-MM
+```
+- d0 스킬 인증 인프라(`erp_login_via_http` + `ensure_chrome_cdp`) 재사용
+- Playwright로 G-ERP 라인보상상세현황 페이지 진입 → 검색 → pqgrid 데이터 직접 추출
+- 산출물 2종:
+  - `05_생산실적/조립비정산/{MM+1}월/라인정지_{MM}월_raw.xlsx` (raw + 집계 시트)
+  - `05_생산실적/조립비정산/{MM+1}월/라인정지_{MM}월_요약.md`
+- 동기화 차단 시간대(매시 x0:10~13/20~23/30~33/40~43/50~53) 자동 회피
+
+### Step 3 — QIS 4탭 자동 조회 (협력사 측 작성 시스템, 신축 예정)
+G-ERP 라인보상상세현황은 청구유형 전체를 통합 표시하지만, **협력사가 작성하는 QIS Claim관리에는 4탭이 분리됨**:
+- 라인정지 / 재작업 / 선별작업 / 기타생산비용
+
+**시스템**: `http://qis.samsong.co.kr/` (HTTP, 회사망 한정)
+- 로그인: `userid` / `userpw` / `company=BP(협력사)` / `language=KR`
+- 로그인 함수: `loginChkForm()` (form action `/globalsystem` POST)
+- 메뉴: 좌측 사이드(frame name=`menu`) → Claim관리 → 비용청구작성관리
+- 비용청구작성관리 URL: `/qis/claim/account/accountView.jsp?system_nm=QIS&menu_id=60012`
+- 탭 anchor: ui-id-1(라인정지) / ui-id-3(재작업) / ui-id-5(선별작업) / ui-id-7(기타생산비용), 패널 ui-id-2/4/6/8
+- 검색일자 input: 활성 패널 안 `STD_DT_*` / `END_DT_*`
+- 그리드: jqGrid 표준 — `$('#yieldTable').jqGrid('getRowData')` (라인정지 탭 기준)
+
+**자동화 인프라**: 같은 OAuth/Playwright 구조 재사용. 회사 Chrome 정책으로 HTTP 차단되므로 **Playwright 내장 Chromium**(별도 9224 포트 detach) + `--unsafely-treat-insecure-origin-as-secure=http://qis.samsong.co.kr` 옵션 사용.
+
+→ 정식 신축: `90_공통기준/스킬/line-stoppage/run.py` `--source qis` 옵션 추가 (TODO).
+
+### Step 4 — 수동 G-ERP UI (최후 수단 — 자동화 인프라 부재 + 사용자 명시 시만)
 1. G-ERP 라인보상상세현황 → 월 검색 → **엑셀 다운로드**
 2. `05_생산실적/조립비정산/{MM+1}월/라인정지_{MM}월_raw.xlsx` 저장
 3. 청구번호별 정지비 합산 → 라인별·귀책업체별 집계
 4. 조립비 정산 본체(`정산_수식버전_MM월.xlsx`)에 별도 시트 또는 보조 파일로 첨부
 
+**원칙**: Step 2·3 자동화 인프라가 동작하는 한 사용자에게 수동 다운로드 요구 금지. 자동화 실패 시에도 원인 분석·우회 시도 우선, 사용자 손은 최후.
+
+### 매월 점검 (자동 보고 항목)
+- 미승인(`APPROVAL_YN ≠ Y`) 건수 — 정산 전 승인 완료 필요
+- 미접수(`ACCEPT_YN_NM ≠ 접수`) 건수
+- 귀책 공란 / 차종 공란 건수
+
 ## 작업폴더 관행
 - 매월 정산 작업폴더 = `05_생산실적/조립비정산/{MM+1}월/` (조립비정산과 동일)
 - 라인정지비 raw·집계 산출물은 정산 작업폴더에 같이 두는 것을 default로 한다 (조립비 정산과 함께 보고)
 
-## 관련 archive
-- `98_아카이브/정리대기_20260412/스킬/line-stoppage/SKILL.md` — 빈 절차 (운영 정의 단계, 폐기). 본 문서로 대체.
+## 관련 스킬·archive
+- `90_공통기준/스킬/line-stoppage/` — 월별 자동 조회 스킬 (2026-05-14 도입)
+- `98_아카이브/정리대기_20260412/스킬/line-stoppage/SKILL.md` — 옛 빈 절차 (운영 정의 단계, 폐기). 본 문서·새 스킬로 대체.
+
+## 변경 이력
+- 2026-05-14: line-stoppage 자동화 스킬 도입. 4월 47건(3,158,529원) 첫 자동 조회 검증 완료. 인증·CDP 인프라는 d0-production-plan 재사용 (별도 신축 0).
+- 2026-05-14 (P0): 자동화 우선 절차로 재구성. QIS 4탭(라인정지·재작업·선별작업·기타생산비용) 자동 조회 인프라 정보 명시 — Playwright 내장 Chromium 9224 detach + `--unsafely-treat-insecure-origin-as-secure` 옵션 (회사 Chrome HTTP 차단 우회). 수동 다운로드는 최후 수단 명시.

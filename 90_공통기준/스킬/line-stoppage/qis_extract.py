@@ -1,0 +1,206 @@
+"""QIS 4탭(라인정지·재작업·선별작업·기타생산비용) 월별 자동 조회.
+
+- Playwright 내장 Chromium을 별도 CDP 포트(9224)로 detach 기동 (회사 Chrome HTTP 차단 우회)
+- 로그인 → 비용청구작성관리 진입 → 4탭 순회 → jqGrid getRowData
+- 산출: 05_생산실적/조립비정산/{MM+1}월/QIS청구_{MM}월_raw.json + 요약 md
+
+⛔ 작성·등록·저장·제출 버튼 절대 클릭 X. 조회 only.
+
+사용:
+  python qis_extract.py --month 2026-04
+  python qis_extract.py --month 2026-04 --keep-open    # 작업 후 브라우저 유지
+"""
+import sys, os, json, time, re, subprocess, argparse, calendar
+from datetime import datetime
+from pathlib import Path
+from collections import defaultdict
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+from playwright.sync_api import sync_playwright
+
+REPO = Path(__file__).resolve().parents[3]
+SKILL_DIR = Path(__file__).parent
+CRED_PATH = SKILL_DIR / ".oauth_qis.json"
+
+QIS_HOME = "http://qis.samsong.co.kr/"
+ACCOUNT_URL = "http://qis.samsong.co.kr/qis/claim/account/accountView.jsp?system_nm=QIS&menu_id=60012"
+CDP_PORT = 9224
+PROFILE = str(SKILL_DIR / ".qis_profile")
+
+TABS = [
+    ("라인정지", "ui-id-1", "ui-id-2"),
+    ("재작업",   "ui-id-3", "ui-id-4"),
+    ("선별작업", "ui-id-5", "ui-id-6"),
+    ("기타생산비용", "ui-id-7", "ui-id-8"),
+]
+
+
+def month_range(yyyymm: str):
+    y, m = map(int, yyyymm.split("-"))
+    last = calendar.monthrange(y, m)[1]
+    return f"{y:04d}-{m:02d}-01", f"{y:04d}-{m:02d}-{last:02d}"
+
+
+def output_dir(yyyymm: str) -> Path:
+    y, m = map(int, yyyymm.split("-"))
+    nm = m + 1 if m < 12 else 1
+    p = REPO / "05_생산실적" / "조립비정산" / f"{nm}월"
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def is_cdp_alive(port=CDP_PORT) -> bool:
+    import urllib.request
+    try:
+        urllib.request.urlopen(f"http://127.0.0.1:{port}/json/version", timeout=2)
+        return True
+    except Exception:
+        return False
+
+
+def ensure_chromium_cdp():
+    """Playwright 내장 Chromium을 detach 모드로 CDP 9224 기동. 이미 살아있으면 skip."""
+    if is_cdp_alive():
+        return None
+    with sync_playwright() as pw:
+        exe = pw.chromium.executable_path
+    flags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+    proc = subprocess.Popen([
+        exe,
+        f"--remote-debugging-port={CDP_PORT}",
+        f"--user-data-dir={PROFILE}",
+        "--no-first-run", "--no-default-browser-check",
+        "--unsafely-treat-insecure-origin-as-secure=http://qis.samsong.co.kr",
+        "--disable-features=HttpsUpgrades,HttpsFirstBalancedMode,HttpsFirstModeIncognito,HttpsFirstModeForTypicallySecureUsers,HttpsFirstModeForAdvancedProtectionUsers",
+        "--allow-running-insecure-content",
+        "about:blank",
+    ], creationflags=flags)
+    # CDP up 대기
+    for _ in range(15):
+        time.sleep(1)
+        if is_cdp_alive():
+            return proc
+    raise RuntimeError("CDP 9224 미기동")
+
+
+def login_and_enter(ctx, user_id, pw_val):
+    """로그인 + 비용청구작성관리 진입. 이미 로그인 상태면 진입만."""
+    page = ctx.pages[0] if ctx.pages else ctx.new_page()
+    page.goto(QIS_HOME, timeout=60000, wait_until="domcontentloaded")
+    time.sleep(2)
+    if page.locator('input[name="userid"]').count() > 0:
+        page.fill('input[name="userid"]', user_id)
+        page.fill('input[name="userpw"]', pw_val)
+        page.evaluate("() => { const r=document.querySelector('input[name=company][value=BP]'); if(r){r.checked=true; r.click();} }")
+        time.sleep(0.5)
+        page.click("button.login-btn")
+        time.sleep(4)
+    # detail frame으로 비용청구작성관리 진입
+    page.evaluate(f"() => {{ if(window.frames && window.frames['detail']) window.frames['detail'].location.href='{ACCOUNT_URL}'; else location.href='{ACCOUNT_URL}'; }}")
+    time.sleep(5)
+    return page
+
+
+def extract_tab(detail, label, tab_id, panel_id, dt_f, dt_t):
+    """탭 활성화 + 검색일자 입력 + 검색 → jqGrid 데이터 + 합계."""
+    detail.evaluate(f"() => document.getElementById('{tab_id}').click()")
+    time.sleep(1.5)
+    detail.evaluate(f"""
+        (() => {{
+            const panel = document.getElementById('{panel_id}');
+            if(!panel) return;
+            panel.querySelectorAll('input[id^="STD_DT_"]').forEach(i => i.value = '{dt_f}');
+            panel.querySelectorAll('input[id^="END_DT_"]').forEach(i => i.value = '{dt_t}');
+            // 검색 버튼 클릭
+            for (const b of panel.querySelectorAll('button, input[type=button], a')) {{
+                const t = (b.innerText || b.value || '').trim();
+                if (t === '검색' || t === '조회' || t.includes('검색')) {{ b.click(); return; }}
+            }}
+        }})()
+    """)
+    time.sleep(4)
+    return detail.evaluate(f"""
+        (() => {{
+            const panel = document.getElementById('{panel_id}');
+            if(!panel) return {{err:'no panel'}};
+            const tbl = panel.querySelector('table.ui-jqgrid-btable, table[role=grid][id]');
+            if(!tbl) return {{err:'no jqgrid', html_len: panel.innerHTML.length}};
+            const gid = tbl.id;
+            let rows = [];
+            try {{ rows = window.jQuery('#'+gid).jqGrid('getRowData'); }}
+            catch(e) {{ return {{err: 'getRowData fail: '+e.message, gid}}; }}
+            let sum_text = '';
+            panel.querySelectorAll('*').forEach(el => {{
+                const t = (el.innerText || '').trim();
+                if (t.includes('청구비합계') && t.length < 80) sum_text = t;
+            }});
+            return {{gid, total: rows.length, rows, sum_text}};
+        }})()
+    """)
+
+
+def save_outputs(results: dict, yyyymm: str):
+    out = output_dir(yyyymm)
+    mm = yyyymm[-2:]
+    raw_path = out / f"QIS청구_{mm}월_raw.json"
+    raw_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    md_path = out / f"QIS청구_{mm}월_요약.md"
+    df, dt = month_range(yyyymm)
+    L = [f"# {yyyymm} QIS 비용청구 4탭 요약", "",
+         f"- 기간: {df} ~ {dt}",
+         f"- 시스템: QIS 협력사 작성 (`http://qis.samsong.co.kr/`)",
+         f"- 업체: BP(협력사)", ""]
+    L.append("| 탭 | 건수 | 청구비합계 텍스트 |")
+    L.append("|----|-----:|------------------|")
+    for label, _, _ in TABS:
+        r = results.get(label, {})
+        L.append(f"| {label} | {r.get('total', 0)} | {r.get('sum_text','')} |")
+    md_path.write_text("\n".join(L), encoding="utf-8")
+    return raw_path, md_path
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--month", required=True, help="YYYY-MM")
+    p.add_argument("--keep-open", action="store_true")
+    args = p.parse_args()
+
+    cred = json.loads(CRED_PATH.read_text(encoding="utf-8"))
+    user_id, pw_val = cred["id"], cred["pw"]
+    df, dt = month_range(args.month)
+    print(f"[start] QIS {args.month} ({df}~{dt})")
+
+    ensure_chromium_cdp()
+    results = {}
+    with sync_playwright() as pw:
+        browser = pw.chromium.connect_over_cdp(f"http://127.0.0.1:{CDP_PORT}")
+        ctx = browser.contexts[0]
+        page = login_and_enter(ctx, user_id, pw_val)
+        detail = next((f for f in page.frames if f.name == "detail"), None)
+        if detail is None:
+            raise RuntimeError("detail frame 없음")
+        print(f"[detail] {detail.url}")
+
+        for label, tab_id, panel_id in TABS:
+            r = extract_tab(detail, label, tab_id, panel_id, df, dt)
+            results[label] = r
+            print(f"  {label}: total={r.get('total', 0)} err={r.get('err','')}")
+
+        # browser 연결만 끊고 detach Chromium은 유지 (--keep-open 무관, 항상 유지)
+
+    raw_path, md_path = save_outputs(results, args.month)
+    print(f"\n[OK] {raw_path}")
+    print(f"     {md_path}")
+    for label, _, _ in TABS:
+        r = results.get(label, {})
+        print(f"  {label}: 건수={r.get('total', 0)}")
+
+
+if __name__ == "__main__":
+    main()

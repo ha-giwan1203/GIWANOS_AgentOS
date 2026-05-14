@@ -2,8 +2,9 @@
 # 보안 민감정보 완전 차단
 # ==========================
 
-# d0-production-plan OAuth credential (세션153)
+# d0-production-plan / line-stoppage 등 OAuth credential
 .oauth.json
+.oauth_*.json
 
 # 환경 변수 / API 키 / 인증 토큰
 *.env
@@ -53,6 +54,8 @@
 !.claude/rules/**
 !.claude/docs/
 !.claude/docs/**
+!.claude/tests/
+!.claude/tests/**
 !.claude/settings.json
 # 세션91 IV-2/IV-4: self 운영 파일 2종만 화이트리스트 (런타임 .json/.jsonl/.txt는 계속 차단)
 !.claude/self/
