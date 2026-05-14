@@ -6,9 +6,10 @@ title D0_SP3M3_Evening (auto)
 rem ---------------------------------------------------------
 rem Windows 작업 스케줄러용 래퍼 (저녁 야간 + OUTER D+1 자동 등록)
 rem 실행: 매주 월~금 (요일·시간은 schtasks /create로 결정 — 세션151 default 18:50)
-rem 동작: python run.py --session evening
+rem 동작: python run.py --session evening --line ALL --http-only
 rem        - SP3M3 야간 (ERP 생산일 = 오늘)
 rem        - SD9A01 OUTER D+1 (ERP 생산일 = 내일)
+rem        (세션157 — --line ALL 명시화(default 의존 제거), --http-only 의무. 브라우저-less 원칙)
 rem 로그: 06_생산관리/D0_업로드/logs/evening_YYYYMMDD.log
 rem ---------------------------------------------------------
 
@@ -26,7 +27,7 @@ echo ======================================================= >> "%LOGFILE%"
 echo [%DTSTAMP%] D0 Evening auto-run start >> "%LOGFILE%"
 echo ======================================================= >> "%LOGFILE%"
 
-python run.py --session evening >> "%LOGFILE%" 2>&1
+python run.py --session evening --line ALL --http-only >> "%LOGFILE%" 2>&1
 set RC=%ERRORLEVEL%
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set DTEND=%%i

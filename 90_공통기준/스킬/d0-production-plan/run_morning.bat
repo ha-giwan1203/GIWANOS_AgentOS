@@ -6,9 +6,10 @@ title D0_SP3M3_Morning (auto)
 rem ---------------------------------------------------------
 rem Windows 작업 스케줄러용 래퍼
 rem 실행: 매주 월~토 07:11 KST (세션133 변경)
-rem 동작: python run.py --session morning --line SP3M3
+rem 동작: python run.py --session morning --line SP3M3 --http-only
 rem        (세션133 — 하이브리드 기본 활성. --api-mode 명시 불필요)
-rem        회귀 시 --legacy-mode 추가하면 화면 모드 fallback
+rem        (세션157 — --http-only 의무. 브라우저-less 운영 원칙. 절전 wake 직후 CDP/Playwright 회피)
+rem        회귀 시 --legacy-mode 추가하면 화면 모드 fallback (이 경우 --http-only 제거)
 rem 로그: 06_생산관리/D0_업로드/logs/morning_YYYYMMDD.log
 rem ---------------------------------------------------------
 
@@ -26,7 +27,7 @@ echo ======================================================= >> "%LOGFILE%"
 echo [%DTSTAMP%] SP3M3 Morning auto-run start >> "%LOGFILE%"
 echo ======================================================= >> "%LOGFILE%"
 
-python run.py --session morning --line SP3M3 >> "%LOGFILE%" 2>&1
+python run.py --session morning --line SP3M3 --http-only >> "%LOGFILE%" 2>&1
 set RC=%ERRORLEVEL%
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set DTEND=%%i
