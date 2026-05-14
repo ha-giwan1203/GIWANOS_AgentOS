@@ -15,15 +15,27 @@ grade: A
 매시 x0:10~13, x0:20~23, x0:30~33, x0:40~43, x0:50~53 G-ERP 조회 차단. 그 시간대 실행 시 결과 누락 가능 — `run.py` 자동 회피 (60초 대기 후 재시도).
 
 ## 사용
+
+### 매월 표준 절차 (3단계)
 ```bash
-# 4월 (대원테크 default)
+# 1) G-ERP 라인보상상세현황 47건 → 라인정지_MM월_raw.xlsx
 python 90_공통기준/스킬/line-stoppage/run.py --month 2026-04
 
-# 다른 업체
-python 90_공통기준/스킬/line-stoppage/run.py --month 2026-04 --cmpy 0110
+# 2) QIS 4탭 (라인정지/재작업/선별작업/기타생산비용=라인교체) → QIS청구_MM월_raw.json
+python 90_공통기준/스킬/line-stoppage/qis_extract.py --month 2026-04
 
-# 라인 필터
+# 3) 통합 — xlsx에 시트 추가(통합집계+QIS_기타생산비용) + md 통합 본문
+python 90_공통기준/스킬/line-stoppage/merge_monthly.py --month 2026-04
+```
+
+### 부분 사용
+```bash
+# G-ERP만 (run.py)
+python 90_공통기준/스킬/line-stoppage/run.py --month 2026-04 --cmpy 0110
 python 90_공통기준/스킬/line-stoppage/run.py --month 2026-04 --line SP3M3
+
+# QIS headless
+python 90_공통기준/스킬/line-stoppage/qis_extract.py --month 2026-04 --headless
 ```
 
 ## 산출물

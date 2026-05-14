@@ -252,9 +252,13 @@ def main():
     save_summary_md(grid, md, yyyymm, args.cmpy)
 
     total = sum(float(r.get("COST_BILL_TOT") or 0) for r in grid["data"])
+    # meta.json — merge_monthly가 재실행 안정성 위해 사용
+    meta = out / f"라인정지_{mm}월_meta.json"
+    meta.write_text(json.dumps({"count": len(grid["data"]), "total_amount": int(total)}, ensure_ascii=False), encoding="utf-8")
     print(f"[OK] {len(grid['data'])}건 / {total:,.0f}원")
     print(f"     {raw}")
     print(f"     {md}")
+    print(f"     {meta}")
 
 
 if __name__ == "__main__":
