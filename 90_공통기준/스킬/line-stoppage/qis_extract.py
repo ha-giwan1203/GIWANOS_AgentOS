@@ -48,9 +48,10 @@ def month_range(yyyymm: str):
 
 
 def output_dir(yyyymm: str) -> Path:
+    """도메인 관행: 매월 작업폴더 = 05_생산실적/조립비정산/{MM+1:02d}월/ (zero-padded)."""
     y, m = map(int, yyyymm.split("-"))
     nm = m + 1 if m < 12 else 1
-    p = REPO / "05_생산실적" / "조립비정산" / f"{nm}월"
+    p = REPO / "05_생산실적" / "조립비정산" / f"{nm:02d}월"
     p.mkdir(parents=True, exist_ok=True)
     return p
 
@@ -166,24 +167,50 @@ def extract_tab(detail, label, tab_id, panel_id, dt_f, dt_t):
 
 
 def save_outputs(results: dict, yyyymm: str):
+    """QIS 4탭 raw를 기존 라인정지_MM월_raw.xlsx에 시트 추가. 별도 json·md 만들지 않음."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
     out = output_dir(yyyymm)
     mm = yyyymm[-2:]
-    raw_path = out / f"QIS청구_{mm}월_raw.json"
-    raw_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    xlsx = out / f"라인정지_{mm}월_raw.xlsx"
+    if not xlsx.exists():
+        # run.py 미실행 — 자체 xlsx 생성
+        wb = openpyxl.Workbook(); wb.remove(wb.active)
+    else:
+        wb = openpyxl.load_workbook(xlsx)
 
-    md_path = out / f"QIS청구_{mm}월_요약.md"
-    df, dt = month_range(yyyymm)
-    L = [f"# {yyyymm} QIS 비용청구 4탭 요약", "",
-         f"- 기간: {df} ~ {dt}",
-         f"- 시스템: QIS 협력사 작성 (`http://qis.samsong.co.kr/`)",
-         f"- 업체: BP(협력사)", ""]
-    L.append("| 탭 | 건수 | 청구비합계 텍스트 |")
-    L.append("|----|-----:|------------------|")
+    HF = Font(bold=True, color="FFFFFF")
+    HB = PatternFill("solid", fgColor="305496")
+    HEAD = Alignment(horizontal="center", vertical="center")
+
+    for label, _, _ in TABS:
+        sheet_name = f"QIS_{label}"
+        if sheet_name in wb.sheetnames: del wb[sheet_name]
+        rows = results.get(label, {}).get("rows", [])
+        if not rows:
+            continue  # 0건 탭은 시트 안 만듦 (_qis_meta 시트에 표시)
+        ws = wb.create_sheet(sheet_name)
+        headers = list(rows[0].keys())
+        ws.append(headers)
+        for r in rows:
+            ws.append([r.get(h, "") for h in headers])
+        for c in ws[1]:
+            c.font = HF; c.fill = HB; c.alignment = HEAD
+        for i in range(1, len(headers) + 1):
+            ws.column_dimensions[openpyxl.utils.get_column_letter(i)].width = 18
+
+    # QIS 4탭 메타
+    if "_qis_meta" in wb.sheetnames: del wb["_qis_meta"]
+    ms = wb.create_sheet("_qis_meta")
+    ms.append(["tab", "count", "sum_text"])
+    for c in ms[1]:
+        c.font = HF; c.fill = HB; c.alignment = HEAD
     for label, _, _ in TABS:
         r = results.get(label, {})
-        L.append(f"| {label} | {r.get('total', 0)} | {r.get('sum_text','')} |")
-    md_path.write_text("\n".join(L), encoding="utf-8")
-    return raw_path, md_path
+        ms.append([label, r.get("total", 0), r.get("sum_text", "")])
+
+    wb.save(xlsx)
+    return xlsx
 
 
 def main():
@@ -219,9 +246,8 @@ def main():
 
         browser.close()
 
-    raw_path, md_path = save_outputs(results, args.month)
-    print(f"\n[OK] {raw_path}")
-    print(f"     {md_path}")
+    xlsx = save_outputs(results, args.month)
+    print(f"\n[OK] {xlsx}")
     for label, _, _ in TABS:
         r = results.get(label, {})
         print(f"  {label}: 건수={r.get('total', 0)}")

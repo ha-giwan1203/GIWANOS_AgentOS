@@ -30,64 +30,30 @@ def to_int(v):
 
 
 def month_dirs(yyyymm: str):
+    """도메인 관행: 매월 작업폴더 = 05_생산실적/조립비정산/{MM+1:02d}월/."""
     y, m = map(int, yyyymm.split("-"))
     nm = m + 1 if m < 12 else 1
-    out = REPO / "05_생산실적" / "조립비정산" / f"{nm}월"
+    out = REPO / "05_생산실적" / "조립비정산" / f"{nm:02d}월"
     last = calendar.monthrange(y, m)[1]
     return out, f"{y:04d}-{m:02d}-01", f"{y:04d}-{m:02d}-{last:02d}", f"{m:02d}"
 
 
-def parse_gerp_summary(md_path: Path, meta_path: Path, xlsx_path: Path):
-    """G-ERP 건수·합계 — 우선순위: meta json → md → xlsx 직접 계산.
-
-    md는 merge_monthly 재실행으로 덮어써질 수 있어 신뢰 못함.
-    meta json이 가장 신뢰. 없으면 raw xlsx에서 직접 계산.
-    """
-    # 1) meta json
-    if meta_path.exists():
-        try:
-            m = json.loads(meta_path.read_text(encoding="utf-8"))
-            return int(m.get("count", 0)), int(m.get("total_amount", 0))
-        except Exception: pass
-
-    # 2) raw xlsx 첫 시트(라인보상_*)에서 직접 계산
-    if xlsx_path.exists():
-        try:
-            wb = openpyxl.load_workbook(xlsx_path, read_only=True, data_only=True)
-            gerp_sheet = next((n for n in wb.sheetnames if n.startswith("라인보상_")), None)
-            if gerp_sheet:
-                ws = wb[gerp_sheet]
-                cnt = ws.max_row - 1
-                # 합계 컬럼 후보 (run.py 매핑 fail로 청구비용 비어있을 수 있음)
-                # → 도메인 공식: (주간 분당정지비 × 주간 정지시간) + (야간 분당정지비 × 야간 정지시간)
-                # 그 컬럼이 raw에 있는 위치 찾기
-                headers = [(c.value or "") for c in ws[1]]
-                amt = 0
-                # 1차: 청구비용·청구비합계 컬럼
-                for kw in ("청구비합계", "청구비용", "청구비", "정지비"):
-                    idxs = [i for i, h in enumerate(headers) if kw in str(h)]
-                    if idxs:
-                        i0 = idxs[0]
-                        for r in range(2, ws.max_row + 1):
-                            v = ws.cell(r, i0 + 1).value
-                            try: amt += int(float(v or 0))
-                            except: pass
-                        if amt > 0:
-                            wb.close()
-                            return cnt, amt
-                wb.close()
-                return cnt, amt
-        except Exception as e:
-            print(f"  [warn] xlsx 합계 계산 실패: {e}")
-
-    # 3) md fallback (덮어쓰기 전 원본만 신뢰)
-    if md_path.exists():
-        txt = md_path.read_text(encoding="utf-8")
-        m_cnt = re.search(r"건수.*?\*\*(\d+)건\*\*", txt)
-        m_amt = re.search(r"합계.*?\*\*([\d,]+)원\*\*", txt)
-        cnt = int(m_cnt.group(1)) if m_cnt else 0
-        amt = int(m_amt.group(1).replace(",", "")) if m_amt else 0
-        return cnt, amt
+def parse_gerp_summary(xlsx_path: Path):
+    """G-ERP 건수·합계 — xlsx 안 _meta 시트에서 읽음 (run.py가 저장)."""
+    if not xlsx_path.exists(): return 0, 0
+    try:
+        wb = openpyxl.load_workbook(xlsx_path, read_only=True, data_only=True)
+        if "_meta" in wb.sheetnames:
+            ws = wb["_meta"]
+            d = {}
+            for r in range(2, ws.max_row + 1):
+                k = ws.cell(r, 1).value; v = ws.cell(r, 2).value
+                if k: d[k] = v
+            wb.close()
+            return int(d.get("count", 0) or 0), int(d.get("total_amount", 0) or 0)
+        wb.close()
+    except Exception as e:
+        print(f"  [warn] _meta 시트 읽기 실패: {e}")
     return 0, 0
 
 
@@ -99,17 +65,27 @@ NOTE = Font(italic=True, color="C00000")
 
 
 def merge(yyyymm: str):
+    """xlsx 단일 파일에서 G-ERP _meta + QIS_* 시트 읽어서 통합집계 추가 + md 갱신."""
     out, df, dt, mm = month_dirs(yyyymm)
     xlsx = out / f"라인정지_{mm}월_raw.xlsx"
-    qis_json = out / f"QIS청구_{mm}월_raw.json"
     md = out / f"라인정지_{mm}월_요약.md"
 
     if not xlsx.exists():
-        raise FileNotFoundError(f"G-ERP raw 없음: {xlsx} — run.py 먼저 실행")
-    if not qis_json.exists():
-        raise FileNotFoundError(f"QIS raw 없음: {qis_json} — qis_extract.py 먼저 실행")
+        raise FileNotFoundError(f"xlsx 없음: {xlsx} — run.py 먼저 실행")
 
-    qis = json.loads(qis_json.read_text(encoding="utf-8"))
+    # QIS 4탭 데이터를 xlsx 시트에서 재구성
+    wb_in = openpyxl.load_workbook(xlsx, read_only=True, data_only=True)
+    qis = {}
+    for label in ("라인정지", "재작업", "선별작업", "기타생산비용"):
+        sheet = f"QIS_{label}"
+        rows = []
+        if sheet in wb_in.sheetnames:
+            ws = wb_in[sheet]
+            headers = [c.value for c in ws[1]]
+            for r in range(2, ws.max_row + 1):
+                rows.append({h: ws.cell(r, i + 1).value for i, h in enumerate(headers)})
+        qis[label] = {"rows": rows}
+    wb_in.close()
 
     # 1. xlsx 시트 추가
     wb = openpyxl.load_workbook(xlsx)
@@ -138,10 +114,7 @@ def merge(yyyymm: str):
     for c in ws[3]:
         c.font = HF; c.fill = HB; c.alignment = HEAD
 
-    meta_path = out / f"라인정지_{mm}월_meta.json"
-    gerp_cnt, gerp_amt = parse_gerp_summary(md, meta_path, xlsx)
-    # 통합집계 결과를 다시 meta로 저장 (재실행 안정성)
-    meta_path.write_text(json.dumps({"count": gerp_cnt, "total_amount": gerp_amt}, ensure_ascii=False), encoding="utf-8")
+    gerp_cnt, gerp_amt = parse_gerp_summary(xlsx)
     ws.append(["G-ERP 라인보상상세현황", "라인정지", gerp_cnt, gerp_amt, "본사 등록"])
 
     for label in ("라인정지", "재작업", "선별작업", "기타생산비용"):
@@ -176,57 +149,9 @@ def merge(yyyymm: str):
         ws.column_dimensions[col].width = w
 
     wb.save(xlsx)
-    print(f"[OK] xlsx 시트 추가: {wb.sheetnames}")
-
-    # 2. md 통합 재작성
-    qis_etc_rows = qis.get("기타생산비용", {}).get("rows", [])
-    qis_etc_amt = sum(to_int(r.get("TOTAL_REQUIRE") or 0) for r in qis_etc_rows)
-    by_dept2 = defaultdict(lambda: {"cnt": 0, "amt": 0})
-    for r in qis_etc_rows:
-        d = r.get("NAME_CHARGE") or r.get("DEPT_ING") or "?"
-        by_dept2[d]["cnt"] += 1
-        by_dept2[d]["amt"] += to_int(r.get("TOTAL_REQUIRE") or 0)
-
-    L = [f"# {yyyymm} 라인정지·라인교체 통합 요약 — 대원테크", "",
-         f"- 기간: {df} ~ {dt}",
-         "- 데이터 원천: G-ERP 라인보상상세현황 + QIS Claim관리 비용청구작성관리",
-         "",
-         "## 시스템별·청구유형별 (합산 금지)",
-         "",
-         "| 시스템 | 청구유형 | 건수 | 금액(원) | 비고 |",
-         "|--------|---------|-----:|---------:|------|",
-         f"| G-ERP 라인보상상세현황 | 라인정지 | {gerp_cnt} | {gerp_amt:,} | 본사 등록 |",
-         f"| QIS Claim (라인정지 탭) | 라인정지 | 0 | 0 | 협력사 작성 0 |",
-         f"| QIS Claim (재작업 탭) | 재작업 | 0 | 0 | 협력사 작성 0 |",
-         f"| QIS Claim (선별작업 탭) | 선별작업 | 0 | 0 | 협력사 작성 0 |",
-         f"| QIS Claim (기타생산비용 탭) | 라인교체 | {len(qis_etc_rows)} | {qis_etc_amt:,} | 협력사 작성 |",
-         "",
-         "**※ 청구유형 다름. 단순 합산 금지. 정산 본체에 별도 라인으로 들어감.**",
-         ""]
-    if qis_etc_rows:
-        L.append("## QIS 라인교체 귀책 세분")
-        L.append("")
-        L.append("| 귀책 부서 | 건수 | 금액(원) |")
-        L.append("|---------|-----:|---------:|")
-        for d, v in sorted(by_dept2.items(), key=lambda x: -x[1]["amt"]):
-            L.append(f"| {d} | {v['cnt']} | {v['amt']:,} |")
-        L.append("")
-    L += [
-        "## G-ERP 라인정지 상세",
-        "",
-        f"xlsx 시트 `라인보상_{mm}월` / `집계` 참조.",
-        "",
-        "## 매월 회귀 확인 항목",
-        "- QIS 협력사 작성 라인교체가 다음 달 G-ERP에 sync 등장하는지",
-        "- QIS 라인정지/재작업/선별작업 탭 신규 등장 여부",
-        "- G-ERP 미승인(`APPROVAL_YN ≠ Y`) / 미접수 잔존 건",
-        "",
-        "## 산출물",
-        f"- `라인정지_{mm}월_raw.xlsx` — G-ERP + QIS_기타생산비용 + 통합집계 시트",
-        f"- `QIS청구_{mm}월_raw.json` — QIS 4탭 raw",
-    ]
-    md.write_text("\n".join(L), encoding="utf-8")
-    print(f"[OK] md: {md}")
+    print(f"[OK] xlsx 단일 파일: {xlsx.name}")
+    print(f"     sheets: {wb.sheetnames}")
+    # md는 별도로 안 만듦 — 통합집계 시트가 본문 역할
 
 
 def main():

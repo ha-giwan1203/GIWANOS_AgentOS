@@ -52,10 +52,10 @@ def month_range(yyyymm: str):
 
 
 def output_dir(yyyymm: str) -> Path:
+    """도메인 관행: 매월 작업폴더 = 05_생산실적/조립비정산/{MM+1:02d}월/ (zero-padded)."""
     y, m = map(int, yyyymm.split("-"))
     next_m = m + 1 if m < 12 else 1
-    next_y = y if m < 12 else y + 1
-    p = REPO_ROOT / "05_생산실적" / "조립비정산" / f"{next_m}월"
+    p = REPO_ROOT / "05_생산실적" / "조립비정산" / f"{next_m:02d}월"
     p.mkdir(parents=True, exist_ok=True)
     return p
 
@@ -252,13 +252,20 @@ def main():
     save_summary_md(grid, md, yyyymm, args.cmpy)
 
     total = sum(float(r.get("COST_BILL_TOT") or 0) for r in grid["data"])
-    # meta.json — merge_monthly가 재실행 안정성 위해 사용
-    meta = out / f"라인정지_{mm}월_meta.json"
-    meta.write_text(json.dumps({"count": len(grid["data"]), "total_amount": int(total)}, ensure_ascii=False), encoding="utf-8")
+    # meta — xlsx 안 _meta 시트에 박음 (json 별도 파일 만들지 않음 — 도메인 관행: 정산 폴더 부산물 금지)
+    import openpyxl
+    wb = openpyxl.load_workbook(raw)
+    if "_meta" in wb.sheetnames: del wb["_meta"]
+    ms = wb.create_sheet("_meta")
+    ms["A1"] = "key"; ms["B1"] = "value"
+    ms["A2"] = "count"; ms["B2"] = len(grid["data"])
+    ms["A3"] = "total_amount"; ms["B3"] = int(total)
+    ms["A4"] = "month"; ms["B4"] = yyyymm
+    ms["A5"] = "cmpy"; ms["B5"] = args.cmpy
+    wb.save(raw)
     print(f"[OK] {len(grid['data'])}건 / {total:,.0f}원")
     print(f"     {raw}")
     print(f"     {md}")
-    print(f"     {meta}")
 
 
 if __name__ == "__main__":
