@@ -1572,6 +1572,10 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
     last_parent = None
     last_m_row = None
     pno_idx = {}
+    # 세션159: 야간 신규 (pno, ext_reg) 처리 순서 보존 — final_save_via_http가
+    # s_data sort에 사용. ERP s_data 응답 정렬 키가 excel 입력 순서와 달라
+    # PRDT_RANK가 어긋나는 사고 재발 방지(setBeginTime은 idx+1로 박는다).
+    processed_order = []
 
     for it in items:
         pno = it["PROD_NO"]
@@ -1590,6 +1594,7 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
             done += 1
             last_parent = result.get("parent_prod_id")
             last_m_row = result.get("m_row")
+            processed_order.append({"PROD_NO": pno, "EXT_PLAN_REG_NO": target_ext_reg})
             print(f"[api_phase4:http] {pno} ext={target_ext_reg} -> OK (rank={result.get('addedRank')})")
         else:
             failed += 1
@@ -1601,7 +1606,8 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
         time.sleep(0.5)
 
     return {"done": done, "failed": failed, "missing": missing, "fails": fails,
-            "last_parent_prod_id": last_parent, "last_m_row": last_m_row}
+            "last_parent_prod_id": last_parent, "last_m_row": last_m_row,
+            "processed_order": processed_order}
 
 
 def _apply_set_begin_time(s_data):
@@ -1675,10 +1681,52 @@ def _apply_set_begin_time(s_data):
         obj["PLAN_DA_E"] = plan_da_e
 
 
-def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1'):
+def _reorder_s_data_by_processed(s_data, processed_order):
+    """세션159: ERP s_data 응답을 excel 입력 순서로 재정렬.
+
+    배경: ERP의 selectListDoAddnPrdtConctLineDetailNew.do 응답은 자체 정렬 키로 반환되며
+    excel 입력 순서와 다르다. setBeginTime은 idx+1로 PRDT_RANK를 박으므로 sort 누락 시
+    SmartMES rank가 어긋난다(세션159 야간 21건 회귀 발생).
+
+    정책:
+      - 야간 신규 (pno + ext_reg 매칭)는 processed_order(items 순) 순서로 정렬
+      - 그 외(주간 기존)는 원래 s_data 순서 유지 — rank 1~(주간끝)
+      - 야간이 뒤로 (rank 주간끝+1~끝)
+
+    s_data row 키 호환: EXT_PLAN_REG_NO 우선, 없으면 REG_NO fallback.
+    매칭 실패 시 sort 자체는 무해 — 원래 순서 유지 (=현 버그 그대로, regression 무).
+    """
+    if not processed_order:
+        return s_data
+    night_order = {}
+    for i, p in enumerate(processed_order):
+        key = (p["PROD_NO"], str(p["EXT_PLAN_REG_NO"]))
+        night_order[key] = i
+
+    def _row_key(row):
+        pno = row.get("PROD_NO")
+        ext = row.get("EXT_PLAN_REG_NO") or row.get("REG_NO")
+        return (pno, str(ext) if ext is not None else "")
+
+    matched = sum(1 for r in s_data if _row_key(r) in night_order)
+    print(f"[phase5:http] s_data 야간 매칭: {matched}/{len(processed_order)} (s_data 총 {len(s_data)}건)")
+
+    indexed = list(enumerate(s_data))
+    def _sort_key(pair):
+        orig_idx, row = pair
+        k = _row_key(row)
+        if k in night_order:
+            return (1, night_order[k])
+        return (0, orig_idx)
+    indexed.sort(key=_sort_key)
+    return [r for _, r in indexed]
+
+
+def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1', processed_order=None):
     """phase5 final_save — sGrid 재조회 후 sendMesFlag='Y'로 POST.
 
     last_m_row: api_rank_batch_via_http 결과에서 받은 마지막 처리 m row의 LINE_CD/STD_DA/PLAN_DA/LINE_DIV_CD.
+    processed_order: 세션159 추가 — 야간 신규 (pno, ext_reg) items 입력 순서. s_data sort에 사용.
     """
     BASE = "http://erp-dev.samsong.com:19100"
     if last_m_row is None or parent_prod_id is None:
@@ -1694,6 +1742,9 @@ def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1')
     r = sess.get(BASE + "/prdtPlanMng/selectListDoAddnPrdtConctLineDetailNew.do",
                  params=s_params, timeout=15)
     s_data = r.json().get("data", {}).get("list", []) or []
+
+    # 세션159: ERP s_data 응답 정렬이 excel 순서와 다르므로 setBeginTime 전 재정렬.
+    s_data = _reorder_s_data_by_processed(s_data, processed_order)
 
     # JS sGridList.setBeginTime() 정밀 재현 — 모든 row의 PRDT_RANK + BEGIN_TIME + END_TIME +
     # PLAN_DA_S + PLAN_DA_E 일괄 부여. 휴식시간 8종 자동 가산.
@@ -1840,7 +1891,8 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         if no_mes_send:
             print(f"[{line}:http] --no-mes-send: final_save 차단")
             return
-        final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"], day_opt='1')
+        final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"],
+                            day_opt='1', processed_order=batch.get("processed_order"))
         vp = verify_prod_date or prod_date
         if not verify_smartmes(target_line, vp, items):
             PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
@@ -2141,8 +2193,7 @@ def _run_jobsetup_chain(mode: str, prod_date):
         print(f"[jobsetup-chain] script not found: {script} — skip", flush=True)
         return
     prdt_da = prod_date.strftime("%Y%m%d")
-    cmd = [sys.executable, str(script), "--mode", mode, "--auto-resolve-pno", "--prdt-da", prdt_da, "--line-cd", "SP3M3",
-           "--with-assign", "--with-auth", "--shift", "D"]
+    cmd = [sys.executable, str(script), "--mode", mode, "--auto-resolve-pno", "--prdt-da", prdt_da, "--line-cd", "SP3M3"]
     print(f"[jobsetup-chain] {' '.join(cmd)}", flush=True)
     try:
         r = subprocess.run(cmd, timeout=180, capture_output=True, text=True, encoding="utf-8", errors="replace")
