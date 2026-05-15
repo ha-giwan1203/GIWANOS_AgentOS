@@ -32,7 +32,6 @@ import os
 import random
 import re
 import sys
-import time
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -230,150 +229,6 @@ def resolve_first_sequence(prdt_da: str, line_cd: str):
     return None
 
 
-def call_assign_list(qry):
-    """v3.4: 작업자 배치 조회 (read-only).
-
-    POST /v2/wrk/assign/list.api + WorkerQRY.
-    근거: ServiceAgent.GetWorkerArrangeResult(token, WorkerQRY) (dnSpy).
-    중요: shiftsCd=""(빈 값)이어야 응답에 6공정 회수됨. 응답 안에 실제 shiftsCd="01" 포함.
-
-    Returns: 공정별 작업자 items (procNo/wrkId/wrkNm/wrkCertiYn/regNo/shiftsCd 등).
-    """
-    url = f"{MES_SERVER}/v2/wrk/assign/list.api"
-    body = {
-        "prdtDa": qry["prdtDa"],
-        "lineCd": qry["lineCd"],
-        "pno": qry["pno"],
-        "pnoRev": qry["pnoRev"],
-        "prdtRank": qry.get("prdtRank", 1),
-        "regNo": qry.get("regNo", 0),
-        "revNo": qry.get("revNo", "0"),
-        "shiftsCd": "",
-        "procCd": "",
-        "procNo": "",
-        "wrkId": "",
-        "mainProcYn": "",
-        "existWrk": "",
-    }
-    r = requests.post(url, json=body, headers=build_headers(), timeout=15)
-    r.raise_for_status()
-    j = r.json()
-    sc = str(j.get("statusCode", ""))
-    if sc != "200":
-        raise RuntimeError(f"assign/list.api statusCode={sc} msg={j.get('statusMsg')}")
-    return (j.get("rslt") or {}).get("items") or []
-
-
-def call_assign_best_list(qry, shifts_cd: str = "01"):
-    """v3.5: 최적배치 추천 회수 (read-only).
-
-    POST /v2/wrk/assign-best/list.api + WorkerQRY.
-    근거: ServiceAgent.GetBestWorkerArrange(token, WorkerQRY) (dnSpy).
-    중요: shiftsCd 필수 입력 ("01" 주간 / "02" 야간). 빈 값이면 sc=801.
-
-    Returns: 공정별 추천 작업자 items (assign/list와 동일 스키마).
-    """
-    url = f"{MES_SERVER}/v2/wrk/assign-best/list.api"
-    body = {
-        "prdtDa": qry["prdtDa"],
-        "lineCd": qry["lineCd"],
-        "pno": qry["pno"],
-        "pnoRev": qry["pnoRev"],
-        "prdtRank": qry.get("prdtRank", 1),
-        "regNo": qry.get("regNo", 0),
-        "revNo": qry.get("revNo", "0"),
-        "shiftsCd": shifts_cd,
-        "procCd": "",
-        "procNo": "",
-        "wrkId": "",
-        "mainProcYn": "",
-        "existWrk": "",
-    }
-    r = requests.post(url, json=body, headers=build_headers(), timeout=15)
-    r.raise_for_status()
-    j = r.json()
-    sc = str(j.get("statusCode", ""))
-    if sc != "200":
-        raise RuntimeError(f"assign-best/list.api statusCode={sc} msg={j.get('statusMsg')}")
-    return (j.get("rslt") or {}).get("items") or []
-
-
-def call_assign_save(items):
-    """v3.5: 작업자 배치 저장.
-
-    POST /v2/wrk/assign/save.api + List<WrkItem>.
-    근거: ServiceAgent.saveAssignWrk(token, List`1 param) → Boolean (dnSpy).
-    body는 assign-best/list 응답 items 그대로 넣음 (assitItems 포함).
-
-    Returns: (status_code, response_json, raw_text).
-    """
-    url = f"{MES_SERVER}/v2/wrk/assign/save.api"
-    r = requests.post(url, json=items, headers=build_headers(), timeout=20)
-    j = None
-    try:
-        j = r.json()
-    except Exception:
-        pass
-    return r.status_code, j, r.text[:300]
-
-
-def is_assignment_complete(assigns):
-    """배치 완료 여부 - 6공정 모두 wrkId 채워져있으면 True."""
-    if not assigns:
-        return False
-    return all((a.get("wrkId") or "").strip() for a in assigns)
-
-
-def auto_shift_code():
-    """현재 시각 → 주간(01) / 야간(02) 자동 추정.
-    06:00~17:59 = 주간(01), 그 외 = 야간(02).
-    """
-    h = datetime.now().hour
-    return "01" if 6 <= h < 18 else "02"
-
-
-def build_auth_payload(assign_item):
-    """assign/list 응답 1건 → auth/cnfm/save.api payload (WorkerQRY).
-
-    WorkerQRY 13 property 중 인증에 필요한 핵심 필드만 채움.
-    가드: 서버 응답에 키 부재(eventual consistency)인 경우 KeyError 회피 → 빈값.
-    호출측에서 wrkId 빈값을 SKIP 분기로 처리한다.
-    """
-    return {
-        "prdtDa": assign_item.get("prdtDa", ""),
-        "lineCd": assign_item.get("lineCd", ""),
-        "revNo": str(assign_item.get("revNo", "0")),
-        "regNo": assign_item.get("regNo", 0),
-        "prdtRank": assign_item.get("prdtRank", 1),
-        "pno": assign_item.get("pno", ""),
-        "pnoRev": assign_item.get("pnoRev", ""),
-        "shiftsCd": assign_item.get("shiftsCd", "01"),
-        "procCd": assign_item.get("procCd", ""),
-        "procNo": assign_item.get("procNo", ""),
-        "wrkId": assign_item.get("wrkId", ""),
-        "mainProcYn": "Y",
-        "existWrk": "Y",
-    }
-
-
-def call_auth_cnfm(payload):
-    """v3.4: 작업자 인증 저장.
-
-    POST /v2/wrk/auth/cnfm/save.api + WorkerQRY.
-    근거: ServiceAgent.CheckWorker(token, WorkerQRY) → Boolean (dnSpy).
-
-    Returns: (status_code, response_json, raw_text).
-    """
-    url = f"{MES_SERVER}/v2/wrk/auth/cnfm/save.api"
-    r = requests.post(url, json=payload, headers=build_headers(), timeout=20)
-    j = None
-    try:
-        j = r.json()
-    except Exception:
-        pass
-    return r.status_code, j, r.text[:300]
-
-
 def build_save_item(master_item, qry, kind, params):
     """list.api 응답 1건(master) + qry 컨텍스트 + A/B 분기 → save.api payload."""
     out = dict(master_item)  # 마스터 11개 그대로 + 추가 컨텍스트
@@ -402,6 +257,16 @@ def build_save_item(master_item, qry, kind, params):
     out["x3RsltNm"] = "OK"
     out["finalCheckRsltCd"] = "O"
     out["finalCheckRsltNm"] = "OK"
+    # 2026-05-15: SmartMES UI 디컴파일 (JobSetupView+SaveJobSetupResultAsync.MoveNext)에서
+    # set_xNBarcd ← ldstr "O" 직접 확인. 자동화가 빈값으로 박으면 "임시 저장" 처리되어
+    # 작업자가 UI 저장 버튼 한 번 더 눌러야 확정되던 문제 해결.
+    out["x1Barcd"] = "O"
+    out["x2Barcd"] = "O"
+    out["x3Barcd"] = "O"
+    # UI도 박는 필드 (사용자 입력값 또는 빈값) — 자동화는 빈 문자열로 박음
+    out["abnmlCtnts"] = ""
+    out["actionCtnts"] = ""
+    out["note"] = ""
     return out
 
 
@@ -419,14 +284,6 @@ def main():
                    help="MES 환경 (default=dev). prod 사용 시 환경변수 JOBSETUP_MES_SERVER/TOKEN 또는 config.json 필수")
     p.add_argument("--auto-resolve-pno", action="store_true",
                    help="v3.3: schedule API로 prdtRank=1 품번 자동 회수. --pno 동시 지정 + 불일치 시 abort")
-    p.add_argument("--with-auth", action="store_true",
-                   help="v3.4: 작업자 인증 단계 포함 (auth/cnfm/save.api). 미인증 상태에서 자동화 시 잡셋업 미완료 처리되는 문제 해결")
-    p.add_argument("--with-assign", action="store_true",
-                   help="v3.5: 작업자 배치 단계 포함 (assign-best/list + assign/save). 배치 미완료 시에만 자동 배치 (멱등). 이미 배치돼있으면 SKIP")
-    p.add_argument("--shift", choices=["D", "N", "auto"], default="auto",
-                   help="v3.5: 작업조 (D=주간 01 / N=야간 02 / auto=시각 기반). 배치 시 필수")
-    p.add_argument("--force-assign", action="store_true",
-                   help="v3.5: 이미 배치된 상태여도 강제 재배치 (사용 주의 - 사용자 수동 배치 덮어쓸 수 있음)")
     args = p.parse_args()
 
     if args.seed is not None:
@@ -465,7 +322,6 @@ def main():
     if args.pno_rev is None:
         args.pno_rev = "A"
 
-    # v3.4: regNo/revNo는 schedule 응답값 우선 (없으면 0/"0" 호환 default)
     qry = {
         "prdtDa": args.prdt_da,
         "lineCd": args.line_cd,
@@ -487,166 +343,9 @@ def main():
         "fail_count": 0,
     }
 
-    # v3.5: shift 코드 결정
-    shift_cd = {"D": "01", "N": "02", "auto": auto_shift_code()}[args.shift]
-
-    print(f"=== jobsetup v3.5 mode={args.mode} with_assign={args.with_assign} with_auth={args.with_auth} shift={args.shift}({shift_cd}) ===")
+    print(f"=== jobsetup v3.3 mode={args.mode} ===")
     print(f"  qry: {qry}")
     print()
-
-    # v3.5: 작업자 배치 단계 (--with-assign)
-    assign_log = {"current_count": 0, "complete_before": False, "assigned": False,
-                  "save_status": None, "save_msg": None, "save_ok": None, "skipped": False}
-    if args.with_assign:
-        print(f"=== assign step (shiftsCd={shift_cd}) ===")
-        try:
-            current = call_assign_list(qry)
-        except Exception as e:
-            print(f"[FAIL] assign/list.api: {e}")
-            return 6
-        complete = is_assignment_complete(current)
-        assign_log["current_count"] = len(current)
-        assign_log["complete_before"] = complete
-        print(f"[assign] 현재 배치 {len(current)}공정, 완전 배치={complete}")
-
-        need_assign = (not complete) or args.force_assign
-        if not need_assign:
-            print("[assign] 배치 완료 상태 - SKIP (멱등)")
-            assign_log["skipped"] = True
-        else:
-            try:
-                recs = call_assign_best_list(qry, shifts_cd=shift_cd)
-            except Exception as e:
-                print(f"[FAIL] assign-best/list.api: {e}")
-                return 6
-            print(f"[assign-best] 추천 {len(recs)}공정")
-            for r in recs:
-                print(f"  proc={r.get('procNo'):4s} {r.get('wrkNm','-'):8s} wrkId={r.get('wrkId','-')} lvl={r.get('wrkLvlNm','-')}")
-            if not recs:
-                print("[FAIL] assign-best 추천 0건 - 마스터 데이터 점검 필요")
-                return 6
-
-            if args.mode in ("commit-one", "commit-all"):
-                # commit-one은 1공정만 검증 → 1건만 배치 시험
-                payload = recs[:1] if args.mode == "commit-one" else recs
-                print(f"\n=== assign commit ({len(payload)}공정) ===")
-                sc, j, body = call_assign_save(payload)
-                msg = (j or {}).get("statusMsg", "") if j else ""
-                ok = (sc == 200 and j and str(j.get("statusCode", "")) == "200")
-                assign_log["save_status"] = sc
-                assign_log["save_msg"] = msg
-                assign_log["save_ok"] = ok
-                assign_log["assigned"] = ok
-                if ok:
-                    print(f"  [OK] assign/save | {msg[:60]}")
-                    # eventual consistency: save 직후 list 재조회에서 wrkId 미반영 케이스
-                    # 발견(20260508). 2초 대기 후 1회 재조회하여 다음 단계로 인계.
-                    time.sleep(2)
-                    try:
-                        recheck = call_assign_list(qry)
-                        rechk_full = is_assignment_complete(recheck)
-                        assign_log["recheck_count"] = len(recheck)
-                        assign_log["recheck_complete"] = rechk_full
-                        print(f"[assign recheck] +2s → {len(recheck)}공정, 완전 배치={rechk_full}")
-                    except Exception as e:
-                        assign_log["recheck_error"] = str(e)[:120]
-                        print(f"[assign recheck] FAIL: {e}")
-                else:
-                    print(f"  [FAIL] sc={sc} msg='{msg[:80]}' body={body[:200]}")
-                    log["assign"] = assign_log
-                    out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
-                    out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
-                    return 6
-            else:
-                print(f"[assign] mode={args.mode} - 추천만 출력 (저장 0)")
-        print()
-
-    log["assign"] = assign_log
-
-    # v3.4: 작업자 인증 단계 (--with-auth)
-    auth_log = {"assign_count": 0, "auth_plans": [], "auth_save_count": 0, "auth_fail_count": 0,
-                "wrkid_missing": 0, "error_kind": None}
-    if args.with_auth:
-        print(f"=== auth step ===")
-        try:
-            assigns = call_assign_list(qry)
-        except Exception as e:
-            print(f"[FAIL] assign/list.api: {e}")
-            return 4
-        auth_log["assign_count"] = len(assigns)
-        print(f"[assign] {len(assigns)}공정 회수")
-        for a in assigns:
-            already_y = (a.get("wrkCertiYn") or "").upper() == "Y"
-            wrkid = (a.get("wrkId") or "").strip()
-            print(f"  proc={a.get('procNo'):4s} {a.get('wrkNm','-'):8s} wrkId={a.get('wrkId','-')} certi={a.get('wrkCertiYn','-')} regNo={a.get('regNo')} shiftsCd={a.get('shiftsCd')}")
-            payload = build_auth_payload(a)
-            auth_log["auth_plans"].append({
-                "procNo": a.get("procNo"),
-                "wrkNm": a.get("wrkNm"),
-                "wrkId": a.get("wrkId"),
-                "wrkCertiYn_before": a.get("wrkCertiYn"),
-                "already_y": already_y,
-                "wrkid_missing": not wrkid,
-                "payload": payload,
-            })
-            if not wrkid:
-                auth_log["wrkid_missing"] += 1
-
-        if not assigns:
-            print("[FAIL] 작업자 배치 없음 - assign/save 선행 필요")
-            auth_log["error_kind"] = "no_assigns"
-            log["auth"] = auth_log
-            out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
-            out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
-            return 4
-
-        # 가드: 모든 wrkId 빈값 → 인증 불가. 잡셋업 진입 차단(wrkCertiYn=N 저장 위험).
-        if auth_log["wrkid_missing"] >= len(assigns):
-            print(f"[ABORT] wrkId 전 공정 미반영 ({len(assigns)}건) - assign/save 직후 list 응답 누락 추정")
-            print("        다음 morning 재시도 또는 SmartMES UI 수동 인증 필요")
-            auth_log["error_kind"] = "wrkid_missing_after_save"
-            log["auth"] = auth_log
-            out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
-            out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
-            return 5
-
-        # auth commit
-        if args.mode in ("commit-one", "commit-all"):
-            print(f"\n=== auth commit ({'1건' if args.mode == 'commit-one' else len(assigns)}건) ===")
-            targets = auth_log["auth_plans"][:1] if args.mode == "commit-one" else auth_log["auth_plans"]
-            for ap in targets:
-                if ap["already_y"]:
-                    print(f"  [SKIP] proc={ap['procNo']} {ap['wrkNm']} 이미 Y (멱등 회피)")
-                    continue
-                if ap.get("wrkid_missing"):
-                    auth_log["auth_fail_count"] += 1
-                    auth_log["error_kind"] = auth_log["error_kind"] or "wrkid_missing_partial"
-                    print(f"  [SKIP] proc={ap['procNo']} wrkId 미반영 - 인증 불가")
-                    continue
-                sc, j, body = call_auth_cnfm(ap["payload"])
-                msg = (j or {}).get("statusMsg", "") if j else ""
-                ok = (sc == 200 and j and str(j.get("statusCode", "")) == "200")
-                ap["auth_status"] = sc
-                ap["auth_msg"] = msg
-                ap["auth_ok"] = ok
-                if ok:
-                    auth_log["auth_save_count"] += 1
-                    print(f"  [OK]   proc={ap['procNo']} {ap['wrkNm']} | {msg[:60]}")
-                else:
-                    auth_log["auth_fail_count"] += 1
-                    print(f"  [FAIL] proc={ap['procNo']} {ap['wrkNm']} sc={sc} msg='{msg[:80]}' body={body[:200]}")
-                    if args.mode == "commit-one":
-                        break
-            print(f"[auth summary] saved={auth_log['auth_save_count']} failed={auth_log['auth_fail_count']}")
-            if auth_log["auth_fail_count"] > 0 and args.mode == "commit-all":
-                print("[ABORT] auth 실패 - jobsetup 단계 진입 차단 (인증 미완료 상태에서 저장 시 미완료 처리됨)")
-                log["auth"] = auth_log
-                out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
-                out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
-                return 5
-        print()
-
-    log["auth"] = auth_log
 
     items = call_list(qry)
     print(f"[list] {len(items)} items")
@@ -688,7 +387,7 @@ def main():
               f"std={p_['stdDivCd']} kind={p_['kind']} spec='{p_['spec'][:30]}' vals={vals}")
 
     if args.mode == "list-only" or args.mode == "dry-run":
-        out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
+        out = STATE_DIR / f"run_v3_{started:%Y%m%d_%H%M%S}.json"
         out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"\n[OK] {out.name} mode={args.mode} (no save)")
         return 0
@@ -714,7 +413,7 @@ def main():
                 break
 
     log["ts_end"] = datetime.now().isoformat()
-    out = STATE_DIR / f"run_v34_{started:%Y%m%d_%H%M%S}.json"
+    out = STATE_DIR / f"run_v3_{started:%Y%m%d_%H%M%S}.json"
     out.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n[summary] mode={args.mode} saved={log['save_count']} failed={log['fail_count']} | {out.name}")
     return 0 if log["fail_count"] == 0 else 3

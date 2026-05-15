@@ -20,7 +20,8 @@ SmartMES 잡셋업 화면의 실측 측정값을 **허용오차 내 정규분포
 | 측정값 | 정규분포 난수 (`random.gauss`, σ=오차/3, 시드 미고정) | 사용자 답변 |
 | OK/NG | OK 자동 체크 (NG 안 씀) | 사용자 답변 |
 | 자동화 경로 | SmartMES UI computer-use → REST API 직호출 (v3.0) | API 미공개였으나 dnSpy 디컴파일로 확정 |
-| 작업자 인증 | 별도 (잡셋업 단독 가능) | 사용자 답변 |
+| **작업자 배치** | **자동화 영역 아님** — 관리자가 매일 새벽 SmartMES UI "최적배치" 버튼으로 처리 (매일 고정 6명 자동 박힘) | 사용자 답변 (2026-05-15 세션) |
+| **작업자 인증** | **별도 (잡셋업 단독 가능)** — 본 자동화 책임 아님 | 사용자 답변 |
 | 저장 단위 | 첫 실행 관찰 후 확정 | 사용자 답변 "모름" |
 | dry-run 기본 | 항상 기본값 | 위험도 차단 |
 
@@ -258,6 +259,9 @@ if v1 == v2 == v3:
 | 2026-05-02 | v3.0 | REST API 직호출 (UI 폐지). dnSpy 디컴파일로 endpoint+token+헤더 확보. POST `/v2/checksheet/check-result/jobsetup/save.api` + 헤더 7개 + JobSetupItem JSON. 17건/30초 |
 | 2026-05-02 | v3.2 | config 외부화 + `--env dev|prod` 3순위 fallback (env → config.json → DEV_DEFAULT). config.example.json + .gitignore |
 | 2026-05-02 | v3.3 | schedule API (POST `/v2/prdt/schdl/list.api`) dnSpy 추출. resolve_first_sequence + `--auto-resolve-pno` cross-check |
+| 2026-05-06 | ~~v3.4~~ | ~~작업자 인증 통합 (`--with-auth`, auth/cnfm/save.api)~~ — **2026-05-15 폐기** |
+| 2026-05-06 | ~~v3.5~~ | ~~작업자 배치 통합 (`--with-assign`, assign-best/list + assign/save, shift D/N/auto)~~ — **2026-05-15 폐기** |
+| 2026-05-15 | v3.3 복귀 | v3.4/v3.5 폐기. 사유: 5/11·12·15 3회 연속 `wrkid_missing_after_save` 실패. 새벽 07:11 자동화 호출 시점에 SmartMES 작업자 마스터 풀이 비어 assign-best API가 빈 wrkId 추천 반환 → assign/save 200 가짜 성공 → wrkId 미반영 → ABORT. **근본**: 본 매뉴얼 "결정 출처" 표(작업자 인증 = 별도, 잡셋업 단독 가능)와 v3.4/v3.5 통합이 충돌. 작업자 배치/인증은 관리자가 SmartMES UI "최적배치" 버튼으로 매일 새벽 처리하고, 본 자동화는 잡셋업 17 검사항목만 담당하도록 복귀. d0-production-plan/run.py chain 호출에서도 `--with-assign --with-auth --shift D` 옵션 제거 |
 
 ## 관련 문서
 - 상위 plan: `C:\Users\User\.claude\plans\splendid-roaming-quilt.md`
