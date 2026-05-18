@@ -502,33 +502,17 @@ for lc in LINE_ORDER:
             gerp_p = 0
         gp_fill = WARN_FILL if (gerp_p > 0 and price > 0 and price != gerp_p) else None
 
-        # 유형 판정
-        price = item['price']
-        has_price_diff = (gerp_p > 0 and price > 0 and price != gerp_p)
-        has_qty_diff = (qty_diff != 0)
-        gerp_missing = (g_amt == 0 and e_amt > 0)   # GERP에 없고 구ERP에 있음
-        erp_missing  = (e_amt == 0 and g_amt > 0)   # 구ERP에 없고 GERP에 있음
-        ref_missing  = (price == 0 and g_amt > 0)    # 기준정보에 단가 없음
-        is_multi_price = (item['part_no'] in multi_price_pns)
-
-        if gerp_missing:
-            dtype = 'GERP누락'
-        elif ref_missing:
-            dtype = '기준누락'
-        elif erp_missing:
-            dtype = '구실적누락'
-        elif is_multi_price:
-            dtype = '다중단가'
-        elif has_price_diff and has_qty_diff:
-            dtype = '단가+수량'
-        elif has_price_diff:
-            dtype = '단가차이'
-        elif has_qty_diff:
-            dtype = '수량차이'
-        elif amt_diff != 0:
-            dtype = '정산차이'
-        else:
-            dtype = ''
+        # 유형 판정 (1차 통합 사전, 2026-05-18 — step5 행별 err_type 우선 사용)
+        # step5 _error_types.classify_error_type 결과 그대로 활용
+        dtype = item.get('err_type', '')
+        excl  = item.get('excl_reason', '')
+        # 제외사유 있으면 라벨 우선 (다중단가분배(정상) 등 STATUS.md 표 라벨 정합)
+        if excl == '정합인정(다중단가분배)':
+            dtype = '다중단가분배(정상)'
+        elif excl == '이관품번':
+            dtype = '이관품번'
+        elif excl == '웨빙재작업':
+            dtype = '웨빙재작업'
 
         assy = item.get('assy_part', '')
         if has_night:

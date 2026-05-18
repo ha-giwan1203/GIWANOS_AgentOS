@@ -21,6 +21,8 @@ sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
 
 from _pipeline_config import *
+from _error_types import classify_error_type, classify_exclusion, calc_recv_amt
+from collections import Counter
 from datetime import datetime
 
 print("=" * 60)
@@ -98,6 +100,12 @@ def sd9_price_judgment(lc, price, night_qty):
         return None
     return '야간가산' if price <= 500 else '기본'
 
+
+# ── 라인별 다중단가 품번 셋 (오류유형 제외사유 판정용) ──
+multi_pns_by_line = {}
+for _lc, _rows in master.items():
+    _cnt = Counter(r['part_no'] for r in _rows)
+    multi_pns_by_line[_lc] = {pn for pn, c in _cnt.items() if c > 1}
 
 # ── 라인별 계산 ───────────────────────────────────────────────
 print(f"\n라인별 정산 계산...")
@@ -352,6 +360,35 @@ for lc in LINE_ORDER:
         total_erp_ngt_amt  += um_e_ngt_amt
         print(f"    미매핑 {pn}: GERP={um_day_qty}개/{um_day_amt:,}원 구ERP={um_e_day_qty}개/{um_e_day_amt:,}원")
 
+    # ── 행별 오류유형 분류 (1차 통합 사전, 2026-05-18) ──
+    line_group = LINE_GROUP.get(lc, '메인SUB')
+    multi_pns  = multi_pns_by_line.get(lc, set())
+    for row in detail:
+        master_has_pn    = (row.get('price_type') != '기준누락')
+        master_has_price = (row.get('price', 0) > 0)
+        # 다중단가 두 번째+ 행은 GERP금액 0 (중복 방지) → 분류 의미 없음. 정합인정으로 표기
+        is_first_gerp = row.get('is_first_gerp', True)
+        amt_diff = row.get('gerp_total_amt', 0) - (row.get('erp_day_amt', 0) + row.get('erp_ngt_amt', 0))
+        if not is_first_gerp:
+            row['err_type']    = '정상'
+            row['note']        = ''
+            row['excl_reason'] = '정합인정(다중단가분배)'
+            row['recv_amt']    = 0
+            continue
+        err_type, note = classify_error_type(
+            row, line_group,
+            master_has_pn=master_has_pn,
+            master_has_price=master_has_price,
+        )
+        excl = classify_exclusion(row, multi_pns)
+        # 차이 0이면 정상 — 제외사유 박지 않음
+        if amt_diff == 0:
+            excl = ''
+        row['err_type']    = err_type
+        row['note']        = note
+        row['excl_reason'] = excl
+        row['recv_amt']    = calc_recv_amt(amt_diff, excl)
+
     gerp_total = total_gerp_day_amt + total_gerp_ngt_amt
     erp_total  = total_erp_day_amt  + total_erp_ngt_amt
     diff       = gerp_total - erp_total
@@ -388,7 +425,8 @@ grand_erp  = sum(r['erp_amt']  for r in summary_rows)
 grand_diff = grand_gerp - grand_erp
 print(f"\n  합계: GERP {grand_gerp:>12,}  구ERP {grand_erp:>12,}  차이 {grand_diff:>+12,}")
 
-# ── 오류 리스트 (라인별 차이 품번 유형 분류) ─────────────────
+# ── 오류 리스트 (1차 통합 사전 — 행별 err_type 그대로 활용, 2026-05-18) ──
+from _error_types import TYPE_ORDER
 error_list = []
 for lc in LINE_ORDER:
     ld = lines_result.get(lc, {})
@@ -400,37 +438,17 @@ for lc in LINE_ORDER:
         e_amt = r['erp_day_amt'] + r['erp_ngt_amt']
         if g_amt == e_amt:
             continue
+        # 제외사유 있으면 정상 처리 (이관품번/웨빙재작업 등) — 오류 리스트 제외
+        if r.get('excl_reason'):
+            continue
         g_qty = r['gerp_day_qty'] + r['gerp_ngt_qty']
         e_qty = r['erp_day_qty'] + r['erp_ngt_qty']
-        # 유형 판정
-        if r.get('price_type') == '기준누락':
-            etype = '기준누락'
-        elif e_amt == 0 and g_amt > 0:
-            etype = '구실적누락'
-        elif g_amt == 0 and e_amt > 0:
-            etype = 'GERP누락'
-        elif r['price'] == 0:
-            etype = '기준누락'
-        elif g_qty != e_qty and g_qty > 0 and e_qty > 0:
-            # 단가도 다른지 확인
-            gerp_up = round(g_amt / g_qty) if g_qty else 0
-            erp_up = r['price']
-            if gerp_up != erp_up:
-                etype = '단가+수량'
-            else:
-                etype = '수량차이'
-        elif g_qty != e_qty:
-            etype = '수량차이'
-        else:
-            # 수량 동일, 금액 다름 → 단가 차이
-            gerp_up = round(g_amt / g_qty) if g_qty else 0
-            erp_up = r['price']
-            if gerp_up != erp_up:
-                etype = '단가차이'
-            else:
-                etype = '정산차이'
         error_list.append({
-            'line': lc, 'part_no': r['part_no'], 'type': etype,
+            'line': lc, 'part_no': r['part_no'],
+            'type': r.get('err_type', '정산차이'),
+            'note': r.get('note', ''),
+            'excl_reason': r.get('excl_reason', ''),
+            'recv_amt': r.get('recv_amt', 0),
             'price_type': r['price_type'],
             'gerp_qty': g_qty, 'erp_qty': e_qty,
             'gerp_amt': g_amt, 'erp_amt': e_amt,
@@ -438,13 +456,12 @@ for lc in LINE_ORDER:
         })
 
 # 요약 출력
-from collections import Counter
 type_cnt = Counter(e['type'] for e in error_list)
 type_amt = {}
 for e in error_list:
     type_amt[e['type']] = type_amt.get(e['type'], 0) + e['diff_amt']
 print(f"\n오류 리스트: {len(error_list)}건")
-for t in ['기준누락', '구실적누락', 'GERP누락', '수량차이', '단가+수량', '단가차이', '정산차이']:
+for t in TYPE_ORDER:
     if t in type_cnt:
         print(f"  {t}: {type_cnt[t]}건, {type_amt[t]:+,}원")
 
