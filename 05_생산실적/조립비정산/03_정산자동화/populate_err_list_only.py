@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""본체 오류리스트 시트 정적 박기 단독 진입점.
+"""본체 오류리스트 시트 정적 박기 단독 진입점 (openpyxl, COM-free).
 
-build_formula_version 풀 재빌드 후 COM 정적 박기 단계만 실패한 경우,
-또는 EXCEL.EXE 충돌로 1회만 다시 시도하고 싶을 때 사용.
+build_formula_version의 populate_error_list_static이 COM 충돌로 실패할 때,
+step5 캐시(step5_settlement.json)를 source-of-truth로 본체 오류리스트 시트에
+직접 22컬럼 데이터를 박는다. Excel COM 의존성 없음.
 
-사전 조건: EXCEL.EXE 사용자 인스턴스 모두 닫기.
 사용법:
     python populate_err_list_only.py
 """
-import sys, os
+import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
 
 from openpyxl import load_workbook
-from _pipeline_config import BASE_DIR, MONTH, LINE_ORDER
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from collections import defaultdict, Counter
+
+from _pipeline_config import BASE_DIR, MONTH, LINE_ORDER, VENDOR_CODE, CACHE_STEP5
+from _error_types import TYPE_ORDER, TYPE_COLORS
 
 _m_int = int(MONTH) + 1
 if _m_int > 12:
@@ -26,32 +31,181 @@ output = os.path.join(BASE_DIR, folder, f'정산_수식버전_{MONTH}월.xlsx')
 if not os.path.exists(output):
     print(f'[ERROR] 본체 미존재: {output}')
     sys.exit(1)
+if not os.path.exists(CACHE_STEP5):
+    print(f'[ERROR] step5 캐시 미존재. 먼저 step5_정산계산.py 실행: {CACHE_STEP5}')
+    sys.exit(1)
 
-print(f'대상: {output}')
+print(f'본체: {output}')
+print(f'step5 캐시: {CACHE_STEP5}')
 
-# 라인시트 sum_row 추출 (build_formula_version과 동일 컨벤션 — '합계' 셀)
-wb = load_workbook(output, data_only=False, read_only=False)
-line_summaries = {}
-lines = []
+# ── step5 캐시 → 오류 데이터 수집 ──
+with open(CACHE_STEP5, encoding='utf-8') as f:
+    s5 = json.load(f)
+
+errors = []
+excluded = []
 for lc in LINE_ORDER:
-    if lc not in wb.sheetnames:
-        continue
-    lines.append(lc)
-    ws = wb[lc]
-    for r in range(2, ws.max_row + 1):
-        if ws.cell(r, 1).value == '합계':
-            line_summaries[lc] = r
-            break
-wb.close()
+    ld = s5['lines'].get(lc, {})
+    for r in ld.get('items', []):
+        if not r.get('is_first_gerp', True):
+            continue
+        g_amt = r['gerp_day_amt'] + r['gerp_ngt_amt']
+        e_amt = r['erp_day_amt'] + r['erp_ngt_amt']
+        diff = g_amt - e_amt
+        if g_amt == e_amt:
+            continue
+        excl = r.get('excl_reason', '')
+        if excl:
+            excluded.append({'line': lc, 'part_no': r['part_no'], 'diff': diff, 'excl': excl})
+            continue
+        sup_text = ''
+        if r.get('support'):
+            parts = []
+            for s in r['support']:
+                v = s['vendor']
+                if '[' in v:
+                    v = v.split('[')[1].rstrip(']')
+                parts.append(f"{v}({s['day_qty']+s['night_qty']})")
+            sup_text = ', '.join(parts)
+        errors.append({
+            'line': lc, 'part_no': r['part_no'], 'assy_part': r.get('assy_part', ''),
+            'usage': r.get('usage', 1), 'price_type': r['price_type'],
+            'price': r['price'], 'vtype': r.get('vtype', ''),
+            'gerp_day_qty': r['gerp_day_qty'], 'gerp_day_amt': r['gerp_day_amt'],
+            'gerp_ngt_qty': r['gerp_ngt_qty'], 'gerp_ngt_amt': r['gerp_ngt_amt'],
+            'erp_day_qty': r['erp_day_qty'], 'erp_day_amt': r['erp_day_amt'],
+            'erp_ngt_qty': r['erp_ngt_qty'], 'erp_ngt_amt': r['erp_ngt_amt'],
+            'diff': diff, 'err_type': r.get('err_type', '정산차이'),
+            'note': r.get('note', ''), 'recv_amt': r.get('recv_amt', abs(diff)),
+            'sup_text': sup_text,
+        })
 
-print(f'line_summaries: {line_summaries}')
+type_order_idx = {t: i for i, t in enumerate(TYPE_ORDER)}
+errors.sort(key=lambda x: (LINE_ORDER.index(x['line']),
+                           type_order_idx.get(x['err_type'], 99),
+                           -abs(x['diff'])))
+print(f'오류 {len(errors)}건 / 제외 {len(excluded)}건')
 
-# build_formula_version에서 함수만 import (main 블록 실행 회피 위해 직접 정의 일부 복사 X — module side-effect 감수)
-# 함수 단독 호출이 필요 → import 시 main 블록 실행됨. side-effect 최소화 위해 별도 모듈로 분리하는 게 이상적.
-# 임시 우회: build_formula_version 안의 populate_error_list_static을 별도 함수로 추출했다면 import OK.
-# 현재는 module-level 풀 빌드가 트리거됨. 그래서 직접 함수 정의 import는 불가.
-# → 사용자는 EXCEL 닫고 `python build_formula_version.py` 재호출 권고.
+# ── 본체 오류리스트 시트 박기 ──
+wb = load_workbook(output, data_only=False, read_only=False)
+if '오류리스트' not in wb.sheetnames:
+    print('[ERROR] 본체에 오류리스트 시트 없음. build_formula_version.py 먼저 실행.')
+    sys.exit(1)
+ws = wb['오류리스트']
 
-print('현 시점 단독 호출 불가 — build_formula_version main 블록과 함수가 한 파일이라 import만으로도 풀 빌드 트리거.')
-print('해결: EXCEL.EXE 인스턴스 닫은 후 `python build_formula_version.py` 재호출.')
-sys.exit(2)
+# row 5 이하 기존 데이터 클리어
+for r in range(5, ws.max_row + 1):
+    for c in range(1, 23):
+        ws.cell(r, c).value = None
+        ws.cell(r, c).fill = PatternFill(fill_type=None)
+
+# 스타일
+THIN = Side(style='thin', color='D0D0D0')
+BDR = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
+CA = Alignment(horizontal='center', vertical='center')
+RA = Alignment(horizontal='right', vertical='center')
+LA = Alignment(horizontal='left', vertical='center')
+NUM = '#,##0'
+DATA = Font(name='맑은 고딕', size=9)
+NEG_FILL = PatternFill('solid', fgColor='FDE8E8')
+POS_FILL = PatternFill('solid', fgColor='E8F5E8')
+TYPE_FILLS = {t: PatternFill('solid', fgColor=c) for t, c in TYPE_COLORS.items()}
+
+# 데이터 행
+row = 5
+for e in errors:
+    vals = [
+        (e['part_no'], LA, None), (VENDOR_CODE, CA, None),
+        (e['line'], CA, None), (e['assy_part'], LA, None),
+        (e['usage'], CA, None), (e['price_type'], CA, None),
+        (e['price'], RA, NUM), (e['vtype'], CA, None),
+        (e['gerp_day_qty'], RA, NUM), (e['gerp_day_amt'], RA, NUM),
+        (e['gerp_ngt_qty'], RA, NUM), (e['gerp_ngt_amt'], RA, NUM),
+        (e['erp_day_qty'], RA, NUM), (e['erp_day_amt'], RA, NUM),
+        (e['erp_ngt_qty'], RA, NUM), (e['erp_ngt_amt'], RA, NUM),
+        (e['diff'], RA, NUM), (e['err_type'], CA, None),
+        (e['note'], LA, None), ('', CA, None),
+        (e['recv_amt'], RA, NUM), (e['sup_text'], LA, None),
+    ]
+    for ci, (v, align, fmt) in enumerate(vals, 1):
+        c = ws.cell(row, ci, v)
+        c.font = DATA; c.alignment = align; c.border = BDR
+        if fmt:
+            c.number_format = fmt
+    tf = TYPE_FILLS.get(e['err_type'])
+    if tf:
+        ws.cell(row, 18).fill = tf
+    if e['diff'] < 0:
+        ws.cell(row, 17).fill = NEG_FILL
+    elif e['diff'] > 0:
+        ws.cell(row, 17).fill = POS_FILL
+    row += 1
+
+# 요약 텍스트 (row 2)
+tcnt = Counter(e['err_type'] for e in errors)
+tamt = defaultdict(int)
+for e in errors:
+    tamt[e['err_type']] += e['diff']
+recv_total = sum(e['recv_amt'] for e in errors)
+parts = [f"총 {len(errors)}건"]
+for t in TYPE_ORDER:
+    if t in tcnt:
+        sign = '+' if tamt[t] >= 0 else '-'
+        parts.append(f"{t} {tcnt[t]}건({sign}{abs(tamt[t]):,}원)")
+parts.append(f"받을금액 {recv_total:,}원")
+ws.cell(2, 1).value = '  |  '.join(parts)
+
+# ── 유형별요약 시트 박기 ──
+if '유형별요약' in wb.sheetnames:
+    ws2 = wb['유형별요약']
+    # row 4 이하 클리어
+    for r in range(4, ws2.max_row + 1):
+        for c in range(1, 7):
+            ws2.cell(r, c).value = None
+            ws2.cell(r, c).fill = PatternFill(fill_type=None)
+    BOLD = Font(name='맑은 고딕', size=9, bold=True)
+    SUM_FILL = PatternFill('solid', fgColor='E8E8E8')
+    r2 = 4
+    for t in TYPE_ORDER:
+        items = [e for e in errors if e['err_type'] == t]
+        if not items:
+            continue
+        g_sum = sum(e['gerp_day_amt']+e['gerp_ngt_amt'] for e in items)
+        e_sum = sum(e['erp_day_amt']+e['erp_ngt_amt'] for e in items)
+        d = g_sum - e_sum
+        recv = sum(e['recv_amt'] for e in items)
+        for ci, v in enumerate([t, len(items), g_sum, e_sum, d, recv], 1):
+            c = ws2.cell(r2, ci, v)
+            c.font = DATA; c.border = BDR
+            c.alignment = CA if ci <= 2 else RA
+            if ci >= 3:
+                c.number_format = NUM
+        tf = TYPE_FILLS.get(t)
+        if tf:
+            ws2.cell(r2, 1).fill = tf
+        if d < 0:
+            ws2.cell(r2, 5).fill = NEG_FILL
+        elif d > 0:
+            ws2.cell(r2, 5).fill = POS_FILL
+        if recv > 0:
+            ws2.cell(r2, 6).fill = POS_FILL
+        r2 += 1
+    # 합계
+    for ci in range(1, 7):
+        ws2.cell(r2, ci).fill = SUM_FILL; ws2.cell(r2, ci).border = BDR; ws2.cell(r2, ci).font = BOLD
+    ws2.cell(r2, 1, '합계').alignment = CA
+    ws2.cell(r2, 2, len(errors)).alignment = CA
+    g_all = sum(e['gerp_day_amt']+e['gerp_ngt_amt'] for e in errors)
+    e_all = sum(e['erp_day_amt']+e['erp_ngt_amt'] for e in errors)
+    ws2.cell(r2, 3, g_all).alignment = RA; ws2.cell(r2, 3).number_format = NUM
+    ws2.cell(r2, 4, e_all).alignment = RA; ws2.cell(r2, 4).number_format = NUM
+    total_diff = g_all - e_all
+    ws2.cell(r2, 5, total_diff).alignment = RA; ws2.cell(r2, 5).number_format = NUM
+    ws2.cell(r2, 5).fill = NEG_FILL if total_diff < 0 else POS_FILL
+    ws2.cell(r2, 6, recv_total).alignment = RA; ws2.cell(r2, 6).number_format = NUM
+    ws2.cell(r2, 6).fill = POS_FILL
+
+wb.save(output)
+print(f'\n저장: {output}')
+print(f'오류리스트: {len(errors)}행 박힘 / 유형별요약: {len(tcnt)}유형')
+print(f'받을금액 합계: {recv_total:,}원')
