@@ -91,6 +91,16 @@ wb = load_workbook(output, data_only=False, read_only=False)
 if '오류리스트' not in wb.sheetnames:
     print('[ERROR] 본체에 오류리스트 시트 없음. build_formula_version.py 먼저 실행.')
     sys.exit(1)
+
+# 가드: 라인시트 S컬럼(오류분류 수식) 보존 검증
+# 2026-05-19 회귀 — populate 후 라인시트 S컬럼 0/(전체) 사라짐 사고로 도입
+_line_sheets_for_guard = [s for s in LINE_ORDER if s in wb.sheetnames]
+_s_before = {}
+for s in _line_sheets_for_guard:
+    _ws = wb[s]
+    _s_before[s] = sum(1 for r in range(3, _ws.max_row+1) if _ws.cell(r, 19).value not in (None, ''))
+print(f'[GUARD] 라인시트 S컬럼 load 직후: {_s_before}')
+
 ws = wb['오류리스트']
 
 # row 5 이하 기존 데이터 클리어
@@ -204,6 +214,17 @@ if '유형별요약' in wb.sheetnames:
     ws2.cell(r2, 5).fill = NEG_FILL if total_diff < 0 else POS_FILL
     ws2.cell(r2, 6, recv_total).alignment = RA; ws2.cell(r2, 6).number_format = NUM
     ws2.cell(r2, 6).fill = POS_FILL
+
+# 가드: save 직전 라인시트 S컬럼 재카운트 — load 직후와 차이 있으면 abort
+_s_after = {}
+for s in _line_sheets_for_guard:
+    _ws = wb[s]
+    _s_after[s] = sum(1 for r in range(3, _ws.max_row+1) if _ws.cell(r, 19).value not in (None, ''))
+_diffs = {s: (_s_before[s], _s_after[s]) for s in _s_before if _s_before[s] != _s_after[s]}
+if _diffs:
+    print(f'[GUARD FAIL] 라인시트 S컬럼 손실 감지. abort. diff: {_diffs}')
+    sys.exit(2)
+print(f'[GUARD OK] 라인시트 S컬럼 보존 확인 ({len(_line_sheets_for_guard)}개 시트)')
 
 wb.save(output)
 print(f'\n저장: {output}')
