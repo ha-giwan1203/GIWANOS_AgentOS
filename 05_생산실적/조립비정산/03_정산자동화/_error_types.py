@@ -89,28 +89,30 @@ def classify_error_type(item, line_group, master_has_pn=None, master_has_price=N
     e_exist = (e_amt != 0 or e_qty != 0)
 
     # 1차 매트릭스 분류 (품번 존재 유무)
+    # 비고 라벨: CLAUDE.md 매트릭스 표 + 3월 양식의 사실 진술("구ERP에만 실적" / "GERP에만 실적") 준수
+    # 자체 작문 금지 (2026-05-19 사용자 지적)
     if not g_exist and e_exist:
         # 구ERP만 실적
-        # 도메인 룰 (2026-05-19 사용자 정정):
         # - 완성품 / 웨빙SUB: MO 모듈품번 사용 안 함 → 모두 GERP 품번누락
-        # - 메인SUB (SP3M3 등): GERP에 MO로 통합 입고 → MO만 분기
-        # - RSP는 GERP 야간행 매핑 전용(추가수당). 분류 분기 대상 아님
+        # - 메인SUB (SP3M3 등): GERP에 MO로 통합 입고 → MO 품번만 GERP 품번누락
         if line_group in ('완성품', '웨빙SUB'):
             if master_has_pn:
                 return ('GERP 품번누락', 'GERP 신규등록필요')
             else:
                 return ('GERP 품번누락', 'GERP·기준정보 등록필요')
         else:
-            # 메인SUB — MO 모듈품번 자체면 진짜 GERP 누락, 일반품번은 모듈품번 통합 흡수
+            # 메인SUB
             part_no = str(item.get('part_no') or '')
             if part_no.startswith('MO'):
+                # MO 모듈품번 자체 GERP 누락 — 매트릭스 M1/M2
                 if master_has_pn:
-                    return ('GERP 품번누락', 'GERP 신규등록필요(MO)')
+                    return ('GERP 품번누락', 'GERP 신규등록필요')
                 else:
-                    return ('GERP 품번누락', 'GERP·기준정보 등록필요(MO)')
+                    return ('GERP 품번누락', 'GERP·기준정보 등록필요')
             else:
-                # 일반품번 → 모듈품번 통합 흡수 (정상 다수)
-                return ('정산차이', '모듈품번 통합 (개별 GERP 미기록 정상)')
+                # 일반품번 — 모듈품번에 통합 흡수돼 GERP에 일반품번으로 안 잡힘 (정상 흐름)
+                # 사실 진술만 박음 (3월 양식 차용)
+                return ('정산차이', '구ERP에만 실적')
 
     if g_exist and not e_exist:
         # GERP만 실적
