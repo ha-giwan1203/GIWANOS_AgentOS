@@ -174,55 +174,64 @@ def build_classify_formula(out_r, line_group):
       R = 수량차이
       A = 품번
 
-    분류 우선순위:
-      1. 정상 (Q=0)
-      2. 다중단가분배(정상) — 분배 합산 잔여 0인 케이스
-      3. 1차 매트릭스 (M1/M2/M4/M5/M6)
-      4. 2차 데이터 차이 (D1/D2/D3/D4)
+    분류 우선순위 (위에서 아래로 첫 매칭):
+      1. ROUND(Q,0)=0 → 정상
+      2. GERP만 수량 + COUNTIF>1 → 다중단가분배(정상)
+      3. 구ERP만 수량 + COUNTIF>1 → 다중단가분배(정상)
+      4. GERP raw 없음 + 구ERP O
+            완성품: 마스터O → GERP 품번누락 / 마스터X → GERP 품번누락(마스터X)
+            그외 라인: 정산차이
+      5. GERP O + 구ERP raw 없음
+            마스터O → 라인확인 필요 / 마스터X → 라인확인 필요(마스터X)
+      6. 마스터 X (둘 다 실적 있음) → 기준정보 누락
+      7. R<>0 and Q<>0 → 단가+수량
+      8. R<>0 → 수량차이
+      9. Q<>0 → 정산차이
+     10. 그 외 → 정상
+
+    중첩 IF 명시 카운팅: 매 IF 추가 시 cnt += 1, 마지막에 ')' × cnt 박는다.
+    Excel 수식 괄호 오류로 sheet 전체 수식이 제거되는 회귀(2026-05-19)를 막기 위해
+    자동 카운팅 방식 채택.
     """
     r = out_r
-    # 매트릭스 판정 약식
-    g_exist = f'(I{r}+J{r}+K{r}+L{r}>0)'
-    e_exist = f'(M{r}+N{r}+O{r}+P{r}>0)'
-    master_has = f'(G{r}>0)'
+    g_raw = f'(I{r}+J{r}+K{r}+L{r}>0)'   # GERP raw 데이터 존재 (수량+금액 어느 하나라도)
+    e_raw = f'(M{r}+N{r}+O{r}+P{r}>0)'   # 구ERP raw 데이터 존재
+    g_qty = f'(I{r}+J{r}>0)'              # GERP 수량 존재
+    e_qty = f'(M{r}+N{r}>0)'              # 구ERP 수량 존재
+    master = f'(G{r}>0)'                  # 마스터 단가 존재
+    countif = f'COUNTIF(A:A,A{r})>1'
 
-    # 완성품라인이면 GERP 품번누락 분기 적용, 그 외엔 정산차이로 묶음
+    parts = []
+    cnt = 0
+
+    # 1. 정상 (반올림 후 0)
+    parts.append(f'IF(ROUND(Q{r},0)=0,"정상",'); cnt += 1
+    # 2. 다중단가분배 — GERP만 수량 (구ERP 수량 0) + 동일품번 중복
+    parts.append(f'IF(AND({g_qty},NOT{e_qty},{countif}),"다중단가분배(정상)",'); cnt += 1
+    # 3. 다중단가분배 — 구ERP만 수량 + 동일품번 중복
+    parts.append(f'IF(AND(NOT{g_qty},{e_qty},{countif}),"다중단가분배(정상)",'); cnt += 1
+    # 4. GERP raw 없음 + 구ERP raw 있음
     if line_group == '완성품':
-        m1m2 = (
-            f'IF(AND(NOT{g_exist},{e_exist}),'
-            f'IF({master_has},"GERP 품번누락","GERP 품번누락(마스터X)"),'
-        )
+        parts.append(f'IF(AND(NOT{g_raw},{e_raw}),IF({master},"GERP 품번누락","GERP 품번누락(마스터X)"),'); cnt += 1
     else:
-        # 메인SUB/웨빙SUB: GERP X + 구ERP O = 모듈품번 매칭 케이스 → 정산차이로 흡수
-        m1m2 = (
-            f'IF(AND(NOT{g_exist},{e_exist}),"정산차이",'
-        )
+        parts.append(f'IF(AND(NOT{g_raw},{e_raw}),"정산차이",'); cnt += 1
+    # 5. GERP raw 있음 + 구ERP raw 없음
+    parts.append(f'IF(AND({g_raw},NOT{e_raw}),IF({master},"라인확인 필요","라인확인 필요(마스터X)"),'); cnt += 1
+    # 6. 둘 다 있음 + 마스터 없음
+    parts.append(f'IF(AND({g_raw},{e_raw},NOT{master}),"기준정보 누락",'); cnt += 1
+    # 7. 단가+수량
+    parts.append(f'IF(AND(R{r}<>0,Q{r}<>0),"단가+수량",'); cnt += 1
+    # 8. 수량차이
+    parts.append(f'IF(R{r}<>0,"수량차이",'); cnt += 1
+    # 9. 정산차이 / 10. 그 외 정상
+    parts.append(f'IF(Q{r}<>0,"정산차이","정상")'); cnt += 1
 
-    # M4/M5: GERP O / 구ERP X
-    m4m5 = (
-        f'IF(AND({g_exist},NOT{e_exist}),'
-        f'IF({master_has},"라인확인 필요","라인확인 필요(마스터X)"),'
-    )
-    # M6: 마스터 X (둘 다 실적 있음)
-    m6 = (
-        f'IF(AND({g_exist},{e_exist},NOT{master_has}),"기준정보 누락",'
-    )
-    # D1/D2/D3/D4: 차이 종류
-    # 단가차이: G(마스터단가) ≠ GERP단가. GERP단가는 시트에 별도 컬럼 없으므로 K/I로 역산
-    # 단순화: Q≠0 and R≠0 → 단가+수량 / R≠0 → 수량차이 / Q≠0 → 정산차이
-    d_branch = (
-        f'IF(AND(R{r}<>0,Q{r}<>0),"단가+수량",'
-        f'IF(R{r}<>0,"수량차이",'
-        f'IF(Q{r}<>0,"정산차이","정상"))))'
-    )
-
-    # 정상 + 다중단가분배 우선
-    formula = (
-        f'=IF(ROUND(Q{r},0)=0,"정상",'
-        f'IF(AND(I{r}+J{r}>0,M{r}+N{r}=0,COUNTIF(A:A,A{r})>1),"다중단가분배(정상)",'
-        f'IF(AND(I{r}+J{r}=0,M{r}+N{r}>0,COUNTIF(A:A,A{r})>1),"다중단가분배(정상)",'
-        + m1m2 + m4m5 + m6 + d_branch + '))'
-    )
+    formula = '=' + ''.join(parts) + (')' * (cnt - 1))
+    # 자체 검증
+    op = formula.count('(')
+    cl = formula.count(')')
+    if op != cl:
+        raise ValueError(f'build_classify_formula 괄호 불균형: open={op} close={cl} | {formula}')
     return formula
 
 
