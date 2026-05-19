@@ -91,15 +91,26 @@ def classify_error_type(item, line_group, master_has_pn=None, master_has_price=N
     # 1차 매트릭스 분류 (품번 존재 유무)
     if not g_exist and e_exist:
         # 구ERP만 실적
-        if line_group == '완성품':
+        # 도메인 룰 (2026-05-19 사용자 정정):
+        # - 완성품 / 웨빙SUB: MO 모듈품번 사용 안 함 → 모두 GERP 품번누락
+        # - 메인SUB (SP3M3 등): GERP에 MO로 통합 입고 → MO만 분기
+        # - RSP는 GERP 야간행 매핑 전용(추가수당). 분류 분기 대상 아님
+        if line_group in ('완성품', '웨빙SUB'):
             if master_has_pn:
                 return ('GERP 품번누락', 'GERP 신규등록필요')
             else:
                 return ('GERP 품번누락', 'GERP·기준정보 등록필요')
         else:
-            # 메인SUB/웨빙SUB: GERP에 모듈품번(RSP)으로 잡힘 — M1/M2 적용 X
-            # 단순 차이로만 표시
-            return ('정산차이', 'GERP 모듈품번 매칭 확인')
+            # 메인SUB — MO 모듈품번 자체면 진짜 GERP 누락, 일반품번은 모듈품번 통합 흡수
+            part_no = str(item.get('part_no') or '')
+            if part_no.startswith('MO'):
+                if master_has_pn:
+                    return ('GERP 품번누락', 'GERP 신규등록필요(MO)')
+                else:
+                    return ('GERP 품번누락', 'GERP·기준정보 등록필요(MO)')
+            else:
+                # 일반품번 → 모듈품번 통합 흡수 (정상 다수)
+                return ('정산차이', '모듈품번 통합 (개별 GERP 미기록 정상)')
 
     if g_exist and not e_exist:
         # GERP만 실적
@@ -211,10 +222,18 @@ def build_classify_formula(out_r, line_group):
     # 3. 다중단가분배 — 구ERP만 수량 + 동일품번 중복
     parts.append(f'IF(AND(NOT{g_qty},{e_qty},{countif}),"다중단가분배(정상)",'); cnt += 1
     # 4. GERP raw 없음 + 구ERP raw 있음
-    if line_group == '완성품':
+    # 2026-05-19 사용자 정정: 완성품/웨빙SUB는 모듈품번 미사용 → 모두 GERP 품번누락
+    # 메인SUB만 MO 분기 (RSP는 GERP 야간 전용이라 제외)
+    if line_group in ('완성품', '웨빙SUB'):
         parts.append(f'IF(AND(NOT{g_raw},{e_raw}),IF({master},"GERP 품번누락","GERP 품번누락(마스터X)"),'); cnt += 1
     else:
-        parts.append(f'IF(AND(NOT{g_raw},{e_raw}),"정산차이",'); cnt += 1
+        # 메인SUB — MO 모듈품번 자체면 GERP 누락, 일반품번은 모듈품번 통합 흡수
+        sub_inner = (
+            f'IF(LEFT(A{r},2)="MO",'
+            f'IF({master},"GERP 품번누락","GERP 품번누락(마스터X)"),'
+            f'"정산차이")'
+        )
+        parts.append(f'IF(AND(NOT{g_raw},{e_raw}),{sub_inner},'); cnt += 1
     # 5. GERP raw 있음 + 구ERP raw 없음
     parts.append(f'IF(AND({g_raw},NOT{e_raw}),IF({master},"라인확인 필요","라인확인 필요(마스터X)"),'); cnt += 1
     # 6. 둘 다 있음 + 마스터 없음
