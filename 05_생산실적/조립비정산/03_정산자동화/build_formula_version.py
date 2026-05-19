@@ -44,7 +44,7 @@ except Exception:
     pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _pipeline_config import BASE_DIR, GERP_FILE, OLDERP_FILE, OLDERP_SHEET, MONTH, LINE_INFO, LINE_GROUP, SP3M3_MODULE_FILE
+from _pipeline_config import BASE_DIR, GERP_FILE, OLDERP_FILE, OLDERP_SHEET, MONTH, LINE_INFO, LINE_GROUP, SP3M3_MODULE_FILE, GERP_COL
 from _error_types import (
     build_classify_formula, map_cat_to_user_type,
     TYPE_ORDER, TYPE_COLORS, ERROR_TYPES,
@@ -133,7 +133,7 @@ for sn in master_wb_w.sheetnames:
 # 주의: raw row 1 = 헤더, row 2~ 데이터. col 19 = 업체코드 (raw 컬럼 매핑 실측 2026-05-07).
 gerp_keys = {}  # (라인, 품번, 단가) → (Usage, 조립품번, 단가구분, 차종)
 for r in range(2, gerp_ws.max_row + 1):
-    co = gerp_ws.cell(r, 19).value
+    co = gerp_ws.cell(r, GERP_COL['vendor_cd']+1).value
     if str(co).strip() != '0109': continue
     line = gerp_ws.cell(r, 3).value
     pn = gerp_ws.cell(r, 7).value
@@ -298,7 +298,7 @@ for r in range(1, gerp_ws.max_row + 1):
     line_v = gerp_ws.cell(r, 3).value if r > 1 else None
     pn_v = gerp_ws.cell(r, 7).value if r > 1 else None
     cha_v = gerp_ws.cell(r, 6).value if r > 1 else None  # 차종
-    co_v = gerp_ws.cell(r, 19).value if r > 1 else None  # 업체코드 (raw col 19, 사용자 룰 2026-05-07)
+    co_v = gerp_ws.cell(r, GERP_COL['vendor_cd']+1).value if r > 1 else None  # 업체코드 (raw col 19, 사용자 룰 2026-05-07)
 
     # 0109 vendor 필터 (사용자 명시 2026-05-07: GERP는 0109 필터 OK)
     # 정산 권위 = 대원테크 0109. 다른 vendor (A00029/A00030/A00031 등) 데이터는 SUMIFS 매칭 시 라인+품번+단가 우연 일치하면 합산되는 결함.
@@ -359,7 +359,7 @@ gerp_line_pn_prices = defaultdict(set)   # (라인, 품번) → 정상행 단가
 for r in range(2, gerp_ws.max_row + 1):
     line_v = gerp_ws.cell(r, 3).value
     pn_v = gerp_ws.cell(r, 7).value
-    co_v = gerp_ws.cell(r, 19).value
+    co_v = gerp_ws.cell(r, GERP_COL['vendor_cd']+1).value
     sd_v = gerp_ws.cell(r, 14).value
     price_v = gerp_ws.cell(r, 16).value
     if not (line_v and pn_v):
