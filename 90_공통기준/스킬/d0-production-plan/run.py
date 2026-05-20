@@ -616,6 +616,7 @@ def extract_sp3m3_day(wb, cut_threshold=DAY_CUT_THRESHOLD):
     if day_start is None:
         raise ValueError("출력용 시트 주간 헤더 미발견")
     items = []
+    skipped = []
     cumsum = 0
     for r in range(day_start, ws.max_row+1):
         part = ws.cell(row=r, column=9).value
@@ -625,15 +626,28 @@ def extract_sp3m3_day(wb, cut_threshold=DAY_CUT_THRESHOLD):
         try:
             qty_int = int(qty)
         except (ValueError, TypeError):
-            # 헤더 행이 더 있거나 이상값 — skip
             continue
-        items.append({"PROD_NO": str(part).strip(), "QTY": qty_int})
+        pno = str(part).strip()
         cumsum += qty_int
+        # 한글 포함 PROD_NO는 자리표시 문자열 ("구형바코드사용" 등) — ERP 라인배치 미등록 확정, skip
+        if any('가' <= ch <= '힯' for ch in pno):
+            skipped.append({"row": r, "PROD_NO": pno, "QTY": qty_int})
+            print(f"[phase1:skip] r={r} PROD_NO={pno!r} QTY={qty_int} — 한글 포함, ERP 등록 불가")
+        else:
+            items.append({"PROD_NO": pno, "QTY": qty_int})
         if cumsum >= cut_threshold:
-            print(f"[phase1] SP3M3 주간 컷: 누적 {cumsum} ({len(items)}건)")
+            msg = f"[phase1] SP3M3 주간 컷: 누적 {cumsum} (등록 {len(items)}건"
+            if skipped:
+                msg += f", 제외 {len(skipped)}건"
+            msg += ")"
+            print(msg)
             break
     else:
-        print(f"[phase1] SP3M3 주간: 누적 {cumsum} (컷 미도달, 전량 {len(items)}건)")
+        msg = f"[phase1] SP3M3 주간: 누적 {cumsum} (컷 미도달, 등록 {len(items)}건"
+        if skipped:
+            msg += f", 제외 {len(skipped)}건"
+        msg += ")"
+        print(msg)
     return items
 
 
