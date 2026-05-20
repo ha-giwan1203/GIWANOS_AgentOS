@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>대원테크 명찰 (70×30mm)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'맑은 고딕','Malgun Gothic',sans-serif; background:#f5f5f7; color:#222; padding:20px; }
+  h1 { font-size:20px; margin-bottom:4px; }
+  .sub { color:#666; font-size:13px; margin-bottom:14px; }
+  .editor { background:#fff; border:1px solid #ddd; border-radius:8px; padding:14px 18px; margin-bottom:20px; }
+  .editor label { display:inline-block; min-width:60px; font-size:13px; }
+  .editor input[type=text] { border:1px solid #ccc; border-radius:4px; padding:4px 8px; font-size:13px; }
+  .editor input[type=range] { vertical-align:middle; }
+  .row { display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin:6px 0; }
+  .editor textarea { width:100%; min-height:120px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:13px; font-family:'맑은 고딕',sans-serif; resize:vertical; }
+  .editor button {
+    margin-top:10px; padding:8px 20px; background:#1a237e; color:#fff;
+    border:none; border-radius:4px; cursor:pointer; font-size:13px;
+  }
+  .editor button:hover { background:#3949ab; }
+  .editor button.secondary { background:#666; }
+  .editor button.secondary:hover { background:#888; }
+
+  .print-sheet { background:#fff; width:210mm; min-height:297mm; margin:0 auto 20px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:15mm 10mm; }
+  .grid { display:grid; grid-template-columns:repeat(2,70mm); grid-auto-rows:30mm; gap:5mm 10mm; justify-content:center; }
+  .nametag { display:flex; flex-direction:column; border-radius:1.5mm; overflow:hidden; border:0.3mm dashed #bbb; }
+  .nametag .bar { background:linear-gradient(135deg,#1a237e,#3949ab); display:flex; align-items:center; justify-content:center; height:10mm; }
+  .nametag .bar .company { color:#fff; font-size:11pt; font-weight:600; letter-spacing:0.5px; }
+  .nametag .body { flex:1; display:flex; align-items:center; justify-content:center; gap:3mm; background:#fff; }
+  .nametag .name { font-size:15pt; font-weight:700; color:#111; }
+  .nametag .rank { font-size:8pt; color:#555; }
+
+  @media print {
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    body { background:#fff; padding:0; margin:0; }
+    h1, .sub, .editor { display:none !important; }
+    .print-sheet { box-shadow:none; padding:15mm 10mm; margin:0; page-break-after:always; }
+    .nametag .bar { background:#1a237e !important; }
+    .nametag .bar .company { color:#fff !important; }
+    @page { size:A4; margin:0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>대원테크 명찰 (70×30mm)</h1>
+<div class="sub">Ctrl+P → A4 인쇄 → 절취</div>
+
+<div class="editor">
+  <div class="row">
+    <label>회사명</label><input type="text" id="companyInput" value="대원테크">
+    <label>직급</label><input type="text" id="rankInput" value="반장">
+    <label>이름</label><input type="text" id="nameInput" value="홍길동">
+    <button onclick="updateSingle()">단일 미리보기</button>
+  </div>
+  <div class="row">
+    <label>회사명</label><input type="range" id="compFs" value="15" min="6" max="16" step="0.5" oninput="applyStyle()"> <span id="compFsVal">15</span>pt
+    <label>이름</label><input type="range" id="nameFs" value="22" min="8" max="22" step="0.5" oninput="applyStyle()"> <span id="nameFsVal">22</span>pt
+    <label>직급</label><input type="range" id="rankFs" value="14" min="5" max="14" step="0.5" oninput="applyStyle()"> <span id="rankFsVal">14</span>pt
+    <label>바높이</label><input type="range" id="barH" value="11" min="6" max="16" step="0.5" oninput="applyStyle()"> <span id="barHVal">11</span>mm
+  </div>
+  <div style="margin-top:10px;">
+    <label style="display:block; margin-bottom:4px;">일괄 명단 (한 줄에 <b>직급,이름</b>)</label>
+    <textarea id="bulkInput">사원,최인선
+사원,이민주
+사원,박지영
+사원,김경순
+사원,정미량
+사원,박경혜
+사원,김아름</textarea>
+  </div>
+  <div>
+    <button onclick="generateBulk()">일괄 생성</button>
+    <button class="secondary" onclick="window.print()">🖨 인쇄</button>
+  </div>
+</div>
+
+<div id="previewArea"></div>
+
+<script>
+const PER_PAGE = 16;
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function createTag(company, rank, name) {
+  return `<div class="nametag">
+    <div class="bar"><span class="company">${esc(company)}</span></div>
+    <div class="body"><span class="name">${esc(name)}</span><span class="rank">${esc(rank)}</span></div>
+  </div>`;
+}
+
+function renderSheets(tags) {
+  let html='';
+  for(let i=0;i<tags.length;i+=PER_PAGE){
+    html+='<div class="print-sheet"><div class="grid">'+tags.slice(i,i+PER_PAGE).join('')+'</div></div>';
+  }
+  document.getElementById('previewArea').innerHTML=html;
+  applyStyle();
+}
+
+function updateSingle(){
+  const c=document.getElementById('companyInput').value.trim();
+  const r=document.getElementById('rankInput').value.trim();
+  const n=document.getElementById('nameInput').value.trim();
+  renderSheets([createTag(c,r,n)]);
+}
+
+function generateBulk(){
+  const c=document.getElementById('companyInput').value.trim();
+  const raw=document.getElementById('bulkInput').value.trim();
+  if(!raw){alert('일괄 데이터를 입력해주세요.');return;}
+  const tags=[];
+  for(const l of raw.split('\n').filter(l=>l.trim())){
+    const p=l.split(',').map(s=>s.trim());
+    if(p.length>=2) tags.push(createTag(c,p[0],p[1]));
+  }
+  if(!tags.length){alert('형식 오류: 직급,이름');return;}
+  renderSheets(tags);
+}
+
+function applyStyle(){
+  const cf=document.getElementById('compFs').value;
+  const nf=document.getElementById('nameFs').value;
+  const rf=document.getElementById('rankFs').value;
+  const bh=document.getElementById('barH').value;
+  document.getElementById('compFsVal').textContent=cf;
+  document.getElementById('nameFsVal').textContent=nf;
+  document.getElementById('rankFsVal').textContent=rf;
+  document.getElementById('barHVal').textContent=bh;
+  document.querySelectorAll('.nametag .company').forEach(el=>el.style.fontSize=cf+'pt');
+  document.querySelectorAll('.nametag .name').forEach(el=>el.style.fontSize=nf+'pt');
+  document.querySelectorAll('.nametag .rank').forEach(el=>el.style.fontSize=rf+'pt');
+  document.querySelectorAll('.nametag .bar').forEach(el=>el.style.height=bh+'mm');
+}
+
+window.addEventListener('DOMContentLoaded', generateBulk);
+</script>
+
+</body>
+</html>
