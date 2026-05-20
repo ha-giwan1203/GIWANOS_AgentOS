@@ -7,6 +7,8 @@ grade: B
 
 # ERP D0 자동화 (SP3M3 / SD9A01)
 
+> 🔒 **SD9A01 OUTER 보류 잠금 (2026-05-20)**: `state/sd9a01_outer.lock` 활성. `--line SD9A01` → exit 0, `--line ALL` → SP3M3 only. 해제: 락 파일 삭제 또는 사용자 명시 발화.
+
 > Phase 0~7 절차 / 모드 분기 / 핵심 주의사항 / 변경 이력은 [MANUAL.md](MANUAL.md). 용어는 ../GLOSSARY.json.
 > 도메인 규칙: `90_공통기준/erp-mes-recovery-protocol.md`
 

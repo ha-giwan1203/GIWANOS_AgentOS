@@ -32,6 +32,9 @@ D0_URL = "http://erp-dev.samsong.com:19100/prdtPlanMng/viewListDoAddnPrdtPlanIns
 OAUTH_LOGIN = "http://auth-dev.samsong.com:18100/login"
 PLAN_ROOT = r"Z:\15. SP3 메인 CAPA점검\SP3M3\생산지시서"
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
+SKILL_DIR = Path(__file__).resolve().parent
+STATE_DIR = SKILL_DIR / "state"
+OUTER_LOCK_FILE = STATE_DIR / "sd9a01_outer.lock"
 UPLOAD_DIR = REPO_ROOT / "06_생산관리" / "D0_업로드"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 SMARTMES_TOKEN = "bfee3f3d-caf9-434d-abbb-2cb015ec2469"
@@ -1934,6 +1937,31 @@ def determine_session(arg):
 # ============================================================
 # 메인
 # ============================================================
+def _apply_line_locks(args):
+    """라인별 자동화 보류 잠금. state/<line>_*.lock 존재 시 해당 라인 차단.
+
+    - --line SD9A01 + sd9a01_outer.lock → exit 0 (작업 미수행)
+    - --line ALL    + sd9a01_outer.lock → SP3M3 only로 자동 조정
+    """
+    if OUTER_LOCK_FILE.exists():
+        try:
+            reason = OUTER_LOCK_FILE.read_text(encoding="utf-8").strip()
+        except Exception:
+            reason = "(사유 파일 읽기 실패)"
+        print(f"[lock] SD9A01 OUTER 보류 잠금 활성 — {OUTER_LOCK_FILE}")
+        print(f"[lock] 해제: 위 파일 삭제 또는 사용자 명시 해제 발화")
+        # 사유 첫 줄만 안내 (전체는 파일 직접 확인)
+        first_line = reason.split("\n", 1)[0] if reason else ""
+        if first_line:
+            print(f"[lock] {first_line}")
+        if args.line == "SD9A01":
+            print("[lock] --line SD9A01 호출 — 잠금으로 작업 미수행, exit 0")
+            sys.exit(0)
+        if args.line == "ALL":
+            print("[lock] --line ALL → SD9A01 자동 skip, SP3M3 only 처리")
+            args.line = "SP3M3"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--session", choices=["evening","morning","auto"], required=True)
@@ -1962,6 +1990,9 @@ def main():
     if args.legacy_mode:
         args.api_mode = False
         print("[mode] --legacy-mode 활성 — 화면 모드(jQuery.ajax) 강제. 하이브리드 미사용")
+
+    # 라인 잠금 체크 (사용자 명시 보류 — 락 파일 존재 시 해당 라인 차단)
+    _apply_line_locks(args)
 
     session = determine_session(args.session)
     print(f"=== /d0-plan session={session} line={args.line} dry_run={args.dry_run} ===")

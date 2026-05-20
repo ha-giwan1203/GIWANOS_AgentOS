@@ -1,0 +1,9 @@
+locked_at: 2026-05-20
+locked_by: 사용자 지시 (세션 직접)
+scope: SD9A01 OUTER D0 자동화 전체 (evening / morning / ALL 묶음 포함)
+reason: OUTER 계획 잠정 보류. 추후 해제 발화 전까지 자동화 진입 차단.
+unlock_how: 이 파일을 삭제하면 즉시 해제. 또는 사용자가 "OUTER 잠금 풀어"·"OUTER 재개" 등 명시 발화.
+behavior:
+  - --line SD9A01 호출 시 즉시 exit 0 종료 (작업 미수행)
+  - --line ALL 호출 시 SP3M3만 처리, SD9A01 자동 skip
+  - morning/evening 무관, 모든 세션에 적용
