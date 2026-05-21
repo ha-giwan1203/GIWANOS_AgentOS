@@ -4,6 +4,13 @@
 > Codex는 이 문서를 먼저 읽고 작업을 시작합니다.
 > Claude 전용 규칙은 [CLAUDE.md](CLAUDE.md) + [.claude/rules/essentials.md](.claude/rules/essentials.md) 참조.
 
+## 0. 호출 채널
+
+- **사용자는 Codex를 직접 호출하지 않습니다.** 사용자 발화는 Claude(브레인)가 받습니다.
+- Codex가 받는 지시문은 **Claude가 작성·전달**합니다 (`codex exec "<지시문>"` 비대화 호출).
+- 결과는 Claude가 받아 검증한 뒤 사용자에게 보고합니다.
+- Codex는 "사용자에게 다시 물어봐 주세요"·"확인 후 알려주세요" 같은 응답을 하지 않습니다. 추가 정보 필요 시 **Claude에게 반환** (출력 마지막에 `[NEEDS_CLARIFICATION] ...` 1줄).
+
 ## 1. 사용자
 
 - **직무**: 자동차 부품 제조업(삼송 G-ERP) 생산관리 실무자 — **비개발자**
