@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-21 KST — **Codex** [C] **Windows UTF-8 영구 인코딩 설정 적용**. 사용자 홈 PowerShell Profile(`C:/Users/User/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`)에 UTF-8 기본 블록을 BOM-less로 추가/정규화했고, 사용자 환경변수 `PYTHONUTF8=1`, `PYTHONIOENCODING=UTF-8` 및 Git 전역 설정 `core.quotepath=false`, `i18n.commitencoding=utf-8`, `i18n.logoutputencoding=utf-8`, `core.precomposeunicode=true` 적용. 저장소 변경은 이력용 `TASKS.md`/`HANDOFF.md`만 commit 대상.
+
 최종 업데이트: 2026-05-21 KST — **Codex** [C] **슬래시명령어 레퍼런스 Codex plugin 7건 추가**. `90_공통기준/업무관리/슬래시명령어_레퍼런스.xlsx`를 openpyxl `data_only=False`로 열어 시트 구조 확인 후 `플러그인스킬` 시트 11~17행에 `/codex:setup`, `/codex:review`, `/codex:adversarial-review`, `/codex:rescue`, `/codex:status`, `/codex:result`, `/codex:cancel` 추가. 설명 문구는 사용자 제공 원문 그대로 입력했고 Review Gate Stop hook 활성 상태 맥락은 비고 `openai/codex-plugin-cc v1.0.4`로 정리.
 
 최종 업데이트: 2026-05-21 KST — **세션166-Codex** [B] **정산 도메인 전체 점검**. 범위: `05_생산실적/조립비정산/` 하위 md/py/xlsx/json, 정산 관련 7개 스킬, 루트 `CLAUDE.md` 정산 진입, 최근 TASKS/HANDOFF 정산 이력. 핵심 발견: `정산결과_MM월.xlsx` vs `정산_수식버전_MM월.xlsx` 본체 정의 분열, monthly-pnl-rollup 문서 산식에서 E 누락, V1/V2 기준정보 파일 참조 혼재, 작업폴더 direct 규칙과 `05월/5월/라인정지_04월_요약.md` 중첩 경로 충돌, STATUS의 파일 존재·시트수 최신화 누락. 도메인 정책 변경 없이 사실만 취합 보고. 다음 액션: 진입문서 → 스킬 → 파이프라인 README/RUNBOOK 순으로 정합 패치하면 정리 효율이 높음.
