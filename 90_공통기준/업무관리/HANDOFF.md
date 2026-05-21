@@ -4,6 +4,12 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — **Codex** [A] **어제 영상 분석 자료 재정리 완료**. 어제 분석한 YouTube 영상은 xCFbMXk5ul4 기준으로 재확인했고, 원본은 90_공통기준/스킬/youtube-analysis/cache/xCFbMXk5ul4/{manifest.json, transcript.txt}에 남아 있음을 확인했다. 사람이 바로 보기 좋은 요약본은 99_임시수집/2026-05-21_영상분석_정리.md로 신규 정리했다. 핵심 결론은 Claude Code=판단/브레인, Codex=실행/손발 하이브리드 운영이며, 자막 693세그먼트·transcript_only·프레임 0장·Drive OAuth invalid_grant 보류·Notion 페이지 367fee67 upsert 이력까지 함께 정리해 두었다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **영상분석 기반 하이브리드 운영 보완 완료**. TASKS `[작업중] owner=...` 잠금 줄을 `daily_doc_check.py` 진행중 카운트에 포함했고, Claude→Codex 표준 작업지시 템플릿 `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`를 신설한 뒤 AGENTS.md에 연결했다. 세션166의 정산 #2 후속 액션은 `A+B+C-D+E` 반영 확인 완료로 정리했다. 검증: `python -m py_compile daily_doc_check.py` PASS, `python daily_doc_check.py --json` PASS(in_progress=1). Drive OAuth 재인증은 사용자 브라우저 인증이 필요한 별도 작업이라 이번 로컬 보완 범위에서는 보류했다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **영상기준 추가 보완 3종 적용 완료**. 영상에서 남은 보완점 3개를 운영 체크리스트로 분리했다: 브라우저 수집 기준 `CODEX_브라우저수집_체크리스트.md`, PDF/이미지/HTML 검증 기준 `CODEX_시각산출물_검증체크리스트.md`, 중요 변경 리뷰 기준 `CODEX_리뷰루틴.md`. `CODEX_작업지시_템플릿.md`에는 작업 유형별 추가 문서와 검증 항목을 연결했고, AGENTS.md에도 3개 기준 적용 문구를 추가했다. 검증: `daily_doc_check.py --json` PASS, 문서 링크 검색 PASS.
+
 최종 업데이트: 2026-05-21 KST — **Codex** [C2+] **정산 도메인 정리 후속 실행**. 사용자 결정대로 현 본체는 유지하고 `monthly-pnl-rollup/run.py --month 04`로 `정산_수식버전_04월.xlsx`의 90·91만 재생성했다. 결과는 본체 19시트 복구, KPI `A=232,328,088 / B=-6,568,418 / C=7,837,722 / D=0 / E=7,462,150 / 최종=241,059,542`, step1 캐시는 `05월/_cache`를 `_local_backup/_cache.20260521_182439/`로 옮긴 뒤 V2 기준정보 경로로 다시 생성했다. 문서는 ENTRY 진입, 관련 스킬 보강, 운영문서 4종의 본체/step7/step8 역할 정리, line-mapping-validator audit log 반영, step5·step6·MANUAL 레거시 야간규칙 deprecated 주석 추가까지 마쳤다. 제약 2건: `C:\Users\User\.claude\plans\eager-painting-snail.md`는 권한 거부로 갱신 못 했고, `.git` ACL 쓰기 거부로 commit / git mv 불가했다.
 
 최종 업데이트: 2026-05-21 KST — **Codex** [C] **Windows UTF-8 영구 인코딩 설정 적용**. 사용자 홈 PowerShell Profile(`C:/Users/User/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`)에 UTF-8 기본 블록을 BOM-less로 추가/정규화했고, 사용자 환경변수 `PYTHONUTF8=1`, `PYTHONIOENCODING=UTF-8` 및 Git 전역 설정 `core.quotepath=false`, `i18n.commitencoding=utf-8`, `i18n.logoutputencoding=utf-8`, `core.precomposeunicode=true` 적용. 저장소 변경은 이력용 `TASKS.md`/`HANDOFF.md`만 commit 대상.
@@ -40,7 +46,7 @@
 - **본 세션 HANDOFF/TASKS 갱신을 미루다가 `/현재상태`가 outdated** → 본 단락이 그 정정
 
 ### 다음 세션 액션
-- **정산 #2 산식 정정**: `monthly-pnl-rollup/SKILL.md` 산식 `A+B+C-D` → `A+B+C-D+E (BI 차이청구)` 적용 — Codex 위임
+- **정산 #2 산식 정정**: `monthly-pnl-rollup/SKILL.md` 기준 `A+B+C-D+E (BI 차이청구)` 반영 확인 완료
 - **Codex Plugin 시범**: 사용자 Claude Code 재시작 후 `/codex:setup` + `/codex:review 792ba38a` (정산 commit 교차 검토)
 - **Drive OAuth 재인증**: youtube-analysis upload_to_drive.py xCFbMXk5ul4 재시도
 - SD9A01 OUTER 잠금 유지 / Phase 6 순서 비교 알고리즘 별도 분리

@@ -5,7 +5,7 @@ daily_doc_check.py — TASKS/STATUS/HANDOFF 정합성 자동 판정
 SKILL.md(daily-doc-check)에서 호출.
 
 판정 기준 (SKILL.md와 동일):
-1. TASKS 진행중 항목 > 1: FAIL
+1. TASKS 진행중 항목 > 1: FAIL (`[작업중] owner=...` 잠금 포함)
 2. STATUS 세션 < TASKS 세션 (1세션 이상 drift): FAIL
 3. HANDOFF에 `## [완료/진행/...]` 또는 `^상태:`/`^판정:` 독립 선언: FAIL
 
@@ -37,6 +37,7 @@ SLACK_NOTIFY = REPO_ROOT / "90_공통기준" / "업무관리" / "slack_notify.py
 SESSION_RE = re.compile(r"세션(\d+)")
 IN_PROGRESS_HEADER_RE = re.compile(r"^### \[진행중?\]", re.MULTILINE)
 IN_PROGRESS_CHECKBOX_RE = re.compile(r"^- \[ \]", re.MULTILINE)
+CODEX_IN_PROGRESS_RE = re.compile(r"^- \[작업중\]\s+owner=", re.MULTILINE)
 HANDOFF_FORBIDDEN_HEADER_RE = re.compile(r"^## \[(완료|진행|보류|차단)\]", re.MULTILINE)
 HANDOFF_FORBIDDEN_STATUS_RE = re.compile(r"^(상태|판정)[:：]", re.MULTILINE)
 
@@ -51,15 +52,16 @@ def extract_session(path: Path) -> int | None:
 
 
 def count_in_progress(path: Path) -> int:
-    """TASKS.md에서 [진행중] 헤더 + 체크박스 미완료 라인 합계."""
+    """TASKS.md에서 [진행중] 헤더 + Codex 작업잠금 + 미완료 체크박스 합계."""
     if not path.exists():
         return 0
     txt = path.read_text(encoding="utf-8")
     # 헤더 안내문(L4) 제외 — `완료/미완료/진행중/차단` 같은 메타 설명
     txt = re.sub(r"^> .*$", "", txt, flags=re.MULTILINE)
     headers = len(IN_PROGRESS_HEADER_RE.findall(txt))
+    codex_locks = len(CODEX_IN_PROGRESS_RE.findall(txt))
     checkboxes = len(IN_PROGRESS_CHECKBOX_RE.findall(txt))
-    return headers + checkboxes
+    return headers + codex_locks + checkboxes
 
 
 def detect_handoff_forbidden(path: Path) -> list[str]:
