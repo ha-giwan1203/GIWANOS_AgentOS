@@ -9,11 +9,12 @@ grade: B
 
 > 8단계 파이프라인 / 비즈니스 규칙 / 실패조건은 [MANUAL.md](MANUAL.md). 용어는 ../GLOSSARY.json.
 > 도메인 규칙: `05_생산실적/조립비정산/CLAUDE.md`
+> 본체 파일: `정산_수식버전_MM월.xlsx` 본체 (`정산결과_MM월.xlsx` 는 산출용 임시본·교차대조)
 
 ## 절차 (요약)
 1. 환경 세팅: `python setup_month.py {MM}` (월별 폴더 + 실적 복사 + config 갱신)
 2. 파이프라인 실행: `python run_settlement_pipeline.py` (Step1~8)
-3. step6 검증 PASS 확인 → 정산결과/오류리스트 엑셀 산출
+3. step6 검증 PASS 확인 → `정산_수식버전_MM월.xlsx` 본체 확인 + `정산결과_MM월.xlsx` / 오류리스트 엑셀 산출
 
 ## 8단계 파이프라인
 | Step | 기능 |

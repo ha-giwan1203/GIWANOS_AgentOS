@@ -236,8 +236,9 @@ python run_settlement_pipeline.py
 python run_settlement_pipeline.py --start-from 5 --use-cache  # 재시작
 
 # 3. 산출물 확인
-#   {월별폴더}/정산결과_MM월.xlsx   — 정산 보고서 (13개 시트)
-#   {월별폴더}/오류리스트_MM월.xlsx — DB 양식 오류 리스트
+#   {월별폴더}/정산_수식버전_MM월.xlsx — 본체 (정산결과_MM월.xlsx 는 산출용 임시본·교차대조)
+#   {월별폴더}/정산결과_MM월.xlsx     — 산출용 임시본·교차대조 결과
+#   {월별폴더}/오류리스트_MM월.xlsx   — DB 양식 오류 리스트
 ```
 
 ### 파이프라인 8단계
@@ -291,7 +292,7 @@ python run_settlement_pipeline.py --start-from 5 --use-cache  # 재시작
 |------|-----|------|
 | 업체코드 | 0109 | 대원테크 |
 | 라인 수 | 10개 | SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03 |
-| 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx` | 단가 권위값 |
+| 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx` (legacy, 운영 기준 V2) | 단가 권위값 |
 | 파이프라인 진입점 | `03_정산자동화/run_settlement_pipeline.py` | step1~8 순차 실행 |
 | 환경 세팅 | `03_정산자동화/setup_month.py` | 월 전환 자동화 |
 | 대시보드 출력 | `_cache/월간_조립비_대시보드.png` | step7 시각화 |

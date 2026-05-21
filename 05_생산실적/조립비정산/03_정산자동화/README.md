@@ -50,7 +50,7 @@ PYTHONUTF8=1 python run_settlement_pipeline.py --use-cache --month MM
 ```
 C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\
   01_기준정보\
-    기준정보_라인별정리_최종_V1_20260316.xlsx   ← MASTER_FILE
+    기준정보_라인별정리_최종_V1_20260316.xlsx (legacy, 운영 기준 V2)   ← MASTER_FILE
   04_실적데이터\
     GERP_실적현황_20260311.xlsx                ← GERP_FILE
     구ERP_실적현황_20260311.xlsx               ← OLDERP_FILE
@@ -60,7 +60,7 @@ C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\
 
 | 파일 | config 변수 | 필수 내용 |
 |------|------------|-----------|
-| 기준정보_라인별정리_최종_V1_*.xlsx | `MASTER_FILE` | 10개 라인 시트, 품번·단가·Usage 컬럼 |
+| 기준정보_라인별정리_최종_V1_*.xlsx (legacy, 운영 기준 V2) | `MASTER_FILE` | 10개 라인 시트, 품번·단가·Usage 컬럼 |
 | GERP_실적현황_*.xlsx | `GERP_FILE` | 23열 이상, 주야구분(정상/추가), 업체코드 0109 행 포함 |
 | 구ERP_실적현황_*.xlsx | `OLDERP_FILE` | Sheet1, 14열 이상, LOTNO 끝자리 A/B/C/S |
 
