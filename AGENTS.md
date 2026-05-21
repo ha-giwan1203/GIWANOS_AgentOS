@@ -31,6 +31,8 @@
 - 단순 명세 후 대량 변환·반복 처리
 - **정산·라인배치·MES·D0 등 도메인 패치도 Codex가 실행** (단, 무엇을·어떻게 바꿀지는 Claude가 사전 설계해서 지시문으로 전달함)
 - CLAUDE.md/hook/skill 코드 수정도 Codex가 실행 (Claude 설계 → Codex 적용)
+- 작업 완료 직후 TASKS.md / HANDOFF.md / STATUS.md 갱신 (Claude 수동 금지 — 너의 실행 영역)
+- git commit·push (Claude가 git diff 검증·승인한 직후 너가 실행)
 
 ### Claude 담당 — 설계·검증 (실행은 안 함)
 - 무엇을·어떻게 바꿀지 사전 설계
@@ -45,9 +47,9 @@
 ### 공유 문서
 | 파일 | 역할 | 누가 갱신 |
 |------|------|-----------|
-| `90_공통기준/업무관리/TASKS.md` | **워크보드 = 작업 상태 유일 원본**. 작업 시작 시 owner + in_progress 기재 | Claude·Codex 양쪽 |
-| `90_공통기준/업무관리/HANDOFF.md` | **Handoff Log = 세션 메모**. 완료 직후 1단락 추가 | 작업 수행한 쪽 |
-| `90_공통기준/업무관리/STATUS.md` | 도메인 상태 | Claude 주관 |
+| `90_공통기준/업무관리/TASKS.md` | **워크보드 = 작업 상태 유일 원본**. 작업 시작 시 owner + in_progress 기재 | Codex(작업 수행한 쪽) |
+| `90_공통기준/업무관리/HANDOFF.md` | **Handoff Log = 세션 메모**. 완료 직후 1단락 추가 | Codex(작업 수행한 쪽) |
+| `90_공통기준/업무관리/STATUS.md` | 도메인 상태 | Codex(작업 수행한 쪽) |
 | `AGENTS.md`(this) | Codex 지침 | Claude 주관 |
 | `CLAUDE.md` | Claude 지침 | Claude 주관 |
 
