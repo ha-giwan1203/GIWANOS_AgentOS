@@ -1,12 +1,12 @@
 {
   "step": 1,
-  "timestamp": "2026-05-06T11:24:12.419817",
+  "timestamp": "2026-05-21T18:25:18.868898",
   "status": "OK",
   "checks": [
     {
       "name": "기준정보 파일 존재",
       "status": "PASS",
-      "detail": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V1_20260316.xlsx"
+      "detail": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V2_20260506.xlsx"
     },
     {
       "name": "GERP 파일 존재",
@@ -26,42 +26,42 @@
     {
       "name": "  기준정보 [SD9A01] 데이터행",
       "status": "PASS",
-      "detail": "619행"
+      "detail": "617행"
     },
     {
       "name": "  기준정보 [SP3M3] 데이터행",
       "status": "PASS",
-      "detail": "1380행"
+      "detail": "1494행"
     },
     {
       "name": "  기준정보 [WAMAS01] 데이터행",
       "status": "PASS",
-      "detail": "10372행"
+      "detail": "10403행"
     },
     {
       "name": "  기준정보 [WABAS01] 데이터행",
       "status": "PASS",
-      "detail": "1337행"
+      "detail": "1363행"
     },
     {
       "name": "  기준정보 [ANAAS04] 데이터행",
       "status": "PASS",
-      "detail": "669행"
+      "detail": "672행"
     },
     {
       "name": "  기준정보 [DRAAS11] 데이터행",
       "status": "PASS",
-      "detail": "392행"
+      "detail": "394행"
     },
     {
       "name": "  기준정보 [WASAS01] 데이터행",
       "status": "PASS",
-      "detail": "247행"
+      "detail": "248행"
     },
     {
       "name": "  기준정보 [HCAMS02] 데이터행",
       "status": "PASS",
-      "detail": "1262행"
+      "detail": "1334행"
     },
     {
       "name": "  기준정보 [HASMS02] 데이터행",
@@ -71,22 +71,22 @@
     {
       "name": "  기준정보 [ISAMS03] 데이터행",
       "status": "PASS",
-      "detail": "209행"
+      "detail": "198행"
     },
     {
       "name": "GERP 시트 열기",
       "status": "PASS",
-      "detail": "21열"
+      "detail": "23열"
     },
     {
       "name": "GERP 컬럼수 최소 21개",
       "status": "PASS",
-      "detail": "실제 21열"
+      "detail": "실제 23열"
     },
     {
       "name": "GERP 데이터행 1건 이상",
       "status": "PASS",
-      "detail": "11,548행"
+      "detail": "11,584행"
     },
     {
       "name": "GERP 주야구분 값 (정상/추가 포함)",
@@ -96,7 +96,7 @@
     {
       "name": "GERP 대원테크(0109) 데이터 존재",
       "status": "PASS",
-      "detail": "3,115행"
+      "detail": "2,954행"
     },
     {
       "name": "구ERP 'Sheet1' 시트 존재",
@@ -125,7 +125,7 @@
     }
   ],
   "files": {
-    "master": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V1_20260316.xlsx",
+    "master": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V2_20260506.xlsx",
     "gerp": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\05월\\실적데이터\\G-ERP 4월실적.xlsx",
     "olderp": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\05월\\실적데이터\\구ERP 4월실적.xlsx"
   }

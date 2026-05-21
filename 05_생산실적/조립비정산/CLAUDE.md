@@ -206,16 +206,12 @@ SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, IS
 ## 관련 스킬
 - assembly-cost-settlement: 정산 자동화 (`/settlement MM`으로 실행)
 - gerp-unregistered-check: 매월 GERP 미등록 품번 + 라벨 정확성 검증 + ERP 정정 가이드 (`python 90_공통기준/스킬/gerp-unregistered-check/run_check.py {MM}`)
+- monthly-pnl-rollup: 본체 `정산_수식버전_MM월.xlsx`에 90·91 손익 시트 재생성
+- assy-registration-check: 월 시작 전 기준정보 품번 ERP 등록 여부 점검
+- line-stoppage: 라인정지 raw 취합 + 월정산 반영용 요약 생성
+- sub-part-classify: SUB 계열 품번 분류 보조
 
-## 관련 에이전트 (도메인 지식 vs 실물 검증)
-
-| 에이전트 | 역할 | 호출 조건 |
-|---------|------|---------|
-| `settlement-domain-expert` | 도메인 지식 질의 (NotebookLM 조립비정산_대원테크) | 규칙·공식·Known Exception·파이프라인 계약·용어 질문 |
-| `settlement-validator` | 실물 데이터 검증 (정산결과 xlsx 대조) | `run_settlement_pipeline.py` 실행 후 결과 검증, `/settlement-validate` |
-
-- 역할 분리 원칙 (세션55 영상분석 패턴): **에이전트=도메인 지식, 스킬=실행 레시피**
-- NotebookLM 응답은 저장소 원본이 권위. 불일치 시 저장소 우선
+- NotebookLM/옛 에이전트 경로는 deprecated. 규칙·용어·실행 기준은 저장소 원본 문서와 스킬을 우선한다.
 
 ## 월별 정산 실행 절차
 
@@ -292,7 +288,7 @@ python run_settlement_pipeline.py --start-from 5 --use-cache  # 재시작
 |------|-----|------|
 | 업체코드 | 0109 | 대원테크 |
 | 라인 수 | 10개 | SD9A01, SP3M3, ANAAS04, DRAAS11, HASMS02, HCAMS02, WAMAS01, WABAS01, WASAS01, ISAMS03 |
-| 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx` (legacy, 운영 기준 V2) | 단가 권위값 |
+| 기준정보 파일 | `01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx` (`_pipeline_config.py` 단일 출처) | 단가 권위값 |
 | 파이프라인 진입점 | `03_정산자동화/run_settlement_pipeline.py` | step1~8 순차 실행 |
 | 환경 세팅 | `03_정산자동화/setup_month.py` | 월 전환 자동화 |
 | 대시보드 출력 | `_cache/월간_조립비_대시보드.png` | step7 시각화 |

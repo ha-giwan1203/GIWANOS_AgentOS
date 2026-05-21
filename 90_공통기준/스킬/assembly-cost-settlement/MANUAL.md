@@ -8,7 +8,7 @@
 ## 기본 설정
 - 대상 업체: 대원테크 (0109)
 - 10개 라인: SD9A01, SP3M3, WAMAS01, WABAS01, ANAAS04, DRAAS11, WASAS01, HCAMS02, HASMS02, ISAMS03
-- 기준정보: `01_기준정보/기준정보_라인별정리_최종_V1_20260316.xlsx`
+- 기준정보: `01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx` (`_pipeline_config.py` 단일 출처)
 - 파이프라인: `03_정산자동화/run_settlement_pipeline.py`
 - 슬래시: `/settlement MM` (예: `/settlement 03`)
 
@@ -56,6 +56,7 @@ python run_settlement_pipeline.py --start-from 5 --use-cache
 ## 핵심 비즈니스 규칙
 
 ### 야간 계산 (구ERP 방식 통일)
+> deprecated 참고: 아래 1.3/170원 설명은 옛 step5/step6 레거시 규칙 기록이다. 현재 운영 권위는 `05_생산실적/조립비정산/CLAUDE.md`와 `03_정산자동화/build_formula_version.py`를 따른다.
 - SD9A01: 야간금액 = 야간수량 × 기준단가 × 1.3
 - SP3M3: 야간금액 = 야간수량 × 170원 (고정)
 - SUB 라인: 야간 없음

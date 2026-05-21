@@ -1,5 +1,16 @@
 # 조립비 정산 진행 현황 (2026-05-18 빌더 오류유형 1차 통합 정리)
 
+## 2026-05-21 — 04월 본체 90·91 재생성 + 05월 _cache 초기화
+
+- `monthly-pnl-rollup/run.py --month 04` 실행으로 `05월/정산_수식버전_04월.xlsx`에 `90_월정산_요약`, `91_정산상세` 재생성 완료
+- 본체 시트 수: 19개 복구
+- run.py 출력 기준 KPI: `A=232,328,088 / B=-6,568,418 / C=7,837,722 / D=0 / E=7,462,150 / 최종=241,059,542`
+- 백업본 `.20260519_regression.bak.xlsx`는 권위본이 아니라 표본 대조용으로만 유지
+- `05월/_cache/`는 `_local_backup/_cache.20260521_182439/`로 이동 후 step1만 재생성
+- 재생성 `05월/_cache/step1_validation.json` 기준정보 경로 확인: `기준정보_라인별정리_최종_V2_20260506.xlsx`
+- `05월/5월/라인정지_04월_요약.md`는 `05월/라인정지_04월_요약.md`로 상위 이동 완료
+- S8 게이트 결과: 옛 야간가산 규칙 호출 흔적이 step5/step6 및 관련 문서에 남아 있어 파일 이동은 보류, deprecated 주석만 추가
+
 ## 2026-05-18 — 빌더 오류유형 1차 통합 사전 (캡처 매트릭스 + 데이터 차이 8유형 합침)
 
 ### 배경
@@ -389,15 +400,15 @@ E. BI 차이 청구 (170원 고정)    =  +9,414,430원
 | 노트북 URL | https://notebooklm.google.com/notebook/dfb82a61-81b4-4e2d-8ed0-a70a5c7d0b9c |
 | 노트북명 | 조립비정산_대원테크 |
 | 소스 파일 | [notebooklm_source_조립비정산_v1.txt](06_스킬문서/notebooklm_source_조립비정산_v1.txt) — 9개 .md 병합본 (2,164줄) |
-| 질의 에이전트 | `settlement-domain-expert` ([.claude/agents/settlement-domain-expert.md](../../.claude/agents/settlement-domain-expert.md)) |
+| 질의 경로 | `05_생산실적/조립비정산/ENTRY.md` → `CLAUDE.md` → 관련 스킬 문서 |
 | 권위 서열 | 저장소 원본 > NotebookLM 응답 (불일치 시 저장소 우선) |
 | 파일럿 정확성 | 세션56 도메인 테스트 3건 PASS (야간계산식·SP3M3 주간수량·Known Exception 7건) |
-| 역할 분리 | settlement-validator=실물검증(xlsx 대조) / settlement-domain-expert=도메인지식(NotebookLM 질의) |
+| 역할 분리 | 저장소 문서·스킬=권위 / NotebookLM=보조 참고 |
 
 ### 재접속 절차
 1. 세션 재시작 후 `mcp__notebooklm-mcp__get_health` → `authenticated=true` 확인
 2. 만료 시 `setup_auth` 재실행 (최초 127초)
-3. 사용: `Agent(subagent_type="settlement-domain-expert", prompt="{도메인 질문}")`
+3. 사용: 저장소 원본 문서와 관련 스킬을 먼저 열고, NotebookLM은 보조 참고로만 사용
 
 ### Known Issue: MCP 좀비 Chrome (세션57 확인 · 2026-04-17)
 **증상**: `ask_question` 호출 즉시 실패 — `browserType.launchPersistentContext: Target page, context or browser has been closed` / `exitCode=21`. `get_health`는 `authenticated=true` 반환하나 실제 질의 불가.

@@ -3,6 +3,7 @@
 > 기준: 2026-03-24 실행 결과 (02월 정산)
 > 경로: `C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\03_정산자동화\`
 > Python: `C:\Users\User\AppData\Local\Programs\Python\Python312\python.exe`
+> 이 파이프라인은 검증·교차대조 보조용이다. 운영 본체는 `05_생산실적/조립비정산/{MM+1}월/정산_수식버전_MM월.xlsx`이며, `정산결과_MM월.xlsx`는 step7 보조 산출본이다.
 
 ---
 
@@ -38,7 +39,7 @@ PYTHONUTF8=1 python run_settlement_pipeline.py --use-cache --month MM
 | 옵션 | 설명 | 기본값 |
 |------|------|--------|
 | `--month MM` | 대상 월 (두 자리) | config 기본값 (MONTH 변수) |
-| `--start-from N` | Step N부터 시작 (1~7) | 1 |
+| `--start-from N` | Step N부터 시작 (1~8) | 1 |
 | `--use-cache` | 출력 JSON이 있는 Step은 SKIP | False |
 
 ---
@@ -50,7 +51,7 @@ PYTHONUTF8=1 python run_settlement_pipeline.py --use-cache --month MM
 ```
 C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\
   01_기준정보\
-    기준정보_라인별정리_최종_V1_20260316.xlsx (legacy, 운영 기준 V2)   ← MASTER_FILE
+    기준정보_라인별정리_최종_V2_20260506.xlsx (`_pipeline_config.py` 단일 출처)   ← MASTER_FILE
   04_실적데이터\
     GERP_실적현황_20260311.xlsx                ← GERP_FILE
     구ERP_실적현황_20260311.xlsx               ← OLDERP_FILE
@@ -60,7 +61,7 @@ C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\
 
 | 파일 | config 변수 | 필수 내용 |
 |------|------------|-----------|
-| 기준정보_라인별정리_최종_V1_*.xlsx (legacy, 운영 기준 V2) | `MASTER_FILE` | 10개 라인 시트, 품번·단가·Usage 컬럼 |
+| 기준정보_라인별정리_최종_V2_*.xlsx (`_pipeline_config.py` 단일 출처) | `MASTER_FILE` | 10개 라인 시트, 품번·단가·Usage 컬럼 |
 | GERP_실적현황_*.xlsx | `GERP_FILE` | 23열 이상, 주야구분(정상/추가), 업체코드 0109 행 포함 |
 | 구ERP_실적현황_*.xlsx | `OLDERP_FILE` | Sheet1, 14열 이상, LOTNO 끝자리 A/B/C/S |
 
@@ -80,12 +81,16 @@ C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\
 
 ## 3. 출력 파일
 
-### 정산결과 Excel
+### 운영 본체 + step7 보조 산출본
 
 ```
-C:\Users\User\Desktop\업무리스트\
-  정산결과_MM월.xlsx
+C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\{MM+1}월\
+  정산_수식버전_MM월.xlsx    ← 운영 본체
+  정산결과_MM월.xlsx         ← step7 보조 산출본·교차대조용
 ```
+
+### step8 오류리스트 보조 산출
+- `python run_settlement_pipeline.py --start-from 8 --use-cache --month MM`
 
 **시트 구성 (총 13개):**
 

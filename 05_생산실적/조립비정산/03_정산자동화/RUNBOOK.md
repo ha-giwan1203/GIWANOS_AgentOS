@@ -2,6 +2,7 @@
 
 > 기준: 2026-03-24 실행 결과 (02월 정산)
 > 경로: `C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산\03_정산자동화\`
+> 이 파이프라인은 검증·교차대조 보조용이다. 운영 본체는 `정산_수식버전_MM월.xlsx`이며, `정산결과_MM월.xlsx`는 step7 보조 산출본이다.
 
 ---
 
@@ -16,6 +17,7 @@
 | 5 | step5_정산계산.py | step4 캐시 손상, Usage=2 품번 수량 홀수 | 계산 오류 |
 | 6 | step6_검증.py | FAIL 항목 발생 (PASS 조건 미충족) | `최종 판정: FAIL` |
 | 7 | step7_보고서.py | OUTPUT_FILE 경로 잠김 (Excel 열려 있음), openpyxl 오류 | 파일 저장 실패 |
+| 8 | step8_오류리스트.py | step7 산출본 없음, 오류리스트 시트/요약 시트 생성 실패 | 오류리스트 보조 산출 누락 |
 
 ---
 
@@ -59,6 +61,7 @@ cat run_logs/$(ls run_logs/*_summary.json | tail -1) | python -c "import sys,jso
 | Step 5 | `--start-from 5 --use-cache` |
 | Step 6 | `--start-from 6 --use-cache` (step5 캐시 유효 시) |
 | Step 7 | `--start-from 7 --use-cache` (Excel 닫은 후) |
+| Step 8 | `--start-from 8 --use-cache` (step7/본체 준비 후) |
 
 **원칙:**
 - Step 1~4는 입력 데이터 또는 기준정보가 변경되면 **해당 Step부터 전부 재실행** 필요

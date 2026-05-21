@@ -218,3 +218,4 @@ config/private/
 03_품번관리/초물관리/_output/
 03_품번관리/초물관리/_backup/
 .claude/state/gpt_tab_id
+**/_local_backup/

@@ -1,4 +1,0 @@
-usage: run_check.py [-h] [--applied APPLIED] [--master MASTER] [--use-cache]
-                    [--limit LIMIT]
-                    LINE
-run_check.py: error: unrecognized arguments: SP3 메인 CAPA점검\SP3M3\생산지시서\2026년 생산지시\05월\SP3M3_생산지시서_(26.05.11).xlsm

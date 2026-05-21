@@ -7,7 +7,7 @@ Step 5 — 정산 계산
 계산 규칙 (GERP 단가 기준 — 2026-04-05 변경):
   - 정산금액 = GERP 원본금액 직접 사용 (기준단가 재계산 아님)
   - 주간: GERP 원본 주간금액, 야간: GERP 원본 야간금액
-  - SD9A01 단가기준판정: 단가 ≤ 500 → 야간가산, > 500 → 기본 (표시용)
+  - [deprecated legacy] SD9A01 단가기준판정: 단가 ≤ 500 → 야간가산, > 500 → 기본 (표시용 잔존)
   - Usage=2 품번: 수량 2배 환산
 
 실행: python step5_정산계산.py
@@ -79,6 +79,7 @@ def get_olderp_pv(lc):
 def calc_night_price_erp(lc, price, night_qty):
     """구ERP 야간 정산금액 계산 (구ERP에는 GERP 원본 없으므로 기존 방식 유지)
 
+    [deprecated legacy] S8 이동 게이트 미통과로 임시 보존:
     SP3M3: qty × 170원 고정단가
     SD9A01: qty × 단가 × 1.3 (기본100% + 가산30%)
     기타 야간 없는 라인: 0
@@ -93,7 +94,7 @@ def calc_night_price_erp(lc, price, night_qty):
 
 
 def sd9_price_judgment(lc, price, night_qty):
-    """SD9A01 단가기준판정 반환 (야간실적 없으면 None)"""
+    """[deprecated legacy] SD9A01 단가기준판정 반환 (야간실적 없으면 None)"""
     if lc != 'SD9A01':
         return None
     if night_qty == 0:

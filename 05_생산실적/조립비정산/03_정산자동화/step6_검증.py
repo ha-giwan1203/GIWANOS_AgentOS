@@ -6,10 +6,10 @@ Step 6 — 검증
 
 검증 항목:
   1. 라인합계 vs 00_정산집계 일치 여부 (엑셀 파일 생성 전: Step5 JSON 내부 일관성)
-  2. SD9A01 단가기준판정 규칙 (단가≤500→야간가산, >500→기본)
+  2. [deprecated legacy] SD9A01 단가기준판정 규칙 (단가≤500→야간가산, >500→기본)
   3. WABAS01 단가=0 품번 건수 및 실적 유무 (INFO)
   4. Usage=2 수량 2배 환산 적용 확인
-  5. SP3M3 야간 고정단가 170원 적용 확인 (KNOWN_EXCEPTIONS 매칭)
+  5. [deprecated legacy] SP3M3 야간 고정단가 170원 적용 확인 (KNOWN_EXCEPTIONS 매칭)
   6. 미매핑 품번 존재 여부 (INFO)
   7. 전체 합계 일관성 (라인합산 == grand 합계)
 
@@ -114,7 +114,7 @@ chk(1, "전체합계 일관성 (라인합산 == grand)",
     'PASS' if (gerp_ok and erp_ok) else 'FAIL',
     f"GERP: {calc_gerp:,} vs {grand_gerp:,}  구ERP: {calc_erp:,} vs {grand_erp:,}")
 
-# ── 항목 2: SD9A01 단가기준판정 ──────────────────────────────
+# ── 항목 2: SD9A01 단가기준판정 [deprecated legacy] ─────────────
 sd9_items = lines.get('SD9A01', {}).get('items', [])
 sd9_fail  = []
 for r in sd9_items:
@@ -127,7 +127,7 @@ for r in sd9_items:
         if r['price_judgment'] != expected:
             sd9_fail.append(f"{r['part_no']}(단가={r['price']},판정={r['price_judgment']},기대={expected})")
 
-chk(2, "SD9A01 단가기준판정 규칙 (단가≤500→야간가산, >500→기본)",
+chk(2, "[deprecated legacy] SD9A01 단가기준판정 규칙 (단가≤500→야간가산, >500→기본)",
     'PASS' if not sd9_fail else 'FAIL',
     f"오류: {sd9_fail[:5]}" if sd9_fail else "전체 정상")
 

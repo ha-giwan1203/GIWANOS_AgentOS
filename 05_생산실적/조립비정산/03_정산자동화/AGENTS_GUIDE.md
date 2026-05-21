@@ -2,6 +2,7 @@
 
 > 기준: 2026-03-24 실행 결과 기반 (02월 정산)
 > 경로: `03_정산자동화/`
+> 이 파이프라인은 검증·교차대조 보조용이다. 운영 본체는 `정산_수식버전_MM월.xlsx`이며, `정산결과_MM월.xlsx`는 step7 보조 산출본이다.
 
 ---
 
@@ -15,7 +16,8 @@
 | 4 | step4_기준정보매칭.py | 기준정보 단가 매칭 | ~7s |
 | 5 | step5_정산계산.py | 라인별 GERP/구ERP 정산 계산 | ~0.5s |
 | 6 | step6_검증.py | 합계 일관성 + 비즈니스 규칙 검증 | ~0.2s |
-| 7 | step7_보고서.py | 정산결과_MM월.xlsx 생성 | ~8s |
+| 7 | step7_보고서.py | 정산결과_MM월.xlsx 생성 (보조 산출본) | ~8s |
+| 8 | step8_오류리스트.py | 오류리스트/유형별요약 보조 산출 | ~2s |
 
 전체 소요: **약 25초**
 
@@ -67,7 +69,7 @@ PASS 판정: `overall == "PASS"` AND `fail == 0`
 
 ### 2-4. report-writer (Step 7 완료 후)
 
-> 대상 파일: `정산결과_MM월.xlsx`
+> 대상 파일: `정산결과_MM월.xlsx` (step7 보조 산출본)
 
 | 항목 | PASS 조건 | 참고값 (02월) |
 |------|-----------|--------------|
@@ -88,6 +90,9 @@ PYTHONUTF8=1 python run_settlement_pipeline.py --start-from 5 --month 02
 
 # 캐시 활용 (이미 처리된 Step 건너뜀)
 PYTHONUTF8=1 python run_settlement_pipeline.py --use-cache --month 02
+
+# step8 오류리스트 보조 산출만 다시 만들기
+PYTHONUTF8=1 python run_settlement_pipeline.py --start-from 8 --use-cache --month 02
 ```
 
 > Windows cmd 환경: `set PYTHONUTF8=1` 후 실행 시 콘솔 출력 깨짐 발생 가능.
