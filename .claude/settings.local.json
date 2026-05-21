@@ -1,38 +1,42 @@
 {
-    "permissions": {
-        "allow": [
-            "PowerShell(*)",
-            "Bash(cmd*:*)",
-            "Bash(taskkill:*)",
-            "Bash(schtasks:*)",
-            "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
-            "Read(//c/Users/User/.claude/scheduled-tasks//**)",
-            "Read(//c/Users/User/.claude/scheduled-tasks/daily-doc-check//**)",
-            "Bash(bash .claude/hooks/list_active_hooks.sh --full)",
-            "Bash(python .claude/hooks/incident_review.py --days 7 --threshold 3)",
-            "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('hooks events:', list\\(d.get\\('hooks',{}\\).keys\\(\\)\\)\\); [print\\(' ',e,len\\(d['hooks'][e]\\),'matchers'\\) for e in d.get\\('hooks',{}\\)]\")",
-            "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('hooks_present:', 'hooks' in d\\); print\\('permissions allow count:', len\\(d.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('deny count:', len\\(d.get\\('permissions',{}\\).get\\('deny',[]\\)\\)\\)\")",
-            "Bash(bash .claude/hooks/smoke_fast.sh)",
-            "Bash(bash .claude/hooks/gate_boundary_check.sh)",
-            "Bash(curl -s -m 3 http://127.0.0.1:9222/json/version)",
-            "Bash(curl -sv -m 3 http://127.0.0.1:9222/json/version)",
-            "Bash(python \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
-            "Bash(ls C:/Users/User/.claude/scheduled-tasks/ 2>&1)",
-            "Bash(find C:/Users/User/.claude -maxdepth 5 -name \"self-audit*\" 2>&1 | grep -v worktree | head -20)",
-            "mcp__8d2abc6d-9827-4a8a-91b9-99dce8a2ee5d__slack_send_message",
-            "Bash(awk 'NR==13 {print \"line13 chars:\", length\\($0\\)}' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")",
-            "Bash(awk 'NR==13' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")",
-            "PowerShell(adb shell input tap*:*)",
-            "PowerShell(adb shell input keyevent*:*)",
-            "PowerShell(*adb*shell input*:*)",
-            "PowerShell(*adb*screencap*:*)",
-            "PowerShell(*adb*pull*:*)"
-        ],
-        "ask": [],
-        "additionalDirectories": [
-            "C:/Users/User/Desktop",
-            "C:/Users/User/Downloads",
-            "C:/Users/User/Documents"
-        ]
-    }
+  "permissions": {
+    "allow": [
+      "PowerShell(*)",
+      "Bash(cmd*:*)",
+      "Bash(taskkill:*)",
+      "Bash(schtasks:*)",
+      "Bash(python3 \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
+      "Read(//c/Users/User/.claude/scheduled-tasks//**)",
+      "Read(//c/Users/User/.claude/scheduled-tasks/daily-doc-check//**)",
+      "Bash(bash .claude/hooks/list_active_hooks.sh --full)",
+      "Bash(python .claude/hooks/incident_review.py --days 7 --threshold 3)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('hooks events:', list\\(d.get\\('hooks',{}\\).keys\\(\\)\\)\\); [print\\(' ',e,len\\(d['hooks'][e]\\),'matchers'\\) for e in d.get\\('hooks',{}\\)]\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('hooks_present:', 'hooks' in d\\); print\\('permissions allow count:', len\\(d.get\\('permissions',{}\\).get\\('allow',[]\\)\\)\\); print\\('deny count:', len\\(d.get\\('permissions',{}\\).get\\('deny',[]\\)\\)\\)\")",
+      "Bash(bash .claude/hooks/smoke_fast.sh)",
+      "Bash(bash .claude/hooks/gate_boundary_check.sh)",
+      "Bash(curl -s -m 3 http://127.0.0.1:9222/json/version)",
+      "Bash(curl -sv -m 3 http://127.0.0.1:9222/json/version)",
+      "Bash(python \"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/daily-routine/run.py\")",
+      "Bash(ls C:/Users/User/.claude/scheduled-tasks/ 2>&1)",
+      "Bash(find C:/Users/User/.claude -maxdepth 5 -name \"self-audit*\" 2>&1 | grep -v worktree | head -20)",
+      "mcp__8d2abc6d-9827-4a8a-91b9-99dce8a2ee5d__slack_send_message",
+      "Bash(awk 'NR==13 {print \"line13 chars:\", length\\($0\\)}' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")",
+      "Bash(awk 'NR==13' \"/c/Users/User/Desktop/업무리스트/90_공통기준/업무관리/TASKS.md\")",
+      "PowerShell(adb shell input tap*:*)",
+      "PowerShell(adb shell input keyevent*:*)",
+      "PowerShell(*adb*shell input*:*)",
+      "PowerShell(*adb*screencap*:*)",
+      "PowerShell(*adb*pull*:*)",
+      "Bash(\"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/d0-production-plan/run_morning.bat\")",
+      "Bash(python 90_공통기준/업무관리/daily_doc_check.py --slack)",
+      "Bash(git rev-list *)",
+      "Bash(python \"90_공통기준/업무관리/daily_doc_check.py\" --slack)"
+    ],
+    "ask": [],
+    "additionalDirectories": [
+      "C:/Users/User/Desktop",
+      "C:/Users/User/Downloads",
+      "C:/Users/User/Documents"
+    ]
+  }
 }

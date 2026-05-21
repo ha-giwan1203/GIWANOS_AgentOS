@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-21 KST — **Codex** [C2+] **정산 도메인 정리 후속 실행**. 사용자 결정대로 현 본체는 유지하고 `monthly-pnl-rollup/run.py --month 04`로 `정산_수식버전_04월.xlsx`의 90·91만 재생성했다. 결과는 본체 19시트 복구, KPI `A=232,328,088 / B=-6,568,418 / C=7,837,722 / D=0 / E=7,462,150 / 최종=241,059,542`, step1 캐시는 `05월/_cache`를 `_local_backup/_cache.20260521_182439/`로 옮긴 뒤 V2 기준정보 경로로 다시 생성했다. 문서는 ENTRY 진입, 관련 스킬 보강, 운영문서 4종의 본체/step7/step8 역할 정리, line-mapping-validator audit log 반영, step5·step6·MANUAL 레거시 야간규칙 deprecated 주석 추가까지 마쳤다. 제약 2건: `C:\Users\User\.claude\plans\eager-painting-snail.md`는 권한 거부로 갱신 못 했고, `.git` ACL 쓰기 거부로 commit / git mv 불가했다.
+
 최종 업데이트: 2026-05-21 KST — **Codex** [C] **Windows UTF-8 영구 인코딩 설정 적용**. 사용자 홈 PowerShell Profile(`C:/Users/User/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`)에 UTF-8 기본 블록을 BOM-less로 추가/정규화했고, 사용자 환경변수 `PYTHONUTF8=1`, `PYTHONIOENCODING=UTF-8` 및 Git 전역 설정 `core.quotepath=false`, `i18n.commitencoding=utf-8`, `i18n.logoutputencoding=utf-8`, `core.precomposeunicode=true` 적용. 저장소 변경은 이력용 `TASKS.md`/`HANDOFF.md`만 commit 대상.
 
 최종 업데이트: 2026-05-21 KST — **Codex** [C] **슬래시명령어 레퍼런스 Codex plugin 7건 추가**. `90_공통기준/업무관리/슬래시명령어_레퍼런스.xlsx`를 openpyxl `data_only=False`로 열어 시트 구조 확인 후 `플러그인스킬` 시트 11~17행에 `/codex:setup`, `/codex:review`, `/codex:adversarial-review`, `/codex:rescue`, `/codex:status`, `/codex:result`, `/codex:cancel` 추가. 설명 문구는 사용자 제공 원문 그대로 입력했고 Review Gate Stop hook 활성 상태 맥락은 비고 `openai/codex-plugin-cc v1.0.4`로 정리.
