@@ -9,8 +9,8 @@
 - 성공 기준:
 
 ## 2. 잠금 파일
-- TASKS.md에 먼저 추가할 줄:
-  - `[작업중] owner=Codex / <작업명> / 잠금 파일: <경로1>, <경로2>`
+- 작업 시작 명령:
+  - `python 90_공통기준/업무관리/doc_worklog.py start --task "<작업명>" --paths "<경로1>" "<경로2>"`
 - 수정 대상:
   - `<파일 또는 폴더>`
 - 건드리면 안 되는 파일:
@@ -52,11 +52,9 @@
   - 마지막 줄에 `[NEEDS_CLARIFICATION] <필요한 결정>`을 남긴다.
 
 ## 6. 완료 처리
-- TASKS.md:
-  - `[완료] owner=Codex / <작업명> / 잠금 해제: <경로1>, <경로2>`
-- HANDOFF.md:
-  - 완료 내용, 검증 결과, 남은 예외를 1단락으로 기록
-- STATUS.md:
-  - 전체 운영 상태에 영향이 있으면 최종 업데이트만 갱신
+- 문서 갱신 명령:
+  - `python 90_공통기준/업무관리/doc_worklog.py complete --task "<작업명>" --paths "<경로1>" "<경로2>" --handoff "[C] **<작업명> 완료**. 완료 내용, 검증 결과, 남은 예외를 1단락으로 기록." --status-title "<작업명> 완료"`
+- 최종 검증:
+  - `python 90_공통기준/업무관리/daily_doc_check.py --json`
 - 리뷰:
   - 중요 변경은 `CODEX_리뷰루틴.md` 기준으로 Claude 검증 또는 `/codex:review` 대상 여부를 남긴다.

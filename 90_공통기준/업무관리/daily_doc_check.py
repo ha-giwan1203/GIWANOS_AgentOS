@@ -40,6 +40,8 @@ IN_PROGRESS_CHECKBOX_RE = re.compile(r"^- \[ \]", re.MULTILINE)
 CODEX_IN_PROGRESS_RE = re.compile(r"^- \[작업중\]\s+owner=", re.MULTILINE)
 HANDOFF_FORBIDDEN_HEADER_RE = re.compile(r"^## \[(완료|진행|보류|차단)\]", re.MULTILINE)
 HANDOFF_FORBIDDEN_STATUS_RE = re.compile(r"^(상태|판정)[:：]", re.MULTILINE)
+TASK_LEDGER_RE = re.compile(r"^- \[(작업중|완료)\]\s+owner=", re.MULTILINE)
+MAIN_TITLE = "# 업무리스트 작업 목록"
 
 
 def extract_session(path: Path) -> int | None:
@@ -55,7 +57,7 @@ def count_in_progress(path: Path) -> int:
     """TASKS.md에서 [진행중] 헤더 + Codex 작업잠금 + 미완료 체크박스 합계."""
     if not path.exists():
         return 0
-    txt = path.read_text(encoding="utf-8")
+    txt = path.read_text(encoding="utf-8").lstrip("\ufeff")
     # 헤더 안내문(L4) 제외 — `완료/미완료/진행중/차단` 같은 메타 설명
     txt = re.sub(r"^> .*$", "", txt, flags=re.MULTILINE)
     headers = len(IN_PROGRESS_HEADER_RE.findall(txt))
@@ -68,7 +70,7 @@ def detect_handoff_forbidden(path: Path) -> list[str]:
     """HANDOFF.md 독립 상태 선언 라인 추출. 안내문(`>` 블록)은 제외."""
     if not path.exists():
         return []
-    txt = path.read_text(encoding="utf-8")
+    txt = path.read_text(encoding="utf-8").lstrip("\ufeff")
     # `>` 인용 블록(안내문) 제외
     txt = re.sub(r"^> .*$", "", txt, flags=re.MULTILINE)
     hits = []
@@ -79,6 +81,39 @@ def detect_handoff_forbidden(path: Path) -> list[str]:
     return hits
 
 
+def detect_tasks_ledger_misplaced(path: Path) -> list[str]:
+    """TASKS 상단 워크보드 줄이 본문 아래로 밀린 경우를 잡는다."""
+    if not path.exists():
+        return []
+    lines = path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines()
+    try:
+        title_idx = lines.index(MAIN_TITLE)
+    except ValueError:
+        return ["TASKS main title missing"]
+    hits = []
+    for i, line in enumerate(lines[title_idx + 1 :], start=title_idx + 2):
+        if TASK_LEDGER_RE.match(line):
+            hits.append(f"L{i}: {line[:120]}")
+    return hits
+
+
+def detect_handoff_order(path: Path) -> list[str]:
+    """HANDOFF 최신 메모가 아래쪽에 붙는 실수를 날짜 역순으로 잡는다."""
+    if not path.exists():
+        return []
+    entries = []
+    for i, line in enumerate(path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines(), start=1):
+        if line.startswith("최종 업데이트:"):
+            m = re.search(r"(\d{4}-\d{2}-\d{2})", line)
+            if m:
+                entries.append((i, m.group(1), line[:120]))
+    hits = []
+    for prev, cur in zip(entries, entries[1:]):
+        if cur[1] > prev[1]:
+            hits.append(f"L{cur[0]}: newer entry appears below older entry: {cur[2]}")
+    return hits
+
+
 def judge() -> dict:
     """3개 항목 판정 후 결과 dict 반환."""
     tasks_session = extract_session(TASKS)
@@ -86,6 +121,8 @@ def judge() -> dict:
     handoff_session = extract_session(HANDOFF)
     in_progress = count_in_progress(TASKS)
     handoff_forbidden = detect_handoff_forbidden(HANDOFF)
+    tasks_ledger_misplaced = detect_tasks_ledger_misplaced(TASKS)
+    handoff_order = detect_handoff_order(HANDOFF)
 
     checks = {
         "in_progress": {
@@ -108,6 +145,16 @@ def judge() -> dict:
             "hits": handoff_forbidden,
             "pass": len(handoff_forbidden) == 0,
             "label": "HANDOFF 독립 상태 선언 없음",
+        },
+        "tasks_ledger_position": {
+            "hits": tasks_ledger_misplaced,
+            "pass": len(tasks_ledger_misplaced) == 0,
+            "label": "TASKS 워크보드 줄은 상단 블록에만 위치",
+        },
+        "handoff_order": {
+            "hits": handoff_order,
+            "pass": len(handoff_order) == 0,
+            "label": "HANDOFF 최신 메모가 위에 위치",
         },
     }
     all_pass = all(c["pass"] for c in checks.values())

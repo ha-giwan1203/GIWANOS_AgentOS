@@ -56,9 +56,10 @@
 | `CLAUDE.md` | Claude 지침 | Claude 주관 |
 
 ### 작업 시작 시 (Codex 작업)
-1. **TASKS.md 상단**에 1줄 추가: `[작업중] owner=Codex / [짧은 작업명] / 잠금 파일: <경로>`
+1. 문서 갱신은 직접 편집보다 `python 90_공통기준/업무관리/doc_worklog.py start --task "<작업명>" --paths <경로...>` 사용을 기본으로 한다.
 2. 작업 수행
-3. 완료 후 TASKS.md 줄 갱신: `[완료] ...` + HANDOFF.md에 1단락 추가
+3. 완료 후 `python 90_공통기준/업무관리/doc_worklog.py complete --task "<작업명>" --paths <경로...> --handoff "<1단락>" --status-title "<요약>"`로 TASKS/HANDOFF/STATUS를 함께 갱신한다.
+4. 종료 전 `python 90_공통기준/업무관리/daily_doc_check.py --json`이 PASS인지 확인한다.
 
 ### 동시 수정 금지
 - TASKS.md 워크보드에 `잠금 파일`로 기재된 파일은 **다른 AI가 건드리지 않는다**

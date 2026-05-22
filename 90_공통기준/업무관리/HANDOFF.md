@@ -1,14 +1,22 @@
-﻿# HANDOFF — AI 인수인계 문서 (세션 메모 전용)
+# HANDOFF — AI 인수인계 문서 (세션 메모 전용)
 
 > **이 파일은 세션 인수인계 메모다. 상태 원본이 아니다.**
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **문서갱신 실수 방지 자동화 보강 완료**. TASKS/HANDOFF/STATUS 직접 편집 실수를 줄이기 위해 doc_worklog.py를 신설했고, daily_doc_check.py에 TASKS 워크보드 위치와 HANDOFF 최신순 점검을 추가했다. AGENTS.md와 CODEX 작업지시 템플릿은 doc_worklog.py 사용을 기본으로 바꿨다. 검증: py_compile PASS, daily_doc_check.py --json PASS.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **폴더정리 이동 적합성 점검 완료**. `99_임시수집/2026-05-22_폴더정리_dryrun.csv`와 실제 archive 구성을 재대조했다. 실제 이동분은 `.claude/tmp` 잔여 임시/검증 산출물, 게임 자동화 실험물, 날짜별 임시 산출물로 archive 목적에 맞다. Git 추적 파일 2개는 이미 원위치 복구되어 `.claude/tmp`에 남아 있고, `오류리스트_재검증_20260508`, `4월정산_ERP다운로드`, `.tmp.driveupload`, `.claude/worktrees`, `03_품번관리/초물관리/_backup/_output`은 업무 증빙/도메인/작업공간 가능성 때문에 보류 유지가 맞다.
 
 최종 업데이트: 2026-05-22 KST — **Codex** [A] **어제 영상 분석 자료 재정리 완료**. 어제 분석한 YouTube 영상은 xCFbMXk5ul4 기준으로 재확인했고, 원본은 90_공통기준/스킬/youtube-analysis/cache/xCFbMXk5ul4/{manifest.json, transcript.txt}에 남아 있음을 확인했다. 사람이 바로 보기 좋은 요약본은 99_임시수집/2026-05-21_영상분석_정리.md로 신규 정리했다. 핵심 결론은 Claude Code=판단/브레인, Codex=실행/손발 하이브리드 운영이며, 자막 693세그먼트·transcript_only·프레임 0장·Drive OAuth invalid_grant 보류·Notion 페이지 367fee67 upsert 이력까지 함께 정리해 두었다.
 
 최종 업데이트: 2026-05-22 KST — **Codex** [C] **영상분석 기반 하이브리드 운영 보완 완료**. TASKS `[작업중] owner=...` 잠금 줄을 `daily_doc_check.py` 진행중 카운트에 포함했고, Claude→Codex 표준 작업지시 템플릿 `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`를 신설한 뒤 AGENTS.md에 연결했다. 세션166의 정산 #2 후속 액션은 `A+B+C-D+E` 반영 확인 완료로 정리했다. 검증: `python -m py_compile daily_doc_check.py` PASS, `python daily_doc_check.py --json` PASS(in_progress=1). Drive OAuth 재인증은 사용자 브라우저 인증이 필요한 별도 작업이라 이번 로컬 보완 범위에서는 보류했다.
 
 최종 업데이트: 2026-05-22 KST — **Codex** [C] **영상기준 추가 보완 3종 적용 완료**. 영상에서 남은 보완점 3개를 운영 체크리스트로 분리했다: 브라우저 수집 기준 `CODEX_브라우저수집_체크리스트.md`, PDF/이미지/HTML 검증 기준 `CODEX_시각산출물_검증체크리스트.md`, 중요 변경 리뷰 기준 `CODEX_리뷰루틴.md`. `CODEX_작업지시_템플릿.md`에는 작업 유형별 추가 문서와 검증 항목을 연결했고, AGENTS.md에도 3개 기준 적용 문구를 추가했다. 검증: `daily_doc_check.py --json` PASS, 문서 링크 검색 PASS.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [B] **업무리스트 폴더정리 dry-run 산출 완료**. 전체 구조 분석 결과를 실행 후보로 쪼개 `99_임시수집/2026-05-22_폴더정리_dryrun.csv`와 `99_임시수집/2026-05-22_폴더정리_실행계획.md`를 만들었다. 바로 archive 이동 가능한 낮은 위험 후보는 `.claude/tmp` 20.70MB, `99_임시수집/게임_파운데이션우주전선` 136.58MB, 날짜 임시폴더 3건 합계 약 3.88MB로 총 약 161MB다. `.tmp.driveupload`, `99_임시수집/4월정산_ERP다운로드`, `.claude/worktrees`, `03_품번관리/초물관리/_backup/_output`은 보류로 분리했다. 삭제/이동은 아직 수행하지 않았다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **폴더정리 Phase 1 archive 이동 완료**. 삭제 없이 낮은 위험 후보만 `98_아카이브/폴더정리_20260522/` 아래로 이동했다. 이동 결과: archive 파일 420개 / 161.15MB. 대상은 `.claude/tmp` 임시파일 220개(단, Git 추적 중인 `erp_d0_dedupe.py`, `erp_d0_deleteA.py` 2개는 원위치 복구), `99_임시수집/게임_파운데이션우주전선`, `20260514`, `20260513`, `20260508`. 보류 유지: `.tmp.driveupload`, `99_임시수집/4월정산_ERP다운로드`, `.claude/worktrees`, `03_품번관리/초물관리/_backup/_output`. 검증: archive 존재/용량 확인, `daily_doc_check.py --json` PASS.
 
 최종 업데이트: 2026-05-21 KST — **Codex** [C2+] **정산 도메인 정리 후속 실행**. 사용자 결정대로 현 본체는 유지하고 `monthly-pnl-rollup/run.py --month 04`로 `정산_수식버전_04월.xlsx`의 90·91만 재생성했다. 결과는 본체 19시트 복구, KPI `A=232,328,088 / B=-6,568,418 / C=7,837,722 / D=0 / E=7,462,150 / 최종=241,059,542`, step1 캐시는 `05월/_cache`를 `_local_backup/_cache.20260521_182439/`로 옮긴 뒤 V2 기준정보 경로로 다시 생성했다. 문서는 ENTRY 진입, 관련 스킬 보강, 운영문서 4종의 본체/step7/step8 역할 정리, line-mapping-validator audit log 반영, step5·step6·MANUAL 레거시 야간규칙 deprecated 주석 추가까지 마쳤다. 제약 2건: `C:\Users\User\.claude\plans\eager-painting-snail.md`는 권한 거부로 갱신 못 했고, `.git` ACL 쓰기 거부로 commit / git mv 불가했다.
 
@@ -267,3 +275,4 @@
 
 > **이전 세션 이력 아카이브**: `98_아카이브/handoff_archive_20260501_20260512.md` (세션152 별건 ~ 세션134)
 > **이전 archive**: `98_아카이브/handoff_archive_20260430_20260430.md`
+
