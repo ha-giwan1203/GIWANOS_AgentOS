@@ -2,7 +2,7 @@
 
 > 출처: 영상분석 자동 모드 (2026-04-01)
 > GPT 합의: A1→B 하향 + B1 범위 조정 (settlement-validator 우선, skills preloading 포함)
-> 상태: **구현 완료** (2026-04-02 사용자 승인 → 즉시 구현)
+> 상태: **폐기** — 세션138 Phase6(commit 7c8a34f6)에서 settlement-validator subagent를 98_아카이브/_deprecated_v1/agents/로 이동. 산출물 없음.
 
 ---
 

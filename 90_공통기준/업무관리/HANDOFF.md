@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — **Codex** 멀티에이전트 새구조 협의안 Claude 검토 완료 반영. 검토기록/README.md를 확정본으로 두고 agent-shadow 폴더명·brief/result/review 3파일안은 폐기, 90_공통기준/업무관리/검토기록/ + review.md 단일안을 채택했다. plan_subagent_expansion.md와 plan_멀티에이전트_A2.md의 거짓 구현 상태를 폐기로 정정했으며, Gemini는 외부 워커와 D 모드 토론모드 반대검토자 2갈래로 문서화했다. 파일럿은 차기 hook/skill/자동화 변경 1건 대기.
+
 최종 업데이트: 2026-05-22 KST — 세션211 **Codex** 세션210 후속: 사용자 지적에 따라 push 기준 충돌을 정정했다. 기준 원본은 CLAUDE.md durable authorization이며, 사용자 push 발화 시 git push origin main 즉시 허용·별도 재확인 생략으로 AGENTS.md, CLAUDE.md, CODEX_작업지시_템플릿.md, CODEX_리뷰루틴.md를 통일했다. push 관련 4항목은 사용자 확인 요청이 아니라 실행 전후 보고 항목으로 정리했다.
 
 최종 업데이트: 2026-05-22 KST — 세션210 **Codex** 업무분장 문서의 실행/검증 경계를 재정렬했다. 직접 Codex 채팅이 발생해도 역할은 유지하고, 판단·설계·검증·도메인 의사결정은 Claude로 반환하도록 명시했다. commit은 Claude diff 승인 후 Codex 실행, push는 Claude 검증 PASS와 사용자 push 발화가 모두 있을 때만 Codex가 실행하도록 AGENTS.md, CLAUDE.md, CODEX_작업지시_템플릿.md를 맞췄다.

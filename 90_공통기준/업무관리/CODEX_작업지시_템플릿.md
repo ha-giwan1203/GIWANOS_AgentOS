@@ -17,12 +17,14 @@
 | 파일 수정·엑셀/CSV·문서·스크립트 실행 | Codex | Claude | 불필요 |
 | 정산·라인배치·MES·D0 실행 패치 | Codex | Claude 도메인 검증 | 불필요 |
 | 브라우저 수집·화면 확인 | Codex browser | Claude | 불필요 |
-| PDF·이미지·수식·긴 문서 인식 | Codex 문서/비전 도구 우선 | Claude | 필요 시 승인 후 Gemini/비전 워커 |
+| PDF·이미지·수식·긴 문서 인식 | Codex 문서/비전 도구 우선 | Claude | 외부 워커: 승인 후 Gemini/비전 워커 |
+| 반대검토·3자 토론 | Claude | Claude | Gemini 반대검토자: D 모드 토론모드(`/debate-mode`) 경유 |
 | hook·skill·자동화 코드 변경 | Codex | Claude + Codex Critic | 불필요 |
 | git commit / git push | Codex | commit=Claude diff 승인 후, push=사용자 push 발화 시 즉시 허용 | 불필요 |
 
 - 외부 워커 필요 시 먼저 적을 것:
   - `누구 / 왜 / 입력 / 산출물 / 검증`
+- Gemini는 API 자동 파이프라인 없음(브라우저/CLI 수동) — 상시 자동 검토자로 박지 않는다.
 
 ### git 권한 경계
 > 비유: 로컬 커밋은 공장 안 작업완료 도장이고, push는 외부 거래처로 서류를 보내는 출하다. 둘은 같은 버튼처럼 보여도 위험도가 다르다.

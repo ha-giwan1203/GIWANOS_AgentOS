@@ -2,6 +2,7 @@
 
 작성일: 2026-03-31
 GPT 승인: 확인됨 (최소 파일럿 2종)
+상태: 폐기 — Step3~5 미완료. doc-check·task-status-sync 커맨드도 _deprecated_v1로 archive됨. 산출물 없음.
 
 ---
 
