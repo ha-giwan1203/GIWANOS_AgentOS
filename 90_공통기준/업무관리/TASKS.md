@@ -1,3 +1,14 @@
+- [완료] owner=Codex / 세션203 Claude 현재 세션 사전 감지 기준 강화 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
+- [완료] owner=Codex / 세션202 Claude CLI 세션 감지 실패 기준 보완 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
+- [완료] owner=Codex / 세션201 Codex 직접 채팅 Claude 반환 기준 협의 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
+- [완료] owner=Codex / 세션200 Claude CLI Enter 제출 재테스트 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / 세션199 Codex 신뢰 프로젝트 설정 점검 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / 세션198 Claude CLI Enter 제출 재확인 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / Claude 역방향 토론 파일럿 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `90_공통기준/업무관리/검토기록/README.md`
+- [완료] owner=Codex / Codex 직접 Claude CLI 입력 테스트 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / Codex-Claude 현재세션 요청 테스트 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / Codex-Claude 현재세션 검토요청 파일럿 정리 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / Claude-Codex 역방향 호출 경로 점검 / 잠금 해제: `AGENTS.md`, `CLAUDE.md`, `.claude`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 검토기록 shadow README 파일럿 적용 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 멀티에이전트 새구조 협의안 작성 / 잠금 해제: `99_임시수집/2026-05-22_멀티에이전트_새구조_협의안.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 운영 보완 후속 정리 / 잠금 해제: `90_공통기준/업무관리/daily_doc_check.py`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`

@@ -4,6 +4,28 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — 세션203 **Codex** 세션203: Claude 현재 세션 감지 기준을 사용자 진술 의존에서 Codex 사전 확인 기준으로 강화했다. 앞으로 Claude 현재 세션을 쓰려는 작업은 사용자가 세션이 열려 있다고 말하지 않아도 Codex가 먼저 확인해야 하며, 일반 sandbox 조회가 비어도 세션 없음으로 확정하지 않고 입력/제출/응답 회수가 필요한 경우 GUI 권한 프로세스 조회까지 수행한 뒤 판단한다.
+
+최종 업데이트: 2026-05-22 KST — 세션202 **Codex** 세션202: 열린 Claude CLI 세션을 Codex가 일반 sandbox 프로세스 조회에서 놓친 문제를 보완했다. 외부 권한 조회에서는 WindowsTerminal 21932 / Test Codex reverse connection 창이 확인됐으므로, 검토기록 README 8장에 일반 sandbox 조회 결과가 비어도 세션 없음으로 확정하지 말고 사용자 진술 또는 최근 창 제목/PID가 있으면 GUI 권한 프로세스 조회로 재확인하라는 기준을 추가했다.
+
+최종 업데이트: 2026-05-22 KST — 세션201 **Codex** 세션201: 사용자가 Codex에 직접 채팅했을 때 Claude로 되넘길 기준을 Claude CLI와 협의해 확정했다. 결론은 직접 채팅이 발생해도 역할은 바뀌지 않으며, 실행은 Codex가 계속하고 판단/설계/검증/도메인 의사결정/신규 구조 판단은 Claude로 반환한다는 것이다. 검토기록 README 8장에 반환 기준표와 반환 형식을 압축 반영했고, AGENTS.md와 충돌하지 않도록 Codex 작업지시 종료 마커는 기존 [NEEDS_CLARIFICATION]을 유지했다.
+
+최종 업데이트: 2026-05-22 KST — 세션200 **Codex** trusted project/hooks 적용 후 Codex가 Claude CLI 창에 짧은 테스트 문장을 직접 입력하고 Enter 제출까지 수행했다. Claude 세션 로그 9b97dfee-ddfd-4f62-b464-ec548803ce70.jsonl에서 사용자 프롬프트와 Claude 응답 'PASS: 수신됨'을 회수해 Codex→Claude 입력/제출/응답 회수 왕복을 PASS로 확인했다.
+
+최종 업데이트: 2026-05-22 KST — 세션199 **Codex** 사용자 승인에 따라 C:\Users\User\.codex\config.toml 전역 설정에 features.hooks=true를 추가하고, 일반 경로 형태의 C:\Users\User\Desktop\업무리스트 trusted project 항목을 추가했다. 기존 \\?\ 경로 trusted project는 유지했으며, 설정 파일 실물에서 hooks=true와 두 trusted project 항목을 확인했다.
+
+최종 업데이트: 2026-05-22 KST — 세션198 **Codex** 사용자가 설정 변경 후 재확인을 요청해 Claude CLI 창을 다시 식별했으나, Codex가 Enter 제출로 Claude 외부 서비스에 전송하는 단계는 여전히 안전 심사에서 차단됐다. 차단 사유는 로컬 설정 변경과 무관하게 외부 제3자 서비스로 작업 맥락을 전송하는 행위가 불허된다는 점이며, 가능한 대체안은 Codex가 입력창 준비 후 사용자가 Enter를 누르는 방식이다.
+
+최종 업데이트: 2026-05-22 KST — 세션197 **Codex** Claude 역방향 토론 파일럿은 Codex가 Claude CLI 창 식별까지 확인했으나, Codex가 Enter 제출로 외부 Claude 서비스에 현재 작업 맥락을 전송하는 단계는 안전 심사에서 차단되어 보류했다. 대체 운영안은 Codex가 요청문을 입력창에 준비하고 사용자가 Enter를 누른 뒤 Codex가 응답 회수/기록을 수행하는 방식이다.
+
+최종 업데이트: 2026-05-22 KST — 세션196 **Codex** 사용자 지적에 따라 이전 수동 붙여넣기 판정을 정정하고, Codex가 Windows Terminal Claude CLI 창을 찾아 직접 테스트 문장을 붙여넣었다. 결과는 PASTED_NO_ENTER로, Codex→현재 Claude CLI 창 텍스트 입력은 PASS이며 Enter 제출/Claude 응답 호출은 수행하지 않았다.
+
+최종 업데이트: 2026-05-22 KST — 세션195 **Codex** Codex→Claude 현재 세션 요청 테스트를 수행했다. 자동 claude --continue -p 호출은 외부 세션 맥락 전송 위험으로 승인 차단됐고, 사용자 직접 CLI 방식에서는 Claude Code 창에 테스트 문장이 현재 세션 입력으로 표시되어 입력 경로는 부분 PASS로 확인됐다. 다만 Claude 응답은 화면상 retrying 상태라 최종 응답 수신은 API/서비스 상태 확인 후 재시도 필요하다.
+
+최종 업데이트: 2026-05-22 KST — 세션194 **Codex** 토론스킬 변형 방향을 브라우저 자동화 재사용이 아니라 Codex→Claude 현재 세션 요청 파일럿으로 정리했다. 검토기록 README 8장에 브라우저 미사용, 고정방 금지, claude --continue/--resume 후보, 세션 미확인 시 보류, Claude 판정 받아쓰기 원칙을 추가했으며 실제 외부 전송 자동화는 실행하지 않았다.
+
+최종 업데이트: 2026-05-22 KST — 세션193 **Codex** [C] **Claude-Codex 역방향 호출 경로 점검 완료**. 현재 Claude→Codex 호출은 문서상 codex exec 또는 Codex 채팅창 전달이며, 별도 자동 호출 스크립트는 확인되지 않았다. 로컬에는 Claude Code CLI 2.1.147이 설치되어 있고 claude -p/--print 비대화 호출이 가능하나, 프로세스 프록시가 127.0.0.1:9로 설정되어 API 연결이 막히며 외부 호출 테스트는 컨텍스트 유출 위험으로 승인 없이 실행하지 않았다. 안전한 역방향 구조는 claude --bare -p + tools 없음 + 요청 파일 입력 방식으로 별도 승인 후 파일럿하는 안이다.
+
 최종 업데이트: 2026-05-22 KST — 세션192 **Codex** [C] **검토기록 shadow README 파일럿 적용 완료**. Claude 협의 결과에 맞춰 90_공통기준/업무관리/검토기록/README.md만 생성했다. 상태 원본 아님, review.md 1개 기본, brief/result 미생성, 1건/1주일 파일럿, Codex의 Claude 판정 받아쓰기 원칙을 명시했으며 실제 run 폴더나 자동 디스패처는 만들지 않았다.
 
 최종 업데이트: 2026-05-22 KST — 세션191 **Codex** [C] **멀티에이전트 새구조 협의안 작성 완료**. Claude Code와 협의할 수 있도록 새 구조 도입 목적, 기존 구조와 충돌 위험, agent-shadow shadow mode 후보, brief/result/review 3파일 제한, 외부 워커 승인제, 단계별 적용안과 Claude 확인 질문을 99_임시수집 문서로 정리했다. 실제 새 구조나 폴더는 생성하지 않았다.
