@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-05-21 07:46 KST",
+  "generated_at": "2026-05-22 15:57 KST",
   "last_updated": "",
-  "github_sha": "05e6319f12bcc91a450a56d782c75b133583fbfe",
-  "github_sha_short": "05e6319f",
+  "github_sha": "b3eea572d164ca3ae5da0b27c4cd6255a0c054ee",
+  "github_sha_short": "b3eea572",
   "hooks_raw": 22,
-  "hooks_active": 6,
+  "hooks_active": 5,
   "commands": 7,
   "smoke": "unknown",
   "recent_sessions": [

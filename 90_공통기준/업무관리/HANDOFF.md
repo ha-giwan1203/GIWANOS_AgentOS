@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — **Claude** 재시작 후 세션 시작 자동실행 정상 확인(smoke 9/9·doctor OK·folder_map). selfcheck 수동 실행으로 7일 초과 해소. 승인 프롬프트 원인 = settings.local.json `Bash(bash *)` 문법 오류(콜론 누락 → 매칭 불가) → `Bash(bash:*)` 수정 + `Bash(codex:*)` 추가(다음 재시작부터 적용). TASKS.md 최상단 완료항목 48건을 98_아카이브로 이동, 427→379줄로 줄수 한도 충족(98_아카이브/** ignore 정책상 archive 파일은 로컬 보존·git 미추적, 완료이력 원본은 TASKS.md git history).
+
 최종 업데이트: 2026-05-22 KST — 세션209 **Codex** .codex hook/agent 후보 실물 감사 완료. 활성 hook 5개와 agent TOML 5개는 기본 구문 검증 PASS이나 hooks.json 절대경로와 .claude/hooks 교차 의존이 남아 저장소 추적은 보류. config/log/cache/marker는 ignore 유지, 삭제 없이 로컬 유지 + 휴대형 경로화 후 최소 커밋 권고.
 
 최종 업데이트: 2026-05-22 KST — 세션208 **Codex** 세션208: dirty worktree 반복 노이즈를 줄이기 위해 .gitignore를 보강했다. 추가 패턴은 .claude/tmp 1회성 파일, jobsetup-auto/state/run_*.json, .codex/config.toml, .codex hook 로그/캐시/_archive, *.bak_* 백업 파일이다. 실제 삭제는 하지 않았고, .codex 활성 hook/agent 후보 파일은 계속 git status에 보이도록 남겼다.

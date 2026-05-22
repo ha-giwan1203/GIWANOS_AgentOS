@@ -6,13 +6,13 @@
   "user_reported": true,
   "followup_checked": true,
   "exception_reason": null,
-  "mode": "A+C",
-  "commit_sha": "3f110a8c",
-  "session": 167,
-  "session_title": "정산 도메인 신·구 세대 문서/코드 불일치 일괄 정리 (plan v3)",
-  "gpt_share_skipped_reason": "A 모드 위주 (도메인 정리) — feedback_finish_gpt_share_scope.md 룰 적용",
+  "mode": "C",
+  "commit_sha": null,
+  "session": 210,
+  "session_title": "재시작 자동실행 점검 + 승인 패턴 수정 + TASKS.md 정리",
+  "gpt_share_skipped_reason": "C 변경이 settings.local.json permission 문법 오타 1줄 수정 + TASKS.md 완료항목 아카이브 정리 — GPT 판정이 산출할 실질 정보 없음(자명), 사용자 명시 공유 발화 없음",
   "next_agenda": [
-    "S8 별건 분리: step5_정산계산.py / step6_검증.py / assembly-cost-settlement/MANUAL.md 잔존 옛 야간가산 함수 호출처 분석 + 분리 가능 여부 판정",
-    "Codex 세션 핀 고정 룰 운영 안착 모니터링 (feedback_codex_session_pinning.md)"
+    "settings.local.json Bash 권한 수정 반영 위해 다음 세션 재시작 후 승인 프롬프트 미발생 확인",
+    "TASKS.md 최상단 prepend 누적 구조 — 자동화가 헤더 위에 작업이력을 쌓는 패턴, 주기적 아카이브 필요"
   ]
 }

@@ -30,13 +30,25 @@
       "Bash(\"C:/Users/User/Desktop/업무리스트/90_공통기준/스킬/d0-production-plan/run_morning.bat\")",
       "Bash(python 90_공통기준/업무관리/daily_doc_check.py --slack)",
       "Bash(git rev-list *)",
-      "Bash(python \"90_공통기준/업무관리/daily_doc_check.py\" --slack)"
+      "Bash(python \"90_공통기준/업무관리/daily_doc_check.py\" --slack)",
+      "Bash(powershell -NoProfile -Command \"Get-Content 'C:\\\\Users\\\\User\\\\Desktop\\\\업무리스트\\\\06_생산관리\\\\D0_업로드\\\\logs\\\\morning_20260522.log' -Tail 60\")",
+      "Bash(codex --version)",
+      "Bash(python -c \"import playwright, openpyxl; print\\('deps OK'\\)\")",
+      "Bash(python .claude/tmp/line_stop_0521_check.py)",
+      "Bash(python -c \"import json; d=json.load\\(open\\('.claude/settings.json',encoding='utf-8'\\)\\); print\\('JSON OK — hooks events:', list\\(d['hooks'].keys\\(\\)\\)\\)\")",
+      "Bash(bash .claude/hooks/finish_trigger_detect.sh)",
+      "Bash(python -c ' *)",
+      "Skill(update-config)",
+      "Bash(bash:*)",
+      "Bash(codex:*)"
     ],
     "ask": [],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "C:/Users/User/Desktop",
       "C:/Users/User/Downloads",
       "C:/Users/User/Documents"
     ]
-  }
+  },
+  "skipAutoPermissionPrompt": true
 }
