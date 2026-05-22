@@ -1,3 +1,6 @@
+- [완료] owner=Codex / 세션207 정산 dirty 묶음 로컬 커밋 / 잠금 해제: `05_생산실적/조립비정산/03_정산자동화/step5_정산계산.py`, `05_생산실적/조립비정산/03_정산자동화/step6_검증.py`, `05_생산실적/조립비정산/STATUS.md`, `90_공통기준/스킬/assembly-cost-settlement/MANUAL.md`, `90_공통기준/스킬/assembly-cost-settlement/SKILL.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / 세션206 정산 dirty 묶음 Claude 도메인 검증 / 잠금 해제: `99_임시수집/2026-05-22_정산_dirty_도메인검증.md`
+- [완료] owner=Codex / 세션205 dirty worktree 정리 판정표 작성 / 잠금 해제: `99_임시수집/2026-05-22_dirty_worktree_정리판정.md`
 - [완료] owner=Codex / 세션204 git 권한 경계 릴리즈 절차 정리 / 잠금 해제: `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`
 - [완료] owner=Codex / 세션203 Claude 현재 세션 사전 감지 기준 강화 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
 - [완료] owner=Codex / 세션202 Claude CLI 세션 감지 실패 기준 보완 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`

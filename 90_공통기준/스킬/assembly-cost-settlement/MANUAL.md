@@ -45,7 +45,7 @@ python run_settlement_pipeline.py --start-from 5 --use-cache
 | 4 | step4_기준정보매칭.py | 단가 매칭 + 미매핑 검출 |
 | 5 | step5_정산계산.py | 라인별 GERP/구ERP 정산 계산 |
 | 6 | step6_검증.py | 합계 검증 (PASS/WARNING/FAIL) |
-| 7 | step7_보고서.py | 정산결과_MM월.xlsx (13개 시트) |
+| 7 | step7_보고서.py | 정산결과_MM월.xlsx (보조 산출본·교차대조) |
 | 8 | step8_오류리스트.py | 오류리스트_MM월.xlsx |
 
 ### Phase 3: 결과 검증
@@ -82,7 +82,8 @@ python run_settlement_pipeline.py --start-from 5 --use-cache
 ## 산출물
 | 파일 | 위치 | 내용 |
 |------|------|------|
-| 정산결과_MM월.xlsx | {월별폴더}/ | 00_정산집계 + 10개 라인 시트 + 차이분석 + 검증결과 + 오류리스트 |
+| 정산_수식버전_MM월.xlsx | {월별폴더}/ | 운영 본체. 90/91 손익 시트 + 10개 라인 시트 + 입력/집계/오류/요약 시트 |
+| 정산결과_MM월.xlsx | {월별폴더}/ | step7 보조 산출본·교차대조용 |
 | 오류리스트_MM월.xlsx | {월별폴더}/ | DB 양식 오류 리스트 + 유형별 요약 |
 | _cache/*.json | {월별폴더}/_cache/ | step1~5 중간 결과 |
 
@@ -105,7 +106,7 @@ python run_settlement_pipeline.py --start-from 5 --use-cache
 
 ## 검증 항목
 - step6: 10개 라인 모두 PASS 여부
-- 정산결과 13개 시트 + 00_정산집계 합계 = 라인별 합산
+- 정산결과 보조 산출본의 00_정산집계 합계 = 라인별 합산
 - 오류리스트 건수/금액 = 차이분석 시트 일치
 - GERP 총액 = 라인별 GERP 합산 (교차검증)
 

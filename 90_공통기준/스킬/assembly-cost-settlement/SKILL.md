@@ -25,7 +25,7 @@ grade: B
 | 4 | 기준정보 매칭 |
 | 5 | 정산 계산 |
 | 6 | 합계 검증 (PASS/WARNING/FAIL) |
-| 7 | 정산결과_MM월.xlsx (13시트) |
+| 7 | 정산결과_MM월.xlsx (보조 산출본·교차대조) |
 | 8 | 오류리스트_MM월.xlsx |
 
 ## verify

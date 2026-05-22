@@ -3,6 +3,8 @@
 """
 Step 6 — 검증
 기존 검증_정산결과.py 기반 자동 검증 (Step5 JSON → 항목별 PASS/FAIL/WARNING/INFO)
+주의: 이 파일은 run_settlement_pipeline의 보조·교차대조용이다.
+운영 본체 검증은 build_formula_version.py 산출 본체와 후속 검증 스킬 기준으로 판단한다.
 
 검증 항목:
   1. 라인합계 vs 00_정산집계 일치 여부 (엑셀 파일 생성 전: Step5 JSON 내부 일관성)

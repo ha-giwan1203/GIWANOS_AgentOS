@@ -4,6 +4,12 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — 세션207 **Codex** 세션207: Claude 도메인 검증과 실물 엑셀 19시트 확인이 끝난 정산 dirty 묶음을 로컬 커밋 대상으로 확정했다. 커밋 범위는 step5/step6 주석, 조립비정산 STATUS, assembly-cost-settlement SKILL/MANUAL, 업무관리 TASKS/HANDOFF/STATUS로 제한하고, push는 사용자 push 발화 전까지 금지한다.
+
+최종 업데이트: 2026-05-22 KST — 세션206 **Codex** 세션206: dirty worktree에 남은 정산 관련 5개 변경을 Claude 도메인 검증에 올리고 실물 엑셀로 재확인했다. Claude 판정은 5개 전부 정합/단일 커밋 가능이며, Codex도 05월/정산_수식버전_04월.xlsx를 openpyxl로 열어 19시트와 90/91 시트 포함을 확인했다. 변경은 계산 로직이 아니라 운영 본체(정산_수식버전)와 보조 산출본(정산결과) 역할을 명확히 하는 문서/주석 정리다.
+
+최종 업데이트: 2026-05-22 KST — 세션205 **Codex** 세션205: 푸시 후 남은 dirty worktree를 삭제/ignore/별도커밋/보류 후보로 분류하는 판정표를 작성했다. 실제 삭제, 이동, 커밋, .gitignore 수정은 하지 않았다. 핵심 판정은 정산 묶음은 Claude 도메인 검증 후 별도 처리, .codex는 danger-full-access config와 로그를 제외하고 활성 hook/agent만 선별 감사, 백업/run state/log는 ignore 또는 정리 후보, 업무 산출물은 git 보관 여부 별도 판단이다.
+
 최종 업데이트: 2026-05-22 KST — 세션204 **Codex** 세션204: git add/commit/push 권한 문제를 임시 승인 문제가 아니라 운영 경계로 정리했다. Claude 검토 판정은 부분반영이었고, 이에 따라 로컬 커밋은 lock 확인/일반 재시도/실패 시 escalated 1회로 제한했으며, 원격 push는 Claude 검증 PASS와 사용자 push 발화가 모두 필요한 외부 반출 단계로 문서화했다. push 전 고지 항목은 origin, 브랜치, 커밋 해시, GitHub 외부 반출 고지 4개로 고정했다.
 
 최종 업데이트: 2026-05-22 KST — 세션203 **Codex** 세션203: Claude 현재 세션 감지 기준을 사용자 진술 의존에서 Codex 사전 확인 기준으로 강화했다. 앞으로 Claude 현재 세션을 쓰려는 작업은 사용자가 세션이 열려 있다고 말하지 않아도 Codex가 먼저 확인해야 하며, 일반 sandbox 조회가 비어도 세션 없음으로 확정하지 않고 입력/제출/응답 회수가 필요한 경우 GUI 권한 프로세스 조회까지 수행한 뒤 판단한다.

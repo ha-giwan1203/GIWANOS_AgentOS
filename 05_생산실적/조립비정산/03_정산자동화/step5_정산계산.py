@@ -3,6 +3,8 @@
 """
 Step 5 — 정산 계산
 라인별 금액 계산 → JSON 저장 (Step7 엑셀 생성용 중간 데이터)
+주의: 이 파일은 run_settlement_pipeline의 보조·교차대조용이다.
+운영 본체 정산은 build_formula_version.py와 정산_수식버전_MM월.xlsx 기준으로 판단한다.
 
 계산 규칙 (GERP 단가 기준 — 2026-04-05 변경):
   - 정산금액 = GERP 원본금액 직접 사용 (기준단가 재계산 아님)
