@@ -56,6 +56,18 @@ def extract_session(path: Path) -> int | None:
     return int(m.group(1)) if m else None
 
 
+def extract_handoff_session(path: Path) -> int | None:
+    """HANDOFF 최신 메모 1건의 세션 번호만 추출한다."""
+    if not path.exists():
+        return None
+    for line in path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines():
+        if not line.startswith("최종 업데이트:"):
+            continue
+        m = SESSION_RE.search(line)
+        return int(m.group(1)) if m else None
+    return None
+
+
 def count_in_progress(path: Path) -> int:
     """TASKS.md에서 [진행중] 헤더 + Codex 작업잠금 + 미완료 체크박스 합계."""
     if not path.exists():
@@ -136,7 +148,7 @@ def judge() -> dict:
     """문서 정합성 항목 판정 후 결과 dict 반환."""
     tasks_session = extract_session(TASKS)
     status_session = extract_session(STATUS)
-    handoff_session = extract_session(HANDOFF)
+    handoff_session = extract_handoff_session(HANDOFF)
     in_progress = count_in_progress(TASKS)
     handoff_forbidden = detect_handoff_forbidden(HANDOFF)
     tasks_ledger_misplaced = detect_tasks_ledger_misplaced(TASKS)

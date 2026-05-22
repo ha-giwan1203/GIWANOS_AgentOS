@@ -136,9 +136,9 @@ def handoff_insert_index(lines: list[str]) -> int:
     return len(lines)
 
 
-def insert_handoff(handoff_text: str) -> None:
+def insert_handoff(handoff_text: str, session: int) -> None:
     lines = read_lines(HANDOFF)
-    paragraph = f"최종 업데이트: {datetime.now():%Y-%m-%d} KST — **Codex** {handoff_text}"
+    paragraph = f"최종 업데이트: {datetime.now():%Y-%m-%d} KST — 세션{session} **Codex** {handoff_text}"
     idx = handoff_insert_index(lines)
     insert_block = [paragraph, ""]
     lines[idx:idx] = insert_block
@@ -170,7 +170,7 @@ def start(args: argparse.Namespace) -> None:
 def complete(args: argparse.Namespace) -> None:
     session = args.session if args.session is not None else next_session()
     complete_task_line(args.task, args.paths)
-    insert_handoff(args.handoff)
+    insert_handoff(args.handoff, session)
     update_status(session, args.status_title)
     print(f"[OK] 문서 갱신 완료: 세션{session}")
 
