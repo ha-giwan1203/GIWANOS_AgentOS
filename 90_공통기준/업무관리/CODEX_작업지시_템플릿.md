@@ -19,7 +19,7 @@
 | 브라우저 수집·화면 확인 | Codex browser | Claude | 불필요 |
 | PDF·이미지·수식·긴 문서 인식 | Codex 문서/비전 도구 우선 | Claude | 필요 시 승인 후 Gemini/비전 워커 |
 | hook·skill·자동화 코드 변경 | Codex | Claude + Codex Critic | 불필요 |
-| git commit·push | Codex | Claude diff 승인 후 | 불필요 |
+| git commit / git push | Codex | commit=Claude diff 승인 후, push=사용자 push 발화 시 즉시 허용 | 불필요 |
 
 - 외부 워커 필요 시 먼저 적을 것:
   - `누구 / 왜 / 입력 / 산출물 / 검증`
@@ -32,9 +32,9 @@
 | 로컬 작업 | Codex가 실행한다. |
 | 로컬 검증 | `daily_doc_check`, 테스트, 산출물 확인, git diff 중 작업에 맞는 증거를 남긴다. |
 | 로컬 커밋 | Claude diff 검증 PASS 후 Codex가 실행한다. `.git/index.lock` 문제가 있으면 lock 잔존 확인/정리, 일반 경로 재시도, 실패 시 escalated 1회 순서로 제한한다. |
-| 원격 push | 외부 반출 단계로 분리한다. Claude 검증 PASS와 사용자 push 발화가 모두 있어야 하며, Codex 단독 자동 push는 금지한다. |
+| 원격 push | 외부 반출 단계로 분리한다. 사용자 push 발화가 있으면 `git push origin main` 즉시 허용하며, 별도 재확인 단계는 생략한다. Codex 단독 자동 push는 금지한다. |
 
-push 전 사용자에게 확인할 4항목:
+push 실행 전후 보고에 남길 4항목:
 
 - 원격 주소(`origin`)
 - 브랜치

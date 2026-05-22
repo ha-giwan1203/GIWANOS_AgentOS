@@ -7,6 +7,7 @@
 ## 0. 호출 채널
 
 - **사용자는 Codex를 직접 호출하지 않습니다.** 사용자 발화는 Claude(브레인)가 받습니다.
+- 단, 사용자가 Codex 채팅창에 직접 요청한 경우에도 역할은 바뀌지 않습니다. Codex는 실행 가능한 작업만 계속하고, 판단·설계·검증·도메인 의사결정은 Claude에게 반환합니다.
 - Codex가 받는 지시문은 **Claude가 작성·전달**합니다 (`codex exec "<지시문>"` 비대화 호출).
 - Claude가 Codex에 넘기는 지시문은 `90_공통기준/업무관리/CODEX_작업지시_템플릿.md` 형식을 기본으로 합니다.
 - 브라우저 수집은 `CODEX_브라우저수집_체크리스트.md`, PDF·이미지·HTML 산출물은 `CODEX_시각산출물_검증체크리스트.md`, 중요 변경 리뷰는 `CODEX_리뷰루틴.md`를 함께 적용합니다.
@@ -34,7 +35,8 @@
 - **정산·라인배치·MES·D0 등 도메인 패치도 Codex가 실행** (단, 무엇을·어떻게 바꿀지는 Claude가 사전 설계해서 지시문으로 전달함)
 - CLAUDE.md/hook/skill 코드 수정도 Codex가 실행 (Claude 설계 → Codex 적용)
 - 작업 완료 직후 TASKS.md / HANDOFF.md / STATUS.md 갱신 (Claude 수동 금지 — 너의 실행 영역)
-- git commit·push (Claude가 git diff 검증·승인한 직후 너가 실행)
+- git commit (Claude가 git diff 검증·승인한 뒤 Codex가 실행)
+- git push (사용자 push 발화 시 Codex가 실행, 별도 재확인 생략)
 
 ### Claude 담당 — 설계·검증 (실행은 안 함)
 - 무엇을·어떻게 바꿀지 사전 설계
@@ -55,7 +57,7 @@
 | 브라우저 수집·화면 확인 | Codex browser | Claude | 불필요 |
 | PDF·이미지·수식·긴 문서 인식 | Codex 문서/비전 도구 우선 | Claude | 필요 시 승인 후 Gemini/비전 워커 |
 | hook·skill·자동화 코드 변경 | Codex | Claude + Codex Critic | 불필요 |
-| git commit·push | Codex | Claude diff 승인 후 | 불필요 |
+| git commit / git push | Codex | commit=Claude diff 승인 후, push=사용자 push 발화 시 즉시 허용 | 불필요 |
 
 - Codex는 Claude 지시문에 없는 외부 AI/워커를 자동 호출하지 않는다.
 - 외부 워커가 필요하면 지시문에 `누구 / 왜 / 입력 / 산출물 / 검증`을 먼저 적는다.
@@ -138,4 +140,4 @@
 | 라인정지비 | `07_라인정지비용/CLAUDE.md` |
 | 급여 / 단가 | `02_급여단가/CLAUDE.md` |
 
-도메인 진입 후 비가역 작업이 필요하면 → **Claude에게 토스** (TASKS.md에 `owner=Claude / 도메인 의사결정 필요` 표시).
+도메인 진입 후 비가역 작업 여부·대상·범위 판단이 필요하면 → **Claude에게 반환** (TASKS.md에 `owner=Claude / 도메인 의사결정 필요` 표시). Claude 판단·승인 뒤 실제 적용 실행은 **Codex**가 맡는다.

@@ -4,6 +4,10 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — 세션211 **Codex** 세션210 후속: 사용자 지적에 따라 push 기준 충돌을 정정했다. 기준 원본은 CLAUDE.md durable authorization이며, 사용자 push 발화 시 git push origin main 즉시 허용·별도 재확인 생략으로 AGENTS.md, CLAUDE.md, CODEX_작업지시_템플릿.md, CODEX_리뷰루틴.md를 통일했다. push 관련 4항목은 사용자 확인 요청이 아니라 실행 전후 보고 항목으로 정리했다.
+
+최종 업데이트: 2026-05-22 KST — 세션210 **Codex** 업무분장 문서의 실행/검증 경계를 재정렬했다. 직접 Codex 채팅이 발생해도 역할은 유지하고, 판단·설계·검증·도메인 의사결정은 Claude로 반환하도록 명시했다. commit은 Claude diff 승인 후 Codex 실행, push는 Claude 검증 PASS와 사용자 push 발화가 모두 있을 때만 Codex가 실행하도록 AGENTS.md, CLAUDE.md, CODEX_작업지시_템플릿.md를 맞췄다.
+
 최종 업데이트: 2026-05-22 KST — **Claude** 재시작 후 세션 시작 자동실행 정상 확인(smoke 9/9·doctor OK·folder_map). selfcheck 수동 실행으로 7일 초과 해소. 승인 프롬프트 원인 = settings.local.json `Bash(bash *)` 문법 오류(콜론 누락 → 매칭 불가) → `Bash(bash:*)` 수정 + `Bash(codex:*)` 추가(다음 재시작부터 적용). TASKS.md 최상단 완료항목 48건을 98_아카이브로 이동, 427→379줄로 줄수 한도 충족(98_아카이브/** ignore 정책상 archive 파일은 로컬 보존·git 미추적, 완료이력 원본은 TASKS.md git history).
 
 최종 업데이트: 2026-05-22 KST — 세션209 **Codex** .codex hook/agent 후보 실물 감사 완료. 활성 hook 5개와 agent TOML 5개는 기본 구문 검증 PASS이나 hooks.json 절대경로와 .claude/hooks 교차 의존이 남아 저장소 추적은 보류. config/log/cache/marker는 ignore 유지, 삭제 없이 로컬 유지 + 휴대형 경로화 후 최소 커밋 권고.

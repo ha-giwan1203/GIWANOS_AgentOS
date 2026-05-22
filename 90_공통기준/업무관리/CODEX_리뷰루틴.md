@@ -67,8 +67,8 @@
 - commit 전에는 변경 파일 목록, 의도하지 않은 변경, 검증 명령, `TASKS/HANDOFF/STATUS` 갱신 여부를 확인한다.
 - Claude 검증이 FAIL이면 commit/push로 넘어가지 않는다.
 - `.git/index.lock` 권한 문제가 나면 먼저 lock 잔존 여부와 실행 중 git 작업을 확인하고, 일반 경로 재시도 후에도 실패할 때만 escalated commit을 1회 사용한다.
-- push 전에는 Claude 검증 PASS와 사용자 push 발화가 모두 필요하다.
-- push 전 사용자에게 원격 주소(`origin`), 브랜치, 커밋 해시, 외부 반출 고지를 제시한다.
+- push는 사용자 push 발화 시 즉시 허용하며, 별도 재확인 단계는 생략한다.
+- push 실행 전후 보고에는 원격 주소(`origin`), 브랜치, 커밋 해시, 외부 반출 고지를 남긴다.
 - push가 차단되거나 실패하면 로컬 커밋 해시와 미푸시 상태를 보고하고, 우회·강제 push·원격 변경은 하지 않는다.
 
 ## 9. 보고 형식

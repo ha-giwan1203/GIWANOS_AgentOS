@@ -1,3 +1,5 @@
+- [완료] owner=Codex / push 발화 기준 정정 및 업무분장 문서 푸시 / 잠금 해제: `AGENTS.md`, `CLAUDE.md`, `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / AGENTS 역할분담 경계 정리 / 잠금 해제: `AGENTS.md`, `CLAUDE.md`, `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Claude / 재시작 후 세션 자동실행 점검 + 승인 패턴(Bash 권한 문법) 수정 + TASKS.md 완료항목 48건 아카이브 정리 / 잠금 해제: `.claude/settings.local.json`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`
 # 업무리스트 작업 목록
 
