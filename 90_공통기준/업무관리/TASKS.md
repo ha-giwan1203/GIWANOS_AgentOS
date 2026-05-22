@@ -1,3 +1,5 @@
+- [완료] owner=Codex / 검토기록 shadow README 파일럿 적용 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
+- [완료] owner=Codex / 멀티에이전트 새구조 협의안 작성 / 잠금 해제: `99_임시수집/2026-05-22_멀티에이전트_새구조_협의안.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 운영 보완 후속 정리 / 잠금 해제: `90_공통기준/업무관리/daily_doc_check.py`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 영상 기반 운영 보완 연결성 점검 / 잠금 해제: `AGENTS.md`, `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`, `90_공통기준/업무관리/doc_worklog.py`, `90_공통기준/업무관리/daily_doc_check.py`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 작업 라우팅 기준 적용 / 잠금 해제: `AGENTS.md`, `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
