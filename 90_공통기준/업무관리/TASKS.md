@@ -1,3 +1,6 @@
+- [완료] owner=Claude / SP3M3 5/21 라인정지 조회 + /finish 자동트리거 정책 정합 정리 / 잠금 해제: `.claude/commands/finish.md`, `.claude/settings.json`, `.claude/hooks/finish_trigger_detect.sh`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`
+- [작업중] owner=Codex / GIWANOS_AgentOS 하네스 구조 점검 / 잠금 파일: `99_임시수집/2026-05-22_하네스_엔지니어링_점검.md`
+- [차단] owner=Codex / git 권한 문제 해결 / 사유: `.git` Deny ACL 제거 권한복구 명령이 승인 실행 필요, 현재 Codex 사용 한도 메시지로 차단됨 / 잠금 해제: `.git`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 문서갱신 실수 방지 자동화 보강 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `90_공통기준/업무관리/daily_doc_check.py`, `90_공통기준/업무관리/doc_worklog.py`, `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `AGENTS.md`
 - [완료] owner=Codex / 폴더정리 이동 적합성 점검 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `98_아카이브/폴더정리_20260522/`, `99_임시수집/2026-05-22_폴더정리_dryrun.csv`
 - [완료] owner=Codex / 폴더정리 Phase 1 archive 이동 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `98_아카이브/폴더정리_20260522/`

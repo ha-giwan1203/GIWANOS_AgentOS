@@ -4,6 +4,10 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — **세션168-Claude** [A+C] **SP3M3 5/21 라인정지 조회 + /finish 자동트리거 정책 정합 정리**. (A) line-stoppage 인프라로 G-ERP 라인보상상세현황 2026-05 재조회 — 5/21 SP3M3 라인정지 2건 모두 야간조(DAY_STOP_MINUTE=0, NGT 30분+21분), 주간조 비가동 0분. `라인정지_05월_raw.xlsx`/`_요약.md` 5월 34건으로 최신화. (C) 세션157에 비활성화된 finish_trigger_detect가 settings.json UserPromptSubmit hook으로 등록만 잔존 → 등록 해제. `finish.md` line3 "자동 트리거 키워드(세션153)" → "종결 발화 처리(세션157)"로 정합 수정, `finish_trigger_detect.sh`는 미사용 stub 명시 주석으로 보존, MEMORY.md 인덱스 1줄 정정. 영향반경: UserPromptSubmit 이벤트는 이 hook 단독 → 이벤트 블록 제거, 검증 스크립트 무영향. settings 변경은 세션 재시작 시 반영.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [차단] **git 권한 문제 해결 시도 중단**. 일반 git add는 여전히 .git/index.lock 생성 Permission denied로 실패한다. 점검 결과 index.lock 잔존은 없고 .git/.git/index ACL에 SID 3종 Deny ACE가 존재한다. 근본 조치는 .git Deny ACL 제거 + 현재 사용자 FullControl 재부여인데, 해당 권한 복구 명령은 승인 실행이 필요했고 현재 Codex 사용 한도 메시지로 차단되어 실행하지 못했다.
+
 최종 업데이트: 2026-05-22 KST — **Codex** [C] **문서갱신 실수 방지 자동화 보강 완료**. TASKS/HANDOFF/STATUS 직접 편집 실수를 줄이기 위해 doc_worklog.py를 신설했고, daily_doc_check.py에 TASKS 워크보드 위치와 HANDOFF 최신순 점검을 추가했다. AGENTS.md와 CODEX 작업지시 템플릿은 doc_worklog.py 사용을 기본으로 바꿨다. 검증: py_compile PASS, daily_doc_check.py --json PASS.
 
 최종 업데이트: 2026-05-22 KST — **Codex** [C] **폴더정리 이동 적합성 점검 완료**. `99_임시수집/2026-05-22_폴더정리_dryrun.csv`와 실제 archive 구성을 재대조했다. 실제 이동분은 `.claude/tmp` 잔여 임시/검증 산출물, 게임 자동화 실험물, 날짜별 임시 산출물로 archive 목적에 맞다. Git 추적 파일 2개는 이미 원위치 복구되어 `.claude/tmp`에 남아 있고, `오류리스트_재검증_20260508`, `4월정산_ERP다운로드`, `.tmp.driveupload`, `.claude/worktrees`, `03_품번관리/초물관리/_backup/_output`은 업무 증빙/도메인/작업공간 가능성 때문에 보류 유지가 맞다.
