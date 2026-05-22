@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — 세션209 **Codex** .codex hook/agent 후보 실물 감사 완료. 활성 hook 5개와 agent TOML 5개는 기본 구문 검증 PASS이나 hooks.json 절대경로와 .claude/hooks 교차 의존이 남아 저장소 추적은 보류. config/log/cache/marker는 ignore 유지, 삭제 없이 로컬 유지 + 휴대형 경로화 후 최소 커밋 권고.
+
 최종 업데이트: 2026-05-22 KST — 세션208 **Codex** 세션208: dirty worktree 반복 노이즈를 줄이기 위해 .gitignore를 보강했다. 추가 패턴은 .claude/tmp 1회성 파일, jobsetup-auto/state/run_*.json, .codex/config.toml, .codex hook 로그/캐시/_archive, *.bak_* 백업 파일이다. 실제 삭제는 하지 않았고, .codex 활성 hook/agent 후보 파일은 계속 git status에 보이도록 남겼다.
 
 최종 업데이트: 2026-05-22 KST — 세션207 **Codex** 세션207: Claude 도메인 검증과 실물 엑셀 19시트 확인이 끝난 정산 dirty 묶음을 로컬 커밋 대상으로 확정했다. 커밋 범위는 step5/step6 주석, 조립비정산 STATUS, assembly-cost-settlement SKILL/MANUAL, 업무관리 TASKS/HANDOFF/STATUS로 제한하고, push는 사용자 push 발화 전까지 금지한다.

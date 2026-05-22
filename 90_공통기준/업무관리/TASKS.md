@@ -1,3 +1,4 @@
+- [완료] owner=Codex / 세션209 .codex 활성 hook 감사 / 잠금 해제: `99_임시수집/2026-05-22_codex_hook_agent_감사.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 세션208 dirty worktree ignore 패턴 보강 / 잠금 해제: `.gitignore`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 세션207 정산 dirty 묶음 로컬 커밋 / 잠금 해제: `05_생산실적/조립비정산/03_정산자동화/step5_정산계산.py`, `05_생산실적/조립비정산/03_정산자동화/step6_검증.py`, `05_생산실적/조립비정산/STATUS.md`, `90_공통기준/스킬/assembly-cost-settlement/MANUAL.md`, `90_공통기준/스킬/assembly-cost-settlement/SKILL.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / 세션206 정산 dirty 묶음 Claude 도메인 검증 / 잠금 해제: `99_임시수집/2026-05-22_정산_dirty_도메인검증.md`
