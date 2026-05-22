@@ -56,10 +56,12 @@
 | `CLAUDE.md` | Claude 지침 | Claude 주관 |
 
 ### 작업 시작 시 (Codex 작업)
-1. 문서 갱신은 직접 편집보다 `python 90_공통기준/업무관리/doc_worklog.py start --task "<작업명>" --paths <경로...>` 사용을 기본으로 한다.
-2. 작업 수행
-3. 완료 후 `python 90_공통기준/업무관리/doc_worklog.py complete --task "<작업명>" --paths <경로...> --handoff "<1단락>" --status-title "<요약>"`로 TASKS/HANDOFF/STATUS를 함께 갱신한다.
-4. 종료 전 `python 90_공통기준/업무관리/daily_doc_check.py --json`이 PASS인지 확인한다.
+1. 먼저 **작업 전용 하네스 5줄**을 자체 설계한다: 입력 / 작업범위 / 성공기준 / 검증명령 / 중단기준.
+2. 파일 2개 이상 수정, 코드/데이터/브라우저/시각산출물, 비가역 가능성이 있는 작업은 같은 작업지시 안에서 **Plan → Design → Do → Check**를 짧게 세운다. 새 close-lite/full 같은 구조를 만들지 않는다.
+3. 문서 갱신은 직접 편집보다 `python 90_공통기준/업무관리/doc_worklog.py start --task "<작업명>" --paths <경로...> --harness-input "<입력>" --harness-scope "<작업범위>" --harness-success "<성공기준>" --harness-verify "<검증명령>" --harness-stop "<중단기준>"` 사용을 기본으로 한다. 하네스 5필드 누락 시 시작 명령과 `daily_doc_check.py`가 실패한다.
+4. 작업 수행
+5. 완료 후 `python 90_공통기준/업무관리/doc_worklog.py complete --task "<작업명>" --paths <경로...> --handoff "<1단락>" --status-title "<요약>"`로 TASKS/HANDOFF/STATUS를 함께 갱신한다.
+6. 종료 전 `python 90_공통기준/업무관리/daily_doc_check.py --json`이 PASS인지 확인한다.
 
 ### 동시 수정 금지
 - TASKS.md 워크보드에 `잠금 파일`로 기재된 파일은 **다른 AI가 건드리지 않는다**
@@ -90,6 +92,8 @@
 - 사용자에게 "다운로드해서 줘"·"엑셀 export 해서 줘"·"화면 캡처해서 줘" 요구 (자동화 자산 활용)
 - A/B/C 옵션 선택 요구. 자체 판단으로 1개 진행
 - "새 세션에서 다시"·"다음 컨텍스트에서" 보고로 종료
+- AI 완료 보고만 믿고 PASS 금지. 자동검사·실물 산출물·git diff 중 해당 작업에 맞는 증거를 확인한다.
+- `goal mode`·`full access`·신규 플러그인 추가를 기본 운영으로 바로 확대 금지. 권한 완화는 검증명령과 중단기준이 명확한 반복 작업에만 제한한다.
 - Git config 변경, `git push --force`, `git reset --hard`, `--no-verify` 등 파괴적 명령 (사용자 명시 외)
 - 정산/라인배치/MES 도메인 의사결정 (Claude 영역)
 

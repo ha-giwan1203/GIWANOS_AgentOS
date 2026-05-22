@@ -8,6 +8,7 @@ SKILL.md(daily-doc-check)에서 호출.
 1. TASKS 진행중 항목 > 1: FAIL (`[작업중] owner=...` 잠금 포함)
 2. STATUS 세션 < TASKS 세션 (1세션 이상 drift): FAIL
 3. HANDOFF에 `## [완료/진행/...]` 또는 `^상태:`/`^판정:` 독립 선언: FAIL
+4. Codex `[작업중]` 줄에 작업 전용 하네스 5필드가 없으면 FAIL
 
 사용법:
     python daily_doc_check.py              # 판정만 출력 (exit 0=PASS / 1=FAIL)
@@ -41,6 +42,8 @@ CODEX_IN_PROGRESS_RE = re.compile(r"^- \[작업중\]\s+owner=", re.MULTILINE)
 HANDOFF_FORBIDDEN_HEADER_RE = re.compile(r"^## \[(완료|진행|보류|차단)\]", re.MULTILINE)
 HANDOFF_FORBIDDEN_STATUS_RE = re.compile(r"^(상태|판정)[:：]", re.MULTILINE)
 TASK_LEDGER_RE = re.compile(r"^- \[(작업중|완료)\]\s+owner=", re.MULTILINE)
+CODEX_TASK_LINE_RE = re.compile(r"^- \[작업중\]\s+owner=Codex\s+/", re.MULTILINE)
+HARNESS_FIELD_LABELS = ("입력=", "범위=", "성공=", "검증=", "중단=")
 MAIN_TITLE = "# 업무리스트 작업 목록"
 
 
@@ -114,8 +117,23 @@ def detect_handoff_order(path: Path) -> list[str]:
     return hits
 
 
+def detect_codex_harness_missing(path: Path) -> list[str]:
+    """Codex 진행중 줄에 작업 전용 하네스 5필드가 빠진 경우를 잡는다."""
+    if not path.exists():
+        return []
+    lines = path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines()
+    hits = []
+    for i, line in enumerate(lines, start=1):
+        if not CODEX_TASK_LINE_RE.match(line):
+            continue
+        has_harness = " / 하네스: " in line and all(label in line for label in HARNESS_FIELD_LABELS)
+        if not has_harness:
+            hits.append(f"L{i}: {line[:120]}")
+    return hits
+
+
 def judge() -> dict:
-    """3개 항목 판정 후 결과 dict 반환."""
+    """문서 정합성 항목 판정 후 결과 dict 반환."""
     tasks_session = extract_session(TASKS)
     status_session = extract_session(STATUS)
     handoff_session = extract_session(HANDOFF)
@@ -123,6 +141,7 @@ def judge() -> dict:
     handoff_forbidden = detect_handoff_forbidden(HANDOFF)
     tasks_ledger_misplaced = detect_tasks_ledger_misplaced(TASKS)
     handoff_order = detect_handoff_order(HANDOFF)
+    codex_harness_missing = detect_codex_harness_missing(TASKS)
 
     checks = {
         "in_progress": {
@@ -155,6 +174,11 @@ def judge() -> dict:
             "hits": handoff_order,
             "pass": len(handoff_order) == 0,
             "label": "HANDOFF 최신 메모가 위에 위치",
+        },
+        "codex_harness": {
+            "hits": codex_harness_missing,
+            "pass": len(codex_harness_missing) == 0,
+            "label": "Codex 작업중 줄에 작업 전용 하네스 5필드 포함",
         },
     }
     all_pass = all(c["pass"] for c in checks.values())

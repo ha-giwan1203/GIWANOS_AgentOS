@@ -5,7 +5,10 @@ doc_worklog.py — TASKS/HANDOFF/STATUS 갱신 전용 도구
 STATUS 세션 갱신을 반복 실수하는 문제를 줄인다.
 
 사용 예:
-    python doc_worklog.py start --task "작업명" --paths "a.md" "b.py"
+    python doc_worklog.py start --task "작업명" --paths "a.md" ^
+        --harness-input "요청/기준" --harness-scope "수정 범위" ^
+        --harness-success "성공 기준" --harness-verify "검증 명령" ^
+        --harness-stop "중단 기준"
     python doc_worklog.py complete --task "작업명" --paths "a.md" "b.py" ^
         --handoff "완료 내용 1단락" --status-title "작업 완료"
 """
@@ -32,6 +35,13 @@ STATUS_SESSION_RE = re.compile(r"세션(\d+)")
 STATUS_UPDATE_RE = re.compile(r"^최종 업데이트: .*$")
 TASK_START_PREFIX = "- [작업중] owner=Codex / "
 TASK_DONE_PREFIX = "- [완료] owner=Codex / "
+HARNESS_FIELDS = [
+    ("input", "입력"),
+    ("scope", "범위"),
+    ("success", "성공"),
+    ("verify", "검증"),
+    ("stop", "중단"),
+]
 
 
 def read_lines(path: Path) -> list[str]:
@@ -47,9 +57,16 @@ def paths_text(paths: list[str]) -> str:
     return ", ".join(f"`{p}`" for p in paths)
 
 
-def task_line(state: str, task: str, paths: list[str]) -> str:
+def harness_text(harness: dict[str, str] | None) -> str:
+    if not harness:
+        return ""
+    parts = [f"{label}={harness[key]}" for key, label in HARNESS_FIELDS]
+    return " / 하네스: " + "; ".join(parts)
+
+
+def task_line(state: str, task: str, paths: list[str], harness: dict[str, str] | None = None) -> str:
     if state == "start":
-        return f"{TASK_START_PREFIX}{task} / 잠금 파일: {paths_text(paths)}"
+        return f"{TASK_START_PREFIX}{task} / 잠금 파일: {paths_text(paths)}{harness_text(harness)}"
     if state == "done":
         return f"{TASK_DONE_PREFIX}{task} / 잠금 해제: {paths_text(paths)}"
     raise ValueError(f"unknown state: {state}")
@@ -128,8 +145,25 @@ def insert_handoff(handoff_text: str) -> None:
     write_lines(HANDOFF, lines)
 
 
+def build_harness(args: argparse.Namespace) -> dict[str, str] | None:
+    values = {
+        "input": args.harness_input,
+        "scope": args.harness_scope,
+        "success": args.harness_success,
+        "verify": args.harness_verify,
+        "stop": args.harness_stop,
+    }
+    present = {key: bool(value) for key, value in values.items()}
+    if not any(present.values()):
+        raise SystemExit("[FAIL] Codex 작업 시작에는 하네스 5필드가 필요합니다.")
+    if not all(present.values()):
+        missing = ", ".join(label for key, label in HARNESS_FIELDS if not present[key])
+        raise SystemExit(f"[FAIL] 하네스 5필드가 모두 필요합니다. 누락: {missing}")
+    return values
+
+
 def start(args: argparse.Namespace) -> None:
-    insert_top_task_line(task_line("start", args.task, args.paths))
+    insert_top_task_line(task_line("start", args.task, args.paths, build_harness(args)))
     print("[OK] TASKS 작업중 줄을 상단에 추가했습니다.")
 
 
@@ -148,6 +182,11 @@ def main() -> None:
     p_start = sub.add_parser("start", help="TASKS 상단에 작업중 줄 추가")
     p_start.add_argument("--task", required=True, help="작업명")
     p_start.add_argument("--paths", nargs="+", required=True, help="잠금 파일/폴더")
+    p_start.add_argument("--harness-input", help="작업 전용 하네스 입력 기준")
+    p_start.add_argument("--harness-scope", help="작업 전용 하네스 작업 범위")
+    p_start.add_argument("--harness-success", help="작업 전용 하네스 성공 기준")
+    p_start.add_argument("--harness-verify", help="작업 전용 하네스 검증 명령")
+    p_start.add_argument("--harness-stop", help="작업 전용 하네스 중단 기준")
     p_start.set_defaults(func=start)
 
     p_complete = sub.add_parser("complete", help="TASKS 완료 + HANDOFF + STATUS 갱신")

@@ -4,6 +4,22 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **하네스 보완 적용 완료**. 기존 AGENTS.md와 CODEX 작업지시 템플릿 안에 큰 작업용 Plan-Design-Do-Check 흐름, AI 완료 보고만으로 PASS 금지, goal/full access/신규 플러그인 확대 보류 기준을 추가했다. 신규 close-lite/full 구조는 만들지 않았고 daily_doc_check와 py_compile 검증을 통과했다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] **YouTube 영상 ZDfNfEGo7Fc 분석 완료**. youtube-analysis 스킬로 자막을 회수해 Codex 세팅, 플러그인/스킬, goal mode, Plan/Design/AGENTS 기반 하네스, 실제 배포 후 오류 재검증 장면을 확인했다. 우리 운영에는 신규 구조 추가보다 기존 작업 전용 하네스와 자동검증을 강화하고, full access/goal/plugin 확장은 보류해야 한다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] 작업 전용 하네스가 선택사항에 머물지 않도록 강제 규칙을 추가했다. doc_worklog.py start는 하네스 5필드가 없으면 즉시 FAIL하고, daily_doc_check.py는 Codex 작업중 줄에 입력/범위/성공/검증/중단 5필드가 없으면 FAIL한다. 검증: py_compile PASS, 하네스 없는 start 실패 PASS, mock TASKS 하네스 누락/포함 검사 PASS.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [C] 명령별 자체 하네스 설계를 기존 작업 흐름에 적용했다. doc_worklog.py start에 --harness-input/--harness-scope/--harness-success/--harness-verify/--harness-stop 5필드를 추가했고, CODEX 작업지시 템플릿과 AGENTS.md 작업 시작 절차에 작업 전용 하네스 5줄을 먼저 설계하도록 반영했다. 검증: py_compile PASS, start --help PASS, task_line 하네스 출력 PASS.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [B] 사용자 지적에 따라 6MYZ7fMhKPY 영상의 핵심을 '명령별 자체 하네스 설계'로 재정렬했다. 보고서의 영상 기준 보완점 1순위를 도구 축소에서 작업 전용 하네스 5줄(입력/작업범위/성공기준/검증명령/실패시 중단기준) 생성으로 변경했고, 도구 축소·산출물 검증·프로젝트 프롬프트 정리는 후순위로 조정했다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [B] 6MYZ7fMhKPY 영상을 youtube-analysis 스킬로 재분석했다. 프록시 환경변수 제거 후 한국어 자동자막 192세그먼트를 확보했고, 영상 핵심 기준(도구 최소화, 검증 자동화, 프로젝트 전체 프롬프트, 실행/판단 분리, 환경 설계)을 기준으로 하네스 점검 보고서 상단을 재작성했다. 결론은 전체 보류가 아니라 부분반영이며, 최우선 보완점은 새 구조 추가가 아니라 활성 코어 5개 기준으로 도구·문서·검증 레이어를 압축하는 것이다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [B] 사용자 지적으로 6MYZ7fMhKPY 점검에서 youtube-analysis 스킬을 최초 호출하지 않은 오류를 정정했다. 후속으로 youtube_analyze.py를 실행해 cache/6MYZ7fMhKPY/manifest.json 생성은 확인했지만 자막 회수는 네트워크 프록시 오류로 실패했다. 보고서는 영상 기준 전체 판정을 보류로 고치고, 저장소 실물 참고 판정만 부분반영으로 분리했다.
+
+최종 업데이트: 2026-05-22 KST — **Codex** [B] GIWANOS_AgentOS 하네스 구조를 현재 설정 실물 기준으로 점검해 99_임시수집/2026-05-22_하네스_엔지니어링_점검.md에 정리했다. 결론은 활성 코어는 5개 훅까지 압축됐지만, 하네스_운영가이드.md와 STATUS.md가 예전 구조를 현재형처럼 계속 설명해 체감 복잡도가 다시 올라간 상태라는 것이다. Git 실물상 .claude/settings.json, .claude/settings.local.json, .claude/commands/finish.md, .claude/hooks/finish_trigger_detect.sh 등이 수정 중이라 PASS는 부여하지 않고 부분반영/과잉/보류 체계로만 판정했다.
+
 최종 업데이트: 2026-05-22 KST — **세션168-Claude** [A+C] **SP3M3 5/21 라인정지 조회 + /finish 자동트리거 정책 정합 정리**. (A) line-stoppage 인프라로 G-ERP 라인보상상세현황 2026-05 재조회 — 5/21 SP3M3 라인정지 2건 모두 야간조(DAY_STOP_MINUTE=0, NGT 30분+21분), 주간조 비가동 0분. `라인정지_05월_raw.xlsx`/`_요약.md` 5월 34건으로 최신화. (C) 세션157에 비활성화된 finish_trigger_detect가 settings.json UserPromptSubmit hook으로 등록만 잔존 → 등록 해제. `finish.md` line3 "자동 트리거 키워드(세션153)" → "종결 발화 처리(세션157)"로 정합 수정, `finish_trigger_detect.sh`는 미사용 stub 명시 주석으로 보존, MEMORY.md 인덱스 1줄 정정. 영향반경: UserPromptSubmit 이벤트는 이 hook 단독 → 이벤트 블록 제거, 검증 스크립트 무영향. settings 변경은 세션 재시작 시 반영.
 
 최종 업데이트: 2026-05-22 KST — **Codex** [차단] **git 권한 문제 해결 시도 중단**. 일반 git add는 여전히 .git/index.lock 생성 Permission denied로 실패한다. 점검 결과 index.lock 잔존은 없고 .git/.git/index ACL에 SID 3종 Deny ACE가 존재한다. 근본 조치는 .git Deny ACL 제거 + 현재 사용자 FullControl 재부여인데, 해당 권한 복구 명령은 승인 실행이 필요했고 현재 Codex 사용 한도 메시지로 차단되어 실행하지 못했다.
