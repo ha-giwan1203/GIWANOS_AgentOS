@@ -1,3 +1,4 @@
+- [완료] owner=Codex / 세션204 git 권한 경계 릴리즈 절차 정리 / 잠금 해제: `90_공통기준/업무관리/CODEX_작업지시_템플릿.md`, `90_공통기준/업무관리/CODEX_리뷰루틴.md`
 - [완료] owner=Codex / 세션203 Claude 현재 세션 사전 감지 기준 강화 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
 - [완료] owner=Codex / 세션202 Claude CLI 세션 감지 실패 기준 보완 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
 - [완료] owner=Codex / 세션201 Codex 직접 채팅 Claude 반환 기준 협의 / 잠금 해제: `90_공통기준/업무관리/검토기록/README.md`
