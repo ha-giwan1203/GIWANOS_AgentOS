@@ -57,7 +57,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 6개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 5개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
@@ -92,7 +92,7 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_SKILLS_START -->
 
-### Skills (90_공통기준/스킬/) — 23개 등록
+### Skills (90_공통기준/스킬/) — 27개 등록
 
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
 
@@ -106,19 +106,23 @@ Claude-GPT 공동작업 + 운영 원칙.
 | daily-routine | A | ZDM 일상점검 + MES 생산실적 업로드 통합 자동화 (월~토 08:07 cron) |
 | flow-chat-analysis | C | Flow.team SP3S03 채팅방 원문 → 품질·설비 이슈 자동 분류 + 월별 보고서 |
 | gerp-unregistered-check | B | 매월 정산 빌더 산출물(정산_수식버전_MM월.xlsx)에서 GERP 미등록 품번 + 분류 라벨 정확성 + E |
-| jobsetup-auto | B | SmartMES 첫 서열 품번 자동 처리 (REST API v3.5). 작업자 배치 + 인증 + 잡셋업 17 |
+| jobsetup-auto | B | SmartMES 첫 서열 품번의 잡셋업 17 검사항목 자동 입력 (REST API v3.3). 작업자 배치/ |
 | line-batch-mainsub | A | ERP 메인서브 라인배치 자동화 — SP3메인서브 품번 검색 + SUB ASSY 그리드 조립라인 자동 입력  |
 | line-batch-management | A | ERP 라인배치 관리 통합 자동화 — SP3메인서브 + OUTER 라인 (검색 기반 + 리스트업 기반). 시 |
 | line-batch-outer-main | A | ERP OUTER/MAIN 라인배치 자동화 — 검색 없이 그리드 행 순서대로 리스트업 처리 |
 | line-mapping-validator | B | 품번-라인배정 정합성 검증 — 기준 품번 vs 라인배정(ERP/GERP) 비교 + A~F 판정 (일치/컬러확 |
+| line-stoppage | A | 월별 라인정지비(라인보상상세현황) G-ERP 자동 조회 + raw xlsx + 요약 md 생성. 대원테크(0 |
+| monthly-pnl-rollup | B | 월정산 손익 통합팩 — 본체 정산_수식버전_MM월.xlsx에 90·91 두 시트 추가. GERP/구ERP/B |
 | night-scan-compare | B | MES 야간스캔실적 조회 → BI 대비 비교 엑셀 자동 생성 (4시트 데이터+수식+양식) |
 | pptx-generator | B | PPT 자동 생성 (템플릿 편집 + 신규 생성). python-pptx + matplotlib + Beaut |
 | production-report | B | 생산실적 집계 자동화 — BI 실적 + 임률단가 + 조립비 API → 생산관리 마스터리스트 자동 생성 |
 | production-result-upload | A | MES 생산실적 자동 업로드 — BI 엑셀 → SaveExcelData.do API 직접 POST. dail |
 | skill-creator-merged | B | 재사용 스킬 제작·수정·평가·패키징 — 6 모드 (draft / improve / eval / optimiz |
 | sp3-production-plan | B | SP3 생산계획 자동화 — ERP 계획 반영, D+1/D+2 산출, 야간 이월, 수동서열 반영 |
+| sub-part-classify | - | - |
 | supanova-deploy | A | Pinterest 레퍼런스 → Gemini 영상 → WebP 프레임 + 스크롤 애니메이션 → 템플릿 HTML |
 | token-threshold-warn | advisory | 저장소 문서 비대화 사전 감시 — TASKS/HANDOFF/MEMORY/incident 라인·바이트 측정 + |
+| training-record-create | B | 대원테크 표준 교육 기록부(부적합교육·라인내 유의사항·재발방지 등) xlsx 신규 생성. 교육 기록부 만들어 |
 | youtube-analysis | C | YouTube 영상 분석 (자동 + 수동 모드). 자막+프레임 추출 → 9개 관점 분석 → A/B/C 판정  |
 | zdm-daily-inspection | A | ZDM 일상점검 자동 입력 (SP3M3 19개 점검표 / 75개 항목). daily-routine 통합 또는 |
 
