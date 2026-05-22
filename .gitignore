@@ -53,6 +53,7 @@
 !.claude/scripts/cdp/cdp_chat_send.py
 # 세션110: D0 운영 도구 (SKILL.md "되돌리기 방법"에서 참조)
 !.claude/tmp/
+.claude/tmp/*
 !.claude/tmp/erp_d0_deleteA.py
 !.claude/tmp/erp_d0_dedupe.py
 !.claude/rules/
@@ -80,6 +81,16 @@
 
 # 잡셋업 v3.2: 환경별 MES 서버 token (실값). config.example.json은 추적
 90_공통기준/스킬/jobsetup-auto/config.json
+90_공통기준/스킬/jobsetup-auto/state/run_*.json
+
+# Codex 로컬 런타임/로그 (활성 hook/agent 본체는 별도 감사 후 선별 추적)
+.codex/config.toml
+.codex/hooks/*.jsonl
+.codex/hooks/*.log
+.codex/hooks/__pycache__/
+.codex/hooks/.notify_dedup
+.codex/hooks/send_gate_passed
+.codex/hooks/_archive/
 
 # Dedup 상태 파일
 .notion_dedup_state.json
@@ -145,6 +156,7 @@ venv/
 # 임시 / 백업 파일
 # ==========================
 *.bak
+*.bak_*
 *.bak_session107_pre_port9223
 *.old
 *.swp
