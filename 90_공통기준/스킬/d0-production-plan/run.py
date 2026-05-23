@@ -1878,21 +1878,24 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
 # 세션 실행
 # ============================================================
 def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None, parse_only=False, no_mes_send=False, api_mode=False):
+    """반환값 (2026-05-23 추가): True = Phase 3~6 정상 완료(jobsetup chain 가능),
+    False = 실패/부분진행(Phase 4 실패 / Phase 6 SmartMES 불일치 / dry_run / parse_only / no_mes_send).
+    기존 호출부는 반환값 무시(파이썬 호환). 신규 --xlsx 호출부는 jobsetup 가드용으로 활용."""
     if not items:
         print(f"[{line}] 추출 0건 — 스킵")
-        return
+        return False
     cfg = LINE_CONFIG[line]
     xlsx = UPLOAD_DIR / f"d0_{line}_{prod_date.strftime('%Y%m%d')}.xlsx"
     make_upload_xlsx(items, prod_date, xlsx)
 
     if dry_run:
         print(f"[{line}] dry-run: 엑셀 생성까지만 (추출 {len(items)}건)")
-        return
+        return False
 
     if parse_only:
         d0_upload(page, xlsx, parse_only=True)
         print(f"[{line}] parse-only: 업로드 창에 엑셀 첨부 + 서버 파싱까지만 (추출 {len(items)}건). Phase 4/5 미진행")
-        return
+        return False
 
     target_line = "SP3M3" if line == "SP3M3" else "SD9A01"
 
@@ -1904,16 +1907,17 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         print(f"[{line}:http] api_rank_batch: {batch}")
         if batch["failed"] > 0 or batch["missing"] > 0:
             print(f"[{line}:http] 실패/누락 존재 — 최종 저장 보류")
-            return
+            return False
         if no_mes_send:
             print(f"[{line}:http] --no-mes-send: final_save 차단")
-            return
+            return False
         final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"],
                             day_opt='1', processed_order=batch.get("processed_order"))
         vp = verify_prod_date or prod_date
         if not verify_smartmes(target_line, vp, items):
             PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
-        return
+            return False
+        return True
 
     d0_upload(page, xlsx)
     if api_mode:
@@ -1925,18 +1929,20 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         print(f"[{line}] rank_batch: {batch}")
     if batch["failed"] > 0:
         print(f"[{line}] 실패 존재 — 최종 저장 보류")
-        return
+        return False
     if no_mes_send:
         # P3 사고 재발 방지 (세션133 추가) — final_save sendMesFlag='Y' 차단
         # rank 임시저장(sendMesFlag='N')까지만 발생. MES 전송 미발생.
         # 단 ERP DB에는 등록분 + rank 행 잔존 — 사용자 정리 결정 필요
         print(f"[{line}] --no-mes-send: final_save 차단 (sendMesFlag='Y' MES 전송 미실행)")
         print(f"[{line}]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
-        return
+        return False
     final_save(page, cfg["save_url"])
     vp = verify_prod_date or prod_date
     if not verify_smartmes(target_line, vp, items):
         PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
+        return False
+    return True
 
 
 def determine_session(arg):
@@ -1984,6 +1990,7 @@ def main():
     ap.add_argument("--target-date", help="YYYY-MM-DD 파일명 날짜 (기본 자동)")
     ap.add_argument("--prod-date", help="YYYY-MM-DD ERP 등록 생산일자 명시 오버라이드 (공휴일 매핑 등 — evening: target-1 자동 무시 / morning: target 자동 무시)")
     ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
+    ap.add_argument("--no-dedupe", action="store_true", help="dedupe 우회 — 같은 PROD_NO가 이미 등록돼 있어도 그대로 추가 등록 (사용자 명시 중복 등록)")
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
     ap.add_argument("--parse-only", action="store_true", help="검증 모드: 엑셀 업로드창 첨부 + 서버 파싱(selectList)까지만. multiList(DB 저장)/Phase 4-5 모두 스킵")
     ap.add_argument("--no-mes-send", action="store_true", help="Phase 5 final_save(sendMesFlag='Y') 차단 — MES 전송 미발생. P3 PoC/검증용. rank 임시저장(sendMesFlag='N')까지는 발생 — ERP DB 등록분 정리 필요할 수 있음")
@@ -2142,15 +2149,16 @@ def main():
                 if not items:
                     print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
                 else:
-                    run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
-                    sp3m3_registered = True
+                    # 2026-05-23 수정: run_session_line 반환값으로 sp3m3_registered 결정 — Phase 4 실패 / Phase 6 불일치 시 False
+                    sp3m3_registered = run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
             # 세션135: morning SP3M3 등록 성공 시 잡셋업 자동 호출 (chain).
-            # 가드: 실 등록 발생 + dry-run/parse-only 아님 + --no-jobsetup 미사용.
+            # 가드: sp3m3_registered=True (run_session_line이 Phase 3~6 정상 완료 반환) + --no-jobsetup 미사용.
+            # sp3m3_registered=False는 dry_run/parse_only/no_mes_send/Phase4실패/Phase6불일치 모두 포괄.
             # 실패는 advisory(morning 자체 종료에 영향 없음).
-            if sp3m3_registered and not args.dry_run and not args.parse_only and not args.no_jobsetup:
+            if sp3m3_registered and not args.no_jobsetup:
                 _run_jobsetup_chain(args.jobsetup_mode, prod_date)
 
         print("=== /d0-plan 완료 ===")
@@ -2167,8 +2175,55 @@ def _main_http_only(args, sess, session, target_file_date):
 
     ensure_chrome_cdp + sync_playwright 0. dedupe/d0_upload/api_rank_batch/final_save 모두 http.
     page=None — page 의존 함수는 _HTTP_ONLY_SESS 보고 자동 분기 (래퍼).
-    --xlsx 직접 모드는 미지원 (사용자 요청 시 추가).
+    --xlsx 직접 모드 지원 (2026-05-23 추가): 외부 엑셀 5건 등을 SSKR 템플릿으로 변환 후 http-only Phase 3~6.
     """
+    # --xlsx 직접 모드 (http-only) — 사용자 첨부 엑셀에서 PROD_NO/QTY 추출 후 등록
+    if args.xlsx:
+        xlsx_path = Path(args.xlsx)
+        if not xlsx_path.exists():
+            raise FileNotFoundError(f"--xlsx 파일 없음: {xlsx_path}")
+        items = _load_items_from_xlsx(xlsx_path)
+        prod_date = _extract_prod_date(items) or target_file_date
+        line_override = args.line if args.line != "ALL" else "SP3M3"
+        print(f"[direct:http] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
+        page = None
+        items_before = len(items)
+        if args.no_dedupe:
+            print(f"[direct:http] --no-dedupe: dedupe 우회 — items {len(items)}건 그대로 진행 (사용자 명시 중복 등록)")
+        else:
+            items = dedupe_existing_registrations(page, items, prod_date, line_override)
+            if items_before > 0 and len(items) == 0:
+                print("[direct:http] 모든 items가 이미 등록됨 — 업로드 스킵, 종료")
+                print("=== /d0-plan --xlsx --http-only 완료 ===")
+                return
+        if args.dry_run:
+            print(f"[direct:http] dry-run: dedupe 후 등록 대상 {len(items)}건")
+            for it in items:
+                print(f"  - {it['PROD_NO']} QTY={it['QTY']}")
+            print("=== /d0-plan --xlsx --http-only 완료 (dry-run) ===")
+            return
+        # --skip-upload 가드 (2026-05-23 추가):
+        # 기존 브라우저 --xlsx 분기는 skip_upload면 Phase 3 d0_upload 건너뛰고 Phase 4부터 진행했으나,
+        # http-only 경로는 run_session_line이 d0_upload_via_http를 무조건 호출 → 같은 xlsx가 중복 업로드되는 위험.
+        # 안전 차단: --xlsx --http-only --skip-upload 조합은 명시적 미지원으로 종료. Phase 4부터 진행이 필요하면
+        # --xlsx 빼고 --skip-upload만으로 morning/evening 자동 흐름을 사용하거나, 브라우저 모드(--http-only 미사용)로 실행.
+        if args.skip_upload:
+            print("[direct:http] --xlsx --http-only --skip-upload 조합은 미지원 — d0_upload_via_http가 무조건 호출되어 중복 업로드 위험. 작업 중단", file=sys.stderr)
+            sys.exit(2)
+        # run_session_line 위임 — http-only 분기(d0_upload_via_http / api_rank_batch_via_http / final_save_via_http / verify_smartmes) 자동 처리
+        # 반환값 True = Phase 3~6 전부 정상 (jobsetup 가능). False = Phase 4 실패 / Phase 6 SmartMES 불일치 / parse_only / no_mes_send / dry_run 등 비완료
+        run_ok = run_session_line(page, None, line_override, items, prod_date, dry_run=False,
+                                  verify_prod_date=prod_date, parse_only=args.parse_only,
+                                  no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+        if line_override == "SP3M3" and run_ok and not args.no_jobsetup:
+            _run_jobsetup_chain(args.jobsetup_mode, prod_date)
+        elif line_override == "SP3M3" and not run_ok:
+            print(f"[direct:http] run_session_line 미완료(Phase 4 실패 / Phase 6 불일치 / parse_only / no_mes_send) — jobsetup chain 차단", file=sys.stderr)
+        print("=== /d0-plan --xlsx --http-only 완료 ===")
+        if PHASE6_FAILED:
+            print(f"[phase6] 검증 실패 누적: {PHASE6_FAILED} — exit 2", file=sys.stderr)
+            sys.exit(2)
+        return
     try:
         plan_path = find_plan_file(target_file_date)
     except FileNotFoundError as e:
@@ -2212,14 +2267,15 @@ def _main_http_only(args, sess, session, target_file_date):
             if not items:
                 print("[morning:http] dedupe 후 등록 대상 0건 — 업로드 스킵")
             else:
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
-                                 verify_prod_date=prod_date, parse_only=args.parse_only,
-                                 no_mes_send=args.no_mes_send, api_mode=args.api_mode)
-                sp3m3_registered = True
+                # 2026-05-23 수정: run_session_line 반환값으로 결정 — Phase 4 실패 / Phase 6 불일치 시 False → jobsetup 차단
+                sp3m3_registered = run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
+                                                    verify_prod_date=prod_date, parse_only=args.parse_only,
+                                                    no_mes_send=args.no_mes_send, api_mode=args.api_mode)
         if args.line == "SD9A01":
             print("[morning:http] SD9A01은 저녁 세션 전용 — 스킵")
 
-        if sp3m3_registered and not args.dry_run and not args.parse_only and not args.no_jobsetup:
+        # sp3m3_registered=False는 dry_run/parse_only/no_mes_send/Phase4실패/Phase6불일치 모두 포괄
+        if sp3m3_registered and not args.no_jobsetup:
             _run_jobsetup_chain(args.jobsetup_mode, prod_date)
 
     print("=== /d0-plan http-only 완료 ===")

@@ -4,6 +4,10 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-23 KST — **Claude** SP3M3 야간(5/22) + 주간 추가반영(5/23) ERP·MES 처리 완료. (1) 5/22 야간: 25건→dedupe 22건 등록, rank 21~42, SmartMES 대조 ✅. (2) 5/23 주간 추가 첨부5건: dedupe 3건 신규+사용자 명시 중복 2건=5건 모두 등록, rank 27~31. run.py 패치 3건: ①`_main_http_only`에 `--xlsx` 분기 추가 (외부 xlsx → SSKR 템플릿 변환 → http-only Phase 3~6) ②`--no-dedupe` 옵션 (사용자 명시 중복 등록) ③`run_session_line` 반환값(True/False) 도입 + 두 morning 경로(브라우저 2153 / http-only 2263) 가드 일관화 — Phase 4 실패/Phase 6 SmartMES 불일치/parse_only/no_mes_send 모두 jobsetup chain 차단. **별건**: codex plugin Stop hook(`stop-review-gate-hook.mjs`)이 매 turn마다 새 Codex review task spawn하는 동작 차단 — `cache/openai-codex/codex/1.0.4/hooks/hooks.json`의 Stop 섹션 빈 배열 (다음 세션부터 적용). marketplace 경로 hooks.json 동일 차단은 후속 세션 권고.
+
+최종 업데이트: 2026-05-22 KST — Claude→Codex 창 직접 입력 채널로 전환. 이후 Claude의 Codex 지시는 사용자가 열어둔 Codex 창 경유로 진행(헤드리스 codex exec 대신), 사용자 실시간 확인용.
+
 최종 업데이트: 2026-05-22 KST — **Codex** 멀티에이전트 새구조 협의안 Claude 검토 완료 반영. 검토기록/README.md를 확정본으로 두고 agent-shadow 폴더명·brief/result/review 3파일안은 폐기, 90_공통기준/업무관리/검토기록/ + review.md 단일안을 채택했다. plan_subagent_expansion.md와 plan_멀티에이전트_A2.md의 거짓 구현 상태를 폐기로 정정했으며, Gemini는 외부 워커와 D 모드 토론모드 반대검토자 2갈래로 문서화했다. 파일럿은 차기 hook/skill/자동화 변경 1건 대기.
 
 최종 업데이트: 2026-05-22 KST — 세션211 **Codex** 세션210 후속: 사용자 지적에 따라 push 기준 충돌을 정정했다. 기준 원본은 CLAUDE.md durable authorization이며, 사용자 push 발화 시 git push origin main 즉시 허용·별도 재확인 생략으로 AGENTS.md, CLAUDE.md, CODEX_작업지시_템플릿.md, CODEX_리뷰루틴.md를 통일했다. push 관련 4항목은 사용자 확인 요청이 아니라 실행 전후 보고 항목으로 정리했다.
