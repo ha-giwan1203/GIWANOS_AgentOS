@@ -4,6 +4,18 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-25 KST — 세션212 **Codex** Codex가 Claude 자체 P1 패치 후속으로 precompact 운영기준을 보정했다. precompact_save.sh는 Windows Git Bash TZ 오동작을 피하도록 TZ 지정 없이 시스템 KST date를 사용하고, 최신 HANDOFF 구간은 tail이 아닌 head 50줄로 저장한다. 실제 활성 hook 6개에 맞춰 README/AGENTS_GUIDE와 generate_agents_guide.sh 파서를 정합화했으며, precompact_save 실실행으로 완료 상태 기준 session_kernel.md 재생성까지 확인했다. daily_doc_check PASS, final_check --fast/--full ALL CLEAR 확인.
+
+Claude 확인 요청: Codex 변경 범위는 `.claude/hooks/precompact_save.sh`, `.claude/hooks/README.md`, `90_공통기준/업무관리/AGENTS_GUIDE.md`, `90_공통기준/업무관리/generate_agents_guide.sh`, `TASKS/HANDOFF/STATUS`이다. 검증 결과는 `daily_doc_check.py --json` PASS, `final_check.sh --full` ALL CLEAR, `git diff --check` 오류 없음. 기존 untracked 파일과 `.claude/incident_ledger.jsonl` 경고 로그 증분은 이번 P1 보정과 분리해서 검토하면 된다. 다음 액션은 Claude diff 검증 후 commit 승인 또는 보완 지시.
+
+Codex→Claude 직접 전달 확인: Codex가 현재 Claude interactive session `a53a18c6-a00d-4652-b302-440cae20ba7d`(PID 9248)을 확인하고 `claude --resume` 전송을 시도했으나, 작업공간 경로와 변경 요약을 외부 Claude 서비스 세션으로 전송하는 행위가 데이터 반출로 판정되어 안전검토에서 차단됐다. 우회 전송은 하지 않았고, 로컬 검증 요청 원본은 `90_공통기준/업무관리/검토기록/runs/20260525_codex_claude_bridge/request.md`, 차단 기록은 같은 폴더의 `review.md`에 남겼다. 현재 멀티 에이전트 운영은 자동 실시간 전송이 아니라 로컬 검토기록 + TASKS/HANDOFF fallback 상태다.
+
+자동전달 모드 전환 시도: 사용자가 2026-05-25 11:28 KST에 "자동전달 모드로 설정하라고" 명시해 `codex_claude_auto_delivery.json`과 `codex_claude_auto_deliver.py`를 만들었다. 그러나 11:32 KST 실제 전송은 명시 승인 후에도 tenant 정책상 외부 Claude service 데이터 반출로 재차 차단됐다. 우회하지 않았고, 설정은 `enabled=false`, `effective_mode=local_review_queue_only`로 정정했다. 현재 가능한 운영은 Codex가 request.md/review.md/TASKS에 자동 검증대기함을 만들고, Claude가 로컬 파일을 읽어 검증하는 방식이다.
+
+Channels 대체 경로 파일럿: 외부 문서 확인 결과 Claude Code 공식 Channels는 실행 중인 Claude Code 세션에 MCP channel event를 주입하는 구조라 `claude --resume -p` 외부 전송과 다른 경로다. Codex가 `90_공통기준/업무관리/codex_claude_channel/`에 로컬 `codex-bridge` MCP 서버, `send_request.py`, `start_claude_channel.ps1`, README를 구성했고 `bun build server.ts --target=bun` 및 `send_request.py --help`는 PASS했다. 단독 HTTP 서버처럼 띄우는 방식은 잘못된 테스트라 중단했고, 최종 PASS 조건은 Claude를 `start_claude_channel.ps1`로 시작한 뒤 channel send PASS와 Claude `reply` 도구 기록이 `review.md`에 추가되는지 확인하는 것이다. 조직 정책상 Channels가 비활성화되어 있으면 fallback은 계속 `local_review_queue_only`다.
+
+정정: 사용자가 쓰는 것은 Claude 앱 버전 세션이므로 위 Channels 브리지는 현재 세션에 붙지 않는다. Channels 후보는 Claude Code CLI를 `start_claude_channel.ps1`로 별도 시작할 때만 유효하며, 앱 버전 Claude 세션에는 자동전달 수단으로 쓰지 않는다. 따라서 2026-05-25 13:41 KST 기준 운영 판정은 `자동전달 미작동`, 유효한 fallback은 `request.md/review.md` 로컬 검토대기함뿐이다. 이후 보고에서 "세션이 안 떠 있음"이라고 표현하지 말고 "앱 세션은 열려 있으나 CLI Channels 브리지가 붙지 않음"으로 구분한다.
+
 최종 업데이트: 2026-05-23 KST — **Claude** SP3M3 야간(5/22) + 주간 추가반영(5/23) ERP·MES 처리 완료. (1) 5/22 야간: 25건→dedupe 22건 등록, rank 21~42, SmartMES 대조 ✅. (2) 5/23 주간 추가 첨부5건: dedupe 3건 신규+사용자 명시 중복 2건=5건 모두 등록, rank 27~31. run.py 패치 3건: ①`_main_http_only`에 `--xlsx` 분기 추가 (외부 xlsx → SSKR 템플릿 변환 → http-only Phase 3~6) ②`--no-dedupe` 옵션 (사용자 명시 중복 등록) ③`run_session_line` 반환값(True/False) 도입 + 두 morning 경로(브라우저 2153 / http-only 2263) 가드 일관화 — Phase 4 실패/Phase 6 SmartMES 불일치/parse_only/no_mes_send 모두 jobsetup chain 차단. **별건**: codex plugin Stop hook(`stop-review-gate-hook.mjs`)이 매 turn마다 새 Codex review task spawn하는 동작 차단 — `cache/openai-codex/codex/1.0.4/hooks/hooks.json`의 Stop 섹션 빈 배열 (다음 세션부터 적용). marketplace 경로 hooks.json 동일 차단은 후속 세션 권고.
 
 최종 업데이트: 2026-05-22 KST — Claude→Codex 창 직접 입력 채널로 전환. 이후 Claude의 Codex 지시는 사용자가 열어둔 Codex 창 경유로 진행(헤드리스 codex exec 대신), 사용자 실시간 확인용.

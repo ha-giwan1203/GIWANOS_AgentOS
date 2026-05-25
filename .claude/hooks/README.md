@@ -1,7 +1,7 @@
 # Hooks 운영 현황
 
-> Phase 3 완료 — 36개 → 5개 압축 (Round 1+2 합의안 채택, 세션137).
-> 31개 폐기본은 `98_아카이브/_deprecated_v1/hooks/` 보존.
+> Phase 3 완료 — 36개 → 5개 압축 후 P1 세션 커널 복구로 현재 6개 운영.
+> 폐기본은 `98_아카이브/_deprecated_v1/hooks/` 보존하며, `precompact_save.sh`만 운영 복귀.
 > 합의 원본: `90_공통기준/토론모드/logs/debate_20260503_101125_3way/round2_consensus.md`
 
 ## Single Source of Truth
@@ -12,13 +12,14 @@
 
 `final_check.sh`는 이 기준 + settings.json(team+local union)을 따른다.
 
-## 활성 Hook 5개 (settings.json 기준)
+## 활성 Hook 6개 (settings.json 기준)
 
 | 훅 | matcher | 역할 |
 |---|---|---|
 | `block_dangerous.sh` | PreToolUse / Bash | 위험 명령 차단 (rm -rf, sudo, chmod 777). deterministic 차단만. |
 | `commit_gate.sh` | PreToolUse / Bash | final_check --fast 통과 후만 commit/push 허용. 자연어 가이드 금지. |
 | `protect_files.sh` | PreToolUse / Write\|Edit\|MultiEdit | 보호 파일(원본 xlsx·기준 문서) 수정 차단. deterministic. |
+| `precompact_save.sh` | PreCompact | compact 직전 TASKS/HANDOFF 최신 구간을 session_kernel.md에 저장. |
 | `session_start_restore.sh` | SessionStart | git status·최근 commit 5건·TASKS·HANDOFF 상단·incident N건 데이터만 출력. 자연어 조언 금지. |
 | `completion_gate.sh` | Stop | 통과/실패 + 누락 staged file만 보고. "반성하라"·"다음엔 이렇게 하라" 메시지 금지. |
 
@@ -30,7 +31,7 @@
 
 ## 보조 파일 (settings.json 미등록, 라이브러리·헬퍼)
 
-표가 아닌 목록 형식 (final_check 카운트는 첫 테이블 5행만 = 활성 hook 5개):
+표가 아닌 목록 형식 (final_check 카운트는 첫 테이블 6행만 = 활성 hook 6개):
 
 - `hook_common.sh` — 공통 함수 라이브러리 (등급 wrapper / fingerprint / suppress)
 - `list_active_hooks.sh` — settings.json 기준 활성 hook 카운트 (final_check가 SSoT로 사용)

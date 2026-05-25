@@ -35,49 +35,18 @@ else
   [ -z "$HOOK_COUNT" ] && HOOK_COUNT=0
 fi
 
-HOOKS_TABLE="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.json+settings.local.json 기준)
-
-> 상세: \`.claude/hooks/README.md\` 참조. 아카이브: \`.claude/hooks/_archive/\`
-> 이 표는 \`generate_agents_guide.sh\`가 자동 생성. 수동 편집하지 마세요.
-
-| 층 | 스크립트 | matcher | 역할 |
-|----|---------|---------|------|"
-
-# README.md에서 활성 hook 표 파싱
-while IFS='|' read -r _ layer script matcher role _; do
-  script=$(echo "$script" | xargs)
-  [ -z "$script" ] && continue
-  [[ "$script" == "훅" ]] && continue
-  [[ "$script" == "---"* ]] && continue
-  [[ "$script" == *"스크립트"* ]] && continue
-  layer=$(echo "$layer" | xargs)
-  matcher=$(echo "$matcher" | xargs)
-  role=$(echo "$role" | xargs)
-  [ -n "$script" ] && [ -n "$role" ] && \
-    echo "| $layer | $script | $matcher | $role |" >> /tmp/hooks_table.tmp
-done < <(sed -n '/^## 활성 Hook/,/^## /p' "$README" | grep '^\|' | grep -v '^\|.*층.*\|.*스크립트' | grep -v '^\|.*---')
-
-# README에서 활성 훅 행 추출: .sh 포함 행에서 스크립트명+역할 추출
+# README에서 활성 훅 표 추출: 현재 README의 3열 표(`훅 | matcher | 역할`) 기준
 HOOKS_ROWS=""
-IN_SECTION=0
-while IFS= read -r line; do
-  if echo "$line" | grep -qE "^### (이벤트층|프롬프트층|차단층|추적층|알림층|종료층)"; then IN_SECTION=1; continue; fi
-  if [ "$IN_SECTION" -eq 1 ]; then
-    if echo "$line" | grep -qE '`[a-z_]+\.sh`'; then
-      # 테이블 행에서 스크립트명과 역할 추출
-      SCRIPT_NAME=$(echo "$line" | grep -oE '`[a-z_]+\.sh`' | head -1)
-      ROLE=$(echo "$line" | awk -F'|' '{print $NF}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-      [ -z "$ROLE" ] && ROLE=$(echo "$line" | awk -F'|' '{print $(NF-1)}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-      [ -n "$SCRIPT_NAME" ] && HOOKS_ROWS="${HOOKS_ROWS}| ${SCRIPT_NAME} | ${ROLE} |
+if [ -f "$README" ]; then
+  while IFS= read -r line; do
+    hook=$(printf '%s\n' "$line" | grep -oE '`[a-z_]+\.sh`' | head -1)
+    [ -z "$hook" ] && continue
+    role=$(printf '%s\n' "$line" | awk -F'|' '{print $(NF-1)}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [ -z "$role" ] && role=$(printf '%s\n' "$line" | awk -F'|' '{print $NF}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    [ -n "$role" ] && HOOKS_ROWS="${HOOKS_ROWS}| ${hook} | ${role} |
 "
-    fi
-    if echo "$line" | grep -qE "^## (보조 스크립트|req clear|훅별 실패|참조)"; then
-      IN_SECTION=0
-    fi
-  fi
-done < "$README"
-
-rm -f /tmp/hooks_table.tmp
+  done < <(sed -n '/^## 활성 Hook/,/^## 핵심 운영 원칙/p' "$README" | grep '^\|')
+fi
 
 # README의 각 층별 표에서 .sh 행 추출 + 층 라벨 부착
 HOOKS_BLOCK="### Hooks (.claude/hooks/) — ${HOOK_COUNT}개 활성 (settings.json+settings.local.json 기준)

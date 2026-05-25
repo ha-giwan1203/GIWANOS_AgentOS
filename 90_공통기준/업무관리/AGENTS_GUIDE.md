@@ -57,13 +57,19 @@ Claude-GPT 공동작업 + 운영 원칙.
 
 <!-- AUTO_HOOKS_START -->
 
-### Hooks (.claude/hooks/) — 5개 활성 (settings.json+settings.local.json 기준)
+### Hooks (.claude/hooks/) — 6개 활성 (settings.json+settings.local.json 기준)
 
 > 상세: `.claude/hooks/README.md` 참조. 아카이브: `.claude/hooks/_archive/`
 > 이 섹션은 `generate_agents_guide.sh`가 자동 갱신. 수동 편집 시 덮어쓰기됨.
 
 | 스크립트 | 역할 |
 |---------|------|
+| `block_dangerous.sh` | 위험 명령 차단 (rm -rf, sudo, chmod 777). deterministic 차단만. |
+| `commit_gate.sh` | final_check --fast 통과 후만 commit/push 허용. 자연어 가이드 금지. |
+| `protect_files.sh` | 보호 파일(원본 xlsx·기준 문서) 수정 차단. deterministic. |
+| `precompact_save.sh` | compact 직전 TASKS/HANDOFF 최신 구간을 session_kernel.md에 저장. |
+| `session_start_restore.sh` | git status·최근 commit 5건·TASKS·HANDOFF 상단·incident N건 데이터만 출력. 자연어 조언 금지. |
+| `completion_gate.sh` | 통과/실패 + 누락 staged file만 보고. "반성하라"·"다음엔 이렇게 하라" 메시지 금지. |
 
 
 <!-- AUTO_HOOKS_END -->
