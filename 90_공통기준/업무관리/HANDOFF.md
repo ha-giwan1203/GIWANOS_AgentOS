@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-26 KST — 세션213 **Codex** SD9A01 88820X9xxx GERP 품번누락 10건이 통합 오류리스트에 누락되던 경로를 보정했다. step5는 NaN 단가를 0으로 정규화하고 0원 GERP 품번누락의 비고/받을금액을 명시하며, populate는 SD9A01 라인시트 계산값으로 캐시 누락 10건을 보강해 본체 오류리스트만 230행으로 갱신했다. 검증 결과 오류리스트 총 230건, GERP 품번누락 112건, 대상 10건, SD9A01 S열 수식 617건/대상 10건 보존 PASS.
+
 최종 업데이트: 2026-05-25 KST — 세션212 **Codex** Codex가 Claude 자체 P1 패치 후속으로 precompact 운영기준을 보정했다. precompact_save.sh는 Windows Git Bash TZ 오동작을 피하도록 TZ 지정 없이 시스템 KST date를 사용하고, 최신 HANDOFF 구간은 tail이 아닌 head 50줄로 저장한다. 실제 활성 hook 6개에 맞춰 README/AGENTS_GUIDE와 generate_agents_guide.sh 파서를 정합화했으며, precompact_save 실실행으로 완료 상태 기준 session_kernel.md 재생성까지 확인했다. daily_doc_check PASS, final_check --fast/--full ALL CLEAR 확인.
 
 Claude 확인 요청: Codex 변경 범위는 `.claude/hooks/precompact_save.sh`, `.claude/hooks/README.md`, `90_공통기준/업무관리/AGENTS_GUIDE.md`, `90_공통기준/업무관리/generate_agents_guide.sh`, `TASKS/HANDOFF/STATUS`이다. 검증 결과는 `daily_doc_check.py --json` PASS, `final_check.sh --full` ALL CLEAR, `git diff --check` 오류 없음. 기존 untracked 파일과 `.claude/incident_ledger.jsonl` 경고 로그 증분은 이번 P1 보정과 분리해서 검토하면 된다. 다음 액션은 Claude diff 검증 후 commit 승인 또는 보완 지시.

@@ -17,7 +17,7 @@ Step 5 — 정산 계산
 출력: _cache/step5_settlement.json
 """
 
-import sys, os, json
+import sys, os, json, math
 sys.path.insert(0, os.path.dirname(__file__))
 sys.stdout.reconfigure(encoding='utf-8')
 sys.stderr.reconfigure(encoding='utf-8')
@@ -30,6 +30,39 @@ from datetime import datetime
 print("=" * 60)
 print("Step 5: 정산 계산")
 print("=" * 60)
+
+MISSING_PRICE_NOTE = '단가 미매핑(기준정보 등록필요)'
+
+
+def _num(value, default=0):
+    try:
+        n = float(value)
+    except (TypeError, ValueError):
+        return default
+    if math.isnan(n) or math.isinf(n):
+        return default
+    return int(n) if n.is_integer() else n
+
+
+def _is_finished_gerp_missing(row, line_group):
+    if line_group != '완성품':
+        return False
+    if not str(row.get('err_type', '')).startswith('GERP 품번누락'):
+        return False
+    g_qty = _num(row.get('gerp_day_qty')) + _num(row.get('gerp_ngt_qty'))
+    e_qty = _num(row.get('erp_day_qty')) + _num(row.get('erp_ngt_qty'))
+    return g_qty == 0 and e_qty > 0
+
+
+def _is_qty_only_gerp_missing(row, line_group, g_amt=None, e_amt=None):
+    """완성품라인에서 금액 0이어도 구ERP 수량만 있으면 오류리스트 대상으로 유지."""
+    if not _is_finished_gerp_missing(row, line_group):
+        return False
+    if g_amt is None:
+        g_amt = _num(row.get('gerp_total_amt'))
+    if e_amt is None:
+        e_amt = _num(row.get('erp_day_amt')) + _num(row.get('erp_ngt_amt'))
+    return g_amt == 0 and e_amt == 0
 
 # ── 의존 체크 ─────────────────────────────────────────────────
 for fpath, name in [(CACHE_STEP2, 'Step2'), (CACHE_STEP3, 'Step3'), (CACHE_STEP4, 'Step4')]:
@@ -138,8 +171,8 @@ for lc in LINE_ORDER:
 
     for r in rows:
         pn    = r['part_no']
-        price = r['price']
-        usage = r['usage']
+        price = _num(r.get('price'), 0)
+        usage = _num(r.get('usage'), 1)
         _processed_pns.add(pn)
         is_first_gerp = pn not in _gerp_amt_used  # 다중단가: 첫 행만 GERP 합계에 포함
 
@@ -391,6 +424,11 @@ for lc in LINE_ORDER:
         row['note']        = note
         row['excl_reason'] = excl
         row['recv_amt']    = calc_recv_amt(amt_diff, excl)
+        if _is_qty_only_gerp_missing(row, line_group):
+            row['err_type'] = 'GERP 품번누락'
+            row['note'] = MISSING_PRICE_NOTE
+            row['excl_reason'] = ''
+            row['recv_amt'] = 0
 
     gerp_total = total_gerp_day_amt + total_gerp_ngt_amt
     erp_total  = total_erp_day_amt  + total_erp_ngt_amt
@@ -433,25 +471,27 @@ from _error_types import TYPE_ORDER
 error_list = []
 for lc in LINE_ORDER:
     ld = lines_result.get(lc, {})
+    line_group = LINE_GROUP.get(lc, '메인SUB')
     for r in ld.get('items', []):
         # 다중단가 2번째+ 행: GERP금액이 의도적 0 (중복방지) → 비교 대상 아님
         if not r.get('is_first_gerp', True):
             continue
-        g_amt = r['gerp_total_amt']
-        e_amt = r['erp_day_amt'] + r['erp_ngt_amt']
-        if g_amt == e_amt:
+        g_amt = _num(r.get('gerp_total_amt'))
+        e_amt = _num(r.get('erp_day_amt')) + _num(r.get('erp_ngt_amt'))
+        qty_only_gerp_missing = _is_qty_only_gerp_missing(r, line_group, g_amt, e_amt)
+        if g_amt == e_amt and not qty_only_gerp_missing:
             continue
-        # 제외사유 있으면 정상 처리 (이관품번/웨빙재작업 등) — 오류 리스트 제외
-        if r.get('excl_reason'):
+        # 제외사유 있으면 정상 처리. 단, 0원 GERP 품번누락 보강 행은 통합 리스트에 노출한다.
+        if r.get('excl_reason') and not qty_only_gerp_missing:
             continue
-        g_qty = r['gerp_day_qty'] + r['gerp_ngt_qty']
-        e_qty = r['erp_day_qty'] + r['erp_ngt_qty']
+        g_qty = _num(r.get('gerp_day_qty')) + _num(r.get('gerp_ngt_qty'))
+        e_qty = _num(r.get('erp_day_qty')) + _num(r.get('erp_ngt_qty'))
         error_list.append({
             'line': lc, 'part_no': r['part_no'],
-            'type': r.get('err_type', '정산차이'),
-            'note': r.get('note', ''),
+            'type': 'GERP 품번누락' if qty_only_gerp_missing else r.get('err_type', '정산차이'),
+            'note': MISSING_PRICE_NOTE if qty_only_gerp_missing else r.get('note', ''),
             'excl_reason': r.get('excl_reason', ''),
-            'recv_amt': r.get('recv_amt', 0),
+            'recv_amt': 0 if qty_only_gerp_missing else r.get('recv_amt', 0),
             'price_type': r['price_type'],
             'gerp_qty': g_qty, 'erp_qty': e_qty,
             'gerp_amt': g_amt, 'erp_amt': e_amt,
