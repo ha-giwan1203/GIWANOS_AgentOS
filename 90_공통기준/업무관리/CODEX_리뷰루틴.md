@@ -54,6 +54,10 @@
 - 사용자가 원하지 않은 비가역 작업이 없는지 확인
 - 산출물 경로와 파일명이 맞는지 확인
 - 실패·보류·예외가 숨겨지지 않았는지 확인
+- 자동전달 모드가 정책상 허용되어 있으면 Codex는 `codex_claude_auto_deliver.py`로 `request.md`를 현재 Claude session에 보내고, 응답을 `review.md`에 기록한다.
+- 2026-05-25 현재 이 환경에서는 외부 Claude service 전송이 tenant 정책으로 차단되어, 유효 운영은 로컬 자동 검증대기함이다.
+- Codex가 직접 Claude 세션으로 검증 요청을 전송하지 못한 경우, `90_공통기준/업무관리/검토기록/runs/.../request.md`와 `TASKS.md` owner=Claude 항목을 Claude 검증 대기함으로 본다.
+- 안전검토나 실행 오류로 외부 전송이 차단된 요청은 우회하지 않고 `review.md`에 차단 사유를 남긴다.
 
 ## 7. `/codex:review` 사용 기준
 - commit 전 코드 변경이 있으면 사용 권장
@@ -66,6 +70,8 @@
 
 - commit 전에는 변경 파일 목록, 의도하지 않은 변경, 검증 명령, `TASKS/HANDOFF/STATUS` 갱신 여부를 확인한다.
 - Claude 검증이 FAIL이면 commit/push로 넘어가지 않는다.
+- Claude 검증 요청이 전송 차단 또는 보류 상태이면 commit 승인으로 보지 않는다.
+- 자동전달 성공 후에도 Claude 응답에 `commit 승인: YES` 또는 동등한 승인 문구가 없으면 commit 승인으로 보지 않는다.
 - `.git/index.lock` 권한 문제가 나면 먼저 lock 잔존 여부와 실행 중 git 작업을 확인하고, 일반 경로 재시도 후에도 실패할 때만 escalated commit을 1회 사용한다.
 - push는 사용자 push 발화 시 즉시 허용하며, 별도 재확인 단계는 생략한다.
 - push 실행 전후 보고에는 원격 주소(`origin`), 브랜치, 커밋 해시, 외부 반출 고지를 남긴다.

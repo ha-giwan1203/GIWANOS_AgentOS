@@ -83,6 +83,51 @@
 5. 완료 후 `python 90_공통기준/업무관리/doc_worklog.py complete --task "<작업명>" --paths <경로...> --handoff "<1단락>" --status-title "<요약>"`로 TASKS/HANDOFF/STATUS를 함께 갱신한다.
 6. 종료 전 `python 90_공통기준/업무관리/daily_doc_check.py --json`이 PASS인지 확인한다.
 
+### 도구 부재 시 자체 설치·생성 (2026-05-26 명시)
+> 비유: 공장에서 공구가 없으면 사다 쓰거나 만들어 쓰는 게 당연하다. "도구 없어서 보류"는 안 된다.
+
+- 작업에 필요한 CLI·라이브러리·모듈이 없으면 **Codex가 자체 판단으로 설치한다**.
+  - Python 패키지: `pip install <pkg>` (사용자 환경 venv 또는 system)
+  - Windows CLI: `winget install <id>` 또는 `choco install <pkg>`
+  - Node 패키지: `npm install -g <pkg>` (필요 시)
+  - 한 번 설치하면 다음 작업에서도 사용 가능
+- **기능이 없으면 도구를 만든다**. 외부 패키지로 안 되는 OS 자동화는 `pyautogui` / `pywin32` / `keyboard` 등으로 직접 모듈 작성. Win32 API 호출이면 grant 불필요.
+- 비가역(ERP/MES 업로드·삭제·정산 본체 덮어쓰기)은 1줄 통보 후 진행. 도구 설치·자체 구현은 비가역 아니므로 통보 불필요.
+- 보고에 "도구가 없어서 보류" 패턴 금지. "설치 시도 → 실패 사유" 또는 "자체 구현 → 결과" 형태로 진행.
+
+### 작업 완료 시 자동 회신 (풀-자동 채널 — 2026-05-26 도입)
+> 비유: 작업이 끝났으면 본인이 직접 클로드 책상까지 가서 "다 했습니다" 보고하는 구조다. Claude가 따로 확인하러 오지 않아도 된다.
+
+Codex는 위임받은 작업의 **진행 상황과 완료 결과를 Claude 앱에 자동 입력**한다.
+
+0. **(진행상황) Claude 앱 채팅창 직접 입력**:
+   - 작업 시작, 의미 있는 단계 완료, 검증 시작/완료, 블로커 발생 시 `auto_reply.py`로 Claude에 진행상황을 입력한다
+   - 호출 명령: `python 90_공통기준/업무관리/codex_claude_channel/auto_reply.py "[Codex 진행] <현재 단계 / 다음 행동>"`
+   - 메시지 시작은 반드시 `[Codex 진행]` 마커
+   - 모든 shell 명령마다 보내지 않는다. Claude가 상태를 놓치지 않을 정도의 작업 단위로 보낸다
+   - paste 실패·입력 충돌이면 우회하지 않고 `auto_reply.log`와 해당 작업 `review.md`에 남긴다
+
+Codex는 위임받은 작업이 끝나면 **자동으로 두 곳에 회신**한다.
+
+1. **(A 메인) Claude 앱 채팅창 직접 입력**:
+   - 보조 모니터(`LG FULL HD (2)`)의 Claude 앱 채팅창에 computer-use로 paste + Enter 제출
+   - 호출 명령: `python 90_공통기준/업무관리/codex_claude_channel/auto_reply.py "[Codex 완료] <한 줄 요약>"`
+   - 메시지 시작은 반드시 `[Codex 완료]` 마커
+   - 형식: `[Codex 완료] <작업명> / 결과 PASS or FAIL / 변경 파일 N개 / 한 줄 요약 / 상세는 채팅 위 참조`
+   - 짧게 5~10줄 이내. 긴 diff·로그는 채팅에 안 박고 review.md로
+   - computer-use grant 없거나 Claude 창 식별 실패 시 시도하지 말고 B만 실행
+2. **(B 안전망 fallback) `90_공통기준/업무관리/검토기록/runs/<YYYYMMDD_task-slug>/review.md` 작성**:
+   - 진단·diff·재빌드·검증 결과 전체 기록
+   - mtime 갱신이 Claude 폴링 신호
+
+**무한 루프 방지**:
+- `[Codex 완료]` 마커로 시작하는 메시지는 사용자 발화가 아니라 Codex 회신이다. Claude는 이걸 받으면 **검증·요약만 하고 새 작업을 spawn하지 않는다**.
+- `[Codex 진행]` 마커로 시작하는 메시지도 사용자 발화가 아니라 Codex 진행상황이다. Claude는 새 작업을 spawn하지 않고 상태 참고만 한다.
+- 동일 task에 대해 자동 회신은 1회만. 보충 질의는 새 task로 분리.
+- Claude 앱 채팅창에 사용자가 입력 중인 텍스트가 있으면 Codex는 paste를 보류하고 B만 실행한다.
+
+**적용 시점**: 이번 위임부터 적용. AGENTS.md를 읽었으면 룰 적용 의무.
+
 ### 동시 수정 금지
 - TASKS.md 워크보드에 `잠금 파일`로 기재된 파일은 **다른 AI가 건드리지 않는다**
 - 작업이 끝나면 잠금 해제 (TASKS.md 줄 갱신)

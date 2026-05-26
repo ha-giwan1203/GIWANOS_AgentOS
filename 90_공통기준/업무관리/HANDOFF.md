@@ -4,6 +4,12 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-26 KST — 세션216 **Codex** 자동회신 채널 작업물 commit 및 push 위임을 수행한다. 커밋 범위는 AGENTS 자동 설치/진행/완료 룰, auto_reply.py, auto_reply 실행 로그, 검토 루틴/검토기록 문서, 작업문서 갱신분으로 제한하고 별건 untracked는 제외한다. push 결과는 20260526_push_auto_reply/review.md와 Claude 자동완료 메시지에 기록한다.
+
+최종 업데이트: 2026-05-26 KST — 세션215 **Codex** 진행상황 Claude 자동입력 규칙을 AGENTS.md에 반영했다. Codex는 작업 시작, 단계 완료, 검증, 블로커 때 auto_reply.py로 Codex 진행 메시지를 Claude 앱에 입력하고 완료 시 Codex 완료 메시지를 보낸다. foreground 예외 보강 후 재전송 PASS 확인.
+
+최종 업데이트: 2026-05-26 KST — 세션214 **Codex** Codex Claude 자동회신 모듈을 구축했다. auto_reply.py는 pyautogui/pyperclip/Win32 창 열거로 Claude 앱을 찾아 하단 입력창에 paste+Enter를 수행하며, 입력 충돌 감지 시 exit 2로 보류한다. 90% 좌표 false positive를 probe로 확인해 95.5% 지점으로 보정했고 self-test 메시지 전송 exit 0 및 auto_reply.log PASS를 확인했다.
+
 최종 업데이트: 2026-05-26 KST — 세션213 **Codex** SD9A01 88820X9xxx GERP 품번누락 10건이 통합 오류리스트에 누락되던 경로를 보정했다. step5는 NaN 단가를 0으로 정규화하고 0원 GERP 품번누락의 비고/받을금액을 명시하며, populate는 SD9A01 라인시트 계산값으로 캐시 누락 10건을 보강해 본체 오류리스트만 230행으로 갱신했다. 검증 결과 오류리스트 총 230건, GERP 품번누락 112건, 대상 10건, SD9A01 S열 수식 617건/대상 10건 보존 PASS.
 
 최종 업데이트: 2026-05-25 KST — 세션212 **Codex** Codex가 Claude 자체 P1 패치 후속으로 precompact 운영기준을 보정했다. precompact_save.sh는 Windows Git Bash TZ 오동작을 피하도록 TZ 지정 없이 시스템 KST date를 사용하고, 최신 HANDOFF 구간은 tail이 아닌 head 50줄로 저장한다. 실제 활성 hook 6개에 맞춰 README/AGENTS_GUIDE와 generate_agents_guide.sh 파서를 정합화했으며, precompact_save 실실행으로 완료 상태 기준 session_kernel.md 재생성까지 확인했다. daily_doc_check PASS, final_check --fast/--full ALL CLEAR 확인.

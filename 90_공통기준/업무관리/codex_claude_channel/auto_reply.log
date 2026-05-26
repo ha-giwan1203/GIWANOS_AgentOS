@@ -1,0 +1,9 @@
+{"timestamp": "2026-05-26T14:26:29", "result": "SKIP_EXISTING_TEXT", "message_len": 34, "detail": "draft_len=4159", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:28:43", "result": "PASS", "message_len": 34, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:30:08", "result": "PASS", "message_len": 79, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:32:34", "result": "PASS", "message_len": 45, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:33:27", "result": "PASS", "message_len": 57, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:33:56", "result": "FAIL", "message_len": 65, "detail": "PyGetWindowException: Error code from Windows: 0 - 작업을 완료했습니다.", "hwnd": 524468}
+{"timestamp": "2026-05-26T14:34:37", "result": "PASS", "message_len": 56, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:35:36", "result": "PASS", "message_len": 91, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:38:55", "result": "PASS", "message_len": 52, "detail": "title=Claude", "hwnd": 198186}
