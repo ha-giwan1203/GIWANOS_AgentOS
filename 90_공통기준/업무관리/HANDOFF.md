@@ -4,6 +4,12 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-27 KST — 세션223 **Codex** auto_reply.py의 send(message,target)에서 target=codex 메시지에만 Codex 완료 회신 의무 블록을 자동 append하도록 보강했다. 빈 메시지 거부는 유지했고, 동일 블록 중복 append를 방지했으며, target=claude는 메시지 길이 무변경을 self-test로 확인했다.
+
+최종 업데이트: 2026-05-27 KST — 세션222 **Codex** auto_reply 실패의 근본 원인은 Codex 일반 샌드박스 셸에서 Windows GUI 창 열거가 0개가 되는 권한 문제였다. auto_reply.py가 이 상태를 GUI_ACCESS_UNAVAILABLE로 명확히 진단하도록 보강했고, AGENTS.md/README.md에는 일반 실행 실패 시 require_escalated로 1회 재시도 후 fallback 판정하도록 반영했다.
+
+최종 업데이트: 2026-05-27 KST — 세션221 **Codex** A RETRACTOR 3,860행 중 상태=확정 3,858개 PROD_NO를 기준으로 B SQL Results의 DECIDE_CD=Y 라인코드 집합을 비교했다. WAMAS01 미보유는 385건, B에 PROD_NO 자체가 없는 건은 0건이며 결과 엑셀은 99_임시수집/retractor_wamas01_missing_20260527.xlsx에 생성했다.
+
 최종 업데이트: 2026-05-26 KST — 세션220 **Codex** auto_reply.py의 SKIP_FINAL/ENTER_FAILED exit code를 10/11로 재매핑하고 argparse 오류 exit 2와 분리했다. --help 및 AGENTS.md 호출자 가이드에 코드표를 추가했으며, 창 식별 실패 FAIL 로그 경로 1건을 함께 보강했다. py_compile, invalid target exit 2, mock SKIP/ENTER/FAIL, target=claude 정상 호출 검증을 완료했다.
 
 최종 업데이트: 2026-05-26 KST — 세션219 **Codex** auto_reply.py에 SKIP_EXISTING_TEXT 2회 자동 재시도, SKIP_FINAL exit 2, Enter 후 입력창 probe 검증, ENTER_FAILED exit 3, retries/verify 로그 필드를 추가했다. target=claude self-test는 exit 0 및 verify=enter_confirmed 로그로 확인했다. b407e058와 이번 보강 commit을 함께 origin/main에 push할 예정이다.

@@ -49,6 +49,12 @@ EXIT_CODE_HELP = """Exit codes:
   11  ENTER_FAILED (paste succeeded, but Enter did not clear the input)
 """
 
+CODEX_REPLY_REMINDER = """---
+[필수 회신] 작업 완료 시 즉시:
+python 90_공통기준/업무관리/codex_claude_channel/auto_reply.py --target claude "[Codex 완료] <한 줄 요약>"
+- 실패 시 require_escalated 1회 재시도
+- 그래도 실패면 90_공통기준/업무관리/검토기록/runs/<YYYYMMDD_task-slug>/review.md 작성으로 fallback"""
+
 REQUIRED_PACKAGES = {
     "pyautogui": "pyautogui",
     "pyperclip": "pyperclip",
@@ -148,6 +154,67 @@ def _matches_target(spec: TargetSpec, title: str, process_name: str) -> tuple[bo
     return title_match or process_match, process_match
 
 
+def _target_process_summaries(target: str) -> list[str]:
+    import psutil
+
+    spec = TARGETS[target]
+    summaries: list[str] = []
+    for proc in psutil.process_iter(["pid", "name"]):
+        try:
+            name = proc.info.get("name") or ""
+            if name.lower() in spec.process_names:
+                summaries.append(f"{name}:{proc.info.get('pid')}")
+        except Exception:
+            continue
+    return summaries
+
+
+def _visible_top_window_count() -> int:
+    import win32gui
+
+    count = 0
+
+    def enum_cb(hwnd: int, _param: object) -> bool:
+        nonlocal count
+        if not win32gui.IsWindowVisible(hwnd):
+            return True
+        try:
+            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+        except Exception:
+            return True
+        if right > left and bottom > top:
+            count += 1
+        return True
+
+    win32gui.EnumWindows(enum_cb, None)
+    return count
+
+
+def _window_not_found_message(target: str) -> str:
+    label = TARGETS[target].label
+    processes = _target_process_summaries(target)
+    visible_count = _visible_top_window_count()
+    if processes and visible_count == 0:
+        return (
+            f"{label} window not found; GUI_ACCESS_UNAVAILABLE: no visible top-level windows "
+            f"are visible to this process while {label} processes exist ({len(processes)}). "
+            "In Codex shell, rerun auto_reply.py with sandbox_permissions=require_escalated."
+        )
+    if processes:
+        return (
+            f"{label} window not found; {label} processes exist ({len(processes)}) but no matching "
+            "visible window was found. Restore/open the app window, then retry."
+        )
+    return f"{label} window not found; {label} process not found"
+
+
+def _append_codex_reply_reminder(message: str, target: str) -> str:
+    if target != "codex" or CODEX_REPLY_REMINDER in message:
+        return message
+    separator = "\n" if message.endswith("\n") else "\n\n"
+    return f"{message}{separator}{CODEX_REPLY_REMINDER}"
+
+
 def _candidate_windows(target: str) -> list[TargetWindow]:
     import win32gui
 
@@ -190,7 +257,7 @@ def _candidate_windows(target: str) -> list[TargetWindow]:
 def _select_window(target: str) -> TargetWindow:
     candidates = _candidate_windows(target)
     if not candidates:
-        raise RuntimeError(f"{TARGETS[target].label} window not found")
+        raise RuntimeError(_window_not_found_message(target))
 
     def score(win: TargetWindow) -> tuple[int, int, int, int]:
         left, top, right, bottom = win.rect
@@ -316,8 +383,12 @@ def _attempt_send_once(
 
     pyperclip.copy(message)
     pyautogui.hotkey("ctrl", "v")
-    time.sleep(0.5)
-    pyautogui.press("enter")
+    # paste 대기: 긴 메시지(Electron 렌더 지연) 대응. 0.5s base + 500자당 0.25s, 상한 5s.
+    paste_wait = min(5.0, 0.5 + (len(message) / 500.0) * 0.25)
+    time.sleep(paste_wait)
+    # 전송: Codex 앱은 멀티라인일 때 Enter=줄바꿈, Ctrl+Enter=전송 (issue #6307).
+    # Claude 앱도 Ctrl+Enter 전송 지원. 단일 규칙으로 통일.
+    pyautogui.hotkey("ctrl", "enter")
     time.sleep(0.5)
 
     code, verify, detail = _verify_enter_result(win.hwnd, target, message)
@@ -336,6 +407,7 @@ def send(message: str, target: str = "claude") -> int:
         raise ValueError("message is empty")
     if target not in TARGETS:
         raise ValueError(f"unsupported target: {target}")
+    message = _append_codex_reply_reminder(message, target)
 
     _install_missing()
     import pyautogui
