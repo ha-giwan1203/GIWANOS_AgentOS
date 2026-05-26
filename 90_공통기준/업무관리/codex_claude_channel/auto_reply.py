@@ -9,8 +9,9 @@ Usage:
 Exit codes:
     0: paste + Enter submitted and verified where supported
     1: failed before submission
-    2: existing draft text detected after retries, so paste was skipped
-    3: paste succeeded but Enter did not clear the input
+    2: argparse usage or invalid argument error
+    10: existing draft text detected after retries, so paste was skipped
+    11: paste succeeded but Enter did not clear the input
 """
 
 from __future__ import annotations
@@ -32,6 +33,21 @@ BASE_DIR = Path(__file__).resolve().parent
 LOG_PATH = BASE_DIR / "auto_reply.log"
 MAX_SKIP_RETRIES = 2
 SKIP_RETRY_DELAY_SEC = 5
+
+EXIT_PASS = 0
+EXIT_FAIL = 1
+EXIT_ARGPARSE = 2
+EXIT_SKIP_FINAL = 10
+EXIT_ENTER_FAILED = 11
+RETRY_SKIP = -10
+
+EXIT_CODE_HELP = """Exit codes:
+  0   PASS
+  1   FAIL (window lookup, paste, or unexpected runtime failure)
+  2   argparse usage or invalid argument error
+  10  SKIP_FINAL (existing draft text remained after retries)
+  11  ENTER_FAILED (paste succeeded, but Enter did not clear the input)
+"""
 
 REQUIRED_PACKAGES = {
     "pyautogui": "pyautogui",
@@ -257,18 +273,18 @@ def _verify_enter_result(hwnd: int, target: str, message: str) -> tuple[int, str
         _click_input(hwnd, target)
         remaining = _draft_text_or_empty()
     except Exception as exc:
-        return 0, "skipped", f"verify=skipped {type(exc).__name__}: {exc}"
+        return EXIT_PASS, "skipped", f"verify=skipped {type(exc).__name__}: {exc}"
 
     stripped = (remaining or "").strip()
     if not stripped:
-        return 0, "enter_confirmed", "verify=enter_confirmed"
+        return EXIT_PASS, "enter_confirmed", "verify=enter_confirmed"
 
     message_text = message.strip()
     plausible_draft_len = max(len(message_text) * 2, 500)
     if len(stripped) <= plausible_draft_len and message_text in stripped:
-        return 3, "enter_confirmed", f"draft_len={len(stripped)}"
+        return EXIT_ENTER_FAILED, "enter_confirmed", f"draft_len={len(stripped)}"
 
-    return 0, "skipped", f"verify=skipped non_composer_selection_len={len(stripped)}"
+    return EXIT_PASS, "skipped", f"verify=skipped non_composer_selection_len={len(stripped)}"
 
 
 def _attempt_send_once(
@@ -296,7 +312,7 @@ def _attempt_send_once(
             verify="skipped",
         )
         pyperclip.copy(original_clipboard)
-        return 2
+        return RETRY_SKIP
 
     pyperclip.copy(message)
     pyautogui.hotkey("ctrl", "v")
@@ -305,14 +321,14 @@ def _attempt_send_once(
     time.sleep(0.5)
 
     code, verify, detail = _verify_enter_result(win.hwnd, target, message)
-    if code == 3:
+    if code == EXIT_ENTER_FAILED:
         _log(target, "ENTER_FAILED", message, detail, win.hwnd, retries=retries, verify=verify)
         pyperclip.copy(original_clipboard)
-        return 3
+        return EXIT_ENTER_FAILED
 
     _log(target, "PASS", message, f"title={win.title}; {detail}", win.hwnd, retries=retries, verify=verify)
     pyperclip.copy(original_clipboard)
-    return 0
+    return EXIT_PASS
 
 
 def send(message: str, target: str = "claude") -> int:
@@ -326,13 +342,15 @@ def send(message: str, target: str = "claude") -> int:
     import pyperclip
 
     pyautogui.PAUSE = 0.08
-    win = _select_window(target)
-    original_clipboard = pyperclip.paste()
+    win = None
+    original_clipboard = ""
 
     try:
+        win = _select_window(target)
+        original_clipboard = pyperclip.paste()
         for retries in range(MAX_SKIP_RETRIES + 1):
             code = _attempt_send_once(message, target, win, original_clipboard, retries)
-            if code != 2:
+            if code != RETRY_SKIP:
                 return code
             if retries < MAX_SKIP_RETRIES:
                 time.sleep(SKIP_RETRY_DELAY_SEC)
@@ -347,14 +365,14 @@ def send(message: str, target: str = "claude") -> int:
             verify="skipped",
         )
         pyperclip.copy(original_clipboard)
-        return 2
+        return EXIT_SKIP_FINAL
     except Exception as exc:
         _log(
             target,
             "FAIL",
             message,
             f"{type(exc).__name__}: {exc}",
-            win.hwnd if "win" in locals() else None,
+            win.hwnd if win else None,
             verify="paste_only",
         )
         try:
@@ -365,26 +383,30 @@ def send(message: str, target: str = "claude") -> int:
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(description="Paste a message into Claude or Codex and press Enter.")
+    parser = argparse.ArgumentParser(
+        description="Paste a message into Claude or Codex and press Enter.",
+        epilog=EXIT_CODE_HELP,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     parser.add_argument("--target", choices=sorted(TARGETS), default="claude")
     parser.add_argument("message", nargs="?")
     args = parser.parse_args(argv[1:])
 
     if not args.message:
         parser.print_usage(sys.stderr)
-        return 1
+        return EXIT_FAIL
     try:
         code = send(args.message, target=args.target)
-        if code == 0:
+        if code == EXIT_PASS:
             print(f"PASS: target={args.target} paste+enter submitted", file=sys.stderr)
-        elif code == 2:
+        elif code == EXIT_SKIP_FINAL:
             print(f"SKIP_FINAL: target={args.target} existing draft text detected after retries", file=sys.stderr)
-        elif code == 3:
+        elif code == EXIT_ENTER_FAILED:
             print(f"ENTER_FAILED: target={args.target} text remained after Enter", file=sys.stderr)
         return code
     except Exception as exc:
         print(f"FAIL: target={args.target} {type(exc).__name__}: {exc}", file=sys.stderr)
-        return 1
+        return EXIT_FAIL
 
 
 if __name__ == "__main__":

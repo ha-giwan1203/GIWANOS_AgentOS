@@ -1,3 +1,4 @@
+- [완료] owner=Codex / auto_reply exit code 충돌 해소 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `AGENTS.md`, `90_공통기준/업무관리/검토기록/runs/20260526_auto_reply_exitcode/review.md`
 - [완료] owner=Codex / auto_reply 견고화 및 push / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `90_공통기준/업무관리/codex_claude_channel/auto_reply.log`, `90_공통기준/업무관리/검토기록/runs/20260526_auto_reply_robustness/review.md`
 - [완료] owner=Codex / SD9A01 88820X9xxx 이관품번 제외 적용 / 잠금 해제: `05_생산실적/조립비정산/03_정산자동화/_error_types.py`, `05_생산실적/조립비정산/03_정산자동화/step5_정산계산.py`, `05_생산실적/조립비정산/03_정산자동화/populate_err_list_only.py`, `05_생산실적/조립비정산/CLAUDE.md`, `05_생산실적/조립비정산/05월/정산_수식버전_04월.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260526_sd9a01_x9_excl/review.md`
 - [완료] owner=Codex / auto_reply 양방향 확장 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `AGENTS.md`, `90_공통기준/업무관리/검토기록/runs/20260526_auto_reply_bidirectional/review.md`

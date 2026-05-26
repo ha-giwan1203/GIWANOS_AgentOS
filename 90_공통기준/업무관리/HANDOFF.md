@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-26 KST — 세션220 **Codex** auto_reply.py의 SKIP_FINAL/ENTER_FAILED exit code를 10/11로 재매핑하고 argparse 오류 exit 2와 분리했다. --help 및 AGENTS.md 호출자 가이드에 코드표를 추가했으며, 창 식별 실패 FAIL 로그 경로 1건을 함께 보강했다. py_compile, invalid target exit 2, mock SKIP/ENTER/FAIL, target=claude 정상 호출 검증을 완료했다.
+
 최종 업데이트: 2026-05-26 KST — 세션219 **Codex** auto_reply.py에 SKIP_EXISTING_TEXT 2회 자동 재시도, SKIP_FINAL exit 2, Enter 후 입력창 probe 검증, ENTER_FAILED exit 3, retries/verify 로그 필드를 추가했다. target=claude self-test는 exit 0 및 verify=enter_confirmed 로그로 확인했다. b407e058와 이번 보강 commit을 함께 origin/main에 push할 예정이다.
 
 최종 업데이트: 2026-05-26 KST — 세션218 **Codex** SD9A01 88820X9xxx 10건을 사용자 결정에 따라 X2 이관품번 제외로 처리했다. _error_types.py에 88820X9 prefix를 추가하고 step5/populate 보강 경로에서 제외사유를 보존하도록 수정했다. populate_err_list_only.py 재실행 및 Excel COM 재계산 저장 후 오류리스트 대상 10건 제외사유=이관품번, 받을금액=0, 차이금액 합계 -5,653,284원, 전체 받을금액 8,856,197원, SD9A01 합계행 차이금액 -5,652,332원 확인.

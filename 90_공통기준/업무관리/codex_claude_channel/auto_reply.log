@@ -30,3 +30,13 @@
 {"timestamp": "2026-05-26T16:08:59", "target": "claude", "result": "PASS", "message_len": 86, "detail": "title=Claude", "hwnd": 198186}
 {"timestamp": "2026-05-26T16:10:52", "target": "claude", "result": "PASS", "message_len": 60, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
 {"timestamp": "2026-05-26T16:11:16", "target": "claude", "result": "PASS", "message_len": 93, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:15:56", "target": "claude", "result": "PASS", "message_len": 102, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:16:54", "target": "claude", "result": "PASS", "message_len": 124, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:18:42", "target": "codex", "result": "PASS", "message_len": 87, "detail": "title=Codex; verify=enter_confirmed", "hwnd": 262360, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:20:30", "target": "codex", "result": "ENTER_FAILED", "message_len": 1407, "detail": "draft_len=1407", "hwnd": 262360, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:27:02", "target": "claude", "result": "SKIP_EXISTING_TEXT", "message_len": 87, "detail": "draft_len=2812", "hwnd": 198186, "retries": 0, "verify": "skipped"}
+{"timestamp": "2026-05-26T16:27:10", "target": "claude", "result": "PASS", "message_len": 87, "detail": "title=Claude; verify=skipped non_composer_selection_len=3118", "hwnd": 198186, "retries": 1, "verify": "skipped"}
+{"timestamp": "2026-05-26T16:29:12", "target": "claude", "result": "SKIP_FINAL", "message_len": 9, "detail": "retries=2", "hwnd": 123, "retries": 2, "verify": "skipped"}
+{"timestamp": "2026-05-26T16:29:34", "target": "claude", "result": "PASS", "message_len": 63, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:30:10", "target": "claude", "result": "SKIP_FINAL", "message_len": 9, "detail": "retries=2", "hwnd": 123, "retries": 2, "verify": "skipped"}
+{"timestamp": "2026-05-26T16:30:10", "target": "claude", "result": "FAIL", "message_len": 9, "detail": "RuntimeError: mock window missing", "hwnd": null, "retries": 0, "verify": "paste_only"}
