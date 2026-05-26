@@ -18,3 +18,15 @@
 {"timestamp": "2026-05-26T14:55:47", "target": "codex", "result": "PASS", "message_len": 37, "detail": "title=Codex", "hwnd": 262360}
 {"timestamp": "2026-05-26T14:56:15", "target": "claude", "result": "PASS", "message_len": 87, "detail": "title=Claude", "hwnd": 198186}
 {"timestamp": "2026-05-26T14:57:08", "target": "claude", "result": "PASS", "message_len": 67, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T14:59:34", "target": "claude", "result": "PASS", "message_len": 113, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T15:01:25", "target": "codex", "result": "PASS", "message_len": 353, "detail": "title=Codex", "hwnd": 262360}
+{"timestamp": "2026-05-26T15:02:18", "target": "claude", "result": "PASS", "message_len": 81, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T15:03:34", "target": "claude", "result": "PASS", "message_len": 86, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T15:46:36", "target": "codex", "result": "PASS", "message_len": 1442, "detail": "title=Codex", "hwnd": 262360}
+{"timestamp": "2026-05-26T15:50:04", "target": "claude", "result": "PASS", "message_len": 71, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T16:01:52", "target": "claude", "result": "PASS", "message_len": 78, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T16:04:43", "target": "claude", "result": "PASS", "message_len": 91, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T16:07:58", "target": "codex", "result": "PASS", "message_len": 1764, "detail": "title=Codex", "hwnd": 262360}
+{"timestamp": "2026-05-26T16:08:59", "target": "claude", "result": "PASS", "message_len": 86, "detail": "title=Claude", "hwnd": 198186}
+{"timestamp": "2026-05-26T16:10:52", "target": "claude", "result": "PASS", "message_len": 60, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-26T16:11:16", "target": "claude", "result": "PASS", "message_len": 93, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 198186, "retries": 0, "verify": "enter_confirmed"}

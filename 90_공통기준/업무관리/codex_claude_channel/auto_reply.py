@@ -7,9 +7,10 @@ Usage:
     python auto_reply.py --target codex "[Claude 위임] ..."
 
 Exit codes:
-    0: paste + Enter submitted
+    0: paste + Enter submitted and verified where supported
     1: failed before submission
-    2: existing draft text detected, so paste was skipped
+    2: existing draft text detected after retries, so paste was skipped
+    3: paste succeeded but Enter did not clear the input
 """
 
 from __future__ import annotations
@@ -29,6 +30,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 LOG_PATH = BASE_DIR / "auto_reply.log"
+MAX_SKIP_RETRIES = 2
+SKIP_RETRY_DELAY_SEC = 5
 
 REQUIRED_PACKAGES = {
     "pyautogui": "pyautogui",
@@ -77,7 +80,15 @@ TARGETS = {
 }
 
 
-def _log(target: str, result: str, message: str, detail: str = "", hwnd: int | None = None) -> None:
+def _log(
+    target: str,
+    result: str,
+    message: str,
+    detail: str = "",
+    hwnd: int | None = None,
+    retries: int = 0,
+    verify: str = "paste_only",
+) -> None:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     rec = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
@@ -86,6 +97,8 @@ def _log(target: str, result: str, message: str, detail: str = "", hwnd: int | N
         "message_len": len(message),
         "detail": detail,
         "hwnd": hwnd,
+        "retries": retries,
+        "verify": verify,
     }
     with LOG_PATH.open("a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -224,6 +237,84 @@ def _draft_text_or_empty() -> str:
     return copied or ""
 
 
+def _click_input(hwnd: int, target: str) -> None:
+    import pyautogui
+
+    x, y = _client_input_point(hwnd, target)
+    pyautogui.click(x, y)
+    time.sleep(0.2)
+
+
+def _verify_enter_result(hwnd: int, target: str, message: str) -> tuple[int, str, str]:
+    """Return (exit_code, verify_label, detail) after Enter.
+
+    Electron apps usually do not expose a native EditControl, so clipboard
+    probing is the practical fallback. If the probe looks like page text rather
+    than the composer draft, treat verification as unsupported instead of
+    raising a false ENTER_FAILED.
+    """
+    try:
+        _click_input(hwnd, target)
+        remaining = _draft_text_or_empty()
+    except Exception as exc:
+        return 0, "skipped", f"verify=skipped {type(exc).__name__}: {exc}"
+
+    stripped = (remaining or "").strip()
+    if not stripped:
+        return 0, "enter_confirmed", "verify=enter_confirmed"
+
+    message_text = message.strip()
+    plausible_draft_len = max(len(message_text) * 2, 500)
+    if len(stripped) <= plausible_draft_len and message_text in stripped:
+        return 3, "enter_confirmed", f"draft_len={len(stripped)}"
+
+    return 0, "skipped", f"verify=skipped non_composer_selection_len={len(stripped)}"
+
+
+def _attempt_send_once(
+    message: str,
+    target: str,
+    win: TargetWindow,
+    original_clipboard: str,
+    retries: int,
+) -> int:
+    import pyautogui
+    import pyperclip
+
+    _activate(win.hwnd)
+    _click_input(win.hwnd, target)
+
+    existing = _draft_text_or_empty()
+    if existing.strip():
+        _log(
+            target,
+            "SKIP_EXISTING_TEXT",
+            message,
+            f"draft_len={len(existing)}",
+            win.hwnd,
+            retries=retries,
+            verify="skipped",
+        )
+        pyperclip.copy(original_clipboard)
+        return 2
+
+    pyperclip.copy(message)
+    pyautogui.hotkey("ctrl", "v")
+    time.sleep(0.5)
+    pyautogui.press("enter")
+    time.sleep(0.5)
+
+    code, verify, detail = _verify_enter_result(win.hwnd, target, message)
+    if code == 3:
+        _log(target, "ENTER_FAILED", message, detail, win.hwnd, retries=retries, verify=verify)
+        pyperclip.copy(original_clipboard)
+        return 3
+
+    _log(target, "PASS", message, f"title={win.title}; {detail}", win.hwnd, retries=retries, verify=verify)
+    pyperclip.copy(original_clipboard)
+    return 0
+
+
 def send(message: str, target: str = "claude") -> int:
     if not message.strip():
         raise ValueError("message is empty")
@@ -239,27 +330,33 @@ def send(message: str, target: str = "claude") -> int:
     original_clipboard = pyperclip.paste()
 
     try:
-        _activate(win.hwnd)
-        x, y = _client_input_point(win.hwnd, target)
-        pyautogui.click(x, y)
-        time.sleep(0.2)
+        for retries in range(MAX_SKIP_RETRIES + 1):
+            code = _attempt_send_once(message, target, win, original_clipboard, retries)
+            if code != 2:
+                return code
+            if retries < MAX_SKIP_RETRIES:
+                time.sleep(SKIP_RETRY_DELAY_SEC)
 
-        existing = _draft_text_or_empty()
-        if existing.strip():
-            _log(target, "SKIP_EXISTING_TEXT", message, f"draft_len={len(existing)}", win.hwnd)
-            pyperclip.copy(original_clipboard)
-            return 2
-
-        pyperclip.copy(message)
-        pyautogui.hotkey("ctrl", "v")
-        time.sleep(0.5)
-        pyautogui.press("enter")
-        time.sleep(0.2)
-        _log(target, "PASS", message, f"title={win.title}", win.hwnd)
+        _log(
+            target,
+            "SKIP_FINAL",
+            message,
+            f"retries={MAX_SKIP_RETRIES}",
+            win.hwnd,
+            retries=MAX_SKIP_RETRIES,
+            verify="skipped",
+        )
         pyperclip.copy(original_clipboard)
-        return 0
+        return 2
     except Exception as exc:
-        _log(target, "FAIL", message, f"{type(exc).__name__}: {exc}", win.hwnd if "win" in locals() else None)
+        _log(
+            target,
+            "FAIL",
+            message,
+            f"{type(exc).__name__}: {exc}",
+            win.hwnd if "win" in locals() else None,
+            verify="paste_only",
+        )
         try:
             pyperclip.copy(original_clipboard)
         except Exception:
@@ -279,9 +376,11 @@ def main(argv: list[str]) -> int:
     try:
         code = send(args.message, target=args.target)
         if code == 0:
-            print(f"PASS: target={args.target} paste+enter submitted")
+            print(f"PASS: target={args.target} paste+enter submitted", file=sys.stderr)
         elif code == 2:
-            print(f"SKIP: target={args.target} existing draft text detected", file=sys.stderr)
+            print(f"SKIP_FINAL: target={args.target} existing draft text detected after retries", file=sys.stderr)
+        elif code == 3:
+            print(f"ENTER_FAILED: target={args.target} text remained after Enter", file=sys.stderr)
         return code
     except Exception as exc:
         print(f"FAIL: target={args.target} {type(exc).__name__}: {exc}", file=sys.stderr)
