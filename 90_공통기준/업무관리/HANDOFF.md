@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-26 KST — 세션218 **Codex** SD9A01 88820X9xxx 10건을 사용자 결정에 따라 X2 이관품번 제외로 처리했다. _error_types.py에 88820X9 prefix를 추가하고 step5/populate 보강 경로에서 제외사유를 보존하도록 수정했다. populate_err_list_only.py 재실행 및 Excel COM 재계산 저장 후 오류리스트 대상 10건 제외사유=이관품번, 받을금액=0, 차이금액 합계 -5,653,284원, 전체 받을금액 8,856,197원, SD9A01 합계행 차이금액 -5,652,332원 확인.
+
 최종 업데이트: 2026-05-26 KST — 세션217 **Codex** auto_reply.py에 --target claude|codex 옵션을 추가하고 AGENTS.md 호출문을 --target claude로 명시했다. target=codex는 Codex 입력창 하단 툴바를 피하도록 input_y_ratio=0.925로 분기했으며 target=claude/target=codex self-test 모두 PASS했다. push는 보류하고 commit만 진행한다.
 
 최종 업데이트: 2026-05-26 KST — 세션216 **Codex** 자동회신 채널 작업물 commit 및 push 위임을 수행한다. 커밋 범위는 AGENTS 자동 설치/진행/완료 룰, auto_reply.py, auto_reply 실행 로그, 검토 루틴/검토기록 문서, 작업문서 갱신분으로 제한하고 별건 untracked는 제외한다. push 결과는 20260526_push_auto_reply/review.md와 Claude 자동완료 메시지에 기록한다.

@@ -417,17 +417,17 @@ for lc in LINE_ORDER:
             master_has_price=master_has_price,
         )
         excl = classify_exclusion(row, multi_pns)
-        # 차이 0이면 정상 — 제외사유 박지 않음
-        if amt_diff == 0:
+        qty_only_gerp_missing = _is_qty_only_gerp_missing(row, line_group)
+        # 차이 0이면 정상 — 제외사유 박지 않음. 단, 수량만 있는 GERP 품번누락은 X2 제외사유를 보존한다.
+        if amt_diff == 0 and not qty_only_gerp_missing:
             excl = ''
         row['err_type']    = err_type
         row['note']        = note
         row['excl_reason'] = excl
         row['recv_amt']    = calc_recv_amt(amt_diff, excl)
-        if _is_qty_only_gerp_missing(row, line_group):
+        if qty_only_gerp_missing:
             row['err_type'] = 'GERP 품번누락'
             row['note'] = MISSING_PRICE_NOTE
-            row['excl_reason'] = ''
             row['recv_amt'] = 0
 
     gerp_total = total_gerp_day_amt + total_gerp_ngt_amt

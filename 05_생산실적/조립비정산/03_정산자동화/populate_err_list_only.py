@@ -20,7 +20,7 @@ from openpyxl.utils import get_column_letter
 from collections import defaultdict, Counter
 
 from _pipeline_config import BASE_DIR, MONTH, LINE_ORDER, VENDOR_CODE, CACHE_STEP5, LINE_GROUP
-from _error_types import TYPE_ORDER, TYPE_COLORS
+from _error_types import TYPE_ORDER, TYPE_COLORS, classify_exclusion
 
 MISSING_PRICE_NOTE = '단가 미매핑(기준정보 등록필요)'
 GERP_MISSING_SUPPLEMENT_LINES = {'SD9A01'}
@@ -92,7 +92,7 @@ for lc in LINE_ORDER:
         )
         if g_amt == e_amt and not qty_only_gerp_missing:
             continue
-        excl = r.get('excl_reason', '')
+        excl = r.get('excl_reason', '') or classify_exclusion(r)
         if excl and not qty_only_gerp_missing:
             excluded.append({'line': lc, 'part_no': r['part_no'], 'diff': diff, 'excl': excl})
             continue
@@ -107,7 +107,7 @@ for lc in LINE_ORDER:
             sup_text = ', '.join(parts)
         err_type = 'GERP 품번누락' if qty_only_gerp_missing else r.get('err_type', '정산차이')
         note = MISSING_PRICE_NOTE if qty_only_gerp_missing else r.get('note', '')
-        recv_amt = 0 if qty_only_gerp_missing else r.get('recv_amt', abs(diff))
+        recv_amt = 0 if (qty_only_gerp_missing or excl) else r.get('recv_amt', abs(diff))
         errors.append({
             'line': lc, 'part_no': r['part_no'], 'assy_part': r.get('assy_part', ''),
             'usage': r.get('usage', 1), 'price_type': r['price_type'],
@@ -117,7 +117,7 @@ for lc in LINE_ORDER:
             'erp_day_qty': r['erp_day_qty'], 'erp_day_amt': r['erp_day_amt'],
             'erp_ngt_qty': r['erp_ngt_qty'], 'erp_ngt_amt': r['erp_ngt_amt'],
             'diff': diff, 'err_type': err_type,
-            'note': note, 'recv_amt': recv_amt,
+            'note': note, 'excl_reason': excl, 'recv_amt': recv_amt,
             'sup_text': sup_text,
         })
 
@@ -190,6 +190,8 @@ def _append_line_sheet_gerp_missing():
                 e_amt = e_day_amt + e_ngt_amt
                 diff = g_amt - e_amt
                 qty_only_zero_amt = (g_amt == 0 and e_amt == 0)
+                candidate = {'part_no': str(pn).strip()}
+                excl = classify_exclusion(candidate)
                 errors.append({
                     'line': lc, 'part_no': pn, 'assy_part': row[3] or '',
                     'usage': row[4] or 1, 'price_type': row[5] or '',
@@ -200,7 +202,8 @@ def _append_line_sheet_gerp_missing():
                     'erp_ngt_qty': e_ngt_qty, 'erp_ngt_amt': e_ngt_amt,
                     'diff': diff, 'err_type': 'GERP 품번누락',
                     'note': MISSING_PRICE_NOTE if qty_only_zero_amt else 'GERP 신규등록필요',
-                    'recv_amt': 0 if qty_only_zero_amt else abs(diff),
+                    'excl_reason': excl,
+                    'recv_amt': 0 if (qty_only_zero_amt or excl) else abs(diff),
                     'sup_text': '',
                 })
                 existing_keys.add((lc, pn))
@@ -268,7 +271,7 @@ for e in errors:
         (e['erp_day_qty'], RA, NUM), (e['erp_day_amt'], RA, NUM),
         (e['erp_ngt_qty'], RA, NUM), (e['erp_ngt_amt'], RA, NUM),
         (e['diff'], RA, NUM), (e['err_type'], CA, None),
-        (e['note'], LA, None), ('', CA, None),
+        (e['note'], LA, None), (e.get('excl_reason', ''), CA, None),
         (e['recv_amt'], RA, NUM), (e['sup_text'], LA, None),
     ]
     for ci, (v, align, fmt) in enumerate(vals, 1):

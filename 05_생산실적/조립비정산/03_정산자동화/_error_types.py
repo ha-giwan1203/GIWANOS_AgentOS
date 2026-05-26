@@ -22,7 +22,7 @@
 
 특수 — 분류와 직교 (제외사유):
   X1 정합인정(다중단가분배)  동일품번 마스터 2+ 단가 분배 정상
-  X2 이관품번                OVK·SVM·X9000·X9500 등
+  X2 이관품번                OVK·SVM·X9000·X9500·88820X9xxx 등
   X3 웨빙재작업              89830R1200NNB 등
   공란                       그 외 (받을금액 청구 대상)
 
@@ -53,6 +53,7 @@ EXCL_REASONS = [
 
 # 이관품번 패턴 (사용자 룰)
 TRANSFER_PATTERNS = ['X9000', 'X9500']
+TRANSFER_PREFIXES = ['88820X9']
 
 # 웨빙재작업 품번 (도메인 룰)
 WEBBING_REWORK_PARTS = {'89830R1200NNB'}
@@ -151,6 +152,9 @@ def classify_exclusion(item, multi_price_pns=None):
 
     if part_no in WEBBING_REWORK_PARTS:
         return '웨빙재작업'
+
+    if any(part_no.startswith(prefix) for prefix in TRANSFER_PREFIXES):
+        return '이관품번'
 
     for pat in TRANSFER_PATTERNS:
         if pat in part_no:
