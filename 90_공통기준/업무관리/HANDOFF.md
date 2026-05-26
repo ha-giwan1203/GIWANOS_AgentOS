@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-26 KST — 세션217 **Codex** auto_reply.py에 --target claude|codex 옵션을 추가하고 AGENTS.md 호출문을 --target claude로 명시했다. target=codex는 Codex 입력창 하단 툴바를 피하도록 input_y_ratio=0.925로 분기했으며 target=claude/target=codex self-test 모두 PASS했다. push는 보류하고 commit만 진행한다.
+
 최종 업데이트: 2026-05-26 KST — 세션216 **Codex** 자동회신 채널 작업물 commit 및 push 위임을 수행한다. 커밋 범위는 AGENTS 자동 설치/진행/완료 룰, auto_reply.py, auto_reply 실행 로그, 검토 루틴/검토기록 문서, 작업문서 갱신분으로 제한하고 별건 untracked는 제외한다. push 결과는 20260526_push_auto_reply/review.md와 Claude 자동완료 메시지에 기록한다.
 
 최종 업데이트: 2026-05-26 KST — 세션215 **Codex** 진행상황 Claude 자동입력 규칙을 AGENTS.md에 반영했다. Codex는 작업 시작, 단계 완료, 검증, 블로커 때 auto_reply.py로 Codex 진행 메시지를 Claude 앱에 입력하고 완료 시 Codex 완료 메시지를 보낸다. foreground 예외 보강 후 재전송 PASS 확인.

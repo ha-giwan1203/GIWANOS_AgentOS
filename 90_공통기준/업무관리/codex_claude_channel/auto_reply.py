@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Paste a Codex completion message into the visible Claude app window.
+"""Paste a bridge message into the visible Claude or Codex app window.
 
 Usage:
     python auto_reply.py "[Codex 완료] ..."
+    python auto_reply.py --target codex "[Claude 위임] ..."
 
 Exit codes:
     0: paste + Enter submitted
@@ -13,6 +14,7 @@ Exit codes:
 
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
 import os
@@ -33,23 +35,53 @@ REQUIRED_PACKAGES = {
     "pyperclip": "pyperclip",
     "pygetwindow": "pygetwindow",
     "win32gui": "pywin32",
+    "psutil": "psutil",
 }
 
 
 @dataclass
-class ClaudeWindow:
+class TargetSpec:
+    key: str
+    label: str
+    title_keyword: str
+    process_names: tuple[str, ...]
+    input_y_ratio: float
+
+
+@dataclass
+class TargetWindow:
     hwnd: int
     title: str
     process_name: str
     rect: tuple[int, int, int, int]
     z_index: int
     is_foreground: bool
+    process_match: bool
 
 
-def _log(result: str, message: str, detail: str = "", hwnd: int | None = None) -> None:
+TARGETS = {
+    "claude": TargetSpec(
+        key="claude",
+        label="Claude",
+        title_keyword="claude",
+        process_names=("claude.exe",),
+        input_y_ratio=0.955,
+    ),
+    "codex": TargetSpec(
+        key="codex",
+        label="Codex",
+        title_keyword="codex",
+        process_names=("codex.exe",),
+        input_y_ratio=0.925,
+    ),
+}
+
+
+def _log(target: str, result: str, message: str, detail: str = "", hwnd: int | None = None) -> None:
     LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     rec = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "target": target,
         "result": result,
         "message_len": len(message),
         "detail": detail,
@@ -81,18 +113,26 @@ def _process_name_for_hwnd(hwnd: int) -> str:
         return ""
 
 
-def _candidate_windows() -> list[ClaudeWindow]:
+def _matches_target(spec: TargetSpec, title: str, process_name: str) -> tuple[bool, bool]:
+    title_match = spec.title_keyword in title.lower()
+    process_match = process_name.lower() in spec.process_names
+    return title_match or process_match, process_match
+
+
+def _candidate_windows(target: str) -> list[TargetWindow]:
     import win32gui
 
+    spec = TARGETS[target]
     foreground = win32gui.GetForegroundWindow()
-    candidates: list[ClaudeWindow] = []
+    candidates: list[TargetWindow] = []
 
     def enum_cb(hwnd: int, _param: object) -> bool:
         if not win32gui.IsWindowVisible(hwnd):
             return True
         title = win32gui.GetWindowText(hwnd) or ""
         process_name = _process_name_for_hwnd(hwnd)
-        if "claude" not in title.lower() and process_name.lower() != "claude.exe":
+        matched, process_match = _matches_target(spec, title, process_name)
+        if not matched:
             return True
         try:
             rect = tuple(win32gui.GetWindowRect(hwnd))
@@ -102,13 +142,14 @@ def _candidate_windows() -> list[ClaudeWindow]:
         if right <= left or bottom <= top:
             return True
         candidates.append(
-            ClaudeWindow(
+            TargetWindow(
                 hwnd=hwnd,
                 title=title,
                 process_name=process_name,
                 rect=rect,
                 z_index=len(candidates),
                 is_foreground=(hwnd == foreground),
+                process_match=process_match,
             )
         )
         return True
@@ -117,29 +158,30 @@ def _candidate_windows() -> list[ClaudeWindow]:
     return candidates
 
 
-def _select_window() -> ClaudeWindow:
-    candidates = _candidate_windows()
+def _select_window(target: str) -> TargetWindow:
+    candidates = _candidate_windows(target)
     if not candidates:
-        raise RuntimeError("Claude window not found")
+        raise RuntimeError(f"{TARGETS[target].label} window not found")
 
-    def score(win: ClaudeWindow) -> tuple[int, int, int]:
+    def score(win: TargetWindow) -> tuple[int, int, int, int]:
         left, top, right, bottom = win.rect
         area = (right - left) * (bottom - top)
         foreground = 1 if win.is_foreground else 0
-        process_match = 1 if win.process_name.lower() == "claude.exe" else 0
+        process_match = 1 if win.process_match else 0
         # EnumWindows is already top-to-bottom z-order on Windows; lower index wins.
-        return (foreground, process_match, area - win.z_index)
+        return (foreground, process_match, -win.z_index, area)
 
     return sorted(candidates, key=score, reverse=True)[0]
 
 
-def _client_input_point(hwnd: int) -> tuple[int, int]:
+def _client_input_point(hwnd: int, target: str) -> tuple[int, int]:
     import win32gui
 
+    spec = TARGETS[target]
     left_top = win32gui.ClientToScreen(hwnd, (0, 0))
     client_left, client_top = left_top
     _, _, width, height = win32gui.GetClientRect(hwnd)
-    return int(client_left + width * 0.50), int(client_top + height * 0.955)
+    return int(client_left + width * 0.50), int(client_top + height * spec.input_y_ratio)
 
 
 def _activate(hwnd: int) -> None:
@@ -182,27 +224,29 @@ def _draft_text_or_empty() -> str:
     return copied or ""
 
 
-def send(message: str) -> int:
+def send(message: str, target: str = "claude") -> int:
     if not message.strip():
         raise ValueError("message is empty")
+    if target not in TARGETS:
+        raise ValueError(f"unsupported target: {target}")
 
     _install_missing()
     import pyautogui
     import pyperclip
 
     pyautogui.PAUSE = 0.08
-    win = _select_window()
+    win = _select_window(target)
     original_clipboard = pyperclip.paste()
 
     try:
         _activate(win.hwnd)
-        x, y = _client_input_point(win.hwnd)
+        x, y = _client_input_point(win.hwnd, target)
         pyautogui.click(x, y)
         time.sleep(0.2)
 
         existing = _draft_text_or_empty()
         if existing.strip():
-            _log("SKIP_EXISTING_TEXT", message, f"draft_len={len(existing)}", win.hwnd)
+            _log(target, "SKIP_EXISTING_TEXT", message, f"draft_len={len(existing)}", win.hwnd)
             pyperclip.copy(original_clipboard)
             return 2
 
@@ -211,11 +255,11 @@ def send(message: str) -> int:
         time.sleep(0.5)
         pyautogui.press("enter")
         time.sleep(0.2)
-        _log("PASS", message, f"title={win.title}", win.hwnd)
+        _log(target, "PASS", message, f"title={win.title}", win.hwnd)
         pyperclip.copy(original_clipboard)
         return 0
     except Exception as exc:
-        _log("FAIL", message, f"{type(exc).__name__}: {exc}", win.hwnd if "win" in locals() else None)
+        _log(target, "FAIL", message, f"{type(exc).__name__}: {exc}", win.hwnd if "win" in locals() else None)
         try:
             pyperclip.copy(original_clipboard)
         except Exception:
@@ -224,19 +268,23 @@ def send(message: str) -> int:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        print('usage: python auto_reply.py "<message text>"', file=sys.stderr)
+    parser = argparse.ArgumentParser(description="Paste a message into Claude or Codex and press Enter.")
+    parser.add_argument("--target", choices=sorted(TARGETS), default="claude")
+    parser.add_argument("message", nargs="?")
+    args = parser.parse_args(argv[1:])
+
+    if not args.message:
+        parser.print_usage(sys.stderr)
         return 1
-    message = argv[1]
     try:
-        code = send(message)
+        code = send(args.message, target=args.target)
         if code == 0:
-            print("PASS: paste+enter submitted")
+            print(f"PASS: target={args.target} paste+enter submitted")
         elif code == 2:
-            print("SKIP: existing draft text detected", file=sys.stderr)
+            print(f"SKIP: target={args.target} existing draft text detected", file=sys.stderr)
         return code
     except Exception as exc:
-        print(f"FAIL: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(f"FAIL: target={args.target} {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
 
 
