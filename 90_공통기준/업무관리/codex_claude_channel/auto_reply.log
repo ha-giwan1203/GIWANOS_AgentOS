@@ -63,3 +63,9 @@
 {"timestamp": "2026-05-27T10:00:35", "target": "codex", "result": "SKIP_EXISTING_TEXT", "message_len": 1570, "detail": "draft_len=495", "hwnd": 329100, "retries": 0, "verify": "skipped"}
 {"timestamp": "2026-05-27T10:00:44", "target": "codex", "result": "PASS", "message_len": 1570, "detail": "title=Codex; verify=enter_confirmed", "hwnd": 329100, "retries": 1, "verify": "enter_confirmed"}
 {"timestamp": "2026-05-27T10:07:18", "target": "claude", "result": "PASS", "message_len": 110, "detail": "title=Claude; verify=skipped non_composer_selection_len=3130", "hwnd": 460528, "retries": 0, "verify": "skipped"}
+{"timestamp": "2026-05-27T10:40:55", "target": "codex", "result": "PASS", "message_len": 1833, "detail": "title=Codex; verify=enter_confirmed", "hwnd": 329100, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-27T10:41:52", "target": "claude", "result": "PASS", "message_len": 56, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 460528, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-27T11:00:52", "target": "claude", "result": "PASS", "message_len": 88, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 460528, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-27T11:02:07", "target": "codex", "result": "PASS", "message_len": 952, "detail": "title=Codex; verify=enter_confirmed", "hwnd": 329100, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-27T11:02:41", "target": "claude", "result": "PASS", "message_len": 70, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 460528, "retries": 0, "verify": "enter_confirmed"}
+{"timestamp": "2026-05-27T11:06:50", "target": "claude", "result": "PASS", "message_len": 96, "detail": "title=Claude; verify=enter_confirmed", "hwnd": 460528, "retries": 0, "verify": "enter_confirmed"}
