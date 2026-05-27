@@ -581,6 +581,7 @@ def extract_sp3m3_night(wb):
             night_end = r - 1
             break
     items = []
+    skipped = []
     for r in range(start, night_end+1):
         part = ws.cell(row=r, column=9).value
         qty = ws.cell(row=r, column=11).value
@@ -590,8 +591,17 @@ def extract_sp3m3_night(wb):
             qty_int = int(qty)
         except (ValueError, TypeError):
             continue  # 헤더 행 등 숫자 아닌 값 skip
-        items.append({"PROD_NO": str(part).strip(), "QTY": qty_int})
-    print(f"[phase1] SP3M3 야간: {len(items)}건")
+        pno = str(part).strip()
+        # 한글 포함 PROD_NO는 자리표시 문자열 ("구형바코드사용" 등) — ERP 라인배치 미등록 확정, skip
+        if any("가" <= ch <= "힣" for ch in pno):
+            skipped.append({"row": r, "PROD_NO": pno, "QTY": qty_int})
+            print(f"[phase1:skip] r={r} PROD_NO={pno!r} QTY={qty_int} — 한글 포함, ERP 등록 불가")
+        else:
+            items.append({"PROD_NO": pno, "QTY": qty_int})
+    if skipped:
+        print(f"[phase1] SP3M3 야간: 원본 {len(items) + len(skipped)}건, 등록 {len(items)}건, 제외 {len(skipped)}건")
+    else:
+        print(f"[phase1] SP3M3 야간: {len(items)}건")
     return items
 
 
@@ -1893,7 +1903,10 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         return False
 
     if parse_only:
-        d0_upload(page, xlsx, parse_only=True)
+        if _HTTP_ONLY_SESS is not None:
+            d0_upload_via_http(_HTTP_ONLY_SESS, xlsx, parse_only=True)
+        else:
+            d0_upload(page, xlsx, parse_only=True)
         print(f"[{line}] parse-only: 업로드 창에 엑셀 첨부 + 서버 파싱까지만 (추출 {len(items)}건). Phase 4/5 미진행")
         return False
 
@@ -2001,6 +2014,7 @@ def main():
     ap.add_argument("--no-jobsetup", action="store_true", help="morning SP3M3 종료 후 잡셋업 자동 호출 차단 (chain 비활성)")
     ap.add_argument("--day-cut", type=int, default=DAY_CUT_THRESHOLD, help=f"morning SP3M3 주간 누적 컷 임계 (default={DAY_CUT_THRESHOLD}). PoC/특수 케이스만 변경")
     ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
+    ap.add_argument("--exclude", default="", help="phase1 추출 후 제외할 PROD_NO 콤마구분 (E 모드 복구용. 예: --exclude RSP3SC0246). P-BOM 미등록 등 단건 차단으로 전체 fail 시 사용")
     ap.add_argument("--http-upload", action="store_true", help="세션153 A안 2단계: phase3 D0 업로드를 requests 직접 (브라우저·iframe·jQuery 0). HTTP OAuth 성공 시만 활성")
     ap.add_argument("--http-only", action="store_true", help="세션153 A안 3단계: 완전 브라우저-less. phase0~6 전부 requests. ensure_chrome_cdp + playwright 0")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
@@ -2141,6 +2155,10 @@ def main():
             sp3m3_registered = False
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, args.day_cut)
+                if args.exclude:
+                    exc = {p.strip() for p in args.exclude.split(",") if p.strip()}
+                    before = len(items); items = [it for it in items if it["PROD_NO"] not in exc]
+                    print(f"[exclude] {sorted(exc)} 제외: {before}→{len(items)}건")
                 # Phase 1.5: 같은 prod_date 이미 등록된 PROD_NO 제외 (세션133 사용자 명시 — 파일 업로드 전 중복 가드)
                 items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
                 if args.limit is not None and len(items) > args.limit:
