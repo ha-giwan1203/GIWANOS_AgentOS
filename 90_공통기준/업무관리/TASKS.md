@@ -1,3 +1,7 @@
+- [완료] owner=Codex / 세션223 /finish 마무리 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `90_공통기준/agent-control/state/finish_state.json`
+- [완료] owner=Codex / auto_reply Ctrl+Enter 전송 통일 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `90_공통기준/업무관리/codex_claude_channel/auto_reply.log`
+- [완료] owner=Codex / UserPromptSubmit Codex 위임 권장 hook 신설 / 잠금 해제: `.claude/settings.json`, `.claude/hooks/codex_delegate_hint.py`(gitignore 추적 제외)
+- [완료] owner=Codex / SP3M3 야간 D0 자동화 PASS / 잠금 해제: `90_공통기준/스킬/d0-production-plan/` / 결과: 30건 등록, Phase 0~6 PASS, MES rsltCnt=1500, SmartMES 일치
 - [완료] owner=Codex / auto_reply codex 회신의무 append / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `90_공통기준/업무관리/검토기록/runs/20260527_auto-reply-codex-reminder-append/review.md`
 - [완료] owner=Codex / auto_reply GUI 접근 실패 근본원인 보강 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `90_공통기준/업무관리/codex_claude_channel/README.md`, `AGENTS.md`, `90_공통기준/업무관리/검토기록/runs/20260527_auto-reply-gui-access-root-cause/review.md`
 - [완료] owner=Codex / RETRACTOR WAMAS01 누락 추출 / 잠금 해제: `05_생산실적/조립비정산/05월/retractor_wamas01_missing_20260527.xlsx`(2026-05-27 Claude가 99_임시수집→정산 05월/로 이관, 정산 작업폴더 관행), `99_임시수집/retractor_wamas01_missing_20260527_build.py`, `90_공통기준/업무관리/검토기록/runs/20260527_retractor-wamas01-missing/review.md`

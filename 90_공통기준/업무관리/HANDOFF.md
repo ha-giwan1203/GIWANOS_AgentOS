@@ -4,7 +4,7 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
-최종 업데이트: 2026-05-27 KST — 세션223 **Codex** auto_reply.py의 send(message,target)에서 target=codex 메시지에만 Codex 완료 회신 의무 블록을 자동 append하도록 보강했다. 빈 메시지 거부는 유지했고, 동일 블록 중복 append를 방지했으며, target=claude는 메시지 길이 무변경을 self-test로 확인했다.
+최종 업데이트: 2026-05-27 KST — 세션223 **Codex /finish** SP3M3 야간 D0 30건 반영 PASS, RETRACTOR×WAMAS01 누락 385건 산출, UserPromptSubmit Codex 위임 권장 hook 등록, auto_reply Ctrl+Enter 전송 통일 및 codex 회신의무 append(c059188b)까지 정리했다. GPT 공유 5~8단계는 사용자 지시에 따라 생략했고, 다음 액션은 사용자 push 발화 대기다.
 
 최종 업데이트: 2026-05-27 KST — 세션222 **Codex** auto_reply 실패의 근본 원인은 Codex 일반 샌드박스 셸에서 Windows GUI 창 열거가 0개가 되는 권한 문제였다. auto_reply.py가 이 상태를 GUI_ACCESS_UNAVAILABLE로 명확히 진단하도록 보강했고, AGENTS.md/README.md에는 일반 실행 실패 시 require_escalated로 1회 재시도 후 fallback 판정하도록 반영했다.
 
