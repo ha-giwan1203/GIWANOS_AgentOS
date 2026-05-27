@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-27 KST — 세션224 **Codex** WAMAS01 missing 385건 중 MO 통합품번 1건을 제외한 384건을 전산팀 전달 표준 10컬럼 오류리스트로 작성했다. 산출 파일은 05_생산실적/조립비정산/05월/오류리스트_04월_WAMAS01등록요청.xlsx이며, 조립품번 예정 범위는 WAMAS01-11382~11765, 단가분포는 67원 16건/49원 368건, 조립품번 중복 및 기존 WAMAS01 겹침 0건으로 검증했다.
+
 최종 업데이트: 2026-05-27 KST — 세션223 **Codex /finish** SP3M3 야간 D0 30건 반영 PASS, RETRACTOR×WAMAS01 누락 385건 산출, UserPromptSubmit Codex 위임 권장 hook 등록, auto_reply Ctrl+Enter 전송 통일 및 codex 회신의무 append(c059188b)까지 정리했다. GPT 공유 5~8단계는 사용자 지시에 따라 생략했고, 다음 액션은 사용자 push 발화 대기다.
 
 최종 업데이트: 2026-05-27 KST — 세션222 **Codex** auto_reply 실패의 근본 원인은 Codex 일반 샌드박스 셸에서 Windows GUI 창 열거가 0개가 되는 권한 문제였다. auto_reply.py가 이 상태를 GUI_ACCESS_UNAVAILABLE로 명확히 진단하도록 보강했고, AGENTS.md/README.md에는 일반 실행 실패 시 require_escalated로 1회 재시도 후 fallback 판정하도록 반영했다.

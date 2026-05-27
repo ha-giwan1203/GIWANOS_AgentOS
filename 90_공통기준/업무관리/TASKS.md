@@ -1,3 +1,5 @@
+- [완료] owner=Codex / WAMAS01 등록 요청 오류리스트 10컬럼 작성 / 잠금 해제: `05_생산실적/조립비정산/05월/오류리스트_04월_WAMAS01등록요청.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260527_wamas01_addmissing_apr/review.md`
+- [차단] owner=Claude / WAMAS01 기준정보 신규 등록 - RETRACTOR 전체(MO 제외) / 잠금 파일: `05_생산실적/조립비정산/01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260527_wamas01_addmissing_apr/review.md` / Codex 사전검증: A missing 385건, MO 제외 1건, 최신 범위 대상 384건, 4월 실적 sanity 41건/46,638 일치. 차단사유: 대상 384건 중 기존 WAMAS01 품번과 244건 중복, 기존 WAMAS01 시트 자체 PROD_NO 중복 79건으로 `기존+신규 PROD_NO 중복 0` 조건 충족 불가. C 본체 수정/백업/append/commit 미수행. 다음 액션: 기존 244건 skip 후 140건만 등록할지, 기존 중복 정리 후 전체 기준을 재정의할지 Claude 도메인 판단 필요
 - [완료] owner=Codex / 세션223 /finish 마무리 / 잠금 해제: `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`, `90_공통기준/agent-control/state/finish_state.json`
 - [완료] owner=Codex / auto_reply Ctrl+Enter 전송 통일 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `90_공통기준/업무관리/codex_claude_channel/auto_reply.log`
 - [완료] owner=Codex / UserPromptSubmit Codex 위임 권장 hook 신설 / 잠금 해제: `.claude/settings.json`, `.claude/hooks/codex_delegate_hint.py`(gitignore 추적 제외)
