@@ -1,6 +1,8 @@
 {
   "terminal_state": "done",
   "committed_pushed": false,
+  "committed": true,
+  "pushed": false,
   "gpt_shared": false,
   "gpt_judgment": null,
   "user_reported": true,
@@ -8,11 +10,11 @@
   "exception_reason": null,
   "mode": "A",
   "commit_sha": null,
-  "session": 223,
-  "session_title": "/finish 마무리: SP3M3 야간 D0, RETRACTOR WAMAS01, UserPromptSubmit hook, auto_reply 정리",
-  "gpt_share_skipped_reason": "사용자 지시: GPT 공유(5~8단계)는 A모드 자동 생략. C/E 항목이 있으나 사용자 명시 공유 발화가 없으므로 생략",
+  "session": 236,
+  "session_title": "/finish 마무리: 화인텍 5월 지원수량 정리 + Codex 위임 채널 룰 박기",
+  "gpt_share_skipped_reason": "A 모드 자동 생략: 정산 도메인 산출물이며 사용자 지시에 따라 GPT 공유 5~8단계 생략",
   "next_agenda": [
-    "사용자 push 발화 시 세션223 마무리 commit push",
-    "Claude가 세션223 정리 commit diff 검증 후 추가 보완 여부 판단"
+    "사용자 push 발화 시 이번 finish commit push",
+    "Claude가 화인텍 최종 xlsx와 Codex 위임 채널 gate 동작을 필요 시 재검증"
   ]
 }
