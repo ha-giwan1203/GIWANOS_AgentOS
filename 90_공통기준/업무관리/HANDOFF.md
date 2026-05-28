@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-05-28 KST — 세션238 **Codex** P-BOM guard를 run.py에 반영했다. Phase1 추출 직후 --exclude 적용 후 품번 목록을 로그로 남기고, Phase5 final_save는 sendMesFlag=N preflight 루프에서 P-BOM 미등록 품번을 파싱해 제외한 뒤 sendMesFlag=Y 본 저장을 1회만 호출한다. 검증은 py_compile 및 monkeypatch dry-run으로 RSP3SC0245/RSP3SC0246 2건 제외, 15건 통과, 정상 17건 유지까지 확인했다. 실제 MES 송신과 commit은 Claude 검증 후 진행한다.
+
 최종 업데이트: 2026-05-28 KST — 세션238 **Claude** SP3M3 주간계획 D0 반영 P-BOM 미등록 복구. 07:10 cron이 Phase 3/4(ERP 17건+서열) 완료 후 Phase 5 final_save에서 `mesMsg: P-BOM 등록 안됨. [SP3M3, RSP3SC0246] statusCode=850`으로 17건 일괄 MES 거부, verify_run는 RETRY_NO/phase6_verify_failed 분류로 알림 없이 종료. 07:49 사용자 발화 후 (1) ERP totGrid raw 조회로 17건 REG_DT=2026-05-28 등록 상태 확인 (2) ERP D0 DELETE 2건만 성공(334797 RSP3SC0572, 334798 RSP3SC0410)·나머지 500 동시성 fail (3) `.claude/tmp/final_save_loop_20260528.py`로 Phase 5 단독 재호출, P-BOM 미등록 자동 누적 제외 루프(RSP3SC0245+0246) → 1회 iter에서 MES statusCode=200 rsltCnt=750, SmartMES R 15건 rank 1~15 등록. run.py에 `--exclude PROD_NO,...` 옵션 추가(phase1 직후 items 제외, E 모드 복구용). 보류 2건은 현업 P-BOM 마스터 등록 후 추가 처리 필요. 잡셋업은 list-only 점검 PASS(pending 15 / done 2), commit-all은 사용자 동의 대기. 다음 액션은 사용자 push 발화 처리(현 발화 "푸시")와 잡셋업 commit 동의 여부.
 
 최종 업데이트: 2026-05-27 KST — 세션237 **Codex** SP3M3 야간계획 D0 반영 완료. 파일일자 2026-05-28, 생산일 2026-05-27, 원본 36건 중 한글 PROD_NO 6건 skip, dedupe 3건 제외 후 27건 ERP 업로드/서열/MES 전송 완료. Phase5 MES statusCode=200 rsltCnt=1350, Phase6 SmartMES 순서 일치 PASS. verify_run은 수동 실행 로그 미존재로 RETRY_NO/log_missing이나 본 실행 Phase6 직접 대조는 PASS.

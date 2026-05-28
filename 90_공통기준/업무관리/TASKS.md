@@ -1,3 +1,5 @@
+- [완료] owner=Codex / D0 P-BOM 사전 조회 가드 구현 / 잠금 해제: `90_공통기준\스킬\d0-production-plan\run.py`, `90_공통기준\업무관리\검토기록\runs\20260528_pbom-guard\review.md`
+- [중단] owner=Codex / 2.xls 보고용 정리 / 잠금 해제: `C:\Users\User\Desktop\2.xls`, `99_임시수집\2xls_보고용` / 사유: 사용자 요청이 D0 P-BOM guard 구현으로 전환되어 산출물 미완료 상태로 중단. 원본 직접 수정 없음
 - [부분완료] owner=Claude / SP3M3 주간계획 D0 반영 (P-BOM 미등록 2건 보류 복구) / 잠금 해제: `90_공통기준/스킬/d0-production-plan/run.py` (--exclude 옵션), `90_공통기준/업무관리/검토기록/runs/20260528_sp3m3-morning-pbom-recovery/review.md` / 결과: SmartMES R 15건 rank 1~15, 보류 RSP3SC0245·RSP3SC0246 (현업 P-BOM 등록 후 추가 처리 필요)
 - [완료] owner=Codex / SP3M3 야간계획 D0 반영 / 잠금 해제: `90_공통기준\스킬\d0-production-plan\run.py`, `90_공통기준\스킬\d0-production-plan\verify_run.py`, `06_생산관리\D0_업로드\d0_SP3M3_20260527.xlsx`, `90_공통기준\업무관리\검토기록\runs\20260527_sp3m3-evening-d0\review.md`
 - [완료] owner=Codex / 화인텍 5월 지원수량 정리·자동계산 완성 (47행, J 4,005,586, 단가 7건 매트릭스 확정값 적용) / 잠금 해제: `05_생산실적\조립비정산\06월\화인텍_지원수량_05월_20260527.xlsx`, `90_공통기준\업무관리\검토기록\runs\20260527_finetek-costform\review.md`, `90_공통기준\업무관리\검토기록\runs\20260527_finetek-confirmed-matrix-prices\review.md`

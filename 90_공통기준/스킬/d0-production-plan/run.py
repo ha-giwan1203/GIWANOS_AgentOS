@@ -64,6 +64,136 @@ LINE_CONFIG = {
     },
 }
 
+PBOM_GUARD_MAX_ITER = 20
+PBOM_MISSING_RE = re.compile(
+    r"P-?BOM\s*등록\s*안\s*됨\.\s*\[\s*([^,\]]+)\s*,\s*([A-Z0-9_./-]+)\s*\]"
+)
+_PBOM_GUARD_PHASE1_LOGGED = set()
+
+
+def _uniq_prod_nos(items):
+    seen = set()
+    prod_nos = []
+    for it in items or []:
+        pno = str(it.get("PROD_NO") or "").strip()
+        if pno and pno not in seen:
+            seen.add(pno)
+            prod_nos.append(pno)
+    return prod_nos
+
+
+def parse_prod_no_csv(value):
+    return {p.strip() for p in (value or "").split(",") if p.strip()}
+
+
+def apply_manual_exclude(items, exclude_csv, label="exclude"):
+    exc = parse_prod_no_csv(exclude_csv)
+    if not exc:
+        return items
+    before = len(items)
+    kept = [it for it in items if it.get("PROD_NO") not in exc]
+    removed = before - len(kept)
+    print(f"[exclude] {label}: {sorted(exc)} 제외 {before}->{len(kept)}건 (removed={removed})")
+    return kept
+
+
+def note_pbom_guard_phase1(items, line, no_pbom_guard=False):
+    prod_nos = _uniq_prod_nos(items)
+    if no_pbom_guard:
+        print(f"[pbom-guard] disabled (--no-pbom-guard): line={line} prod_no={len(prod_nos)}건")
+        return items
+    key = (line, tuple(prod_nos))
+    if key not in _PBOM_GUARD_PHASE1_LOGGED:
+        _PBOM_GUARD_PHASE1_LOGGED.add(key)
+        print(
+            f"[pbom-guard] line={line} PROD_NO {len(prod_nos)}건 수집. "
+            "전용 P-BOM 조회 endpoint 미확정 -> Phase5 sendMesFlag=N preflight로 MES 전송 전 차단"
+        )
+    return items
+
+
+def filter_items_by_prod_nos(items, prod_nos):
+    blocked = set(prod_nos or [])
+    if not blocked:
+        return items
+    kept = [it for it in items if it.get("PROD_NO") not in blocked]
+    print(f"[pbom-guard] items exclude {sorted(blocked)}: {len(items)}->{len(kept)}건")
+    return kept
+
+
+def _flatten_mes_text(value):
+    if value is None:
+        return []
+    if isinstance(value, str):
+        texts = [value]
+        s = value.strip()
+        if s.startswith("{") or s.startswith("["):
+            try:
+                texts.extend(_flatten_mes_text(json.loads(s)))
+            except Exception:
+                pass
+        return texts
+    if isinstance(value, dict):
+        texts = []
+        for v in value.values():
+            texts.extend(_flatten_mes_text(v))
+        return texts
+    if isinstance(value, list):
+        texts = []
+        for v in value:
+            texts.extend(_flatten_mes_text(v))
+        return texts
+    return [str(value)]
+
+
+def parse_pbom_missing_from_mes_msg(mes_msg, line_cd=None):
+    missing = []
+    seen = set()
+    for text in _flatten_mes_text(mes_msg):
+        for m in PBOM_MISSING_RE.finditer(text):
+            line = (m.group(1) or "").strip()
+            pno = (m.group(2) or "").strip()
+            if line_cd and line and line != line_cd:
+                continue
+            if pno and pno not in seen:
+                seen.add(pno)
+                missing.append(pno)
+    return missing
+
+
+def parse_mes_status_code(mes_msg):
+    for text in _flatten_mes_text(mes_msg):
+        s = text.strip()
+        if not (s.startswith("{") or s.startswith("[")):
+            continue
+        try:
+            obj = json.loads(s)
+        except Exception:
+            continue
+        stack = [obj]
+        while stack:
+            cur = stack.pop()
+            if isinstance(cur, dict):
+                if "statusCode" in cur:
+                    return cur.get("statusCode")
+                stack.extend(cur.values())
+            elif isinstance(cur, list):
+                stack.extend(cur)
+    return None
+
+
+def assert_mes_msg_ok(res, context):
+    status = (res or {}).get("statusCode")
+    if status not in (None, 200, "200"):
+        raise RuntimeError(f"{context}: statusCode={status} body={str(res)[:300]}")
+    mes_msg = (res or {}).get("mesMsg") or ""
+    if not mes_msg:
+        return
+    mes_status = parse_mes_status_code(mes_msg)
+    if mes_status in (200, "200"):
+        return
+    raise RuntimeError(f"{context}: MES statusCode={mes_status} mesMsg={str(mes_msg)[:300]}")
+
 
 # ============================================================
 # Phase 0: 환경 준비
@@ -1749,7 +1879,9 @@ def _reorder_s_data_by_processed(s_data, processed_order):
     return [r for _, r in indexed]
 
 
-def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1', processed_order=None):
+def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1',
+                        processed_order=None, send_mes_flag="Y", exclude_prod_nos=None,
+                        raise_on_error=True):
     """phase5 final_save — sGrid 재조회 후 sendMesFlag='Y'로 POST.
 
     last_m_row: api_rank_batch_via_http 결과에서 받은 마지막 처리 m row의 LINE_CD/STD_DA/PLAN_DA/LINE_DIV_CD.
@@ -1771,6 +1903,16 @@ def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1',
     s_data = r.json().get("data", {}).get("list", []) or []
 
     # 세션159: ERP s_data 응답 정렬이 excel 순서와 다르므로 setBeginTime 전 재정렬.
+    exclude_set = set(exclude_prod_nos or [])
+    if exclude_set:
+        before = len(s_data)
+        s_data = [row for row in s_data if row.get("PROD_NO") not in exclude_set]
+        print(f"[pbom-guard] final_save payload exclude {sorted(exclude_set)}: sGrid {before}->{len(s_data)}건")
+        if not s_data:
+            raise RuntimeError("final_save_via_http: P-BOM guard 제외 후 전송 대상 0건")
+        if processed_order:
+            processed_order = [p for p in processed_order if p.get("PROD_NO") not in exclude_set]
+
     s_data = _reorder_s_data_by_processed(s_data, processed_order)
 
     # JS sGridList.setBeginTime() 정밀 재현 — 모든 row의 PRDT_RANK + BEGIN_TIME + END_TIME +
@@ -1781,25 +1923,62 @@ def final_save_via_http(sess, save_url, last_m_row, parent_prod_id, day_opt='1',
     print(f"[phase5:http] setBeginTime 적용 ({len(s_data)}건, ranks 1~{len(s_data)})")
 
     sess.headers["X-XSRF-TOKEN"] = sess.cookies.get("XSRF-TOKEN", "")
-    payload = {"dataList": s_data, "PARENT_PROD_ID": parent_prod_id, "sendMesFlag": "Y"}
+    payload = {"dataList": s_data, "PARENT_PROD_ID": parent_prod_id, "sendMesFlag": send_mes_flag}
     r2 = sess.post(BASE + save_url, data=json.dumps(payload),
                    headers={"Content-Type": "application/json; charset=utf-8",
                             "X-XSRF-TOKEN": sess.cookies.get("XSRF-TOKEN", "")},
                    timeout=120)
-    res = r2.json() if r2.headers.get("content-type", "").startswith("application/json") else {}
-    print(f"[phase5:http final_save] status={r2.status_code} statusCode={res.get('statusCode')} mesMsg={(res.get('mesMsg') or '')[:120]}")
+    if r2.headers.get("content-type", "").startswith("application/json"):
+        res = r2.json()
+    else:
+        res = {"statusCode": r2.status_code, "mesMsg": r2.text[:1000]}
+    print(f"[phase5:http final_save] sendMesFlag={send_mes_flag} status={r2.status_code} statusCode={res.get('statusCode')} mesMsg={(res.get('mesMsg') or '')[:120]}")
     if r2.status_code != 200 or str(res.get("statusCode")) != "200":
-        raise RuntimeError(f"final_save_via_http 실패: status={r2.status_code} body={r2.text[:300]}")
+        if raise_on_error:
+            raise RuntimeError(f"final_save_via_http 실패: status={r2.status_code} body={r2.text[:300]}")
     return res
 
 
-def final_save(page, save_url):
+def final_save_via_http_with_pbom_guard(sess, save_url, last_m_row, parent_prod_id, line_cd,
+                                        day_opt='1', processed_order=None):
+    """sendMesFlag=N preflight로 P-BOM 미등록을 제외한 뒤 sendMesFlag=Y는 1회만 호출."""
+    excluded = set()
+    for attempt in range(1, PBOM_GUARD_MAX_ITER + 1):
+        res = final_save_via_http(
+            sess, save_url, last_m_row, parent_prod_id,
+            day_opt=day_opt, processed_order=processed_order,
+            send_mes_flag="N", exclude_prod_nos=excluded, raise_on_error=False,
+        )
+        missing = parse_pbom_missing_from_mes_msg(res, line_cd=line_cd)
+        if not missing:
+            assert_mes_msg_ok(res, f"pbom-guard preflight line={line_cd}")
+            print(f"[pbom-guard] preflight PASS line={line_cd} excluded={sorted(excluded)}")
+            break
+        new_missing = [p for p in missing if p not in excluded]
+        if not new_missing:
+            raise RuntimeError(f"[pbom-guard] 반복 P-BOM 미등록 감지: {missing}")
+        excluded.update(new_missing)
+        print(f"[pbom-guard] preflight {attempt}: P-BOM 미등록 {new_missing} -> 제외 누적 {sorted(excluded)}")
+    else:
+        raise RuntimeError(f"[pbom-guard] preflight 반복 한도 초과 excluded={sorted(excluded)}")
+
+    res = final_save_via_http(
+        sess, save_url, last_m_row, parent_prod_id,
+        day_opt=day_opt, processed_order=processed_order,
+        send_mes_flag="Y", exclude_prod_nos=excluded,
+    )
+    assert_mes_msg_ok(res, f"pbom-guard final_save line={line_cd}")
+    return res, sorted(excluded)
+
+
+def final_save(page, save_url, send_mes_flag="Y", exclude_prod_nos=None, raise_on_error=True):
     js = """
     async (args) => {
-        jQuery('#sendMesFlag').val('Y');
+        jQuery('#sendMesFlag').val(args.sendMesFlag);
         sGridList.setBeginTime();
-        const dataList = sGridList.$local_grid.getData();
-        const param = JSON.stringify({dataList, PARENT_PROD_ID: totSelectRowData.PROD_ID, sendMesFlag:'Y'});
+        const excluded = new Set(args.excludeProdNos || []);
+        const dataList = sGridList.$local_grid.getData().filter(r => !excluded.has(r.PROD_NO));
+        const param = JSON.stringify({dataList, PARENT_PROD_ID: totSelectRowData.PROD_ID, sendMesFlag:args.sendMesFlag});
         return await new Promise((resolve) => {
             const to = setTimeout(() => resolve({ok:false, err:'timeout 120s'}), 120000);
             jQuery.ajax({
@@ -1810,9 +1989,14 @@ def final_save(page, save_url):
         });
     }
     """
-    r = page.evaluate(js, {"saveUrl": save_url})
+    r = page.evaluate(js, {"saveUrl": save_url, "sendMesFlag": send_mes_flag, "excludeProdNos": list(exclude_prod_nos or [])})
     print(f"[phase5 final_save] {r}")
     if not r.get("ok") or str((r.get("r") or {}).get("statusCode")) != "200":
+        if not raise_on_error:
+            res = r.get("r") if isinstance(r.get("r"), dict) else {}
+            if not res:
+                res = {"statusCode": r.get("httpStatus"), "mesMsg": r.get("body") or str(r)}
+            return res
         raise RuntimeError(f"최종 저장 실패: {r}")
     return r["r"]
 
@@ -1820,6 +2004,28 @@ def final_save(page, save_url):
 # ============================================================
 # Phase 6: SmartMES 검증
 # ============================================================
+def final_save_with_pbom_guard(page, save_url, line_cd):
+    """Browser path fallback for P-BOM guard. Default operation should prefer --http-only."""
+    excluded = set()
+    for attempt in range(1, PBOM_GUARD_MAX_ITER + 1):
+        res = final_save(page, save_url, send_mes_flag="N", exclude_prod_nos=excluded, raise_on_error=False)
+        missing = parse_pbom_missing_from_mes_msg(res, line_cd=line_cd)
+        if not missing:
+            assert_mes_msg_ok(res, f"pbom-guard preflight browser line={line_cd}")
+            print(f"[pbom-guard] browser preflight PASS line={line_cd} excluded={sorted(excluded)}")
+            break
+        new_missing = [p for p in missing if p not in excluded]
+        if not new_missing:
+            raise RuntimeError(f"[pbom-guard] browser 반복 P-BOM 미등록 감지: {missing}")
+        excluded.update(new_missing)
+        print(f"[pbom-guard] browser preflight {attempt}: P-BOM 미등록 {new_missing} -> 제외 누적 {sorted(excluded)}")
+    else:
+        raise RuntimeError(f"[pbom-guard] browser preflight 반복 한도 초과 excluded={sorted(excluded)}")
+    res = final_save(page, save_url, send_mes_flag="Y", exclude_prod_nos=excluded)
+    assert_mes_msg_ok(res, f"pbom-guard browser final_save line={line_cd}")
+    return res, sorted(excluded)
+
+
 def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
     """SmartMES 등록 결과 검증.
 
@@ -1887,7 +2093,8 @@ def verify_smartmes(line_cd: str, prdt_da: datetime, excel_order: list):
 # ============================================================
 # 세션 실행
 # ============================================================
-def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None, parse_only=False, no_mes_send=False, api_mode=False):
+def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date=None,
+                     parse_only=False, no_mes_send=False, api_mode=False, pbom_guard=True):
     """반환값 (2026-05-23 추가): True = Phase 3~6 정상 완료(jobsetup chain 가능),
     False = 실패/부분진행(Phase 4 실패 / Phase 6 SmartMES 불일치 / dry_run / parse_only / no_mes_send).
     기존 호출부는 반환값 무시(파이썬 호환). 신규 --xlsx 호출부는 jobsetup 가드용으로 활용."""
@@ -1924,10 +2131,18 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         if no_mes_send:
             print(f"[{line}:http] --no-mes-send: final_save 차단")
             return False
-        final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"],
-                            day_opt='1', processed_order=batch.get("processed_order"))
+        final_items = items
+        if pbom_guard:
+            _, excluded_pnos = final_save_via_http_with_pbom_guard(
+                sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"],
+                target_line, day_opt='1', processed_order=batch.get("processed_order"))
+            final_items = filter_items_by_prod_nos(items, excluded_pnos)
+        else:
+            print(f"[pbom-guard] disabled (--no-pbom-guard): Phase5 preflight skip line={target_line}")
+            final_save_via_http(sess, cfg["save_url"], batch["last_m_row"], batch["last_parent_prod_id"],
+                                day_opt='1', processed_order=batch.get("processed_order"))
         vp = verify_prod_date or prod_date
-        if not verify_smartmes(target_line, vp, items):
+        if not verify_smartmes(target_line, vp, final_items):
             PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
             return False
         return True
@@ -1950,9 +2165,15 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         print(f"[{line}] --no-mes-send: final_save 차단 (sendMesFlag='Y' MES 전송 미실행)")
         print(f"[{line}]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
         return False
-    final_save(page, cfg["save_url"])
+    final_items = items
+    if pbom_guard:
+        _, excluded_pnos = final_save_with_pbom_guard(page, cfg["save_url"], target_line)
+        final_items = filter_items_by_prod_nos(items, excluded_pnos)
+    else:
+        print(f"[pbom-guard] disabled (--no-pbom-guard): Phase5 preflight skip line={target_line}")
+        final_save(page, cfg["save_url"])
     vp = verify_prod_date or prod_date
-    if not verify_smartmes(target_line, vp, items):
+    if not verify_smartmes(target_line, vp, final_items):
         PHASE6_FAILED.append((target_line, vp.strftime("%Y-%m-%d")))
         return False
     return True
@@ -2015,6 +2236,7 @@ def main():
     ap.add_argument("--day-cut", type=int, default=DAY_CUT_THRESHOLD, help=f"morning SP3M3 주간 누적 컷 임계 (default={DAY_CUT_THRESHOLD}). PoC/특수 케이스만 변경")
     ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
     ap.add_argument("--exclude", default="", help="phase1 추출 후 제외할 PROD_NO 콤마구분 (E 모드 복구용. 예: --exclude RSP3SC0246). P-BOM 미등록 등 단건 차단으로 전체 fail 시 사용")
+    ap.add_argument("--no-pbom-guard", action="store_true", help="P-BOM guard 비활성화. Phase5 sendMesFlag=N preflight 및 자동 제외를 건너뜀")
     ap.add_argument("--http-upload", action="store_true", help="세션153 A안 2단계: phase3 D0 업로드를 requests 직접 (브라우저·iframe·jQuery 0). HTTP OAuth 성공 시만 활성")
     ap.add_argument("--http-only", action="store_true", help="세션153 A안 3단계: 완전 브라우저-less. phase0~6 전부 requests. ensure_chrome_cdp + playwright 0")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
@@ -2071,6 +2293,8 @@ def main():
             line_override = args.line if args.line != "ALL" else "SP3M3"
             print(f"[direct] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
             # 파일 업로드 전 중복 가드 (세션133 사용자 명시 — 같은 prod_date+PROD_NO 이미 등록된 건 제외)
+            items = apply_manual_exclude(items, args.exclude, "direct")
+            items = note_pbom_guard_phase1(items, line_override, args.no_pbom_guard)
             items_before = len(items)
             items = dedupe_existing_registrations(page, items, prod_date, line_override)
             if items_before > 0 and len(items) == 0:
@@ -2109,8 +2333,14 @@ def main():
                 print("[direct]   ERP rank 임시저장만 발생. 정리하려면 erp_d0_dedupe.py 또는 화면에서 삭제")
                 print("=== /d0-plan --xlsx --no-mes-send 완료 ===")
                 return
-            final_save(page, cfg["save_url"])
-            if not verify_smartmes(line_override, prod_date, items):
+            final_items = items
+            if args.no_pbom_guard:
+                print(f"[pbom-guard] disabled (--no-pbom-guard): Phase5 preflight skip line={line_override}")
+                final_save(page, cfg["save_url"])
+            else:
+                _, excluded_pnos = final_save_with_pbom_guard(page, cfg["save_url"], line_override)
+                final_items = filter_items_by_prod_nos(items, excluded_pnos)
+            if not verify_smartmes(line_override, prod_date, final_items):
                 PHASE6_FAILED.append((line_override, prod_date.strftime("%Y-%m-%d")))
             # 세션135: --xlsx 분기에도 chain 호출 (line_override=SP3M3 한정)
             if line_override == "SP3M3" and not args.parse_only and not args.no_jobsetup:
@@ -2137,16 +2367,20 @@ def main():
                 items = extract_sp3m3_night(wb)
                 # Phase 1.5: 야간 1~5행 dedupe (주간 등록분과 PROD_NO+수량 일치 시 제외)
                 items = dedupe_night_first_5(page, items)
+                items = apply_manual_exclude(items, args.exclude, "evening SP3M3")
+                items = note_pbom_guard_phase1(items, "SP3M3", args.no_pbom_guard)
                 prod_date = prod_date_override if prod_date_override else target_file_date - timedelta(days=1)
                 if prod_date_override:
                     print(f"[evening] --prod-date 오버라이드: SP3M3 prod_date = {prod_date.strftime('%Y-%m-%d')} (file={target_file_date.strftime('%Y-%m-%d')})")
-                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode, pbom_guard=not args.no_pbom_guard)
             if args.line in ("SD9A01","ALL"):
                 items = extract_outer_d1(wb, "SD9M01")
+                items = apply_manual_exclude(items, args.exclude, "evening SD9A01")
+                items = note_pbom_guard_phase1(items, "SD9A01", args.no_pbom_guard)
                 prod_date = prod_date_override if prod_date_override else target_file_date
                 if prod_date_override:
                     print(f"[evening] --prod-date 오버라이드: SD9A01 prod_date = {prod_date.strftime('%Y-%m-%d')}")
-                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode, pbom_guard=not args.no_pbom_guard)
         else:  # morning
             # SP3M3 주간: ERP 생산일 = 파일명 날짜 (당일, 어제 저녁 저장된 파일)
             prod_date = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else target_file_date
@@ -2155,10 +2389,8 @@ def main():
             sp3m3_registered = False
             if args.line in ("SP3M3","ALL"):
                 items = extract_sp3m3_day(wb, args.day_cut)
-                if args.exclude:
-                    exc = {p.strip() for p in args.exclude.split(",") if p.strip()}
-                    before = len(items); items = [it for it in items if it["PROD_NO"] not in exc]
-                    print(f"[exclude] {sorted(exc)} 제외: {before}→{len(items)}건")
+                items = apply_manual_exclude(items, args.exclude, "morning SP3M3")
+                items = note_pbom_guard_phase1(items, "SP3M3", args.no_pbom_guard)
                 # Phase 1.5: 같은 prod_date 이미 등록된 PROD_NO 제외 (세션133 사용자 명시 — 파일 업로드 전 중복 가드)
                 items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
                 if args.limit is not None and len(items) > args.limit:
@@ -2168,7 +2400,7 @@ def main():
                     print("[morning] dedupe 후 등록 대상 0건 — 업로드 스킵")
                 else:
                     # 2026-05-23 수정: run_session_line 반환값으로 sp3m3_registered 결정 — Phase 4 실패 / Phase 6 불일치 시 False
-                    sp3m3_registered = run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                    sp3m3_registered = run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run, verify_prod_date=prod_date, parse_only=args.parse_only, no_mes_send=args.no_mes_send, api_mode=args.api_mode, pbom_guard=not args.no_pbom_guard)
             if args.line == "SD9A01":
                 print("[morning] SD9A01은 저녁 세션 전용 — 스킵")
 
@@ -2205,6 +2437,8 @@ def _main_http_only(args, sess, session, target_file_date):
         line_override = args.line if args.line != "ALL" else "SP3M3"
         print(f"[direct:http] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
         page = None
+        items = apply_manual_exclude(items, args.exclude, "direct:http")
+        items = note_pbom_guard_phase1(items, line_override, args.no_pbom_guard)
         items_before = len(items)
         if args.no_dedupe:
             print(f"[direct:http] --no-dedupe: dedupe 우회 — items {len(items)}건 그대로 진행 (사용자 명시 중복 등록)")
@@ -2232,7 +2466,8 @@ def _main_http_only(args, sess, session, target_file_date):
         # 반환값 True = Phase 3~6 전부 정상 (jobsetup 가능). False = Phase 4 실패 / Phase 6 SmartMES 불일치 / parse_only / no_mes_send / dry_run 등 비완료
         run_ok = run_session_line(page, None, line_override, items, prod_date, dry_run=False,
                                   verify_prod_date=prod_date, parse_only=args.parse_only,
-                                  no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                                  no_mes_send=args.no_mes_send, api_mode=args.api_mode,
+                                  pbom_guard=not args.no_pbom_guard)
         if line_override == "SP3M3" and run_ok and not args.no_jobsetup:
             _run_jobsetup_chain(args.jobsetup_mode, prod_date)
         elif line_override == "SP3M3" and not run_ok:
@@ -2256,6 +2491,8 @@ def _main_http_only(args, sess, session, target_file_date):
         if args.line in ("SP3M3", "ALL"):
             items = extract_sp3m3_night(wb)
             items = dedupe_night_first_5(page, items)
+            items = apply_manual_exclude(items, args.exclude, "evening:http SP3M3")
+            items = note_pbom_guard_phase1(items, "SP3M3", args.no_pbom_guard)
             prod_date = prod_date_override if prod_date_override else target_file_date - timedelta(days=1)
             if prod_date_override:
                 print(f"[evening:http] --prod-date 오버라이드: SP3M3 prod_date = {prod_date.strftime('%Y-%m-%d')}")
@@ -2264,20 +2501,26 @@ def _main_http_only(args, sess, session, target_file_date):
                 items = items[:args.limit]
             run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
                              verify_prod_date=prod_date, parse_only=args.parse_only,
-                             no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                             no_mes_send=args.no_mes_send, api_mode=args.api_mode,
+                             pbom_guard=not args.no_pbom_guard)
         if args.line in ("SD9A01", "ALL"):
             items = extract_outer_d1(wb, "SD9M01")
+            items = apply_manual_exclude(items, args.exclude, "evening:http SD9A01")
+            items = note_pbom_guard_phase1(items, "SD9A01", args.no_pbom_guard)
             prod_date = prod_date_override if prod_date_override else target_file_date
             if args.limit is not None and len(items) > args.limit:
                 items = items[:args.limit]
             run_session_line(page, wb, "SD9A01", items, prod_date, args.dry_run,
                              verify_prod_date=prod_date, parse_only=args.parse_only,
-                             no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                             no_mes_send=args.no_mes_send, api_mode=args.api_mode,
+                             pbom_guard=not args.no_pbom_guard)
     else:  # morning
         prod_date = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else target_file_date
         sp3m3_registered = False
         if args.line in ("SP3M3", "ALL"):
             items = extract_sp3m3_day(wb, args.day_cut)
+            items = apply_manual_exclude(items, args.exclude, "morning:http SP3M3")
+            items = note_pbom_guard_phase1(items, "SP3M3", args.no_pbom_guard)
             items = dedupe_existing_registrations(page, items, prod_date, "SP3M3")
             if args.limit is not None and len(items) > args.limit:
                 print(f"[morning:http] --limit {args.limit} 적용: {len(items)}건 → {args.limit}건 (PoC)")
@@ -2288,7 +2531,8 @@ def _main_http_only(args, sess, session, target_file_date):
                 # 2026-05-23 수정: run_session_line 반환값으로 결정 — Phase 4 실패 / Phase 6 불일치 시 False → jobsetup 차단
                 sp3m3_registered = run_session_line(page, wb, "SP3M3", items, prod_date, args.dry_run,
                                                     verify_prod_date=prod_date, parse_only=args.parse_only,
-                                                    no_mes_send=args.no_mes_send, api_mode=args.api_mode)
+                                                    no_mes_send=args.no_mes_send, api_mode=args.api_mode,
+                                                    pbom_guard=not args.no_pbom_guard)
         if args.line == "SD9A01":
             print("[morning:http] SD9A01은 저녁 세션 전용 — 스킵")
 
