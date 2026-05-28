@@ -1,0 +1,5 @@
+node_modules/
+.bun-cache/
+.tmp/
+__pycache__/
+.tmp_write_test

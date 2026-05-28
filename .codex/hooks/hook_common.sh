@@ -1,0 +1,627 @@
+#!/bin/bash
+# 훅 공통 로깅 함수 + 로그 로테이션 + incident 기록
+# 사용법: source .claude/hooks/hook_common.sh && hook_log "이벤트명" "메시지"
+# incident: hook_incident "type" "hook" "file" "detail" ['"classification_reason":"<enum>"']
+# type: gate_reject | hook_block | compile_fail
+# classification_reason enum (세션12 합의, 세션40 정규화, 세션45 확장):
+#   evidence_missing | pre_commit_check | compile_fail | test_fail |
+#   scope_violation | dangerous_cmd | send_block | stop_guard_block |
+#   completion_before_git | completion_before_state_sync |
+#   harness_missing | meta_drift | task_consecutive_fail |
+#   gpt_verdict | user_correction | doc_drift | python3_dependency
+
+PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-.}"
+HOOK_LOG_FILE="$PROJECT_ROOT/.claude/hooks/hook_log.jsonl"
+HOOK_LOG_MAX_SIZE=512000  # 500KB
+INCIDENT_LEDGER="$PROJECT_ROOT/.claude/incident_ledger.jsonl"
+
+# 세션93 (2026-04-22 auto-fix A-2): 전역 PY_CMD fallback
+# python3가 없는 환경(win 일부)에서도 동일 코드 경로 유지.
+# hook_common.sh를 source하는 모든 훅에서 "$PY_CMD" 사용 가능.
+PY_CMD="python"
+command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+export PY_CMD
+
+# 공통 경로 — 개별 훅에서 하드코딩 대신 이 변수 사용
+STATE_EVIDENCE="$PROJECT_ROOT/.claude/state/evidence"
+STATE_AGENT_CONTROL="$PROJECT_ROOT/90_공통기준/agent-control/state"
+PATH_TASKS="$PROJECT_ROOT/90_공통기준/업무관리/TASKS.md"
+PATH_HANDOFF="$PROJECT_ROOT/90_공통기준/업무관리/HANDOFF.md"
+PATH_STATUS="$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md"
+
+# 세션 키 — evidence 시스템의 세션 격리용 (sha1 of transcript path)
+session_key() {
+  local seed="${CLAUDE_TRANSCRIPT_PATH:-$PWD}"
+  if command -v sha1sum >/dev/null 2>&1; then
+    printf '%s' "$seed" | sha1sum | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    printf '%s' "$seed" | shasum | awk '{print $1}'
+  else
+    printf '%s' "$seed" | cksum | awk '{print $1}'
+  fi
+}
+
+_rotate_file() {
+  local f="$1"
+  if [ -f "$f" ]; then
+    local size
+    size=$(wc -c < "$f" 2>/dev/null || echo 0)
+    if [ "$size" -gt "$HOOK_LOG_MAX_SIZE" ] 2>/dev/null; then
+      local tmp="${f}.tmp"
+      tail -n 2000 "$f" > "$tmp" 2>/dev/null && mv "$tmp" "$f" 2>/dev/null
+    fi
+  fi
+}
+
+hook_log() {
+  local event="$1"
+  local msg="$2"
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  # JSON 안전 이스케이프: 쌍따옴표, 백슬래시, 개행
+  msg="${msg//\\/\\\\}"
+  msg="${msg//\"/\\\"}"
+  msg="${msg//$'\n'/\\n}"
+  echo "{\"ts\":\"$ts\",\"event\":\"$event\",\"msg\":\"$msg\"}" >> "$HOOK_LOG_FILE"
+  _rotate_file "$HOOK_LOG_FILE"
+}
+
+# 스킬 사용 로깅 — 스킬 호출 시 전용 계측
+# 사용법: hook_skill_usage "skill_name" "trigger_type"
+SKILL_USAGE_LOG="$PROJECT_ROOT/.claude/hooks/skill_usage.jsonl"
+
+hook_skill_usage() {
+  local skill_name="$1"
+  local trigger_type="${2:-manual}"  # manual|slash|auto
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  local sk
+  sk=$(session_key)
+  skill_name="${skill_name//\\/\\\\}"
+  skill_name="${skill_name//\"/\\\"}"
+  echo "{\"ts\":\"$ts\",\"skill\":\"$skill_name\",\"trigger\":\"$trigger_type\",\"session\":\"$sk\"}" >> "$SKILL_USAGE_LOG"
+  _rotate_file "$SKILL_USAGE_LOG"
+}
+
+# 안전 JSON 값 추출 — sed 단독 파싱의 따옴표/줄바꿈 취약성 대체
+# 사용법: VALUE=$(echo "$JSON" | safe_json_get "key_name")
+# 문자열 값: 따옴표 내부를 이스케이프 인식하며 추출
+# 객체 값: 중괄호 매칭으로 추출
+# 원시 값: true/false/null/숫자 추출 (세션14 추가)
+safe_json_get() {
+  local key="$1"
+  local input
+  input=$(cat)
+  # 1차: 문자열 값 — 이스케이프된 따옴표(\")를 건너뛰며 추출
+  local val
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*"\(\([^"\\]\|\\.\)*\)".*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    # 이스케이프 복원: \\ → \, \" → ", \n → 개행, \t → 탭
+    # 핵심: \\\\ 를 플레이스홀더로 치환 → 다른 이스케이프 복원 → 플레이스홀더를 \ 로 복원
+    # 이렇게 해야 \\n (리터럴\+n)이 개행으로 오변환되지 않음
+    val=$(printf '%s' "$val" | sed 's/\\\\/\x00BSLASH\x00/g; s/\\"/"/g; s/\\n/\n/g; s/\\t/\t/g; s/\x00BSLASH\x00/\\/g')
+    printf '%s' "$val"
+    return 0
+  fi
+  # 2차: 객체/배열 값 — 첫 번째 { 또는 [ 부터 매칭
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*\(\({[^}]*}\)\|\(\[.*\]\)\).*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    printf '%s' "$val"
+    return 0
+  fi
+  # 3차: 원시 값 — true/false/null/숫자 (따옴표 없는 리터럴)
+  val=$(printf '%s' "$input" | tr '\n' ' ' | sed -n 's/.*"'"$key"'"[[:space:]]*:[[:space:]]*\(true\|false\|null\|-\?[0-9][0-9.eE+-]*\)[[:space:]]*[,}].*/\1/p' | head -1)
+  if [ -n "$val" ]; then
+    printf '%s' "$val"
+    return 0
+  fi
+  return 1
+}
+
+# 공통 mtime 조회 (GNU/BSD stat 호환)
+file_mtime() {
+  local path="$1"
+  if [ -z "$path" ] || [ ! -f "$path" ]; then
+    echo 0
+    return 0
+  fi
+  stat --format=%Y "$path" 2>/dev/null || stat -f %m "$path" 2>/dev/null || echo 0
+}
+
+# transcript에서 마지막 assistant text 추출
+last_assistant_text() {
+  local transcript="${1:-$CLAUDE_TRANSCRIPT_PATH}"
+  if [ -z "$transcript" ] || [ ! -f "$transcript" ]; then
+    return 1
+  fi
+  local last_assistant
+  last_assistant=$(tail -n 120 "$transcript" 2>/dev/null | grep '"type":"assistant"' | tail -n 1)
+  if [ -z "$last_assistant" ]; then
+    return 1
+  fi
+  printf '%s' "$last_assistant" | safe_json_get "text"
+}
+
+# JSON 문자열 이스케이프: 백슬래시, 큰따옴표, 개행, CR, 탭 처리
+# 사용법: SAFE="$(json_escape "$RAW_STRING")"
+json_escape() {
+  local s="$1"
+  s=${s//\\/\\\\}
+  s=${s//\"/\\\"}
+  s=${s//$'\n'/\\n}
+  s=${s//$'\r'/\\r}
+  s=${s//$'\t'/\\t}
+  printf '%s' "$s"
+}
+
+# 운영 중 누적되지만 완료 판정에서 무시할 런타임 산출물
+is_volatile_runtime_path() {
+  local path="$1"
+  echo "$path" | grep -qE '^(\.claude/(incident_ledger\.jsonl|settings\.local\.json|settings\.local\.json\.bak_[0-9]+|command-audit\.log|subagent-audit\.log|tool-failure\.log|logs/|state/)|90_공통기준/토론모드/logs/)'
+}
+
+# 강한 완료 표현만 1차 트리거 (GPT+Claude 합의 2026-04-11 세션12)
+# v8: 과감지 86.5% 해소 — "잔여 이슈 없", "ALL CLEAR", "GPT 판정: PASS" 단독 트리거 제거
+# 이들은 completion_gate 내부에서 write_marker 존재 시 후속 조건으로만 사용
+_COMPLETION_PATTERN='(완료 보고|최종[[:space:]]*(완료|반영)|모든[[:space:]]*작업[[:space:]]*완료|작업을[[:space:]]*모두[[:space:]]*마쳤|마무리됐습니다|final[[:space:]]+completion|work[[:space:]]+(is[[:space:]]+)?complete)'
+# 후속 조건용 약한 패턴 (단독으로는 트리거하지 않음)
+_COMPLETION_WEAK_PATTERN='(잔여[[:space:]]*이슈[[:space:]]*없(음|습니다)|ALL CLEAR|GPT 판정:[[:space:]]*PASS)'
+
+is_completion_claim() {
+  local text="$1"
+  if [ -z "$text" ]; then
+    return 1
+  fi
+  local matched
+  matched=$(echo "$text" | grep -oiE "$_COMPLETION_PATTERN" | head -3 | tr '\n' '; ' | sed 's/; $//')
+  if [ -n "$matched" ]; then
+    hook_log "completion_claim" "matched_phrases=$matched" 2>/dev/null
+    # GPT 합의 세션7: completion_claim 별도 로그 (로테이션 영향 없이 보존)
+    local _cc_ts
+    _cc_ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+    matched="${matched//\\/\\\\}"
+    matched="${matched//\"/\\\"}"
+    printf '{"ts":"%s","matched_phrases":"%s","source":"detect"}\n' "$_cc_ts" "$matched" \
+      >> "$PROJECT_ROOT/.claude/logs/completion_claim.jsonl" 2>/dev/null
+    return 0
+  fi
+  return 1
+}
+
+# evidence 공통: 세션 내 파일 신선도 판정 + evidence 디렉토리 설정
+# evidence_gate.sh / evidence_stop_guard.sh 중복 제거 (GPT+Claude 합의 2026-04-11)
+# 사용법: evidence_init → fresh_file/fresh_req/fresh_ok 사용 가능
+evidence_init() {
+  local sk
+  sk=$(session_key)
+  EVIDENCE_SESSION_DIR="$STATE_EVIDENCE/$sk"
+  REQ_DIR="$EVIDENCE_SESSION_DIR/requires"
+  PROOF_DIR="$EVIDENCE_SESSION_DIR/proofs"
+  START_FILE="$EVIDENCE_SESSION_DIR/.session_start"
+  mkdir -p "$REQ_DIR" "$PROOF_DIR"
+  if [ ! -f "$START_FILE" ]; then
+    : > "$START_FILE"
+  fi
+}
+
+fresh_file() {
+  local f="$1"
+  [ -f "$f" ] && [ "$f" -nt "$START_FILE" ]
+}
+
+fresh_req() { fresh_file "$REQ_DIR/$1.req"; }
+fresh_ok()  { fresh_file "$PROOF_DIR/$1.ok"; }
+
+# Git 변경 중 런타임 산출물을 제외한 "실제 반영 대상"만 수집
+git_relevant_change_list() {
+  (
+    cd "$PROJECT_ROOT" 2>/dev/null || exit 1
+    {
+      git -c core.quotepath=false diff --name-only 2>/dev/null
+      git -c core.quotepath=false diff --cached --name-only 2>/dev/null
+      git -c core.quotepath=false ls-files --others --exclude-standard 2>/dev/null
+    } | sed '/^$/d' | sort -u
+  ) | while IFS= read -r path; do
+    if ! is_volatile_runtime_path "$path"; then
+      printf '%s\n' "$path"
+    fi
+  done
+}
+
+git_has_relevant_changes() {
+  local changes
+  changes=$(git_relevant_change_list)
+  [ -n "$changes" ]
+}
+
+# Circuit breaker 최소형 — 동일 hook에서 unresolved incident 연속 N건 이상이면 경고
+# 사용법: if circuit_breaker_tripped "hook_name" 3; then echo "WARN"; fi
+# 반환: 0=tripped(경고 필요), 1=정상
+circuit_breaker_tripped() {
+  local target_hook="$1"
+  local threshold="${2:-3}"
+  [ ! -f "$INCIDENT_LEDGER" ] && return 1
+  # 최근 20줄에서 해당 hook의 연속 unresolved 카운트
+  local consecutive=0
+  while IFS= read -r line; do
+    local h r
+    h=$(printf '%s' "$line" | safe_json_get "hook" 2>/dev/null)
+    r=$(printf '%s' "$line" | safe_json_get "resolved" 2>/dev/null)
+    if [ "$h" = "$target_hook" ]; then
+      if [ "$r" = "false" ]; then
+        consecutive=$((consecutive + 1))
+      else
+        consecutive=0
+      fi
+    fi
+  done < <(tail -20 "$INCIDENT_LEDGER")
+  [ "$consecutive" -ge "$threshold" ] && return 0
+  return 1
+}
+
+hook_incident() {
+  local type="$1"    # hook_block|compile_fail|gate_reject|encoding_error
+  local hook="$2"    # 훅 이름
+  local file="$3"    # 대상 파일 (없으면 "")
+  local detail="$4"  # 상세 사유
+  local extra_json="${5:-}"  # optional: '"key":"value"' 형태의 추가 필드
+  # 세션107 B-2: hook/type 필드 누락 추적 강화 (UNCLASSIFIED 재발 방지)
+  # entry 생성은 유지하되 hook_log에 호출자 경고 기록
+  if [ -z "$hook" ] || [ -z "$type" ]; then
+    hook_log "incident" "WARN: hook_incident 필수 필드 누락 — type='$type' hook='$hook' detail='${detail:0:50}' caller=${BASH_SOURCE[1]:-unknown}:${BASH_LINENO[0]:-0}" 2>/dev/null || true
+  fi
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  detail="${detail//\\/\\\\}"
+  detail="${detail//\"/\\\"}"
+  detail="${detail//$'\n'/\\n}"
+  file="${file//\\/\\\\}"
+  file="${file//\"/\\\"}"
+  extra_json=$(printf '%s' "$extra_json" | tr -d '\n')
+  echo "{\"ts\":\"$ts\",\"type\":\"$type\",\"hook\":\"$hook\",\"file\":\"$file\",\"detail\":\"$detail\",\"resolved\":false${extra_json:+,$extra_json}}" >> "$INCIDENT_LEDGER"
+  # 크기 경고: 512KB 초과 시 로그 (삭제는 하지 않음 — archive_resolved 수동 실행 유도)
+  if [ -f "$INCIDENT_LEDGER" ]; then
+    local _sz
+    _sz=$(wc -c < "$INCIDENT_LEDGER" 2>/dev/null || echo 0)
+    if [ "$_sz" -gt 512000 ] 2>/dev/null; then
+      hook_log "incident" "WARN: incident_ledger ${_sz}B > 512KB — incident_repair.py --archive 실행 권장" 2>/dev/null || true
+    fi
+  fi
+}
+
+# === 사용자 교정 피드백 기록 (세션45 D1) ===
+# 사용자가 AI 동작을 교정할 때 incident로 기록.
+# 학습 루프에서 자동화 후보로 집계된다.
+hook_user_correction() {
+  local detail="$1"
+  local issue_code="${2:-unclassified}"
+  hook_incident "user_correction" "manual" "" "$detail" \
+    "\"source\":\"user\",\"verdict\":\"correction\",\"issue_code\":\"$issue_code\",\"classification_reason\":\"user_correction\""
+}
+
+# === Task Result Logging (세션40) ===
+# scheduled task 실행 결과를 별도 로그에 기록.
+# incident_ledger와 분리하여 1회 실패 노이즈 방지.
+# 연속 실패 시에만 incident로 승격.
+
+# task_results 로그 경로: hook_config.json > 기본값
+_task_log_path=""
+if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
+  _task_log_path=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+    "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.log_path" "" 2>/dev/null)
+fi
+TASK_RESULTS_LOG="${_task_log_path:+$PROJECT_ROOT/$_task_log_path}"
+TASK_RESULTS_LOG="${TASK_RESULTS_LOG:-$PROJECT_ROOT/.claude/logs/task_results.jsonl}"
+
+# hook_task_result "task_id" "success|fail|partial" "detail" [duration_ms]
+hook_task_result() {
+  local task_id="$1"
+  local status="$2"
+  local detail="$3"
+  local duration_ms="${4:-0}"
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  # escape
+  detail="${detail//\\/\\\\}"
+  detail="${detail//\"/\\\"}"
+  detail="${detail//$'\n'/\\n}"
+  task_id="${task_id//\"/\\\"}"
+  mkdir -p "$(dirname "$TASK_RESULTS_LOG")" 2>/dev/null
+  # fail_streak 계산
+  local streak=0
+  if [ "$status" = "fail" ] && [ -f "$TASK_RESULTS_LOG" ]; then
+    while IFS= read -r line; do
+      local tid sts
+      tid=$(printf '%s' "$line" | safe_json_get "task_id" 2>/dev/null)
+      sts=$(printf '%s' "$line" | safe_json_get "result" 2>/dev/null)
+      if [ "$tid" = "$task_id" ]; then
+        if [ "$sts" = "fail" ]; then
+          streak=$((streak + 1))
+        else
+          streak=0
+        fi
+      fi
+    done < <(tail -30 "$TASK_RESULTS_LOG")
+    streak=$((streak + 1))  # 현재 실패 포함
+  elif [ "$status" = "fail" ]; then
+    streak=1
+  fi
+  # escalation 여부
+  local escalated="false"
+  local threshold=3
+  # hook_config.json에서 per_task/default threshold 읽기
+  if [ -f "$PROJECT_ROOT/.claude/hook_config.json" ]; then
+    local pt
+    pt=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+      "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.per_task.$task_id" "" 2>/dev/null)
+    if [ -z "$pt" ]; then
+      pt=$("$PY_CMD" "$(dirname "${BASH_SOURCE[0]}")/json_helper.py" \
+        "$PROJECT_ROOT/.claude/hook_config.json" "task_escalation.default_threshold" "3" 2>/dev/null)
+    fi
+    threshold="${pt:-3}"
+  fi
+  if [ "$streak" -ge "$threshold" ] && [ "$status" = "fail" ]; then
+    escalated="true"
+  fi
+  echo "{\"ts\":\"$ts\",\"task_id\":\"$task_id\",\"result\":\"$status\",\"detail\":\"$detail\",\"duration_ms\":$duration_ms,\"fail_streak\":$streak,\"escalated\":$escalated}" >> "$TASK_RESULTS_LOG"
+  _rotate_file "$TASK_RESULTS_LOG"
+  # escalation → incident
+  if [ "$escalated" = "true" ]; then
+    hook_incident "gate_reject" "scheduled_task" "" \
+      "Task '$task_id' failed $streak consecutive times" \
+      "\"classification_reason\":\"task_consecutive_fail\",\"task_id\":\"$task_id\",\"fail_streak\":$streak"
+    hook_log "task_escalation" "Task '$task_id' escalated after $streak consecutive failures"
+  fi
+}
+
+# ============================================================================
+# 의제5 3자 토론 합의 (2026-04-19 debate_20260418_190429_3way) — Phase 2-A
+# 훅 등급 3종 공통 래퍼 + timing 계측
+# ============================================================================
+# 등급:
+#   advisory    — 실패해도 세션 계속. exit 0 강제. stderr 로그만. || true 허용 명시
+#   gate        — 실패 시 상위 도구 호출 차단. exit 2 전파. || true 금지
+#   measurement — 실패 영향 없음. exit 0 강제. timing만 기록
+#
+# 세션71 Phase 2-A: 래퍼 함수만 정의. 기존 훅 호출부 전환은 Phase 2-B (의도적 범위 제한 — GPT 보강 수용)
+# 확장 여지: cleanup/teardown 등급 (Gemini 제안, 세션72+)
+# ============================================================================
+
+HOOK_TIMING_LOG="$PROJECT_ROOT/.claude/hooks/hook_timing.jsonl"
+
+# 현재 시각을 밀리초 단위 정수로 반환 (Windows Git Bash 호환)
+_hook_ts_ms() {
+  if command -v "$PY_CMD" >/dev/null 2>&1; then
+    "$PY_CMD" -c 'import time; print(int(time.time()*1000))' 2>/dev/null
+  else
+    # fallback: 초 단위
+    date +%s 2>/dev/null
+  fi
+}
+
+# timing 기록: hook_timing_start / hook_timing_end
+# 사용법:
+#   START=$(hook_timing_start)
+#   ... hook 본문 ...
+#   hook_timing_end "hook_name" "$START" "<status>"
+hook_timing_start() {
+  _hook_ts_ms
+}
+
+hook_timing_end() {
+  local hook_name="$1"
+  local start_ms="$2"
+  local status="${3:-ok}"
+  local end_ms
+  end_ms=$(_hook_ts_ms)
+  local duration_ms=$((end_ms - start_ms)) 2>/dev/null || duration_ms=0
+  local ts
+  ts=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
+  hook_name="${hook_name//\\/\\\\}"
+  hook_name="${hook_name//\"/\\\"}"
+  status="${status//\"/\\\"}"
+  echo "{\"ts\":\"$ts\",\"hook\":\"$hook_name\",\"duration_ms\":$duration_ms,\"status\":\"$status\"}" >> "$HOOK_TIMING_LOG" 2>/dev/null || true
+  _rotate_file "$HOOK_TIMING_LOG"
+}
+
+# advisory 래퍼 — 실패 시 stderr + hook_log + exit 0
+# 사용법: hook_advisory <hook_name> <cmd_to_run>
+# 예:    hook_advisory "permissions_sanity" bash .claude/hooks/permissions_sanity.sh
+hook_advisory() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  if "$@" 2>&1; then
+    hook_timing_end "$hook_name" "$start" "ok"
+    return 0
+  else
+    local rc=$?
+    echo "[advisory] $hook_name failed (exit $rc) — session continues" >&2
+    hook_log "advisory_fail" "$hook_name exit $rc" 2>/dev/null || true
+    hook_timing_end "$hook_name" "$start" "advisory_fail"
+    return 0
+  fi
+}
+
+# gate 래퍼 — 실패 시 exit 2 전파 (상위 도구 호출 차단)
+# 사용법: hook_gate <hook_name> <cmd_to_run>
+# 실패 시 호출자(Claude Code)가 차단 시그널로 인식
+hook_gate() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  if "$@"; then
+    hook_timing_end "$hook_name" "$start" "ok"
+    return 0
+  else
+    local rc=$?
+    echo "[gate] $hook_name BLOCKED (exit $rc)" >&2
+    hook_log "gate_block" "$hook_name exit $rc" 2>/dev/null || true
+    hook_incident "hook_block" "$hook_name" "" "gate hook failed with exit $rc" \
+      "\"classification_reason\":\"pre_commit_check\"" 2>/dev/null || true
+    hook_timing_end "$hook_name" "$start" "gate_block"
+    exit 2
+  fi
+}
+
+# measurement 래퍼 — 실패 영향 없음, timing만 기록, trap ERR 무시
+# 사용법: hook_measure <hook_name> <cmd_to_run>
+hook_measure() {
+  local hook_name="$1"
+  shift
+  local start
+  start=$(hook_timing_start)
+  "$@" >/dev/null 2>&1
+  local rc=$?
+  hook_timing_end "$hook_name" "$start" "measure_rc_$rc"
+  return 0
+}
+
+# ============================================================================
+# verify_receipt gate helpers (Phase 0 — 2026-05-03 세션140)
+# 짝 문서: 90_공통기준/업무관리/verify_receipt_gate_plan_20260503.md
+# 3way 합의: GPT PASS / Gemini PASS (SHA b721cb78)
+# Phase 0 = no-op: verify_receipts_required.json 모든 SKILL required:false
+# ============================================================================
+
+# ISO8601 (UTC, Z 종료) → epoch seconds. 실패 시 0
+iso_to_epoch() {
+  local iso="$1"
+  if [ -z "$iso" ]; then echo 0; return 0; fi
+  "$PY_CMD" - "$iso" <<'PYEOF' 2>/dev/null || echo 0
+import sys
+from datetime import datetime, timezone
+s = sys.argv[1].strip()
+fmts = ('%Y-%m-%dT%H:%M:%SZ','%Y-%m-%dT%H:%M:%S','%Y-%m-%d %H:%M:%S')
+for f in fmts:
+    try:
+        dt = datetime.strptime(s, f)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        print(int(dt.timestamp()))
+        sys.exit(0)
+    except Exception:
+        continue
+print(0)
+PYEOF
+}
+
+# verify_receipts_required.json 에서 skill의 required 여부 출력
+# required:true → "required" 출력. 그 외(false/누락) → 빈 문자열
+skill_required_pattern() {
+  local skill="$1"
+  local map_path="$2"
+  [ -z "$skill" ] && return 0
+  [ ! -s "$map_path" ] && return 0
+  "$PY_CMD" - "$skill" "$map_path" <<'PYEOF' 2>/dev/null
+import json, sys
+skill, path = sys.argv[1], sys.argv[2]
+try:
+    d = json.load(open(path, encoding='utf-8'))
+except Exception:
+    sys.exit(0)
+sk = d.get('skills', {}).get(skill)
+if sk and sk.get('required') is True:
+    print('required')
+PYEOF
+}
+
+# _override 디렉토리에서 (skill, task_id) 매칭 receipt 경로 출력. 없으면 빈값
+find_override_receipt() {
+  local override_dir="$1"
+  local skill="$2"
+  local task_id="$3"
+  [ ! -d "$override_dir" ] && return 0
+  "$PY_CMD" - "$override_dir" "$skill" "$task_id" <<'PYEOF' 2>/dev/null
+import json, os, sys, glob
+ovr_dir, skill, task_id = sys.argv[1], sys.argv[2], sys.argv[3]
+for fp in sorted(glob.glob(os.path.join(ovr_dir, '*.json'))):
+    try:
+        d = json.load(open(fp, encoding='utf-8'))
+    except Exception:
+        continue
+    if d.get('skill') == skill and d.get('task_id') == task_id:
+        print(fp); sys.exit(0)
+PYEOF
+}
+
+# override receipt 유효성 검증
+# approver(비빈) + reason(>=10자) + evidence(evidence 또는 evidence_screenshot 둘 중 하나 비빈)
+# + expires_at 미래(현재 epoch 기준)
+# 통과 시 exit 0, 실패 시 exit 1
+validate_override() {
+  local fpath="$1"
+  [ ! -s "$fpath" ] && return 1
+  "$PY_CMD" - "$fpath" <<'PYEOF' 2>/dev/null
+import json, sys
+from datetime import datetime, timezone
+try:
+    d = json.load(open(sys.argv[1], encoding='utf-8'))
+except Exception:
+    sys.exit(1)
+if not d.get('approver'): sys.exit(1)
+if len(str(d.get('reason') or '')) < 10: sys.exit(1)
+if not (d.get('evidence') or d.get('evidence_screenshot')): sys.exit(1)
+exp = d.get('expires_at')
+if not exp: sys.exit(1)
+try:
+    dt = datetime.strptime(exp, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+except Exception:
+    try:
+        dt = datetime.strptime(exp, '%Y-%m-%dT%H:%M:%S').replace(tzinfo=timezone.utc)
+    except Exception:
+        sys.exit(1)
+if dt.timestamp() < datetime.now(timezone.utc).timestamp(): sys.exit(1)
+sys.exit(0)
+PYEOF
+  return $?
+}
+
+# 24h 초과 active_skills marker를 _stale/{YYYYMMDD}/로 이동 (삭제 X)
+# session_start_restore.sh에서 호출. STATUS.md 운영 요약에도 1줄 기록.
+# 호출 비용 작음 (디렉토리 스캔 1회 + 파일별 mtime/started_at 비교)
+cleanup_stale_active_skills() {
+  local dir="$PROJECT_ROOT/.claude/state/active_skills"
+  [ ! -d "$dir" ] && return 0
+  local now_epoch
+  now_epoch=$(date +%s 2>/dev/null || echo 0)
+  local stale_dir="$dir/_stale/$(date +%Y%m%d 2>/dev/null || echo unknown)"
+  local count=0
+  local task_ids=""
+  shopt -s nullglob 2>/dev/null
+  for f in "$dir"/*.json; do
+    [ ! -f "$f" ] && continue
+    local started age fmt_epoch tid
+    started=$(safe_json_get "started_at" < "$f" 2>/dev/null)
+    if [ -n "$started" ]; then
+      fmt_epoch=$(iso_to_epoch "$started")
+    else
+      fmt_epoch=$(file_mtime "$f")
+    fi
+    age=$((now_epoch - fmt_epoch))
+    if [ "$age" -gt 86400 ] 2>/dev/null; then
+      tid=$(safe_json_get "task_id" < "$f" 2>/dev/null)
+      [ -z "$tid" ] && tid="$(basename "$f" .json)"
+      mkdir -p "$stale_dir" 2>/dev/null
+      if mv "$f" "$stale_dir/" 2>/dev/null; then
+        count=$((count + 1))
+        task_ids="${task_ids}${task_ids:+,}${tid}"
+      fi
+    fi
+  done
+  shopt -u nullglob 2>/dev/null
+  if [ "$count" -gt 0 ] 2>/dev/null; then
+    hook_log "active_skill_cleanup" "moved=$count tasks=$task_ids to=$stale_dir"
+    # STATUS.md 운영 요약 1줄 기록 + task_id 목록 (Gemini v3+v4 A제안 채택)
+    local status_md="$PROJECT_ROOT/90_공통기준/업무관리/STATUS.md"
+    if [ -f "$status_md" ]; then
+      local today
+      today=$(date '+%Y-%m-%d' 2>/dev/null || echo unknown)
+      printf '\n[%s] active_skill_cleanup: %d건 _stale/%s/로 이동 — tasks=[%s]\n' \
+        "$today" "$count" "$(basename "$stale_dir")" "$task_ids" >> "$status_md" 2>/dev/null || true
+    fi
+  fi
+  return 0
+}

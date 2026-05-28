@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "codex-bridge": {
+      "command": "bun",
+      "args": [
+        "--cwd",
+        "C:/Users/User/Desktop/업무리스트/90_공통기준/업무관리/codex_claude_channel",
+        "server.ts"
+      ],
+      "env": {
+        "CODEX_BRIDGE_PORT": "8791",
+        "CODEX_WORKSPACE": "C:/Users/User/Desktop/업무리스트",
+        "TEMP": "C:/Users/User/Desktop/업무리스트/90_공통기준/업무관리/codex_claude_channel/.tmp",
+        "TMP": "C:/Users/User/Desktop/업무리스트/90_공통기준/업무관리/codex_claude_channel/.tmp"
+      }
+    }
+  }
+}

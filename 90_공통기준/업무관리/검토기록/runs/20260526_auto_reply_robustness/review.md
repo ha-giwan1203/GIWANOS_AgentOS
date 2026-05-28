@@ -34,6 +34,16 @@
 | push 대상 | `origin main` |
 | push 후 검증 | `git rev-parse --short origin/main` |
 
+## push 결과
+
+| 항목 | 값 |
+|---|---|
+| push 범위 | `227a7fd6..f8a76abf main -> main` |
+| origin/main HEAD | `f8a76abf` |
+| 반영 커밋 | `b407e058`, `f8a76abf` |
+| 미반영 커밋 | 없음 |
+
 ## 참고
 
 - `auto_reply.log`는 self-test와 진행/완료 자동회신 근거로 commit에 포함한다.
+- push 결과는 push 이후 이 파일에 로컬로 추가했다.
