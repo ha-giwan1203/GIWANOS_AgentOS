@@ -753,6 +753,14 @@ def extract_sp3m3_day(wb, cut_threshold=DAY_CUT_THRESHOLD):
         if v and "주간계획" in str(v):
             day_start = r + 2  # 섹션 헤더 + 데이터 헤더 둘 다 skip
             break
+    # fallback: 6월 이후 신규 양식 — "주간계획" 섹션헤더 없이 "순서" 컬럼헤더 직접 등장
+    if day_start is None:
+        for r in range(2, ws.max_row+1):
+            v = ws.cell(row=r, column=2).value
+            if v and str(v).strip() == "순서":
+                day_start = r + 1  # 컬럼헤더만 skip
+                print(f"[phase1] 주간헤더 fallback: r{r} '순서' 컬럼헤더 → day_start=r{r+1}")
+                break
     if day_start is None:
         raise ValueError("출력용 시트 주간 헤더 미발견")
     items = []
