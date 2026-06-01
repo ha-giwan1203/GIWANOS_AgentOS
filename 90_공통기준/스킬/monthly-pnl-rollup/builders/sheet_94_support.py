@@ -43,7 +43,7 @@ def _detect_sign(filename: str, sheetname: str, title: str) -> int:
     return 0  # 명확 안 됨
 
 
-def _find_header_row(ws, max_scan: int = 6) -> int | None:
+def _find_header_row(ws, max_scan: int = 10) -> int | None:
     """첫 max_scan행에서 헤더 행 자동 탐색. "날짜"·"수량"·"합계" 등 키워드 매칭."""
     needed = {"날짜", "수량"}
     for r in range(1, max_scan + 1):

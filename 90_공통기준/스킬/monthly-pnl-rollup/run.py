@@ -502,8 +502,10 @@ def compute_pnl(lines_data, support, etc_data, night_info):
     """
     A = lines_data["grand_total"]
     B = support["B_sum"]
-    C = 0
-    D = etc_data["total"] if etc_data["exists"] else 0
+    # 라인정지·기타생산비용은 사내부서/납품업체 귀책 → 우리(대원테크)가 받을 금액
+    # 사용자 룰 2026-06-01: D 차감 아닌 C 비용보전(가산)으로 처리
+    C = etc_data["total"] if etc_data["exists"] else 0
+    D = 0
     # E 산출 — SP3M3 한정 170원 고정
     E = 0
     e_detail = []
