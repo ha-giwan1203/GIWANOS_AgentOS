@@ -54,23 +54,20 @@ gerp_dw = all_gerp[all_gerp['vendor_cd'] == VENDOR_CODE].copy()
 gerp_dw['shift_type'] = gerp_dw['shift'].map({'정상': '주간', '추가': '야간'}).fillna('주간')
 print(f"  대원테크: {len(gerp_dw):,}행")
 
-# ── 이관품번(SVM/OVK) 제외 — 빌더와 동일 로직 ─────────────────
-# SVM 차종: SP3M3/HCAMS02/ISAMS03 → 이관 (정산 제외)
-# OVK 차종: SD9A01/ANAAS04/DRAAS11 → 이관 (정산 제외)
-SVM_TRANSFER_LINES = {'SP3M3', 'HCAMS02', 'ISAMS03'}
-OVK_TRANSFER_LINES = {'SD9A01', 'ANAAS04', 'DRAAS11'}
+# ── 이관품번 제외 — _settlement_rules 권위 사전 사용 ─────────────────
+# 룰 변경 시 _settlement_rules.py 한 곳만 수정 (5월 사고 회고 — 텍스트 룰과
+# 코드 불일치로 매월 룰 위반 반복 차단)
+from _settlement_rules import (
+    SVM_TRANSFER_LINES, OVK_TRANSFER_LINES, X88820_TRANSFER_LINES,
+    OVK_EXCLUDE_PREFIX,
+)
 before_n = len(gerp_dw)
 svm_mask = gerp_dw['line'].isin(SVM_TRANSFER_LINES) & (gerp_dw['vtype'] == 'SVM')
-# OVK: 단 89880X 시작 품번은 OVK여도 이관 아님 (사용자 룰 2026-05-07)
 ovk_mask = (
     gerp_dw['line'].isin(OVK_TRANSFER_LINES)
     & (gerp_dw['vtype'] == 'OVK')
-    & ~gerp_dw['product_no'].str.startswith('89880X')
+    & ~gerp_dw['product_no'].str.startswith(OVK_EXCLUDE_PREFIX)
 )
-# 88820X 시작 품번은 완성품 라인 한정 정산 제외 (사용자 룰 2026-06-01 정정 — 구ERP 미등록)
-# 이전 룰 "차종/라인 무관 일괄 제외"는 SUB 라인 부당 제외 사고 발생 (5월 39행/1,108,391원)
-# 정정: 완성품 3라인(SD9A01/ANAAS04/DRAAS11)만 제외. SUB 라인은 정산 대상.
-X88820_TRANSFER_LINES = {'SD9A01', 'ANAAS04', 'DRAAS11'}
 x88820_mask = gerp_dw['product_no'].str.startswith('88820X') & gerp_dw['line'].isin(X88820_TRANSFER_LINES)
 svm_n = svm_mask.sum(); svm_amt = gerp_dw.loc[svm_mask, 'amount'].sum()
 ovk_n = ovk_mask.sum(); ovk_amt = gerp_dw.loc[ovk_mask, 'amount'].sum()
