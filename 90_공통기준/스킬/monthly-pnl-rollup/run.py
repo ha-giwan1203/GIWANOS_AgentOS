@@ -360,32 +360,57 @@ def load_line_stoppage(path):
     if not path.exists():
         return {"exists": False, "rows": [], "total": 0, "blame": []}
     wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
-    ws = wb["통합집계"]
     rows, total = [], 0
-    main_end = ws.max_row
-    for r in range(4, ws.max_row + 1):
-        v = ws.cell(r, 1).value
-        if v == "합계":
-            main_end = r
-            break
-        if not v:
-            continue
-        amt = ws.cell(r, 4).value or 0
-        rows.append({"system": v, "claim_type": ws.cell(r, 2).value,
-                     "count": ws.cell(r, 3).value or 0, "amount": amt})
-        total += amt
-    blame, in_blame = [], False
-    for r in range(main_end + 1, ws.max_row + 1):
-        v = ws.cell(r, 1).value
-        if v == "귀책 부서":
-            in_blame = True
-            continue
-        if not in_blame or not v:
-            continue
-        if v == "합계":
-            break
-        blame.append({"blame": v, "count": ws.cell(r, 2).value or 0,
-                      "amount": ws.cell(r, 3).value or 0})
+
+    def num(v):
+        if isinstance(v, (int, float)):
+            return v
+        if isinstance(v, str):
+            try:
+                return float(v.replace(",", "").strip())
+            except ValueError:
+                return 0
+        return 0
+
+    if "집계" in wb.sheetnames:
+        ws_sum = wb["집계"]
+        for row in ws_sum.iter_rows(values_only=True):
+            if row and row[0] == "라인정지":
+                amt = round(num(row[2] if len(row) > 2 else 0))
+                cnt = row[1] if len(row) > 1 and row[1] else 0
+                rows.append({"system": "G-ERP 라인보상",
+                             "claim_type": "라인정지",
+                             "count": cnt, "amount": amt})
+                total += amt
+                break
+
+    blame = []
+    if "통합집계" in wb.sheetnames:
+        ws = wb["통합집계"]
+        main_end = ws.max_row
+        for r in range(4, ws.max_row + 1):
+            v = ws.cell(r, 1).value
+            if v == "합계":
+                main_end = r
+                break
+            if not v:
+                continue
+            amt = round(num(ws.cell(r, 4).value))
+            rows.append({"system": v, "claim_type": ws.cell(r, 2).value,
+                         "count": ws.cell(r, 3).value or 0, "amount": amt})
+            total += amt
+        in_blame = False
+        for r in range(main_end + 1, ws.max_row + 1):
+            v = ws.cell(r, 1).value
+            if v == "귀책 부서":
+                in_blame = True
+                continue
+            if not in_blame or not v:
+                continue
+            if v == "합계":
+                break
+            blame.append({"blame": v, "count": ws.cell(r, 2).value or 0,
+                          "amount": ws.cell(r, 3).value or 0})
     wb.close()
     return {"exists": True, "rows": rows, "total": total, "blame": blame}
 
@@ -445,6 +470,17 @@ def load_support_data(folder, month_mm):
     return result
 
 
+def resolve_support_dir(work, mm):
+    candidates = [
+        work / f"{int(mm):02d}월 지원",
+        work / f"{int(mm)}월 지원",
+    ]
+    for folder in candidates:
+        if folder.exists():
+            return folder
+    return candidates[0]
+
+
 def compute_night_info(lines_data, year, month):
     night_lines = [c for c in LINES
                    if lines_data["lines"].get(c, {}).get("night_qty", 0) > 0]
@@ -466,8 +502,8 @@ def compute_pnl(lines_data, support, etc_data, night_info):
     """
     A = lines_data["grand_total"]
     B = support["B_sum"]
-    C = etc_data["total"] if etc_data["exists"] else 0
-    D = 0
+    C = 0
+    D = etc_data["total"] if etc_data["exists"] else 0
     # E 산출 — SP3M3 한정 170원 고정
     E = 0
     e_detail = []
@@ -725,9 +761,9 @@ def build_sheet_summary(wb, mm, lines_data, support, etc_data,
     _kpi_card(ws, 8, 5, "B. 지원순액",
               pnl["B"], "준지원금 − 받은지원금", C_CARD_B)
     _kpi_card(ws, 8, 9, "C. 비용보전",
-              pnl["C"], "정지 + 재작업 + 기타", C_CARD_C)
+              pnl["C"], "별도 비용보전", C_CARD_C)
     _kpi_card(ws, 8, 13, "D. 차감비용",
-              pnl["D"], "미인정 청구", C_CARD_D)
+              pnl["D"], "G-ERP 라인정지 + QIS", C_CARD_D)
     _kpi_card(ws, 8, 17, "E. BI 차이 청구",
               pnl["E"], "(BI−GERP) × 170원", C_CARD_F)
 
@@ -815,9 +851,9 @@ def build_sheet_summary(wb, mm, lines_data, support, etc_data,
         ("지원 자료",
          "PASS" if support["exists"] else "INFO",
          f"B = {pnl['B']:+,}원" + (f" ({len(support['details'])}건)" if support["exists"] else " — 당월 없음")),
-        ("기타비용 자료",
+        ("차감비용 자료",
          "PASS" if etc_data["exists"] else "FAIL",
-         f"C = {pnl['C']:,}원 ({sum(x['count'] for x in etc_data['rows'])}건)" if etc_data["exists"] else "raw 미존재"),
+          f"D = {pnl['D']:,}원 ({sum(x['count'] for x in etc_data['rows'])}건)" if etc_data["exists"] else "raw 미존재"),
         ("야간 BI 정합", night_label, night_text),
         ("GERP vs 구ERP", erp_label, diff_text),
         ("최종 손익", "PASS", f"{pnl['final']:,}원"),
@@ -836,7 +872,7 @@ def build_sheet_summary(wb, mm, lines_data, support, etc_data,
         f"1. GERP 기준 기본 조립비는 {pnl['A']:,.0f}원입니다.",
         f"2. 야간 가동라인 {len(night_info['night_lines'])}개({night_str}) BI 비교 결과 차이 청구금액은 {pnl['E']:+,.0f}원입니다 (170원 × 누락 EA, 91 ①섹션).",
         f"3. GERP-구ERP 차이는 {err_types.get('total_cnt', 0)}건, {err_types.get('total_diff', 0):+,.0f}원 (91 ④섹션, ERP 정정용).",
-        f"4. 타라인 지원 정산금액은 {pnl['B']:+,.0f}원, 라인정지·재작업·기타생산비 총액 {pnl['C']:,.0f}원입니다.",
+        f"4. 타라인 지원 정산금액은 {pnl['B']:+,.0f}원, 라인정지·기타생산비 차감액은 {pnl['D']:,.0f}원입니다.",
         f"5. 최종 정산 반영금액은 {pnl['final']:,.0f}원입니다 (A+B+C−D+E).",
     ]
     for line in template:
@@ -929,8 +965,8 @@ def build_sheet_detail(wb, mm, lines_data, support, etc_data,
         r += 1
     r += 2
 
-    # ───── ② 기타 생산비용 ─────
-    section(ws, r, "② 기타 생산비용 (손익 산식 C 비용보전)")
+    # ───── ② 차감비용 ─────
+    section(ws, r, "② 차감비용 (손익 산식 D 차감비용)")
     r += 1
     if not etc_data["exists"]:
         ws.cell(r, 1).value = "라인정지_MM월_raw.xlsx 미존재"
@@ -1162,7 +1198,7 @@ def main():
     work = SETTLE / f"{int(mm) + 1:02d}월"
     book = work / f"정산_수식버전_{mm}월.xlsx"
     stoppage = work / f"라인정지_{mm}월_raw.xlsx"
-    support_dir = work / f"{int(mm)}월 지원"
+    support_dir = resolve_support_dir(work, mm)
 
     if not book.exists():
         print(f"[FAIL] 본체 미존재: {book}")

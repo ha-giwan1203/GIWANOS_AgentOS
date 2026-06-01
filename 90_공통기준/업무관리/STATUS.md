@@ -4,7 +4,7 @@
 > 작업 완료/미완료 상태의 원본은 TASKS.md이다. 이 파일에 상태를 독립 선언하지 않는다.
 > 도메인 하위 `STATUS.md`와 `TASKS.md`는 도메인 내부 메모로만 사용한다. 전역 상태 우선순위는 `업무관리/TASKS.md` 기준이다.
 
-최종 업데이트: 2026-05-28 KST — 세션238 (D0 P-BOM guard implemented)
+최종 업데이트: 2026-06-01 KST — 세션251 (5월 정산 1차 완료)
 
 ---
 
@@ -25,7 +25,7 @@
 | 도메인 | 재개 위치 | 참조 |
 |--------|---------|------|
 | ~~라인배치 OUTER~~ | ~~runOuterLine(295)~~ — **사용자 취소** (2026-03-31) | `10_라인배치/STATUS.md` 참조 |
-| 조립비정산 | 파이프라인 정상 운영 중 | `05_생산실적/조립비정산/CLAUDE.md` |
+| 조립비정산 | 5월 정산 1차 완료: 최종 204,469,318.3원, 구ERP 5월 마감 후 step3~8 및 90/91 보강 잔여 | `05_생산실적/조립비정산/CLAUDE.md` |
 | subagent 확장 | 구현 완료 (GPT PASS 7bae2a78) | `_플랜/plan_subagent_expansion.md` |
 | Fast/Full Lane | 규칙 확정 (GPT PASS 15b06459). 규칙은 `data-and-files.md`로 통합됨 | `.claude/rules/data-and-files.md` |
 | 기능 활용 | 합의 완료 (GPT PASS). 별도 규칙 파일 폐기, CLAUDE.md 본문으로 흡수 | `CLAUDE.md` |

@@ -14,15 +14,15 @@ import os
 # 기본 경로 (월별로만 OUTPUT_FILE 변경)
 # ============================================================
 BASE_DIR     = r'C:\Users\User\Desktop\업무리스트\05_생산실적\조립비정산'
-CACHE_DIR    = os.path.join(BASE_DIR, '05월', '_cache')
+CACHE_DIR    = os.path.join(BASE_DIR, '06월', '_cache')
 
 MASTER_FILE  = os.path.join(BASE_DIR, '01_기준정보', '기준정보_라인별정리_최종_V2_20260506.xlsx')
-GERP_FILE    = os.path.join(BASE_DIR, '05월', '실적데이터', 'G-ERP 4월실적.xlsx')
-OLDERP_FILE  = os.path.join(BASE_DIR, '05월', '실적데이터', '구ERP 4월실적.xlsx')
-OUTPUT_FILE  = os.path.join(BASE_DIR, '05월', '정산결과_04월.xlsx')   # ← 월 바꿀 때 수정
+GERP_FILE    = os.path.join(BASE_DIR, '06월', '실적데이터', 'G-ERP 5월실적.xlsx')
+OLDERP_FILE  = os.path.join(BASE_DIR, '06월', '실적데이터', '구ERP 5월실적.xlsx')
+OUTPUT_FILE  = os.path.join(BASE_DIR, '06월', '정산결과_05월.xlsx')   # ← 월 바꿀 때 수정
 
 OLDERP_SHEET = 'Sheet1'   # 구ERP 데이터 시트명 (파일마다 다를 수 있음)
-MONTH        = '04'
+MONTH        = '05'
 VENDOR_CODE  = '0109'
 SP3M3_NIGHT_PRICE = 170   # SP3M3 야간 고정단가(원)
 SP3M3_MODULE_FILE = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), '03_품번관리', '초물관리', 'SP3M3_모듈품번_최신.xlsx')  # RSP→품번 매핑 (1차)

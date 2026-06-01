@@ -118,7 +118,9 @@ def parse_support_file(path: Path, target_month: str) -> list[SupportRow]:
 
 def build_sheet_94(wb: openpyxl.Workbook, month_mm: str, base_dir: Path) -> dict:
     """본체 wb에 94_라인지원 시트 추가. 반환: 라인별 순액 dict."""
-    folder = base_dir / f"{int(month_mm)}월 지원"
+    folder = base_dir / f"{int(month_mm):02d}월 지원"
+    if not folder.exists():
+        folder = base_dir / f"{int(month_mm)}월 지원"
     sheet_name = "94_라인지원"
     if sheet_name in wb.sheetnames:
         del wb[sheet_name]

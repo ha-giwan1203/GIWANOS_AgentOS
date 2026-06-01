@@ -4,6 +4,32 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-06-01 KST — 세션251 **Codex** 5월 정산 Phase H 문서 갱신. 권위 산출물은 `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`이며, 최종 정산금액은 A 204,784,019.3 + B -4,005,586 + C 0 - D 3,624,555 + E 7,315,440 = 204,469,318.3원이다. Known Exception은 구ERP 5월 마감 미완으로, ④ 받을금액 라인확인필요 2,671건/137M은 구ERP 부재 미매칭으로 본다. 다음 AI 액션은 구ERP 5월 마감 후 `setup_month.py`를 재실행해 `OLDERP_FILE`을 실제 5월 raw로 교체한 뒤 step3~8 재실행, 90/91 시트 보강이다. Codex copy2 PermissionError 환경 차이 사례는 디버깅 잔여이며 위치는 `build_formula_version.py` L94 `_master_backup` 단계다.
+
+최종 업데이트: 2026-06-01 KST — 세션250 **Codex** 5월 정산 Phase E 90/91 손익 시트 추가 완료. monthly-pnl-rollup은 최초 실행에서 지원 폴더를 5월 지원으로 찾고 라인정지 통합집계의 QIS만 읽어 B=0/D=0이 되는 불일치가 있어, run.py를 05월 지원 우선 탐색과 G-ERP 라인보상+QIS 합산 D 차감비용 로더로 좁게 보정했다. 재실행 후 Excel COM 재계산 저장까지 완료했고 본체는 19시트, 90/91 존재, KPI는 A 204,784,019.3 / B -4,005,586 / C 0 / D 3,624,555 / E 7,315,440 / 최종 204,469,318.3이다. 91 상세 기준 SP3M3 BI는 GERP 야간 27,942, BI 야간 70,974, 누락 43,032EA×170원이며 화인텍 지원은 -4,005,586원 지출로 확인했다.
+
+최종 업데이트: 2026-06-01 KST — 세션249 **Codex** 5월 정산 Phase D QIS 4탭 조회·통합 완료. qis_extract.py는 일반 실행에서 Playwright subprocess WinError 5로 막혀 권한 상승 1회 재시도 후 PASS했고, QIS 메타는 라인정지 0원/0건, 재작업 0원/0건, 선별작업 0원/0건, 기타생산비용 753,276원/19건이다. merge_monthly.py는 라인정지_05월_raw.xlsx에 통합집계 시트를 추가했고 최종 workbook은 5시트, 통합집계 16행, G-ERP 라인정지 raw는 34건/2,871,279원으로 재확인했다.
+
+최종 업데이트: 2026-06-01 KST — 세션248 **Codex** 5월 정산 Phase C 본체 빌더 재시도도 동일 지점에서 중단됐다. WMI 조회는 권한 상승 후 성공했으나 `build_formula_version` 관련 `python.exe` 잔존 프로세스는 없었고, 마스터 파일 `rb` read 테스트는 `READ OK`였다. 그러나 `python build_formula_version.py` 재실행 시 `build_formula_version.py` 94행 `shutil.copy2(MASTER_FILE, _master_backup)`가 `01_기준정보/기준정보_라인별정리_최종_V2_20260506_pre_autosync_20260601_140633.xlsx`를 생성하려는 순간 다시 `PermissionError: [Errno 13] Permission denied`를 반환했다. 백업 파일과 `06월/정산_수식버전_05월.xlsx`는 미생성이다. 다음 액션은 Claude가 기준정보 폴더 쓰기 권한/ACL 또는 빌더 백업 경로·마스터 자동갱신 정책을 판정하는 것이다.
+
+최종 업데이트: 2026-06-01 KST — 세션247 **Codex** 5월 정산 Phase C 본체 빌더는 초반 마스터 V2 자동 갱신 백업 생성 단계에서 중단됐다. `build_formula_version.py` 94행 `shutil.copy2(MASTER_FILE, _master_backup)`가 `01_기준정보/기준정보_라인별정리_최종_V2_20260506_pre_autosync_20260601_140121.xlsx`를 열어 쓰는 순간 `PermissionError: [Errno 13] Permission denied`를 반환했다. 지시대로 회피 재실행·패치는 하지 않았고, 백업 파일과 `06월/정산_수식버전_05월.xlsx`는 생성되지 않았다. 다음 액션은 Claude가 기준정보 폴더/파일 권한 또는 빌더의 마스터 자동갱신 필요 여부를 판정한 뒤 Phase C 재진입 여부를 지시하는 것이다.
+
+최종 업데이트: 2026-06-01 KST — 세션246 **Codex** 5월 정산 Phase B 재실행 완료. GERP 사본 내부 XML의 공백 문자열 셀 81개를 None 상태로 정리했고 원본 06월/05월 조립비마감상세.xlsx SHA256은 불변이었다. step2_GERP처리.py 단독 PASS 후 run_settlement_pipeline.py 전체 재실행 결과 step1~8 SUCCESS, step6 overall PASS(critical_fail 0, warning 0, info 2)로 종료했다. 산출물은 06월/정산결과_05월.xlsx 1,247,615 bytes/14시트, 06월/오류리스트_05월.xlsx 247,008 bytes/2시트이며 step5 grand GERP 196,731,600 / 구ERP 3,855,865 / 차이 192,875,735이다.
+
+최종 업데이트: 2026-06-01 KST — 세션245 **Codex** 5월 정산 Phase B 파이프라인은 Step 2에서 중단됐다. UTF-8 출력환경 재실행 기준 Step 1은 파일 존재/기준정보/G-ERP 시트 열기까지 진행했으나 GERP 파일 열기 세부검사와 구ERP dummy 데이터 검사는 FAIL로 기록됐고, Step 2 `step2_gerp처리.py` 31행 `pd.read_excel(GERP_FILE, sheet_name=0, header=None)`에서 openpyxl이 셀 값 `' '`을 int로 캐스팅하다 `ValueError`가 발생했다. 회피 패치 없이 중단했으며 생성 산출물은 `06월/_cache/step1_validation.json`과 run_logs뿐이고 step2~5 cache, `정산결과_05월.xlsx`, `오류리스트_05월.xlsx`는 없다. 다음 액션은 Claude가 GERP 원본 정리/읽기 방식 보정/Phase B 재시도 여부를 판정하는 것이다.
+
+최종 업데이트: 2026-06-01 KST — 세션244 **Codex** 5월 정산 Phase A 환경 세팅 완료. 06월/실적데이터, 06월/_cache, 06월/05월 지원 폴더를 생성했고 GERP 5월 실적 사본은 원본과 SHA256 일치로 확인했다. 구ERP dummy는 Sheet1 13컬럼/step3 대상 데이터 0행으로 생성했으며 화인텍 파일은 지원받은 토큰 파일명으로 이동했다. _pipeline_config.py는 CACHE/GERP/OLDERP/OUTPUT/MONTH/OLDERP_SHEET를 05월 정산용으로 전환했으므로 Claude가 Phase B 진입 여부를 판정하면 된다.
+
+최종 업데이트: 2026-05-29 KST — 세션243 **Codex** 업무리스트 폴더 정리 5차 완료. 04_생산계획 루트의 SP3M3_생산지시서 bak 파일 7개(7.89MB)를 04_생산계획/_backup/정리_20260529로 이동했고, 이번 정리 작업 중간 산출물은 99_임시수집/폴더정리_20260529 아래로 통합했다. 최종 감사는 99_임시수집/폴더정리_20260529/최종감사_20260529_1022이며 남은 863건은 업무 원본/표준문서/실행의존성/정산 cache라 자동 이동 보류로 분류했다.
+
+최종 업데이트: 2026-05-29 KST — 세션242 **Codex** 업무리스트 폴더 정리 4차 완료. GoogleDriveFS 프로세스 없음과 20초 mtime 안정 확인 후 루트 .tmp.driveupload 4,045개/58.14MB 및 빈 .tmp.drivedownload를 삭제 없이 99_임시수집/드라이브임시_격리_20260529_1011로 이동했다. 최종 재감사 보고서는 99_임시수집/폴더정리_감사_20260529_101327이며 root_drift/drive_temp 후보가 제거됐다.
+
+최종 업데이트: 2026-05-29 KST — 세션241 **Codex** 업무리스트 폴더 정리 3차 완료. 03_품번관리/초물관리의 _backup/_output은 원본·결과 비교 세트라 보존했고, 05_생산실적/조립비정산에 흩어진 명확한 백업명 파일 34개(38.28MB)를 같은 도메인 내부 백업 폴더로 이동했다. 최종 재감사 보고서는 99_임시수집/폴더정리_감사_20260529_100846이며 backup_file 후보는 56.88MB로 감소했다.
+
+최종 업데이트: 2026-05-29 KST — 세션240 **Codex** 업무리스트 폴더 정리 2차 완료. 원본·백업·Drive 임시·node_modules는 제외하고 __pycache__ 및 .bun-cache류 재생성 캐시를 99_임시수집/폴더정리_격리_20260529_095129 및 095245로 이동했다. 최종 재감사 보고서는 99_임시수집/폴더정리_감사_20260529_095423이며 generated_cache bucket은 제거됐고, 남은 주요 대상은 Drive 동기화 임시폴더와 품번관리/생산실적 ignored 업무 파일이다.
+
+최종 업데이트: 2026-05-29 KST — 세션239 **Codex** 업무리스트 폴더 정리 1차 감사 완료. 삭제/이동 없이 경로·파일명·크기·mtime·git 상태 기준으로 정리 후보 18,431건을 분류했고, 최신 보고서와 CSV를 99_임시수집/폴더정리_감사_20260529_094529에 남겼다. Drive 임시폴더는 동기화 확인 전 처리 금지, generated_cache는 2차 정리 우선 후보로 분리했다.
+
 최종 업데이트: 2026-05-28 KST — 세션238 **Codex** P-BOM guard를 run.py에 반영했다. Phase1 추출 직후 --exclude 적용 후 품번 목록을 로그로 남기고, Phase5 final_save는 sendMesFlag=N preflight 루프에서 P-BOM 미등록 품번을 파싱해 제외한 뒤 sendMesFlag=Y 본 저장을 1회만 호출한다. 검증은 py_compile 및 monkeypatch dry-run으로 RSP3SC0245/RSP3SC0246 2건 제외, 15건 통과, 정상 17건 유지까지 확인했다. 실제 MES 송신과 commit은 Claude 검증 후 진행한다.
 
 최종 업데이트: 2026-05-28 KST — 세션238 **Claude** SP3M3 주간계획 D0 반영 P-BOM 미등록 복구. 07:10 cron이 Phase 3/4(ERP 17건+서열) 완료 후 Phase 5 final_save에서 `mesMsg: P-BOM 등록 안됨. [SP3M3, RSP3SC0246] statusCode=850`으로 17건 일괄 MES 거부, verify_run는 RETRY_NO/phase6_verify_failed 분류로 알림 없이 종료. 07:49 사용자 발화 후 (1) ERP totGrid raw 조회로 17건 REG_DT=2026-05-28 등록 상태 확인 (2) ERP D0 DELETE 2건만 성공(334797 RSP3SC0572, 334798 RSP3SC0410)·나머지 500 동시성 fail (3) `.claude/tmp/final_save_loop_20260528.py`로 Phase 5 단독 재호출, P-BOM 미등록 자동 누적 제외 루프(RSP3SC0245+0246) → 1회 iter에서 MES statusCode=200 rsltCnt=750, SmartMES R 15건 rank 1~15 등록. run.py에 `--exclude PROD_NO,...` 옵션 추가(phase1 직후 items 제외, E 모드 복구용). 보류 2건은 현업 P-BOM 마스터 등록 후 추가 처리 필요. 잡셋업은 list-only 점검 PASS(pending 15 / done 2), commit-all은 사용자 동의 대기. 다음 액션은 사용자 push 발화 처리(현 발화 "푸시")와 잡셋업 commit 동의 여부.
