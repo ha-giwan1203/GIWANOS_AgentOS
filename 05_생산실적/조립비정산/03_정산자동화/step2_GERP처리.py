@@ -67,8 +67,11 @@ ovk_mask = (
     & (gerp_dw['vtype'] == 'OVK')
     & ~gerp_dw['product_no'].str.startswith('89880X')
 )
-# 88820X 시작 품번은 차종 무관 정산 제외 (사용자 룰 2026-05-07 — 구ERP 미등록 시리즈)
-x88820_mask = gerp_dw['product_no'].str.startswith('88820X')
+# 88820X 시작 품번은 완성품 라인 한정 정산 제외 (사용자 룰 2026-06-01 정정 — 구ERP 미등록)
+# 이전 룰 "차종/라인 무관 일괄 제외"는 SUB 라인 부당 제외 사고 발생 (5월 39행/1,108,391원)
+# 정정: 완성품 3라인(SD9A01/ANAAS04/DRAAS11)만 제외. SUB 라인은 정산 대상.
+X88820_TRANSFER_LINES = {'SD9A01', 'ANAAS04', 'DRAAS11'}
+x88820_mask = gerp_dw['product_no'].str.startswith('88820X') & gerp_dw['line'].isin(X88820_TRANSFER_LINES)
 svm_n = svm_mask.sum(); svm_amt = gerp_dw.loc[svm_mask, 'amount'].sum()
 ovk_n = ovk_mask.sum(); ovk_amt = gerp_dw.loc[ovk_mask, 'amount'].sum()
 x88820_n = x88820_mask.sum(); x88820_amt = gerp_dw.loc[x88820_mask, 'amount'].sum()
