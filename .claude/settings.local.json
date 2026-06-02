@@ -40,7 +40,11 @@
       "Bash(python -c ' *)",
       "Skill(update-config)",
       "Bash(bash:*)",
-      "Bash(codex:*)"
+      "Bash(codex:*)",
+      "Skill(codex:setup)",
+      "Bash(python .claude/hooks/incident_repair.py --json --limit 5)",
+      "Bash(npm install *)",
+      "mcp__chrome-devtools-mcp__list_pages"
     ],
     "ask": [],
     "defaultMode": "auto",

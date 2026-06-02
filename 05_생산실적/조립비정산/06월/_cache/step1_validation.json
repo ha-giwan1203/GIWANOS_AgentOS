@@ -1,0 +1,132 @@
+{
+  "step": 1,
+  "timestamp": "2026-06-01T15:59:20.730430",
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "기준정보 파일 존재",
+      "status": "PASS",
+      "detail": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V2_20260506.xlsx"
+    },
+    {
+      "name": "GERP 파일 존재",
+      "status": "PASS",
+      "detail": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\06월\\실적데이터\\G-ERP 5월실적.xlsx"
+    },
+    {
+      "name": "구ERP 파일 존재",
+      "status": "PASS",
+      "detail": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\06월\\실적데이터\\구ERP 5월실적.xlsx"
+    },
+    {
+      "name": "기준정보 라인 시트 10개 존재",
+      "status": "PASS",
+      "detail": "전체:['SD9A01', 'ANAAS04', 'DRAAS11', 'SP3M3', 'HASMS02', 'HCAMS02', 'WAMAS01', 'WABAS01', 'WASAS01', 'ISAMS03']"
+    },
+    {
+      "name": "  기준정보 [SD9A01] 데이터행",
+      "status": "PASS",
+      "detail": "622행"
+    },
+    {
+      "name": "  기준정보 [SP3M3] 데이터행",
+      "status": "PASS",
+      "detail": "1494행"
+    },
+    {
+      "name": "  기준정보 [WAMAS01] 데이터행",
+      "status": "PASS",
+      "detail": "10416행"
+    },
+    {
+      "name": "  기준정보 [WABAS01] 데이터행",
+      "status": "PASS",
+      "detail": "1388행"
+    },
+    {
+      "name": "  기준정보 [ANAAS04] 데이터행",
+      "status": "PASS",
+      "detail": "673행"
+    },
+    {
+      "name": "  기준정보 [DRAAS11] 데이터행",
+      "status": "PASS",
+      "detail": "395행"
+    },
+    {
+      "name": "  기준정보 [WASAS01] 데이터행",
+      "status": "PASS",
+      "detail": "251행"
+    },
+    {
+      "name": "  기준정보 [HCAMS02] 데이터행",
+      "status": "PASS",
+      "detail": "1334행"
+    },
+    {
+      "name": "  기준정보 [HASMS02] 데이터행",
+      "status": "PASS",
+      "detail": "37행"
+    },
+    {
+      "name": "  기준정보 [ISAMS03] 데이터행",
+      "status": "PASS",
+      "detail": "200행"
+    },
+    {
+      "name": "GERP 시트 열기",
+      "status": "PASS",
+      "detail": "23열"
+    },
+    {
+      "name": "GERP 컬럼수 최소 21개",
+      "status": "PASS",
+      "detail": "실제 23열"
+    },
+    {
+      "name": "GERP 데이터행 1건 이상",
+      "status": "PASS",
+      "detail": "2,911행"
+    },
+    {
+      "name": "GERP 주야구분 값 (정상/추가 포함)",
+      "status": "PASS",
+      "detail": "발견값=['정상', '추가']"
+    },
+    {
+      "name": "GERP 대원테크(0109) 데이터 존재",
+      "status": "PASS",
+      "detail": "2,911행"
+    },
+    {
+      "name": "구ERP 'Sheet1' 시트 존재",
+      "status": "PASS",
+      "detail": "시트목록=['Sheet1']"
+    },
+    {
+      "name": "구ERP 데이터행 1건 이상",
+      "status": "FAIL",
+      "detail": "-1행"
+    },
+    {
+      "name": "구ERP 컬럼수 최소 13개",
+      "status": "PASS",
+      "detail": "실제 13열"
+    },
+    {
+      "name": "구ERP LOTNO 끝자리 B/A/S/C 포함",
+      "status": "FAIL",
+      "detail": "끝자리값=[]"
+    },
+    {
+      "name": "구ERP 대원테크(0109) 데이터 존재",
+      "status": "FAIL",
+      "detail": "0행"
+    }
+  ],
+  "files": {
+    "master": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\01_기준정보\\기준정보_라인별정리_최종_V2_20260506.xlsx",
+    "gerp": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\06월\\실적데이터\\G-ERP 5월실적.xlsx",
+    "olderp": "C:\\Users\\User\\Desktop\\업무리스트\\05_생산실적\\조립비정산\\06월\\실적데이터\\구ERP 5월실적.xlsx"
+  }
+}

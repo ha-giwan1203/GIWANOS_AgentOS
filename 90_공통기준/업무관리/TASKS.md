@@ -1,3 +1,4 @@
+- [완료] owner=Codex / SP3M3 D0 야간 반영 사고 재발 방지 시스템 개선 / 잠금 해제: `90_공통기준/스킬/d0-production-plan/run.py`, `90_공통기준/스킬/d0-production-plan/evening_supplement.py`, `90_공통기준/스킬/d0-production-plan/SKILL.md`, `90_공통기준/스킬/d0-production-plan/MANUAL.md`
 - [완료] owner=Claude+Codex / 5월 정산 1차 / Phase A~H 완료 / 구ERP 마감 후 보강 잔여
 - [완료] owner=Codex / 5월 정산 Phase E 90-91 손익 시트 추가 / 잠금 해제: `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`, `05_생산실적/조립비정산/06월/라인정지_05월_raw.xlsx`, `05_생산실적/조립비정산/06월/05월 지원/화인텍_지원받은_05월.xlsx`, `90_공통기준/스킬/monthly-pnl-rollup/run.py`, `90_공통기준/스킬/monthly-pnl-rollup/builders/sheet_94_support.py`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`
 - [완료] owner=Codex / 5월 정산 Phase D QIS 4탭 조회 통합 / 잠금 해제: `05_생산실적/조립비정산/06월/라인정지_05월_raw.xlsx`, `90_공통기준/스킬/line-stoppage/qis_extract.py`, `90_공통기준/스킬/line-stoppage/merge_monthly.py`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`

@@ -4,6 +4,8 @@
 > 작업 완료/미완료 판정은 TASKS.md 기준. 이 파일이 TASKS와 충돌하면 TASKS를 따른다.
 > 세션 변경사항과 다음 AI 액션만 기록한다. 완료/미완료를 독립 선언하지 않는다.
 
+최종 업데이트: 2026-06-01 KST — 세션252 **Codex** SP3M3 D0 야간 stale 출력용 사고 재발 방지를 위해 d0-production-plan에 evening_supplement.py를 정식 추가했다. run.py는 생산지시서 Excel lock 차단, 출력용/생산계획 야간 PROD_NO set stale 가드, --xlsx evening prod_date target-1 보정 및 --prod-date 최우선, api_rank_batch_via_http strict_regdt=False 보충 경로(REG_NO asc)를 지원한다. 실제 ERP/MES 반영은 하지 않았고, py_compile 및 synthetic guard/helper 검증은 PASS, Z드라이브 dry-run은 현재 ~$SP3M3_생산지시서_(26.06.02).xlsm lock 활성으로 차단되는 것을 확인했다.
+
 최종 업데이트: 2026-06-01 KST — 세션251 **Codex** 5월 정산 Phase H 문서 갱신. 권위 산출물은 `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`이며, 최종 정산금액은 A 204,784,019.3 + B -4,005,586 + C 0 - D 3,624,555 + E 7,315,440 = 204,469,318.3원이다. Known Exception은 구ERP 5월 마감 미완으로, ④ 받을금액 라인확인필요 2,671건/137M은 구ERP 부재 미매칭으로 본다. 다음 AI 액션은 구ERP 5월 마감 후 `setup_month.py`를 재실행해 `OLDERP_FILE`을 실제 5월 raw로 교체한 뒤 step3~8 재실행, 90/91 시트 보강이다. Codex copy2 PermissionError 환경 차이 사례는 디버깅 잔여이며 위치는 `build_formula_version.py` L94 `_master_backup` 단계다.
 
 최종 업데이트: 2026-06-01 KST — 세션250 **Codex** 5월 정산 Phase E 90/91 손익 시트 추가 완료. monthly-pnl-rollup은 최초 실행에서 지원 폴더를 5월 지원으로 찾고 라인정지 통합집계의 QIS만 읽어 B=0/D=0이 되는 불일치가 있어, run.py를 05월 지원 우선 탐색과 G-ERP 라인보상+QIS 합산 D 차감비용 로더로 좁게 보정했다. 재실행 후 Excel COM 재계산 저장까지 완료했고 본체는 19시트, 90/91 존재, KPI는 A 204,784,019.3 / B -4,005,586 / C 0 / D 3,624,555 / E 7,315,440 / 최종 204,469,318.3이다. 91 상세 기준 SP3M3 BI는 GERP 야간 27,942, BI 야간 70,974, 누락 43,032EA×170원이며 화인텍 지원은 -4,005,586원 지출로 확인했다.
