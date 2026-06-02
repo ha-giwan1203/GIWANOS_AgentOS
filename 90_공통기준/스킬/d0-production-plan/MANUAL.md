@@ -63,6 +63,10 @@ python run.py --session morning --line SP3M3 --xlsx <1건xlsx> --target-date YYY
 
 # Phase 5 final_save 차단 (P3 사고 재발 방지)
 python run.py --session morning --no-mes-send
+
+# SP3M3 야간 보충 등록 모드 (출력용 stale/누락분 보강)
+python evening_supplement.py --target-date YYYY-MM-DD --source-sheet 생산계획 --dry-run
+python evening_supplement.py --target-date YYYY-MM-DD --source-sheet 생산계획
 ```
 
 ## 모드 분기 (세션133)
@@ -74,6 +78,7 @@ python run.py --session morning --no-mes-send
 | `--dry-run` | Phase 2까지만 | 추출 검증 |
 | `--parse-only` | Phase 3 selectList까지 | 파싱 검증 |
 | `--xlsx <path>` | Phase 1 추출 건너뛰고 외부 xlsx 직접 업로드 | 1건 PoC, 첨부 처리 |
+| `evening_supplement.py` | SP3M3 야간 누락분 보충 등록. 생산계획/출력용 시트 선택, REG_DT 필터 우회 + REG_NO asc 매칭 | 정규 evening 실패 후 보강 |
 
 ## 실행 절차
 
@@ -154,6 +159,19 @@ python run.py --session morning --no-mes-send
 22. rank 순서와 엑셀 순서 대조
 
 ## 핵심 주의사항
+
+⛔ **2026-06-01 SP3M3 D0 야간 반영 사고 재발 방지**
+- 사고 1: `출력용` 시트가 전일 stale 상태였는데 정규 evening이 그대로 추출해 8건을 ERP+MES에 중복 반영했다.
+  - 회피: `run.py --session evening --line SP3M3`는 `출력용`과 `생산계획` 야간 PROD_NO set을 비교한다. 일치율 70% 미만이고 양쪽 set이 명확히 다르면 즉시 차단한다.
+  - 예외: 같은 PROD_NO set에서 시간/수량만 달라진 경우는 통과한다. 강제 진행은 `--allow-stale-output` 명시가 필요하다.
+- 사고 2: `--xlsx --http-only` 직접 분기에서 evening 생산일을 파일명 날짜로 잡아 Phase 4 매칭 0건이 발생했다.
+  - 회피: `--prod-date`가 항상 1순위이며, 없으면 evening `--xlsx`도 `target_file_date - 1`을 사용한다. morning은 기존처럼 target 날짜를 사용한다.
+- 사고 3: 사용자가 편집 중인 `~$` Excel 락 파일 신호를 무시했다.
+  - 회피: 생산지시서 선택 직후 `~$<파일명>` 잠금파일이 있으면 D0 반영을 차단한다.
+- 사고 4: ERP+MES 비가역 반영 전 1줄 통보가 빠졌다.
+  - 회피: Phase 3~5 진입 전 `[비가역 통보]` 로그를 반드시 출력한다. `--dry-run`/`--parse-only`는 비가역 저장 전 종료한다.
+- 보충 등록: 정규 evening 실패 후 누락분만 보강할 때는 `.claude/tmp` 1회용 스크립트를 반복하지 말고 `evening_supplement.py --target-date YYYY-MM-DD --source-sheet 생산계획 --dry-run`으로 먼저 확인한다.
+- 보충 등록의 REG_NO asc는 야간 only 보강 케이스 전용이다. 기본 정규 Phase 4는 기존 매뉴얼 4번 룰(REG_NO desc)을 유지한다.
 
 ⛔ **사용자 첨부 파일 가드** (세션115 사고 실증, 2026-04-27)
 - 첨부 발견 시 자동 실행 금지

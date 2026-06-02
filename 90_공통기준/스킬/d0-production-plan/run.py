@@ -86,6 +86,19 @@ def parse_prod_no_csv(value):
     return {p.strip() for p in (value or "").split(",") if p.strip()}
 
 
+def _excel_lock_path(path: Path) -> Path:
+    return path.parent / f"~${path.name}"
+
+
+def assert_no_excel_lock(path: Path):
+    """Excel 편집 중인 계획 파일은 비가역 업로드 전에 차단한다."""
+    lock_path = _excel_lock_path(path)
+    if lock_path.exists():
+        raise RuntimeError(
+            f"Excel 잠금파일 활성: {lock_path.name} — 사용자가 파일 편집 중일 수 있어 D0 반영 차단"
+        )
+
+
 def apply_manual_exclude(items, exclude_csv, label="exclude"):
     exc = parse_prod_no_csv(exclude_csv)
     if not exc:
@@ -638,6 +651,7 @@ def find_plan_file(target_date: datetime) -> Path:
         if candidates:
             candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
             chosen = candidates[0]
+            assert_no_excel_lock(chosen)
             print(f"[phase1] 파일 선택: {chosen.name}")
             return chosen
 
@@ -667,6 +681,7 @@ def find_plan_file(target_date: datetime) -> Path:
                 print(f"[phase1] fallback: {fb_folder.name}에서 {src.name} 발견 → {target_folder.name}/ 복사")
             else:
                 print(f"[phase1] fallback: {fb_folder.name}에서 {src.name} 발견 (target에 이미 존재)")
+            assert_no_excel_lock(dst)
             print(f"[phase1] 파일 선택: {dst.name}")
             return dst
 
@@ -693,7 +708,63 @@ def _find_section_end(ws, start_row, next_header_keyword=None):
     return last
 
 
-def extract_sp3m3_night(wb):
+def _extract_night_prod_set(ws):
+    """야간 섹션 PROD_NO set만 추출한다. 수량/시간 차이는 stale 판정에 쓰지 않는다."""
+    night_end = 34
+    for r in range(2, ws.max_row + 1):
+        v = ws.cell(row=r, column=2).value
+        if v and "주간계획" in str(v):
+            night_end = r - 1
+            break
+
+    prod_nos = set()
+    for r in range(3, night_end + 1):
+        part = ws.cell(row=r, column=9).value
+        qty = ws.cell(row=r, column=11).value
+        if not (part and qty):
+            continue
+        try:
+            int(qty)
+        except (ValueError, TypeError):
+            continue
+        pno = str(part).strip()
+        if pno and not any("가" <= ch <= "힣" for ch in pno):
+            prod_nos.add(pno)
+    return prod_nos
+
+
+def guard_sp3m3_output_stale(wb, threshold=0.70, allow=False):
+    """출력용 야간과 생산계획 야간의 PROD_NO set가 크게 다르면 stale 파일로 차단."""
+    if allow:
+        print("[stale-guard] --allow-stale-output 활성 — 출력용/생산계획 비교 차단 해제")
+        return
+    if "출력용" not in wb.sheetnames or "생산계획" not in wb.sheetnames:
+        print("[stale-guard] 출력용/생산계획 시트 비교 불가 — stale 가드 skip")
+        return
+
+    out_set = _extract_night_prod_set(wb["출력용"])
+    plan_set = _extract_night_prod_set(wb["생산계획"])
+    if not out_set or not plan_set:
+        print(f"[stale-guard] 비교 set 부족 — 출력용={len(out_set)} 생산계획={len(plan_set)} skip")
+        return
+
+    overlap = len(out_set & plan_set)
+    ratio = overlap / max(len(out_set), len(plan_set))
+    only_out = sorted(out_set - plan_set)
+    only_plan = sorted(plan_set - out_set)
+    print(
+        f"[stale-guard] 출력용/생산계획 PROD_NO 일치율 {ratio:.1%} "
+        f"(overlap={overlap}, 출력용={len(out_set)}, 생산계획={len(plan_set)})"
+    )
+    if ratio < threshold and only_out and only_plan:
+        raise RuntimeError(
+            "출력용 시트 stale 의심 — 생산계획 야간 PROD_NO와 크게 다릅니다. "
+            f"출력용-only {len(only_out)}건, 생산계획-only {len(only_plan)}건. "
+            "사용자 확인 후 --allow-stale-output 명시 시에만 진행"
+        )
+
+
+def extract_sp3m3_night(wb, allow_stale_output=False):
     """출력용 시트 야간 섹션.
 
     구조:
@@ -702,6 +773,7 @@ def extract_sp3m3_night(wb):
       R3~: 실제 데이터
       R?: `◀ D+2 주간계획` (종료 경계)
     """
+    guard_sp3m3_output_stale(wb, allow=allow_stale_output)
     ws = wb["출력용"]
     start = 3
     night_end = 34  # 보수적 default
@@ -830,6 +902,22 @@ def _load_items_from_xlsx(xlsx_path: Path):
 def _extract_prod_date(items):
     """items는 PROD_NO/QTY만 — 외부 엑셀 원본에서 생산일 재추출."""
     return None  # caller에서 fallback
+
+
+def resolve_xlsx_prod_date(args, session, target_file_date, items):
+    """--xlsx 직접 모드 생산일 결정. 사용자 지정 > 세션 규칙 > 파일 내 날짜 순."""
+    if args.prod_date:
+        prod_date = datetime.strptime(args.prod_date, "%Y-%m-%d")
+        print(f"[direct] --prod-date 오버라이드: prod_date={prod_date.strftime('%Y-%m-%d')}")
+        return prod_date
+    if session == "evening":
+        prod_date = target_file_date - timedelta(days=1)
+        print(
+            f"[direct] evening 세션 생산일 보정: "
+            f"target_file_date={target_file_date.strftime('%Y-%m-%d')} -> prod_date={prod_date.strftime('%Y-%m-%d')}"
+        )
+        return prod_date
+    return _extract_prod_date(items) or target_file_date
 
 
 def make_upload_xlsx(items, prod_date: datetime, out_path: Path):
@@ -1453,6 +1541,13 @@ def _sort_idx_map_desc(grid_by_pno):
     return grid_by_pno
 
 
+def _match_grid_by_pno_asc(grid_by_pno):
+    """야간 보충 등록 전용 — REG_DT 필터 우회 후 REG_NO 오름차순 매칭."""
+    for v in grid_by_pno.values():
+        v.sort(key=lambda x: int(x.get("REG_NO", 0)))
+    return grid_by_pno
+
+
 def api_rank_batch(page, items, target_line, save_url, sess=None):
     """rank_batch의 옵션 A 하이브리드 변형 — jQuery.ajax POST를 requests 직접 호출로 전환.
 
@@ -1708,7 +1803,7 @@ def process_one_row_via_http(sess, prod_no, target_ext_reg, target_line, save_ur
             "dataListLen": len(data_list)}
 
 
-def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_opt='1'):
+def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_opt='1', strict_regdt=True):
     """phase4 api_rank_batch HTTP — items 순회하며 process_one_row_via_http 호출.
 
     같은 PROD_NO N회 등장 시 N번째 REG_NO 매칭 (api_rank_batch와 동일 정책).
@@ -1718,19 +1813,24 @@ def api_rank_batch_via_http(sess, items, target_line, save_url, prod_date, day_o
     grid = fetch_tot_grid_via_http(sess, target_date)
     grid_by_pno = {}
     for g in grid:
-        if g.get("REG_DT") != target_date:
+        if strict_regdt and g.get("REG_DT") != target_date:
             continue
         grid_by_pno.setdefault(g["PROD_NO"], []).append(g)
-    # ⚠️ 매뉴얼 4번 룰 (REG_NO 내림차순 매핑) — 반드시 준수
-    # ============================================================
-    # 같은 PROD_NO가 주야 양쪽 등록된 경우 max ext(= 야간 신규)부터 매핑.
-    # ascending 정렬 시 주간 기존 ext(작은 값)가 idx=0이 되어 야간 rank가
-    # 주간 row에 덮어 박힘 → SmartMES 누락 사고.
-    # 회귀 이력 — 같은 사고 2회 발생:
-    #   세션152 evening: legacy rank_batch idx_map JS sort a-b → b-a 패치
-    #   세션155 evening: A안 3단계 신설 시 reverse=True 누락 → 5건 누락 → 보강
-    # 새 함수 추가 시 _sort_idx_map_desc(...) 헬퍼 호출 또는 reverse=True 명시 필수.
-    _sort_idx_map_desc(grid_by_pno)
+    if strict_regdt:
+        # ⚠️ 매뉴얼 4번 룰 (REG_NO 내림차순 매핑) — 기본 경로는 반드시 준수
+        # ============================================================
+        # 같은 PROD_NO가 주야 양쪽 등록된 경우 max ext(=야간 신규)부터 매핑.
+        # ascending 정렬 시 주간 기존 ext(작은 값)가 idx=0이 되어 야간 rank가
+        # 주간 row에 덮어 박힘 → SmartMES 누락 사고.
+        # 회귀 이력 — 같은 사고 2회 발생:
+        #   세션152 evening: legacy rank_batch idx_map JS sort a-b → b-a 패치
+        #   세션155 evening: A안 3단계 신설 시 reverse=True 누락 → 5건 누락 → 보강
+        _sort_idx_map_desc(grid_by_pno)
+    else:
+        # 야간 보충 등록 전용: searchShipDa는 맞지만 REG_DT가 실행일로 찍힌 경우,
+        # REG_DT 필터를 우회하고 업로드 순서(REG_NO asc)를 보존한다.
+        print("[api_phase4:http] strict_regdt=False — REG_DT 필터 우회 + REG_NO asc 매칭")
+        _match_grid_by_pno_asc(grid_by_pno)
 
     done = failed = missing = 0
     fails = []
@@ -2126,6 +2226,11 @@ def run_session_line(page, wb, line, items, prod_date, dry_run, verify_prod_date
         return False
 
     target_line = "SP3M3" if line == "SP3M3" else "SD9A01"
+    print(
+        f"[비가역 통보] {line} prod_date={prod_date.strftime('%Y-%m-%d')} "
+        f"{len(items)}건 ERP D0 저장/서열 반영 진입; "
+        f"MES 전송은 {'차단(--no-mes-send)' if no_mes_send else 'Phase5에서 실행'}"
+    )
 
     # 세션153 A안 3단계 — 완전 브라우저-less path
     if _HTTP_ONLY_SESS is not None:
@@ -2230,7 +2335,7 @@ def main():
     ap.add_argument("--line", choices=["SP3M3","SD9A01","ALL"], default="ALL")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--target-date", help="YYYY-MM-DD 파일명 날짜 (기본 자동)")
-    ap.add_argument("--prod-date", help="YYYY-MM-DD ERP 등록 생산일자 명시 오버라이드 (공휴일 매핑 등 — evening: target-1 자동 무시 / morning: target 자동 무시)")
+    ap.add_argument("--prod-date", help="YYYY-MM-DD ERP 등록 생산일자 명시 오버라이드 (--xlsx 포함 최우선)")
     ap.add_argument("--xlsx", help="업로드용 엑셀 파일 경로 직접 지정 (Phase 1 추출 건너뛰기)")
     ap.add_argument("--no-dedupe", action="store_true", help="dedupe 우회 — 같은 PROD_NO가 이미 등록돼 있어도 그대로 추가 등록 (사용자 명시 중복 등록)")
     ap.add_argument("--skip-upload", action="store_true", help="Phase 3 D0 업로드 건너뛰기 (이미 상단에 등록된 경우 Phase 4부터)")
@@ -2245,6 +2350,7 @@ def main():
     ap.add_argument("--limit", type=int, default=None, help="dedupe 후 등록 대상 N건만 사용 (1건 PoC용, default=전체)")
     ap.add_argument("--exclude", default="", help="phase1 추출 후 제외할 PROD_NO 콤마구분 (E 모드 복구용. 예: --exclude RSP3SC0246). P-BOM 미등록 등 단건 차단으로 전체 fail 시 사용")
     ap.add_argument("--no-pbom-guard", action="store_true", help="P-BOM guard 비활성화. Phase5 sendMesFlag=N preflight 및 자동 제외를 건너뜀")
+    ap.add_argument("--allow-stale-output", action="store_true", help="SP3M3 야간 출력용/생산계획 PROD_NO set 불일치 차단을 명시적으로 해제")
     ap.add_argument("--http-upload", action="store_true", help="세션153 A안 2단계: phase3 D0 업로드를 requests 직접 (브라우저·iframe·jQuery 0). HTTP OAuth 성공 시만 활성")
     ap.add_argument("--http-only", action="store_true", help="세션153 A안 3단계: 완전 브라우저-less. phase0~6 전부 requests. ensure_chrome_cdp + playwright 0")
     ap.add_argument("--jobsetup-mode", choices=["list-only","dry-run","commit-one","commit-all"], default="commit-all",
@@ -2297,7 +2403,7 @@ def main():
             if not xlsx_path.exists():
                 raise FileNotFoundError(f"--xlsx 파일 없음: {xlsx_path}")
             items = _load_items_from_xlsx(xlsx_path)
-            prod_date = _extract_prod_date(items) or target_file_date
+            prod_date = resolve_xlsx_prod_date(args, session, target_file_date, items)
             line_override = args.line if args.line != "ALL" else "SP3M3"
             print(f"[direct] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
             # 파일 업로드 전 중복 가드 (세션133 사용자 명시 — 같은 prod_date+PROD_NO 이미 등록된 건 제외)
@@ -2319,6 +2425,11 @@ def main():
                 print("[direct] parse-only: 엑셀 첨부 + 서버 파싱까지만. Phase 4/5 미진행")
                 return
             else:
+                print(
+                    f"[비가역 통보] direct xlsx line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')} "
+                    f"{len(items)}건 ERP D0 저장/서열 반영 진입; "
+                    f"MES 전송은 {'차단(--no-mes-send)' if args.no_mes_send else 'Phase5에서 실행'}"
+                )
                 # dedupe로 items 줄었으면 xlsx도 재생성 후 업로드 (selectList가 같은 파일 파싱하므로)
                 if len(items) < items_before:
                     new_xlsx = UPLOAD_DIR / f"d0_{line_override}_{prod_date.strftime('%Y%m%d')}_dedup.xlsx"
@@ -2372,7 +2483,7 @@ def main():
             # SD9A01 OUTER: ERP 생산일 = 파일명 날짜 (내일)
             prod_date_override = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else None
             if args.line in ("SP3M3","ALL"):
-                items = extract_sp3m3_night(wb)
+                items = extract_sp3m3_night(wb, allow_stale_output=args.allow_stale_output)
                 # Phase 1.5: 야간 1~5행 dedupe (주간 등록분과 PROD_NO+수량 일치 시 제외)
                 items = dedupe_night_first_5(page, items)
                 items = apply_manual_exclude(items, args.exclude, "evening SP3M3")
@@ -2441,7 +2552,7 @@ def _main_http_only(args, sess, session, target_file_date):
         if not xlsx_path.exists():
             raise FileNotFoundError(f"--xlsx 파일 없음: {xlsx_path}")
         items = _load_items_from_xlsx(xlsx_path)
-        prod_date = _extract_prod_date(items) or target_file_date
+        prod_date = resolve_xlsx_prod_date(args, session, target_file_date, items)
         line_override = args.line if args.line != "ALL" else "SP3M3"
         print(f"[direct:http] xlsx={xlsx_path.name} items={len(items)} line={line_override} prod_date={prod_date.strftime('%Y-%m-%d')}")
         page = None
@@ -2497,7 +2608,7 @@ def _main_http_only(args, sess, session, target_file_date):
     if session == "evening":
         prod_date_override = datetime.strptime(args.prod_date, "%Y-%m-%d") if args.prod_date else None
         if args.line in ("SP3M3", "ALL"):
-            items = extract_sp3m3_night(wb)
+            items = extract_sp3m3_night(wb, allow_stale_output=args.allow_stale_output)
             items = dedupe_night_first_5(page, items)
             items = apply_manual_exclude(items, args.exclude, "evening:http SP3M3")
             items = note_pbom_guard_phase1(items, "SP3M3", args.no_pbom_guard)

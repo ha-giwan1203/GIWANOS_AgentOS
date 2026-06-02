@@ -36,11 +36,17 @@ python run.py --session evening --line SP3M3 --dry-run        # 추출 검증
 python run.py --session morning --legacy-mode                 # 회귀 fallback (화면 모드)
 python run.py --session morning --xlsx <1건xlsx> --target-date YYYY-MM-DD   # 1건 PoC
 python run.py --session morning --line SP3M3 --no-mes-send    # Phase 5 차단
+
+# 야간 보충 등록 모드: 출력용 stale 등으로 누락된 SP3M3 야간분만 별도 보강
+python evening_supplement.py --target-date YYYY-MM-DD --source-sheet 생산계획 --dry-run
+python evening_supplement.py --target-date YYYY-MM-DD --source-sheet 생산계획
 ```
 
 **필수 옵션 (사용자 호출 시)**:
 - `--line {SP3M3|SD9A01|ALL}` — default=ALL은 cron 전용. 사람 호출 시 반드시 라인 명시.
 - `--http-only` — 세션153 A안 3단계 완전 브라우저-less. CDP/Playwright 0. 미명시 시 브라우저 모드로 떨어짐.
+- `evening_supplement.py`는 SP3M3 야간 보충 전용이다. 먼저 `--dry-run`으로 추출 건수와 품번을 확인한 뒤, 사용자 명시가 있을 때만 실제 ERP/MES 반영을 실행한다.
+- `run.py --session evening --line SP3M3`는 `출력용`과 `생산계획` 야간 PROD_NO set 일치율을 검사한다. stale 차단을 해제하려면 `--allow-stale-output`을 명시해야 한다.
 
 ## 절차 (요약)
 1. Phase 0: CDP 9223 + ERP OAuth + D0 화면 진입
