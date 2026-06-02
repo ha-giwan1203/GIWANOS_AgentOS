@@ -231,3 +231,8 @@ config/private/
 03_품번관리/초물관리/_backup/
 .claude/state/gpt_tab_id
 **/_local_backup/
+
+# archive backups (settings/incident/legacy raw backup files - disk preserve, git exclude)
+98_아카이브/reset_*/settings.local.json.bak_*
+98_아카이브/reset_*/settings.json.phase3_backup
+98_아카이브/reset_*/incident_ledger.jsonl.bak_*

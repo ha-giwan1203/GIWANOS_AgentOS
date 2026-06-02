@@ -48,14 +48,15 @@ if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
     >> "$PROJECT_ROOT/.claude/logs/delegation_guard.jsonl" 2>/dev/null
   hook_log "Stop" "delegation_guard: stop_hook_active=true 2회차 통과" 2>/dev/null || true
 elif [ -n "$LAST_TEXT" ] && echo "$LAST_TEXT" | grep -qiE "$_DELEGATION_PATTERN" && ! echo "$LAST_TEXT" | grep -qiE "$_DELEGATION_WHITELIST"; then
-  # 2026-06-02 사고력 회복: block → advisory 강등. 패턴 감지·로그 기록은 유지, 출력 차단(echo block + exit 0)만 제거.
-  # 사유: Stop 직전 출력 차단이 사고 흐름을 분절하여 단답·회피 모드를 강화. Claude plan twinkly-puzzling-hickey 4번. 백업: 98_아카이브/reset_20260602/completion_gate_pre_downgrade.sh
   _DG_MATCH=$(echo "$LAST_TEXT" | grep -oiE "$_DELEGATION_PATTERN" | head -1)
   _DG_SAFE=$(json_escape "$_DG_MATCH" 2>/dev/null || echo "$_DG_MATCH")
+  hook_incident "gate_reject" "delegation_guard" "$_DG_MATCH" "위임 떠넘기기 발화 감지 — 패턴 '${_DG_MATCH}'" '"classification_reason":"delegation_pattern","normal_flow":false,"next_action":"판단 1줄+다음행동 1줄로 재작성"' 2>/dev/null || true
   _DG_TS=$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%S')
-  printf '{"ts":"%s","result":"advisory","reason":"delegation_pattern","match":"%s","source":"delegation_guard","note":"downgrade_20260602"}\n' "$_DG_TS" "$_DG_SAFE" \
+  printf '{"ts":"%s","result":"block","reason":"delegation_pattern","match":"%s","source":"delegation_guard"}\n' "$_DG_TS" "$_DG_SAFE" \
     >> "$PROJECT_ROOT/.claude/logs/delegation_guard.jsonl" 2>/dev/null
-  hook_log "Stop" "delegation_guard advisory: pattern='$_DG_MATCH' (block downgraded 20260602)" 2>/dev/null || true
+  echo "{\"decision\":\"block\",\"reason\":\"[DELEGATION GUARD] 떠넘기기 패턴 '${_DG_MATCH}' 감지. 질문 없이 네 판단으로 재작성하라.\"}"
+  hook_timing_end "completion_gate" "$_CMG_START" "block_delegation"
+  exit 0
 fi
 
 if ! is_completion_claim "$LAST_TEXT"; then
