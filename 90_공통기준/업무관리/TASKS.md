@@ -1,3 +1,26 @@
+- [작업중] owner=Codex / 7월 신규 기준파일 구조 분석 / 잠금 파일: `05_생산실적/조립비정산/06월/조립비_관리DB_05월.xlsx`, `05_생산실적/조립비정산/03_정산자동화/_pipeline_config.py`, `05_생산실적/조립비정산/03_정산자동화/step4_기준정보매칭.py` / 하네스: 입력=사용자 요청: 7월 정산부터 신규 기준파일 조립비_관리DB_05월.xlsx 적용 전 구조 분석 및 _pipeline_config.py 수정안 초안 보고; 범위=신규 기준파일 시트 구조, 헤더, 컬럼 인덱스, 라인/품번/단가/조립품번/Usage 위치, 시트명/데이터 시작행 차이 분석. 실제 config 변경 금지; 성공=현재 MASTER_COL 대비 차이표와 7월 setup_month 직전 적용할 config 수정안 초안을 보고하고, config 파일은 미변경 상태 유지; 검증=openpyxl 구조 스캔, step4 로더 참조 확인, git diff로 _pipeline_config.py 미변경 확인, review.md 작성; 중단=신규 파일 접근 실패, 헤더 식별 불가, 컬럼 의미 불명확, config 변경 발생 시 중단
+- [완료] owner=Codex / 6월 정산 Step1~Step7 재실행 / 잠금 해제: `05_생산실적/조립비정산/06월/_cache/step5_settlement.json`, `05_생산실적/조립비정산/06월/_cache/step6_validation.json`, `05_생산실적/조립비정산/06월/정산결과_05월.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260609_settlement_step1_7_rerun/review.md`
+- [완료] owner=Codex / 화인텍 6월 지원 수식 입력 / 잠금 해제: `05_생산실적/조립비정산/07월/화인텍_지원_06월.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260609_hwain_formula/review.md`
+- [완료] owner=Codex / 6월 GERP 이관품번 잔존 산출 양식 복구 / 잠금 해제: `05_생산실적/조립비정산/06월/이관품번_6월GERP잔존_20260608.xlsx`, `.claude/tmp/jun_residual_vs_aprtransfer_20260608.json`
+- [완료] owner=Codex / 6월 GERP 이관품번 잔존 추출 / 잠금 해제: `05_생산실적/조립비정산/05월/중복품번_오류리스트_04월_이관품번_취합.xlsx`, `05_생산실적/조립비정산/06월/실적데이터/G-ERP 5월실적.xlsx`, `05_생산실적/조립비정산/06월/이관품번_6월GERP잔존_20260608.xlsx`, `.claude/tmp/jun_residual_vs_aprtransfer_20260608.json`
+- [완료] owner=Codex / 4월 이관품번 오류리스트 취합 / 잠금 해제: `05_생산실적/조립비정산/05월/중복품번_오류리스트_04월.xlsx`, `05_생산실적/조립비정산/05월/중복품번_오류리스트_04월_추가.xlsx`, `05_생산실적/조립비정산/05월/중복품번_오류리스트_04월_이관품번_취합.xlsx`
+- [완료] owner=Codex / 6월 이관품번 잔존 조회 / 잠금 해제: `05_생산실적/조립비정산/01_기준정보/_master_denylist.json`, `05_생산실적/조립비정산/06월/_cache/step2_gerp.json`, `05_생산실적/조립비정산/06월/실적데이터/G-ERP 5월실적.xlsx`, `.claude/tmp/jun_transfer_residual_check_20260608.json`
+- [완료] owner=Codex / SD9A01 마스터 미등록 품번 등록 및 동일차종단가 적용 / 잠금 해제: `05_생산실적/조립비정산/01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260606_sd9a01_master_append/review.md`
+- [완료] owner=Codex / SD9A01 마스터 누락 품번 등록요청 오류리스트 작성 / 잠금 해제: `05_생산실적/조립비정산/06월/오류리스트_05월_SD9A01_마스터미등록_등록요청.xlsx`, `90_공통기준/업무관리/검토기록/runs/20260605_sd9a01_master_missing/review.md`
+- [완료] owner=Codex / 동일 PROD_NO 다중 OUTER 매칭 우선순위 룰 추가 / 잠금 해제: `.claude/tmp/probe_outer_priority_20260605.json`
+- [완료] owner=Codex / 5월 정산 SP3M3 이관품번 84건 삭제 후 재실행 / 잠금 해제: `05_생산실적/조립비정산/01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx`, `05_생산실적/조립비정산/01_기준정보/_master_denylist.json`, `05_생산실적/조립비정산/03_정산자동화/_error_types.py`, `05_생산실적/조립비정산/03_정산자동화/step5_정산계산.py`, `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`, `05_생산실적/조립비정산/06월/정산결과_05월.xlsx`, `05_생산실적/조립비정산/06월/오류리스트_05월.xlsx`, `.claude/tmp/sp3m3_transfer_delete_final_verify_20260605.json`
+- [완료] owner=Codex / 5월 정산 마스터 자동갱신 후 전면 재실행 / 잠금 해제: `05_생산실적/조립비정산/01_기준정보/기준정보_라인별정리_최종_V2_20260506.xlsx`, `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`, `05_생산실적/조립비정산/06월/정산결과_05월.xlsx`, `05_생산실적/조립비정산/06월/오류리스트_05월.xlsx`, `.claude/tmp/may_settlement_reexecute2_verify.json`
+- [완료] owner=Codex / 5월 정산 구ERP 실데이터 반영 재실행 / 잠금 해제: `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`, `05_생산실적/조립비정산/06월/정산결과_05월.xlsx`, `05_생산실적/조립비정산/06월/오류리스트_05월.xlsx`, `05_생산실적/조립비정산/06월/실적데이터/구ERP_5월실적.xlsx`, `05_생산실적/조립비정산/06월/실적데이터/G-ERP 5월실적.xlsx`
+- [완료] owner=Codex / 06월 조립비정산 폴더 백업 정리 / 잠금 해제: `05_생산실적/조립비정산/06월`, `.claude/tmp/cleanup_june_settlement_folder.py`
+- [완료] owner=Codex / SP3M3 토요일특근 숫자 서식 정리 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/format_overtime_sp3m3_night_05.py`
+- [완료] owner=Codex / SP3M3 야간 비교 청구금액 복원 및 토요일특근 시트 추가 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/restore_charge_add_overtime_sp3m3_night_05.py`
+- [완료] owner=Codex / SP3M3 야간 비교 토요일 청구금액 제거 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/remove_sat_charge_sp3m3_night_05.py`
+- [완료] owner=Codex / 5월 정산 SP3M3 야간 비교 양식 단순화 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/redesign_sp3m3_night_05.py`
+- [완료] owner=Codex / 5월 정산 SP3M3 GERP 야간 일자별 분해 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/update_gerp_daily_05.py`
+- [완료] owner=Codex / 5월 정산 SP3M3 야간 비교 양식 작성 / 잠금 해제: `05_생산실적/조립비정산/06월/야간_생산_SP3M3.xlsx`, `.claude/tmp/build_night_compare_05.py`
+- [완료] owner=Codex / 부품 출고 운영 지침 교육기록부 작성 / 잠금 해제: `06_생산관리\품질\교육기록부\부품출고운영지침_교육기록부_20260602.xlsx`
+- [완료] owner=Codex / 리노텍산업 PLL스플 홀더가이드 누락 부적합 교육기록부 작성 / 잠금 해제: `06_생산관리\품질\교육기록부\리노텍산업_부적합교육_PLL스플_홀더가이드누락_20260602.xlsx`, `06_생산관리\품질\교육기록부\리노텍산업_부적합교육_PLL스플_홀더가이드누락_20260602.검증출력.pdf`
+- [완료] owner=Codex / 리노텍산업 PLL스플 홀더가이드 누락 부적합 교육기록부 작성 / 잠금 해제: `06_생산관리\품질\교육기록부\리노텍산업_부적합교육_PLL스플_홀더가이드누락_20260602.xlsx`
 - [완료] owner=Codex / SP3M3 D0 야간 반영 사고 재발 방지 시스템 개선 / 잠금 해제: `90_공통기준/스킬/d0-production-plan/run.py`, `90_공통기준/스킬/d0-production-plan/evening_supplement.py`, `90_공통기준/스킬/d0-production-plan/SKILL.md`, `90_공통기준/스킬/d0-production-plan/MANUAL.md`
 - [완료] owner=Claude+Codex / 5월 정산 1차 / Phase A~H 완료 / 구ERP 마감 후 보강 잔여
 - [완료] owner=Codex / 5월 정산 Phase E 90-91 손익 시트 추가 / 잠금 해제: `05_생산실적/조립비정산/06월/정산_수식버전_05월.xlsx`, `05_생산실적/조립비정산/06월/라인정지_05월_raw.xlsx`, `05_생산실적/조립비정산/06월/05월 지원/화인텍_지원받은_05월.xlsx`, `90_공통기준/스킬/monthly-pnl-rollup/run.py`, `90_공통기준/스킬/monthly-pnl-rollup/builders/sheet_94_support.py`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`
@@ -37,7 +60,7 @@
 - [완료] owner=Codex / 진행상황 Claude 자동입력 규칙 반영 / 잠금 해제: `AGENTS.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / Codex Claude 자동회신 모듈 구축 / 잠금 해제: `90_공통기준/업무관리/codex_claude_channel/auto_reply.py`, `AGENTS.md`, `90_공통기준/업무관리/검토기록/runs/20260526_auto_reply_module/review.md`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 - [완료] owner=Codex / SD9A01 GERP 품번누락 오류리스트 빌더 패치 / 잠금 해제: `05_생산실적/조립비정산/03_정산자동화/populate_err_list_only.py`, `05_생산실적/조립비정산/03_정산자동화/step5_정산계산.py`, `05_생산실적/조립비정산/05월/정산_수식버전_04월.xlsx`, `05_생산실적/조립비정산/05월/_cache`
-- [작업중] owner=Claude / Codex P1 후속 보정 diff 검증 및 사용자 보고 / 잠금 파일: 없음 / Codex 보고: precompact_save TZ/head 보정, hook 6개 README·AGENTS_GUIDE 정합화, generate_agents_guide 파서 수정, daily_doc_check PASS, final_check --full ALL CLEAR / 자동전달: 앱 버전 Claude에는 미적용. `claude --resume -p`는 tenant 정책 차단, Channels 브리지는 Claude Code CLI 전용 후보라 현재 앱 세션에는 붙지 않음 / 다음 액션: 자동전달 PASS 주장 금지, Claude가 로컬 `90_공통기준/업무관리/검토기록/runs/20260525_codex_claude_bridge/request.md`와 git diff를 직접 검증 후 commit 승인 또는 보완 지시
+- [완료] owner=Claude / Codex P1 후속 보정 diff 검증 및 사용자 보고 / 잠금 해제: `90_공통기준/업무관리/검토기록/runs/20260525_codex_claude_bridge/request.md`, `90_공통기준/업무관리/검토기록/runs/20260525_codex_claude_bridge/review.md` / 검증결과(2026-06-11): 후속 보정 diff가 main 반영 확인 — `01dbe432`(precompact복원/PreCompact등록), `fd2df6a6`(precompact operating docs), `3b3056de`(AGENTS_GUIDE drift). 자동전달은 tenant 정책 차단·브리지 미지원으로 기술 불가 결론(추가 추구 불가). 종결
 - [완료] owner=Codex / session-kernel-precompact 운영기준 보정 / 잠금 해제: `.claude/hooks/precompact_save.sh`, `.claude/hooks/README.md`, `90_공통기준/업무관리/AGENTS_GUIDE.md`, `90_공통기준/업무관리/generate_agents_guide.sh`, `90_공통기준/업무관리/TASKS.md`, `90_공통기준/업무관리/HANDOFF.md`, `90_공통기준/업무관리/STATUS.md`
 # 업무리스트 작업 목록
 
